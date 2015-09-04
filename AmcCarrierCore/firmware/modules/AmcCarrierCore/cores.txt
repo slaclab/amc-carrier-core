@@ -1,4 +1,4 @@
 ## By default, using the .DCP file during systhesis to reduce compile time
-# CommonCore/coregen/MigCore.xci
-# CommonCore/coregen/MigBramCore.xci
-# CommonCore/coregen/SysMonCore.xci
+# coregen/MigCore.xci
+# coregen/MigBramCore.xci
+# coregen/SysMonCore.xci
