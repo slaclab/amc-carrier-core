@@ -1,0 +1,6 @@
+vhdl work DddrCore/tb/Ddr3ModelWrapper.vhd  
+verilog work DddrCore/tb/ddr3_model/ddr3.sv  
+verilog work DddrCore/tb/ddr3_model/1024Mb_ddr3_parameters.vh  
+verilog work DddrCore/tb/ddr3_model/2048Mb_ddr3_parameters.vh  
+verilog work DddrCore/tb/ddr3_model/4096Mb_ddr3_parameters.vh  
+verilog work DddrCore/tb/ddr3_model/8192Mb_ddr3_parameters.vh  

@@ -1,0 +1,30 @@
+######################################################
+## AMC Carrier Common Library
+######################################################
+vhdl work CommonCore/rtl/AmcCarrierBsi.vhd
+vhdl work CommonCore/rtl/AmcCarrierClkAndRst.vhd
+vhdl work CommonCore/rtl/AmcCarrierCore.vhd
+vhdl work CommonCore/rtl/AmcCarrierDdrMem.vhd
+vhdl work CommonCore/rtl/AmcCarrierInit.vhd
+vhdl work CommonCore/rtl/AmcCarrierRegMapping.vhd
+vhdl work CommonCore/rtl/AmcCarrierSysMon.vhd
+vhdl work CommonCore/rtl/AmcCarrierTiming.vhd
+vhdl work CommonCore/rtl/AmcCarrierXaui.vhd
+
+vhdl work CommonCore/coregen/MigCore.dcp
+vhdl work CommonCore/coregen/MigBramCore.dcp
+vhdl work CommonCore/coregen/SysMonCore.dcp
+
+vhdl work CommonCore/rtl/ApplicationEmptyCore.vhd
+vhdl work CommonCore/rtl/LclsTimingPkg.vhd
+
+######################################################
+## DdrCore Library
+######################################################
+vhdl work DddrCore/rtl/DdrMemCtrl.vhd
+
+######################################################
+## EthCore Library
+######################################################
+vhdl work EthCore/rtl/RawEthLoopBack.vhd
+
