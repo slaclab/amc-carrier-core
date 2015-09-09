@@ -1,16 +1,14 @@
 vhdl work rtl/AmcCarrierBsi.vhd
+vhdl work rtl/AmcCarrierBsiPkg.vhd
 vhdl work rtl/AmcCarrierClkAndRst.vhd
 vhdl work rtl/AmcCarrierCore.vhd
 vhdl work rtl/AmcCarrierDdrMem.vhd
-vhdl work rtl/AmcCarrierInit.vhd
 vhdl work rtl/AmcCarrierRegMapping.vhd
 vhdl work rtl/AmcCarrierSysMon.vhd
 vhdl work rtl/AmcCarrierTiming.vhd
 vhdl work rtl/AmcCarrierXaui.vhd
-vhdl work rtl/AmcEmptyCore.vhd
+vhdl work rtl/AmcCarrierMps.vhd
+vhdl work rtl/AmcCarrierEmptyApp.vhd
 
 vhdl work coregen/MigCore.dcp
-vhdl work coregen/MigBramCore.dcp
 vhdl work coregen/SysMonCore.dcp
-
-

@@ -66,7 +66,10 @@ entity AmcCarrierDdrMem is
       ddrWeL          : out   sl;
       ddrRasL         : out   sl;
       ddrCasL         : out   sl;
-      ddrRstL         : out   sl);
+      ddrRstL         : out   sl;
+      ddrAlertL         : in    sl;
+      ddrPg             : in    sl;
+      ddrPwrEnL         : out   sl);      
 end AmcCarrierDdrMem;
 
 architecture mapping of AmcCarrierDdrMem is
@@ -160,6 +163,9 @@ architecture mapping of AmcCarrierDdrMem is
    attribute KEEP_HIERARCHY of BUFG_Inst   : label is "TRUE";
    
 begin
+
+   -- DDR is always powered
+   ddrPwrEnL <= '0';
 
    axiClk <= ddrClk;
    axiRst <= ddrRst;

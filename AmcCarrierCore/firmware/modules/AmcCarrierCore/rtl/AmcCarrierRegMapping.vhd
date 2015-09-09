@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-08-04
+-- Last update: 2015-09-04
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -19,8 +19,10 @@ use ieee.std_logic_1164.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
+use work.SsiPkg.all;
 use work.AxiLitePkg.all;
 use work.I2cPkg.all;
+use work.AmcCarrierBsiPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -31,62 +33,79 @@ entity AmcCarrierRegMapping is
       FSBL_G : boolean := false);
    port (
       -- Primary AXI-Lite Interface
-      axiClk               : in    sl;
-      axiRst               : in    sl;
-      sAxiReadMaster       : in    AxiLiteReadMasterArray(1 downto 0);
-      sAxiReadSlave        : out   AxiLiteReadSlaveArray(1 downto 0);
-      sAxiWriteMaster      : in    AxiLiteWriteMasterArray(1 downto 0);
-      sAxiWriteSlave       : out   AxiLiteWriteSlaveArray(1 downto 0);
+      axilClk           : in    sl;
+      axilRst           : in    sl;
+      sAxilReadMaster   : in    AxiLiteReadMasterType;
+      sAxilReadSlave    : out   AxiLiteReadSlaveType;
+      sAxilWriteMaster  : in    AxiLiteWriteMasterType;
+      sAxilWriteSlave   : out   AxiLiteWriteSlaveType;
       -- Timing AXI-Lite Interface
-      timingAxiReadMaster  : out   AxiLiteReadMasterType;
-      timingAxiReadSlave   : in    AxiLiteReadSlaveType;
-      timingAxiWriteMaster : out   AxiLiteWriteMasterType;
-      timingAxiWriteSlave  : in    AxiLiteWriteSlaveType;
-      -- XAUI AXI-Lite Interface
-      xauiAxiReadMaster    : out   AxiLiteReadMasterType;
-      xauiAxiReadSlave     : in    AxiLiteReadSlaveType;
-      xauiAxiWriteMaster   : out   AxiLiteWriteMasterType;
-      xauiAxiWriteSlave    : in    AxiLiteWriteSlaveType;
-      -- DDR AXI-Lite Interface
-      ddrAxiReadMaster     : out   AxiLiteReadMasterType;
-      ddrAxiReadSlave      : in    AxiLiteReadSlaveType;
-      ddrAxiWriteMaster    : out   AxiLiteWriteMasterType;
-      ddrAxiWriteSlave     : in    AxiLiteWriteSlaveType;
-      -- AXI-Lite Interface (regClk domain)
-      regClk               : in    sl;
-      regRst               : in    sl;
-      regAxiReadMaster     : out   AxiLiteReadMasterType;
-      regAxiReadSlave      : in    AxiLiteReadSlaveType;
-      regAxiWriteMaster    : out   AxiLiteWriteMasterType;
-      regAxiWriteSlave     : in    AxiLiteWriteSlaveType;
-      -- Boot Prom AXI Streaming Interface (Optional)
-      obPromMaster         : out   AxiStreamMasterType;
-      obPromSlave          : in    AxiStreamSlaveType;
-      ibPromMaster         : in    AxiStreamMasterType;
-      ibPromSlave          : out   AxiStreamSlaveType;
+      timingReadMaster  : out   AxiLiteReadMasterType;
+      timingReadSlave   : in    AxiLiteReadSlaveType;
+      timingWriteMaster : out   AxiLiteWriteMasterType;
+      timingWriteSlave  : in    AxiLiteWriteSlaveType;
+      -- XAUI PHY AXI-Lite Interface
+      xauiReadMaster    : out   AxiLiteReadMasterType;
+      xauiReadSlave     : in    AxiLiteReadSlaveType;
+      xauiWriteMaster   : out   AxiLiteWriteMasterType;
+      xauiWriteSlave    : in    AxiLiteWriteSlaveType;
+      -- DDR PHY AXI-Lite Interface
+      ddrReadMaster     : out   AxiLiteReadMasterType;
+      ddrReadSlave      : in    AxiLiteReadSlaveType;
+      ddrWriteMaster    : out   AxiLiteWriteMasterType;
+      ddrWriteSlave     : in    AxiLiteWriteSlaveType;
+      ddrMemReady       : in    sl;
+      ddrMemError       : in    sl;
+      -- MPS PHY AXI-Lite Interface
+      mpsReadMaster    : out   AxiLiteReadMasterType;
+      mpsReadSlave     : in    AxiLiteReadSlaveType;
+      mpsWriteMaster   : out   AxiLiteWriteMasterType;
+      mpsWriteSlave    : in    AxiLiteWriteSlaveType;      
+      -- Boot Prom AXI Streaming Interface
+      obPromMaster      : out   AxiStreamMasterType;
+      obPromSlave       : in    AxiStreamSlaveType;
+      ibPromMaster      : in    AxiStreamMasterType;
+      ibPromSlave       : out   AxiStreamSlaveType;
+      -- Local Configuration
+      localMac         : out   slv(47 downto 0);
+      localIp          : out   slv(31 downto 0);
+      ----------------------
+      -- Top Level Interface
+      ----------------------           
+      -- AXI-Lite Interface
+      regClk            : in    sl;
+      regRst            : in    sl;
+      regReadMaster     : out   AxiLiteReadMasterType;
+      regReadSlave      : in    AxiLiteReadSlaveType;
+      regWriteMaster    : out   AxiLiteWriteMasterType;
+      regWriteSlave     : in    AxiLiteWriteSlaveType;
+      -- BSI Interface
+      bsiClk           : in    sl;
+      bsiRst           : in    sl;
+      bsiData          : out   BsiDataType;          
       ----------------
       -- Core Ports --
       ----------------   
       -- Crossbar Ports
-      xBarSin              : out   slv(1 downto 0);
-      xBarSout             : out   slv(1 downto 0);
-      xBarConfig           : out   sl;
-      xBarLoad             : out   sl;
+      xBarSin           : out   slv(1 downto 0);
+      xBarSout          : out   slv(1 downto 0);
+      xBarConfig        : out   sl;
+      xBarLoad          : out   sl;
       -- IPMC Ports
-      ipmcScl              : inout sl;
-      ipmcSda              : inout sl;
+      ipmcScl           : inout sl;
+      ipmcSda           : inout sl;
       -- Configuration PROM Ports
-      calScl               : inout sl;
-      calSda               : inout sl;
+      calScl            : inout sl;
+      calSda            : inout sl;
       -- Clock Cleaner Ports
-      timingClkScl         : inout sl;
-      timingClkSda         : inout sl;
+      timingClkScl      : inout sl;
+      timingClkSda      : inout sl;
       -- DDR3L SO-DIMM Ports
-      ddrScl               : inout sl;
-      ddrSda               : inout sl;
+      ddrScl            : inout sl;
+      ddrSda            : inout sl;
       -- SYSMON Ports
-      vPIn                 : in    sl;
-      vNIn                 : in    sl);         
+      vPIn              : in    sl;
+      vNIn              : in    sl);         
 end AmcCarrierRegMapping;
 
 architecture mapping of AmcCarrierRegMapping is
@@ -95,87 +114,87 @@ architecture mapping of AmcCarrierRegMapping is
 
    constant NUM_AXI_MASTERS_C : natural := 13;
 
-   constant DEVICE_TREE_INDEX_C : natural := 0;
-   constant VERSION_INDEX_C     : natural := 1;
-   constant SYSMON_INDEX_C      : natural := 2;
-   constant BOOT_MEM_INDEX_C    : natural := 3;
-   constant XBAR_INDEX_C        : natural := 4;
-   constant CONFIG_I2C_INDEX_C  : natural := 5;
-   constant CLK_I2C_INDEX_C     : natural := 6;
-   constant DDR_I2C_INDEX_C     : natural := 7;
-   constant IPMC_INDEX_C        : natural := 8;
-   constant TIMING_INDEX_C      : natural := 9;
-   constant XAUI_INDEX_C        : natural := 10;
-   constant DDR_INDEX_C         : natural := 11;
-   constant APP_INDEX_C         : natural := 12;
+   constant VERSION_INDEX_C    : natural := 0;
+   constant SYSMON_INDEX_C     : natural := 1;
+   constant BOOT_MEM_INDEX_C   : natural := 2;
+   constant XBAR_INDEX_C       : natural := 3;
+   constant CONFIG_I2C_INDEX_C : natural := 4;
+   constant CLK_I2C_INDEX_C    : natural := 5;
+   constant DDR_I2C_INDEX_C    : natural := 6;
+   constant IPMC_INDEX_C       : natural := 7;
+   constant TIMING_INDEX_C     : natural := 8;
+   constant XAUI_INDEX_C       : natural := 9;
+   constant DDR_INDEX_C        : natural := 10;
+   constant MPS_INDEX_C        : natural := 11;
+   constant APP_INDEX_C        : natural := 12;
 
-   constant DEVICE_TREE_ADDR_C : slv(31 downto 0) := X"00000000";
-   constant VERSION_ADDR_C     : slv(31 downto 0) := X"01000000";
-   constant SYSMON_ADDR_C      : slv(31 downto 0) := X"02000000";
-   constant BOOT_MEM_ADDR_C    : slv(31 downto 0) := X"03000000";
-   constant XBAR_ADDR_C        : slv(31 downto 0) := X"04000000";
-   constant CONFIG_I2C_ADDR_C  : slv(31 downto 0) := X"05000000";
-   constant CLK_I2C_ADDR_C     : slv(31 downto 0) := X"06000000";
-   constant DDR_I2C_ADDR_C     : slv(31 downto 0) := X"07000000";
-   constant IPMC_ADDR_C        : slv(31 downto 0) := X"08000000";
-   constant TIMING_ADDR_C      : slv(31 downto 0) := X"09000000";
-   constant XAUI_ADDR_C        : slv(31 downto 0) := X"0A000000";
-   constant DDR_ADDR_C         : slv(31 downto 0) := X"0B000000";
-   constant APP_ADDR_C         : slv(31 downto 0) := X"80000000";
+   constant VERSION_ADDR_C    : slv(31 downto 0) := X"00000000";
+   constant SYSMON_ADDR_C     : slv(31 downto 0) := X"01000000";
+   constant BOOT_MEM_ADDR_C   : slv(31 downto 0) := X"02000000";
+   constant XBAR_ADDR_C       : slv(31 downto 0) := X"03000000";
+   constant CONFIG_I2C_ADDR_C : slv(31 downto 0) := X"04000000";
+   constant CLK_I2C_ADDR_C    : slv(31 downto 0) := X"05000000";
+   constant DDR_I2C_ADDR_C    : slv(31 downto 0) := X"06000000";
+   constant IPMC_ADDR_C       : slv(31 downto 0) := X"07000000";
+   constant TIMING_ADDR_C     : slv(31 downto 0) := X"08000000";
+   constant XAUI_ADDR_C       : slv(31 downto 0) := X"09000000";
+   constant DDR_ADDR_C        : slv(31 downto 0) := X"0A000000";
+   constant MPS_ADDR_C        : slv(31 downto 0) := X"0B000000";
+   constant APP_ADDR_C        : slv(31 downto 0) := X"80000000";
    
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      DEVICE_TREE_INDEX_C => (
-         baseAddr         => DEVICE_TREE_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0001"),
-      VERSION_INDEX_C     => (
-         baseAddr         => VERSION_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0001"),
-      SYSMON_INDEX_C      => (
-         baseAddr         => SYSMON_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0001"),
-      BOOT_MEM_INDEX_C    => (
-         baseAddr         => BOOT_MEM_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0001"),
-      XBAR_INDEX_C        => (
-         baseAddr         => XBAR_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0001"),
-      CONFIG_I2C_INDEX_C  => (
-         baseAddr         => CONFIG_I2C_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0003"),
-      CLK_I2C_INDEX_C     => (
-         baseAddr         => CLK_I2C_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0001"),
-      DDR_I2C_INDEX_C     => (
-         baseAddr         => DDR_I2C_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0001"),
-      IPMC_INDEX_C        => (
-         baseAddr         => IPMC_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0001"),
-      XAUI_INDEX_C        => (
-         baseAddr         => XAUI_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0002"),
-      TIMING_INDEX_C      => (
-         baseAddr         => TIMING_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0002"),
-      DDR_INDEX_C         => (
-         baseAddr         => DDR_ADDR_C,
-         addrBits         => 24,
-         connectivity     => X"0002"),
-      APP_INDEX_C         => (
-         baseAddr         => APP_ADDR_C,
-         addrBits         => 32,
-         connectivity     => X"0001"));   
+      VERSION_INDEX_C    => (
+         baseAddr        => VERSION_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      SYSMON_INDEX_C     => (
+         baseAddr        => SYSMON_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      BOOT_MEM_INDEX_C   => (
+         baseAddr        => BOOT_MEM_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      XBAR_INDEX_C       => (
+         baseAddr        => XBAR_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      CONFIG_I2C_INDEX_C => (
+         baseAddr        => CONFIG_I2C_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      CLK_I2C_INDEX_C    => (
+         baseAddr        => CLK_I2C_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      DDR_I2C_INDEX_C    => (
+         baseAddr        => DDR_I2C_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      IPMC_INDEX_C       => (
+         baseAddr        => IPMC_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      XAUI_INDEX_C       => (
+         baseAddr        => XAUI_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      TIMING_INDEX_C     => (
+         baseAddr        => TIMING_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      DDR_INDEX_C        => (
+         baseAddr        => DDR_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),
+      MPS_INDEX_C        => (
+         baseAddr        => MPS_ADDR_C,
+         addrBits        => 24,
+         connectivity    => X"0001"),         
+      APP_INDEX_C        => (
+         baseAddr        => APP_ADDR_C,
+         addrBits        => 32,
+         connectivity    => X"0001"));   
 
    constant CONFIG_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
       0             => (
@@ -213,10 +232,10 @@ architecture mapping of AmcCarrierRegMapping is
          addrSize   => 8,               -- in units of bits
          endianness => '1'));           -- Big endian           
 
-   signal mAxiWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxiWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxiReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxiReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal mAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
    signal bootCsL  : sl;
    signal bootSck  : sl;
@@ -231,36 +250,20 @@ begin
    AxiLiteCrossbar_Inst : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         NUM_SLAVE_SLOTS_G  => 2,
+         NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
       port map (
-         axiClk           => axiClk,
-         axiClkRst        => axiRst,
-         sAxiWriteMasters => sAxiWriteMaster,
-         sAxiWriteSlaves  => sAxiWriteSlave,
-         sAxiReadMasters  => sAxiReadMaster,
-         sAxiReadSlaves   => sAxiReadSlave,
-         mAxiWriteMasters => mAxiWriteMasters,
-         mAxiWriteSlaves  => mAxiWriteSlaves,
-         mAxiReadMasters  => mAxiReadMasters,
-         mAxiReadSlaves   => mAxiReadSlaves);
-
-   -----------------------------------           
-   -- AXI-Lite: Device Tree ROM Module
-   -----------------------------------           
-   AxiDeviceTree_Inst : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(DEVICE_TREE_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(DEVICE_TREE_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(DEVICE_TREE_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(DEVICE_TREE_INDEX_C),
-         -- Clocks and Resets
-         axiClk         => axiClk,
-         axiClkRst      => axiRst);         
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => sAxilWriteMaster,
+         sAxiWriteSlaves(0)  => sAxilWriteSlave,
+         sAxiReadMasters(0)  => sAxilReadMaster,
+         sAxiReadSlaves(0)   => sAxilReadSlave,
+         mAxiWriteMasters    => mAxilWriteMasters,
+         mAxiWriteSlaves     => mAxilWriteSlaves,
+         mAxiReadMasters     => mAxilReadMasters,
+         mAxiReadSlaves      => mAxilReadSlaves);      
 
    --------------------------
    -- AXI-Lite Version Module
@@ -273,13 +276,13 @@ begin
          EN_ICAP_G       => true)
       port map (
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(VERSION_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(VERSION_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(VERSION_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(VERSION_INDEX_C),
+         axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
+         axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
+         axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),
+         axiWriteSlave  => mAxilWriteSlaves(VERSION_INDEX_C),
          -- Clocks and Resets
-         axiClk         => axiClk,
-         axiRst         => axiRst);  
+         axiClk         => axilClk,
+         axiRst         => axilRst);  
 
    --------------------------
    -- AXI-Lite: SYSMON Module
@@ -289,24 +292,26 @@ begin
          TPD_G => TPD_G)
       port map (
          -- SYSMON Ports
-         vPIn           => vPIn,
-         vNIn           => vNIn,
+         vPIn            => vPIn,
+         vNIn            => vNIn,
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(SYSMON_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(SYSMON_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(SYSMON_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(SYSMON_INDEX_C),
+         axilReadMaster  => mAxilReadMasters(SYSMON_INDEX_C),
+         axilReadSlave   => mAxilReadSlaves(SYSMON_INDEX_C),
+         axilWriteMaster => mAxilWriteMasters(SYSMON_INDEX_C),
+         axilWriteSlave  => mAxilWriteSlaves(SYSMON_INDEX_C),
          -- Clocks and Resets
-         axiClk         => axiClk,
-         axiRst         => axiRst);  
+         axilClk         => axilClk,
+         axilRst         => axilRst);  
 
    ------------------------------
    -- AXI-Lite: Boot Flash Module
    ------------------------------
    AxiMicronN25QCore_Inst : entity work.AxiMicronN25QCore
       generic map (
-         TPD_G          => TPD_G,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)  -- units of Hz
+         TPD_G           => TPD_G,
+         MEM_ADDR_MASK_G => x"00000000",-- Using hardware write protection
+         AXI_CONFIG_G    => ssiAxiStreamConfig(16),
+         AXI_CLK_FREQ_G  => AXI_CLK_FREQ_C)  -- units of Hz
       port map (
          -- FLASH Memory Ports
          csL            => bootCsL,
@@ -314,18 +319,18 @@ begin
          mosi           => bootMosi,
          miso           => bootMiso,
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(BOOT_MEM_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(BOOT_MEM_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(BOOT_MEM_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(BOOT_MEM_INDEX_C),
-         -- AXI Streaming Interface (Optional)
+         axiReadMaster  => mAxilReadMasters(BOOT_MEM_INDEX_C),
+         axiReadSlave   => mAxilReadSlaves(BOOT_MEM_INDEX_C),
+         axiWriteMaster => mAxilWriteMasters(BOOT_MEM_INDEX_C),
+         axiWriteSlave  => mAxilWriteSlaves(BOOT_MEM_INDEX_C),
+         -- AXI Streaming Interface
          mAxisMaster    => obPromMaster,
          mAxisSlave     => obPromSlave,
          sAxisMaster    => ibPromMaster,
          sAxisSlave     => ibPromSlave,
          -- Clocks and Resets
-         axiClk         => axiClk,
-         axiRst         => axiRst);
+         axiClk         => axilClk,
+         axiRst         => axilRst);
 
    STARTUPE3_Inst : STARTUPE3
       generic map (
@@ -373,13 +378,13 @@ begin
          xBarConfig     => xBarConfig,
          xBarLoad       => xBarLoad,
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(XBAR_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(XBAR_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(XBAR_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(XBAR_INDEX_C),
+         axiReadMaster  => mAxilReadMasters(XBAR_INDEX_C),
+         axiReadSlave   => mAxilReadSlaves(XBAR_INDEX_C),
+         axiWriteMaster => mAxilWriteMasters(XBAR_INDEX_C),
+         axiWriteSlave  => mAxilWriteSlaves(XBAR_INDEX_C),
          -- Clocks and Resets
-         axiClk         => axiClk,
-         axiRst         => axiRst);  
+         axiClk         => axilClk,
+         axiRst         => axilRst);  
 
    ----------------------------------------
    -- AXI-Lite: Configuration Memory Module
@@ -394,13 +399,13 @@ begin
          scl            => calScl,
          sda            => calSda,
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(CONFIG_I2C_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(CONFIG_I2C_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(CONFIG_I2C_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(CONFIG_I2C_INDEX_C),
+         axiReadMaster  => mAxilReadMasters(CONFIG_I2C_INDEX_C),
+         axiReadSlave   => mAxilReadSlaves(CONFIG_I2C_INDEX_C),
+         axiWriteMaster => mAxilWriteMasters(CONFIG_I2C_INDEX_C),
+         axiWriteSlave  => mAxilWriteSlaves(CONFIG_I2C_INDEX_C),
          -- Clocks and Resets
-         axiClk         => axiClk,
-         axiRst         => axiRst); 
+         axiClk         => axilClk,
+         axiRst         => axilRst); 
 
    ---------------------------------
    -- AXI-Lite: Clock Cleaner Module
@@ -415,13 +420,13 @@ begin
          scl            => timingClkScl,
          sda            => timingClkSda,
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(CLK_I2C_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(CLK_I2C_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(CLK_I2C_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(CLK_I2C_INDEX_C),
+         axiReadMaster  => mAxilReadMasters(CLK_I2C_INDEX_C),
+         axiReadSlave   => mAxilReadSlaves(CLK_I2C_INDEX_C),
+         axiWriteMaster => mAxilWriteMasters(CLK_I2C_INDEX_C),
+         axiWriteSlave  => mAxilWriteSlaves(CLK_I2C_INDEX_C),
          -- Clocks and Resets
-         axiClk         => axiClk,
-         axiRst         => axiRst);    
+         axiClk         => axilClk,
+         axiRst         => axilRst);    
 
    -------------------------------
    -- AXI-Lite: DDR Monitor Module
@@ -436,13 +441,13 @@ begin
          scl            => ddrScl,
          sda            => ddrSda,
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(DDR_I2C_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(DDR_I2C_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(DDR_I2C_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(DDR_I2C_INDEX_C),
+         axiReadMaster  => mAxilReadMasters(DDR_I2C_INDEX_C),
+         axiReadSlave   => mAxilReadSlaves(DDR_I2C_INDEX_C),
+         axiWriteMaster => mAxilWriteMasters(DDR_I2C_INDEX_C),
+         axiWriteSlave  => mAxilWriteSlaves(DDR_I2C_INDEX_C),
          -- Clocks and Resets
-         axiClk         => axiClk,
-         axiRst         => axiRst);             
+         axiClk         => axilClk,
+         axiRst         => axilRst);             
 
    -----------------------
    -- AXI-Lite: BSI Module
@@ -451,41 +456,56 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
+         -- Local Configurations
+         localMac         => localMac,
+         localIp          => localIp, 
+         -- Application Interface
+         bsiClk           => bsiClk,
+         bsiRst           => bsiRst,  
+         bsiData          => bsiData,         
          -- I2C Ports
-         scl            => ipmcScl,
-         sda            => ipmcSda,
+         scl             => ipmcScl,
+         sda             => ipmcSda,
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxiReadMasters(IPMC_INDEX_C),
-         axiReadSlave   => mAxiReadSlaves(IPMC_INDEX_C),
-         axiWriteMaster => mAxiWriteMasters(IPMC_INDEX_C),
-         axiWriteSlave  => mAxiWriteSlaves(IPMC_INDEX_C),
+         axilReadMaster  => mAxilReadMasters(IPMC_INDEX_C),
+         axilReadSlave   => mAxilReadSlaves(IPMC_INDEX_C),
+         axilWriteMaster => mAxilWriteMasters(IPMC_INDEX_C),
+         axilWriteSlave  => mAxilWriteSlaves(IPMC_INDEX_C),
          -- Clocks and Resets
-         axiClk         => axiClk,
-         axiRst         => axiRst);    
+         axilClk         => axilClk,
+         axilRst         => axilRst);    
 
    --------------------------------------
    -- Map the AXI-Lite to Timing Firmware
    --------------------------------------
-   timingAxiReadMaster             <= mAxiReadMasters(TIMING_INDEX_C);
-   mAxiReadSlaves(TIMING_INDEX_C)  <= timingAxiReadSlave;
-   timingAxiWriteMaster            <= mAxiWriteMasters(TIMING_INDEX_C);
-   mAxiWriteSlaves(TIMING_INDEX_C) <= timingAxiWriteSlave;
+   timingReadMaster                 <= mAxilReadMasters(TIMING_INDEX_C);
+   mAxilReadSlaves(TIMING_INDEX_C)  <= timingReadSlave;
+   timingWriteMaster                <= mAxilWriteMasters(TIMING_INDEX_C);
+   mAxilWriteSlaves(TIMING_INDEX_C) <= timingWriteSlave;
 
-   ------------------------------------
-   -- Map the AXI-Lite to XAUI Firmware
-   ------------------------------------
-   xauiAxiReadMaster             <= mAxiReadMasters(XAUI_INDEX_C);
-   mAxiReadSlaves(XAUI_INDEX_C)  <= xauiAxiReadSlave;
-   xauiAxiWriteMaster            <= mAxiWriteMasters(XAUI_INDEX_C);
-   mAxiWriteSlaves(XAUI_INDEX_C) <= xauiAxiWriteSlave;
+   ----------------------------------------
+   -- Map the AXI-Lite to XAUI PHY Firmware
+   ----------------------------------------
+   xauiReadMaster                 <= mAxilReadMasters(XAUI_INDEX_C);
+   mAxilReadSlaves(XAUI_INDEX_C)  <= xauiReadSlave;
+   xauiWriteMaster                <= mAxilWriteMasters(XAUI_INDEX_C);
+   mAxilWriteSlaves(XAUI_INDEX_C) <= xauiWriteSlave;
 
-   ------------------------------------------
-   -- Map the AXI-Lite to DDR Memory Firmware
-   ------------------------------------------
-   ddrAxiReadMaster             <= mAxiReadMasters(DDR_INDEX_C);
-   mAxiReadSlaves(DDR_INDEX_C)  <= ddrAxiReadSlave;
-   ddrAxiWriteMaster            <= mAxiWriteMasters(DDR_INDEX_C);
-   mAxiWriteSlaves(DDR_INDEX_C) <= ddrAxiWriteSlave;
+   ---------------------------------------
+   -- Map the AXI-Lite to DDR PHY Firmware
+   ---------------------------------------
+   ddrReadMaster                 <= mAxilReadMasters(DDR_INDEX_C);
+   mAxilReadSlaves(DDR_INDEX_C)  <= ddrReadSlave;
+   ddrWriteMaster                <= mAxilWriteMasters(DDR_INDEX_C);
+   mAxilWriteSlaves(DDR_INDEX_C) <= ddrWriteSlave;
+   
+   ---------------------------------------
+   -- Map the AXI-Lite to MPS PHY Firmware
+   ---------------------------------------
+   mpsReadMaster                 <= mAxilReadMasters(MPS_INDEX_C);
+   mAxilReadSlaves(MPS_INDEX_C)  <= mpsReadSlave;
+   mpsWriteMaster                <= mAxilWriteMasters(MPS_INDEX_C);
+   mAxilWriteSlaves(MPS_INDEX_C) <= mpsWriteSlave;   
 
    -------------------------------------------
    -- Map the AXI-Lite to Application Firmware
@@ -495,18 +515,18 @@ begin
          TPD_G => TPD_G)
       port map (
          -- Slave Port
-         sAxiClk         => axiClk,
-         sAxiClkRst      => axiRst,
-         sAxiReadMaster  => mAxiReadMasters(APP_INDEX_C),
-         sAxiReadSlave   => mAxiReadSlaves(APP_INDEX_C),
-         sAxiWriteMaster => mAxiWriteMasters(APP_INDEX_C),
-         sAxiWriteSlave  => mAxiWriteSlaves(APP_INDEX_C),
+         sAxiClk         => axilClk,
+         sAxiClkRst      => axilRst,
+         sAxiReadMaster  => mAxilReadMasters(APP_INDEX_C),
+         sAxiReadSlave   => mAxilReadSlaves(APP_INDEX_C),
+         sAxiWriteMaster => mAxilWriteMasters(APP_INDEX_C),
+         sAxiWriteSlave  => mAxilWriteSlaves(APP_INDEX_C),
          -- Master Port
          mAxiClk         => regClk,
          mAxiClkRst      => regRst,
-         mAxiReadMaster  => regAxiReadMaster,
-         mAxiReadSlave   => regAxiReadSlave,
-         mAxiWriteMaster => regAxiWriteMaster,
-         mAxiWriteSlave  => regAxiWriteSlave);     
+         mAxiReadMaster  => regReadMaster,
+         mAxiReadSlave   => regReadSlave,
+         mAxiWriteMaster => regWriteMaster,
+         mAxiWriteSlave  => regWriteSlave);     
 
 end mapping;

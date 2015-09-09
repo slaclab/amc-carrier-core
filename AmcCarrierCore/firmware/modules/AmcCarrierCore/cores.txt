@@ -1,4 +1,5 @@
+coregen/GthUltraScaleDummy.xci
+
 ## By default, using the .DCP file during systhesis to reduce compile time
 # coregen/MigCore.xci
-# coregen/MigBramCore.xci
 # coregen/SysMonCore.xci

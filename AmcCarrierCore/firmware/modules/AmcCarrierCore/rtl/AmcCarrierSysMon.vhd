@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-09
--- Last update: 2015-07-10
+-- Last update: 2015-09-04
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -25,16 +25,16 @@ entity AmcCarrierSysMon is
       TPD_G : time := 1 ns);
    port (
       -- SYSMON Ports
-      vPIn             : in  sl;
-      vNIn             : in  sl;
+      vPIn            : in  sl;
+      vNIn            : in  sl;
       -- AXI-Lite Register Interface
-      axiReadMaster  : in  AxiLiteReadMasterType;
-      axiReadSlave   : out AxiLiteReadSlaveType;
-      axiWriteMaster : in  AxiLiteWriteMasterType;
-      axiWriteSlave  : out AxiLiteWriteSlaveType;
+      axilReadMaster  : in  AxiLiteReadMasterType;
+      axilReadSlave   : out AxiLiteReadSlaveType;
+      axilWriteMaster : in  AxiLiteWriteMasterType;
+      axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- Clocks and Resets
-      axiClk         : in  sl;
-      axiRst         : in  sl);
+      axilClk         : in  sl;
+      axilRst         : in  sl);
 end entity AmcCarrierSysMon;
 
 architecture mapping of AmcCarrierSysMon is
@@ -70,33 +70,33 @@ architecture mapping of AmcCarrierSysMon is
          busy_out      : out std_logic);
    end component;
 
-   signal axiRstL : sl;
+   signal axilRstL : sl;
 
 begin
 
-   axiRstL <= not axiRst;
+   axilRstL <= not axilRst;
 
    SysMonCore_Inst : SysMonCore
       port map (
-         s_axi_aclk    => axiClk,
-         s_axi_aresetn => axiRstL,
-         s_axi_awaddr  => axiWriteMaster.awaddr(12 downto 0),
-         s_axi_awvalid => axiWriteMaster.awvalid,
-         s_axi_awready => axiWriteSlave.awready,
-         s_axi_wdata   => axiWriteMaster.wdata,
-         s_axi_wstrb   => axiWriteMaster.wstrb,
-         s_axi_wvalid  => axiWriteMaster.wvalid,
-         s_axi_wready  => axiWriteSlave.wready,
-         s_axi_bresp   => axiWriteSlave.bresp,
-         s_axi_bvalid  => axiWriteSlave.bvalid,
-         s_axi_bready  => axiWriteMaster.bready,
-         s_axi_araddr  => axiReadMaster.araddr(12 downto 0),
-         s_axi_arvalid => axiReadMaster.arvalid,
-         s_axi_arready => axiReadSlave.arready,
-         s_axi_rdata   => axiReadSlave.rdata,
-         s_axi_rresp   => axiReadSlave.rresp,
-         s_axi_rvalid  => axiReadSlave.rvalid,
-         s_axi_rready  => axiReadMaster.rready,
+         s_axi_aclk    => axilClk,
+         s_axi_aresetn => axilRstL,
+         s_axi_awaddr  => axilWriteMaster.awaddr(12 downto 0),
+         s_axi_awvalid => axilWriteMaster.awvalid,
+         s_axi_awready => axilWriteSlave.awready,
+         s_axi_wdata   => axilWriteMaster.wdata,
+         s_axi_wstrb   => axilWriteMaster.wstrb,
+         s_axi_wvalid  => axilWriteMaster.wvalid,
+         s_axi_wready  => axilWriteSlave.wready,
+         s_axi_bresp   => axilWriteSlave.bresp,
+         s_axi_bvalid  => axilWriteSlave.bvalid,
+         s_axi_bready  => axilWriteMaster.bready,
+         s_axi_araddr  => axilReadMaster.araddr(12 downto 0),
+         s_axi_arvalid => axilReadMaster.arvalid,
+         s_axi_arready => axilReadSlave.arready,
+         s_axi_rdata   => axilReadSlave.rdata,
+         s_axi_rresp   => axilReadSlave.rresp,
+         s_axi_rvalid  => axilReadSlave.rvalid,
+         s_axi_rready  => axilReadMaster.rready,
          ip2intc_irpt  => open,
          vp            => vPIn,
          vn            => vNIn,

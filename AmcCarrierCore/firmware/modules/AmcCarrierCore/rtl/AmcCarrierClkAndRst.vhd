@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-08-04
+-- Last update: 2015-09-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -25,37 +25,39 @@ use unisim.vcomponents.all;
 entity AmcCarrierClkAndRst is
    generic (
       TPD_G         : time    := 1 ns;
+      MPS_SLOT_G    : boolean := false;
       SIM_SPEEDUP_G : boolean := false);
    port (
-      axiClk       : out sl;
-      axiRst       : out sl;
-      ref100MHzClk : out sl;
-      ref100MHzRst : out sl;
-      ref125MHzClk : out sl;
-      ref125MHzRst : out sl;
+      -- Reference Clocks and Resets
       ref156MHzClk : out sl;
       ref156MHzRst : out sl;
-      ref200MHzClk : out sl;
-      ref200MHzRst : out sl;
-      ref250MHzClk : out sl;
-      ref250MHzRst : out sl;
+      -- AXI-Lite Clocks and Resets
+      axilClk      : out sl;
+      axilRst      : out sl;
+      -- MPS Clocks and Resets
+      mps125MHzClk : out sl;
+      mps125MHzRst : out sl;
+      mps312MHzClk : out sl;
+      mps312MHzRst : out sl;
+      mps625MHzClk : out sl;
+      mps625MHzRst : out sl;
       ----------------
       -- Core Ports --
       ----------------   
       -- Common Fabricate Clock
       fabClkP      : in  sl;
-      fabClkN      : in  sl);    
+      fabClkN      : in  sl;
+      -- Backplane MPS Ports
+      mpsClkIn     : in  slv(5 downto 0);
+      mpsClkOut    : out slv(5 downto 0));         
 end AmcCarrierClkAndRst;
 
 architecture mapping of AmcCarrierClkAndRst is
 
-   signal gtClk : sl;
-
+   signal gtClk  : sl;
    signal fabClk : sl;
    signal fabRst : sl;
-
-   signal axiClock : sl;
-   signal axiReset : sl;
+   signal refClk : sl;
 
 begin
 
@@ -89,46 +91,92 @@ begin
          clk    => fabClk,
          rstOut => fabRst); 
 
-   U_ClkManager : entity work.ClockManagerUltraScale
-      generic map(
-         TPD_G              => TPD_G,
-         TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => false,
-         FB_BUFG_G          => false,
-         RST_IN_POLARITY_G  => '1',
-         NUM_CLOCKS_G       => 5,
-         -- MMCM attributes
-         BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 6.4,     -- 1 GHz = 6.4 x 156.25 MHz
-         CLKOUT0_DIVIDE_F_G => 6.4,     -- 156.25 MHz = 1 GHz/6.4
-         CLKOUT1_DIVIDE_G   => 10,      -- 100 MHz = 1 GHz/10
-         CLKOUT2_DIVIDE_G   => 8,       -- 125 MHz = 1 GHz/8
-         CLKOUT3_DIVIDE_G   => 5,       -- 200 MHz = 1 GHz/5
-         CLKOUT4_DIVIDE_G   => 4)       -- 250 MHz = 1 GHz/4
-      port map(
-         -- Clock Input
-         clkIn     => fabClk,
-         rstIn     => fabRst,
-         -- Clock Outputs
-         clkOut(0) => axiClock,
-         clkOut(1) => ref100MHzClk,
-         clkOut(2) => ref125MHzClk,
-         clkOut(3) => ref200MHzClk,
-         clkOut(4) => ref250MHzClk,
-         -- Reset Outputs
-         rstOut(0) => axiReset,
-         rstOut(1) => ref100MHzRst,
-         rstOut(2) => ref125MHzRst,
-         rstOut(3) => ref200MHzRst,
-         rstOut(4) => ref250MHzRst);
+   ref156MHzClk <= fabClk;
+   ref156MHzRst <= fabRst;
 
+   axilClk <= fabClk;
+   axilRst <= fabRst;
 
-   ref156MHzClk <= axiClock;
-   ref156MHzRst <= axiReset;
+   APP_SLOT : if (MPS_SLOT_G = false) generate
+      
+      U_ClkManagerMps : entity work.ClockManagerUltraScale
+         generic map(
+            TPD_G              => TPD_G,
+            TYPE_G             => "MMCM",
+            INPUT_BUFG_G       => true,
+            FB_BUFG_G          => true,
+            RST_IN_POLARITY_G  => '1',
+            NUM_CLOCKS_G       => 3,
+            -- MMCM attributes
+            BANDWIDTH_G        => "OPTIMIZED",
+            CLKIN_PERIOD_G     => 8.0,   -- 125 MHz
+            DIVCLK_DIVIDE_G    => 1,
+            CLKFBOUT_MULT_F_G  => 10.0,  -- 1.25 GHz = 10 x 125 MHz
+            CLKOUT0_DIVIDE_F_G => 2.0,   -- 625 MHz = 1.25 GHz/2.0
+            CLKOUT1_DIVIDE_G   => 4,     -- 312.5 MHz = 1.25 GHz/4
+            CLKOUT2_DIVIDE_G   => 10)    -- 125 MHz = 1.25 GHz/10
+         port map(
+            -- Clock Input
+            clkIn     => mpsClkIn(1),
+            rstIn     => '0',
+            -- Clock Outputs
+            clkOut(0) => mps625MHzClk,
+            clkOut(1) => mps312MHzClk,
+            clkOut(2) => mps125MHzClk,
+            -- Reset Outputs
+            rstOut(0) => mps625MHzRst,
+            rstOut(1) => mps312MHzRst,
+            rstOut(2) => mps125MHzRst);
 
-   axiClk <= axiClock;
-   axiRst <= axiReset;
+      mpsClkOut <= (others => '0');
 
+   end generate;
+
+   MPS_SLOT : if (MPS_SLOT_G = true) generate
+      
+      U_ClkManagerMps : entity work.ClockManagerUltraScale
+         generic map(
+            TPD_G              => TPD_G,
+            TYPE_G             => "MMCM",
+            INPUT_BUFG_G       => false,
+            FB_BUFG_G          => true,
+            RST_IN_POLARITY_G  => '1',
+            NUM_CLOCKS_G       => 3,
+            -- MMCM attributes
+            BANDWIDTH_G        => "OPTIMIZED",
+            CLKIN_PERIOD_G     => 6.4,  -- 156.25 MHz
+            DIVCLK_DIVIDE_G    => 1,
+            CLKFBOUT_MULT_F_G  => 8.0,  -- 1.25 GHz = 8 x 156.25 MHz
+            CLKOUT0_DIVIDE_F_G => 2.0,  -- 625 MHz = 1.25 GHz/2.0
+            CLKOUT1_DIVIDE_G   => 4,    -- 312.5 MHz = 1.25 GHz/4
+            CLKOUT2_DIVIDE_G   => 10)   -- 125 MHz = 1.25 GHz/10
+         port map(
+            -- Clock Input
+            clkIn     => fabClk,
+            rstIn     => fabRst,
+            -- Clock Outputs
+            clkOut(0) => mps625MHzClk,
+            clkOut(1) => mps312MHzClk,
+            clkOut(2) => refClk,
+            -- Reset Outputs
+            rstOut(0) => mps625MHzRst,
+            rstOut(1) => mps312MHzRst,
+            rstOut(2) => mps125MHzRst);
+
+      mps125MHzClk <= refClk;
+
+      GEN_VEC :
+      for i in 5 downto 0 generate
+         U_ClkOutBufSingle : entity work.ClkOutBufSingle
+            generic map(
+               TPD_G        => TPD_G,
+               XIL_DEVICE_G => "ULTRASCALE")
+            port map (
+               outEnL => ite((i = 1), '0', '1'),
+               clkIn  => refClk,
+               clkOut => mpsClkOut(i));      
+      end generate GEN_VEC;
+      
+   end generate;
+   
 end mapping;

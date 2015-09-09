@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2015-08-04
+-- Last update: 2015-09-04
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,6 +22,7 @@ use ieee.std_logic_unsigned.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.i2cPkg.all;
+use work.AmcCarrierBsiPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -30,17 +31,24 @@ entity AmcCarrierBsi is
    generic (
       TPD_G : time := 1 ns);
    port (
+      -- Local Configuration
+      localMac         : out   slv(47 downto 0);
+      localIp          : out   slv(31 downto 0);
+      -- Application Interface
+      bsiClk           : in    sl;
+      bsiRst           : in    sl;
+      bsiData          : out   BsiDataType;        
       -- I2C Ports
-      scl            : inout sl;
-      sda            : inout sl;
+      scl             : inout sl;
+      sda             : inout sl;
       -- AXI-Lite Register Interface
-      axiReadMaster  : in    AxiLiteReadMasterType;
-      axiReadSlave   : out   AxiLiteReadSlaveType;
-      axiWriteMaster : in    AxiLiteWriteMasterType;
-      axiWriteSlave  : out   AxiLiteWriteSlaveType;
+      axilReadMaster  : in    AxiLiteReadMasterType;
+      axilReadSlave   : out   AxiLiteReadSlaveType;
+      axilWriteMaster : in    AxiLiteWriteMasterType;
+      axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -- Clocks and Resets
-      axiClk         : in    sl;
-      axiRst         : in    sl);  
+      axilClk         : in    sl;
+      axilRst         : in    sl);  
 end AmcCarrierBsi;
 
 architecture mapping of AmcCarrierBsi is
@@ -54,6 +62,10 @@ architecture mapping of AmcCarrierBsi is
    signal i2cOut      : i2c_out_type;
 
 begin
+
+   bsiData  <= BSI_DATA_INIT_C;
+   localMac <= BSI_DATA_INIT_C.xauiMacAddress;
+   localIp  <= BSI_DATA_INIT_C.xauiIpAddress;
 
    ------------
    -- I2c Slave
@@ -69,8 +81,8 @@ begin
          DATA_SIZE_G          => 1,     -- in bytes
          ENDIANNESS_G         => 0)     -- 0=LE, 1=BE
       port map (
-         clk    => axiClk,
-         sRst   => axiRst,
+         clk    => axilClk,
+         sRst   => axilRst,
          aRst   => '0',
          addr   => i2cBramAddr,
          wrEn   => i2cBramWr,
@@ -108,7 +120,7 @@ begin
          INIT_G       => "0")
       port map (
          -- Port A     
-         clka  => axiClk,
+         clka  => axilClk,
          ena   => '1',
          wea   => i2cBramWr,
          rsta  => '0',
@@ -116,7 +128,7 @@ begin
          dina  => i2cBramDin,
          douta => bramDout,
          -- Port B
-         clkb  => axiClk,
+         clkb  => axilClk,
          enb   => '1',
          rstb  => '0',
          addrb => (others => '0'),
@@ -128,11 +140,11 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
-         axiClk         => axiClk,
-         axiClkRst      => axiRst,
-         axiReadMaster  => axiReadMaster,
-         axiReadSlave   => axiReadSlave,
-         axiWriteMaster => axiWriteMaster,
-         axiWriteSlave  => axiWriteSlave);   
+         axiClk         => axilClk,
+         axiClkRst      => axilRst,
+         axiReadMaster  => axilReadMaster,
+         axiReadSlave   => axilReadSlave,
+         axiWriteMaster => axilWriteMaster,
+         axiWriteSlave  => axilWriteSlave);   
 
 end mapping;
