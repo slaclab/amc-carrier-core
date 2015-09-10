@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-09
--- Last update: 2015-09-04
+-- Last update: 2015-09-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,7 +22,8 @@ use work.AxiLitePkg.all;
 
 entity AmcCarrierSysMon is
    generic (
-      TPD_G : time := 1 ns);
+      TPD_G            : time            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- SYSMON Ports
       vPIn            : in  sl;

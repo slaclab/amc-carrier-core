@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-04
+-- Last update: 2015-09-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -29,8 +29,9 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierRegMapping is
    generic (
-      TPD_G  : time    := 1 ns;
-      FSBL_G : boolean := false);
+      TPD_G            : time            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      FSBL_G           : boolean         := false);
    port (
       -- Primary AXI-Lite Interface
       axilClk           : in    sl;
@@ -57,18 +58,18 @@ entity AmcCarrierRegMapping is
       ddrMemReady       : in    sl;
       ddrMemError       : in    sl;
       -- MPS PHY AXI-Lite Interface
-      mpsReadMaster    : out   AxiLiteReadMasterType;
-      mpsReadSlave     : in    AxiLiteReadSlaveType;
-      mpsWriteMaster   : out   AxiLiteWriteMasterType;
-      mpsWriteSlave    : in    AxiLiteWriteSlaveType;      
+      mpsReadMaster     : out   AxiLiteReadMasterType;
+      mpsReadSlave      : in    AxiLiteReadSlaveType;
+      mpsWriteMaster    : out   AxiLiteWriteMasterType;
+      mpsWriteSlave     : in    AxiLiteWriteSlaveType;
       -- Boot Prom AXI Streaming Interface
       obPromMaster      : out   AxiStreamMasterType;
       obPromSlave       : in    AxiStreamSlaveType;
       ibPromMaster      : in    AxiStreamMasterType;
       ibPromSlave       : out   AxiStreamSlaveType;
       -- Local Configuration
-      localMac         : out   slv(47 downto 0);
-      localIp          : out   slv(31 downto 0);
+      localMac          : out   slv(47 downto 0);
+      localIp           : out   slv(31 downto 0);
       ----------------------
       -- Top Level Interface
       ----------------------           
@@ -80,9 +81,9 @@ entity AmcCarrierRegMapping is
       regWriteMaster    : out   AxiLiteWriteMasterType;
       regWriteSlave     : in    AxiLiteWriteSlaveType;
       -- BSI Interface
-      bsiClk           : in    sl;
-      bsiRst           : in    sl;
-      bsiData          : out   BsiDataType;          
+      bsiClk            : in    sl;
+      bsiRst            : in    sl;
+      bsiData           : out   BsiDataType;
       ----------------
       -- Core Ports --
       ----------------   
@@ -190,7 +191,7 @@ architecture mapping of AmcCarrierRegMapping is
       MPS_INDEX_C        => (
          baseAddr        => MPS_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),         
+         connectivity    => X"0001"),
       APP_INDEX_C        => (
          baseAddr        => APP_ADDR_C,
          addrBits        => 32,
@@ -250,6 +251,7 @@ begin
    AxiLiteCrossbar_Inst : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
@@ -270,10 +272,11 @@ begin
    --------------------------          
    AxiVersion_Inst : entity work.AxiVersion
       generic map (
-         TPD_G           => TPD_G,
-         XIL_DEVICE_G    => "ULTRASCALE",
-         EN_DEVICE_DNA_G => true,
-         EN_ICAP_G       => true)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         XIL_DEVICE_G     => "ULTRASCALE",
+         EN_DEVICE_DNA_G  => true,
+         EN_ICAP_G        => true)
       port map (
          -- AXI-Lite Register Interface
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
@@ -289,7 +292,8 @@ begin
    --------------------------
    AmcCarrierSysMon_Inst : entity work.AmcCarrierSysMon
       generic map (
-         TPD_G => TPD_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
          -- SYSMON Ports
          vPIn            => vPIn,
@@ -308,10 +312,11 @@ begin
    ------------------------------
    AxiMicronN25QCore_Inst : entity work.AxiMicronN25QCore
       generic map (
-         TPD_G           => TPD_G,
-         MEM_ADDR_MASK_G => x"00000000",-- Using hardware write protection
-         AXI_CONFIG_G    => ssiAxiStreamConfig(16),
-         AXI_CLK_FREQ_G  => AXI_CLK_FREQ_C)  -- units of Hz
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         MEM_ADDR_MASK_G  => x"00000000",     -- Using hardware write protection
+         AXI_CONFIG_G     => ssiAxiStreamConfig(16),
+         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)  -- units of Hz
       port map (
          -- FLASH Memory Ports
          csL            => bootCsL,
@@ -369,8 +374,9 @@ begin
    ----------------------------------
    AxiSy56040Reg_Inst : entity work.AxiSy56040Reg
       generic map (
-         TPD_G          => TPD_G,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C) 
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C) 
       port map (
          -- XBAR Ports 
          xBarSin        => xBarSin,
@@ -391,9 +397,10 @@ begin
    ----------------------------------------
    AxiI2cRegMaster_0 : entity work.AxiI2cRegMaster
       generic map (
-         TPD_G          => TPD_G,
-         DEVICE_MAP_G   => CONFIG_DEVICE_MAP_C,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         DEVICE_MAP_G     => CONFIG_DEVICE_MAP_C,
+         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
          -- I2C Ports
          scl            => calScl,
@@ -412,9 +419,10 @@ begin
    ---------------------------------
    AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
       generic map (
-         TPD_G          => TPD_G,
-         DEVICE_MAP_G   => TIME_DEVICE_MAP_C,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         DEVICE_MAP_G     => TIME_DEVICE_MAP_C,
+         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
          -- I2C Ports
          scl            => timingClkScl,
@@ -433,9 +441,10 @@ begin
    -------------------------------
    AxiI2cRegMaster_2 : entity work.AxiI2cRegMaster
       generic map (
-         TPD_G          => TPD_G,
-         DEVICE_MAP_G   => DDR_DEVICE_MAP_C,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         DEVICE_MAP_G     => DDR_DEVICE_MAP_C,
+         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
          -- I2C Ports
          scl            => ddrScl,
@@ -454,15 +463,16 @@ begin
    -----------------------  
    AmcCarrierBsi_Inst : entity work.AmcCarrierBsi
       generic map (
-         TPD_G => TPD_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
          -- Local Configurations
-         localMac         => localMac,
-         localIp          => localIp, 
+         localMac        => localMac,
+         localIp         => localIp,
          -- Application Interface
-         bsiClk           => bsiClk,
-         bsiRst           => bsiRst,  
-         bsiData          => bsiData,         
+         bsiClk          => bsiClk,
+         bsiRst          => bsiRst,
+         bsiData         => bsiData,
          -- I2C Ports
          scl             => ipmcScl,
          sda             => ipmcSda,
@@ -498,14 +508,14 @@ begin
    mAxilReadSlaves(DDR_INDEX_C)  <= ddrReadSlave;
    ddrWriteMaster                <= mAxilWriteMasters(DDR_INDEX_C);
    mAxilWriteSlaves(DDR_INDEX_C) <= ddrWriteSlave;
-   
+
    ---------------------------------------
    -- Map the AXI-Lite to MPS PHY Firmware
    ---------------------------------------
    mpsReadMaster                 <= mAxilReadMasters(MPS_INDEX_C);
    mAxilReadSlaves(MPS_INDEX_C)  <= mpsReadSlave;
    mpsWriteMaster                <= mAxilWriteMasters(MPS_INDEX_C);
-   mAxilWriteSlaves(MPS_INDEX_C) <= mpsWriteSlave;   
+   mAxilWriteSlaves(MPS_INDEX_C) <= mpsWriteSlave;
 
    -------------------------------------------
    -- Map the AXI-Lite to Application Firmware

@@ -60,19 +60,8 @@ set_property -dict { PACKAGE_PIN AP18 IOSTANDARD LVDS DIFF_TERM_ADV TERM_NONE } 
 set_property -dict { PACKAGE_PIN AP11 IOSTANDARD LVDS_25 } [get_ports {mpsTxP}]
 set_property -dict { PACKAGE_PIN AP10 IOSTANDARD LVDS_25 } [get_ports {mpsTxN}]
 
-set_property -dict { PACKAGE_PIN AF9  IOSTANDARD LVCMOS25 } [get_ports {mpsClkIn[0]}]
-set_property -dict { PACKAGE_PIN AF10 IOSTANDARD LVCMOS25 } [get_ports {mpsClkIn[1]}]
-set_property -dict { PACKAGE_PIN AG11 IOSTANDARD LVCMOS25 } [get_ports {mpsClkIn[2]}]
-set_property -dict { PACKAGE_PIN AG12 IOSTANDARD LVCMOS25 } [get_ports {mpsClkIn[3]}]
-set_property -dict { PACKAGE_PIN AF8  IOSTANDARD LVCMOS25 } [get_ports {mpsClkIn[4]}]
-set_property -dict { PACKAGE_PIN AJ11 IOSTANDARD LVCMOS25 } [get_ports {mpsClkIn[5]}]
-
-set_property -dict { PACKAGE_PIN AG9  IOSTANDARD LVCMOS25 } [get_ports {mpsClkOut[0]}]
-set_property -dict { PACKAGE_PIN AG10 IOSTANDARD LVCMOS25 } [get_ports {mpsClkOut[1]}]
-set_property -dict { PACKAGE_PIN AH11 IOSTANDARD LVCMOS25 } [get_ports {mpsClkOut[2]}]
-set_property -dict { PACKAGE_PIN AH12 IOSTANDARD LVCMOS25 } [get_ports {mpsClkOut[3]}]
-set_property -dict { PACKAGE_PIN AJ10 IOSTANDARD LVCMOS25 } [get_ports {mpsClkOut[4]}]
-set_property -dict { PACKAGE_PIN AE13 IOSTANDARD LVCMOS25 } [get_ports {mpsClkOut[5]}]
+set_property -dict { PACKAGE_PIN AF10 IOSTANDARD LVCMOS25 }           [get_ports {mpsClkIn}]
+set_property -dict { PACKAGE_PIN AG10 IOSTANDARD LVCMOS25 SLEW FAST } [get_ports {mpsClkOut}]
 
 # LCLS Timing Ports
 set_property -dict { PACKAGE_PIN AH13 IOSTANDARD LVDS_25  } [get_ports {timingClkOutP}]
@@ -278,8 +267,6 @@ set_property -dict { PACKAGE_PIN C16 IOSTANDARD SSTL15     OUTPUT_IMPEDANCE RDRV
 set_property -dict { PACKAGE_PIN L19 IOSTANDARD LVCMOS15 } [get_ports {ddrScl}] 
 set_property -dict { PACKAGE_PIN L18 IOSTANDARD LVCMOS15 } [get_ports {ddrSda}] 
 set_property -dict { PACKAGE_PIN K17 IOSTANDARD LVCMOS15 } [get_ports {ddrPwrEnL}] 
-set_property -dict { PACKAGE_PIN K18 IOSTANDARD LVCMOS15 } [get_ports {ddrAlertL}] 
-set_property -dict { PACKAGE_PIN J15 IOSTANDARD LVCMOS15 } [get_ports {ddrPg}] 
 
 #####################################
 ## Core Area/Placement Constraints ##
@@ -295,13 +282,14 @@ set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets {U_Core/U_DdrMem/refClkBuf
 create_clock -name ddrClkIn   -period  5.000  [get_pins {U_Core/U_DdrMem/BUFG_Inst/O}]
 create_clock -name fabClk     -period  6.400  [get_ports {fabClkP}]
 create_clock -name xauiRef    -period  6.400  [get_ports {xauiClkP}]
-create_clock -name mpsClkP    -period  8.000  [get_ports {mpsClkIn[1]}]
-create_clock -name timingRef  -period  2.691 [get_ports {timingClkInP}]
+create_clock -name mpsClkP    -period  8.000  [get_ports {mpsClkIn}]
+create_clock -name timingRef  -period  2.691  [get_ports {timingClkInP}]
 
 create_generated_clock -name mpsClk625MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/*/MmcmGen.U_Mmcm/CLKOUT0}] 
 create_generated_clock -name mpsClk312MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/*/MmcmGen.U_Mmcm/CLKOUT1}] 
 create_generated_clock -name mpsClk125MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/*/MmcmGen.U_Mmcm/CLKOUT2}] 
-
+create_generated_clock -name iprogClk     [get_pins {U_Core/U_RegMap/AxiVersion_Inst/GEN_ICAP.Iprog_1/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O}]
+create_generated_clock -name dnaClk       [get_pins {U_Core/U_RegMap/AxiVersion_Inst/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 create_generated_clock -name xauiPhyClk   [get_pins {U_Core/U_Xaui/XauiGthUltraScaleWrapper_Inst/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore/U0/XauiGthUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gthe3_top.XauiGthUltraScale156p25MHz10GigECore_gt_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
 create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_mem_intfc/u_mig_ddr3_phy/inst/u_ddr3_infrastructure/mmcme3_adv_inst/CLKOUT0}]
 create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_mem_intfc/u_mig_ddr3_phy/inst/u_ddr3_infrastructure/u_bufg_riuClk/O}]
@@ -311,15 +299,18 @@ set_multicycle_path -end -hold 7 -from [get_pins -hier -filter {NAME =~ */u_ddr_
 set_false_path -hold -to [get_pins -hier -filter {NAME =~ *.u_xiphy_control/xiphy_control/RIU_ADDR*}]
 set_false_path -hold -to [get_pins -hier -filter {NAME =~ *.u_xiphy_control/xiphy_control/RIU_WR_DATA*}]
 
-set_false_path -to [get_pins -hier -filter {name =~ U_Core/U_AmcCarrierMps/U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST }]
-set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AmcCarrierMps/*/SALT_IDELAY_CTRL_Inst*}]
-set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AmcCarrierMps/*/serdes_1_to_10_ser8_i/idelay_cal}]
-set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AmcCarrierMps/*/serdes_1_to_10_ser8_i/idelay_m}]
-set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AmcCarrierMps/*/serdes_1_to_10_ser8_i/idelay_s}]
+set_false_path -to [get_pins -hier -filter {name =~ U_Core/U_Mps/U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST }]
+set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/SALT_IDELAY_CTRL_Inst*}]
+set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_cal}]
+set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_m}]
+set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_s}]
 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {xauiPhyClk}] 
+set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrClkIn}] 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrIntClk0}] 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrIntClk1}] 
+set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {iprogClk}] 
+set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {dnaClk}] 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {mpsClk125MHz}] 
 
 ##########################

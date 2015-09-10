@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-08
+-- Last update: 2015-09-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -90,8 +90,8 @@ entity AmcCarrierCore is
       xauiClkP          : in    sl;
       xauiClkN          : in    sl;
       -- Backplane MPS Ports
-      mpsClkIn          : in    slv(5 downto 0);
-      mpsClkOut         : out   slv(5 downto 0);
+      mpsClkIn          : in    sl;
+      mpsClkOut         : out   sl;
       mpsBusRxP         : in    slv(14 downto 1);
       mpsBusRxN         : in    slv(14 downto 1);
       mpsBusTxP         : out   slv(14 downto 1);
@@ -152,6 +152,8 @@ entity AmcCarrierCore is
 end AmcCarrierCore;
 
 architecture mapping of AmcCarrierCore is
+
+   constant AXI_ERROR_RESP_C : slv(1 downto 0) := AXI_RESP_DECERR_C;
 
    signal mps125MHzClk : sl;
    signal mps125MHzRst : sl;
@@ -252,7 +254,8 @@ begin
    ------------------------------------
    U_Xaui : entity work.AmcCarrierXaui
       generic map (
-         TPD_G => TPD_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- Local Configuration
          localMac         => localMac,
@@ -295,8 +298,9 @@ begin
    ----------------------------------   
    U_RegMap : entity work.AmcCarrierRegMapping
       generic map (
-         TPD_G  => TPD_G,
-         FSBL_G => FSBL_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
+         FSBL_G           => FSBL_G)
       port map (
          -- Primary AXI-Lite Interface
          axilClk           => axilClk,
@@ -379,6 +383,7 @@ begin
    U_Timing : entity work.AmcCarrierTiming
       generic map (
          TPD_G               => TPD_G,
+         AXI_ERROR_RESP_G    => AXI_ERROR_RESP_C,
          STANDALONE_TIMING_G => STANDALONE_TIMING_G,
          DIAGNOSTIC_SIZE_G   => DIAGNOSTIC_SIZE_G,
          DIAGNOSTIC_CONFIG_G => DIAGNOSTIC_CONFIG_G)
@@ -436,9 +441,10 @@ begin
    ------------------
    U_DdrMem : entity work.AmcCarrierDdrMem
       generic map (
-         TPD_G         => TPD_G,
-         FSBL_G        => FSBL_G,
-         SIM_SPEEDUP_G => SIM_SPEEDUP_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
+         FSBL_G           => FSBL_G,
+         SIM_SPEEDUP_G    => SIM_SPEEDUP_G)
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,
@@ -477,18 +483,19 @@ begin
          ddrRasL         => ddrRasL,
          ddrCasL         => ddrCasL,
          ddrRstL         => ddrRstL,
-         ddrAlertL       => ddrAlertL,
+         ddrPwrEnL       => ddrPwrEnL,
          ddrPg           => ddrPg,
-         ddrPwrEnL       => ddrPwrEnL);
+         ddrAlertL       => ddrAlertL);
 
    -----------
    -- MPS Core
    -----------
-   U_AmcCarrierMps : entity work.AmcCarrierMps
+   U_Mps : entity work.AmcCarrierMps
       generic map (
-         TPD_G        => TPD_G,
-         MPS_SLOT_G   => MPS_SLOT_G,
-         MPS_CONFIG_G => MPS_CONFIG_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
+         MPS_SLOT_G       => MPS_SLOT_G,
+         MPS_CONFIG_G     => MPS_CONFIG_G)
       port map (
          -- MPS Clocks and Resets
          mps125MHzClk    => mps125MHzClk,

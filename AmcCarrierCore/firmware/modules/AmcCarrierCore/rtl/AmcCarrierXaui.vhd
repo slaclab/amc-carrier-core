@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-08
+-- Last update: 2015-09-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -26,7 +26,8 @@ use work.IpV4EnginePkg.all;
 
 entity AmcCarrierXaui is
    generic (
-      TPD_G : time := 1 ns);
+      TPD_G            : time            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration
       localMac         : in  slv(47 downto 0);  --  big-Endian configuration

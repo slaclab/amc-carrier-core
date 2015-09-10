@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-04
+-- Last update: 2015-09-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -26,9 +26,10 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierDdrMem is
    generic (
-      TPD_G         : time    := 1 ns;
-      FSBL_G        : boolean := false;
-      SIM_SPEEDUP_G : boolean := false);
+      TPD_G            : time            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      FSBL_G           : boolean         := false;
+      SIM_SPEEDUP_G    : boolean         := false);
    port (
       -- AXI-Lite Interface
       axilClk         : in    sl;
@@ -67,9 +68,9 @@ entity AmcCarrierDdrMem is
       ddrRasL         : out   sl;
       ddrCasL         : out   sl;
       ddrRstL         : out   sl;
-      ddrAlertL         : in    sl;
-      ddrPg             : in    sl;
-      ddrPwrEnL         : out   sl);      
+      ddrAlertL       : in    sl;
+      ddrPg           : in    sl;
+      ddrPwrEnL       : out   sl);      
 end AmcCarrierDdrMem;
 
 architecture mapping of AmcCarrierDdrMem is
@@ -151,8 +152,11 @@ architecture mapping of AmcCarrierDdrMem is
 
    signal ddrClk     : sl;
    signal ddrRst     : sl;
+   signal reset      : sl;
+   signal sysRst     : sl;
    signal axiRstL    : sl;
    signal ddrCalDone : sl;
+   signal done       : sl;
    signal refClock   : sl;
    signal refClkBufg : sl;
    signal awlock     : sl;
@@ -161,14 +165,32 @@ architecture mapping of AmcCarrierDdrMem is
    attribute KEEP_HIERARCHY                : string;
    attribute KEEP_HIERARCHY of IBUFDS_Inst : label is "TRUE";
    attribute KEEP_HIERARCHY of BUFG_Inst   : label is "TRUE";
+
+   type RegType is record
+      ddrPwrEn       : sl;
+      ddrReset       : sl;
+      memReady       : sl;
+      memError       : sl;
+      axilReadSlave  : AxiLiteReadSlaveType;
+      axilWriteSlave : AxiLiteWriteSlaveType;
+   end record;
+
+   constant REG_INIT_C : RegType := (
+      ddrPwrEn       => '1',
+      ddrReset       => '0',
+      memReady       => '0',
+      memError       => '0',
+      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
+
+   signal r   : RegType := REG_INIT_C;
+   signal rin : RegType;
    
 begin
 
-   -- DDR is always powered
-   ddrPwrEnL <= '0';
-
-   axiClk <= ddrClk;
-   axiRst <= ddrRst;
+   axiClk    <= ddrClk;
+   axiRst    <= ddrRst;
+   ddrPwrEnL <= not(r.ddrPwrEn);
 
    IBUFDS_Inst : IBUFDS
       port map (
@@ -181,7 +203,16 @@ begin
          I => refClock,
          O => refClkBufg);     
 
-   axiRstL <= not(axilRst);
+   reset   <= axilRst or r.ddrReset;
+   axiRstL <= not(sysRst);
+
+   U_RstSync : entity work.RstSync
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk      => refClkBufg,
+         asyncRst => reset,
+         syncRst  => sysRst);   
 
    MigCore_Inst : MigCore
       port map (
@@ -242,7 +273,7 @@ begin
          c0_ddr3_s_axi_rresp     => ddrReadSlave.rresp(1 downto 0),
          c0_ddr3_s_axi_rid       => ddrReadSlave.rid(3 downto 0),
          c0_ddr3_s_axi_rdata     => ddrReadSlave.rdata(511 downto 0),
-         sys_rst                 => axilRst); 
+         sys_rst                 => sysRst); 
 
    FSBL_GEN : if (FSBL_G = true) generate
       
@@ -278,35 +309,110 @@ begin
    end generate;
 
    NORMAL_GEN : if (FSBL_G = false) generate
-      
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMaster,
-            axiReadSlave   => axilReadSlave,
-            axiWriteMaster => axilWriteMaster,
-            axiWriteSlave  => axilWriteSlave);   
-
-      U_RstSync : entity work.RstSync
-         generic map (
-            TPD_G          => TPD_G,
-            OUT_POLARITY_G => '0')
-         port map (
-            clk      => axilClk,
-            asyncRst => ddrRst,
-            syncRst  => memReady);     
-
-      memError <= '0';
 
       -- Map the AXI4 buses
       ddrWriteMaster <= axiWriteMaster;
       axiWriteSlave  <= ddrWriteSlave;
       ddrReadMaster  <= axiReadMaster;
       axiReadSlave   <= ddrReadSlave;
-      
+
+      U_Sync : entity work.Synchronizer
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => axilClk,
+            dataIn  => ddrCalDone,
+            dataOut => done);      
+
+      comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrAlertL, ddrPg, done, r) is
+         variable v         : RegType;
+         variable axiStatus : AxiLiteStatusType;
+
+         -- Wrapper procedures to make calls cleaner.
+         procedure axiSlaveRegisterW (addr : in slv; offset : in integer; reg : inout slv; cA : in boolean := false; cV : in slv := "0") is
+         begin
+            axiSlaveRegister(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, addr, offset, reg, cA, cV);
+         end procedure;
+
+         procedure axiSlaveRegisterR (addr : in slv; offset : in integer; reg : in slv) is
+         begin
+            axiSlaveRegister(axilReadMaster, v.axilReadSlave, axiStatus, addr, offset, reg);
+         end procedure;
+
+         procedure axiSlaveRegisterW (addr : in slv; offset : in integer; reg : inout sl) is
+         begin
+            axiSlaveRegister(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, addr, offset, reg);
+         end procedure;
+
+         procedure axiSlaveRegisterR (addr : in slv; offset : in integer; reg : in sl) is
+         begin
+            axiSlaveRegister(axilReadMaster, v.axilReadSlave, axiStatus, addr, offset, reg);
+         end procedure;
+
+         procedure axiSlaveDefault (
+            axiResp : in slv(1 downto 0)) is
+         begin
+            axiSlaveDefault(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, axiResp);
+         end procedure;
+
+      begin
+         -- Latch the current value
+         v := r;
+
+         -- Reset strobe signals
+         v.ddrReset := '0';
+
+         -- Determine the transaction type
+         axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus);
+
+         -- Map the read registers
+         axiSlaveRegisterR(x"100", 0, r.memReady);
+         axiSlaveRegisterR(x"104", 0, r.memError);
+         axiSlaveRegisterR(x"108", 0, x"00000000");  -- AxiMemTester's wTimer
+         axiSlaveRegisterR(x"10C", 0, x"00000000");  -- AxiMemTester's rTimer
+         axiSlaveRegisterR(x"110", 0, x"00000000");  -- AxiMemTester's START_C Upper word
+         axiSlaveRegisterR(x"114", 0, x"00000000");  -- AxiMemTester's START_C Lower word
+         axiSlaveRegisterR(x"118", 0, x"00000000");  -- AxiMemTester's STOP_C Upper word
+         axiSlaveRegisterR(x"11C", 0, x"00000000");  -- AxiMemTester's STOP_C Lower word
+         axiSlaveRegisterR(x"120", 0, toSlv(AXI_CONFIG_C.ADDR_WIDTH_C, 32));
+         axiSlaveRegisterR(x"124", 0, toSlv(AXI_CONFIG_C.DATA_BYTES_C, 32));
+         axiSlaveRegisterR(x"128", 0, toSlv(AXI_CONFIG_C.ID_BITS_C, 32));
+         axiSlaveRegisterR(x"130", 0, ddrAlertL);
+         axiSlaveRegisterR(x"134", 0, ddrPg);
+
+         -- Map the write registers
+         axiSlaveRegisterW(x"3F8", 0, v.ddrPwrEn);
+         axiSlaveRegisterW(x"3FC", 0, v.ddrReset);
+
+         -- Set the Slave's response
+         axiSlaveDefault(AXI_ERROR_RESP_G);
+
+         -- Latch the values from Synchronizers
+         v.memReady := done;
+
+         -- Synchronous Reset
+         if (axilRst = '1') then
+            v := REG_INIT_C;
+         end if;
+
+         -- Register the variable for next clock cycle
+         rin <= v;
+
+         -- Outputs
+         axilWriteSlave <= r.axilWriteSlave;
+         axilReadSlave  <= r.axilReadSlave;
+         memReady       <= r.memReady;
+         memError       <= r.memError;
+         
+      end process comb;
+
+      seq : process (axilClk) is
+      begin
+         if (rising_edge(axilClk)) then
+            r <= rin after TPD_G;
+         end if;
+      end process seq;
+
    end generate;
    
 end mapping;
