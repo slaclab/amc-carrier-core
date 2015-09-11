@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-10
+-- Last update: 2015-09-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -21,16 +21,16 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
+use work.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
 entity AmcCarrierMps is
    generic (
-      TPD_G            : time                := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)     := AXI_RESP_DECERR_C;
-      MPS_SLOT_G       : boolean             := false;
-      MPS_CONFIG_G     : AxiStreamConfigType := ssiAxiStreamConfig(4));
+      TPD_G            : time            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      MPS_SLOT_G       : boolean         := false);
    port (
       mps125MHzClk    : in  sl;
       mps125MHzRst    : in  sl;
@@ -115,8 +115,8 @@ begin
             RX_ENABLE_G         => false,
             COMMON_TX_CLK_G     => false,
             COMMON_RX_CLK_G     => false,
-            SLAVE_AXI_CONFIG_G  => MPS_CONFIG_G,
-            MASTER_AXI_CONFIG_G => MPS_CONFIG_G)
+            SLAVE_AXI_CONFIG_G  => MPS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => MPS_CONFIG_C)
          port map (
             -- TX Serial Stream
             txP           => mpsTxP,
@@ -184,8 +184,8 @@ begin
                RX_ENABLE_G         => true,
                COMMON_TX_CLK_G     => false,
                COMMON_RX_CLK_G     => false,
-               SLAVE_AXI_CONFIG_G  => MPS_CONFIG_G,
-               MASTER_AXI_CONFIG_G => MPS_CONFIG_G)
+               SLAVE_AXI_CONFIG_G  => MPS_CONFIG_C,
+               MASTER_AXI_CONFIG_G => MPS_CONFIG_C)
             port map (
                -- TX Serial Stream
                txP           => mpsBusTxP(i),

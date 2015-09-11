@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2015-09-10
+-- Last update: 2015-09-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AxiLitePkg.all;
 use work.TimingPkg.all;
-use work.AmcCarrierBsiPkg.all;
+use work.AmcCarrierPkg.all;
 
 entity AmcCarrierEmptyApp is
    generic (
@@ -30,8 +30,7 @@ entity AmcCarrierEmptyApp is
       AXI_ERROR_RESP_G    : slv(1 downto 0)     := AXI_RESP_DECERR_C;
       SIM_SPEEDUP_G       : boolean             := false;
       DIAGNOSTIC_SIZE_G   : positive            := 1;
-      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4);
-      MPS_CONFIG_G        : AxiStreamConfigType := ssiAxiStreamConfig(4));      
+      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));      
    port (
       -----------------------
       -- Application Ports --

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2015-09-10
+-- Last update: 2015-09-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ use ieee.std_logic_unsigned.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.i2cPkg.all;
-use work.AmcCarrierBsiPkg.all;
+use work.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -52,7 +52,7 @@ entity AmcCarrierBsi is
       axilRst         : in    sl);  
 end AmcCarrierBsi;
 
-architecture mapping of AmcCarrierBsi is
+architecture rtl of AmcCarrierBsi is
 
    function ConvertEndianness (word : slv(47 downto 0)) return slv is
       variable retVar : slv(47 downto 0);
@@ -267,15 +267,10 @@ begin
       rin <= v;
 
       -- Outputs
-      axilWriteSlave     <= r.axilWriteSlave;
-      axilReadSlave      <= r.axilReadSlave;
-      localMac           <= ConvertEndianness(r.macAddress(0));
-      localIp            <= r.localIp;
-      bsiData.slotNumber <= r.slotNumber;
-      bsiData.crateId    <= r.crateId;
-      for i in BSI_MAC_SIZE_C-1 downto 1 loop
-         bsiData.macAddress(i) <= ConvertEndianness(r.macAddress(i));
-      end loop;
+      axilWriteSlave <= r.axilWriteSlave;
+      axilReadSlave  <= r.axilReadSlave;
+      localMac       <= ConvertEndianness(r.macAddress(0));
+      localIp        <= r.localIp;
       
    end process comb;
 
@@ -285,5 +280,46 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   Sync_slotNumber : entity work.SynchronizerFifo
+      generic map (
+         TPD_G        => TPD_G,
+         DATA_WIDTH_G => 8)
+      port map (
+         -- Write Ports (wr_clk domain)
+         wr_clk => axilClk,
+         din    => r.slotNumber,
+         -- Read Ports (rd_clk domain)
+         rd_clk => bsiClk,
+         dout   => bsiData.slotNumber); 
+
+   Sync_crateId : entity work.SynchronizerFifo
+      generic map (
+         TPD_G        => TPD_G,
+         DATA_WIDTH_G => 16)
+      port map (
+         -- Write Ports (wr_clk domain)
+         wr_clk => axilClk,
+         din    => r.crateId,
+         -- Read Ports (rd_clk domain)
+         rd_clk => bsiClk,
+         dout   => bsiData.crateId);  
+
+   GEN_VEC :
+   for i in BSI_MAC_SIZE_C-1 downto 1 generate
+      
+      Sync_macAddress : entity work.SynchronizerFifo
+         generic map (
+            TPD_G        => TPD_G,
+            DATA_WIDTH_G => 48)
+         port map (
+            -- Write Ports (wr_clk domain)
+            wr_clk => axilClk,
+            din    => ConvertEndianness(r.macAddress(i)),
+            -- Read Ports (rd_clk domain)
+            rd_clk => bsiClk,
+            dout   => bsiData.macAddress(i));     
+
+   end generate GEN_VEC;
    
-end mapping;
+end rtl;

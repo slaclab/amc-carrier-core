@@ -1,5 +1,6 @@
+vhdl work rtl/AmcCarrierPkg.vhd
+
 vhdl work rtl/AmcCarrierBsi.vhd
-vhdl work rtl/AmcCarrierBsiPkg.vhd
 vhdl work rtl/AmcCarrierClkAndRst.vhd
 vhdl work rtl/AmcCarrierCore.vhd
 vhdl work rtl/AmcCarrierDdrMem.vhd

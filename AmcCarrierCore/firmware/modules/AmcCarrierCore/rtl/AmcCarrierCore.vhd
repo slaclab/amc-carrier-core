@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-10
+-- Last update: 2015-09-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ use work.SsiPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiPkg.all;
 use work.TimingPkg.all;
-use work.AmcCarrierBsiPkg.all;
+use work.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -36,8 +36,7 @@ entity AmcCarrierCore is
       MPS_SLOT_G          : boolean             := false;  -- true = MPS message concentrator (Slot#2 only)
       FSBL_G              : boolean             := false;  -- false = Normal Operation, true = First Stage Boot loader
       DIAGNOSTIC_SIZE_G   : positive            := 1;
-      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4);
-      MPS_CONFIG_G        : AxiStreamConfigType := ssiAxiStreamConfig(4));
+      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
    port (
       ----------------------
       -- Top Level Interface
@@ -494,8 +493,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         MPS_SLOT_G       => MPS_SLOT_G,
-         MPS_CONFIG_G     => MPS_CONFIG_G)
+         MPS_SLOT_G       => MPS_SLOT_G)
       port map (
          -- MPS Clocks and Resets
          mps125MHzClk    => mps125MHzClk,
