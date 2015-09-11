@@ -52,7 +52,7 @@ entity AmcCarrierCore is
       -- Timing Interface (timingClk domain) 
       timingClk         : in    sl;
       timingRst         : in    sl;
-      timingData        : out   LclsTimingDataType;
+      timingData        : out   TimingDataType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk     : in    sl;
       diagnosticRst     : in    sl;

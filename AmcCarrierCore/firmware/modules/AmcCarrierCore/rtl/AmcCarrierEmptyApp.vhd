@@ -82,7 +82,7 @@ entity AmcCarrierEmptyApp is
       -- Timing Interface (timingClk domain) 
       timingClk         : out sl;
       timingRst         : out sl;
-      timingData        : in  LclsTimingDataType;
+      timingData        : in  TimingDataType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk     : out sl;
       diagnosticRst     : out sl;

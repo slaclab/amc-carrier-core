@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-10
+-- Last update: 2015-09-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ entity AmcCarrierTiming is
       refTimingRst      : out sl;
       timingClk         : in  sl;
       timingRst         : in  sl;
-      timingData        : out LclsTimingDataType;
+      timingData        : out TimingDataType;
       -- Diagnostic Interface
       diagnosticClk     : in  sl;
       diagnosticRst     : in  sl;
@@ -147,7 +147,7 @@ begin
    -- Place holder for future development
    --------------------------------------
    timingRecClk     <= '0';
-   timingData       <= LCLS_TIMING_DATA_INIT_C;
+   timingData       <= TIMING_DATA_INIT_C;
    diagnosticSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
    axiWriteMaster   <= AXI_WRITE_MASTER_INIT_C;
    axiReadMaster    <= AXI_READ_MASTER_INIT_C;
