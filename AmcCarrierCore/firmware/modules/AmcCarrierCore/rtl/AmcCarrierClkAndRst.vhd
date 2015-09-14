@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-10
+-- Last update: 2015-09-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -29,8 +29,14 @@ entity AmcCarrierClkAndRst is
       SIM_SPEEDUP_G : boolean := false);
    port (
       -- Reference Clocks and Resets
+      ref125MHzClk : out sl;
+      ref125MHzRst : out sl;
       ref156MHzClk : out sl;
       ref156MHzRst : out sl;
+      ref312MHzClk : out sl;
+      ref312MHzRst : out sl;
+      ref625MHzClk : out sl;
+      ref625MHzRst : out sl;
       -- AXI-Lite Clocks and Resets
       axilClk      : out sl;
       axilRst      : out sl;
@@ -57,20 +63,32 @@ architecture mapping of AmcCarrierClkAndRst is
    signal gtClk     : sl;
    signal fabClk    : sl;
    signal fabRst    : sl;
-   signal refClk    : sl;
    signal mpsRefClk : sl;
    signal clk       : sl;
    signal rst       : sl;
+   signal clkOut    : slv(2 downto 0);
+   signal rstOut    : slv(2 downto 0);
 
 begin
-
-   ref156MHzClk <= fabClk;
-   ref156MHzRst <= fabRst;
 
    axilClk <= fabClk;
    axilRst <= fabRst;
 
-   mps125MHzClk <= refClk;
+   ref125MHzClk <= clkOut(2);
+   ref125MHzRst <= rstOut(2);
+   ref156MHzClk <= fabClk;
+   ref156MHzRst <= fabRst;
+   ref312MHzClk <= clkOut(1);
+   ref312MHzRst <= rstOut(1);
+   ref625MHzClk <= clkOut(0);
+   ref625MHzRst <= rstOut(0);
+
+   mps125MHzClk <= clkOut(2);
+   mps125MHzRst <= rstOut(2);
+   mps312MHzClk <= clkOut(1);
+   mps312MHzRst <= rstOut(1);
+   mps625MHzClk <= clkOut(0);
+   mps625MHzRst <= rstOut(0);
 
    IBUFDS_GTE3_Inst : IBUFDS_GTE3
       generic map (
@@ -128,16 +146,12 @@ begin
          CLKOUT2_DIVIDE_G   => 10)                          -- 125 MHz = 1.25 GHz/10
       port map(
          -- Clock Input
-         clkIn     => clk,
-         rstIn     => rst,
+         clkIn  => clk,
+         rstIn  => rst,
          -- Clock Outputs
-         clkOut(0) => mps625MHzClk,
-         clkOut(1) => mps312MHzClk,
-         clkOut(2) => refClk,
+         clkOut => clkOut,
          -- Reset Outputs
-         rstOut(0) => mps625MHzRst,
-         rstOut(1) => mps312MHzRst,
-         rstOut(2) => mps125MHzRst);
+         rstOut => rstOut);
 
    U_ClkOutBufSingle : entity work.ClkOutBufSingle
       generic map(
@@ -145,7 +159,7 @@ begin
          XIL_DEVICE_G => "ULTRASCALE")
       port map (
          outEnL => ite(MPS_SLOT_G, '0', '1'),
-         clkIn  => refClk,
+         clkIn  => clkOut(2),
          clkOut => mpsClkOut);    
 
 end mapping;

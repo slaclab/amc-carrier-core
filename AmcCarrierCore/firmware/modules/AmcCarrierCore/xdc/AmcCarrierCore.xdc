@@ -300,10 +300,10 @@ set_false_path -hold -to [get_pins -hier -filter {NAME =~ *.u_xiphy_control/xiph
 set_false_path -hold -to [get_pins -hier -filter {NAME =~ *.u_xiphy_control/xiphy_control/RIU_WR_DATA*}]
 
 set_false_path -to [get_pins -hier -filter {name =~ U_Core/U_Mps/U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST }]
-set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/SALT_IDELAY_CTRL_Inst*}]
-set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_cal}]
-set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_m}]
-set_property IODELAY_GROUP SALT_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_s}]
+set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/SALT_IDELAY_CTRL_Inst*}]
+set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_cal}]
+set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_m}]
+set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_Mps/*/serdes_1_to_10_ser8_i/idelay_s}]
 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {xauiPhyClk}] 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrClkIn}] 

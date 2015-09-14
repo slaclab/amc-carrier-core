@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-11
+-- Last update: 2015-09-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ begin
    U_SaltDelayCtrl : entity work.SaltDelayCtrl
       generic map (
          TPD_G           => TPD_G,
-         IODELAY_GROUP_G => "SALT_IODELAY_GRP")
+         IODELAY_GROUP_G => "MPS_IODELAY_GRP")
       port map (
          iDelayCtrlRdy => iDelayCtrlRdy,
          refClk        => mps625MHzClk,

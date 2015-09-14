@@ -5,11 +5,14 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2015-09-11
+-- Last update: 2015-09-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: Application's Top Level
+-- 
+-- Note: Common-to-Application interface defined here (see URL below)
+--       https://confluence.slac.stanford.edu/x/rLyMCw
 -------------------------------------------------------------------------------
 -- Copyright (c) 2015 SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
@@ -103,8 +106,14 @@ entity AmcCarrierEmptyApp is
       -- Support Reference Clocks and Resets
       refTimingClk      : in  sl;
       refTimingRst      : in  sl;
+      ref125MHzClk      : in  sl;
+      ref125MHzRst      : in  sl;
       ref156MHzClk      : in  sl;
-      ref156MHzRst      : in  sl);
+      ref156MHzRst      : in  sl;
+      ref312MHzClk      : in  sl;
+      ref312MHzRst      : in  sl;
+      ref625MHzClk      : in  sl;
+      ref625MHzRst      : in  sl);
 end AmcCarrierEmptyApp;
 
 architecture mapping of AmcCarrierEmptyApp is

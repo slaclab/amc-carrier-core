@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-11
+-- Last update: 2015-09-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -73,8 +73,14 @@ entity AmcCarrierCore is
       -- Reference Clocks and Resets
       refTimingClk      : out   sl;
       refTimingRst      : out   sl;
+      ref125MHzClk      : out   sl;
+      ref125MHzRst      : out   sl;
       ref156MHzClk      : out   sl;
       ref156MHzRst      : out   sl;
+      ref312MHzClk      : out   sl;
+      ref312MHzRst      : out   sl;
+      ref625MHzClk      : out   sl;
+      ref625MHzRst      : out   sl;
       ----------------
       -- Core Ports --
       ----------------
@@ -226,8 +232,14 @@ begin
          SIM_SPEEDUP_G => SIM_SPEEDUP_G)
       port map (
          -- Reference Clocks and Resets
+         ref125MHzClk => ref125MHzClk,
+         ref125MHzRst => ref125MHzRst,
          ref156MHzClk => ref156MHzClk,
          ref156MHzRst => ref156MHzRst,
+         ref312MHzClk => ref312MHzClk,
+         ref312MHzRst => ref312MHzRst,
+         ref625MHzClk => ref625MHzClk,
+         ref625MHzRst => ref625MHzRst,
          -- AXI-Lite Clocks and Resets
          axilClk      => axilClk,
          axilRst      => axilRst,
