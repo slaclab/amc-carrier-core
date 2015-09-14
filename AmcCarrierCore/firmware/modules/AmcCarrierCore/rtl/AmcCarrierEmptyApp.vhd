@@ -118,6 +118,9 @@ end AmcCarrierEmptyApp;
 
 architecture mapping of AmcCarrierEmptyApp is
 
+   signal testMode : sl;
+   signal mpsMsg   : Slv8Array(MPS_NULL_LEN_C-1 downto 0);
+
    signal sysClk : sl;
    signal sysRst : sl;
 
@@ -126,24 +129,10 @@ begin
    sysClk <= ref156MHzClk;
    sysRst <= ref156MHzRst;
 
-   regClk <= sysClk;
-   regRst <= sysRst;
-
-   timingClk <= sysClk;
-   timingRst <= sysRst;
-
    diagnosticClk     <= sysClk;
    diagnosticRst     <= sysRst;
    diagnosticMessage <= (others => x"00000000");
    diagnosticMasters <= (others => AXI_STREAM_MASTER_INIT_C);
-
-   mpsClk      <= sysClk;
-   mpsRst      <= sysRst;
-   mpsIbMaster <= AXI_STREAM_MASTER_INIT_C;
-   mpsObSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
-
-   bsiClk <= sysClk;
-   bsiRst <= sysRst;
 
    U_AxiLiteEmpty : entity work.AxiLiteEmpty
       generic map (
@@ -155,5 +144,38 @@ begin
          axiReadSlave   => regReadSlave,
          axiWriteMaster => regWriteMaster,
          axiWriteSlave  => regWriteSlave);
+
+   testMode <= '0';
+   mpsMsg   <= (others => x"0");
+
+   U_CommonAppSupport : entity work.CommonAppSupport
+      generic map (
+         TPD_G      => TPD_G,
+         MPS_TYPE_G => MPS_NULL_TYPE_C,
+         MPS_LEN_G  => MPS_NULL_LEN_C)
+      port map (
+         -- User Interface
+         sysClk       => sysClk,
+         sysRst       => sysRst,
+         testMode     => testMode,
+         mpsMsg       => mpsMsg,
+         -- AXI-Lite Interface
+         regClk       => regClk,
+         regRst       => regRst,
+         -- Timing Interface
+         timingClk    => timingClk,
+         timingRst    => timingRst,
+         timingData   => timingData,
+         -- BSI Interface
+         bsiClk       => bsiClk,
+         bsiRst       => bsiRst,
+         bsiData      => bsiData,
+         -- MPS Interface
+         mpsClk       => mpsClk,
+         mpsRst       => mpsRst,
+         mpsIbMaster  => mpsIbMaster,
+         mpsIbSlave   => mpsIbSlave,
+         mpsObMasters => mpsObMasters,
+         mpsObSlaves  => mpsObSlaves);       
 
 end mapping;

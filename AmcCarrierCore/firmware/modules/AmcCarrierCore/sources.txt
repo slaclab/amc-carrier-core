@@ -9,7 +9,10 @@ vhdl work rtl/AmcCarrierSysMon.vhd
 vhdl work rtl/AmcCarrierTiming.vhd
 vhdl work rtl/AmcCarrierXaui.vhd
 vhdl work rtl/AmcCarrierMps.vhd
+vhdl work rtl/AmcCarrierMpsMsg.vhd
 vhdl work rtl/AmcCarrierEmptyApp.vhd
+
+vhdl work rtl/CommonAppSupport.vhd
 
 vhdl work coregen/MigCore.dcp
 vhdl work coregen/SysMonCore.dcp
