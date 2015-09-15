@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-14
+-- Last update: 2015-09-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -27,9 +27,10 @@ use work.TimingPkg.all;
 
 entity AmcCarrierMpsMsg is
    generic (
-      TPD_G      : time            := 1 ns;
-      MPS_TYPE_G : slv(4 downto 0) := MPS_NULL_TYPE_C;
-      MPS_LEN_G  : positive        := MPS_NULL_LEN_C);
+      TPD_G            : time            := 1 ns;
+      SIM_ERROR_HALT_G : boolean         := false;
+      MPS_TYPE_G       : slv(4 downto 0) := MPS_NULL_TYPE_C;
+      MPS_LEN_G        : positive        := MPS_NULL_LEN_C);
    port (
       -- User Interface
       clk         : in  sl;
@@ -170,12 +171,14 @@ begin
 
       -- Check for error condition
       if (timingData.strb = '1') and (r.state /= IDLE_S) then
-         -- Check the simulation error printing
-         report "AmcCarrierMpsMsg: Simulation Overflow Detected ...";
-         report "MPS_TYPE_G = " & integer'image(conv_integer(MPS_TYPE_G));
-         report "Crate ID   = " & integer'image(conv_integer(bsiData.crateId));
-         report "Slot ID    = " & integer'image(conv_integer(bsiData.slotNumber));
-         report "APP ID     = " & integer'image(conv_integer(r.appId)) severity failure;
+         if SIM_ERROR_HALT_G then
+            -- Check the simulation error printing
+            report "AmcCarrierMpsMsg: Simulation Overflow Detected ...";
+            report "MPS_TYPE_G = " & integer'image(conv_integer(MPS_TYPE_G));
+            report "Crate ID   = " & integer'image(conv_integer(bsiData.crateId));
+            report "Slot ID    = " & integer'image(conv_integer(bsiData.slotNumber));
+            report "APP ID     = " & integer'image(conv_integer(r.appId)) severity failure;
+         end if;
       end if;
 
       -- Reset

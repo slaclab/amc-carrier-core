@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-09-14
+-- Last update: 2015-09-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ package AmcCarrierPkg is
       crateId    : slv(15 downto 0);
       macAddress : Slv48Array(BSI_MAC_SIZE_C-1 downto 1);  --  big-Endian format 
    end record;
-   
+   type BsiDataArray is array (natural range <>) of BsiDataType;
    constant BSI_DATA_INIT_C : BsiDataType := (
       slotNumber => x"00",
       crateId    => x"0000",
