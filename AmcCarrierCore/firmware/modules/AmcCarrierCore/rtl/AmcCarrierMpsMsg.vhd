@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-15
+-- Last update: 2015-09-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ entity AmcCarrierMpsMsg is
       rst         : in  sl;
       testMode    : in  sl;
       mpsMsg      : in  Slv8Array(MPS_LEN_G-1 downto 0);
-      appId       : in  slv(4 downto 0);
+      appId       : in  slv(15 downto 0);
       -- Timing Interface
       timingData  : in  TimingDataType;
       -- BSI Interface      
@@ -51,14 +51,15 @@ architecture rtl of AmcCarrierMpsMsg is
 
    type StateType is (
       IDLE_S,
-      TIMESTAMP_S,
       HEADER_S,
+      APP_ID_S,
+      TIMESTAMP_S,
       PAYLOAD_S); 
 
    type RegType is record
       cnt         : natural range 0 to MPS_LEN_G;
       timeStamp   : slv(15 downto 0);
-      appId       : slv(4 downto 0);
+      appId       : slv(15 downto 0);
       testMode    : sl;
       mpsMsg      : Slv8Array(MPS_LEN_G-1 downto 0);
       mpsIbMaster : AxiStreamMasterType;
@@ -92,7 +93,6 @@ begin
          v.mpsIbMaster.tValid := '0';
          v.mpsIbMaster.tLast  := '0';
          v.mpsIbMaster.tUser  := (others => '0');
-         v.mpsIbMaster.tData  := (others => '0');
       end if;
 
       -- State Machine
@@ -107,7 +107,32 @@ begin
                v.testMode  := testMode;
                v.mpsMsg    := mpsMsg;
                -- Next state
-               v.state     := TIMESTAMP_S;
+               v.state     := HEADER_S;
+            end if;
+         ----------------------------------------------------------------------
+         when HEADER_S =>
+            -- Check if ready to move data
+            if v.mpsIbMaster.tValid = '0' then
+               -- Send the header 
+               v.mpsIbMaster.tValid             := '1';
+               v.mpsIbMaster.tData(15 downto 8) := toSlv(MPS_LEN_G+5, 8);
+               v.mpsIbMaster.tData(7)           := r.testMode;
+               v.mpsIbMaster.tData(6)           := '0';
+               v.mpsIbMaster.tData(5)           := '0';
+               v.mpsIbMaster.tData(4 downto 0)  := MPS_TYPE_G;
+               ssiSetUserSof(MPS_CONFIG_C, v.mpsIbMaster, '1');
+               -- Next state
+               v.state                          := APP_ID_S;
+            end if;
+         ----------------------------------------------------------------------
+         when APP_ID_S =>
+            -- Check if ready to move data
+            if v.mpsIbMaster.tValid = '0' then
+               -- Send the application ID 
+               v.mpsIbMaster.tValid             := '1';
+               v.mpsIbMaster.tData(15 downto 0) := r.appId;
+               -- Next state
+               v.state                          := PAYLOAD_S;
             end if;
          ----------------------------------------------------------------------
          when TIMESTAMP_S =>
@@ -116,32 +141,19 @@ begin
                -- Send the timestamp 
                v.mpsIbMaster.tValid             := '1';
                v.mpsIbMaster.tData(15 downto 0) := r.timeStamp;
-               ssiSetUserSof(MPS_CONFIG_C, v.mpsIbMaster, '1');
                -- Next state
-               v.state                          := HEADER_S;
-            end if;
-         ----------------------------------------------------------------------
-         when HEADER_S =>
-            -- Check if ready to move data
-            if v.mpsIbMaster.tValid = '0' then
-               -- Send the header 
-               v.mpsIbMaster.tValid              := '1';
-               v.mpsIbMaster.tData(15 downto 11) := toSlv(MPS_LEN_G, 5);
-               v.mpsIbMaster.tData(10 downto 6)  := MPS_TYPE_G;
-               v.mpsIbMaster.tData(5 downto 1)   := r.appId;
-               v.mpsIbMaster.tData(0)            := r.testMode;
-               -- Next state
-               v.state                           := PAYLOAD_S;
+               v.state                          := PAYLOAD_S;
             end if;
          ----------------------------------------------------------------------
          when PAYLOAD_S =>
             -- Check if ready to move data
             if v.mpsIbMaster.tValid = '0' then
                -- Send the payload 
-               v.mpsIbMaster.tValid            := '1';
-               v.mpsIbMaster.tData(7 downto 0) := r.mpsMsg(r.cnt);
+               v.mpsIbMaster.tValid             := '1';
+               v.mpsIbMaster.tData(7 downto 0)  := r.mpsMsg(r.cnt);
+               v.mpsIbMaster.tData(15 downto 8) := (others => '0');
                -- Increment the counter
-               v.cnt                           := r.cnt + 1;
+               v.cnt                            := r.cnt + 1;
                -- Check if lower byte is tLast
                if v.cnt = MPS_LEN_G then
                   -- Reset the counter
@@ -171,8 +183,8 @@ begin
 
       -- Check for error condition
       if (timingData.strb = '1') and (r.state /= IDLE_S) then
+         -- Check the simulation error printing
          if SIM_ERROR_HALT_G then
-            -- Check the simulation error printing
             report "AmcCarrierMpsMsg: Simulation Overflow Detected ...";
             report "MPS_TYPE_G = " & integer'image(conv_integer(MPS_TYPE_G));
             report "Crate ID   = " & integer'image(conv_integer(bsiData.crateId));

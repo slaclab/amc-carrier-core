@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-14
+-- Last update: 2015-09-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ entity AmcCarrierClkAndRst is
       ref312MHzRst : out sl;
       ref625MHzClk : out sl;
       ref625MHzRst : out sl;
+      gthFabClk    : out sl;
       -- AXI-Lite Clocks and Resets
       axilClk      : out sl;
       axilRst      : out sl;
@@ -100,7 +101,7 @@ begin
          IB    => fabClkN,
          CEB   => '0',
          ODIV2 => gtClk,
-         O     => open);  
+         O     => gthFabClk);  
 
    BUFG_GT_Inst : BUFG_GT
       port map (

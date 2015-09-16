@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-09-15
+-- Last update: 2015-09-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ package AmcCarrierPkg is
    constant MPS_BLEN_LEN_C  : positive        := 1;        -- This number is still TBD
 
    constant MPS_BPM_TYPE_C : slv(4 downto 0) := "10010";  -- Type = 0x12
-   constant MPS_BPM_LEN_C  : positive        := 1;        -- This number is still TBD
+   constant MPS_BPM_LEN_C  : positive        := 11;       -- This number is still TBD
 
    constant MPS_LLRF_TYPE_C : slv(4 downto 0) := "10011";  -- Type = 0x13
    constant MPS_LLRF_LEN_C  : positive        := 1;        -- This number is still TBD

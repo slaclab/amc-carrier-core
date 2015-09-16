@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-14
+-- Last update: 2015-09-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -81,6 +81,7 @@ entity AmcCarrierCore is
       ref312MHzRst      : out   sl;
       ref625MHzClk      : out   sl;
       ref625MHzRst      : out   sl;
+      gthFabClk         : out   sl;
       ----------------
       -- Core Ports --
       ----------------
@@ -240,6 +241,7 @@ begin
          ref312MHzRst => ref312MHzRst,
          ref625MHzClk => ref625MHzClk,
          ref625MHzRst => ref625MHzRst,
+         gthFabClk    => gthFabClk,
          -- AXI-Lite Clocks and Resets
          axilClk      => axilClk,
          axilRst      => axilRst,

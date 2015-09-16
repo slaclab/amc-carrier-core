@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-14
--- Last update: 2015-09-14
+-- Last update: 2015-09-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -58,17 +58,25 @@ end CommonAppSupport;
 
 architecture mapping of CommonAppSupport is
 
+   signal appId : slv(15 downto 0);
+
 begin
 
-   regClk      <= sysClk;
-   regRst      <= sysRst;
-   timingClk   <= sysClk;
-   timingRst   <= sysRst;
-   bsiClk      <= sysClk;
-   bsiRst      <= sysRst;
+   regClk <= sysClk;
+   regRst <= sysRst;
+
+   timingClk <= sysClk;
+   timingRst <= sysRst;
+
+   bsiClk <= sysClk;
+   bsiRst <= sysRst;
+
    mpsClk      <= sysClk;
    mpsRst      <= sysRst;
    mpsObSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
+
+   appId(4 downto 0)  <= bsiData.slotNumber(4 downto 0);
+   appId(15 downto 5) <= bsiData.crateId(10 downto 0);
 
    U_MpsMsg : entity work.AmcCarrierMpsMsg
       generic map (
@@ -81,7 +89,7 @@ begin
          rst         => sysRst,
          testMode    => testMode,
          mpsMsg      => mpsMsg,
-         appId       => bsiData.slotNumber(4 downto 0),
+         appId       => appId,
          -- Timing Interface
          timingData  => timingData,
          -- BSI Interface      
