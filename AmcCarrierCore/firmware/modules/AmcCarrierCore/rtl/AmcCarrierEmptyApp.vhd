@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2015-09-14
+-- Last update: 2015-09-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -113,7 +113,8 @@ entity AmcCarrierEmptyApp is
       ref312MHzClk      : in  sl;
       ref312MHzRst      : in  sl;
       ref625MHzClk      : in  sl;
-      ref625MHzRst      : in  sl);
+      ref625MHzRst      : in  sl;
+      gthFabClk         : in  sl);
 end AmcCarrierEmptyApp;
 
 architecture mapping of AmcCarrierEmptyApp is
