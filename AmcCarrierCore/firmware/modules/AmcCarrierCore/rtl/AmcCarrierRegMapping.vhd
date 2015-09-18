@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-11
+-- Last update: 2015-09-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -23,6 +23,7 @@ use work.SsiPkg.all;
 use work.AxiLitePkg.all;
 use work.I2cPkg.all;
 use work.AmcCarrierPkg.all;
+use work.AmcCarrierRegPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -70,6 +71,7 @@ entity AmcCarrierRegMapping is
       -- Local Configuration
       localMac          : out   slv(47 downto 0);
       localIp           : out   slv(31 downto 0);
+      localAppId        : out   slv(15 downto 0);
       ----------------------
       -- Top Level Interface
       ----------------------           
@@ -111,8 +113,6 @@ end AmcCarrierRegMapping;
 
 architecture mapping of AmcCarrierRegMapping is
 
-   constant AXI_CLK_FREQ_C : real := 156.25E+6;
-
    constant NUM_AXI_MASTERS_C : natural := 13;
 
    constant VERSION_INDEX_C    : natural := 0;
@@ -128,74 +128,60 @@ architecture mapping of AmcCarrierRegMapping is
    constant DDR_INDEX_C        : natural := 10;
    constant MPS_INDEX_C        : natural := 11;
    constant APP_INDEX_C        : natural := 12;
-
-   constant VERSION_ADDR_C    : slv(31 downto 0) := X"00000000";
-   constant SYSMON_ADDR_C     : slv(31 downto 0) := X"01000000";
-   constant BOOT_MEM_ADDR_C   : slv(31 downto 0) := X"02000000";
-   constant XBAR_ADDR_C       : slv(31 downto 0) := X"03000000";
-   constant CONFIG_I2C_ADDR_C : slv(31 downto 0) := X"04000000";
-   constant CLK_I2C_ADDR_C    : slv(31 downto 0) := X"05000000";
-   constant DDR_I2C_ADDR_C    : slv(31 downto 0) := X"06000000";
-   constant IPMC_ADDR_C       : slv(31 downto 0) := X"07000000";
-   constant TIMING_ADDR_C     : slv(31 downto 0) := X"08000000";
-   constant XAUI_ADDR_C       : slv(31 downto 0) := X"09000000";
-   constant DDR_ADDR_C        : slv(31 downto 0) := X"0A000000";
-   constant MPS_ADDR_C        : slv(31 downto 0) := X"0B000000";
-   constant APP_ADDR_C        : slv(31 downto 0) := X"80000000";
    
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       VERSION_INDEX_C    => (
          baseAddr        => VERSION_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       SYSMON_INDEX_C     => (
          baseAddr        => SYSMON_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       BOOT_MEM_INDEX_C   => (
          baseAddr        => BOOT_MEM_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       XBAR_INDEX_C       => (
          baseAddr        => XBAR_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       CONFIG_I2C_INDEX_C => (
          baseAddr        => CONFIG_I2C_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       CLK_I2C_INDEX_C    => (
          baseAddr        => CLK_I2C_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       DDR_I2C_INDEX_C    => (
          baseAddr        => DDR_I2C_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       IPMC_INDEX_C       => (
          baseAddr        => IPMC_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       XAUI_INDEX_C       => (
          baseAddr        => XAUI_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       TIMING_INDEX_C     => (
          baseAddr        => TIMING_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       DDR_INDEX_C        => (
          baseAddr        => DDR_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       MPS_INDEX_C        => (
          baseAddr        => MPS_ADDR_C,
          addrBits        => 24,
-         connectivity    => X"0001"),
+         connectivity    => x"FFFF"),
       APP_INDEX_C        => (
          baseAddr        => APP_ADDR_C,
          addrBits        => 32,
-         connectivity    => X"0001"));   
+         connectivity    => x"FFFF"));   
 
    constant CONFIG_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
       0             => (
@@ -248,7 +234,7 @@ begin
    --------------------------
    -- AXI-Lite: Crossbar Core
    --------------------------  
-   AxiLiteCrossbar_Inst : entity work.AxiLiteCrossbar
+   U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
@@ -270,7 +256,7 @@ begin
    --------------------------
    -- AXI-Lite Version Module
    --------------------------          
-   AxiVersion_Inst : entity work.AxiVersion
+   U_Version : entity work.AxiVersion
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
@@ -290,7 +276,7 @@ begin
    --------------------------
    -- AXI-Lite: SYSMON Module
    --------------------------
-   AmcCarrierSysMon_Inst : entity work.AmcCarrierSysMon
+   U_SysMon : entity work.AmcCarrierSysMon
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
@@ -310,7 +296,7 @@ begin
    ------------------------------
    -- AXI-Lite: Boot Flash Module
    ------------------------------
-   AxiMicronN25QCore_Inst : entity work.AxiMicronN25QCore
+   U_BootProm : entity work.AxiMicronN25QCore
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
@@ -337,7 +323,7 @@ begin
          axiClk         => axilClk,
          axiRst         => axilRst);
 
-   STARTUPE3_Inst : STARTUPE3
+   U_STARTUPE3 : STARTUPE3
       generic map (
          PROG_USR      => "FALSE",  -- Activate program event security feature. Requires encrypted bitstreams.
          SIM_CCLK_FREQ => 0.0)          -- Set the Configuration Clock Frequency(ns) for simulation
@@ -372,7 +358,7 @@ begin
    ----------------------------------
    -- AXI-Lite: Clock Crossbar Module
    ----------------------------------
-   AxiSy56040Reg_Inst : entity work.AxiSy56040Reg
+   U_Sy56040 : entity work.AxiSy56040Reg
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
@@ -461,7 +447,7 @@ begin
    -----------------------
    -- AXI-Lite: BSI Module
    -----------------------  
-   AmcCarrierBsi_Inst : entity work.AmcCarrierBsi
+   U_Bsi : entity work.AmcCarrierBsi
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
@@ -469,6 +455,7 @@ begin
          -- Local Configurations
          localMac        => localMac,
          localIp         => localIp,
+         localAppId      => localAppId,
          -- Application Interface
          bsiClk          => bsiClk,
          bsiRst          => bsiRst,
@@ -520,7 +507,7 @@ begin
    -------------------------------------------
    -- Map the AXI-Lite to Application Firmware
    -------------------------------------------
-   AxiLiteAsync_Inst : entity work.AxiLiteAsync
+   U_AxiLiteAsync : entity work.AxiLiteAsync
       generic map (
          TPD_G => TPD_G)
       port map (

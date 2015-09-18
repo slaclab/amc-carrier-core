@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-10
+-- Last update: 2015-09-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -54,6 +54,9 @@ entity AmcCarrierXaui is
       obPromSlave      : out AxiStreamSlaveType;
       ibPromMaster     : out AxiStreamMasterType;
       ibPromSlave      : in  AxiStreamSlaveType;
+      -- FFB Outbound Interface
+      ffbObMaster      : in  AxiStreamMasterType;
+      ffbObSlave       : out AxiStreamSlaveType;
       ----------------
       -- Core Ports --
       ----------------   
@@ -306,5 +309,10 @@ begin
    obBsaSlave         <= ibServerSlaves(2);
    ibBsaMaster        <= obServerMasters(2);
    obServerSlaves(2)  <= ibBsaSlave;
+
+   -------------------------
+   -- FFB Outbound Interface
+   -------------------------
+   ffbObSlave <= AXI_STREAM_SLAVE_FORCE_C;
    
 end mapping;

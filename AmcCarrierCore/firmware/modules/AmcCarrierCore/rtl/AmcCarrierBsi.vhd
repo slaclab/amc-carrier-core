@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2015-09-11
+-- Last update: 2015-09-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -35,6 +35,7 @@ entity AmcCarrierBsi is
       -- Local Configuration
       localMac        : out   slv(47 downto 0);
       localIp         : out   slv(31 downto 0);
+      localAppId      : out   slv(15 downto 0);
       -- Application Interface
       bsiClk          : in    sl;
       bsiRst          : in    sl;
@@ -267,10 +268,12 @@ begin
       rin <= v;
 
       -- Outputs
-      axilWriteSlave <= r.axilWriteSlave;
-      axilReadSlave  <= r.axilReadSlave;
-      localMac       <= ConvertEndianness(r.macAddress(0));
-      localIp        <= r.localIp;
+      axilWriteSlave          <= r.axilWriteSlave;
+      axilReadSlave           <= r.axilReadSlave;
+      localMac                <= ConvertEndianness(r.macAddress(0));
+      localIp                 <= r.localIp;
+      localAppId(3 downto 0)  <= r.slotNumber(3 downto 0);
+      localAppId(15 downto 4) <= r.crateId(15 downto 4);
       
    end process comb;
 

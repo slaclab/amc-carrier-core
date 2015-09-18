@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierMps.vhd
+-- File       : AmcCarrierMpsSalt.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-14
+-- Last update: 2015-09-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -26,58 +26,79 @@ use work.AmcCarrierPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcCarrierMps is
+entity AmcCarrierMpsSalt is
    generic (
       TPD_G            : time            := 1 ns;
+      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       MPS_SLOT_G       : boolean         := false);
    port (
-      mps125MHzClk    : in  sl;
-      mps125MHzRst    : in  sl;
-      mps312MHzClk    : in  sl;
-      mps312MHzRst    : in  sl;
-      mps625MHzClk    : in  sl;
-      mps625MHzRst    : in  sl;
+      -- SALT Reference clocks
+      mps125MHzClk      : in  sl;
+      mps125MHzRst      : in  sl;
+      mps312MHzClk      : in  sl;
+      mps312MHzRst      : in  sl;
+      mps625MHzClk      : in  sl;
+      mps625MHzRst      : in  sl;
       -- AXI-Lite Interface
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType;
+      axilClk           : in  sl;
+      axilRst           : in  sl;
+      axilReadMaster    : in  AxiLiteReadMasterType;
+      axilReadSlave     : out AxiLiteReadSlaveType;
+      axilWriteMaster   : in  AxiLiteWriteMasterType;
+      axilWriteSlave    : out AxiLiteWriteSlaveType;
+      -- MPS Interface
+      mpsIbMaster       : in  AxiStreamMasterType;
+      mpsIbSlave        : out AxiStreamSlaveType;
+      -- MPS/FFB configuration/status signals
+      appId             : in  slv(15 downto 0);
+      mpsEnable         : out sl;
+      mpsTestMode       : out sl;
+      ffbEnable         : out sl;
+      ffbTestMode       : out sl;
+      timeStrbRate      : in  slv(31 downto 0);
+      diagnosticClkFreq : in  slv(31 downto 0);
       ----------------------
       -- Top Level Interface
       ----------------------
       -- MPS Interface
-      mpsClk          : in  sl;
-      mpsRst          : in  sl;
-      mpsIbMaster     : in  AxiStreamMasterType;
-      mpsIbSlave      : out AxiStreamSlaveType;
-      mpsObMasters    : out AxiStreamMasterArray(14 downto 1);
-      mpsObSlaves     : in  AxiStreamSlaveArray(14 downto 1);
+      mpsObMasters      : out AxiStreamMasterArray(14 downto 1);
+      mpsObSlaves       : in  AxiStreamSlaveArray(14 downto 1);
       ----------------
       -- Core Ports --
       ----------------
       -- Backplane MPS Ports
-      mpsBusRxP       : in  slv(14 downto 1);
-      mpsBusRxN       : in  slv(14 downto 1);
-      mpsBusTxP       : out slv(14 downto 1);
-      mpsBusTxN       : out slv(14 downto 1);
-      mpsTxP          : out sl;
-      mpsTxN          : out sl);
-end AmcCarrierMps;
+      mpsBusRxP         : in  slv(14 downto 1);
+      mpsBusRxN         : in  slv(14 downto 1);
+      mpsBusTxP         : out slv(14 downto 1);
+      mpsBusTxN         : out slv(14 downto 1);
+      mpsTxP            : out sl;
+      mpsTxN            : out sl);
+end AmcCarrierMpsSalt;
 
-architecture mapping of AmcCarrierMps is
+architecture mapping of AmcCarrierMpsSalt is
 
+   constant STATUS_SIZE_C   : natural                := 15;
+   constant MPS_CHANNELS_C  : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
+   constant MPS_THRESHOLD_C : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
+   constant FFB_CHANNELS_C  : natural range 0 to 32  := getFfbChCnt(APP_TYPE_G);
 
    type RegType is record
+      mpsEnable      : sl;
+      mpsTestMode    : sl;
+      ffbEnable      : sl;
+      ffbTestMode    : sl;
       cntRst         : sl;
-      rollOverEn     : slv(14 downto 0);
+      rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
+      mpsEnable      => '0',
+      mpsTestMode    => '0',
+      ffbEnable      => '0',
+      ffbTestMode    => '0',
       cntRst         => '1',
       rollOverEn     => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
@@ -89,8 +110,8 @@ architecture mapping of AmcCarrierMps is
    signal iDelayCtrlRdy : sl;
    signal mpsTxLinkUp   : sl;
    signal mpsRxLinkUp   : slv(14 downto 1);
-   signal statusOut     : slv(14 downto 0);
-   signal cntOut        : SlVectorArray(14 downto 0, 31 downto 0);
+   signal statusOut     : slv(STATUS_SIZE_C-1 downto 0);
+   signal cntOut        : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
 
 begin
 
@@ -132,13 +153,13 @@ begin
             iDelayCtrlRdy => iDelayCtrlRdy,
             linkUp        => mpsTxLinkUp,
             -- Slave Port
-            sAxisClk      => mpsClk,
-            sAxisRst      => mpsRst,
+            sAxisClk      => axilClk,
+            sAxisRst      => axilRst,
             sAxisMaster   => mpsIbMaster,
             sAxisSlave    => mpsIbSlave,
             -- Master Port
-            mAxisClk      => mpsClk,
-            mAxisRst      => mpsRst,
+            mAxisClk      => axilClk,
+            mAxisRst      => axilRst,
             mAxisMaster   => open,
             mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);            
 
@@ -201,20 +222,21 @@ begin
                iDelayCtrlRdy => iDelayCtrlRdy,
                linkUp        => mpsRxLinkUp(i),
                -- Slave Port
-               sAxisClk      => mpsClk,
-               sAxisRst      => mpsRst,
+               sAxisClk      => axilClk,
+               sAxisRst      => axilRst,
                sAxisMaster   => AXI_STREAM_MASTER_INIT_C,
                sAxisSlave    => open,
                -- Master Port
-               mAxisClk      => mpsClk,
-               mAxisRst      => mpsRst,
+               mAxisClk      => axilClk,
+               mAxisRst      => axilRst,
                mAxisMaster   => mpsObMasters(i),
                mAxisSlave    => mpsObSlaves(i));             
       end generate GEN_VEC;
       
    end generate;
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, cntOut, r, statusOut) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, cntOut, diagnosticClkFreq, r,
+                   statusOut, timeStrbRate) is
       variable v         : RegType;
       variable axiStatus : AxiLiteStatusType;
 
@@ -273,8 +295,18 @@ begin
       axiSlaveRegisterR(x"038", 0, muxSlVectorArray(cntOut, 14));
       axiSlaveRegisterR(x"100", 0, statusOut);
       axiSlaveRegisterR(x"104", 0, ite(MPS_SLOT_G, x"00000001", x"00000000"));
+      axiSlaveRegisterR(x"108", 0, timeStrbRate);
+      axiSlaveRegisterR(x"10C", 0, diagnosticClkFreq);
+      axiSlaveRegisterR(x"110", 0, APP_TYPE_G);
+      axiSlaveRegisterR(x"114", 0, toSlv(MPS_CHANNELS_C, 32));
+      axiSlaveRegisterR(x"118", 0, toSlv(MPS_THRESHOLD_C, 32));
+      axiSlaveRegisterR(x"11C", 0, toSlv(FFB_CHANNELS_C, 32));
 
       -- Map the write registers
+      axiSlaveRegisterW(x"200", 0, v.mpsEnable);
+      axiSlaveRegisterW(x"204", 0, v.mpsTestMode);
+      axiSlaveRegisterW(x"208", 0, v.ffbEnable);
+      axiSlaveRegisterW(x"20C", 0, v.ffbTestMode);
       axiSlaveRegisterW(x"3F0", 0, v.rollOverEn);
       axiSlaveRegisterW(x"3FC", 0, v.cntRst);
 
@@ -292,6 +324,10 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
+      mpsEnable      <= r.mpsEnable;
+      mpsTestMode    <= r.mpsTestMode;
+      ffbEnable      <= r.ffbEnable;
+      ffbTestMode    <= r.ffbTestMode;
       
    end process comb;
 
@@ -308,7 +344,7 @@ begin
          OUT_POLARITY_G => '1',
          CNT_RST_EDGE_G => true,
          CNT_WIDTH_G    => 32,
-         WIDTH_G        => 15)     
+         WIDTH_G        => STATUS_SIZE_C)     
       port map (
          -- Input Status bit Signals (wrClk domain)                  
          statusIn(14 downto 1) => mpsRxLinkUp,

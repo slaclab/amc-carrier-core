@@ -1,18 +1,30 @@
-vhdl work rtl/AmcCarrierPkg.vhd
 
-vhdl work rtl/AmcCarrierBsi.vhd
-vhdl work rtl/AmcCarrierClkAndRst.vhd
-vhdl work rtl/AmcCarrierCore.vhd
-vhdl work rtl/AmcCarrierDdrMem.vhd
-vhdl work rtl/AmcCarrierRegMapping.vhd
-vhdl work rtl/AmcCarrierSysMon.vhd
-vhdl work rtl/AmcCarrierTiming.vhd
-vhdl work rtl/AmcCarrierXaui.vhd
-vhdl work rtl/AmcCarrierMps.vhd
-vhdl work rtl/AmcCarrierMpsMsg.vhd
+vhdl work rtl/AmcCarrierPkg.vhd
+vhdl work rtl/AmcCarrierRegPkg.vhd
+
 vhdl work rtl/AmcCarrierEmptyApp.vhd
 
-vhdl work rtl/CommonAppSupport.vhd
+vhdl work rtl/AmcCarrierCore.vhd
+
+vhdl work rtl/AmcCarrierClkAndRst.vhd
+
+vhdl work rtl/AmcCarrierXaui.vhd
+
+vhdl work rtl/AmcCarrierRegMapping.vhd
+vhdl work rtl/AmcCarrierSysMon.vhd
+
+vhdl work rtl/AmcCarrierBsi.vhd
+
+vhdl work rtl/AmcCarrierTiming.vhd
+
+vhdl work rtl/AmcCarrierDdrMem.vhd
+
+vhdl work rtl/AmcCarrierMpsAndFfb.vhd
+vhdl work rtl/AmcCarrierMpsSalt.vhd
+vhdl work rtl/AmcCarrierMpsMsg.vhd
+vhdl work rtl/AmcCarrierMpsEncoder.vhd
+vhdl work rtl/AmcCarrierMpsComparator.vhd
+vhdl work rtl/AmcCarrierFfbObMsg.vhd
 
 vhdl work coregen/MigCore.dcp
 vhdl work coregen/SysMonCore.dcp

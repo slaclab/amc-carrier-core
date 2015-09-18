@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-09-16
+-- Last update: 2015-09-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,25 +22,34 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 
 package AmcCarrierPkg is
+
+   constant AXI_CLK_FREQ_C : real := 156.25E+6;  -- In units of HZ
+
+   -----------------------------------------------------------
+   -- Application: Configurations, Constants and Records Types
+   -----------------------------------------------------------
+   subtype AppType is slv(4 downto 0);
+   constant APP_MPS_DIN_TYPE_C : AppType := toSlv(0, AppType'length);   -- Type =  0 = 0x00
+   constant APP_PLIC_TYPE_C    : AppType := toSlv(1, AppType'length);   -- Type =  1 = 0x01
+   constant APP_PIC_TYPE_C     : AppType := toSlv(2, AppType'length);   -- Type =  2 = 0x02
+   constant APP_BCM_TYPE_C     : AppType := toSlv(16, AppType'length);  -- Type = 16 = 0x10
+   constant APP_BLEN_TYPE_C    : AppType := toSlv(17, AppType'length);  -- Type = 17 = 0x11
+   constant APP_BPM_TYPE_C     : AppType := toSlv(18, AppType'length);  -- Type = 18 = 0x12
+   constant APP_LLRF_TYPE_C    : AppType := toSlv(19, AppType'length);  -- Type = 19 = 0x13
+   constant APP_NULL_TYPE_C    : AppType := toSlv(31, AppType'length);  -- Type = 31 = 0x1F
+
    ---------------------------------------------------
    -- MPS: Configurations, Constants and Records Types
-   ---------------------------------------------------
+   ---------------------------------------------------   
    constant MPS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(2);
 
-   constant MPS_BCM_TYPE_C : slv(4 downto 0) := "10000";  -- Type = 0x10
-   constant MPS_BCM_LEN_C  : positive        := 1;        -- This number is still TBD
+   function getMpsChCnt(appType        : AppType) return natural;
+   function getMpsThresholdCnt(appType : AppType) return natural;
 
-   constant MPS_BLEN_TYPE_C : slv(4 downto 0) := "10001";  -- Type = 0x11
-   constant MPS_BLEN_LEN_C  : positive        := 1;        -- This number is still TBD
-
-   constant MPS_BPM_TYPE_C : slv(4 downto 0) := "10010";  -- Type = 0x12
-   constant MPS_BPM_LEN_C  : positive        := 11;       -- This number is still TBD
-
-   constant MPS_LLRF_TYPE_C : slv(4 downto 0) := "10011";  -- Type = 0x13
-   constant MPS_LLRF_LEN_C  : positive        := 1;        -- This number is still TBD
-
-   constant MPS_NULL_TYPE_C : slv(4 downto 0) := "11111";  -- Type = 0x1F
-   constant MPS_NULL_LEN_C  : positive        := 1;
+   -------------------------------------------------------------      
+   -- Fast Feedback: Configurations, Constants and Records Types
+   -------------------------------------------------------------      
+   function getFfbChCnt(appType : AppType) return natural;
 
    ---------------------------------------------------
    -- BSI: Configurations, Constants and Records Types
@@ -58,4 +67,56 @@ package AmcCarrierPkg is
       crateId    => x"0000",
       macAddress => (others => (others => '0')));
 
-end AmcCarrierPkg;
+end package AmcCarrierPkg;
+
+package body AmcCarrierPkg is
+
+   function getMpsChCnt (appType : AppType) return natural is
+      variable retVar : natural range 0 to 32;
+   begin
+      case appType is
+         when APP_MPS_DIN_TYPE_C => retVar := 0;  -- TBD value
+         when APP_PLIC_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_PIC_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_BCM_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_BLEN_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_BPM_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_LLRF_TYPE_C    => retVar := 0;  -- TBD value
+         when others             => retVar := 0;
+      end case;
+      return retVar;
+   end function;
+
+   function getMpsThresholdCnt (appType : AppType) return natural is
+      variable retVar : natural range 0 to 256;
+   begin
+      case appType is
+         when APP_MPS_DIN_TYPE_C => retVar := 0;  -- TBD value
+         when APP_PLIC_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_PIC_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_BCM_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_BLEN_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_BPM_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_LLRF_TYPE_C    => retVar := 0;  -- TBD value
+         when others             => retVar := 0;
+      end case;
+      return retVar;
+   end function;
+
+   function getFfbChCnt (appType : AppType) return natural is
+      variable retVar : natural range 0 to 32;
+   begin
+      case appType is
+         when APP_MPS_DIN_TYPE_C => retVar := 0;  -- TBD value
+         when APP_PLIC_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_PIC_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_BCM_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_BLEN_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_BPM_TYPE_C     => retVar := 0;  -- TBD value
+         when APP_LLRF_TYPE_C    => retVar := 0;  -- TBD value
+         when others             => retVar := 0;
+      end case;
+      return retVar;
+   end function;
+   
+end package body AmcCarrierPkg;

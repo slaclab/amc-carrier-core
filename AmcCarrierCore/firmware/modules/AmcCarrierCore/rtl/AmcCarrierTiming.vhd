@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-11
+-- Last update: 2015-09-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,52 +33,54 @@ entity AmcCarrierTiming is
       DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
    port (
       -- AXI-Lite Interface
-      axilClk           : in  sl;
-      axilRst           : in  sl;
-      axilReadMaster    : in  AxiLiteReadMasterType;
-      axilReadSlave     : out AxiLiteReadSlaveType;
-      axilWriteMaster   : in  AxiLiteWriteMasterType;
-      axilWriteSlave    : out AxiLiteWriteSlaveType;
+      axilClk             : in  sl;
+      axilRst             : in  sl;
+      axilReadMaster      : in  AxiLiteReadMasterType;
+      axilReadSlave       : out AxiLiteReadSlaveType;
+      axilWriteMaster     : in  AxiLiteWriteMasterType;
+      axilWriteSlave      : out AxiLiteWriteSlaveType;
       -- AXI4 Interface
-      axiClk            : in  sl;
-      axiRst            : in  sl;
-      axiWriteMaster    : out AxiWriteMasterType;
-      axiWriteSlave     : in  AxiWriteSlaveType;
-      axiReadMaster     : out AxiReadMasterType;
-      axiReadSlave      : in  AxiReadSlaveType;
+      axiClk              : in  sl;
+      axiRst              : in  sl;
+      axiWriteMaster      : out AxiWriteMasterType;
+      axiWriteSlave       : in  AxiWriteSlaveType;
+      axiReadMaster       : out AxiReadMasterType;
+      axiReadSlave        : in  AxiReadSlaveType;
       -- BSA Ethernet Client Interface (axilClk domain)
-      obBsaMaster       : in  AxiStreamMasterType;
-      obBsaSlave        : out AxiStreamSlaveType;
-      ibBsaMaster       : out AxiStreamMasterType;
-      ibBsaSlave        : in  AxiStreamSlaveType;
+      obBsaMaster         : in  AxiStreamMasterType;
+      obBsaSlave          : out AxiStreamSlaveType;
+      ibBsaMaster         : out AxiStreamMasterType;
+      ibBsaSlave          : in  AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
       ----------------------      
       -- Timing Interface 
-      refTimingClk      : out sl;
-      refTimingRst      : out sl;
-      timingClk         : in  sl;
-      timingRst         : in  sl;
-      timingData        : out TimingDataType;
+      refTimingClk        : out sl;
+      refTimingRst        : out sl;
+      timingClk           : in  sl;
+      timingRst           : in  sl;
+      timingData          : out TimingDataType;
       -- Diagnostic Interface
-      diagnosticClk     : in  sl;
-      diagnosticRst     : in  sl;
-      diagnosticMessage : in  Slv32Array(31 downto 0);
-      diagnosticMasters : in  AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticSlaves  : out AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticClk       : in  sl;
+      diagnosticRst       : in  sl;
+      diagnosticValid     : in  sl;
+      diagnosticTimeStamp : in  slv(63 downto 0);
+      diagnosticMessage   : in  Slv32Array(31 downto 0);
+      diagnosticMasters   : in  AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticSlaves    : out AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       ----------------
       -- Core Ports --
       ----------------   
       -- LCLS Timing Ports
-      timingRxP         : in  sl;
-      timingRxN         : in  sl;
-      timingTxP         : out sl;
-      timingTxN         : out sl;
-      timingClkInP      : in  sl;
-      timingClkInN      : in  sl;
-      timingClkOutP     : out sl;
-      timingClkOutN     : out sl;
-      timingClkSel      : out sl);    
+      timingRxP           : in  sl;
+      timingRxN           : in  sl;
+      timingTxP           : out sl;
+      timingTxN           : out sl;
+      timingClkInP        : in  sl;
+      timingClkInN        : in  sl;
+      timingClkOutP       : out sl;
+      timingClkOutN       : out sl;
+      timingClkSel        : out sl);    
 end AmcCarrierTiming;
 
 architecture mapping of AmcCarrierTiming is

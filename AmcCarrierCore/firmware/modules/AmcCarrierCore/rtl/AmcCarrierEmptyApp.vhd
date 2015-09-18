@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2015-09-16
+-- Last update: 2015-09-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -30,8 +30,8 @@ use work.AmcCarrierPkg.all;
 entity AmcCarrierEmptyApp is
    generic (
       TPD_G               : time                := 1 ns;
-      AXI_ERROR_RESP_G    : slv(1 downto 0)     := AXI_RESP_DECERR_C;
       SIM_SPEEDUP_G       : boolean             := false;
+      AXI_ERROR_RESP_G    : slv(1 downto 0)     := AXI_RESP_DECERR_C;
       DIAGNOSTIC_SIZE_G   : positive            := 1;
       DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));      
    port (
@@ -76,107 +76,58 @@ entity AmcCarrierEmptyApp is
       -- Top Level Interface
       ----------------------
       -- AXI-Lite Interface (regClk domain)
-      regClk            : out sl;
-      regRst            : out sl;
-      regReadMaster     : in  AxiLiteReadMasterType;
-      regReadSlave      : out AxiLiteReadSlaveType;
-      regWriteMaster    : in  AxiLiteWriteMasterType;
-      regWriteSlave     : out AxiLiteWriteSlaveType;
+      regClk              : out sl;
+      regRst              : out sl;
+      regReadMaster       : in  AxiLiteReadMasterType;
+      regReadSlave        : out AxiLiteReadSlaveType;
+      regWriteMaster      : in  AxiLiteWriteMasterType;
+      regWriteSlave       : out AxiLiteWriteSlaveType;
       -- Timing Interface (timingClk domain) 
-      timingClk         : out sl;
-      timingRst         : out sl;
-      timingData        : in  TimingDataType;
+      timingClk           : out sl;
+      timingRst           : out sl;
+      timingData          : in  TimingDataType;
       -- Diagnostic Interface (diagnosticClk domain)
-      diagnosticClk     : out sl;
-      diagnosticRst     : out sl;
-      diagnosticMessage : out Slv32Array(31 downto 0);
-      diagnosticMasters : out AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticSlaves  : in  AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      -- MPS Interface (mpsClk domain)
-      mpsClk            : out sl;
-      mpsRst            : out sl;
-      mpsIbMaster       : out AxiStreamMasterType;
-      mpsIbSlave        : in  AxiStreamSlaveType;
-      mpsObMasters      : in  AxiStreamMasterArray(14 downto 1);
-      mpsObSlaves       : out AxiStreamSlaveArray(14 downto 1);
-      -- BSI Interface (bsiClk domain) 
-      bsiClk            : out sl;
-      bsiRst            : out sl;
-      bsiData           : in  BsiDataType;
+      diagnosticClk       : out sl;
+      diagnosticRst       : out sl;
+      diagnosticValid     : out sl;
+      diagnosticTimeStamp : out slv(63 downto 0);
+      diagnosticMessage   : out Slv32Array(31 downto 0);
+      diagnosticMasters   : out AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticSlaves    : in  AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       -- Support Reference Clocks and Resets
-      refTimingClk      : in  sl;
-      refTimingRst      : in  sl;
-      ref125MHzClk      : in  sl;
-      ref125MHzRst      : in  sl;
-      ref156MHzClk      : in  sl;
-      ref156MHzRst      : in  sl;
-      ref312MHzClk      : in  sl;
-      ref312MHzRst      : in  sl;
-      ref625MHzClk      : in  sl;
-      ref625MHzRst      : in  sl;
-      gthFabClk         : in  sl);
+      refTimingClk        : in  sl;
+      refTimingRst        : in  sl;
+      ref156MHzClk        : in  sl;
+      ref156MHzRst        : in  sl);
 end AmcCarrierEmptyApp;
 
-architecture mapping of AmcCarrierEmptyApp is
+architecture top_level_app of AmcCarrierEmptyApp is
 
-   signal testMode : sl;
-   signal mpsMsg   : Slv8Array(MPS_NULL_LEN_C-1 downto 0);
-
-   signal sysClk : sl;
-   signal sysRst : sl;
+   signal clk : sl;
+   signal rst : sl;
 
 begin
 
-   sysClk <= ref156MHzClk;
-   sysRst <= ref156MHzRst;
-
-   diagnosticClk     <= sysClk;
-   diagnosticRst     <= sysRst;
-   diagnosticMessage <= (others => x"00000000");
-   diagnosticMasters <= (others => AXI_STREAM_MASTER_INIT_C);
+   clk                 <= ref156MHzClk;
+   rst                 <= ref156MHzRst;
+   timingClk           <= clk;
+   timingRst           <= rst;
+   diagnosticClk       <= clk;
+   diagnosticRst       <= rst;
+   diagnosticValid     <= timingData.strb;
+   diagnosticTimeStamp <= timingData.msg.timeStamp;
+   diagnosticMessage   <= (others => x"00000000");
+   diagnosticMasters   <= (others => AXI_STREAM_MASTER_INIT_C);
 
    U_AxiLiteEmpty : entity work.AxiLiteEmpty
       generic map (
          TPD_G => TPD_G)
       port map (
-         axiClk         => sysClk,
-         axiClkRst      => sysRst,
+         axiClk         => clk,
+         axiClkRst      => rst,
          axiReadMaster  => regReadMaster,
          axiReadSlave   => regReadSlave,
          axiWriteMaster => regWriteMaster,
          axiWriteSlave  => regWriteSlave);
 
-   testMode <= '0';
-   mpsMsg   <= (others => x"0");
-
-   U_CommonAppSupport : entity work.CommonAppSupport
-      generic map (
-         TPD_G      => TPD_G,
-         MPS_TYPE_G => MPS_NULL_TYPE_C,
-         MPS_LEN_G  => MPS_NULL_LEN_C)
-      port map (
-         -- User Interface
-         sysClk       => sysClk,
-         sysRst       => sysRst,
-         testMode     => testMode,
-         mpsMsg       => mpsMsg,
-         -- AXI-Lite Interface
-         regClk       => regClk,
-         regRst       => regRst,
-         -- Timing Interface
-         timingClk    => timingClk,
-         timingRst    => timingRst,
-         timingData   => timingData,
-         -- BSI Interface
-         bsiClk       => bsiClk,
-         bsiRst       => bsiRst,
-         bsiData      => bsiData,
-         -- MPS Interface
-         mpsClk       => mpsClk,
-         mpsRst       => mpsRst,
-         mpsIbMaster  => mpsIbMaster,
-         mpsIbSlave   => mpsIbSlave,
-         mpsObMasters => mpsObMasters,
-         mpsObSlaves  => mpsObSlaves);       
-
-end mapping;
+end top_level_app;
