@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-18
+-- Last update: 2015-09-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ entity AmcCarrierTiming is
       axiWriteSlave       : in  AxiWriteSlaveType;
       axiReadMaster       : out AxiReadMasterType;
       axiReadSlave        : in  AxiReadSlaveType;
-      -- BSA Ethernet Client Interface (axilClk domain)
+      -- BSA Ethernet Interface (axilClk domain)
       obBsaMaster         : in  AxiStreamMasterType;
       obBsaSlave          : out AxiStreamSlaveType;
       ibBsaMaster         : out AxiStreamMasterType;

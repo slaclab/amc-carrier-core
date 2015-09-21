@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-09-18
+-- Last update: 2015-09-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -50,6 +50,23 @@ package AmcCarrierPkg is
    -- Fast Feedback: Configurations, Constants and Records Types
    -------------------------------------------------------------      
    function getFfbChCnt(appType : AppType) return natural;
+
+   type FfbDataType is record
+      valid     : sl;
+      testMode  : sl;
+      app       : AppType;
+      appId     : slv(15 downto 0);
+      timeStamp : slv(63 downto 0);
+      message   : Slv32Array(31 downto 0);
+   end record;
+   type FfbDataArray is array (natural range <>) of FfbDataType;
+   constant FFB_DATA_INIT_C : FfbDataType := (
+      valid     => '0',
+      testMode  => '0',
+      app       => (others => '0'),
+      appId     => (others => '0'),
+      timeStamp => (others => '0'),
+      message   => (others => (others => '0')));   
 
    ---------------------------------------------------
    -- BSI: Configurations, Constants and Records Types

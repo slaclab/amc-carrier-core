@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-18
+-- Last update: 2015-09-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,10 +37,10 @@ entity AmcCarrierRegMapping is
       -- Primary AXI-Lite Interface
       axilClk           : in    sl;
       axilRst           : in    sl;
-      sAxilReadMaster   : in    AxiLiteReadMasterType;
-      sAxilReadSlave    : out   AxiLiteReadSlaveType;
-      sAxilWriteMaster  : in    AxiLiteWriteMasterType;
-      sAxilWriteSlave   : out   AxiLiteWriteSlaveType;
+      sAxilReadMasters  : in    AxiLiteReadMasterArray(3 downto 0);
+      sAxilReadSlaves   : out   AxiLiteReadSlaveArray(3 downto 0);
+      sAxilWriteMasters : in    AxiLiteWriteMasterArray(3 downto 0);
+      sAxilWriteSlaves  : out   AxiLiteWriteSlaveArray(3 downto 0);
       -- Timing AXI-Lite Interface
       timingReadMaster  : out   AxiLiteReadMasterType;
       timingReadSlave   : in    AxiLiteReadSlaveType;
@@ -238,20 +238,20 @@ begin
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_SLAVE_SLOTS_G  => 4,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
       port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => sAxilWriteMaster,
-         sAxiWriteSlaves(0)  => sAxilWriteSlave,
-         sAxiReadMasters(0)  => sAxilReadMaster,
-         sAxiReadSlaves(0)   => sAxilReadSlave,
-         mAxiWriteMasters    => mAxilWriteMasters,
-         mAxiWriteSlaves     => mAxilWriteSlaves,
-         mAxiReadMasters     => mAxilReadMasters,
-         mAxiReadSlaves      => mAxilReadSlaves);      
+         axiClk           => axilClk,
+         axiClkRst        => axilRst,
+         sAxiWriteMasters => sAxilWriteMasters,
+         sAxiWriteSlaves  => sAxilWriteSlaves,
+         sAxiReadMasters  => sAxilReadMasters,
+         sAxiReadSlaves   => sAxilReadSlaves,
+         mAxiWriteMasters => mAxilWriteMasters,
+         mAxiWriteSlaves  => mAxilWriteSlaves,
+         mAxiReadMasters  => mAxilReadMasters,
+         mAxiReadSlaves   => mAxilReadSlaves);      
 
    --------------------------
    -- AXI-Lite Version Module

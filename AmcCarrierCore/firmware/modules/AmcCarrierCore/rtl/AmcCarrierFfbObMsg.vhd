@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-18
+-- Last update: 2015-09-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ begin
                v.ffbMaster.tData(31 downto 16)                := appId;
                v.ffbMaster.tData(15)                          := testMode;
                v.ffbMaster.tData((AppType'length)+7 downto 8) := APP_TYPE_G;
-               v.ffbMaster.tData(7 downto 0)                  := toSlv(FFB_CHANNELS_C+11, 8);
+               v.ffbMaster.tData(7 downto 0)                  := toSlv(FFB_CHANNELS_C, 8);
                -- Set SOF
                ssiSetUserSof(IP_ENGINE_CONFIG_C, v.ffbMaster, '1');
                -- Check for EOF

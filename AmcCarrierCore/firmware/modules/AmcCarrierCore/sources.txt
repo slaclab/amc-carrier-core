@@ -3,20 +3,19 @@ vhdl work rtl/AmcCarrierPkg.vhd
 vhdl work rtl/AmcCarrierRegPkg.vhd
 
 vhdl work rtl/AmcCarrierEmptyApp.vhd
-
 vhdl work rtl/AmcCarrierCore.vhd
-
 vhdl work rtl/AmcCarrierClkAndRst.vhd
 
-vhdl work rtl/AmcCarrierXaui.vhd
+vhdl work rtl/AmcCarrierEth.vhd
+vhdl work rtl/AmcCarrierEthNoVlan.vhd
+vhdl work rtl/AmcCarrierEthVlan.vhd
+vhdl work rtl/AmcCarrierFfbIbMsg.vhd
 
 vhdl work rtl/AmcCarrierRegMapping.vhd
 vhdl work rtl/AmcCarrierSysMon.vhd
-
 vhdl work rtl/AmcCarrierBsi.vhd
 
 vhdl work rtl/AmcCarrierTiming.vhd
-
 vhdl work rtl/AmcCarrierDdrMem.vhd
 
 vhdl work rtl/AmcCarrierMpsAndFfb.vhd

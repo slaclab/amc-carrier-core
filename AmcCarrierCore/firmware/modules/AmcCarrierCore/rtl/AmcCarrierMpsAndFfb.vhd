@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-18
+-- Last update: 2015-09-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ entity AmcCarrierMpsAndFfb is
       axilReadSlave       : out AxiLiteReadSlaveType;
       axilWriteMaster     : in  AxiLiteWriteMasterType;
       axilWriteSlave      : out AxiLiteWriteSlaveType;
-      -- FFB Interface
+      -- FFB Outbound Interface
       ffbObMaster         : out AxiStreamMasterType;
       ffbObSlave          : in  AxiStreamSlaveType;
       ----------------------

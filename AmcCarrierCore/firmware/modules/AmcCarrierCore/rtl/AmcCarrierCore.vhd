@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-18
+-- Last update: 2015-09-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -36,6 +36,7 @@ entity AmcCarrierCore is
       MPS_SLOT_G          : boolean             := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G              : boolean             := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G          : AppType             := APP_NULL_TYPE_C;
+      FFB_CLIENT_SIZE_G   : positive            := 1;
       DIAGNOSTIC_SIZE_G   : positive            := 1;
       DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
    port (
@@ -62,13 +63,17 @@ entity AmcCarrierCore is
       diagnosticMessage   : in    Slv32Array(31 downto 0);
       diagnosticMasters   : in    AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       diagnosticSlaves    : out   AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      -- MPS Concentrator Interface (diagnosticClk domain)
-      mpsObMasters        : out   AxiStreamMasterArray(14 downto 1);
-      mpsObSlaves         : in    AxiStreamSlaveArray(14 downto 1) := (others => AXI_STREAM_SLAVE_FORCE_C);
+      -- FFB Inbound Interface (ffbClk domain)
+      ffbClk              : in    sl                               := '0';
+      ffbRst              : in    sl                               := '0';
+      ffbData             : out   FfbDataType;
       -- BSI Interface (bsiClk domain) 
       bsiClk              : in    sl                               := '0';
       bsiRst              : in    sl                               := '0';
       bsiData             : out   BsiDataType;
+      -- MPS Concentrator Interface (diagnosticClk domain)
+      mpsObMasters        : out   AxiStreamMasterArray(14 downto 1);
+      mpsObSlaves         : in    AxiStreamSlaveArray(14 downto 1) := (others => AXI_STREAM_SLAVE_FORCE_C);
       -- Reference Clocks and Resets
       refTimingClk        : out   sl;
       refTimingRst        : out   sl;
@@ -167,12 +172,12 @@ architecture mapping of AmcCarrierCore is
    signal mps625MHzClk : sl;
    signal mps625MHzRst : sl;
 
-   signal axilClk         : sl;
-   signal axilRst         : sl;
-   signal axilReadMaster  : AxiLiteReadMasterType;
-   signal axilReadSlave   : AxiLiteReadSlaveType;
-   signal axilWriteMaster : AxiLiteWriteMasterType;
-   signal axilWriteSlave  : AxiLiteWriteSlaveType;
+   signal axilClk          : sl;
+   signal axilRst          : sl;
+   signal axilReadMasters  : AxiLiteReadMasterArray(3 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(3 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(3 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(3 downto 0);
 
    signal axiClk         : sl;
    signal axiRst         : sl;
@@ -266,51 +271,59 @@ begin
          mpsClkOut    => mpsClkOut);
 
    ------------------------------------
-   -- 10 GigE XAUI Module (ATCA ZONE 2)
+   -- Ethernet Module (ATCA ZONE 2)
    ------------------------------------
-   U_Xaui : entity work.AmcCarrierXaui
+   U_Eth : entity work.AmcCarrierEth
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
+         TPD_G             => TPD_G,
+         FFB_CLIENT_SIZE_G => FFB_CLIENT_SIZE_G,
+         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
       port map (
          -- Local Configuration
-         localMac         => localMac,
-         localIp          => localIp,
+         localMac          => localMac,
+         localIp           => localIp,
          -- Master AXI-Lite Interface
-         mAxilReadMaster  => axilReadMaster,
-         mAxilReadSlave   => axilReadSlave,
-         mAxilWriteMaster => axilWriteMaster,
-         mAxilWriteSlave  => axilWriteSlave,
+         mAxilReadMasters  => axilReadMasters,
+         mAxilReadSlaves   => axilReadSlaves,
+         mAxilWriteMasters => axilWriteMasters,
+         mAxilWriteSlaves  => axilWriteSlaves,
          -- AXI-Lite Interface
-         axilClk          => axilClk,
-         axilRst          => axilRst,
-         axilReadMaster   => xauiReadMaster,
-         axilReadSlave    => xauiReadSlave,
-         axilWriteMaster  => xauiWriteMaster,
-         axilWriteSlave   => xauiWriteSlave,
-         -- BSA Ethernet Client Interface
-         obBsaMaster      => obBsaMaster,
-         obBsaSlave       => obBsaSlave,
-         ibBsaMaster      => ibBsaMaster,
-         ibBsaSlave       => ibBsaSlave,
+         axilClk           => axilClk,
+         axilRst           => axilRst,
+         axilReadMaster    => xauiReadMaster,
+         axilReadSlave     => xauiReadSlave,
+         axilWriteMaster   => xauiWriteMaster,
+         axilWriteSlave    => xauiWriteSlave,
+         -- BSA Ethernet Interface
+         obBsaMaster       => obBsaMaster,
+         obBsaSlave        => obBsaSlave,
+         ibBsaMaster       => ibBsaMaster,
+         ibBsaSlave        => ibBsaSlave,
          -- Boot Prom AXI Streaming Interface
-         obPromMaster     => obPromMaster,
-         obPromSlave      => obPromSlave,
-         ibPromMaster     => ibPromMaster,
-         ibPromSlave      => ibPromSlave,
+         obPromMaster      => obPromMaster,
+         obPromSlave       => obPromSlave,
+         ibPromMaster      => ibPromMaster,
+         ibPromSlave       => ibPromSlave,
          -- Outbound FFB Interface
-         ffbObMaster      => ffbObMaster,
-         ffbObSlave       => ffbObSlave,
+         ffbObMaster       => ffbObMaster,
+         ffbObSlave        => ffbObSlave,
+         ----------------------
+         -- Top Level Interface
+         ----------------------
+         -- FFB Inbound Interface (ffbClk domain)         
+         ffbClk            => ffbClk,
+         ffbRst            => ffbRst,
+         ffbData           => ffbData,
          ----------------
          -- Core Ports --
          ----------------   
          -- XAUI Ports
-         xauiRxP          => xauiRxP,
-         xauiRxN          => xauiRxN,
-         xauiTxP          => xauiTxP,
-         xauiTxN          => xauiTxN,
-         xauiClkP         => xauiClkP,
-         xauiClkN         => xauiClkN);    
+         xauiRxP           => xauiRxP,
+         xauiRxN           => xauiRxN,
+         xauiTxP           => xauiTxP,
+         xauiTxN           => xauiTxN,
+         xauiClkP          => xauiClkP,
+         xauiClkN          => xauiClkN);    
 
    ----------------------------------   
    -- Register Address Mapping Module
@@ -324,10 +337,10 @@ begin
          -- Primary AXI-Lite Interface
          axilClk           => axilClk,
          axilRst           => axilRst,
-         sAxilReadMaster   => axilReadMaster,
-         sAxilReadSlave    => axilReadSlave,
-         sAxilWriteMaster  => axilWriteMaster,
-         sAxilWriteSlave   => axilWriteSlave,
+         sAxilReadMasters  => axilReadMasters,
+         sAxilReadSlaves   => axilReadSlaves,
+         sAxilWriteMasters => axilWriteMasters,
+         sAxilWriteSlaves  => axilWriteSlaves,
          -- Timing AXI-Lite Interface
          timingReadMaster  => timingReadMaster,
          timingReadSlave   => timingReadSlave,
@@ -422,7 +435,7 @@ begin
          axiWriteSlave       => axiWriteSlave,
          axiReadMaster       => axiReadMaster,
          axiReadSlave        => axiReadSlave,
-         -- BSA Ethernet Client Interface (axilClk domain)
+         -- BSA Ethernet Interface (axilClk domain)
          obBsaMaster         => obBsaMaster,
          obBsaSlave          => obBsaSlave,
          ibBsaMaster         => ibBsaMaster,
