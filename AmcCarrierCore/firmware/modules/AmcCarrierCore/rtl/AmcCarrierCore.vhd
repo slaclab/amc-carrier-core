@@ -71,7 +71,7 @@ entity AmcCarrierCore is
       bsiClk              : in    sl                               := '0';
       bsiRst              : in    sl                               := '0';
       bsiData             : out   BsiDataType;
-      -- MPS Concentrator Interface (diagnosticClk domain)
+      -- MPS Concentrator Interface (ref156MHzClk domain)
       mpsObMasters        : out   AxiStreamMasterArray(14 downto 1);
       mpsObSlaves         : in    AxiStreamSlaveArray(14 downto 1) := (others => AXI_STREAM_SLAVE_FORCE_C);
       -- Reference Clocks and Resets
