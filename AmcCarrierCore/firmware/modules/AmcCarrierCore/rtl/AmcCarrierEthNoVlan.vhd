@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-09-21
+-- Last update: 2015-09-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -80,8 +80,8 @@ architecture mapping of AmcCarrierEthNoVlan is
    signal ibServerMasters : AxiStreamMasterArray(SERVER_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal ibServerSlaves  : AxiStreamSlaveArray(SERVER_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
-   signal axilIbTxMasters : AxiStreamMasterArray(3 downto 0);
-   signal axilObTxMasters : AxiStreamMasterArray(3 downto 0);
+   signal sAxisMasters : AxiStreamMasterArray(3 downto 0);
+   signal mAxisMasters : AxiStreamMasterArray(3 downto 0);
    
 begin
 
@@ -143,8 +143,8 @@ begin
    GEN_VEC :
    for i in 3 downto 0 generate
       
-      axilIbTxMasters(i) <= Axis32BitEndianConvert(obServerMasters(i));
-      ibServerMasters(i) <= Axis32BitEndianConvert(axilObTxMasters(i));
+      sAxisMasters(i)    <= Axis32BitEndianConvert(obServerMasters(i));
+      ibServerMasters(i) <= Axis32BitEndianConvert(mAxisMasters(i));
       U_SsiAxiLiteMaster : entity work.SsiAxiLiteMaster
          generic map (
             TPD_G               => TPD_G,
@@ -157,13 +157,13 @@ begin
             -- Streaming Slave (Rx) Interface (sAxisClk domain) 
             sAxisClk            => axilClk,
             sAxisRst            => axilRst,
-            sAxisMaster         => axilIbTxMasters(i),
-            sAxisSlave          => ibServerSlaves(i),
+            sAxisMaster         => sAxisMasters(i),
+            sAxisSlave          => obServerSlaves(i),
             -- Streaming Master (Tx) Data Interface (mAxisClk domain)
             mAxisClk            => axilClk,
             mAxisRst            => axilRst,
-            mAxisMaster         => axilObTxMasters(i),
-            mAxisSlave          => obServerSlaves(i),
+            mAxisMaster         => mAxisMasters(i),
+            mAxisSlave          => ibServerSlaves(i),
             -- AXI Lite Bus (axiLiteClk domain)
             axiLiteClk          => axilClk,
             axiLiteRst          => axilRst,
