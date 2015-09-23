@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-09-22
+-- Last update: 2015-09-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -79,9 +79,6 @@ architecture mapping of AmcCarrierEthNoVlan is
    signal obServerSlaves  : AxiStreamSlaveArray(SERVER_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
    signal ibServerMasters : AxiStreamMasterArray(SERVER_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal ibServerSlaves  : AxiStreamSlaveArray(SERVER_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
-
-   signal sAxisMasters : AxiStreamMasterArray(3 downto 0);
-   signal mAxisMasters : AxiStreamMasterArray(3 downto 0);
    
 begin
 
@@ -143,8 +140,6 @@ begin
    GEN_VEC :
    for i in 3 downto 0 generate
       
-      sAxisMasters(i)    <= Axis32BitEndianConvert(obServerMasters(i));
-      ibServerMasters(i) <= Axis32BitEndianConvert(mAxisMasters(i));
       U_SsiAxiLiteMaster : entity work.SsiAxiLiteMaster
          generic map (
             TPD_G               => TPD_G,
@@ -157,12 +152,12 @@ begin
             -- Streaming Slave (Rx) Interface (sAxisClk domain) 
             sAxisClk            => axilClk,
             sAxisRst            => axilRst,
-            sAxisMaster         => sAxisMasters(i),
+            sAxisMaster         => obServerMasters(i),
             sAxisSlave          => obServerSlaves(i),
             -- Streaming Master (Tx) Data Interface (mAxisClk domain)
             mAxisClk            => axilClk,
             mAxisRst            => axilRst,
-            mAxisMaster         => mAxisMasters(i),
+            mAxisMaster         => ibServerMasters(i),
             mAxisSlave          => ibServerSlaves(i),
             -- AXI Lite Bus (axiLiteClk domain)
             axiLiteClk          => axilClk,
@@ -177,9 +172,9 @@ begin
    -----------------------------------------
    -- Server[4]@8196 = PROM Inbound/Outbound
    -----------------------------------------
-   ibServerMasters(4) <= Axis32BitEndianConvert(obPromMaster);
+   ibServerMasters(4) <= obPromMaster;
    obPromSlave        <= ibServerSlaves(4);
-   ibPromMaster       <= Axis32BitEndianConvert(obServerMasters(4));
+   ibPromMaster       <= obServerMasters(4);
    obServerSlaves(4)  <= ibPromSlave;
 
    ----------------------------------------     
