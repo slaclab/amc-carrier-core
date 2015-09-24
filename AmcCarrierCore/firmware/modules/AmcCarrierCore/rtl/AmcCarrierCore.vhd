@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-21
+-- Last update: 2015-09-24
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -55,6 +55,7 @@ entity AmcCarrierCore is
       timingClk           : in    sl;
       timingRst           : in    sl;
       timingData          : out   TimingDataType;
+      timingPhy           : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk       : in    sl;
       diagnosticRst       : in    sl;
@@ -416,6 +417,7 @@ begin
    U_Timing : entity work.AmcCarrierTiming
       generic map (
          TPD_G               => TPD_G,
+         APP_TYPE_G          => APP_TYPE_G,
          AXI_ERROR_RESP_G    => AXI_ERROR_RESP_C,
          STANDALONE_TIMING_G => STANDALONE_TIMING_G,
          DIAGNOSTIC_SIZE_G   => DIAGNOSTIC_SIZE_G,
@@ -449,6 +451,7 @@ begin
          timingClk           => timingClk,
          timingRst           => timingRst,
          timingData          => timingData,
+         timingPhy           => timingPhy,
          -- Diagnostic Interface
          diagnosticClk       => diagnosticClk,
          diagnosticRst       => diagnosticRst,
