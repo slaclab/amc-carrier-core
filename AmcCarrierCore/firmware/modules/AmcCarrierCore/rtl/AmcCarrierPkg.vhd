@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-09-21
+-- Last update: 2015-09-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,6 +37,8 @@ package AmcCarrierPkg is
    constant APP_BPM_TYPE_C     : AppType := toSlv(18, AppType'length);  -- Type = 18 = 0x12
    constant APP_LLRF_TYPE_C    : AppType := toSlv(19, AppType'length);  -- Type = 19 = 0x13
    constant APP_NULL_TYPE_C    : AppType := toSlv(31, AppType'length);  -- Type = 31 = 0x1F
+
+   constant APP_REG_BASE_ADDR_C : slv(31 downto 0) := x"80000000";
 
    ---------------------------------------------------
    -- MPS: Configurations, Constants and Records Types
