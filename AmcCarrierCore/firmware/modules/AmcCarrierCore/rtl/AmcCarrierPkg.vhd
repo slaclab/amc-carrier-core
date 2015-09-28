@@ -29,15 +29,15 @@ package AmcCarrierPkg is
    -- Application: Configurations, Constants and Records Types
    -----------------------------------------------------------
    subtype AppType is slv(4 downto 0);
-   constant APP_MPS_DIN_TYPE_C : AppType := toSlv(0, AppType'length);   -- Type =  0 = 0x00
-   constant APP_PLIC_TYPE_C    : AppType := toSlv(1, AppType'length);   -- Type =  1 = 0x01
-   constant APP_PIC_TYPE_C     : AppType := toSlv(2, AppType'length);   -- Type =  2 = 0x02
-   constant APP_BCM_TYPE_C     : AppType := toSlv(16, AppType'length);  -- Type = 16 = 0x10
-   constant APP_BLEN_TYPE_C    : AppType := toSlv(17, AppType'length);  -- Type = 17 = 0x11
-   constant APP_BPM_TYPE_C     : AppType := toSlv(18, AppType'length);  -- Type = 18 = 0x12
-   constant APP_LLRF_TYPE_C    : AppType := toSlv(19, AppType'length);  -- Type = 19 = 0x13
-   constant APP_NULL_TYPE_C    : AppType := toSlv(31, AppType'length);  -- Type = 31 = 0x1F
-
+   constant APP_MPS_DIN_TYPE_C  : AppType          := toSlv(0, AppType'length);  -- Type =  0 = 0x00
+   constant APP_PLIC_TYPE_C     : AppType          := toSlv(1, AppType'length);  -- Type =  1 = 0x01
+   constant APP_PIC_TYPE_C      : AppType          := toSlv(2, AppType'length);  -- Type =  2 = 0x02
+   constant APP_BCM_TYPE_C      : AppType          := toSlv(16, AppType'length);  -- Type = 16 = 0x10
+   constant APP_BLEN_TYPE_C     : AppType          := toSlv(17, AppType'length);  -- Type = 17 = 0x11
+   constant APP_BPM_TYPE_C      : AppType          := toSlv(18, AppType'length);  -- Type = 18 = 0x12
+   constant APP_LLRF_TYPE_C     : AppType          := toSlv(19, AppType'length);  -- Type = 19 = 0x13
+   constant APP_TIME_GEN_TYPE_C : AppType          := toSlv(20, AppType'length);  -- Type = 20 = 0x14
+   constant APP_NULL_TYPE_C     : AppType          := toSlv(31, AppType'length);  -- Type = 31 = 0x1F
    constant APP_REG_BASE_ADDR_C : slv(31 downto 0) := x"80000000";
 
    ---------------------------------------------------
