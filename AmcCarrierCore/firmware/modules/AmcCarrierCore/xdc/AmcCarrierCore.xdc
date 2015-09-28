@@ -64,8 +64,8 @@ set_property -dict { PACKAGE_PIN AF10 IOSTANDARD LVCMOS25 }           [get_ports
 set_property -dict { PACKAGE_PIN AG10 IOSTANDARD LVCMOS25 SLEW FAST } [get_ports {mpsClkOut}]
 
 # LCLS Timing Ports
-set_property -dict { PACKAGE_PIN AH13 IOSTANDARD LVDS_25  } [get_ports {timingClkOutP}]
-set_property -dict { PACKAGE_PIN AJ13 IOSTANDARD LVDS_25  } [get_ports {timingClkOutN}]
+set_property -dict { PACKAGE_PIN AH13 IOSTANDARD LVDS_25  } [get_ports {timingRecClkOutP}]
+set_property -dict { PACKAGE_PIN AJ13 IOSTANDARD LVDS_25  } [get_ports {timingRecClkOutN}]
 set_property -dict { PACKAGE_PIN K22  IOSTANDARD LVCMOS25 } [get_ports {timingClkSel}]
 set_property -dict { PACKAGE_PIN AE11 IOSTANDARD LVCMOS25 } [get_ports {timingClkScl}]
 set_property -dict { PACKAGE_PIN AD11 IOSTANDARD LVCMOS25 } [get_ports {timingClkSda}]
@@ -74,8 +74,8 @@ set_property PACKAGE_PIN AK6  [get_ports {timingTxP}]
 set_property PACKAGE_PIN AK5  [get_ports {timingTxN}]
 set_property PACKAGE_PIN AJ4  [get_ports {timingRxP}]
 set_property PACKAGE_PIN AJ3  [get_ports {timingRxN}]
-set_property PACKAGE_PIN Y6   [get_ports {timingClkInP}]
-set_property PACKAGE_PIN Y5   [get_ports {timingClkInN}]
+set_property PACKAGE_PIN Y6   [get_ports {timingRefClkInP}]
+set_property PACKAGE_PIN Y5   [get_ports {timingRefClkInN}]
 
 # Crossbar Ports
 set_property -dict { PACKAGE_PIN AF13 IOSTANDARD LVCMOS25 } [get_ports {xBarSin[0]}] 

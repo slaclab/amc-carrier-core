@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2015-09-18
+-- Last update: 2015-09-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -95,8 +95,8 @@ entity AmcCarrierEmptyApp is
       diagnosticMasters   : out AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       diagnosticSlaves    : in  AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       -- Support Reference Clocks and Resets
-      refTimingClk        : in  sl;
-      refTimingRst        : in  sl;
+      recTimingClk        : in  sl;
+      recTimingRst        : in  sl;
       ref156MHzClk        : in  sl;
       ref156MHzRst        : in  sl);
 end AmcCarrierEmptyApp;

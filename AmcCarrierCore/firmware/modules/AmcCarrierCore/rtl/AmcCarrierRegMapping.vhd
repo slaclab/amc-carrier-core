@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-21
+-- Last update: 2015-09-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -46,6 +46,11 @@ entity AmcCarrierRegMapping is
       timingReadSlave   : in    AxiLiteReadSlaveType;
       timingWriteMaster : out   AxiLiteWriteMasterType;
       timingWriteSlave  : in    AxiLiteWriteSlaveType;
+      -- BSA AXI-Lite Interface
+      bsaReadMaster  : out   AxiLiteReadMasterType;
+      bsaReadSlave   : in    AxiLiteReadSlaveType;
+      bsaWriteMaster : out   AxiLiteWriteMasterType;
+      bsaWriteSlave  : in    AxiLiteWriteSlaveType;
       -- XAUI PHY AXI-Lite Interface
       xauiReadMaster    : out   AxiLiteReadMasterType;
       xauiReadSlave     : in    AxiLiteReadSlaveType;
@@ -113,7 +118,7 @@ end AmcCarrierRegMapping;
 
 architecture mapping of AmcCarrierRegMapping is
 
-   constant NUM_AXI_MASTERS_C : natural := 13;
+   constant NUM_AXI_MASTERS_C : natural := 14;
 
    constant VERSION_INDEX_C    : natural := 0;
    constant SYSMON_INDEX_C     : natural := 1;
@@ -124,10 +129,11 @@ architecture mapping of AmcCarrierRegMapping is
    constant DDR_I2C_INDEX_C    : natural := 6;
    constant IPMC_INDEX_C       : natural := 7;
    constant TIMING_INDEX_C     : natural := 8;
-   constant XAUI_INDEX_C       : natural := 9;
-   constant DDR_INDEX_C        : natural := 10;
-   constant MPS_INDEX_C        : natural := 11;
-   constant APP_INDEX_C        : natural := 12;
+   constant BSA_INDEX_C : natural := 9;
+   constant XAUI_INDEX_C       : natural := 10;
+   constant DDR_INDEX_C        : natural := 11;
+   constant MPS_INDEX_C        : natural := 12;
+   constant APP_INDEX_C        : natural := 13;
    
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       VERSION_INDEX_C    => (
@@ -170,6 +176,10 @@ architecture mapping of AmcCarrierRegMapping is
          baseAddr        => TIMING_ADDR_C,
          addrBits        => 24,
          connectivity    => x"FFFF"),
+      BSA_INDEX_C     => (
+         baseAddr        => BSA_ADDR_C,
+         addrBits        => 24,
+         connectivity    => x"FFFF"),      
       DDR_INDEX_C        => (
          baseAddr        => DDR_ADDR_C,
          addrBits        => 24,
@@ -479,6 +489,14 @@ begin
    mAxilReadSlaves(TIMING_INDEX_C)  <= timingReadSlave;
    timingWriteMaster                <= mAxilWriteMasters(TIMING_INDEX_C);
    mAxilWriteSlaves(TIMING_INDEX_C) <= timingWriteSlave;
+
+   --------------------------------------
+   -- Map the AXI-Lite to BSA Firmware
+   --------------------------------------
+   bsaReadMaster                 <= mAxilReadMasters(BSA_INDEX_C);
+   mAxilReadSlaves(BSA_INDEX_C)  <= bsaReadSlave;
+   bsaWriteMaster                <= mAxilWriteMasters(BSA_INDEX_C);
+   mAxilWriteSlaves(BSA_INDEX_C) <= bsaWriteSlave;
 
    ----------------------------------------
    -- Map the AXI-Lite to XAUI PHY Firmware

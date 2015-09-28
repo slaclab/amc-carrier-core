@@ -16,6 +16,7 @@ vhdl work rtl/AmcCarrierSysMon.vhd
 vhdl work rtl/AmcCarrierBsi.vhd
 
 vhdl work rtl/AmcCarrierTiming.vhd
+vhdl work rtl/AmcCarrierBsa.vhd
 vhdl work rtl/AmcCarrierDdrMem.vhd
 
 vhdl work rtl/AmcCarrierMpsAndFfb.vhd

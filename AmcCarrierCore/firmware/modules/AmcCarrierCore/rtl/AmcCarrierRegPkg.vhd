@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-09-18
+-- Last update: 2015-09-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,9 +33,10 @@ package AmcCarrierRegPkg is
    constant DDR_I2C_ADDR_C    : slv(31 downto 0) := x"06000000";
    constant IPMC_ADDR_C       : slv(31 downto 0) := x"07000000";
    constant TIMING_ADDR_C     : slv(31 downto 0) := x"08000000";
-   constant XAUI_ADDR_C       : slv(31 downto 0) := x"09000000";
-   constant DDR_ADDR_C        : slv(31 downto 0) := x"0A000000";
-   constant MPS_ADDR_C        : slv(31 downto 0) := x"0B000000";
+   constant BSA_ADDR_C        : slv(31 downto 0) := X"09000000";
+   constant XAUI_ADDR_C       : slv(31 downto 0) := x"0A000000";
+   constant DDR_ADDR_C        : slv(31 downto 0) := x"0B000000";
+   constant MPS_ADDR_C        : slv(31 downto 0) := x"0C000000";
    constant APP_ADDR_C        : slv(31 downto 0) := x"80000000";
 
 end AmcCarrierRegPkg;

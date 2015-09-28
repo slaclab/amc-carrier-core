@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-24
+-- Last update: 2015-09-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -76,8 +76,8 @@ entity AmcCarrierCore is
       mpsObMasters        : out   AxiStreamMasterArray(14 downto 1);
       mpsObSlaves         : in    AxiStreamSlaveArray(14 downto 1) := (others => AXI_STREAM_SLAVE_FORCE_C);
       -- Reference Clocks and Resets
-      refTimingClk        : out   sl;
-      refTimingRst        : out   sl;
+      recTimingClk        : out   sl;
+      recTimingRst        : out   sl;
       ref125MHzClk        : out   sl;
       ref125MHzRst        : out   sl;
       ref156MHzClk        : out   sl;
@@ -114,10 +114,10 @@ entity AmcCarrierCore is
       timingRxN           : in    sl;
       timingTxP           : out   sl;
       timingTxN           : out   sl;
-      timingClkInP        : in    sl;
-      timingClkInN        : in    sl;
-      timingClkOutP       : out   sl;
-      timingClkOutN       : out   sl;
+      timingRefClkInP     : in    sl;
+      timingRefClkInN     : in    sl;
+      timingRecClkOutP    : out   sl;
+      timingRecClkOutN    : out   sl;
       timingClkSel        : out   sl;
       timingClkScl        : inout sl;
       timingClkSda        : inout sl;
@@ -159,7 +159,7 @@ entity AmcCarrierCore is
       ddrSda              : inout sl;
       -- SYSMON Ports
       vPIn                : in    sl;
-      vNIn                : in    sl);      
+      vNIn                : in    sl);
 end AmcCarrierCore;
 
 architecture mapping of AmcCarrierCore is
@@ -191,6 +191,11 @@ architecture mapping of AmcCarrierCore is
    signal timingReadSlave   : AxiLiteReadSlaveType;
    signal timingWriteMaster : AxiLiteWriteMasterType;
    signal timingWriteSlave  : AxiLiteWriteSlaveType;
+
+   signal bsaReadMaster  : AxiLiteReadMasterType;
+   signal bsaReadSlave   : AxiLiteReadSlaveType;
+   signal bsaWriteMaster : AxiLiteWriteMasterType;
+   signal bsaWriteSlave  : AxiLiteWriteSlaveType;
 
    signal xauiReadMaster  : AxiLiteReadMasterType;
    signal xauiReadSlave   : AxiLiteReadSlaveType;
@@ -324,7 +329,7 @@ begin
          xauiTxP           => xauiTxP,
          xauiTxN           => xauiTxN,
          xauiClkP          => xauiClkP,
-         xauiClkN          => xauiClkN);    
+         xauiClkN          => xauiClkN);
 
    ----------------------------------   
    -- Register Address Mapping Module
@@ -347,6 +352,11 @@ begin
          timingReadSlave   => timingReadSlave,
          timingWriteMaster => timingWriteMaster,
          timingWriteSlave  => timingWriteSlave,
+         -- Bsa AXI-Lite Interface
+         bsaReadMaster     => bsaReadMaster,
+         bsaReadSlave      => bsaReadSlave,
+         bsaWriteMaster    => bsaWriteMaster,
+         bsaWriteSlave     => bsaWriteSlave,
          -- XAUI PHY AXI-Lite Interface
          xauiReadMaster    => xauiReadMaster,
          xauiReadSlave     => xauiReadSlave,
@@ -409,7 +419,7 @@ begin
          ddrSda            => ddrSda,
          -- SYSMON Ports
          vPIn              => vPIn,
-         vNIn              => vNIn);          
+         vNIn              => vNIn);
 
    --------------
    -- Timing Core
@@ -419,17 +429,57 @@ begin
          TPD_G               => TPD_G,
          APP_TYPE_G          => APP_TYPE_G,
          AXI_ERROR_RESP_G    => AXI_ERROR_RESP_C,
-         STANDALONE_TIMING_G => STANDALONE_TIMING_G,
+         STANDALONE_TIMING_G => STANDALONE_TIMING_G)
+      port map (
+         -- AXI-Lite Interface
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMaster   => timingReadMaster,
+         axilReadSlave    => timingReadSlave,
+         axilWriteMaster  => timingWriteMaster,
+         axilWriteSlave   => timingWriteSlave,
+         ----------------------
+         -- Top Level Interface
+         ----------------------         
+         -- Timing Interface 
+         recTimingClk     => recTimingClk,
+         recTimingRst     => recTimingRst,
+         timingClk        => timingClk,
+         timingRst        => timingRst,
+         timingData       => timingData,
+         timingPhy        => timingPhy,
+         ----------------
+         -- Core Ports --
+         ----------------   
+         -- LCLS Timing Ports
+         timingRxP        => timingRxP,
+         timingRxN        => timingRxN,
+         timingTxP        => timingTxP,
+         timingTxN        => timingTxN,
+         timingRefClkInP  => timingRefClkInP,
+         timingRefClkInN  => timingRefClkInN,
+         timingRecClkOutP => timingRecClkOutP,
+         timingRecClkOutN => timingRecClkOutN,
+         timingClkSel     => timingClkSel);
+
+   --------------
+   -- BSA Core
+   --------------
+   U_Bsa : entity work.AmcCarrierBsa
+      generic map (
+         TPD_G               => TPD_G,
+         APP_TYPE_G          => APP_TYPE_G,
+         AXI_ERROR_RESP_G    => AXI_ERROR_RESP_C,
          DIAGNOSTIC_SIZE_G   => DIAGNOSTIC_SIZE_G,
          DIAGNOSTIC_CONFIG_G => DIAGNOSTIC_CONFIG_G)
       port map (
          -- AXI-Lite Interface
          axilClk             => axilClk,
          axilRst             => axilRst,
-         axilReadMaster      => timingReadMaster,
-         axilReadSlave       => timingReadSlave,
-         axilWriteMaster     => timingWriteMaster,
-         axilWriteSlave      => timingWriteSlave,
+         axilReadMaster      => bsaReadMaster,
+         axilReadSlave       => bsaReadSlave,
+         axilWriteMaster     => bsaWriteMaster,
+         axilWriteSlave      => bsaWriteSlave,
          -- AXI4 Interface
          axiClk              => axiClk,
          axiRst              => axiRst,
@@ -445,13 +495,6 @@ begin
          ----------------------
          -- Top Level Interface
          ----------------------         
-         -- Timing Interface 
-         refTimingClk        => refTimingClk,
-         refTimingRst        => refTimingRst,
-         timingClk           => timingClk,
-         timingRst           => timingRst,
-         timingData          => timingData,
-         timingPhy           => timingPhy,
          -- Diagnostic Interface
          diagnosticClk       => diagnosticClk,
          diagnosticRst       => diagnosticRst,
@@ -459,20 +502,7 @@ begin
          diagnosticTimeStamp => diagnosticTimeStamp,
          diagnosticMessage   => diagnosticMessage,
          diagnosticMasters   => diagnosticMasters,
-         diagnosticSlaves    => diagnosticSlaves,
-         ----------------
-         -- Core Ports --
-         ----------------   
-         -- LCLS Timing Ports
-         timingRxP           => timingRxP,
-         timingRxN           => timingRxN,
-         timingTxP           => timingTxP,
-         timingTxN           => timingTxN,
-         timingClkInP        => timingClkInP,
-         timingClkInN        => timingClkInN,
-         timingClkOutP       => timingClkOutP,
-         timingClkOutN       => timingClkOutN,
-         timingClkSel        => timingClkSel);  
+         diagnosticSlaves    => diagnosticSlaves);
 
    ------------------
    -- DDR Memory Core
@@ -575,6 +605,6 @@ begin
          mpsBusTxP           => mpsBusTxP,
          mpsBusTxN           => mpsBusTxN,
          mpsTxP              => mpsTxP,
-         mpsTxN              => mpsTxN);   
+         mpsTxN              => mpsTxN);
 
 end mapping;
