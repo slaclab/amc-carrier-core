@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-28
+-- Last update: 2015-09-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -186,6 +186,10 @@ architecture mapping of AmcCarrierCore is
    signal axiWriteSlave  : AxiWriteSlaveType;
    signal axiReadMaster  : AxiReadMasterType;
    signal axiReadSlave   : AxiReadSlaveType;
+
+   signal bsaTimingClk  : sl;
+   signal bsaTimingRst  : sl;
+   signal bsaTimingData : TimingDataType;
 
    signal timingReadMaster  : AxiLiteReadMasterType;
    signal timingReadSlave   : AxiLiteReadSlaveType;
@@ -431,23 +435,27 @@ begin
          AXI_ERROR_RESP_G    => AXI_ERROR_RESP_C,
          STANDALONE_TIMING_G => STANDALONE_TIMING_G)
       port map (
-         -- AXI-Lite Interface
+         -- AXI-Lite Interface (axilClk domain)
          axilClk          => axilClk,
          axilRst          => axilRst,
          axilReadMaster   => timingReadMaster,
          axilReadSlave    => timingReadSlave,
          axilWriteMaster  => timingWriteMaster,
          axilWriteSlave   => timingWriteSlave,
+         -- BSA Interface (bsaTimingClk domain)
+         bsaTimingClk     => bsaTimingClk,
+         bsaTimingRst     => bsaTimingRst,
+         bsaTimingData    => bsaTimingData,
          ----------------------
          -- Top Level Interface
          ----------------------         
          -- Timing Interface 
          recTimingClk     => recTimingClk,
          recTimingRst     => recTimingRst,
-         timingClk        => timingClk,
-         timingRst        => timingRst,
-         timingData       => timingData,
-         timingPhy        => timingPhy,
+         appTimingClk     => timingClk,
+         appTimingRst     => timingRst,
+         appTimingData    => timingData,
+         appTimingPhy     => timingPhy,
          ----------------
          -- Core Ports --
          ----------------   
@@ -473,25 +481,29 @@ begin
          DIAGNOSTIC_SIZE_G   => DIAGNOSTIC_SIZE_G,
          DIAGNOSTIC_CONFIG_G => DIAGNOSTIC_CONFIG_G)
       port map (
-         -- AXI-Lite Interface
+         -- AXI-Lite Interface (axilClk domain)
          axilClk             => axilClk,
          axilRst             => axilRst,
          axilReadMaster      => bsaReadMaster,
          axilReadSlave       => bsaReadSlave,
          axilWriteMaster     => bsaWriteMaster,
          axilWriteSlave      => bsaWriteSlave,
-         -- AXI4 Interface
+         -- AXI4 Interface (axiClk domain)
          axiClk              => axiClk,
          axiRst              => axiRst,
          axiWriteMaster      => axiWriteMaster,
          axiWriteSlave       => axiWriteSlave,
          axiReadMaster       => axiReadMaster,
          axiReadSlave        => axiReadSlave,
-         -- BSA Ethernet Interface (axilClk domain)
+         -- Ethernet Interface (axilClk domain)
          obBsaMaster         => obBsaMaster,
          obBsaSlave          => obBsaSlave,
          ibBsaMaster         => ibBsaMaster,
          ibBsaSlave          => ibBsaSlave,
+         -- Timing Interface (bsaTimingClk domain)
+         bsaTimingClk        => bsaTimingClk,
+         bsaTimingRst        => bsaTimingRst,
+         bsaTimingData       => bsaTimingData,
          ----------------------
          -- Top Level Interface
          ----------------------         

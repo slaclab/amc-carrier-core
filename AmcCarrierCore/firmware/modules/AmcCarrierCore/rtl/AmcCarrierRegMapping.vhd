@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-28
+-- Last update: 2015-09-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -47,10 +47,10 @@ entity AmcCarrierRegMapping is
       timingWriteMaster : out   AxiLiteWriteMasterType;
       timingWriteSlave  : in    AxiLiteWriteSlaveType;
       -- BSA AXI-Lite Interface
-      bsaReadMaster  : out   AxiLiteReadMasterType;
-      bsaReadSlave   : in    AxiLiteReadSlaveType;
-      bsaWriteMaster : out   AxiLiteWriteMasterType;
-      bsaWriteSlave  : in    AxiLiteWriteSlaveType;
+      bsaReadMaster     : out   AxiLiteReadMasterType;
+      bsaReadSlave      : in    AxiLiteReadSlaveType;
+      bsaWriteMaster    : out   AxiLiteWriteMasterType;
+      bsaWriteSlave     : in    AxiLiteWriteSlaveType;
       -- XAUI PHY AXI-Lite Interface
       xauiReadMaster    : out   AxiLiteReadMasterType;
       xauiReadSlave     : in    AxiLiteReadSlaveType;
@@ -129,7 +129,7 @@ architecture mapping of AmcCarrierRegMapping is
    constant DDR_I2C_INDEX_C    : natural := 6;
    constant IPMC_INDEX_C       : natural := 7;
    constant TIMING_INDEX_C     : natural := 8;
-   constant BSA_INDEX_C : natural := 9;
+   constant BSA_INDEX_C        : natural := 9;
    constant XAUI_INDEX_C       : natural := 10;
    constant DDR_INDEX_C        : natural := 11;
    constant MPS_INDEX_C        : natural := 12;
@@ -176,10 +176,10 @@ architecture mapping of AmcCarrierRegMapping is
          baseAddr        => TIMING_ADDR_C,
          addrBits        => 24,
          connectivity    => x"FFFF"),
-      BSA_INDEX_C     => (
+      BSA_INDEX_C        => (
          baseAddr        => BSA_ADDR_C,
          addrBits        => 24,
-         connectivity    => x"FFFF"),      
+         connectivity    => x"FFFF"),
       DDR_INDEX_C        => (
          baseAddr        => DDR_ADDR_C,
          addrBits        => 24,

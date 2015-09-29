@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-28
+-- Last update: 2015-09-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -28,7 +28,6 @@ use work.AmcCarrierPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-
 entity AmcCarrierTiming is
    generic (
       TPD_G               : time            := 1 ns;
@@ -36,23 +35,27 @@ entity AmcCarrierTiming is
       AXI_ERROR_RESP_G    : slv(1 downto 0) := AXI_RESP_DECERR_C;
       STANDALONE_TIMING_G : boolean         := false);  -- true = LCLS-I timing only
    port (
-      -- AXI-Lite Interface
+      -- AXI-Lite Interface (axilClk domain)
       axilClk          : in  sl;
       axilRst          : in  sl;
       axilReadMaster   : in  AxiLiteReadMasterType;
       axilReadSlave    : out AxiLiteReadSlaveType;
       axilWriteMaster  : in  AxiLiteWriteMasterType;
       axilWriteSlave   : out AxiLiteWriteSlaveType;
+      -- BSA Interface (bsaTimingClk domain)
+      bsaTimingClk     : out sl;
+      bsaTimingRst     : out sl;
+      bsaTimingData    : out TimingDataType;
       ----------------------
       -- Top Level Interface
       ----------------------      
       -- Timing Interface 
       recTimingClk     : out sl;
       recTimingRst     : out sl;
-      timingClk     : in  sl;
-      timingRst     : in  sl;
-      timingData    : out TimingDataType;
-      timingPhy        : in  TimingPhyType;             -- Input for timing generator only
+      appTimingClk     : in  sl;
+      appTimingRst     : in  sl;
+      appTimingData    : out TimingDataType;
+      appTimingPhy     : in  TimingPhyType;             -- Input for timing generator only
       ----------------
       -- Core Ports --
       ----------------   
@@ -101,10 +104,21 @@ architecture mapping of AmcCarrierTiming is
 
 begin
 
+   recTimingClk  <= timingRecClkG;
+   recTimingRst  <= not(rxResetDone);
+   appTimingData <= TIMING_DATA_INIT_C;
+   bsaTimingClk  <= timingRecClkG;
+   bsaTimingRst  <= not(rxResetDone);
+   bsaTimingData <= TIMING_DATA_INIT_C;
+
    -------------------------------------------------------------------------------------------------
    -- Clock Buffers
    -------------------------------------------------------------------------------------------------
    TIMING_REFCLK_IBUFDS_GTE3 : IBUFDS_GTE3
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "01",    -- 2'b01: ODIV2 = Divide-by-2 version of O
+         REFCLK_ICNTL_RX    => "00")
       port map (
          I     => timingRefClkInP,
          IB    => timingRefClkInN,
@@ -112,15 +126,14 @@ begin
          ODIV2 => timingRefClkDiv2,     -- Frequency the same as jesdRefClk
          O     => timingRefClk);
 
-
    TIMING_REFCLK_BUFG_GT : BUFG_GT
       port map (
          I       => timingRefClkDiv2,
          CE      => '1',
-         CLR     => '0',
          CEMASK  => '1',
+         CLR     => '0',
          CLRMASK => '1',
-         DIV     => "000",
+         DIV     => "000",              -- Divide-by-1
          O       => timingRefClkG);
 
    -------------------------------------------------------------------------------------------------
@@ -161,21 +174,21 @@ begin
       port map (
          I       => rxOutClk,
          CE      => '1',
-         CLR     => '0',
          CEMASK  => '1',
+         CLR     => '0',
          CLRMASK => '1',
-         DIV     => "000",
+         DIV     => "000",              -- Divide-by-1
          O       => timingRecClkG);
 
-   -- Loop back tx clk though BUFG_GT too. Maybe just drive 0 instead?
+-- -- Loop back tx clk though BUFG_GT too. Maybe just drive 0 instead?
 --    TIMING_RECCLK_BUFG_GT : BUFG_GT
 --       port map (
 --          I       => txOutClk,
 --          CE      => '1',
---          CLR     => '0',
 --          CEMASK  => '1',
+--          CLR     => '0',
 --          CLRMASK => '1',
---          DIV     => "000",
+--          DIV     => "000",           -- Divide-by-1
 --          O       => txUsrClk);
 
 

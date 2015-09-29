@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-28
+-- Last update: 2015-09-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,25 +33,29 @@ entity AmcCarrierBsa is
       DIAGNOSTIC_SIZE_G   : positive            := 1;
       DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
    port (
-      -- AXI-Lite Interface
+      -- AXI-Lite Interface (axilClk domain)
       axilClk             : in  sl;
       axilRst             : in  sl;
       axilReadMaster      : in  AxiLiteReadMasterType;
       axilReadSlave       : out AxiLiteReadSlaveType;
       axilWriteMaster     : in  AxiLiteWriteMasterType;
       axilWriteSlave      : out AxiLiteWriteSlaveType;
-      -- AXI4 Interface
+      -- AXI4 Interface (axiClk domain)
       axiClk              : in  sl;
       axiRst              : in  sl;
       axiWriteMaster      : out AxiWriteMasterType;
       axiWriteSlave       : in  AxiWriteSlaveType;
       axiReadMaster       : out AxiReadMasterType;
       axiReadSlave        : in  AxiReadSlaveType;
-      -- BSA Ethernet Interface (axilClk domain)
+      -- Ethernet Interface (axilClk domain)
       obBsaMaster         : in  AxiStreamMasterType;
       obBsaSlave          : out AxiStreamSlaveType;
       ibBsaMaster         : out AxiStreamMasterType;
       ibBsaSlave          : in  AxiStreamSlaveType;
+      -- BSA Interface (bsaTimingClk domain)
+      bsaTimingClk        : in  sl;
+      bsaTimingRst        : in  sl;
+      bsaTimingData       : in  TimingDataType;
       ----------------------
       -- Top Level Interface
       ----------------------      
@@ -93,20 +97,20 @@ begin
          axiWriteSlave  => axilWriteSlave);
 
 
-    ------------------------------------------------------------------------------------------------
-    -- Diagnostic Engine
-    -- Create circular buffers in DDR Ram for dianostic data
-    ------------------------------------------------------------------------------------------------
+   ------------------------------------------------------------------------------------------------
+   -- Diagnostic Engine
+   -- Create circular buffers in DDR Ram for dianostic data
+   ------------------------------------------------------------------------------------------------
 
-    ------------------------------------------------------------------------------------------------
-    -- BSA engine
-    -- Manage BSA buffers
-    ------------------------------------------------------------------------------------------------
+   ------------------------------------------------------------------------------------------------
+   -- BSA engine
+   -- Manage BSA buffers
+   ------------------------------------------------------------------------------------------------
 
-    ------------------------------------------------------------------------------------------------
-    -- DDR Engine
-    -- Arbiter and DDR3 Controller
-    ------------------------------------------------------------------------------------------------
+   ------------------------------------------------------------------------------------------------
+   -- DDR Engine
+   -- Arbiter and DDR3 Controller
+   ------------------------------------------------------------------------------------------------
 
 
 
