@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-21
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -25,6 +25,7 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierRegPkg.all;
+use work.TimingPkg.all;
 
 entity AmcCarrierMpsAndFfb is
    generic (
@@ -34,46 +35,44 @@ entity AmcCarrierMpsAndFfb is
       MPS_SLOT_G       : boolean         := false);
    port (
       -- Local Configuration
-      localAppId          : in  slv(15 downto 0);
+      localAppId      : in  slv(15 downto 0);
       -- SALT Reference clocks
-      mps125MHzClk        : in  sl;
-      mps125MHzRst        : in  sl;
-      mps312MHzClk        : in  sl;
-      mps312MHzRst        : in  sl;
-      mps625MHzClk        : in  sl;
-      mps625MHzRst        : in  sl;
+      mps125MHzClk    : in  sl;
+      mps125MHzRst    : in  sl;
+      mps312MHzClk    : in  sl;
+      mps312MHzRst    : in  sl;
+      mps625MHzClk    : in  sl;
+      mps625MHzRst    : in  sl;
       -- AXI-Lite Interface
-      axilClk             : in  sl;
-      axilRst             : in  sl;
-      axilReadMaster      : in  AxiLiteReadMasterType;
-      axilReadSlave       : out AxiLiteReadSlaveType;
-      axilWriteMaster     : in  AxiLiteWriteMasterType;
-      axilWriteSlave      : out AxiLiteWriteSlaveType;
+      axilClk         : in  sl;
+      axilRst         : in  sl;
+      axilReadMaster  : in  AxiLiteReadMasterType;
+      axilReadSlave   : out AxiLiteReadSlaveType;
+      axilWriteMaster : in  AxiLiteWriteMasterType;
+      axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- FFB Outbound Interface
-      ffbObMaster         : out AxiStreamMasterType;
-      ffbObSlave          : in  AxiStreamSlaveType;
+      ffbObMaster     : out AxiStreamMasterType;
+      ffbObSlave      : in  AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
       ----------------------
       -- Diagnostic Interface (diagnosticClk domain)
-      diagnosticClk       : in  sl;
-      diagnosticRst       : in  sl;
-      diagnosticValid     : in  sl;
-      diagnosticTimeStamp : in  slv(63 downto 0);
-      diagnosticMessage   : in  Slv32Array(31 downto 0);
+      diagnosticClk   : in  sl;
+      diagnosticRst   : in  sl;
+      diagnosticBus  : in  DiagnosticBusType;
       -- MPS Interface
-      mpsObMasters        : out AxiStreamMasterArray(14 downto 1);
-      mpsObSlaves         : in  AxiStreamSlaveArray(14 downto 1);
+      mpsObMasters    : out AxiStreamMasterArray(14 downto 1);
+      mpsObSlaves     : in  AxiStreamSlaveArray(14 downto 1);
       ----------------
       -- Core Ports --
       ----------------
       -- Backplane MPS Ports
-      mpsBusRxP           : in  slv(14 downto 1);
-      mpsBusRxN           : in  slv(14 downto 1);
-      mpsBusTxP           : out slv(14 downto 1);
-      mpsBusTxN           : out slv(14 downto 1);
-      mpsTxP              : out sl;
-      mpsTxN              : out sl);
+      mpsBusRxP       : in  slv(14 downto 1);
+      mpsBusRxN       : in  slv(14 downto 1);
+      mpsBusTxP       : out slv(14 downto 1);
+      mpsBusTxN       : out slv(14 downto 1);
+      mpsTxP          : out sl;
+      mpsTxN          : out sl);
 end AmcCarrierMpsAndFfb;
 
 architecture mapping of AmcCarrierMpsAndFfb is
@@ -94,7 +93,7 @@ architecture mapping of AmcCarrierMpsAndFfb is
       MPS_PHY_INDEX_C => (
          baseAddr     => MPS_PHY_ADDR_C,
          addrBits     => 16,
-         connectivity => X"0001"));  
+         connectivity => X"0001"));
 
    signal writeMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal writeSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -113,7 +112,7 @@ architecture mapping of AmcCarrierMpsAndFfb is
 
    signal mpsMaster : AxiStreamMasterType;
    signal mpsSlave  : AxiStreamSlaveType;
-   
+
 begin
 
    ------------------------------------ 
@@ -128,12 +127,12 @@ begin
          rst    => diagnosticRst,
          -- Write Ports (wr_clk domain)
          wr_clk => diagnosticClk,
-         wr_en  => diagnosticValid,
-         din    => diagnosticTimeStamp,
+         wr_en  => diagnosticBus.strobe,
+         din    => diagnosticBus.timingMessage.timeStamp,
          -- Read Ports (rd_clk domain)
          rd_clk => axilClk,
          valid  => timeStrb,
-         dout   => timeStamp);  
+         dout   => timeStamp);
 
    --------------------------------- 
    -- Message Synchronization Module
@@ -150,11 +149,11 @@ begin
             rst    => diagnosticRst,
             -- Write Ports (wr_clk domain)
             wr_clk => diagnosticClk,
-            wr_en  => diagnosticValid,
-            din    => diagnosticMessage(i),
+            wr_en  => diagnosticBus.strobe,
+            din    => diagnosticBus.data(i),
             -- Read Ports (rd_clk domain)
             rd_clk => axilClk,
-            dout   => message(i));         
+            dout   => message(i));
 
    end generate GEN_VEC;
 
@@ -175,7 +174,7 @@ begin
          trigRateOut => timeStrbRate,
          -- Clocks
          locClk      => axilClk,
-         refClk      => axilClk);   
+         refClk      => axilClk);
 
    -----------------------------------------            
    -- Measure the diagnostic Clock frequency
@@ -214,7 +213,7 @@ begin
          mAxiWriteMasters    => writeMasters,
          mAxiWriteSlaves     => writeSlaves,
          mAxiReadMasters     => readMasters,
-         mAxiReadSlaves      => readSlaves);     
+         mAxiReadSlaves      => readSlaves);
 
    --------------------------
    -- FFB: Outbound Messenger
@@ -222,7 +221,7 @@ begin
    U_FfbMsg : entity work.AmcCarrierFfbObMsg
       generic map (
          TPD_G      => TPD_G,
-         APP_TYPE_G => APP_TYPE_G)     
+         APP_TYPE_G => APP_TYPE_G)
       port map (
          -- Clock and reset
          clk       => axilClk,
@@ -236,7 +235,7 @@ begin
          appId     => localAppId,
          -- FFB Interface
          ffbMaster => ffbObMaster,
-         ffbSlave  => ffbObSlave);           
+         ffbSlave  => ffbObSlave);
 
    --------------------------
    -- MPS: Outbound Messenger
@@ -246,7 +245,7 @@ begin
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => MPS_RAM_ADDR_C)     
+         AXI_BASE_ADDR_G  => MPS_RAM_ADDR_C)
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,
@@ -264,7 +263,7 @@ begin
          appId           => localAppId,
          -- MPS Interface
          mpsMaster       => mpsMaster,
-         mpsSlave        => mpsSlave);            
+         mpsSlave        => mpsSlave);
 
    ---------------------------------         
    -- MPS Backplane SALT Transceiver

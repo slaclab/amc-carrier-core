@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-09-21
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ entity AmcCarrierEthVlan is
       -- FFB Inbound Interface (ffbClk domain)
       ffbClk          : in  sl;
       ffbRst          : in  sl;
-      ffbData         : out FfbDataType);      
+      ffbBus         : out FfbBusType);      
 end AmcCarrierEthVlan;
 
 architecture mapping of AmcCarrierEthVlan is
@@ -150,7 +150,7 @@ begin
          -- FFB Inbound Interface (ffbClk domain)
          ffbClk         => ffbClk,
          ffbRst         => ffbRst,
-         ffbData        => ffbData);
+         ffbBus        => ffbBus);
 
    -------------------------
    -- FFB Outbound Interface

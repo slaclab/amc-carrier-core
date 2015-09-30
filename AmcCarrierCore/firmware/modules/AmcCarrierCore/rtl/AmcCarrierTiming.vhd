@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-29
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ entity AmcCarrierTiming is
       -- BSA Interface (bsaTimingClk domain)
       bsaTimingClk     : out sl;
       bsaTimingRst     : out sl;
-      bsaTimingData    : out TimingDataType;
+      bsaTimingBus    : out TimingBusType;
       ----------------------
       -- Top Level Interface
       ----------------------      
@@ -54,7 +54,7 @@ entity AmcCarrierTiming is
       recTimingRst     : out sl;
       appTimingClk     : in  sl;
       appTimingRst     : in  sl;
-      appTimingData    : out TimingDataType;
+      appTimingBus    : out TimingBusType;
       appTimingPhy     : in  TimingPhyType;             -- Input for timing generator only
       ----------------
       -- Core Ports --
@@ -106,10 +106,10 @@ begin
 
    recTimingClk  <= timingRecClkG;
    recTimingRst  <= not(rxResetDone);
-   appTimingData <= TIMING_DATA_INIT_C;
+   appTimingBus <= TIMING_BUS_INIT_C;
    bsaTimingClk  <= timingRecClkG;
    bsaTimingRst  <= not(rxResetDone);
-   bsaTimingData <= TIMING_DATA_INIT_C;
+   bsaTimingBus <= TIMING_BUS_INIT_C;
 
    -------------------------------------------------------------------------------------------------
    -- Clock Buffers

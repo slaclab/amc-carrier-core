@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-29
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -45,121 +45,119 @@ entity AmcCarrierCore is
       ----------------------
       -- AXI-Lite Interface (regClk domain)
       -- Address Range = [0x80000000:0xFFFFFFFF]
-      regClk              : in    sl;
-      regRst              : in    sl;
-      regReadMaster       : out   AxiLiteReadMasterType;
-      regReadSlave        : in    AxiLiteReadSlaveType;
-      regWriteMaster      : out   AxiLiteWriteMasterType;
-      regWriteSlave       : in    AxiLiteWriteSlaveType;
+      regClk            : in    sl;
+      regRst            : in    sl;
+      regReadMaster     : out   AxiLiteReadMasterType;
+      regReadSlave      : in    AxiLiteReadSlaveType;
+      regWriteMaster    : out   AxiLiteWriteMasterType;
+      regWriteSlave     : in    AxiLiteWriteSlaveType;
       -- Timing Interface (timingClk domain) 
-      timingClk           : in    sl;
-      timingRst           : in    sl;
-      timingData          : out   TimingDataType;
-      timingPhy           : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
+      timingClk         : in    sl;
+      timingRst         : in    sl;
+      timingBus         : out   TimingBusType;
+      timingPhy         : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
       -- Diagnostic Interface (diagnosticClk domain)
-      diagnosticClk       : in    sl;
-      diagnosticRst       : in    sl;
-      diagnosticValid     : in    sl;
-      diagnosticTimeStamp : in    slv(63 downto 0);
-      diagnosticMessage   : in    Slv32Array(31 downto 0);
-      diagnosticMasters   : in    AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticSlaves    : out   AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticClk     : in    sl;
+      diagnosticRst     : in    sl;
+      diagnosticBus     : in    DiagnosticBusType;
+      diagnosticMasters : in    AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticSlaves  : out   AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       -- FFB Inbound Interface (ffbClk domain)
-      ffbClk              : in    sl                               := '0';
-      ffbRst              : in    sl                               := '0';
-      ffbData             : out   FfbDataType;
+      ffbClk            : in    sl                               := '0';
+      ffbRst            : in    sl                               := '0';
+      ffbBus            : out   FfbBusType;
       -- BSI Interface (bsiClk domain) 
-      bsiClk              : in    sl                               := '0';
-      bsiRst              : in    sl                               := '0';
-      bsiData             : out   BsiDataType;
+      bsiClk            : in    sl                               := '0';
+      bsiRst            : in    sl                               := '0';
+      bsiData           : out   BsiDataType;
       -- MPS Concentrator Interface (ref156MHzClk domain)
-      mpsObMasters        : out   AxiStreamMasterArray(14 downto 1);
-      mpsObSlaves         : in    AxiStreamSlaveArray(14 downto 1) := (others => AXI_STREAM_SLAVE_FORCE_C);
+      mpsObMasters      : out   AxiStreamMasterArray(14 downto 1);
+      mpsObSlaves       : in    AxiStreamSlaveArray(14 downto 1) := (others => AXI_STREAM_SLAVE_FORCE_C);
       -- Reference Clocks and Resets
-      recTimingClk        : out   sl;
-      recTimingRst        : out   sl;
-      ref125MHzClk        : out   sl;
-      ref125MHzRst        : out   sl;
-      ref156MHzClk        : out   sl;
-      ref156MHzRst        : out   sl;
-      ref312MHzClk        : out   sl;
-      ref312MHzRst        : out   sl;
-      ref625MHzClk        : out   sl;
-      ref625MHzRst        : out   sl;
-      gthFabClk           : out   sl;
+      recTimingClk      : out   sl;
+      recTimingRst      : out   sl;
+      ref125MHzClk      : out   sl;
+      ref125MHzRst      : out   sl;
+      ref156MHzClk      : out   sl;
+      ref156MHzRst      : out   sl;
+      ref312MHzClk      : out   sl;
+      ref312MHzRst      : out   sl;
+      ref625MHzClk      : out   sl;
+      ref625MHzRst      : out   sl;
+      gthFabClk         : out   sl;
       ----------------
       -- Core Ports --
       ----------------
       -- Common Fabricate Clock
-      fabClkP             : in    sl;
-      fabClkN             : in    sl;
+      fabClkP           : in    sl;
+      fabClkN           : in    sl;
       -- Backplane Ethernet Ports
-      xauiRxP             : in    slv(3 downto 0);
-      xauiRxN             : in    slv(3 downto 0);
-      xauiTxP             : out   slv(3 downto 0);
-      xauiTxN             : out   slv(3 downto 0);
-      xauiClkP            : in    sl;
-      xauiClkN            : in    sl;
+      xauiRxP           : in    slv(3 downto 0);
+      xauiRxN           : in    slv(3 downto 0);
+      xauiTxP           : out   slv(3 downto 0);
+      xauiTxN           : out   slv(3 downto 0);
+      xauiClkP          : in    sl;
+      xauiClkN          : in    sl;
       -- Backplane MPS Ports
-      mpsClkIn            : in    sl;
-      mpsClkOut           : out   sl;
-      mpsBusRxP           : in    slv(14 downto 1);
-      mpsBusRxN           : in    slv(14 downto 1);
-      mpsBusTxP           : out   slv(14 downto 1);
-      mpsBusTxN           : out   slv(14 downto 1);
-      mpsTxP              : out   sl;
-      mpsTxN              : out   sl;
+      mpsClkIn          : in    sl;
+      mpsClkOut         : out   sl;
+      mpsBusRxP         : in    slv(14 downto 1);
+      mpsBusRxN         : in    slv(14 downto 1);
+      mpsBusTxP         : out   slv(14 downto 1);
+      mpsBusTxN         : out   slv(14 downto 1);
+      mpsTxP            : out   sl;
+      mpsTxN            : out   sl;
       -- LCLS Timing Ports
-      timingRxP           : in    sl;
-      timingRxN           : in    sl;
-      timingTxP           : out   sl;
-      timingTxN           : out   sl;
-      timingRefClkInP     : in    sl;
-      timingRefClkInN     : in    sl;
-      timingRecClkOutP    : out   sl;
-      timingRecClkOutN    : out   sl;
-      timingClkSel        : out   sl;
-      timingClkScl        : inout sl;
-      timingClkSda        : inout sl;
+      timingRxP         : in    sl;
+      timingRxN         : in    sl;
+      timingTxP         : out   sl;
+      timingTxN         : out   sl;
+      timingRefClkInP   : in    sl;
+      timingRefClkInN   : in    sl;
+      timingRecClkOutP  : out   sl;
+      timingRecClkOutN  : out   sl;
+      timingClkSel      : out   sl;
+      timingClkScl      : inout sl;
+      timingClkSda      : inout sl;
       -- Crossbar Ports
-      xBarSin             : out   slv(1 downto 0);
-      xBarSout            : out   slv(1 downto 0);
-      xBarConfig          : out   sl;
-      xBarLoad            : out   sl;
+      xBarSin           : out   slv(1 downto 0);
+      xBarSout          : out   slv(1 downto 0);
+      xBarConfig        : out   sl;
+      xBarLoad          : out   sl;
       -- Secondary AMC Auxiliary Power Enable Port
-      enAuxPwrL           : out   sl;
+      enAuxPwrL         : out   sl;
       -- IPMC Ports
-      ipmcScl             : inout sl;
-      ipmcSda             : inout sl;
+      ipmcScl           : inout sl;
+      ipmcSda           : inout sl;
       -- Configuration PROM Ports
-      calScl              : inout sl;
-      calSda              : inout sl;
+      calScl            : inout sl;
+      calSda            : inout sl;
       -- DDR3L SO-DIMM Ports
-      ddrClkP             : in    sl;
-      ddrClkN             : in    sl;
-      ddrDm               : out   slv(7 downto 0);
-      ddrDqsP             : inout slv(7 downto 0);
-      ddrDqsN             : inout slv(7 downto 0);
-      ddrDq               : inout slv(63 downto 0);
-      ddrA                : out   slv(15 downto 0);
-      ddrBa               : out   slv(2 downto 0);
-      ddrCsL              : out   slv(1 downto 0);
-      ddrOdt              : out   slv(1 downto 0);
-      ddrCke              : out   slv(1 downto 0);
-      ddrCkP              : out   slv(1 downto 0);
-      ddrCkN              : out   slv(1 downto 0);
-      ddrWeL              : out   sl;
-      ddrRasL             : out   sl;
-      ddrCasL             : out   sl;
-      ddrRstL             : out   sl;
-      ddrAlertL           : in    sl;
-      ddrPg               : in    sl;
-      ddrPwrEnL           : out   sl;
-      ddrScl              : inout sl;
-      ddrSda              : inout sl;
+      ddrClkP           : in    sl;
+      ddrClkN           : in    sl;
+      ddrDm             : out   slv(7 downto 0);
+      ddrDqsP           : inout slv(7 downto 0);
+      ddrDqsN           : inout slv(7 downto 0);
+      ddrDq             : inout slv(63 downto 0);
+      ddrA              : out   slv(15 downto 0);
+      ddrBa             : out   slv(2 downto 0);
+      ddrCsL            : out   slv(1 downto 0);
+      ddrOdt            : out   slv(1 downto 0);
+      ddrCke            : out   slv(1 downto 0);
+      ddrCkP            : out   slv(1 downto 0);
+      ddrCkN            : out   slv(1 downto 0);
+      ddrWeL            : out   sl;
+      ddrRasL           : out   sl;
+      ddrCasL           : out   sl;
+      ddrRstL           : out   sl;
+      ddrAlertL         : in    sl;
+      ddrPg             : in    sl;
+      ddrPwrEnL         : out   sl;
+      ddrScl            : inout sl;
+      ddrSda            : inout sl;
       -- SYSMON Ports
-      vPIn                : in    sl;
-      vNIn                : in    sl);
+      vPIn              : in    sl;
+      vNIn              : in    sl);
 end AmcCarrierCore;
 
 architecture mapping of AmcCarrierCore is
@@ -187,9 +185,9 @@ architecture mapping of AmcCarrierCore is
    signal axiReadMaster  : AxiReadMasterType;
    signal axiReadSlave   : AxiReadSlaveType;
 
-   signal bsaTimingClk  : sl;
-   signal bsaTimingRst  : sl;
-   signal bsaTimingData : TimingDataType;
+   signal bsaTimingClk : sl;
+   signal bsaTimingRst : sl;
+   signal bsaTimingBus : TimingBusType;
 
    signal timingReadMaster  : AxiLiteReadMasterType;
    signal timingReadSlave   : AxiLiteReadSlaveType;
@@ -323,7 +321,7 @@ begin
          -- FFB Inbound Interface (ffbClk domain)         
          ffbClk            => ffbClk,
          ffbRst            => ffbRst,
-         ffbData           => ffbData,
+         ffbBus            => ffbBus,
          ----------------
          -- Core Ports --
          ----------------   
@@ -445,7 +443,7 @@ begin
          -- BSA Interface (bsaTimingClk domain)
          bsaTimingClk     => bsaTimingClk,
          bsaTimingRst     => bsaTimingRst,
-         bsaTimingData    => bsaTimingData,
+         bsaTimingBus     => bsaTimingBus,
          ----------------------
          -- Top Level Interface
          ----------------------         
@@ -454,7 +452,7 @@ begin
          recTimingRst     => recTimingRst,
          appTimingClk     => timingClk,
          appTimingRst     => timingRst,
-         appTimingData    => timingData,
+         appTimingBus     => timingBus,
          appTimingPhy     => timingPhy,
          ----------------
          -- Core Ports --
@@ -482,39 +480,37 @@ begin
          DIAGNOSTIC_CONFIG_G => DIAGNOSTIC_CONFIG_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)
-         axilClk             => axilClk,
-         axilRst             => axilRst,
-         axilReadMaster      => bsaReadMaster,
-         axilReadSlave       => bsaReadSlave,
-         axilWriteMaster     => bsaWriteMaster,
-         axilWriteSlave      => bsaWriteSlave,
+         axilClk           => axilClk,
+         axilRst           => axilRst,
+         axilReadMaster    => bsaReadMaster,
+         axilReadSlave     => bsaReadSlave,
+         axilWriteMaster   => bsaWriteMaster,
+         axilWriteSlave    => bsaWriteSlave,
          -- AXI4 Interface (axiClk domain)
-         axiClk              => axiClk,
-         axiRst              => axiRst,
-         axiWriteMaster      => axiWriteMaster,
-         axiWriteSlave       => axiWriteSlave,
-         axiReadMaster       => axiReadMaster,
-         axiReadSlave        => axiReadSlave,
+         axiClk            => axiClk,
+         axiRst            => axiRst,
+         axiWriteMaster    => axiWriteMaster,
+         axiWriteSlave     => axiWriteSlave,
+         axiReadMaster     => axiReadMaster,
+         axiReadSlave      => axiReadSlave,
          -- Ethernet Interface (axilClk domain)
-         obBsaMaster         => obBsaMaster,
-         obBsaSlave          => obBsaSlave,
-         ibBsaMaster         => ibBsaMaster,
-         ibBsaSlave          => ibBsaSlave,
+         obBsaMaster       => obBsaMaster,
+         obBsaSlave        => obBsaSlave,
+         ibBsaMaster       => ibBsaMaster,
+         ibBsaSlave        => ibBsaSlave,
          -- Timing Interface (bsaTimingClk domain)
-         bsaTimingClk        => bsaTimingClk,
-         bsaTimingRst        => bsaTimingRst,
-         bsaTimingData       => bsaTimingData,
+         bsaTimingClk      => bsaTimingClk,
+         bsaTimingRst      => bsaTimingRst,
+         bsaTimingBus      => bsaTimingBus,
          ----------------------
          -- Top Level Interface
          ----------------------         
          -- Diagnostic Interface
-         diagnosticClk       => diagnosticClk,
-         diagnosticRst       => diagnosticRst,
-         diagnosticValid     => diagnosticValid,
-         diagnosticTimeStamp => diagnosticTimeStamp,
-         diagnosticMessage   => diagnosticMessage,
-         diagnosticMasters   => diagnosticMasters,
-         diagnosticSlaves    => diagnosticSlaves);
+         diagnosticClk     => diagnosticClk,
+         diagnosticRst     => diagnosticRst,
+         diagnosticBus     => diagnosticBus,
+         diagnosticMasters => diagnosticMasters,
+         diagnosticSlaves  => diagnosticSlaves);
 
    ------------------
    -- DDR Memory Core
@@ -578,45 +574,43 @@ begin
          MPS_SLOT_G       => MPS_SLOT_G)
       port map (
          -- Local Configuration
-         localAppId          => localAppId,
+         localAppId      => localAppId,
          -- MPS Clocks and Resets
-         mps125MHzClk        => mps125MHzClk,
-         mps125MHzRst        => mps125MHzRst,
-         mps312MHzClk        => mps312MHzClk,
-         mps312MHzRst        => mps312MHzRst,
-         mps625MHzClk        => mps625MHzClk,
-         mps625MHzRst        => mps625MHzRst,
+         mps125MHzClk    => mps125MHzClk,
+         mps125MHzRst    => mps125MHzRst,
+         mps312MHzClk    => mps312MHzClk,
+         mps312MHzRst    => mps312MHzRst,
+         mps625MHzClk    => mps625MHzClk,
+         mps625MHzRst    => mps625MHzRst,
          -- AXI-Lite Interface
-         axilClk             => axilClk,
-         axilRst             => axilRst,
-         axilReadMaster      => mpsReadMaster,
-         axilReadSlave       => mpsReadSlave,
-         axilWriteMaster     => mpsWriteMaster,
-         axilWriteSlave      => mpsWriteSlave,
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => mpsReadMaster,
+         axilReadSlave   => mpsReadSlave,
+         axilWriteMaster => mpsWriteMaster,
+         axilWriteSlave  => mpsWriteSlave,
          -- FFB Interface
-         ffbObMaster         => ffbObMaster,
-         ffbObSlave          => ffbObSlave,
+         ffbObMaster     => ffbObMaster,
+         ffbObSlave      => ffbObSlave,
          ----------------------
          -- Top Level Interface
          ----------------------
          -- Diagnostic Interface (diagnosticClk domain)
-         diagnosticClk       => diagnosticClk,
-         diagnosticRst       => diagnosticRst,
-         diagnosticValid     => diagnosticValid,
-         diagnosticTimeStamp => diagnosticTimeStamp,
-         diagnosticMessage   => diagnosticMessage,
+         diagnosticClk   => diagnosticClk,
+         diagnosticRst   => diagnosticRst,
+         diagnosticBus   => diagnosticBus,
          -- MPS Interface
-         mpsObMasters        => mpsObMasters,
-         mpsObSlaves         => mpsObSlaves,
+         mpsObMasters    => mpsObMasters,
+         mpsObSlaves     => mpsObSlaves,
          ----------------
          -- Core Ports --
          ----------------
          -- Backplane MPS Ports
-         mpsBusRxP           => mpsBusRxP,
-         mpsBusRxN           => mpsBusRxN,
-         mpsBusTxP           => mpsBusTxP,
-         mpsBusTxN           => mpsBusTxN,
-         mpsTxP              => mpsTxP,
-         mpsTxN              => mpsTxN);
+         mpsBusRxP       => mpsBusRxP,
+         mpsBusRxN       => mpsBusRxN,
+         mpsBusTxP       => mpsBusTxP,
+         mpsBusTxN       => mpsBusTxN,
+         mpsTxP          => mpsTxP,
+         mpsTxN          => mpsTxN);
 
 end mapping;

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-09-21
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ entity AmcCarrierEth is
       -- FFB Inbound Interface (ffbClk domain)
       ffbClk            : in  sl;
       ffbRst            : in  sl;
-      ffbData           : out FfbDataType;
+      ffbBus            : out FfbBusType;
       ----------------
       -- Core Ports --
       ----------------   
@@ -75,7 +75,7 @@ entity AmcCarrierEth is
       xauiTxP           : out slv(3 downto 0);
       xauiTxN           : out slv(3 downto 0);
       xauiClkP          : in  sl;
-      xauiClkN          : in  sl);  
+      xauiClkN          : in  sl);
 end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
@@ -90,7 +90,7 @@ architecture mapping of AmcCarrierEth is
    signal ibMacSlave  : AxiStreamSlaveType;
    signal obMacMaster : AxiStreamMasterType;
    signal obMacSlave  : AxiStreamSlaveType;
-   
+
 begin
 
    ----------------------
@@ -100,7 +100,7 @@ begin
       generic map (
          TPD_G         => TPD_G,
          -- AXI Streaming Configurations
-         AXIS_CONFIG_G => ssiAxiStreamConfig(8))  
+         AXIS_CONFIG_G => ssiAxiStreamConfig(8))
       port map (
          -- Local Configurations
          localMac           => localMac,
@@ -125,7 +125,7 @@ begin
          gtTxP              => xauiTxP,
          gtTxN              => xauiTxN,
          gtRxP              => xauiRxP,
-         gtRxN              => xauiRxN);  
+         gtRxN              => xauiRxN);
 
    ----------------------------------------         
    -- Retrofitting the "old" MAC
@@ -149,7 +149,7 @@ begin
          mAxisClk    => axilClk,
          mAxisRst    => axilRst,
          mAxisMaster => obMacMaster,
-         mAxisSlave  => obMacSlave);   
+         mAxisSlave  => obMacSlave);
 
    FIFO_Inbound : entity work.AxiStreamFifo
       generic map (
@@ -166,7 +166,7 @@ begin
          FIFO_ADDR_WIDTH_G   => 4,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(8))            
+         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(8))
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
@@ -177,7 +177,7 @@ begin
          mAxisClk    => axilClk,
          mAxisRst    => axilRst,
          mAxisMaster => obMaster,
-         mAxisSlave  => dmaObSlave);  
+         mAxisSlave  => dmaObSlave);
 
    -- Current MAC only support 64-bit inbound transfers
    dmaObMaster.tValid <= obMaster.tValid;
@@ -256,6 +256,6 @@ begin
          -- FFB Inbound Interface (ffbClk domain)
          ffbClk          => ffbClk,
          ffbRst          => ffbRst,
-         ffbData         => ffbData);      
+         ffbBus          => ffbBus);
 
 end mapping;

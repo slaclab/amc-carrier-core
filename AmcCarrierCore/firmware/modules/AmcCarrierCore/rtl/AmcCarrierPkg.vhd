@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-09-28
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -20,6 +20,8 @@ use ieee.std_logic_1164.all;
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
+
+use work.TimingPkg.all;
 
 package AmcCarrierPkg is
 
@@ -53,7 +55,7 @@ package AmcCarrierPkg is
    -------------------------------------------------------------      
    function getFfbChCnt(appType : AppType) return natural;
 
-   type FfbDataType is record
+   type FfbBusType is record
       valid     : sl;
       testMode  : sl;
       app       : AppType;
@@ -61,14 +63,14 @@ package AmcCarrierPkg is
       timeStamp : slv(63 downto 0);
       message   : Slv32Array(31 downto 0);
    end record;
-   type FfbDataArray is array (natural range <>) of FfbDataType;
-   constant FFB_DATA_INIT_C : FfbDataType := (
+   type FfbBusArray is array (natural range <>) of FfbBusType;
+   constant FFB_BUS_INIT_C : FfbBusType := (
       valid     => '0',
       testMode  => '0',
       app       => (others => '0'),
       appId     => (others => '0'),
       timeStamp => (others => '0'),
-      message   => (others => (others => '0')));   
+      message   => (others => (others => '0')));
 
    ---------------------------------------------------
    -- BSI: Configurations, Constants and Records Types
@@ -85,6 +87,12 @@ package AmcCarrierPkg is
       slotNumber => x"00",
       crateId    => x"0000",
       macAddress => (others => (others => '0')));
+
+   type DiagnosticBusType is record
+      strobe        : sl;
+      data          : Slv32Array(31 downto 0);
+      timingMessage : TimingMessageType;
+   end record;
 
 end package AmcCarrierPkg;
 
@@ -137,5 +145,5 @@ package body AmcCarrierPkg is
       end case;
       return retVar;
    end function;
-   
+
 end package body AmcCarrierPkg;

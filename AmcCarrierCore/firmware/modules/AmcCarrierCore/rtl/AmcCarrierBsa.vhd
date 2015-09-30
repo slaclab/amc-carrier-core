@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-29
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -34,39 +34,37 @@ entity AmcCarrierBsa is
       DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
    port (
       -- AXI-Lite Interface (axilClk domain)
-      axilClk             : in  sl;
-      axilRst             : in  sl;
-      axilReadMaster      : in  AxiLiteReadMasterType;
-      axilReadSlave       : out AxiLiteReadSlaveType;
-      axilWriteMaster     : in  AxiLiteWriteMasterType;
-      axilWriteSlave      : out AxiLiteWriteSlaveType;
+      axilClk           : in  sl;
+      axilRst           : in  sl;
+      axilReadMaster    : in  AxiLiteReadMasterType;
+      axilReadSlave     : out AxiLiteReadSlaveType;
+      axilWriteMaster   : in  AxiLiteWriteMasterType;
+      axilWriteSlave    : out AxiLiteWriteSlaveType;
       -- AXI4 Interface (axiClk domain)
-      axiClk              : in  sl;
-      axiRst              : in  sl;
-      axiWriteMaster      : out AxiWriteMasterType;
-      axiWriteSlave       : in  AxiWriteSlaveType;
-      axiReadMaster       : out AxiReadMasterType;
-      axiReadSlave        : in  AxiReadSlaveType;
+      axiClk            : in  sl;
+      axiRst            : in  sl;
+      axiWriteMaster    : out AxiWriteMasterType;
+      axiWriteSlave     : in  AxiWriteSlaveType;
+      axiReadMaster     : out AxiReadMasterType;
+      axiReadSlave      : in  AxiReadSlaveType;
       -- Ethernet Interface (axilClk domain)
-      obBsaMaster         : in  AxiStreamMasterType;
-      obBsaSlave          : out AxiStreamSlaveType;
-      ibBsaMaster         : out AxiStreamMasterType;
-      ibBsaSlave          : in  AxiStreamSlaveType;
+      obBsaMaster       : in  AxiStreamMasterType;
+      obBsaSlave        : out AxiStreamSlaveType;
+      ibBsaMaster       : out AxiStreamMasterType;
+      ibBsaSlave        : in  AxiStreamSlaveType;
       -- BSA Interface (bsaTimingClk domain)
-      bsaTimingClk        : in  sl;
-      bsaTimingRst        : in  sl;
-      bsaTimingData       : in  TimingDataType;
+      bsaTimingClk      : in  sl;
+      bsaTimingRst      : in  sl;
+      bsaTimingBus      : in  TimingBusType;
       ----------------------
       -- Top Level Interface
       ----------------------      
       -- Diagnostic Interface
-      diagnosticClk       : in  sl;
-      diagnosticRst       : in  sl;
-      diagnosticValid     : in  sl;
-      diagnosticTimeStamp : in  slv(63 downto 0);
-      diagnosticMessage   : in  Slv32Array(31 downto 0);
-      diagnosticMasters   : in  AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticSlaves    : out AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0));
+      diagnosticClk     : in  sl;
+      diagnosticRst     : in  sl;
+      diagnosticBus     : in  DiagnosticBusType;
+      diagnosticMasters : in  AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticSlaves  : out AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0));
 
 end AmcCarrierBsa;
 

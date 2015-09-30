@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2015-09-29
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ entity AmcCarrierEmptyApp is
       SIM_SPEEDUP_G       : boolean             := false;
       AXI_ERROR_RESP_G    : slv(1 downto 0)     := AXI_RESP_DECERR_C;
       DIAGNOSTIC_SIZE_G   : positive            := 1;
-      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));      
+      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
    port (
       -----------------------
       -- Application Ports --
@@ -76,29 +76,27 @@ entity AmcCarrierEmptyApp is
       -- Top Level Interface
       ----------------------
       -- AXI-Lite Interface (regClk domain)
-      regClk              : out sl;
-      regRst              : out sl;
-      regReadMaster       : in  AxiLiteReadMasterType;
-      regReadSlave        : out AxiLiteReadSlaveType;
-      regWriteMaster      : in  AxiLiteWriteMasterType;
-      regWriteSlave       : out AxiLiteWriteSlaveType;
+      regClk            : out sl;
+      regRst            : out sl;
+      regReadMaster     : in  AxiLiteReadMasterType;
+      regReadSlave      : out AxiLiteReadSlaveType;
+      regWriteMaster    : in  AxiLiteWriteMasterType;
+      regWriteSlave     : out AxiLiteWriteSlaveType;
       -- Timing Interface (timingClk domain) 
-      timingClk           : out sl;
-      timingRst           : out sl;
-      timingData          : in  TimingDataType;
+      timingClk         : out sl;
+      timingRst         : out sl;
+      timingBus         : in  TimingBusType;
       -- Diagnostic Interface (diagnosticClk domain)
-      diagnosticClk       : out sl;
-      diagnosticRst       : out sl;
-      diagnosticValid     : out sl;
-      diagnosticTimeStamp : out slv(63 downto 0);
-      diagnosticMessage   : out Slv32Array(31 downto 0);
-      diagnosticMasters   : out AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticSlaves    : in  AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticClk     : out sl;
+      diagnosticRst     : out sl;
+      diagnosticBus     : out DiagnosticBusType;
+      diagnosticMasters : out AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticSlaves  : in  AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       -- Support Reference Clocks and Resets
-      recTimingClk        : in  sl;
-      recTimingRst        : in  sl;
-      ref156MHzClk        : in  sl;
-      ref156MHzRst        : in  sl);
+      recTimingClk      : in  sl;
+      recTimingRst      : in  sl;
+      ref156MHzClk      : in  sl;
+      ref156MHzRst      : in  sl);
 end AmcCarrierEmptyApp;
 
 architecture top_level_app of AmcCarrierEmptyApp is
@@ -108,16 +106,16 @@ architecture top_level_app of AmcCarrierEmptyApp is
 
 begin
 
-   clk                 <= ref156MHzClk;
-   rst                 <= ref156MHzRst;
-   timingClk           <= clk;
-   timingRst           <= rst;
-   diagnosticClk       <= clk;
-   diagnosticRst       <= rst;
-   diagnosticValid     <= timingData.strb;
-   diagnosticTimeStamp <= timingData.msg.timeStamp;
-   diagnosticMessage   <= (others => x"00000000");
-   diagnosticMasters   <= (others => AXI_STREAM_MASTER_INIT_C);
+   clk                         <= ref156MHzClk;
+   rst                         <= ref156MHzRst;
+   timingClk                   <= clk;
+   timingRst                   <= rst;
+   diagnosticClk               <= clk;
+   diagnosticRst               <= rst;
+   diagnosticBus.strobe        <= timingBus.strobe;
+   diagnosticBus.timingMessage <= timingBus.message;
+   diagnosticBus.data          <= (others => x"00000000");
+   diagnosticMasters           <= (others => AXI_STREAM_MASTER_INIT_C);
 
    U_AxiLiteEmpty : entity work.AxiLiteEmpty
       generic map (
