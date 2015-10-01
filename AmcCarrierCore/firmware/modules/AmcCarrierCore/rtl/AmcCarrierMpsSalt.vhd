@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-18
+-- Last update: 2015-10-01
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -143,8 +143,8 @@ begin
             txP           => mpsTxP,
             txN           => mpsTxN,
             -- RX Serial Stream
-            rxP           => mpsBusRxP(2),
-            rxN           => mpsBusRxN(2),
+            rxP           => mpsBusRxP(1),
+            rxN           => mpsBusRxN(1),
             -- Reference Signals
             clk125MHz     => mps125MHzClk,
             rst125MHz     => mps125MHzRst,
@@ -163,19 +163,11 @@ begin
             mAxisMaster   => open,
             mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);            
 
-      U_IBUFDS : IBUFDS
-         generic map (
-            DIFF_TERM => false) 
-         port map(
-            I  => mpsBusRxP(1),
-            IB => mpsBusRxN(1),
-            O  => open);            
-
       GEN_VEC :
-      for i in 14 downto 3 generate
+      for i in 14 downto 2 generate
          U_IBUFDS : IBUFDS
             generic map (
-               DIFF_TERM => false) 
+               DIFF_TERM => true) 
             port map(
                I  => mpsBusRxP(i),
                IB => mpsBusRxN(i),
@@ -189,10 +181,9 @@ begin
       mpsTxLinkUp <= '0';
       mpsIbSlave  <= AXI_STREAM_SLAVE_FORCE_C;
 
-      U_OBUFDS : OBUFTDS
+      U_OBUFDS : OBUFDS
          port map (
             I  => '0',
-            T  => '1',
             O  => mpsTxP,
             OB => mpsTxN);      
 
