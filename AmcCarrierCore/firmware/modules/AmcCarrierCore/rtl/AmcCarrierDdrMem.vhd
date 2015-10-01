@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-10
+-- Last update: 2015-09-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -281,7 +281,7 @@ begin
          generic map (
             TPD_G        => TPD_G,
             START_ADDR_G => START_ADDR_C,
-            STOP_ADDR_G  => ite(SIM_SPEEDUP_G, toSlv(8191, AXI_CONFIG_C.ADDR_WIDTH_C), STOP_ADDR_C),
+            STOP_ADDR_G  => ite(SIM_SPEEDUP_G, toSlv(32*4096, AXI_CONFIG_C.ADDR_WIDTH_C), STOP_ADDR_C),
             AXI_CONFIG_G => AXI_CONFIG_C)
          port map (
             -- AXI-Lite Interface
