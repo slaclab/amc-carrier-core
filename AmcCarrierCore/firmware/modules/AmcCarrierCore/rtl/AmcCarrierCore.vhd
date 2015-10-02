@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-30
+-- Last update: 2015-10-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -338,9 +338,11 @@ begin
    ----------------------------------   
    U_RegMap : entity work.AmcCarrierRegMapping
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         FSBL_G           => FSBL_G)
+         TPD_G               => TPD_G,
+         AXI_ERROR_RESP_G    => AXI_ERROR_RESP_C,
+         APP_TYPE_G          => APP_TYPE_G,
+         STANDALONE_TIMING_G => STANDALONE_TIMING_G,
+         FSBL_G              => FSBL_G)
       port map (
          -- Primary AXI-Lite Interface
          axilClk           => axilClk,

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-29
+-- Last update: 2015-10-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -16,6 +16,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
@@ -30,9 +32,11 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierRegMapping is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      FSBL_G           : boolean         := false);
+      TPD_G               : time            := 1 ns;
+      AXI_ERROR_RESP_G    : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      APP_TYPE_G          : AppType         := APP_NULL_TYPE_C;
+      STANDALONE_TIMING_G : boolean         := false;  -- false = Normal Operation, = LCLS-I timing only
+      FSBL_G              : boolean         := false);
    port (
       -- Primary AXI-Lite Interface
       axilClk           : in    sl;
@@ -117,6 +121,9 @@ entity AmcCarrierRegMapping is
 end AmcCarrierRegMapping;
 
 architecture mapping of AmcCarrierRegMapping is
+
+   -- FSBL Timeout Duration
+   constant TIMEOUT_C : integer := integer(10.0 / AXI_CLK_PERIOD_C);
 
    constant NUM_AXI_MASTERS_C : natural := 14;
 
@@ -238,6 +245,12 @@ architecture mapping of AmcCarrierRegMapping is
    signal bootSck  : sl;
    signal bootMosi : sl;
    signal bootMiso : sl;
+
+   signal hardReload     : sl                           := '0';
+   signal softReload     : sl                           := '0';
+   signal fpgaReload     : sl                           := '0';
+   signal fpgaReloadAddr : slv(31 downto 0);
+   signal reloadTimer    : integer range 0 to TIMEOUT_C := 0;
    
 begin
 
@@ -268,12 +281,20 @@ begin
    --------------------------          
    U_Version : entity work.AxiVersion
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         XIL_DEVICE_G     => "ULTRASCALE",
-         EN_DEVICE_DNA_G  => true,
-         EN_ICAP_G        => true)
+         TPD_G              => TPD_G,
+         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         CLK_PERIOD_G       => AXI_CLK_PERIOD_C,
+         XIL_DEVICE_G       => "ULTRASCALE",
+         EN_DEVICE_DNA_G    => true,
+         EN_DS2411_G        => false,
+         EN_ICAP_G          => false,
+         AUTO_RELOAD_EN_G   => false,
+         AUTO_RELOAD_TIME_G => 10.0,
+         AUTO_RELOAD_ADDR_G => x"04000000")  -- LCLS-II Image by default
       port map (
+         -- IPROG Signals
+         fpgaReload     => softReload,
+         fpgaReloadAddr => fpgaReloadAddr,
          -- AXI-Lite Register Interface
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
@@ -282,6 +303,44 @@ begin
          -- Clocks and Resets
          axiClk         => axilClk,
          axiRst         => axilRst);  
+
+   U_Iprog : entity work.Iprog
+      generic map (
+         TPD_G        => TPD_G,
+         XIL_DEVICE_G => "ULTRASCALE")
+      port map (
+         clk         => axilClk,
+         rst         => axilRst,
+         start       => fpgaReload,
+         bootAddress => fpgaReloadAddr);        
+
+   NORMAL_IMAGE : if (FSBL_G = false) generate
+      hardReload <= '0';
+      fpgaReload <= softReload;
+   end generate;
+
+   FSBL_IMAGE : if (FSBL_G = true) generate
+      process (axilClk) is
+      begin
+         if (rising_edge(axilClk)) then
+            -- OR the software and FSBL reload signals together
+            fpgaReload <= softReload or hardReload after TPD_G;
+            -- Check for Reset
+            if (axilRst = '1') or (ddrMemError = '1') or (ddrMemReady = '0') then
+               reloadTimer <= 0   after TPD_G;
+               hardReload  <= '0' after TPD_G;
+            else
+               -- Check for reboot timeout
+               if reloadTimer = TIMEOUT_C then
+                  hardReload <= '1' after TPD_G;
+               else
+                  -- Increment the counter
+                  reloadTimer <= reloadTimer + 1 after TPD_G;
+               end if;
+            end if;
+         end if;
+      end process;
+   end generate;
 
    --------------------------
    -- AXI-Lite: SYSMON Module
@@ -372,6 +431,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, STANDALONE_TIMING_G),
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C) 
       port map (
          -- XBAR Ports 
