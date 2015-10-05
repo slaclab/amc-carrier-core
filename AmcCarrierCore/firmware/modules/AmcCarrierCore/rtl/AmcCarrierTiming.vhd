@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-30
+-- Last update: 2015-10-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ entity AmcCarrierTiming is
       -- BSA Interface (bsaTimingClk domain)
       bsaTimingClk     : out sl;
       bsaTimingRst     : out sl;
-      bsaTimingBus    : out TimingBusType;
+      bsaTimingBus     : out TimingBusType;
       ----------------------
       -- Top Level Interface
       ----------------------      
@@ -54,7 +54,7 @@ entity AmcCarrierTiming is
       recTimingRst     : out sl;
       appTimingClk     : in  sl;
       appTimingRst     : in  sl;
-      appTimingBus    : out TimingBusType;
+      appTimingBus     : out TimingBusType;
       appTimingPhy     : in  TimingPhyType;             -- Input for timing generator only
       ----------------
       -- Core Ports --
@@ -104,11 +104,11 @@ architecture mapping of AmcCarrierTiming is
 
 begin
 
-   recTimingClk  <= timingRecClkG;
-   recTimingRst  <= not(rxResetDone);
+   recTimingClk <= timingRecClkG;
+   recTimingRst <= not(rxResetDone);
    appTimingBus <= TIMING_BUS_INIT_C;
-   bsaTimingClk  <= timingRecClkG;
-   bsaTimingRst  <= not(rxResetDone);
+   bsaTimingClk <= timingRecClkG;
+   bsaTimingRst <= not(rxResetDone);
    bsaTimingBus <= TIMING_BUS_INIT_C;
 
    -------------------------------------------------------------------------------------------------
@@ -160,6 +160,7 @@ begin
          rxDecErr       => rxDecErr,
          rxPolarity     => rxPolarity,
          rxOutClk       => rxOutClk,
+         txInhibit      => ite((APP_TYPE_G = APP_TIME_GEN_TYPE_C), '0', '1'),
          txReset        => txReset,
          txUsrClk       => txUsrClk,
          txUsrClkActive => txUsrClkActive,
