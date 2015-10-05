@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-02
+-- Last update: 2015-10-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -241,16 +241,11 @@ architecture mapping of AmcCarrierRegMapping is
    signal mAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal bootCsL  : sl;
-   signal bootSck  : sl;
-   signal bootMosi : sl;
-   signal bootMiso : sl;
-
-   signal hardReload     : sl                           := '0';
-   signal softReload     : sl                           := '0';
-   signal fpgaReload     : sl                           := '0';
-   signal fpgaReloadAddr : slv(31 downto 0);
-   signal reloadTimer    : integer range 0 to TIMEOUT_C := 0;
+   signal bootCsL      : sl;
+   signal bootSck      : sl;
+   signal bootMosi     : sl;
+   signal bootMiso     : sl;
+   signal fpgaEnReload : sl;
    
 begin
 
@@ -287,60 +282,22 @@ begin
          XIL_DEVICE_G       => "ULTRASCALE",
          EN_DEVICE_DNA_G    => true,
          EN_DS2411_G        => false,
-         EN_ICAP_G          => false,
-         AUTO_RELOAD_EN_G   => false,
+         EN_ICAP_G          => true,
+         AUTO_RELOAD_EN_G   => FSBL_G,
          AUTO_RELOAD_TIME_G => 10.0,
          AUTO_RELOAD_ADDR_G => x"04000000")  -- LCLS-II Image by default
       port map (
-         -- IPROG Signals
-         fpgaReload     => softReload,
-         fpgaReloadAddr => fpgaReloadAddr,
-         -- AXI-Lite Register Interface
+         -- AXI-Lite Interface
+         axiClk         => axilClk,
+         axiRst         => axilRst,
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),
          axiWriteSlave  => mAxilWriteSlaves(VERSION_INDEX_C),
-         -- Clocks and Resets
-         axiClk         => axilClk,
-         axiRst         => axilRst);  
+         -- Optional: FPGA Reloading Interface
+         fpgaEnReload   => fpgaEnReload);
 
-   U_Iprog : entity work.Iprog
-      generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => "ULTRASCALE")
-      port map (
-         clk         => axilClk,
-         rst         => axilRst,
-         start       => fpgaReload,
-         bootAddress => fpgaReloadAddr);        
-
-   NORMAL_IMAGE : if (FSBL_G = false) generate
-      hardReload <= '0';
-      fpgaReload <= softReload;
-   end generate;
-
-   FSBL_IMAGE : if (FSBL_G = true) generate
-      process (axilClk) is
-      begin
-         if (rising_edge(axilClk)) then
-            -- OR the software and FSBL reload signals together
-            fpgaReload <= softReload or hardReload after TPD_G;
-            -- Check for Reset
-            if (axilRst = '1') or (ddrMemError = '1') or (ddrMemReady = '0') then
-               reloadTimer <= 0   after TPD_G;
-               hardReload  <= '0' after TPD_G;
-            else
-               -- Check for reboot timeout
-               if reloadTimer = TIMEOUT_C then
-                  hardReload <= '1' after TPD_G;
-               else
-                  -- Increment the counter
-                  reloadTimer <= reloadTimer + 1 after TPD_G;
-               end if;
-            end if;
-         end if;
-      end process;
-   end generate;
+   fpgaEnReload <= ddrMemReady and not(ddrMemError);
 
    --------------------------
    -- AXI-Lite: SYSMON Module
