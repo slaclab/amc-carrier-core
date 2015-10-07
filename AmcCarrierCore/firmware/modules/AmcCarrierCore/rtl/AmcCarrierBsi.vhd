@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2015-09-18
+-- Last update: 2015-10-06
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -268,12 +268,17 @@ begin
       rin <= v;
 
       -- Outputs
-      axilWriteSlave          <= r.axilWriteSlave;
-      axilReadSlave           <= r.axilReadSlave;
-      localMac                <= ConvertEndianness(r.macAddress(0));
-      localIp                 <= r.localIp;
+      axilWriteSlave <= r.axilWriteSlave;
+      axilReadSlave  <= r.axilReadSlave;
+
       localAppId(3 downto 0)  <= r.slotNumber(3 downto 0);
       localAppId(15 downto 4) <= r.crateId(15 downto 4);
+
+      -- localMac <= ConvertEndianness(r.macAddress(0));
+      -- localIp  <= r.localIp;
+      
+      localMac <= x"010300564400";
+      localIp  <= x"0A02A8C0";      
       
    end process comb;
 
