@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-09-30
+-- Last update: 2015-10-07
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -98,9 +98,14 @@ begin
    ----------------------
    U_Xaui : entity work.XauiGthUltraScaleWrapper
       generic map (
-         TPD_G         => TPD_G,
+         TPD_G            => TPD_G,
+         -- XAUI Configurations
+         XAUI_20GIGE_G    => false,
+         REF_CLK_FREQ_G   => 156.25E+6,
+         -- AXI-Lite Configurations
+         AXI_ERROR_RESP_G => AXI_RESP_SLVERR_C,
          -- AXI Streaming Configurations
-         AXIS_CONFIG_G => ssiAxiStreamConfig(8))
+         AXIS_CONFIG_G    => ssiAxiStreamConfig(8))
       port map (
          -- Local Configurations
          localMac           => localMac,
@@ -118,6 +123,11 @@ begin
          axiLiteReadSlave   => open,
          axiLiteWriteMaster => AXI_LITE_WRITE_MASTER_INIT_C,
          axiLiteWriteSlave  => open,
+         -- Misc. Signals
+         extRst             => axilRst,
+         phyClk             => open,
+         phyRst             => open,
+         phyReady           => open,
          -- MGT Clock Port (156.25 MHz)
          gtClkP             => xauiClkP,
          gtClkN             => xauiClkN,
