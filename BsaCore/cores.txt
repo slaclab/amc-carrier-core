@@ -1,1 +1,2 @@
-  
+cores/DdrAxi4Crossbar/DdrAxi4Crossbar.xci  
+cores/BsaAddFpCore/BsaAddFpCore.xci  
