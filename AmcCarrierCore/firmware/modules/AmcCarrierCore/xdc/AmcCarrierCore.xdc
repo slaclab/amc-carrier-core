@@ -319,6 +319,9 @@ set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {
 
 # BITSTREAM Configurations
 set_property BITSTREAM.CONFIG.CONFIGRATE 66 [current_design] 
+set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes [current_design]
+set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 1 [current_design]
+set_property BITSTREAM.CONFIG.SPI_FALL_EDGE No [current_design]
 
 # StdLib
 set_property ASYNC_REG TRUE [get_cells -hierarchical {*crossDomainSyncReg_reg*}]
