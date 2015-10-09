@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-10-02
+-- Last update: 2015-10-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ package AmcCarrierPkg is
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
    -----------------------------------------------------------
-   subtype AppType is slv(4 downto 0);
+   subtype AppType is slv(6 downto 0);  -- Max. Size is 7-bits
 
    constant APP_NULL_TYPE_C     : AppType := toSlv(0, AppType'length);
    constant APP_TIME_GEN_TYPE_C : AppType := toSlv(1, AppType'length);
