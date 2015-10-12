@@ -1,2 +1,2 @@
-# vhdl work rtl/BsaBufferControl.vhd
-# vhdl work cores/BsaAddFpCore/BsaAddFpCore.dcp  
+vhdl work rtl/BsaBufferControl.vhd
+##vhdl work cores/BsaAddFpCore/BsaAddFpCore.dcp  
