@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-02
+-- Last update: 2015-10-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ entity AmcCarrierCore is
       -- BSI Interface (bsiClk domain) 
       bsiClk            : in    sl                               := '0';
       bsiRst            : in    sl                               := '0';
-      bsiData           : out   BsiDataType;
+      bsiBus            : out   BsiBusType;
       -- MPS Concentrator Interface (ref156MHzClk domain)
       mpsObMasters      : out   AxiStreamMasterArray(14 downto 1);
       mpsObSlaves       : in    AxiStreamSlaveArray(14 downto 1) := (others => AXI_STREAM_SLAVE_FORCE_C);
@@ -400,7 +400,7 @@ begin
          -- BSI Interface
          bsiClk            => bsiClk,
          bsiRst            => bsiRst,
-         bsiData           => bsiData,
+         bsiBus            => bsiBus,
          ----------------
          -- Core Ports --
          ----------------   

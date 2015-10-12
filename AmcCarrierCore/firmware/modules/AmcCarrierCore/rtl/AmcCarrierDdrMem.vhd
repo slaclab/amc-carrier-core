@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-30
+-- Last update: 2015-10-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -165,6 +165,10 @@ architecture mapping of AmcCarrierDdrMem is
    attribute KEEP_HIERARCHY                : string;
    attribute KEEP_HIERARCHY of IBUFDS_Inst : label is "TRUE";
    attribute KEEP_HIERARCHY of BUFG_Inst   : label is "TRUE";
+
+   attribute dont_touch               : string;
+   attribute dont_touch of refClock   : signal is "TRUE";
+   attribute dont_touch of refClkBufg : signal is "TRUE";
 
    type RegType is record
       ddrPwrEn       : sl;

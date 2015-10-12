@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-10-08
+-- Last update: 2015-10-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -78,13 +78,12 @@ package AmcCarrierPkg is
    ---------------------------------------------------
    constant BSI_MAC_SIZE_C : natural := 4;
 
-   type BsiDataType is record
+   type BsiBusType is record
       slotNumber : slv(7 downto 0);
       crateId    : slv(15 downto 0);
       macAddress : Slv48Array(BSI_MAC_SIZE_C-1 downto 1);  --  big-Endian format 
    end record;
-   type BsiDataArray is array (natural range <>) of BsiDataType;
-   constant BSI_DATA_INIT_C : BsiDataType := (
+   constant BSI_BUS_INIT_C : BsiBusType := (
       slotNumber => x"00",
       crateId    => x"0000",
       macAddress => (others => (others => '0')));
@@ -94,8 +93,8 @@ package AmcCarrierPkg is
       data          : Slv32Array(31 downto 0);
       timingMessage : TimingMessageType;
    end record;
-   
-  constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*32 + TIMING_MESSAGE_BITS_C;
+
+   constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*32 + TIMING_MESSAGE_BITS_C;
 
    function toSlv (b             : DiagnosticBusType) return slv;
    function toDiagnosticBus (vec : slv) return DiagnosticBusType;
@@ -148,10 +147,10 @@ package body AmcCarrierPkg is
       end case;
       return retVar;
    end function;
-   
+
    function toSlv (b : DiagnosticBusType) return slv is
       variable vector : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0) := (others => '0');
-      variable i      : integer := 0;
+      variable i      : integer                               := 0;
    begin
       vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
       i                                        := TIMING_MESSAGE_BITS_C;
@@ -164,10 +163,10 @@ package body AmcCarrierPkg is
 
    function toDiagnosticBus (vec : slv) return DiagnosticBusType is
       variable b : DiagnosticBusType;
-      variable i       : integer := 0;
+      variable i : integer := 0;
    begin
       b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
-      i := TIMING_MESSAGE_BITS_C;
+      i               := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
          assignRecord(i, vec, b.data(j));
       end loop;

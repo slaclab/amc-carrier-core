@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2015-10-06
+-- Last update: 2015-10-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ entity AmcCarrierBsi is
       -- Application Interface
       bsiClk          : in    sl;
       bsiRst          : in    sl;
-      bsiData         : out   BsiDataType;
+      bsiBus          : out   BsiBusType;
       -- I2C Ports
       scl             : inout sl;
       sda             : inout sl;
@@ -276,9 +276,9 @@ begin
 
       -- localMac <= ConvertEndianness(r.macAddress(0));
       -- localIp  <= r.localIp;
-      
+
       localMac <= x"010300564400";
-      localIp  <= x"0A02A8C0";      
+      localIp  <= x"0A02A8C0";
       
    end process comb;
 
@@ -299,7 +299,7 @@ begin
          din    => r.slotNumber,
          -- Read Ports (rd_clk domain)
          rd_clk => bsiClk,
-         dout   => bsiData.slotNumber); 
+         dout   => bsiBus.slotNumber); 
 
    Sync_crateId : entity work.SynchronizerFifo
       generic map (
@@ -311,7 +311,7 @@ begin
          din    => r.crateId,
          -- Read Ports (rd_clk domain)
          rd_clk => bsiClk,
-         dout   => bsiData.crateId);  
+         dout   => bsiBus.crateId);  
 
    GEN_VEC :
    for i in BSI_MAC_SIZE_C-1 downto 1 generate
@@ -326,7 +326,7 @@ begin
             din    => ConvertEndianness(r.macAddress(i)),
             -- Read Ports (rd_clk domain)
             rd_clk => bsiClk,
-            dout   => bsiData.macAddress(i));     
+            dout   => bsiBus.macAddress(i));     
 
    end generate GEN_VEC;
    

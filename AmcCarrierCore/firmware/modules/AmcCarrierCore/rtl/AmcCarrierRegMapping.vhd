@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-05
+-- Last update: 2015-10-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ entity AmcCarrierRegMapping is
       -- BSI Interface
       bsiClk            : in    sl;
       bsiRst            : in    sl;
-      bsiData           : out   BsiDataType;
+      bsiBus            : out   bsiBusType;
       ----------------
       -- Core Ports --
       ----------------   
@@ -486,7 +486,7 @@ begin
          -- Application Interface
          bsiClk          => bsiClk,
          bsiRst          => bsiRst,
-         bsiData         => bsiData,
+         bsiBus          => bsiBus,
          -- I2C Ports
          scl             => ipmcScl,
          sda             => ipmcSda,

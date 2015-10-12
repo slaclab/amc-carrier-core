@@ -291,15 +291,10 @@ create_generated_clock -name mpsClk125MHz [get_pins -hier -filter {NAME =~ U_Cor
 create_generated_clock -name iprogClk     [get_pins {U_Core/U_RegMap/U_Version/GEN_ICAP.Iprog_1/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 create_generated_clock -name dnaClk       [get_pins {U_Core/U_RegMap/U_Version/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 create_generated_clock -name xauiPhyClk   [get_pins {U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore/U0/XauiGthUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gthe3_top.XauiGthUltraScale156p25MHz10GigECore_gt_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
-create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_mem_intfc/u_mig_ddr3_phy/inst/u_ddr3_infrastructure/mmcme3_adv_inst/CLKOUT0}]
-create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_mem_intfc/u_mig_ddr3_phy/inst/u_ddr3_infrastructure/u_bufg_riuClk/O}]
+create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
+create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT6}]
 
-set_multicycle_path -setup 8 -from [get_pins -hier -filter {NAME =~ */u_ddr_mc_cal/u_ddr_cal/calDone*/C}]
-set_multicycle_path -end -hold 7 -from [get_pins -hier -filter {NAME =~ */u_ddr_mc_cal/u_ddr_cal/calDone*/C}]
-set_false_path -hold -to [get_pins -hier -filter {NAME =~ *.u_xiphy_control/xiphy_control/RIU_ADDR*}]
-set_false_path -hold -to [get_pins -hier -filter {NAME =~ *.u_xiphy_control/xiphy_control/RIU_WR_DATA*}]
-
-set_false_path -to [get_pins -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST }]
+set_false_path -to [get_pins -hier -filter {name =~ */U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/SALT_IDELAY_CTRL_Inst*}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/serdes_1_to_10_ser8_i/idelay_cal}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/serdes_1_to_10_ser8_i/idelay_m}]
@@ -318,7 +313,7 @@ set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {
 ##########################
 
 # BITSTREAM Configurations
-set_property BITSTREAM.CONFIG.CONFIGRATE 66 [current_design] 
+set_property BITSTREAM.CONFIG.CONFIGRATE 90 [current_design] 
 set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes [current_design]
 set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 1 [current_design]
 set_property BITSTREAM.CONFIG.SPI_FALL_EDGE No [current_design]
