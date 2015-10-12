@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-10-09
+-- Last update: 2015-10-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -94,6 +94,11 @@ package AmcCarrierPkg is
       data          : Slv32Array(31 downto 0);
       timingMessage : TimingMessageType;
    end record;
+   
+  constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*32 + TIMING_MESSAGE_BITS_C;
+
+   function toSlv (b             : DiagnosticBusType) return slv;
+   function toDiagnosticBus (vec : slv) return DiagnosticBusType;
 
 end package AmcCarrierPkg;
 
@@ -143,5 +148,31 @@ package body AmcCarrierPkg is
       end case;
       return retVar;
    end function;
+   
+   function toSlv (b : DiagnosticBusType) return slv is
+      variable vector : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0) := (others => '0');
+      variable i      : integer := 0;
+   begin
+      vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
+      i                                        := TIMING_MESSAGE_BITS_C;
+      for j in 0 to 31 loop
+         assignSlv(i, vector, b.data(j));
+      end loop;
+      assignSlv(i, vector, b.strobe);
+      return vector;
+   end function;
 
+   function toDiagnosticBus (vec : slv) return DiagnosticBusType is
+      variable b : DiagnosticBusType;
+      variable i       : integer := 0;
+   begin
+      b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
+      i := TIMING_MESSAGE_BITS_C;
+      for j in 0 to 31 loop
+         assignRecord(i, vec, b.data(j));
+      end loop;
+      assignRecord(i, vec, b.strobe);
+      return b;
+   end function;
+   
 end package body AmcCarrierPkg;

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2015-09-30
+-- Last update: 2015-10-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ begin
    diagnosticRst               <= rst;
    diagnosticBus.strobe        <= timingBus.strobe;
    diagnosticBus.timingMessage <= timingBus.message;
-   diagnosticBus.data          <= (others => x"00000000");
+   diagnosticBus.data          <= (others => x"3F800000");  -- 1.0
    diagnosticMasters           <= (others => AXI_STREAM_MASTER_INIT_C);
 
    U_AxiLiteEmpty : entity work.AxiLiteEmpty

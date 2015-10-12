@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-05
+-- Last update: 2015-10-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ use work.AxiPkg.all;
 use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
+use work.AmcCarrierRegPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -90,7 +91,6 @@ architecture mapping of AmcCarrierTiming is
    signal rxDataK        : slv(1 downto 0);
    signal rxDispErr      : slv(1 downto 0);
    signal rxDecErr       : slv(1 downto 0);
-   signal rxPolarity     : sl;
    signal rxOutClk       : sl;
    signal txReset        : sl;
    signal txUsrClk       : sl;
@@ -106,7 +106,6 @@ begin
 
    recTimingClk <= timingRecClkG;
    recTimingRst <= not(rxResetDone);
-   appTimingBus <= TIMING_BUS_INIT_C;
    bsaTimingClk <= timingRecClkG;
    bsaTimingRst <= not(rxResetDone);
    bsaTimingBus <= TIMING_BUS_INIT_C;
@@ -158,7 +157,6 @@ begin
          rxDataK        => rxDataK,
          rxDispErr      => rxDispErr,
          rxDecErr       => rxDecErr,
-         rxPolarity     => rxPolarity,
          rxOutClk       => rxOutClk,
          txInhibit      => ite((APP_TYPE_G = APP_TIME_GEN_TYPE_C), '0', '1'),
          txReset        => txReset,
@@ -216,22 +214,33 @@ begin
    -------------------------------------------------------------------------------------------------
    -- AxiLiteCrossbar
    -------------------------------------------------------------------------------------------------
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+
 
    ------------------------------------------------------------------------------------------------
    -- Timing Core
    -- Decode timing message from GTH and distribute to system
    ------------------------------------------------------------------------------------------------
-
-
+   TimingCore_1: entity work.TimingCore
+      generic map (
+         TPD_G             => TPD_G,
+         AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
+         AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
+      port map (
+         gtRxRecClk      => timingRecClkG,
+         gtRxData        => rxData,
+         gtRxDataK       => rxDataK,
+         gtRxDispErr     => rxDispErr,
+         gtRxDecErr      => rxDecErr,
+         gtRxReset       => rxReset,
+         gtRxResetDone   => rxResetDone,
+         appTimingClk    => appTimingClk,
+         appTimingRst    => appTimingRst,
+         appTimingBus    => appTimingBus,
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMaster,
+         axilReadSlave   => axilReadSlave,
+         axilWriteMaster => axilWriteMaster,
+         axilWriteSlave  => axilWriteSlave);
 
 end mapping;
