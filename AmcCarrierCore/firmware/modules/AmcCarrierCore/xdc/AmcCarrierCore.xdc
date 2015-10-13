@@ -290,13 +290,13 @@ create_generated_clock -name mpsClk312MHz [get_pins -hier -filter {NAME =~ U_Cor
 create_generated_clock -name mpsClk125MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/*/MmcmGen.U_Mmcm/CLKOUT2}] 
 create_generated_clock -name iprogClk     [get_pins {U_Core/U_RegMap/U_Version/GEN_ICAP.Iprog_1/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 create_generated_clock -name dnaClk       [get_pins {U_Core/U_RegMap/U_Version/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
-create_generated_clock -name xauiPhyClk   [get_pins {U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore/U0/XauiGthUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gthe3_top.XauiGthUltraScale156p25MHz10GigECore_gt_gtwizard_gthe3_inst/gen_gtwizard_gthe3.gen_channel_container[0].gen_enabled_channel.gthe3_channel_wrapper_inst/channel_inst/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
+create_generated_clock -name xauiPhyClk   [get_pins -hier -filter {name =~ U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/*/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
 create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
 create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT6}]
+create_generated_clock -name timingRecClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/RXOUTCLK}]
 
-set_false_path -to [get_pins {U_Core/U_MpsandFfb/U_Salt/U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst/RST}]
-set_false_path -to [get_pins {U_Core/U_MpsandFfb/U_Salt/U_SaltDelayCtrl/U_Core/U_MpsandFfb/U_Salt/U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst_REPLICATED_0/RST}]
-
+set_false_path -to [get_pins -hier -filter {name =~ */U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST}]
+set_max_delay -from [get_pins U_Core/U_ClkAndRst/mps625MHzRst_reg/C] -to [get_pins -hier -filter {name =~ */U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST}] 16.0
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/SALT_IDELAY_CTRL_Inst*}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/serdes_1_to_10_ser8_i/idelay_cal}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/serdes_1_to_10_ser8_i/idelay_m}]
@@ -309,6 +309,7 @@ set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {iprogClk}] 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {dnaClk}] 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {mpsClk125MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingRecClk}] 
 
 ##########################
 ## Misc. Configurations ##

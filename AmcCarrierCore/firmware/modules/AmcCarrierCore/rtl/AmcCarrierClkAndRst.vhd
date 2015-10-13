@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-09-16
+-- Last update: 2015-10-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -69,27 +69,46 @@ architecture mapping of AmcCarrierClkAndRst is
    signal rst       : sl;
    signal clkOut    : slv(2 downto 0);
    signal rstOut    : slv(2 downto 0);
+   signal rstDly    : slv(2 downto 0);
 
 begin
 
-   axilClk <= fabClk;
-   axilRst <= fabRst;
+   axilClk      <= fabClk;
+   ref156MHzClk <= fabClk;
+
+   axilRst      <= rstDly(2);
+   ref156MHzRst <= rstDly(2);
+
+   -- Adding registers to help with timing
+   process(fabClk)
+   begin
+      if rising_edge(fabClk) then
+         rstDly <= rstDly(1 downto 0) & fabRst after TPD_G;
+      end if;
+   end process;
 
    ref125MHzClk <= clkOut(2);
    ref125MHzRst <= rstOut(2);
-   ref156MHzClk <= fabClk;
-   ref156MHzRst <= fabRst;
+
    ref312MHzClk <= clkOut(1);
    ref312MHzRst <= rstOut(1);
-   ref625MHzClk <= clkOut(0);
-   ref625MHzRst <= rstOut(0);
 
    mps125MHzClk <= clkOut(2);
    mps125MHzRst <= rstOut(2);
+
    mps312MHzClk <= clkOut(1);
    mps312MHzRst <= rstOut(1);
+
+   -- Adding registers to help with timing
+   process(clkOut)
+   begin
+      if rising_edge(clkOut(0)) then
+         mps625MHzRst <= rstOut(0) after TPD_G;
+         ref625MHzRst <= rstOut(0) after TPD_G;
+      end if;
+   end process;
+   ref625MHzClk <= clkOut(0);
    mps625MHzClk <= clkOut(0);
-   mps625MHzRst <= rstOut(0);
 
    IBUFDS_GTE3_Inst : IBUFDS_GTE3
       generic map (

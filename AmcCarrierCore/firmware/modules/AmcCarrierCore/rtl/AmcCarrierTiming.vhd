@@ -219,7 +219,7 @@ begin
          TPD_G           => TPD_G)
       port map (
          axiClk         => axilClk,
-         axiClkRst      => axilClkRst,
+         axiClkRst      => axilRst,
          axiReadMaster  => axilReadMaster,
          axiReadSlave   => axilReadSlave,
          axiWriteMaster => axilWriteMaster,
