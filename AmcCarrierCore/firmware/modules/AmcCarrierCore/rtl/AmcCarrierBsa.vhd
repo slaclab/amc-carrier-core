@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-09
+-- Last update: 2015-10-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -83,6 +83,17 @@ begin
    ibBsaMaster      <= AXI_STREAM_MASTER_INIT_C;
 
 
+   AxiLiteEmpty_1: entity work.AxiLiteEmpty
+      generic map (
+         TPD_G           => TPD_G)
+      port map (
+         axiClk         => axilClk,
+         axiClkRst      => axilClkRst,
+         axiReadMaster  => axilReadMaster,
+         axiReadSlave   => axilReadSlave,
+         axiWriteMaster => axilWriteMaster,
+         axiWriteSlave  => axilWriteSlave);
+   
    ------------------------------------------------------------------------------------------------
    -- Diagnostic Engine
    -- Create circular buffers in DDR Ram for dianostic data
@@ -91,24 +102,27 @@ begin
    -------------------------------------------------------------------------------------------------
    -- BSA buffers
    -------------------------------------------------------------------------------------------------
-   BsaBufferControl_1 : entity work.BsaBufferControl
-      generic map (
-         TPD_G         => TPD_G,
-         BSA_BUFFERS_G => 64)
-      port map (
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave,
-         diagnosticClk   => diagnosticClk,
-         diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBus,
-         axiClk          => axiClk,
-         axiRst          => axiRst,
-         axiWriteMaster  => axiWriteMaster,
-         axiWriteSlave   => axiWriteSlave);
+   
+--    BsaBufferControl_1 : entity work.BsaBufferControl
+--       generic map (
+--          TPD_G         => TPD_G,
+--          BSA_BUFFERS_G => 64)
+--       port map (
+--          axilClk         => axilClk,
+--          axilRst         => axilRst,
+--          axilReadMaster  => axilReadMaster,
+--          axilReadSlave   => axilReadSlave,
+--          axilWriteMaster => axilWriteMaster,
+--          axilWriteSlave  => axilWriteSlave,
+--          diagnosticClk   => diagnosticClk,
+--          diagnosticRst   => diagnosticRst,
+--          diagnosticBus   => diagnosticBus,
+--          axiClk          => axiClk,
+--          axiRst          => axiRst,
+--          axiWriteMaster  => axiWriteMaster,
+--          axiWriteSlave   => axiWriteSlave);
+   axiWriteMaster <= AXI_WRITE_MASTER_INIT_C;
+   axiReadMaster <= AXI_READ_MASTER_INIT_C;
 
    ------------------------------------------------------------------------------------------------
    -- DDR Engine
