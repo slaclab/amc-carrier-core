@@ -197,7 +197,7 @@ architecture mapping of AmcCarrierRegMapping is
          connectivity    => x"FFFF"),
       APP_INDEX_C        => (
          baseAddr        => APP_ADDR_C,
-         addrBits        => 32,
+         addrBits        => 31,
          connectivity    => x"FFFF"));   
 
    constant CONFIG_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
