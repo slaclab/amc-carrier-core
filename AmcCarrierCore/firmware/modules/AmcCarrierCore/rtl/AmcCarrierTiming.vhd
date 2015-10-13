@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-09
+-- Last update: 2015-10-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -214,33 +214,42 @@ begin
    -------------------------------------------------------------------------------------------------
    -- AxiLiteCrossbar
    -------------------------------------------------------------------------------------------------
-
+   AxiLiteEmpty_1: entity work.AxiLiteEmpty
+      generic map (
+         TPD_G           => TPD_G)
+      port map (
+         axiClk         => axilClk,
+         axiClkRst      => axilClkRst,
+         axiReadMaster  => axilReadMaster,
+         axiReadSlave   => axilReadSlave,
+         axiWriteMaster => axilWriteMaster,
+         axiWriteSlave  => axilWriteSlave);
 
    ------------------------------------------------------------------------------------------------
    -- Timing Core
    -- Decode timing message from GTH and distribute to system
    ------------------------------------------------------------------------------------------------
-   TimingCore_1: entity work.TimingCore
-      generic map (
-         TPD_G             => TPD_G,
-         AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
-         AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
-      port map (
-         gtRxRecClk      => timingRecClkG,
-         gtRxData        => rxData,
-         gtRxDataK       => rxDataK,
-         gtRxDispErr     => rxDispErr,
-         gtRxDecErr      => rxDecErr,
-         gtRxReset       => rxReset,
-         gtRxResetDone   => rxResetDone,
-         appTimingClk    => appTimingClk,
-         appTimingRst    => appTimingRst,
-         appTimingBus    => appTimingBus,
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave);
+--    TimingCore_1: entity work.TimingCore
+--       generic map (
+--          TPD_G             => TPD_G,
+--          AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
+--          AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
+--       port map (
+--          gtRxRecClk      => timingRecClkG,
+--          gtRxData        => rxData,
+--          gtRxDataK       => rxDataK,
+--          gtRxDispErr     => rxDispErr,
+--          gtRxDecErr      => rxDecErr,
+--          gtRxReset       => rxReset,
+--          gtRxResetDone   => rxResetDone,
+--          appTimingClk    => appTimingClk,
+--          appTimingRst    => appTimingRst,
+--          appTimingBus    => appTimingBus,
+--          axilClk         => axilClk,
+--          axilRst         => axilRst,
+--          axilReadMaster  => axilReadMaster,
+--          axilReadSlave   => axilReadSlave,
+--          axilWriteMaster => axilWriteMaster,
+--          axilWriteSlave  => axilWriteSlave);
 
 end mapping;
