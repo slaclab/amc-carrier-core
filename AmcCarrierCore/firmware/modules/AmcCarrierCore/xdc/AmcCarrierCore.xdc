@@ -296,7 +296,6 @@ create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Ins
 create_generated_clock -name timingRecClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/RXOUTCLK}]
 
 set_false_path -to [get_pins -hier -filter {name =~ */U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST}]
-set_max_delay -from [get_pins U_Core/U_ClkAndRst/mps625MHzRst_reg/C] -to [get_pins -hier -filter {name =~ */U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST}] 16.0
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/SALT_IDELAY_CTRL_Inst*}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/serdes_1_to_10_ser8_i/idelay_cal}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/serdes_1_to_10_ser8_i/idelay_m}]

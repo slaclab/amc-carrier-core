@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-13
+-- Last update: 2015-10-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -70,6 +70,13 @@ architecture mapping of AmcCarrierClkAndRst is
    signal clkOut    : slv(2 downto 0);
    signal rstOut    : slv(2 downto 0);
    signal rstDly    : slv(2 downto 0);
+
+   attribute dont_touch           : string;
+   attribute dont_touch of clk    : signal is "TRUE";
+   attribute dont_touch of rst    : signal is "TRUE";
+   attribute dont_touch of clkOut : signal is "TRUE";
+   attribute dont_touch of rstOut : signal is "TRUE";
+   attribute dont_touch of rstDly : signal is "TRUE";
 
 begin
 
