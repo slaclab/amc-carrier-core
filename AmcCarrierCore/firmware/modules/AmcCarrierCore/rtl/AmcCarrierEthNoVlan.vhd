@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-09-23
+-- Last update: 2015-10-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -48,32 +48,25 @@ entity AmcCarrierEthNoVlan is
       obBsaMaster       : in  AxiStreamMasterType;
       obBsaSlave        : out AxiStreamSlaveType;
       ibBsaMaster       : out AxiStreamMasterType;
-      ibBsaSlave        : in  AxiStreamSlaveType;
-      -- Boot Prom AXI Streaming Interface
-      obPromMaster      : in  AxiStreamMasterType;
-      obPromSlave       : out AxiStreamSlaveType;
-      ibPromMaster      : out AxiStreamMasterType;
-      ibPromSlave       : in  AxiStreamSlaveType); 
+      ibBsaSlave        : in  AxiStreamSlaveType);
 end AmcCarrierEthNoVlan;
 
 architecture mapping of AmcCarrierEthNoVlan is
 
    constant RX_MTU_C      : positive := 1500;
-   constant SERVER_SIZE_C : positive := 6;
+   constant SERVER_SIZE_C : positive := 5;
    constant SERVER_PORTS_C : PositiveArray(SERVER_SIZE_C-1 downto 0) := (
       0 => 8192,                        -- EPICS IOC[0]
       1 => 8193,                        -- EPICS IOC[1]
       2 => 8194,                        -- EPICS IOC[2]
       3 => 8195,                        -- EPICS IOC[3]
-      4 => 8196,                        -- PROM Inbound/Outbound
-      5 => 8197);                       -- BSA Inbound/Outbound
+      4 => 8197);                       -- BSA Inbound/Outbound
    constant SERVER_MTU_C : PositiveArray(SERVER_SIZE_C-1 downto 0) := (
       0 => 1500,                        -- EPICS IOC[0]
       1 => 1500,                        -- EPICS IOC[1]
       2 => 1500,                        -- EPICS IOC[2]
       3 => 1500,                        -- EPICS IOC[3]
-      4 => 1500,                        -- PROM Inbound/Outbound
-      5 => 1500);                       -- BSA Inbound/Outbound
+      4 => 1500);                       -- BSA Inbound/Outbound
 
    signal obServerMasters : AxiStreamMasterArray(SERVER_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal obServerSlaves  : AxiStreamSlaveArray(SERVER_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
@@ -169,20 +162,12 @@ begin
 
    end generate GEN_VEC;
 
-   -----------------------------------------
-   -- Server[4]@8196 = PROM Inbound/Outbound
-   -----------------------------------------
-   ibServerMasters(4) <= obPromMaster;
-   obPromSlave        <= ibServerSlaves(4);
-   ibPromMaster       <= obServerMasters(4);
-   obServerSlaves(4)  <= ibPromSlave;
-
    ----------------------------------------     
-   -- Server[5]@8197 = BSA Inbound/Outbound
+   -- Server[4]@8196 = BSA Inbound/Outbound
    ----------------------------------------     
-   ibServerMasters(5) <= obBsaMaster;
-   obBsaSlave         <= ibServerSlaves(5);
-   ibBsaMaster        <= obServerMasters(5);
-   obServerSlaves(5)  <= ibBsaSlave;
+   ibServerMasters(4) <= obBsaMaster;
+   obBsaSlave         <= ibServerSlaves(4);
+   ibBsaMaster        <= obServerMasters(4);
+   obServerSlaves(4)  <= ibBsaSlave;
    
 end mapping;

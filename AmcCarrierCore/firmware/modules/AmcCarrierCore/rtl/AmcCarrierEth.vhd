@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-10-07
+-- Last update: 2015-10-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -51,11 +51,6 @@ entity AmcCarrierEth is
       obBsaSlave        : out AxiStreamSlaveType;
       ibBsaMaster       : out AxiStreamMasterType;
       ibBsaSlave        : in  AxiStreamSlaveType;
-      -- Boot Prom AXI Streaming Interface
-      obPromMaster      : in  AxiStreamMasterType;
-      obPromSlave       : out AxiStreamSlaveType;
-      ibPromMaster      : out AxiStreamMasterType;
-      ibPromSlave       : in  AxiStreamSlaveType;
       -- FFB Outbound Interface
       ffbObMaster       : in  AxiStreamMasterType;
       ffbObSlave        : out AxiStreamSlaveType;
@@ -226,12 +221,7 @@ begin
          obBsaMaster       => obBsaMaster,
          obBsaSlave        => obBsaSlave,
          ibBsaMaster       => ibBsaMaster,
-         ibBsaSlave        => ibBsaSlave,
-         -- Boot Prom AXI Streaming Interface
-         obPromMaster      => obPromMaster,
-         obPromSlave       => obPromSlave,
-         ibPromMaster      => ibPromMaster,
-         ibPromSlave       => ibPromSlave);
+         ibBsaSlave        => ibBsaSlave);
 
    -----------------
    -- VLAN Interface

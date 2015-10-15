@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-12
+-- Last update: 2015-10-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -221,11 +221,6 @@ architecture mapping of AmcCarrierCore is
    signal ibBsaMaster : AxiStreamMasterType;
    signal ibBsaSlave  : AxiStreamSlaveType;
 
-   signal obPromMaster : AxiStreamMasterType;
-   signal obPromSlave  : AxiStreamSlaveType;
-   signal ibPromMaster : AxiStreamMasterType;
-   signal ibPromSlave  : AxiStreamSlaveType;
-
    signal ffbObMaster : AxiStreamMasterType;
    signal ffbObSlave  : AxiStreamSlaveType;
 
@@ -307,11 +302,6 @@ begin
          obBsaSlave        => obBsaSlave,
          ibBsaMaster       => ibBsaMaster,
          ibBsaSlave        => ibBsaSlave,
-         -- Boot Prom AXI Streaming Interface
-         obPromMaster      => obPromMaster,
-         obPromSlave       => obPromSlave,
-         ibPromMaster      => ibPromMaster,
-         ibPromSlave       => ibPromSlave,
          -- Outbound FFB Interface
          ffbObMaster       => ffbObMaster,
          ffbObSlave        => ffbObSlave,
@@ -378,11 +368,6 @@ begin
          mpsReadSlave      => mpsReadSlave,
          mpsWriteMaster    => mpsWriteMaster,
          mpsWriteSlave     => mpsWriteSlave,
-         -- Boot Prom AXI Streaming Interface
-         obPromMaster      => obPromMaster,
-         obPromSlave       => obPromSlave,
-         ibPromMaster      => ibPromMaster,
-         ibPromSlave       => ibPromSlave,
          -- Local Configuration
          localMac          => localMac,
          localIp           => localIp,
@@ -472,7 +457,7 @@ begin
 
    --------------
    -- BSA Core
-   --------------
+   -----------
    U_Bsa : entity work.AmcCarrierBsa
       generic map (
          TPD_G               => TPD_G,

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-12
+-- Last update: 2015-10-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -72,11 +72,6 @@ entity AmcCarrierRegMapping is
       mpsReadSlave      : in    AxiLiteReadSlaveType;
       mpsWriteMaster    : out   AxiLiteWriteMasterType;
       mpsWriteSlave     : in    AxiLiteWriteSlaveType;
-      -- Boot Prom AXI Streaming Interface
-      obPromMaster      : out   AxiStreamMasterType;
-      obPromSlave       : in    AxiStreamSlaveType;
-      ibPromMaster      : in    AxiStreamMasterType;
-      ibPromSlave       : out   AxiStreamSlaveType;
       -- Local Configuration
       localMac          : out   slv(47 downto 0);
       localIp           : out   slv(31 downto 0);
@@ -327,7 +322,6 @@ begin
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          MEM_ADDR_MASK_G  => x"00000000",     -- Using hardware write protection
-         AXI_CONFIG_G     => ssiAxiStreamConfig(16),
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)  -- units of Hz
       port map (
          -- FLASH Memory Ports
@@ -340,11 +334,6 @@ begin
          axiReadSlave   => mAxilReadSlaves(BOOT_MEM_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(BOOT_MEM_INDEX_C),
          axiWriteSlave  => mAxilWriteSlaves(BOOT_MEM_INDEX_C),
-         -- AXI Streaming Interface
-         mAxisMaster    => obPromMaster,
-         mAxisSlave     => obPromSlave,
-         sAxisMaster    => ibPromMaster,
-         sAxisSlave     => ibPromSlave,
          -- Clocks and Resets
          axiClk         => axilClk,
          axiRst         => axilRst);
