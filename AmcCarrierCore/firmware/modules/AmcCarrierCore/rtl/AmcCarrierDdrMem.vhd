@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-13
+-- Last update: 2015-10-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ entity AmcCarrierDdrMem is
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
-      axilReadMaster  : in    AxiLiteReadMasterType := AXI_LITE_READ_MASTER_INIT_C;
+      axilReadMaster  : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
@@ -159,8 +159,6 @@ architecture mapping of AmcCarrierDdrMem is
    signal done       : sl;
    signal refClock   : sl;
    signal refClkBufg : sl;
-   signal awlock     : sl;
-   signal arlock     : sl;
 
    attribute KEEP_HIERARCHY                : string;
    attribute KEEP_HIERARCHY of IBUFDS_Inst : label is "TRUE";

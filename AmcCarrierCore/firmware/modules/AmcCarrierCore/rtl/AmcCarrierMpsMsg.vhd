@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-18
+-- Last update: 2015-10-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -54,28 +54,9 @@ end AmcCarrierMpsMsg;
 
 architecture rtl of AmcCarrierMpsMsg is
 
-   constant MPS_CHANNELS_C  : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
-   constant MPS_THRESHOLD_C : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
-
-   constant NUM_AXI_SPLIT_C    : natural          := 2;
-   constant NUM_AXI_MASTERS_C  : natural          := 16;
-   constant SPLIT0_BASE_ADDR_C : slv(31 downto 0) := (AXI_BASE_ADDR_G + x"00000000");
-   constant SPLIT1_BASE_ADDR_C : slv(31 downto 0) := (AXI_BASE_ADDR_G + x"00004000");
-   
-   constant SPLIT_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_SPLIT_C-1 downto 0) := (
-      0               => (
-         baseAddr     => SPLIT0_BASE_ADDR_C,
-         addrBits     => 14,
-         connectivity => X"0001"),
-      1               => (
-         baseAddr     => SPLIT1_BASE_ADDR_C,
-         addrBits     => 14,
-         connectivity => X"0001"));
-
-   signal splitWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_SPLIT_C-1 downto 0);
-   signal splitWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_SPLIT_C-1 downto 0);
-   signal splitReadMasters  : AxiLiteReadMasterArray(NUM_AXI_SPLIT_C-1 downto 0);
-   signal splitReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_SPLIT_C-1 downto 0);
+   constant MPS_CHANNELS_C    : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
+   constant MPS_THRESHOLD_C   : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
+   constant NUM_AXI_MASTERS_C : natural                := ite((MPS_CHANNELS_C = 0), 1, MPS_CHANNELS_C);
 
    function genConfig (baseAddr : slv(31 downto 0)) return AxiLiteCrossbarMasterConfigArray is
       variable retVar : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -89,18 +70,12 @@ architecture rtl of AmcCarrierMpsMsg is
       return retVar;
    end function;
 
-   constant SPLIT0_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genConfig(SPLIT0_BASE_ADDR_C);
-   constant SPLIT1_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genConfig(SPLIT1_BASE_ADDR_C);
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genConfig(AXI_BASE_ADDR_G);
 
-   signal ram0WriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal ram0WriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal ram0ReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal ram0ReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-
-   signal ram1WriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal ram1WriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal ram1ReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal ram1ReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal ramWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal ramWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal ramReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal ramReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    
    type StateType is (
       IDLE_S,
@@ -137,111 +112,73 @@ begin
 
    ibValid <= timeStrb and enable;
 
-   U_XBAR_SPLIT : entity work.AxiLiteCrossbar
-      generic map (
-         TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => NUM_AXI_SPLIT_C,
-         MASTERS_CONFIG_G   => SPLIT_CONFIG_C)
-      port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => axilWriteMaster,
-         sAxiWriteSlaves(0)  => axilWriteSlave,
-         sAxiReadMasters(0)  => axilReadMaster,
-         sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => splitWriteMasters,
-         mAxiWriteSlaves     => splitWriteSlaves,
-         mAxiReadMasters     => splitReadMasters,
-         mAxiReadSlaves      => splitReadSlaves);  
+   DONT_SYNTH : if (MPS_CHANNELS_C = 0) generate
 
-   U_XBAR_SPLIT0 : entity work.AxiLiteCrossbar
-      generic map (
-         TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
-         MASTERS_CONFIG_G   => SPLIT0_CONFIG_C)
-      port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => splitWriteMasters(0),
-         sAxiWriteSlaves(0)  => splitWriteSlaves(0),
-         sAxiReadMasters(0)  => splitReadMasters(0),
-         sAxiReadSlaves(0)   => splitReadSlaves(0),
-         mAxiWriteMasters    => ram0WriteMasters,
-         mAxiWriteSlaves     => ram0WriteSlaves,
-         mAxiReadMasters     => ram0ReadMasters,
-         mAxiReadSlaves      => ram0ReadSlaves);  
+      obValid <= (others => '0');
+      obValue <= (others => (others => '0'));
 
-   U_XBAR_SPLIT1 : entity work.AxiLiteCrossbar
-      generic map (
-         TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
-         MASTERS_CONFIG_G   => SPLIT1_CONFIG_C)
-      port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => splitWriteMasters(1),
-         sAxiWriteSlaves(0)  => splitWriteSlaves(1),
-         sAxiReadMasters(0)  => splitReadMasters(1),
-         sAxiReadSlaves(0)   => splitReadSlaves(1),
-         mAxiWriteMasters    => ram1WriteMasters,
-         mAxiWriteSlaves     => ram1WriteSlaves,
-         mAxiReadMasters     => ram1ReadMasters,
-         mAxiReadSlaves      => ram1ReadSlaves);           
+      U_AxiLiteEmpty : entity work.AxiLiteEmpty
+         generic map (
+            TPD_G            => TPD_G,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         port map (
+            axiClk         => axilClk,
+            axiClkRst      => axilRst,
+            axiReadMaster  => axilReadMaster,
+            axiReadSlave   => axilReadSlave,
+            axiWriteMaster => axilWriteMaster,
+            axiWriteSlave  => axilWriteSlave);
 
-   GEN_VEC :
-   for i in NUM_AXI_MASTERS_C-1 downto 0 generate
+   end generate;
+
+   MPS_SYNTH : if (MPS_CHANNELS_C /= 0) generate
+
+      U_XBAR : entity work.AxiLiteCrossbar
+         generic map (
+            TPD_G              => TPD_G,
+            DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+            NUM_SLAVE_SLOTS_G  => 1,
+            NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
+            MASTERS_CONFIG_G   => AXI_CONFIG_C)
+         port map (
+            axiClk              => axilClk,
+            axiClkRst           => axilRst,
+            sAxiWriteMasters(0) => axilWriteMaster,
+            sAxiWriteSlaves(0)  => axilWriteSlave,
+            sAxiReadMasters(0)  => axilReadMaster,
+            sAxiReadSlaves(0)   => axilReadSlave,
+            mAxiWriteMasters    => ramWriteMasters,
+            mAxiWriteSlaves     => ramWriteSlaves,
+            mAxiReadMasters     => ramReadMasters,
+            mAxiReadSlaves      => ramReadSlaves);  
+
+      GEN_VEC :
+      for i in NUM_AXI_MASTERS_C-1 downto 0 generate
+         
+         U_Encoder : entity work.AmcCarrierMpsEncoder
+            generic map (
+               TPD_G            => TPD_G,
+               MPS_THRESHOLD_G  => MPS_THRESHOLD_C,
+               AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+               AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
+            port map (
+               -- AXI-Lite Interface
+               axilClk         => axilClk,
+               axilRst         => axilRst,
+               axilReadMaster  => ramReadMasters(i),
+               axilReadSlave   => ramReadSlaves(i),
+               axilWriteMaster => ramWriteMasters(i),
+               axilWriteSlave  => ramWriteSlaves(i),
+               -- Inbound Message Value
+               ibValid         => ibValid,
+               ibValue         => message(i),
+               -- Outbound Encode MPS Value
+               obValid         => obValid(i),
+               obValue         => obValue(i));
+
+      end generate GEN_VEC;
       
-      U_Encoder0 : entity work.AmcCarrierMpsEncoder
-         generic map (
-            TPD_G            => TPD_G,
-            MPS_SYNTH_G      => ite((MPS_CHANNELS_C > (i+0)), true, false),
-            MPS_THRESHOLD_G  => MPS_THRESHOLD_C,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G  => SPLIT0_CONFIG_C(i).baseAddr)
-         port map (
-            -- AXI-Lite Interface
-            axilClk         => axilClk,
-            axilRst         => axilRst,
-            axilReadMaster  => ram0ReadMasters(i),
-            axilReadSlave   => ram0ReadSlaves(i),
-            axilWriteMaster => ram0WriteMasters(i),
-            axilWriteSlave  => ram0WriteSlaves(i),
-            -- Inbound Message Value
-            ibValid         => ibValid,
-            ibValue         => message(i+0),
-            -- Outbound Encode MPS Value
-            obValid         => obValid(i+0),
-            obValue         => obValue(i+0));
-
-      U_Encoder1 : entity work.AmcCarrierMpsEncoder
-         generic map (
-            TPD_G            => TPD_G,
-            MPS_SYNTH_G      => ite((MPS_CHANNELS_C > (i+16)), true, false),
-            MPS_THRESHOLD_G  => MPS_THRESHOLD_C,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G  => SPLIT1_CONFIG_C(i).baseAddr)
-         port map (
-            -- AXI-Lite Interface
-            axilClk         => axilClk,
-            axilRst         => axilRst,
-            axilReadMaster  => ram1ReadMasters(i),
-            axilReadSlave   => ram1ReadSlaves(i),
-            axilWriteMaster => ram1WriteMasters(i),
-            axilWriteSlave  => ram1WriteSlaves(i),
-            -- Inbound Message Value
-            ibValid         => ibValid,
-            ibValue         => message(i+16),
-            -- Outbound Encode MPS Value
-            obValid         => obValid(i+16),
-            obValue         => obValue(i+16));      
-
-   end generate GEN_VEC;
+   end generate;
 
    comb : process (appId, axilRst, mpsSlave, obValid, obValue, r, testMode, timeStamp) is
       variable v : RegType;

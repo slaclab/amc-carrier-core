@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-15
+-- Last update: 2015-10-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -346,7 +346,7 @@ begin
          timingReadSlave   => timingReadSlave,
          timingWriteMaster => timingWriteMaster,
          timingWriteSlave  => timingWriteSlave,
-         -- Bsa AXI-Lite Interface
+         -- BSA AXI-Lite Interface
          bsaReadMaster     => bsaReadMaster,
          bsaReadSlave      => bsaReadSlave,
          bsaWriteMaster    => bsaWriteMaster,
