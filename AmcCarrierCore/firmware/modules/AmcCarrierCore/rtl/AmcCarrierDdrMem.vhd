@@ -68,8 +68,8 @@ entity AmcCarrierDdrMem is
       ddrRasL         : out   sl;
       ddrCasL         : out   sl;
       ddrRstL         : out   sl;
-      ddrAlertL       : in    sl;
-      ddrPg           : in    sl;
+      ddrAlertL       : in    sl                     := '1';
+      ddrPg           : in    sl                     := '1';
       ddrPwrEnL       : out   sl);      
 end AmcCarrierDdrMem;
 
