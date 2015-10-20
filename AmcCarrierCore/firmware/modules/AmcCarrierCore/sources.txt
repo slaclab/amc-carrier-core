@@ -26,5 +26,5 @@ vhdl work rtl/AmcCarrierMpsEncoder.vhd
 vhdl work rtl/AmcCarrierMpsComparator.vhd
 vhdl work rtl/AmcCarrierFfbObMsg.vhd
 
-# vhdl work coregen/MigCore.dcp
+vhdl work coregen/MigCore.dcp
 vhdl work coregen/SysMonCore.dcp
