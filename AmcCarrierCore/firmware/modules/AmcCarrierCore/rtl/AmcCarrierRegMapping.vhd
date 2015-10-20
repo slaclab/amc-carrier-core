@@ -279,7 +279,7 @@ begin
          EN_DS2411_G        => false,
          EN_ICAP_G          => true,
          AUTO_RELOAD_EN_G   => FSBL_G,
-         AUTO_RELOAD_TIME_G => 10.0,
+         AUTO_RELOAD_TIME_G => 3.17,-- Total of 5 seconds: 1.87 seconds for Memory Test and 3.17 second in AxiVersion
          AUTO_RELOAD_ADDR_G => x"04000000")  -- LCLS-II Image by default
       port map (
          -- AXI-Lite Interface
