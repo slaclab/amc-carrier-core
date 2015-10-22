@@ -1,0 +1,5 @@
+##########################################################################
+## By default, using the .DCP file during systhesis to reduce compile time
+##########################################################################
+# coregen/SysMonCore.xci
+# coregen/MigCore.xci
