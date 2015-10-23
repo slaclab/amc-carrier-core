@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2015-10-12
+-- Last update: 2015-10-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -250,8 +250,9 @@ begin
 
       -- Map the read registers
       for i in BSI_MAC_SIZE_C-1 downto 0 loop
-         axiSlaveRegisterR(toSlv(8*i+0, 8), 0, r.macAddress(i)(47 downto 32));
-         axiSlaveRegisterR(toSlv(8*i+4, 8), 0, r.macAddress(i)(31 downto 0));
+         axiSlaveRegisterR(toSlv(8*i+0, 8), 0, r.macAddress(i)(31 downto 0));
+         axiSlaveRegisterR(toSlv(8*i+4, 8), 0, r.macAddress(i)(47 downto 32));
+         axiSlaveRegisterR(toSlv(8*i+4, 8), 16, x"0000");
       end loop;
       axiSlaveRegisterR(x"80", 0, r.crateId);
       axiSlaveRegisterR(x"84", 0, r.slotNumber);
