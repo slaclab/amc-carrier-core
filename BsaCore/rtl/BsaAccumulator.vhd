@@ -26,10 +26,10 @@ use work.SsiPkg.all;
 entity BsaAccumulator is
 
    generic (
-      TPD_G : time := 1 ns;
-      BSA_NUMBER_G : integer range 0 to 64 := 0;
+      TPD_G              : time                      := 1 ns;
+      BSA_NUMBER_G       : integer range 0 to 64     := 0;
       FRAME_SIZE_BYTES_G : integer range 128 to 4096 := 2048;
-      AXIS_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
+      AXIS_CONFIG_G      : AxiStreamConfigType       := ssiAxiStreamConfig(4));
 
    port (
       clk : in sl;
@@ -38,6 +38,7 @@ entity BsaAccumulator is
       bsaInit        : in  sl;
       bsaActive      : in  sl;
       bsaAvgDone     : in  sl;
+      bsaDone        : in  sl;
       diagnosticData : in  slv(31 downto 0);
       accumulateEn   : in  sl;
       axisMaster     : out AxiStreamMasterType;
@@ -50,7 +51,7 @@ architecture rtl of BsaAccumulator is
    constant MAX_COUNT_G : integer := FRAME_SIZE_BYTES_G/4-1;
 
    type RegType is record
-      count : integer range 0 to MAX_COUNT_G-1;
+      count         : integer range 0 to MAX_COUNT_G-1;
       accumulations : Slv32Array(31 downto 0);
    end record RegType;
 
@@ -69,7 +70,7 @@ architecture rtl of BsaAccumulator is
    signal shiftIn : slv(31 downto 0);
 
    signal sAxisMaster : AxiStreamMasterType;
-   signal sAxisSlave : AxiStreamSlaveType;
+   signal sAxisSlave  : AxiStreamSlaveType;
 
    component BsaAddFpCore is
       port (
@@ -81,7 +82,7 @@ architecture rtl of BsaAccumulator is
          m_axis_result_tvalid : out sl;
          m_axis_result_tdata  : out slv(31 downto 0));
    end component BsaAddFpCore;
-   
+
    constant INT_AXI_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => 4,
@@ -93,7 +94,7 @@ architecture rtl of BsaAccumulator is
 
 --    attribute srl_style : string;
 --    attribute srl_style of r.accumulations : signal is "srl";
-   
+
 begin
 
    BSA_ADD_FP_CORE : BsaAddFpCore
@@ -115,12 +116,12 @@ begin
 
    sAxisMaster.tdata(31 downto 0) <= adderOut;
    sAxisMaster.tvalid             <= adderValid and bsaAvgDone;
-   sAxisMaster.tdest <= toSlv(BSA_NUMBER_G, 8);
-   sAxisMaster.tlast <= toSl(r.count = MAX_COUNT_G);
-   sAxisMaster.tkeep <= (others => '1');
-   sAxisMaster.tStrb <= (others => '1');
-   sAxisMaster.tUser <= (others => '0');
-   sAxisMaster.tId <= (others => '0');
+   sAxisMaster.tdest              <= toSlv(BSA_NUMBER_G, 8);
+   sAxisMaster.tlast              <= toSl(r.count = MAX_COUNT_G);
+   sAxisMaster.tkeep              <= (others => '1');
+   sAxisMaster.tStrb              <= (others => '1');
+   sAxisMaster.tUser              <= (others => '0');
+   sAxisMaster.tId                <= (others => '0');
 
    U_AxiStreamFifo_1 : entity work.AxiStreamFifo
       generic map (
@@ -141,7 +142,7 @@ begin
          sAxisClk    => clk,            -- [in]
          sAxisRst    => rst,            -- [in]
          sAxisMaster => sAxisMaster,    -- [in]
-         sAxisSlave  => sAxisSlave,           -- [out]
+         sAxisSlave  => sAxisSlave,     -- [out]
          sAxisCtrl   => open,           -- [out]
          mAxisClk    => clk,            -- [in]
          mAxisRst    => rst,            -- [in]
@@ -167,7 +168,7 @@ begin
          end if;
       end if;
 
- 
+
       ----------------------------------------------------------------------------------------------
       -- Reset and output assignment
       ----------------------------------------------------------------------------------------------
