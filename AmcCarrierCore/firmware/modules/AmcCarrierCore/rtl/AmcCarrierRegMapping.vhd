@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-15
+-- Last update: 2015-11-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -76,6 +76,8 @@ entity AmcCarrierRegMapping is
       localMac          : out   slv(47 downto 0);
       localIp           : out   slv(31 downto 0);
       localAppId        : out   slv(15 downto 0);
+      -- Misc.
+      debugReset        : out   sl;
       ----------------------
       -- Top Level Interface
       ----------------------           
@@ -279,12 +281,13 @@ begin
          EN_DS2411_G        => false,
          EN_ICAP_G          => true,
          AUTO_RELOAD_EN_G   => FSBL_G,
-         AUTO_RELOAD_TIME_G => 3.17,-- Total of 5 seconds: 1.87 seconds for Memory Test and 3.17 second in AxiVersion
+         AUTO_RELOAD_TIME_G => 3.17,  -- Total of 5 seconds: 1.87 seconds for Memory Test and 3.17 second in AxiVersion
          AUTO_RELOAD_ADDR_G => x"04000000")  -- LCLS-II Image by default
       port map (
          -- AXI-Lite Interface
          axiClk         => axilClk,
          axiRst         => axilRst,
+         masterReset    => debugReset,
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),

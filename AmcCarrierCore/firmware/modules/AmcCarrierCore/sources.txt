@@ -26,5 +26,20 @@ vhdl work rtl/AmcCarrierMpsEncoder.vhd
 vhdl work rtl/AmcCarrierMpsComparator.vhd
 vhdl work rtl/AmcCarrierFfbObMsg.vhd
 
+vhdl work rtl/AmcAxisDaq.vhd
+vhdl work rtl/AmcAxisDaqMux.vhd
+vhdl work rtl/AmcAxisDaqMuxDecimator.vhd
+vhdl work rtl/AmcAxiLiteDaqRegItf.vhd
+
+vhdl work rtl/DebugRtmAmcCarrierCore.vhd
+vhdl work rtl/DebugRtmPgp2bGthUltra.vhd
+vhdl work rtl/DebugRtmPgpAmcCarrier.vhd
+vhdl work rtl/DebugRtmPgpAmcCarrierDdrMem.vhd
+vhdl work rtl/DebugRtmPgpGthCoreWrapper.vhd
+vhdl work rtl/DebugAmcAdcDdrFifo.vhd
+
 vhdl work coregen/MigCore.dcp
 vhdl work coregen/SysMonCore.dcp
+vhdl work coregen/DebugMigCore.dcp
+vhdl work coregen/DebugRtmPgpGthCore.dcp
+vhdl work coregen/DebugAxiStreamDdrFifo.dcp
