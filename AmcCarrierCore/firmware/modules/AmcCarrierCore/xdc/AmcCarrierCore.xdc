@@ -27,6 +27,8 @@ set_property PACKAGE_PIN P1  [get_ports {xauiRxN[3]}]
 set_property PACKAGE_PIN V6  [get_ports {xauiClkP}]
 set_property PACKAGE_PIN V5  [get_ports {xauiClkN}]
 
+# RTM Ports
+
 # Backplane MPS Ports
 set_property -dict { PACKAGE_PIN AD19 IOSTANDARD LVDS DIFF_TERM_ADV TERM_NONE } [get_ports {mpsBusRxP[1]}]
 set_property -dict { PACKAGE_PIN AD18 IOSTANDARD LVDS DIFF_TERM_ADV TERM_NONE } [get_ports {mpsBusRxN[1]}]
@@ -294,6 +296,9 @@ create_generated_clock -name xauiPhyClk   [get_pins -hier -filter {name =~ U_Cor
 create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
 create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT6}]
 create_generated_clock -name timingRecClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/RXOUTCLK}]
+create_generated_clock -name timingGenClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/TXOUTCLK}]
+create_generated_clock -name timingGenUsrClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TIMING_TXCLK_BUFG_GT/O}]
+create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/recTimingClk}]
 
 set_false_path -to [get_pins -hier -filter {name =~ */U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/SALT_IDELAY_CTRL_Inst*}]
@@ -309,6 +314,9 @@ set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {dnaClk}] 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {mpsClk125MHz}] 
 set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingRecClk}] 
+set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingGenClk}] 
+set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingGenUsrClk}] 
+set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {recTimingClk}] 
 
 ##########################
 ## Misc. Configurations ##

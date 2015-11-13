@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-16
+-- Last update: 2015-11-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -36,6 +36,9 @@ entity AmcCarrierCore is
       MPS_SLOT_G          : boolean             := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G              : boolean             := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G          : AppType             := APP_NULL_TYPE_C;
+      OVERRIDE_BSI_G      : boolean             := false;  -- false = Normal Operation, true = use IP_ADDR, MAC_ADDR generics
+      IP_ADDR_G           : slv(31 downto 0)    := x"0A02A8C0";
+      MAC_ADDR_G          : slv(47 downto 0)    := x"010300564400";
       FFB_CLIENT_SIZE_G   : positive            := 1;
       DIAGNOSTIC_SIZE_G   : positive            := 1;
       DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
@@ -56,6 +59,8 @@ entity AmcCarrierCore is
       timingRst         : in    sl;
       timingBus         : out   TimingBusType;
       timingPhy         : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
+      timingPhyClk      : out   sl;
+      timingPhyRst      : out   sl;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk     : in    sl;
       diagnosticRst     : in    sl;
@@ -224,12 +229,25 @@ architecture mapping of AmcCarrierCore is
    signal ffbObMaster : AxiStreamMasterType;
    signal ffbObSlave  : AxiStreamSlaveType;
 
+   signal bsiMac     : slv(47 downto 0);
+   signal bsiIp      : slv(31 downto 0);
+
    signal localMac   : slv(47 downto 0);
    signal localIp    : slv(31 downto 0);
    signal localAppId : slv(15 downto 0);
 
 begin
 
+  GEN_BSI_OVERRIDE: if OVERRIDE_BSI_G=true generate
+    localIp    <= IP_ADDR_G;
+    localMac   <= MAC_ADDR_G;
+  end generate GEN_BSI_OVERRIDE;
+
+  GEN_NO_BSI_OVERRIDE: if OVERRIDE_BSI_G=false generate
+    localIp    <= bsiIp;
+    localMac   <= bsiMac;
+  end generate GEN_NO_BSI_OVERRIDE;
+  
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
    -- Note: Install R1063 if you want the FPGA to control AUX power
    enAuxPwrL <= '0';
@@ -346,7 +364,7 @@ begin
          timingReadSlave   => timingReadSlave,
          timingWriteMaster => timingWriteMaster,
          timingWriteSlave  => timingWriteSlave,
-         -- BSA AXI-Lite Interface
+         -- Bsa AXI-Lite Interface
          bsaReadMaster     => bsaReadMaster,
          bsaReadSlave      => bsaReadSlave,
          bsaWriteMaster    => bsaWriteMaster,
@@ -369,8 +387,8 @@ begin
          mpsWriteMaster    => mpsWriteMaster,
          mpsWriteSlave     => mpsWriteSlave,
          -- Local Configuration
-         localMac          => localMac,
-         localIp           => localIp,
+         localMac          => bsiMac,
+         localIp           => bsiIp,
          localAppId        => localAppId,
          ----------------------
          -- Top Level Interface
@@ -441,6 +459,8 @@ begin
          appTimingRst     => timingRst,
          appTimingBus     => timingBus,
          appTimingPhy     => timingPhy,
+         appTimingPhyClk  => timingPhyClk,
+         appTimingPhyRst  => timingPhyRst,
          ----------------
          -- Core Ports --
          ----------------   
@@ -457,7 +477,7 @@ begin
 
    --------------
    -- BSA Core
-   -----------
+   --------------
    U_Bsa : entity work.AmcCarrierBsa
       generic map (
          TPD_G               => TPD_G,

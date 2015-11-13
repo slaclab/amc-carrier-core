@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-13
+-- Last update: 2015-11-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -57,6 +57,8 @@ entity AmcCarrierTiming is
       appTimingRst     : in  sl;
       appTimingBus     : out TimingBusType;
       appTimingPhy     : in  TimingPhyType;             -- Input for timing generator only
+      appTimingPhyClk  : out sl;
+      appTimingPhyRst  : out sl;
       ----------------
       -- Core Ports --
       ----------------   
@@ -94,23 +96,47 @@ architecture mapping of AmcCarrierTiming is
    signal rxOutClk       : sl;
    signal txReset        : sl;
    signal txUsrClk       : sl;
+   signal txUsrRst       : sl;
    signal txUsrClkActive : sl;
    signal txResetDone    : sl;
    signal txData         : slv(15 downto 0);
    signal txDataK        : slv(1 downto 0);
+   signal txDataCore     : slv(15 downto 0);
+   signal txDataCoreK    : slv(1 downto 0);
    signal txOutClk       : sl;
    signal loopback       : slv(2 downto 0);
 
 
 begin
 
-   recTimingClk <= timingRecClkG;
-   recTimingRst <= not(rxResetDone);
-   bsaTimingClk <= timingRecClkG;
-   bsaTimingRst <= not(rxResetDone);
-   bsaTimingBus <= TIMING_BUS_INIT_C;
+   recTimingClk     <= timingRecClkG;
+   recTimingRst     <= not(rxResetDone);
+   bsaTimingClk     <= timingRecClkG;
+   bsaTimingRst     <= not(rxResetDone);
 
-   -------------------------------------------------------------------------------------------------
+   TIMING_GEN_CLK: if APP_TYPE_G = APP_TIME_GEN_TYPE_C generate
+     txData         <= appTimingPhy.data;
+     txDataK        <= appTimingPhy.dataK;
+   end generate TIMING_GEN_CLK;
+
+   NOT_TIMING_GEN_CLK: if APP_TYPE_G /= APP_TIME_GEN_TYPE_C generate
+     txData         <= txDataCore;
+     txDataK        <= txDataCoreK;
+   end generate NOT_TIMING_GEN_CLK;
+   
+   bsaTimingBus     <= TIMING_BUS_INIT_C;
+
+   loopback         <= "000";
+
+   txUsrRst         <= not(txResetDone);
+   appTimingPhyClk  <= txUsrClk;
+   appTimingPhyRst  <= txUsrRst;
+   txUsrClkActive   <= '1';
+   txReset          <= '0';
+   rxUsrClk         <= timingRecClkG;
+   rxUsrClkActive   <= '1';
+   
+     -------------------------------------------------------------------------------------------------
    -- Clock Buffers
    -------------------------------------------------------------------------------------------------
    TIMING_REFCLK_IBUFDS_GTE3 : IBUFDS_GTE3
@@ -158,7 +184,7 @@ begin
          rxDispErr      => rxDispErr,
          rxDecErr       => rxDecErr,
          rxOutClk       => rxOutClk,
-         txInhibit      => ite((APP_TYPE_G = APP_TIME_GEN_TYPE_C), '0', '1'),
+         txInhibit      => '0',
          txReset        => txReset,
          txUsrClk       => txUsrClk,
          txUsrClkActive => txUsrClkActive,
@@ -179,24 +205,21 @@ begin
          DIV     => "000",              -- Divide-by-1
          O       => timingRecClkG);
 
--- -- Loop back tx clk though BUFG_GT too. Maybe just drive 0 instead?
---    TIMING_RECCLK_BUFG_GT : BUFG_GT
---       port map (
---          I       => txOutClk,
---          CE      => '1',
---          CEMASK  => '1',
---          CLR     => '0',
---          CLRMASK => '1',
---          DIV     => "000",           -- Divide-by-1
---          O       => txUsrClk);
+-- Loop back tx clk though BUFG_GT too. Maybe just drive 0 instead?
+   TIMING_TXCLK_BUFG_GT : BUFG_GT
+      port map (
+         I       => txOutClk,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "001",           -- Divide-by-2
+         O       => txUsrClk);
 
 
    ------------------------------------------------------------------------------------------------
    -- Pass recovered clock through MMCM (maybe unnecessary?)
    ------------------------------------------------------------------------------------------------
-
-
-   recTimingRst <= '0';
 
    -- Drive the external CLK MUX to standalone or dual timing mode
    timingClkSel <= ite(STANDALONE_TIMING_G, '1', '0');
@@ -211,45 +234,36 @@ begin
          clkOutP => timingRecClkOutP,
          clkOutN => timingRecClkOutN);
 
-   -------------------------------------------------------------------------------------------------
-   -- AxiLiteCrossbar
-   -------------------------------------------------------------------------------------------------
-   AxiLiteEmpty_1: entity work.AxiLiteEmpty
-      generic map (
-         TPD_G           => TPD_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
-
    ------------------------------------------------------------------------------------------------
    -- Timing Core
    -- Decode timing message from GTH and distribute to system
    ------------------------------------------------------------------------------------------------
---    TimingCore_1: entity work.TimingCore
---       generic map (
---          TPD_G             => TPD_G,
---          AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
---          AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
---       port map (
---          gtRxRecClk      => timingRecClkG,
---          gtRxData        => rxData,
---          gtRxDataK       => rxDataK,
---          gtRxDispErr     => rxDispErr,
---          gtRxDecErr      => rxDecErr,
---          gtRxReset       => rxReset,
---          gtRxResetDone   => rxResetDone,
---          appTimingClk    => appTimingClk,
---          appTimingRst    => appTimingRst,
---          appTimingBus    => appTimingBus,
---          axilClk         => axilClk,
---          axilRst         => axilRst,
---          axilReadMaster  => axilReadMaster,
---          axilReadSlave   => axilReadSlave,
---          axilWriteMaster => axilWriteMaster,
---          axilWriteSlave  => axilWriteSlave);
+   TimingCore_1: entity work.TimingCore
+     generic map (
+       TPD_G             => TPD_G,
+       TPGEN_G           => ite(APP_TYPE_G=APP_TIME_GEN_TYPE_C,true,false),
+       AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
+       AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
+     port map (
+       gtTxUsrClk      => txUsrClk,
+       gtTxUsrRst      => txUsrRst,
+       gtTxData        => txDataCore,
+       gtTxDataK       => txDataCoreK,
+       gtRxRecClk      => timingRecClkG,
+       gtRxData        => rxData,
+       gtRxDataK       => rxDataK,
+       gtRxDispErr     => rxDispErr,
+       gtRxDecErr      => rxDecErr,
+       gtRxReset       => rxReset,
+       gtRxResetDone   => rxResetDone,
+       appTimingClk    => appTimingClk,
+       appTimingRst    => appTimingRst,
+       appTimingBus    => appTimingBus,
+       axilClk         => axilClk,
+       axilRst         => axilRst,
+       axilReadMaster  => axilReadMaster,
+       axilReadSlave   => axilReadSlave,
+       axilWriteMaster => axilWriteMaster,
+       axilWriteSlave  => axilWriteSlave);
 
 end mapping;
