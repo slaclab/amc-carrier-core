@@ -26,10 +26,11 @@ use work.SsiPkg.all;
 entity BsaAccumulator is
 
    generic (
-      TPD_G              : time                      := 1 ns;
-      BSA_NUMBER_G       : integer range 0 to 64     := 0;
-      FRAME_SIZE_BYTES_G : integer range 128 to 4096 := 2048;
-      AXIS_CONFIG_G      : AxiStreamConfigType       := ssiAxiStreamConfig(4));
+      TPD_G               : time                      := 1 ns;
+      BSA_NUMBER_G        : integer range 0 to 64     := 0;
+      NUM_ACCUMULATIONS_G : integer range 1 to 32     := 28;
+      FRAME_SIZE_BYTES_G  : integer range 128 to 4096 := 2048;
+      AXIS_CONFIG_G       : AxiStreamConfigType       := ssiAxiStreamConfig(4));
 
    port (
       clk : in sl;
@@ -41,6 +42,8 @@ entity BsaAccumulator is
       bsaDone        : in  sl;
       diagnosticData : in  slv(31 downto 0);
       accumulateEn   : in  sl;
+      setEn          : in  sl;
+      lastEn         : in  sl;
       axisMaster     : out AxiStreamMasterType;
       axisSlave      : in  AxiStreamSlaveType);
 
@@ -48,11 +51,12 @@ end entity BsaAccumulator;
 
 architecture rtl of BsaAccumulator is
 
+   constant MAX_ENTRIES_C : integer := FRAME_SIZE_BYTES_G / (NUM_ACCUMULATIONS_G*4);
    constant MAX_COUNT_G : integer := FRAME_SIZE_BYTES_G/4-1;
 
    type RegType is record
       count         : integer range 0 to MAX_COUNT_G-1;
-      accumulations : Slv32Array(31 downto 0);
+      accumulations : Slv32Array(NUM_ACCUMULATIONS_G-1 downto 0);
    end record RegType;
 
 
@@ -62,9 +66,11 @@ architecture rtl of BsaAccumulator is
    -- Outputs from FB adder array
    signal adderEn    : sl;
    signal adderInA   : slv(31 downto 0);
+   signal adderInALast : sl;
    signal adderInB   : slv(31 downto 0);
    signal adderOut   : slv(31 downto 0);
    signal adderValid : sl;
+   signal adderOutLast : sl;
 
    signal shiftEn : sl;
    signal shiftIn : slv(31 downto 0);
@@ -77,10 +83,12 @@ architecture rtl of BsaAccumulator is
          aclk                 : in  sl;
          s_axis_a_tvalid      : in  sl;
          s_axis_a_tdata       : in  slv(31 downto 0);
+         s_axis_a_tlast : in sl;
          s_axis_b_tvalid      : in  sl;
          s_axis_b_tdata       : in  slv(31 downto 0);
          m_axis_result_tvalid : out sl;
-         m_axis_result_tdata  : out slv(31 downto 0));
+         m_axis_result_tdata  : out slv(31 downto 0);
+         m_axis_result_tlast : out sl);
    end component BsaAddFpCore;
 
    constant INT_AXI_STREAM_CONFIG_C : AxiStreamConfigType := (
@@ -102,14 +110,17 @@ begin
          aclk                 => clk,
          s_axis_a_tvalid      => adderEn,
          s_axis_a_tdata       => adderInA,
+         s_axis_a_tlast       => adderInALast,
          s_axis_b_tvalid      => adderEn,
          s_axis_b_tdata       => adderInB,
          m_axis_result_tvalid => adderValid,
-         m_axis_result_tdata  => adderOut);
+         m_axis_result_tdata  => adderOut,
+         m_axis_result_tlast => adderOutLast);
 
-   adderInA <= diagnosticData     when bsaActive = '1' else X"00000000";
-   adderInB <= r.accumulations(0) when bsaInit = '0'   else X"00000000";
-   adderEn  <= accumulateEn;
+   adderInA     <= diagnosticData     when bsaActive = '1'               else X"00000000";
+   adderInALast <= lastEn;
+   adderInB     <= r.accumulations(0) when bsaInit = '0' and setEn = '0' else X"00000000";
+   adderEn      <= accumulateEn;
 
    shiftEn <= accumulateEn or adderValid;
    shiftIn <= adderOut when bsaAvgDone = '0' else X"00000000";
@@ -117,7 +128,7 @@ begin
    sAxisMaster.tdata(31 downto 0) <= adderOut;
    sAxisMaster.tvalid             <= adderValid and bsaAvgDone;
    sAxisMaster.tdest              <= toSlv(BSA_NUMBER_G, 8);
-   sAxisMaster.tlast              <= toSl(r.count = MAX_COUNT_G);
+   sAxisMaster.tlast              <= adderOutLast and (toSl(r.count = MAX_ENTRIES_G) or bsaDone);
    sAxisMaster.tkeep              <= (others => '1');
    sAxisMaster.tStrb              <= (others => '1');
    sAxisMaster.tUser              <= (others => '0');
@@ -157,13 +168,14 @@ begin
       v := r;
 
       if (shiftEn = '1') then
-         v.accumulations(31)          := shiftIn;
-         v.accumulations(30 downto 0) := r.accumulations(31 downto 1);
+         v.accumulations(NUM_ACCUMULATIONS_G-1)          := shiftIn;
+         v.accumulations(NUM_ACCUMULATIONS_G-2 downto 0) := r.accumulations(NUM_ACCUMULATIONS_G-1 downto 1);
       end if;
 
-      if (sAxisMaster.tvalid = '1' and sAxisSlave.tReady = '1') then
+      --Count entries
+      if (sAxisMaster.tvalid = '1' and sAxisSlave.tReady = '1' and adderOutLast = '1') then
          v.count := r.count + 1;
-         if (r.count = MAX_COUNT_G) then
+         if (r.count = MAX_ENTRIES_C) then
             v.count := 0;
          end if;
       end if;

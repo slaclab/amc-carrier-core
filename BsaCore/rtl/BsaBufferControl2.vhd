@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2015-10-22
+-- Last update: 2015-11-17
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,11 +33,12 @@ use work.TimingPkg.all;
 entity BsaBufferControl2 is
 
    generic (
-      TPD_G              : time                      := 1 ns;
-      BSA_BUFFERS_G      : natural range 1 to 64     := 64;
-      BSA_STREAM_BYTES_G : integer range 4 to 128    := 4;
-      DDR_BURST_BYTES_G  : integer range 128 to 4096 := 2048;
-      DDR_DATA_BYTES_G   : integer range 1 to 128    := 4);
+      TPD_G                : time                      := 1 ns;
+      BSA_BUFFERS_G        : natural range 1 to 64     := 64;
+      BSA_STREAM_BYTES_G   : integer range 4 to 128    := 4;
+      DIAGNOSTIC_OUTPUTS_G : integer range 1 to 32     := 24;
+      DDR_BURST_BYTES_G    : integer range 128 to 4096 := 2048;
+      DDR_DATA_BYTES_G     : integer range 1 to 128    := 4);
 
    port (
       -- AXI-Lite Interface for local registers 
@@ -86,6 +87,16 @@ architecture rtl of BsaBufferControl2 is
 
    constant RAM_ADDR_BITS_C : integer := log2(BSA_BUFFERS_G);
 
+   component BsaConvFpCore
+      port (
+         aclk                 : in  sl;
+         s_axis_a_tvalid      : in  sl;
+         s_axis_a_tdata       : in  slv(31 downto 0);
+         m_axis_result_tvalid : out sl;
+         m_axis_result_tdata  : out slv(31 downto 0)
+         );
+   end component;
+
    constant AXI_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => BSA_STREAM_BYTES_G,
@@ -122,11 +133,14 @@ architecture rtl of BsaBufferControl2 is
 
    type AxiStateType is (WAIT_FIFO_ENTRY_S, ADDR_S, DATA_S, RESP_S);
 
+   -- Each accumulator maintains 4 header words + diagnostic output accumulations
+   constant NUM_ACCUMULATIONS_C : integer := DIAGNOSTIC_OUTPUTS_G + 4;
+
    type RegType is record
       -- Just register the whole timing message
       strobe          : sl;
       timingMessage   : TimingMessageType;
-      diagnosticData  : Slv32Array(31 downto 0);
+      diagnosticData  : Slv32Array(NUM_ACCUMULATIONS_C - 1 downto 0);
       bsaInitAxil     : slv(63 downto 0);
       bsaCompleteAxil : slv(63 downto 0);
 
@@ -141,8 +155,11 @@ architecture rtl of BsaBufferControl2 is
       startAddr  : slv(31 downto 0);
       endAddr    : slv(31 downto 0);
 
+      timestampEn  : sl;
       accumulateEn : sl;
-      adderCount   : integer range 0 to 63;
+      setEn        : sl;
+      lastEn       : sl;
+      adderCount   : slv(5 downto 0);
 
       ddrAxisSlave : AxiStreamSlaveType;
 
@@ -168,26 +185,33 @@ architecture rtl of BsaBufferControl2 is
       nextAddr        => (others => '0'),
       startAddr       => (others => '0'),
       endAddr         => (others => '0'),
+      timestampEn     => '0',
+      setEn           => '0',
+      lastEn          => '0',
       accumulateEn    => '0',
-      adderCount      => 0,
+      adderCount      => (others => '0'),
       ddrAxisSlave    => AXI_STREAM_SLAVE_INIT_C,
       axiState        => WAIT_FIFO_ENTRY_S,
       axiWriteMaster  => AXI_WRITE_MASTER_INIT_C,
-      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C,
-      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C);
+      axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C,
+      axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
 
+
    -- signals that new diagnostic data is available
    signal diagnosticStrobeSync : sl;
+   signal diagnosticFpValid    : slv(DIAGNOSTIC_OUTPUTS_G-1 downto 0);
+   signal diagnosticFpData     : Slv32Array(DIAGNOSTIC_OUTPUTS_G-1 downto 0);
 
-   signal startRamDout : slv(31 downto 0);
-   signal endRamDout   : slv(31 downto 0);
-   signal firstRamDout : slv(31 downto 0);
-   signal lastRamDout  : slv(31 downto 0);
-   signal nextRamDout  : slv(31 downto 0);
+   signal startRamDout   : slv(31 downto 0);
+   signal endRamDout     : slv(31 downto 0);
+   signal firstRamDout   : slv(31 downto 0);
+   signal lastRamDout    : slv(31 downto 0);
+   signal nextRamDout    : slv(31 downto 0);
+   signal timeStampRamWe : sl;
 
 
 begin
@@ -327,7 +351,7 @@ begin
          din            => r.lastAddr,
          dout           => lastRamDout);
 
-   -- Last Addresses
+   -- Next Addresses
    U_AxiDualPortRam_Next : entity work.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
@@ -351,6 +375,32 @@ begin
          din            => r.nextAddr,
          dout           => nextRamDout);
 
+   -- Store timestamps during accumulate phase since we are already iterating over
+   timestampRamWe <= r.timestampEn and r.timingMessage.bsaInit(conv_integer(r.adderCount));
+   U_AxiDualPortRam_TimeStamps : entity work.AxiDualPortRam
+      generic map (
+         TPD_G        => TPD_G,
+         BRAM_EN_G    => false,
+         REG_EN_G     => false,
+         AXI_WR_EN_G  => false,
+         SYS_WR_EN_G  => true,
+         ADDR_WIDTH_G => RAM_ADDR_BITS_C,
+         DATA_WIDTH_G => 64)
+      port map (
+         axiClk         => axiClk,
+         axiRst         => axiRst,
+         axiReadMaster  => locAxilReadMasters(TIMESTAMP_AXIL_C),
+         axiReadSlave   => locAxilReadSlaves(TIMESTAMP_AXIL_C),
+         axiWriteMaster => locAxilWriteMasters(TIMESTAMP_AXIL_C),
+         axiWriteSlave  => locAxilWriteSlaves(TIMESTAMP_AXIL_C),
+         clk            => axiClk,
+         rst            => axiRst,
+         we             => timeStampRamWe,
+         addr           => r.adderCount(RAM_ADDR_BITS_C-1 downto 0),
+         din            => r.timingMessage.timeStamp,
+         dout           => open);
+
+
    -------------------------------------------------------------------------------------------------
    -- Synchronize diagnostic bus to local clock
    -------------------------------------------------------------------------------------------------
@@ -368,15 +418,29 @@ begin
          valid  => diagnosticStrobeSync);
 
    -------------------------------------------------------------------------------------------------
+   -- Convert synchronized diagnostic bus to floating point
+   -------------------------------------------------------------------------------------------------
+   DIAGNOSTIC_FP_CONV : for i in DIAGNOSTIC_OUTPUTS_G-1 downto 0 generate
+      U_BsaConvFpCore_1 : entity work.BsaConvFpCore
+         port map (
+            aclk                 => diagnosticClk,          -- [in]
+            s_axis_a_tvalid      => diagnosticBus.strobe,   -- [in]
+            s_axis_a_tdata       => diagnosticBus.data(i),  -- [in]
+            m_axis_result_tvalid => diagnosticFpValid(i),   -- [out]
+            m_axis_result_tdata  => diagnosticFpData(i));   -- [out]
+   end generate DIAGNOSTIC_FP_CONV;
+
+   -------------------------------------------------------------------------------------------------
    -- One accumulator per BSA buffer
    -------------------------------------------------------------------------------------------------
    BsaAccumulator_GEN : for i in BSA_BUFFERS_G-1 downto 0 generate
       U_BsaAccumulator_1 : entity work.BsaAccumulator
          generic map (
-            TPD_G              => TPD_G,
-            BSA_NUMBER_G       => i,
-            FRAME_SIZE_BYTES_G => DDR_BURST_BYTES_G,
-            AXIS_CONFIG_G      => AXI_STREAM_CONFIG_C)
+            TPD_G               => TPD_G,
+            BSA_NUMBER_G        => i,
+            NUM_ACCUMULATIONS_G => NUM_ACCUMULATIONS_C,
+            FRAME_SIZE_BYTES_G  => DDR_BURST_BYTES_G,
+            AXIS_CONFIG_G       => AXI_STREAM_CONFIG_C)
          port map (
             clk            => axiClk,                         -- [in]
             rst            => axiRst,                         -- [in]
@@ -386,6 +450,8 @@ begin
             bsaDone        => r.timingMessage.bsaDone(i),     -- [in]
             diagnosticData => r.diagnosticData(0),            -- [in]
             accumulateEn   => r.accumulateEn,                 -- [in]
+            setEn          => r.setEn,                        -- [in]
+            lastEn         => r.lastEn,                       -- [in]
             axisMaster     => bsaAxisMasters(i),              -- [out]
             axisSlave      => bsaAxisSlaves(i));              -- [in]
    end generate;
@@ -471,17 +537,30 @@ begin
       ----------------------------------------------------------------------------------------------
       v.strobe := '0';
       if (diagnosticStrobeSync = '1') then
-         v.strobe         := '1';
-         v.timingMessage  := diagnosticBus.timingMessage;
-         v.diagnosticData := diagnosticBus.data;
+         v.strobe                                         := '1';
+         v.timingMessage                                  := diagnosticBus.timingMessage;
+         v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 4) := diagnosticBus.data(DIAGNOSTIC_OUTPUTS_G-1 downto 0);
+         v.diagnosticData(3)                              := X"3F80000";  -- 1.0 (for number of accumulations)
+         v.diagnosticData(2)                              := toSlv(DIAGNOSTIC_OUTPUTS_G, 32);  --Make this based on app constants
+         v.diagnosticData(1)                              := diagnosticBus.timingMessage.pulseId(63 downto 32);
+         v.diagnosticData(0)                              := diagnosticBus.timingMessage.pulseId(31 downto 0);
       end if;
 
       ----------------------------------------------------------------------------------------------
-      -- Grab timestamp
+      -- Counter is freerunning. Reset at start of new message
       ----------------------------------------------------------------------------------------------
-      if (r.strobe = '1') then
-         v.accumulateEn := '1';
-         v.adderCount   := 0;
+      v.adderCount := r.adderCount + 1;
+      v.lastEn     := '0';
+
+      ----------------------------------------------------------------------------------------------
+      -- Wiat for FP conversion of diagnostic data
+      ----------------------------------------------------------------------------------------------
+      if (diagnosticFpValid(0) = '1') then
+         v.timestampEn                                    := '1';
+         v.accumulateEn                                   := '1';
+         v.setEn                                          := '1';
+         v.adderCount                                     := (others => '0');
+         v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 4) := diagnosticFpData;
 
          v.bsaCompleteAxil := r.bsaCompleteAxil or r.timingMessage.bsaDone;
          v.bsaInitAxil     := r.bsaInitAxil or r.timingMessage.bsaInit;
@@ -489,18 +568,30 @@ begin
       end if;
 
       ----------------------------------------------------------------------------------------------
-      -- Accumulation stage - shift new diagnostic data through the accumulator
+      -- Accumulation stage - shift new diagnostic data through the accumulators
       ----------------------------------------------------------------------------------------------
       if (r.accumulateEn = '1') then
-         v.diagnosticData(31)          := X"00000000";
-         v.diagnosticData(30 downto 0) := r.diagnosticData(31 downto 1);
+         v.diagnosticData(NUM_ACCUMULATIONS_C-1)          := X"00000000";
+         v.diagnosticData(NUM_ACCUMULATIONS_C-2 downto 0) := r.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 1);
 
          -- Stop when done with all buffers
          v.adderCount := r.adderCount + 1;
-         if (r.adderCount = 31) then
-            v.adderCount   := 0;
+         if (r.adderCount = 2) then
+            v.setEn := '0';
+         end if;
+         if (r.adderCount = NUM_ACCUMULATIONS_C-2) then
+            v.lastEn := '1';
+         end if;
+         if (r.adderCount = NUM_ACCUMULATIONS_C-1) then
             v.accumulateEn := '0';
          end if;
+      end if;
+
+      ----------------------------------------------------------------------------------------------
+      -- Disable timestamps after iterating through all bsa indicies
+      ----------------------------------------------------------------------------------------------
+      if (r.adderCount = 63) then
+         v.timestampEn := '0';
       end if;
 
       ----------------------------------------------------------------------------------------------
@@ -509,7 +600,7 @@ begin
 
       -- default bus outputs
       v.axiWriteMaster.awid       := (others => '0');
---      v.axiWriteMaster.awlen      := toSlv(DDR_BURST_BYTES_G/DDR_DATA_BYTES_G-1, 8);  -- 64 bytes per burst txn
+      v.axiWriteMaster.awlen      := toSlv(DDR_BURST_BYTES_G/DDR_DATA_BYTES_G-1, 8);
       v.axiWriteMaster.awsize     := toSlv(log2(DDR_DATA_BYTES_G), 3);  -- 64 byte data bus
       v.axiWriteMaster.awburst    := "01";    -- Burst type = "INCR"
       v.axiWriteMaster.awlock     := (others => '0');
@@ -542,19 +633,18 @@ begin
          when WAIT_FIFO_ENTRY_S =>
             -- If there is data and no active AXI txn, then read it out of the FIFO and start a new txn
             if (ddrAxisMaster.tvalid = '1' and v.axiWriteMaster.awvalid = '0' and v.axiWriteMaster.wvalid = '0') then
-               v.axiState               := ADDR_S;
+               v.axiState  := ADDR_S;
                -- Latch pointers
-               v.startAddr              := startRamDout;
-               v.endAddr                := endRamDout;
-               v.firstAddr              := firstRamDout;
-               v.lastAddr               := lastRamDout;
-               v.nextAddr               := nextRamDout;
-               -- Don't do anything on the axi bus yet
-               v.axiWriteMaster.awvalid := '0';
-               v.axiWriteMaster.wvalid  := '0';
-               -- First word has length in bytes, convert to bus txns and assign to awlen
-               v.axiWriteMaster.awlen   := ddrAxisMaster.tdata(7+log2(DDR_DATA_BYTES_G) downto log2(DDR_DATA_BYTES_G)) - 1;
-               v.ddrAxisSlave.tready    := '1';
+               v.startAddr := startRamDout;
+               v.endAddr   := endRamDout;
+               v.firstAddr := firstRamDout;
+               v.lastAddr  := lastRamDout;
+               v.nextAddr  := nextRamDout;
+
+            -- First word has length in bytes, convert to bus txns and assign to awlen
+            -- Not doing this anymore. Just void the end of txns that terminate early.
+            -- v.axiWriteMaster.awlen   := ddrAxisMaster.tdata(7+log2(DDR_DATA_BYTES_G) downto log2(DDR_DATA_BYTES_G)) - 1;
+            -- v.ddrAxisSlave.tready    := '1';
             end if;
 
          when ADDR_S =>
@@ -585,6 +675,7 @@ begin
                v.ddrAxisSlave.tready   := '1';
                v.axiWriteMaster.wvalid := '1';
                if (ddrAxisMaster.tlast = '1') then
+                  v.axiWriteMaster.wstrb := (others => '0');
                   v.axiWriteMaster.wlast := '1';
                   v.axiState             := RESP_S;
                end if;
@@ -614,12 +705,12 @@ begin
                v.axilReadSlave.rdata := r.bsaInitAxil(31 downto 0);
             when X"04" =>
                v.axilReadSlave.rdata := r.bsaInitAxil(63 downto 32);
-               v.bsaInitAxil             := (others => '0');
+               v.bsaInitAxil         := (others => '0');
             when X"08" =>
                v.axilReadSlave.rdata := r.bsaCompleteAxil(31 downto 0);
             when X"0C" =>
                v.axilReadSlave.rdata := r.bsaCompleteAxil(63 downto 32);
-               v.bsaCompleteAxil         := (others => '0');
+               v.bsaCompleteAxil     := (others => '0');
             when X"10" =>
                v.axilReadSlave.rdata(0) := r.ramAddr32;
             when others => null;
@@ -644,7 +735,7 @@ begin
 
       rin <= v;
 
-      axiWriteMaster     <= r.axiWriteMaster;
+      axiWriteMaster        <= r.axiWriteMaster;
       locAxilWriteSlaves(0) <= r.axilWriteSlave;
       locAxilReadSlaves(0)  <= r.axilReadSlave;
 
