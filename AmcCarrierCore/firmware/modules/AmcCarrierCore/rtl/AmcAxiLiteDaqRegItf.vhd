@@ -11,11 +11,6 @@
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for DAQ
 --               0x00 (W) - Trigger data acquisition on both AXI stream channels. Note: This is an Auto clear register!
---               0x01 (R) - Status register
---                   bit 3: s_error    - Error during last Acquisition
---                   bit 2: s_overflow - Buffer overflow
---                   bit 1: s_idle     - Ready for new trigger
---                   bit 0: s_pause    - Busy
 --               0x02 (RW)- Sample rate divider(Decimator): 
 --                                  0 = Sample rate,
 --                                  1 = Sample rate/2,
@@ -25,6 +20,14 @@
 --               0x1X (RW) - M
 --                   bit 7-4: Stream 1 Channel select Multiplexer(0 - Disabled, 1 - Ch1, 2 - Ch2, 3 - Ch3, etc.)
 --                   bit 3-0: Stream 0 Channel select Multiplexer(0 - Disabled, 1 - Ch1, 2 - Ch2, 3 - Ch3, etc.)
+--               0x2X (R) - Status register
+--                   bit 31-15: - Number of packets (frames) sent
+--                   bit 5: - AXI stream enabled
+--                   bit 4: - Jesd lane valid
+--                   bit 3: - Error during last Acquisition
+--                   bit 2: - Buffer overflow
+--                   bit 1: - Ready for new trigger
+--                   bit 0: - Busy
 -------------------------------------------------------------------------------
 -- Copyright (c) 2013 SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
@@ -63,8 +66,7 @@ entity AmcAxiLiteDaqRegItf is
       devRst_i : in sl;
 
       -- JESD registers
-
-      status_i : in slv(31 downto 0);
+      status_i         : in  Slv32Array(L_AXI_G-1 downto 0);
 
       -- Control
       trigSw_o         : out sl;
@@ -104,7 +106,7 @@ architecture rtl of AmcAxiLiteDaqRegItf is
    signal s_RdAddr : natural := 0;
    signal s_WrAddr : natural := 0;
 
-   signal s_status : slv(status_i'range);
+   signal s_status : Slv32Array(L_AXI_G-1 downto 0);
    
 begin
 
@@ -155,16 +157,20 @@ begin
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0)
                v.axilReadSlave.rdata(0 downto 0) := r.commonCtrl;
-            when 16#01# =>              -- ADDR (4)
-               v.axilReadSlave.rdata(status_i'range) := s_status;
             when 16#02# =>              -- ADDR (8)
                v.axilReadSlave.rdata(15 downto 0) := r.rateDiv;
             when 16#03# =>              -- ADDR (12)
                v.axilReadSlave.rdata(axisPacketSize_o'range) := r.axisPacketSize;
-            when 16#10# to 16#1F# =>
+            when 16#10# to 16#1F# =>    -- ADDR (64)
                for I in (L_AXI_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = I) then
                      v.axilReadSlave.rdata(3 downto 0) := r.muxSel(I);
+                  end if;
+               end loop;
+            when 16#20# to 16#2F# =>     -- ADDR (128)
+               for I in (L_AXI_G-1) downto 0 loop
+                  if (axilReadMaster.araddr(5 downto 2) = I) then
+                     v.axilReadSlave.rdata(31 downto 0)  := s_status(I);
                   end if;
                end loop;
             when others =>
@@ -195,17 +201,19 @@ begin
    end process seq;
 
    -- Input assignment and synchronisation
-   SyncFifo_IN0 : entity work.SynchronizerFifo
+   GEN_0: for I in L_AXI_G-1 downto 0 generate
+      SyncFifo_IN0 : entity work.SynchronizerFifo
       generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => status_i'length
-         )
+        TPD_G        => TPD_G,
+        DATA_WIDTH_G => 32
+      )
       port map (
-         wr_clk => devClk_i,
-         din    => status_i,
-         rd_clk => axiClk_i,
-         dout   => s_status
-         );
+        wr_clk => devClk_i,
+        din    => status_i(I),
+        rd_clk => axiClk_i,
+        dout   => s_status(I) 
+      );
+   end generate GEN_0;
 
    -- Output assignment and synchronisation
    Sync_OUT1 : entity work.Synchronizer

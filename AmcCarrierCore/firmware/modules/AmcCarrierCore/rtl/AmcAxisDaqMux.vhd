@@ -104,7 +104,7 @@ architecture rtl of AmcAxisDaqMux is
    signal s_idle        : sl;
    signal s_overflow    : sl;
    signal s_error       : sl;
-   signal s_status      : slv(31 downto 0);
+   signal s_status      : Slv32Array(L_AXI_G-1 downto 0);
    signal s_pctCntVec   : Slv16Array(L_AXI_G-1 downto 0);
    
    
@@ -178,7 +178,7 @@ begin
             s_dataValidVecMux(I)  <= '0';
             s_enAxi(I)            <= '0';
             s_laneNum(I)          <= 0;
-         elsif s_muxSel(I) > toSlv(L_AXI_G, 4) then
+         elsif s_muxSel(I) > toSlv(L_G, 4) then
             s_sampleDataArrMux(I) <= (others => '0');
             s_dataValidVecMux(I)  <= '0';
             s_enAxi(I)            <= '0';
@@ -235,10 +235,11 @@ begin
             ready_i        => rxAxisSlaveArr_i(I).tReady,
             sampleData_i   => s_sampleDataArrMux(I),
             dataReady_i    => s_dataValidVecMux(I)
-            );
+          );
+          
+      -- Status register assignment
+      s_status(I) <= s_pctCntVec(I) & x"00" & "00" & s_enAxi(I) & s_dataValidVecMux(I) & s_errorVec(I) & s_overflowVec(I) & s_idleVec(I) & s_pauseVec(I);
+      --
    end generate genAxiStreamLanes;
-   -----------------------------------------------------
-   -- Status register assignment
-   s_status <= s_pctCntVec(0) & x"000" & s_error & s_overflow & s_idle & s_pause;
-   
+------------------------------------- 
 end rtl;
