@@ -52,10 +52,10 @@ end entity BsaAccumulator;
 architecture rtl of BsaAccumulator is
 
    constant MAX_ENTRIES_C : integer := FRAME_SIZE_BYTES_G / (NUM_ACCUMULATIONS_G*4);
-   constant MAX_COUNT_G : integer := FRAME_SIZE_BYTES_G/4-1;
+--   constant MAX_COUNT_G : integer := FRAME_SIZE_BYTES_G/4-1;
 
    type RegType is record
-      count         : integer range 0 to MAX_COUNT_G-1;
+      count         : integer range 0 to MAX_ENTRIES_C-1;
       accumulations : Slv32Array(NUM_ACCUMULATIONS_G-1 downto 0);
    end record RegType;
 
@@ -96,7 +96,7 @@ architecture rtl of BsaAccumulator is
       TDATA_BYTES_C => 4,
       TDEST_BITS_C  => 8,
       TID_BITS_C    => 0,
-      TKEEP_MODE_C  => TKEEP_NONE_C,
+      TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 0,
       TUSER_MODE_C  => TUSER_NONE_C);
 
@@ -128,11 +128,13 @@ begin
    sAxisMaster.tdata(31 downto 0) <= adderOut;
    sAxisMaster.tvalid             <= adderValid and bsaAvgDone;
    sAxisMaster.tdest              <= toSlv(BSA_NUMBER_G, 8);
-   sAxisMaster.tlast              <= adderOutLast and (toSl(r.count = MAX_ENTRIES_G) or bsaDone);
-   sAxisMaster.tkeep              <= (others => '1');
+   sAxisMaster.tlast              <= adderOutLast and (toSl(r.count = (MAX_ENTRIES_C-1)) or bsaDone);
+   sAxisMaster.tkeep              <= genTKeep(INT_AXI_STREAM_CONFIG_C);
    sAxisMaster.tStrb              <= (others => '1');
    sAxisMaster.tUser              <= (others => '0');
    sAxisMaster.tId                <= (others => '0');
+
+   -- Note: For now, bsaDone must coincide with the last bsaAvgDone
 
    U_AxiStreamFifo_1 : entity work.AxiStreamFifo
       generic map (
@@ -144,7 +146,7 @@ begin
          USE_BUILT_IN_G      => false,
          GEN_SYNC_FIFO_G     => true,
          CASCADE_SIZE_G      => 1,
-         FIFO_ADDR_WIDTH_G   => 9,
+         FIFO_ADDR_WIDTH_G   => 10,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 1,
          SLAVE_AXI_CONFIG_G  => INT_AXI_STREAM_CONFIG_C,
@@ -175,7 +177,7 @@ begin
       --Count entries
       if (sAxisMaster.tvalid = '1' and sAxisSlave.tReady = '1' and adderOutLast = '1') then
          v.count := r.count + 1;
-         if (r.count = MAX_ENTRIES_C) then
+         if (r.count = MAX_ENTRIES_C-1) then
             v.count := 0;
          end if;
       end if;

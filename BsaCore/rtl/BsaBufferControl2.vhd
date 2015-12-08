@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2015-11-17
+-- Last update: 2015-11-24
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -25,6 +25,7 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiPkg.all;
+use work.AxiDmaPkg.all;
 
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierRegPkg.all;
@@ -33,12 +34,12 @@ use work.TimingPkg.all;
 entity BsaBufferControl2 is
 
    generic (
-      TPD_G                : time                      := 1 ns;
-      BSA_BUFFERS_G        : natural range 1 to 64     := 64;
-      BSA_STREAM_BYTES_G   : integer range 4 to 128    := 4;
-      DIAGNOSTIC_OUTPUTS_G : integer range 1 to 32     := 24;
-      DDR_BURST_BYTES_G    : integer range 128 to 4096 := 2048;
-      DDR_DATA_BYTES_G     : integer range 1 to 128    := 4);
+      TPD_G                   : time                      := 1 ns;
+      BSA_BUFFERS_G           : natural range 1 to 64     := 64;
+      BSA_STREAM_BYTE_WIDTH_G : integer range 4 to 128    := 4;
+      DIAGNOSTIC_OUTPUTS_G    : integer range 1 to 32     := 24;
+      DDR_BURST_BYTES_G       : integer range 128 to 4096 := 2048;
+      DDR_DATA_BYTE_WIDTH_G   : integer range 1 to 128    := 16);
 
    port (
       -- AXI-Lite Interface for local registers 
@@ -85,7 +86,7 @@ architecture rtl of BsaBufferControl2 is
    signal locAxilReadMasters  : AxiLiteReadMasterArray(AXIL_MASTERS_C-1 downto 0);
    signal locAxilReadSlaves   : AxiLiteReadSlaveArray(AXIL_MASTERS_C-1 downto 0);
 
-   constant RAM_ADDR_BITS_C : integer := log2(BSA_BUFFERS_G);
+   constant BSA_ADDR_BITS_C : integer := log2(BSA_BUFFERS_G);
 
    component BsaConvFpCore
       port (
@@ -99,21 +100,27 @@ architecture rtl of BsaBufferControl2 is
 
    constant AXI_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
-      TDATA_BYTES_C => BSA_STREAM_BYTES_G,
-      TDEST_BITS_C  => RAM_ADDR_BITS_C,
+      TDATA_BYTES_C => BSA_STREAM_BYTE_WIDTH_G,
+      TDEST_BITS_C  => BSA_ADDR_BITS_C,
       TID_BITS_C    => 0,
-      TKEEP_MODE_C  => TKEEP_NONE_C,
+      TKEEP_MODE_C  => ite(BSA_STREAM_BYTE_WIDTH_G = 4, TKEEP_FIXED_C, TKEEP_COMP_C),
       TUSER_BITS_C  => 0,
       TUSER_MODE_C  => TUSER_NONE_C);
 
    constant DDR_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
-      TDATA_BYTES_C => DDR_DATA_BYTES_G,
-      TDEST_BITS_C  => RAM_ADDR_BITS_C,
+      TDATA_BYTES_C => DDR_DATA_BYTE_WIDTH_G,
+      TDEST_BITS_C  => BSA_ADDR_BITS_C,
       TID_BITS_C    => 0,
-      TKEEP_MODE_C  => TKEEP_NONE_C,
+      TKEEP_MODE_C  => ite(DDR_DATA_BYTE_WIDTH_G = 4, TKEEP_FIXED_C, TKEEP_COMP_C),
       TUSER_BITS_C  => 0,
       TUSER_MODE_C  => TUSER_NONE_C);
+
+   constant AXI_CONFIG_C : AxiConfigType := (
+      ADDR_WIDTH_C => 33,
+      DATA_BYTES_C => DDR_DATA_BYTE_WIDTH_G,
+      ID_BITS_C    => 1,
+      LEN_BITS_C   => 8);
 
    constant INT_AXIS_COUNT_C : integer := integer(ceil(real(BSA_BUFFERS_G)/8.0));
 
@@ -126,15 +133,11 @@ architecture rtl of BsaBufferControl2 is
    signal ddrAxisMaster  : AxiStreamMasterType;
    signal ddrAxisSlave   : AxiStreamSlaveType;
 
-   constant BSA_BUFFER_ENTRY_BITS_C      : integer := 1024;
-   constant BSA_BUFFER_ENTRY_BYTES_C     : integer := BSA_BUFFER_ENTRY_BITS_C/8;
-   constant BSA_BUFFER_ENTRY_INCREMENT_C : integer := 64*2;  -- bursts cant cross 4k boundary
-
-
-   type AxiStateType is (WAIT_FIFO_ENTRY_S, ADDR_S, DATA_S, RESP_S);
-
    -- Each accumulator maintains 4 header words + diagnostic output accumulations
-   constant NUM_ACCUMULATIONS_C : integer := DIAGNOSTIC_OUTPUTS_G + 4;
+   constant NUM_ACCUMULATIONS_C      : integer := DIAGNOSTIC_OUTPUTS_G + 4;
+   constant BSA_BUFFER_ENTRY_BYTES_C : integer := NUM_ACCUMULATIONS_C * 4;
+
+   type AxiStateType is (WAIT_TVALID_S, LATCH_POINTERS_S, WAIT_DMA_DONE_S);
 
    type RegType is record
       -- Just register the whole timing message
@@ -146,14 +149,16 @@ architecture rtl of BsaBufferControl2 is
 
       ramAddr32 : sl;
 
-      firstRamWe : sl;
-      lastRamWe  : sl;
-      nextRamWe  : sl;
-      firstAddr  : slv(31 downto 0);
-      lastAddr   : slv(31 downto 0);
-      nextAddr   : slv(31 downto 0);
-      startAddr  : slv(31 downto 0);
-      endAddr    : slv(31 downto 0);
+      bsaAddr        : slv(log2(BSA_BUFFERS_G)-1 downto 0);
+      clearBsaBuffer : sl;
+      firstRamWe     : sl;
+      lastRamWe      : sl;
+      nextRamWe      : sl;
+      firstAddr      : slv(31 downto 0);
+      lastAddr       : slv(31 downto 0);
+      nextAddr       : slv(31 downto 0);
+      startAddr      : slv(31 downto 0);
+      endAddr        : slv(31 downto 0);
 
       timestampEn  : sl;
       accumulateEn : sl;
@@ -163,8 +168,8 @@ architecture rtl of BsaBufferControl2 is
 
       ddrAxisSlave : AxiStreamSlaveType;
 
-      axiState       : AxiStateType;
-      axiWriteMaster : AxiWriteMasterType;
+      state          : AxiStateType;
+      dmaReq         : AxiWriteDmaReqType;
 
       axilWriteSlave : AxiLiteWriteSlaveType;
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -177,6 +182,8 @@ architecture rtl of BsaBufferControl2 is
       bsaInitAxil     => (others => '0'),
       bsaCompleteAxil => (others => '0'),
       ramAddr32       => '0',
+      bsaAddr         => (others => '0'),
+      clearBsaBuffer  => '0',
       firstRamWe      => '0',
       lastRamWe       => '0',
       nextRamWe       => '0',
@@ -191,8 +198,8 @@ architecture rtl of BsaBufferControl2 is
       accumulateEn    => '0',
       adderCount      => (others => '0'),
       ddrAxisSlave    => AXI_STREAM_SLAVE_INIT_C,
-      axiState        => WAIT_FIFO_ENTRY_S,
-      axiWriteMaster  => AXI_WRITE_MASTER_INIT_C,
+      state           => WAIT_TVALID_S,
+      dmaReq          => AXI_WRITE_DMA_REQ_INIT_C,
       axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C,
       axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C);
 
@@ -213,6 +220,7 @@ architecture rtl of BsaBufferControl2 is
    signal nextRamDout    : slv(31 downto 0);
    signal timeStampRamWe : sl;
 
+   signal dmaAck : AxiWriteDmaAckType;
 
 begin
 
@@ -242,7 +250,7 @@ begin
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => AXIL_MASTERS_C,
          DEC_ERROR_RESP_G   => AXI_RESP_DECERR_C,
-         MASTERS_CONFIG_G   => genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, RAM_ADDR_BITS_C+3, RAM_ADDR_BITS_C),
+         MASTERS_CONFIG_G   => genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, BSA_ADDR_BITS_C+3, BSA_ADDR_BITS_C),
          DEBUG_G            => true)
       port map (
          axiClk              => axiClk,               -- [in]
@@ -267,7 +275,7 @@ begin
          REG_EN_G     => false,
          AXI_WR_EN_G  => true,
          SYS_WR_EN_G  => false,
-         ADDR_WIDTH_G => RAM_ADDR_BITS_C,
+         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
          DATA_WIDTH_G => 32)
       port map (
          axiClk         => axiClk,
@@ -278,7 +286,7 @@ begin
          axiWriteSlave  => locAxilWriteSlaves(START_AXIL_C),
          clk            => axiClk,
          rst            => axiRst,
-         addr           => ddrAxisMaster.tdest(RAM_ADDR_BITS_C-1 downto 0),
+         addr           => r.bsaAddr,
          dout           => startRamDout);
 
    -- End Addresses
@@ -289,7 +297,7 @@ begin
          REG_EN_G     => false,
          AXI_WR_EN_G  => true,
          SYS_WR_EN_G  => false,
-         ADDR_WIDTH_G => RAM_ADDR_BITS_C,
+         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
          DATA_WIDTH_G => 32)
       port map (
          axiClk         => axiClk,
@@ -300,7 +308,7 @@ begin
          axiWriteSlave  => locAxilWriteSlaves(END_AXIL_C),
          clk            => axiClk,
          rst            => axiRst,
-         addr           => ddrAxisMaster.tdest(RAM_ADDR_BITS_C-1 downto 0),
+         addr           => r.bsaAddr,
          dout           => endRamDout);
 
    -- First Addresses
@@ -311,7 +319,7 @@ begin
          REG_EN_G     => false,
          AXI_WR_EN_G  => false,
          SYS_WR_EN_G  => true,
-         ADDR_WIDTH_G => RAM_ADDR_BITS_C,
+         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
          DATA_WIDTH_G => 32)
       port map (
          axiClk         => axiClk,
@@ -323,7 +331,7 @@ begin
          clk            => axiClk,
          rst            => axiRst,
          we             => r.firstRamWe,
-         addr           => ddrAxisMaster.tdest(RAM_ADDR_BITS_C-1 downto 0),
+         addr           => r.bsaAddr,
          din            => r.firstAddr,
          dout           => firstRamDout);
 
@@ -335,7 +343,7 @@ begin
          REG_EN_G     => false,
          AXI_WR_EN_G  => false,
          SYS_WR_EN_G  => true,
-         ADDR_WIDTH_G => RAM_ADDR_BITS_C,
+         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
          DATA_WIDTH_G => 32)
       port map (
          axiClk         => axiClk,
@@ -347,7 +355,7 @@ begin
          clk            => axiClk,
          rst            => axiRst,
          we             => r.lastRamWe,
-         addr           => ddrAxisMaster.tdest(RAM_ADDR_BITS_C-1 downto 0),
+         addr           => r.bsaAddr,
          din            => r.lastAddr,
          dout           => lastRamDout);
 
@@ -359,7 +367,7 @@ begin
          REG_EN_G     => false,
          AXI_WR_EN_G  => false,
          SYS_WR_EN_G  => true,
-         ADDR_WIDTH_G => RAM_ADDR_BITS_C,
+         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
          DATA_WIDTH_G => 32)
       port map (
          axiClk         => axiClk,
@@ -371,7 +379,7 @@ begin
          clk            => axiClk,
          rst            => axiRst,
          we             => r.nextRamWe,
-         addr           => ddrAxisMaster.tdest(RAM_ADDR_BITS_C-1 downto 0),
+         addr           => r.bsaAddr,
          din            => r.nextAddr,
          dout           => nextRamDout);
 
@@ -384,7 +392,7 @@ begin
          REG_EN_G     => false,
          AXI_WR_EN_G  => false,
          SYS_WR_EN_G  => true,
-         ADDR_WIDTH_G => RAM_ADDR_BITS_C,
+         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
          DATA_WIDTH_G => 64)
       port map (
          axiClk         => axiClk,
@@ -396,7 +404,7 @@ begin
          clk            => axiClk,
          rst            => axiRst,
          we             => timeStampRamWe,
-         addr           => r.adderCount(RAM_ADDR_BITS_C-1 downto 0),
+         addr           => r.adderCount(BSA_ADDR_BITS_C-1 downto 0),
          din            => r.timingMessage.timeStamp,
          dout           => open);
 
@@ -521,9 +529,31 @@ begin
          mAxisMaster => ddrAxisMaster,    -- [out]
          mAxisSlave  => r.ddrAxisSlave);  -- [in]
 
+   U_AxiStreamDmaWrite_1 : entity work.AxiStreamDmaWrite
+      generic map (
+         TPD_G          => TPD_G,
+         AXI_READY_EN_G => true,
+         AXIS_CONFIG_G  => DDR_STREAM_CONFIG_C,
+         AXI_CONFIG_G   => AXI_CONFIG_C,
+         AXI_BURST_G    => "01",            -- INCR
+         AXI_CACHE_G    => "1111")          -- Cacheable
+      port map (
+         axiClk         => axiClk,          -- [in]
+         axiRst         => axiRst,          -- [in]
+         dmaReq         => r.dmaReq,        -- [in]
+         dmaAck         => dmaAck,          -- [out]
+         axisMaster     => ddrAxisMaster,   -- [in]
+         axisSlave      => ddrAxisSlave,    -- [out]
+         axiWriteMaster => axiWriteMaster,  -- [out]
+         axiWriteSlave  => axiWriteSlave);   -- [in]
 
-   comb : process (axiRst, axiWriteSlave, ddrAxisMaster, diagnosticBus, diagnosticStrobeSync,
-                   locAxilReadMasters, locAxilWriteMasters, r) is
+
+   -------------------------------------------------------------------------------------------------
+   -- Accumulation sequencing, DMA ring buffer, and AXI-Lite logic
+   -------------------------------------------------------------------------------------------------
+   comb : process (axiRst, ddrAxisMaster, diagnosticBus, diagnosticFpData, diagnosticFpValid,
+                   diagnosticStrobeSync, dmaAck, endRamDout, firstRamDout, lastRamDout,
+                   locAxilReadMasters, locAxilWriteMasters, nextRamDout, r, startRamDout) is
       variable v         : RegType;
       variable b         : integer range 0 to BSA_BUFFERS_G-1;
       variable axiStatus : AxiLiteStatusType;
@@ -597,99 +627,58 @@ begin
       ----------------------------------------------------------------------------------------------
       -- AXI4 Stage - Read entries from FIFO and write to RAM on AXI4 bus
       ----------------------------------------------------------------------------------------------
+      case (r.state) is
+         when WAIT_TVALID_S =>
+            -- need to set dmaReq.maxSize according to end of ram buffer
+            -- if it overflows, the data is lost... shit.
 
-      -- default bus outputs
-      v.axiWriteMaster.awid       := (others => '0');
-      v.axiWriteMaster.awlen      := toSlv(DDR_BURST_BYTES_G/DDR_DATA_BYTES_G-1, 8);
-      v.axiWriteMaster.awsize     := toSlv(log2(DDR_DATA_BYTES_G), 3);  -- 64 byte data bus
-      v.axiWriteMaster.awburst    := "01";    -- Burst type = "INCR"
-      v.axiWriteMaster.awlock     := (others => '0');
-      v.axiWriteMaster.awprot     := (others => '0');
-      v.axiWriteMaster.awcache    := "1111";  -- Write-back Read and Write-allocate      
-      v.axiWriteMaster.awqos      := (others => '0');
-      v.axiWriteMaster.bready     := '1';
-      v.axiWriteMaster.wstrb      := (others => '1');
-      v.axiWriteMaster.awaddr(32) := r.ramAddr32;
-
-      -- Clear valids upon ready response
-      if axiWriteSlave.awready = '1' then
-         v.axiWriteMaster.awvalid := '0';
-      end if;
-      if axiWriteSlave.wready = '1' then
-         v.axiWriteMaster.wvalid := '0';
-         v.axiWriteMaster.wlast  := '0';
-      end if;
-
-      v.ddrAxisSlave.tready := '0';
-
-      v.axiWriteMaster.wdata(DDR_DATA_BYTES_G*8-1 downto 0) := ddrAxisMaster.tdata(DDR_DATA_BYTES_G*8-1 downto 0);
-
-
-      v.firstRamWe := '0';
-      v.lastRamWe  := '0';
-      v.nextRamWe  := '0';
-
-      case (r.axiState) is
-         when WAIT_FIFO_ENTRY_S =>
-            -- If there is data and no active AXI txn, then read it out of the FIFO and start a new txn
-            if (ddrAxisMaster.tvalid = '1' and v.axiWriteMaster.awvalid = '0' and v.axiWriteMaster.wvalid = '0') then
-               v.axiState  := ADDR_S;
-               -- Latch pointers
-               v.startAddr := startRamDout;
-               v.endAddr   := endRamDout;
-               v.firstAddr := firstRamDout;
-               v.lastAddr  := lastRamDout;
-               v.nextAddr  := nextRamDout;
-
-            -- First word has length in bytes, convert to bus txns and assign to awlen
-            -- Not doing this anymore. Just void the end of txns that terminate early.
-            -- v.axiWriteMaster.awlen   := ddrAxisMaster.tdata(7+log2(DDR_DATA_BYTES_G) downto log2(DDR_DATA_BYTES_G)) - 1;
-            -- v.ddrAxisSlave.tready    := '1';
+            -- Idea - Only final burst before readout can be short, so no need to worry about next
+            -- burst wrapping awkwardly. Whole thing will be reset after readout.
+            -- Don't do anything if in the middle of a buffer address clear
+            if (ddrAxisMaster.tvalid = '1') then
+               v.bsaAddr := ddrAxisMaster.tdest(BSA_ADDR_BITS_C-1 downto 0);
+               v.state   := LATCH_POINTERS_S;
             end if;
 
-         when ADDR_S =>
-            -- Send address and first data word.
-            v.axiWriteMaster.awaddr(31 downto 0) := r.nextAddr;
+         when LATCH_POINTERS_S =>
+            -- Latch pointers
+            v.startAddr := startRamDout;
+            v.endAddr   := endRamDout;
+            v.firstAddr := firstRamDout;
+            v.lastAddr  := lastRamDout;
+            v.nextAddr  := nextRamDout;
 
-            -- Update next addr
-            v.nextRamWe := '1';
-            v.nextAddr  := r.nextAddr + DDR_BURST_BYTES_G;
-            if (r.nextAddr = r.endAddr - DDR_BURST_BYTES_G) then
-               v.nextAddr := r.startAddr;
-            end if;
+            v.dmaReq.address(31 downto 0) := nextRamDout;
+            v.dmaReq.address(32)          := r.ramAddr32;
+            v.dmaReq.request              := '1';
+            v.state                       := WAIT_DMA_DONE_S;
 
-            -- Update firstAddr
-            v.firstRamWe := '1';
-            if (r.nextAddr = r.firstAddr and r.lastAddr /= r.firstAddr) then
-               v.firstAddr := r.firstAddr + DDR_BURST_BYTES_G;
-            end if;
+         when WAIT_DMA_DONE_S =>
+            if (dmaAck.done = '1') then
 
-            v.axiWriteMaster.awvalid := '1';
-            v.axiWriteMaster.wvalid  := '1';
-            v.ddrAxisSlave.tready    := '1';
-            v.axiState               := DATA_S;
-
-         when DATA_S =>
-            -- put next word on the wr data bus
-            if (v.axiWriteMaster.wvalid = '0') then
-               v.ddrAxisSlave.tready   := '1';
-               v.axiWriteMaster.wvalid := '1';
-               if (ddrAxisMaster.tlast = '1') then
-                  v.axiWriteMaster.wstrb := (others => '0');
-                  v.axiWriteMaster.wlast := '1';
-                  v.axiState             := RESP_S;
+               -- Update nextAddr
+               v.nextRamWe := '1';
+               v.nextAddr  := r.nextAddr + dmaAck.size;
+               if (r.nextAddr + dmaAck.size = r.endAddr) then
+                  -- Wrap around
+                  v.nextAddr := r.startAddr;
                end if;
-            end if;
 
-         when RESP_S =>
-            -- When bvalid resp comes back, update lastAddr and firstAddr for the buffer
-            if (axiWriteSlave.bvalid = '1') then
-               v.axiState  := WAIT_FIFO_ENTRY_S;
-               v.lastAddr  := r.axiWriteMaster.awaddr(31 downto 0) + DDR_BURST_BYTES_G - BSA_BUFFER_ENTRY_INCREMENT_C;
+               -- Update firstAddr
+               v.firstRamWe := '1';
+               if (r.nextAddr = r.firstAddr and r.lastAddr /= r.firstAddr) then
+                  -- if full and not empty
+                  v.firstAddr := r.firstAddr + dmaAck.size;
+               end if;
+
+               -- Update lastAddr
                v.lastRamWe := '1';
-            end if;
+               v.lastAddr  := r.nextAddr + dmaAck.size - BSA_BUFFER_ENTRY_BYTES_C;
 
+               v.state := WAIT_TVALID_S;
+            end if;
       end case;
+
 
 
       ----------------------------------------------------------------------------------------------
@@ -721,8 +710,25 @@ begin
       if (axiStatus.writeEnable = '1') then
          if (locAxilWriteMasters(0).awaddr(7 downto 0) = X"10") then
             v.ramAddr32 := locAxilWriteMasters(0).wdata(0);
+         elsif (locAxilWriteMasters(0).awaddr(7 downto 0) = X"14") then
+            v.bsaAddr        := locAxilWriteMasters(0).wdata(BSA_ADDR_BITS_C-1 downto 0);
+            v.clearBsaBuffer := '1';
+            if (r.state = WAIT_TVALID_S) then
+               v.state := WAIT_TVALID_S;  -- Override state machine to to clear
+            end if;
          end if;
          axiSlaveWriteResponse(v.axilWriteSlave, AXI_RESP_OK_C);
+      end if;
+
+
+      if (r.clearBsaBuffer = '1') then
+         v.nextAddr       := startRamDout;
+         v.firstAddr      := startRamDout;
+         v.lastAddr       := startRamDout;
+         v.nextRamWe      := '1';
+         v.firstRamWe     := '1';
+         v.lastRamWe      := '1';
+         v.clearBsaBuffer := '0';
       end if;
 
 
@@ -735,7 +741,6 @@ begin
 
       rin <= v;
 
-      axiWriteMaster        <= r.axiWriteMaster;
       locAxilWriteSlaves(0) <= r.axilWriteSlave;
       locAxilReadSlaves(0)  <= r.axilReadSlave;
 
@@ -749,3 +754,96 @@ begin
    end process seq;
 
 end architecture rtl;
+
+-- default bus outputs
+--       v.axiWriteMaster.awid       := (others => '0');
+--       v.axiWriteMaster.awlen      := toSlv(DDR_BURST_BYTES_G/DDR_DATA_BYTE_WIDTH_G-1, 8);
+--       v.axiWriteMaster.awsize     := toSlv(log2(DDR_DATA_BYTE_WIDTH_G), 3);  -- 64 byte data bus
+--       v.axiWriteMaster.awburst    := "01";    -- Burst type = "INCR"
+--       v.axiWriteMaster.awlock     := (others => '0');
+--       v.axiWriteMaster.awprot     := (others => '0');
+--       v.axiWriteMaster.awcache    := "1111";  -- Write-back Read and Write-allocate      
+--       v.axiWriteMaster.awqos      := (others => '0');
+--       v.axiWriteMaster.bready     := '1';
+--       v.axiWriteMaster.wstrb      := (others => '1');
+--       v.axiWriteMaster.awaddr(32) := r.ramAddr32;
+
+--       -- Clear valids upon ready response
+--       if axiWriteSlave.awready = '1' then
+--          v.axiWriteMaster.awvalid := '0';
+--       end if;
+--       if axiWriteSlave.wready = '1' then
+--          v.axiWriteMaster.wvalid := '0';
+--          v.axiWriteMaster.wlast  := '0';
+--       end if;
+
+--       v.ddrAxisSlave.tready := '0';
+
+--       v.axiWriteMaster.wdata(DDR_DATA_BYTE_WIDTH_G*8-1 downto 0) := ddrAxisMaster.tdata(DDR_DATA_BYTE_WIDTH_G*8-1 downto 0);
+
+
+--       v.firstRamWe := '0';
+--       v.lastRamWe  := '0';
+--       v.nextRamWe  := '0';
+
+--       case (r.axiState) is
+--          when WAIT_FIFO_ENTRY_S =>
+--             -- If there is data and no active AXI txn, then read it out of the FIFO and start a new txn
+--             if (ddrAxisMaster.tvalid = '1' and v.axiWriteMaster.awvalid = '0' and v.axiWriteMaster.wvalid = '0') then
+--                v.axiState  := ADDR_S;
+--                -- Latch pointers
+--                v.startAddr := startRamDout;
+--                v.endAddr   := endRamDout;
+--                v.firstAddr := firstRamDout;
+--                v.lastAddr  := lastRamDout;
+--                v.nextAddr  := nextRamDout;
+
+--             -- First word has length in bytes, convert to bus txns and assign to awlen
+--             -- Not doing this anymore. Just void the end of txns that terminate early.
+--             -- v.axiWriteMaster.awlen   := ddrAxisMaster.tdata(7+log2(DDR_DATA_BYTE_WIDTH_G) downto log2(DDR_DATA_BYTE_WIDTH_G)) - 1;
+--             -- v.ddrAxisSlave.tready    := '1';
+--             end if;
+
+--          when ADDR_S =>
+--             -- Send address and first data word.
+--             v.axiWriteMaster.awaddr(31 downto 0) := r.nextAddr;
+
+--             -- Update next addr
+--             v.nextRamWe := '1';
+--             v.nextAddr  := r.nextAddr + DDR_BURST_BYTES_G;
+--             if (r.nextAddr = r.endAddr - DDR_BURST_BYTES_G) then
+--                v.nextAddr := r.startAddr;
+--             end if;
+
+--             -- Update firstAddr
+--             v.firstRamWe := '1';
+--             if (r.nextAddr = r.firstAddr and r.lastAddr /= r.firstAddr) then
+--                v.firstAddr := r.firstAddr + DDR_BURST_BYTES_G;
+--             end if;
+
+--             v.axiWriteMaster.awvalid := '1';
+--             v.axiWriteMaster.wvalid  := '1';
+--             v.ddrAxisSlave.tready    := '1';
+--             v.axiState               := DATA_S;
+
+--          when DATA_S =>
+--             -- put next word on the wr data bus
+--             if (v.axiWriteMaster.wvalid = '0') then
+--                v.ddrAxisSlave.tready   := '1';
+--                v.axiWriteMaster.wvalid := '1';
+--                if (ddrAxisMaster.tlast = '1') then
+--                   v.axiWriteMaster.wstrb := (others => '0');
+--                   v.axiWriteMaster.wlast := '1';
+--                   v.axiState             := RESP_S;
+--                end if;
+--             end if;
+
+--          when RESP_S =>
+--             -- When bvalid resp comes back, update lastAddr and firstAddr for the buffer
+--             if (axiWriteSlave.bvalid = '1') then
+--                v.axiState  := WAIT_FIFO_ENTRY_S;
+--                v.lastAddr  := r.axiWriteMaster.awaddr(31 downto 0) + DDR_BURST_BYTES_G - BSA_BUFFER_ENTRY_INCREMENT_C;
+--                v.lastRamWe := '1';
+--             end if;
+
+--       end case;
