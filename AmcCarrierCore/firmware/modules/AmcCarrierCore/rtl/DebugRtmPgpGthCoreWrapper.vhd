@@ -80,6 +80,7 @@ architecture rtl of DebugRtmPgpGthCoreWrapper is
          gthrxp_in                          : in  slv(0 downto 0);
          gtrefclk0_in                       : in  slv(0 downto 0);
          -- loopback_in                        : in  slv(2 downto 0);
+         rxbufreset_in                      : in  slv(0 downto 0);
          rx8b10ben_in                       : in  slv(0 downto 0);
          rxcommadeten_in                    : in  slv(0 downto 0);
          rxmcommaalignen_in                 : in  slv(0 downto 0);
@@ -131,6 +132,7 @@ begin
          gthrxp_in(0)                          => gtRxP,
          gtrefclk0_in(0)                       => gtRefClk,
          -- loopback_in                           => loopback,
+         rxbufreset_in(0)                      => '0',
          rx8b10ben_in(0)                       => '1',
          rxcommadeten_in(0)                    => '1',
          rxmcommaalignen_in(0)                 => '1',
