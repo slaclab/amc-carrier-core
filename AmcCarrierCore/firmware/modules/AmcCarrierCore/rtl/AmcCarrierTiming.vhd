@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-11-09
+-- Last update: 2015-11-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -99,13 +99,11 @@ architecture mapping of AmcCarrierTiming is
    signal txUsrRst       : sl;
    signal txUsrClkActive : sl;
    signal txResetDone    : sl;
-   signal txData         : slv(15 downto 0);
-   signal txDataK        : slv(1 downto 0);
-   signal txDataCore     : slv(15 downto 0);
-   signal txDataCoreK    : slv(1 downto 0);
+   signal timingPhy      : TimingPhyType;
+   signal coreTimingPhy  : TimingPhyType;
    signal txOutClk       : sl;
    signal loopback       : slv(2 downto 0);
-
+   signal rxPolarity     : sl;
 
 begin
 
@@ -115,13 +113,11 @@ begin
    bsaTimingRst     <= not(rxResetDone);
 
    TIMING_GEN_CLK: if APP_TYPE_G = APP_TIME_GEN_TYPE_C generate
-     txData         <= appTimingPhy.data;
-     txDataK        <= appTimingPhy.dataK;
+     timingPhy      <= appTimingPhy;
    end generate TIMING_GEN_CLK;
 
    NOT_TIMING_GEN_CLK: if APP_TYPE_G /= APP_TIME_GEN_TYPE_C generate
-     txData         <= txDataCore;
-     txDataK        <= txDataCoreK;
+     timingPhy      <= coreTimingPhy;
    end generate NOT_TIMING_GEN_CLK;
    
    bsaTimingBus     <= TIMING_BUS_INIT_C;
@@ -179,18 +175,20 @@ begin
          rxCdrStable    => rxCdrStable,
          rxResetDone    => rxResetDone,
          rxUsrClk       => rxUsrClk,
+         rxPolarity     => rxPolarity,
          rxData         => rxData,
          rxDataK        => rxDataK,
          rxDispErr      => rxDispErr,
          rxDecErr       => rxDecErr,
          rxOutClk       => rxOutClk,
          txInhibit      => '0',
+         txPolarity     => timingPhy.polarity,
          txReset        => txReset,
          txUsrClk       => txUsrClk,
          txUsrClkActive => txUsrClkActive,
          txResetDone    => txResetDone,
-         txData         => txData,
-         txDataK        => txDataK,
+         txData         => timingPhy.data,
+         txDataK        => timingPhy.dataK,
          txOutClk       => txOutClk,
          loopback       => loopback);
 
@@ -247,8 +245,6 @@ begin
      port map (
        gtTxUsrClk      => txUsrClk,
        gtTxUsrRst      => txUsrRst,
-       gtTxData        => txDataCore,
-       gtTxDataK       => txDataCoreK,
        gtRxRecClk      => timingRecClkG,
        gtRxData        => rxData,
        gtRxDataK       => rxDataK,
@@ -256,9 +252,11 @@ begin
        gtRxDecErr      => rxDecErr,
        gtRxReset       => rxReset,
        gtRxResetDone   => rxResetDone,
+       gtRxPolarity    => rxPolarity,
        appTimingClk    => appTimingClk,
        appTimingRst    => appTimingRst,
        appTimingBus    => appTimingBus,
+       timingPhy       => coreTimingPhy,
        axilClk         => axilClk,
        axilRst         => axilRst,
        axilReadMaster  => axilReadMaster,

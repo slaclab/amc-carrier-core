@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-14
+-- Last update: 2015-11-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -70,7 +70,8 @@ architecture mapping of AmcCarrierClkAndRst is
    signal clkOut    : slv(2 downto 0);
    signal rstOut    : slv(2 downto 0);
    signal rstDly    : slv(2 downto 0);
-
+   signal rstFO     : sl;
+   
    attribute dont_touch           : string;
    attribute dont_touch of clk    : signal is "TRUE";
    attribute dont_touch of rst    : signal is "TRUE";
@@ -83,8 +84,14 @@ begin
    axilClk      <= fabClk;
    ref156MHzClk <= fabClk;
 
-   axilRst      <= rstDly(2);
-   ref156MHzRst <= rstDly(2);
+--   axilRst      <= rstDly(2);
+--   ref156MHzRst <= rstDly(2);
+   --  Put large fanout reset onto BUFG
+   axilRst      <= rstFO;
+   ref156MHzRst <= rstFO;
+   U_AXILRST : BUFG
+     port map ( O => rstFO,
+                I => rstDly(2) );
 
    -- Adding registers to help with timing
    process(fabClk)
