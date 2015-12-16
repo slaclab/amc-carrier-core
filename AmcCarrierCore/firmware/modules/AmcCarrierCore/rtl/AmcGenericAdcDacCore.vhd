@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2015-12-07
+-- Last update: 2015-12-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -96,8 +96,7 @@ entity AmcGenericAdcDacCore is
       -- Fast DAC's SPI Ports
       dacCsL          : out   sl;
       dacSck          : out   sl;
-      dacMiso         : in    sl;
-      dacMosi         : out   sl;
+      dacDio          : inout sl;
       -- Slow DAC's SPI Ports
       dacVcoCsP       : out   sl;
       dacVcoCsN       : out   sl;
@@ -184,10 +183,27 @@ architecture mapping of AmcGenericAdcDacCore is
    signal jesdSysRef     : sl;
    signal jesdRxSync     : sl;
    signal jesdTxSync     : sl;
-   signal lmkDin         : sl;
-   signal lmkDout        : sl;
    signal adcDav         : slv(3 downto 0);
    signal adcData        : sampleDataArray(3 downto 0);
+   signal lmkSeletL      : sl;
+   signal lmkSclk        : sl;
+   signal lmkDin         : sl;
+   signal lmkDout        : sl;
+   signal dacSeletL      : sl;
+   signal dacSclk        : sl;
+   signal dacDin         : sl;
+   signal dacDout        : sl;
+
+   attribute dont_touch              : string;
+   attribute dont_touch of lmkSeletL : signal is "TRUE";
+   attribute dont_touch of lmkSclk   : signal is "TRUE";
+   attribute dont_touch of lmkDin    : signal is "TRUE";
+   attribute dont_touch of lmkDout   : signal is "TRUE";
+   attribute dont_touch of dacSeletL : signal is "TRUE";
+   attribute dont_touch of dacSclk   : signal is "TRUE";
+   attribute dont_touch of dacDin    : signal is "TRUE";
+   attribute dont_touch of dacDout   : signal is "TRUE";
+   
    
 begin
 
@@ -428,12 +444,15 @@ begin
          axiReadSlave   => readSlaves(LMK_INDEX_C),
          axiWriteMaster => writeMasters(LMK_INDEX_C),
          axiWriteSlave  => writeSlaves(LMK_INDEX_C),
-         coreSclk       => lmkSck,
+         coreSclk       => lmkSclk,
          coreSDin       => lmkDin,
          coreSDout      => lmkDout,
-         coreCsb        => lmkCsL);  
+         coreCsb        => lmkSeletL);  
+         
+   lmkCsL <= lmkSeletL;
+   lmkSck <= lmkSclk;         
 
-   U_IOBUF : IOBUF
+   IOBUF_Lmk : IOBUF
       port map (
          I  => '0',
          O  => lmkDin,
@@ -472,8 +491,8 @@ begin
       generic map (
          TPD_G             => TPD_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
-         ADDRESS_SIZE_G    => 15,
-         DATA_SIZE_G       => 8,
+         ADDRESS_SIZE_G    => 7,
+         DATA_SIZE_G       => 16,
          CLK_PERIOD_G      => getRealDiv(1, AXI_CLK_FREQ_G),
          SPI_SCLK_PERIOD_G => 1.0E-6)
       port map (
@@ -483,10 +502,20 @@ begin
          axiReadSlave   => readSlaves(DAC_INDEX_C),
          axiWriteMaster => writeMasters(DAC_INDEX_C),
          axiWriteSlave  => writeSlaves(DAC_INDEX_C),
-         coreSclk       => dacSck,
-         coreSDin       => dacMiso,
-         coreSDout      => dacMosi,
-         coreCsb        => dacCsL);   
+         coreSclk       => dacSclk,
+         coreSDin       => dacDin,
+         coreSDout      => dacDout,
+         coreCsb        => dacSeletL);   
+
+   dacCsL <= dacSeletL;
+   dacSck <= dacSclk;
+         
+   IOBUF_Dac : IOBUF
+      port map (
+         I  => '0',
+         O  => dacDin,
+         IO => dacDio,
+         T  => dacDout);             
 
    ----------------------   
    -- SLOW DAC SPI Module

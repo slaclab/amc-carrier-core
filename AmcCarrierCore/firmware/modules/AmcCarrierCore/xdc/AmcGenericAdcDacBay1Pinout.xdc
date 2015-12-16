@@ -35,10 +35,10 @@ set_property -dict { PACKAGE_PIN AA20 IOSTANDARD LVCMOS18 } [get_ports {lmkClkSe
 set_property -dict { PACKAGE_PIN AC22 IOSTANDARD LVCMOS18 } [get_ports {lmkClkSel[1][1]}]
 set_property -dict { PACKAGE_PIN AB20 IOSTANDARD LVCMOS18 } [get_ports {lmkStatus[1][0]}]
 set_property -dict { PACKAGE_PIN AC23 IOSTANDARD LVCMOS18 } [get_ports {lmkStatus[1][1]}]
+set_property -dict { PACKAGE_PIN Y26  IOSTANDARD LVCMOS18 } [get_ports {lmkCsL[1]}]
 set_property -dict { PACKAGE_PIN Y27  IOSTANDARD LVCMOS18 } [get_ports {lmkSck[1]}]
 set_property -dict { PACKAGE_PIN AL25 IOSTANDARD LVCMOS18 } [get_ports {lmkDio[1]}]
 set_property -dict { PACKAGE_PIN AL22 IOSTANDARD LVCMOS18 } [get_ports {lmkSync[1]}]
-set_property -dict { PACKAGE_PIN Y26  IOSTANDARD LVCMOS18 } [get_ports {lmkCsL[1]}]
 set_property -dict { PACKAGE_PIN AL24 IOSTANDARD LVCMOS18 } [get_ports {lmkRst[1]}]
 
 # Fast ADC's SPI Ports
@@ -52,10 +52,9 @@ set_property -dict { PACKAGE_PIN AA32 IOSTANDARD LVCMOS18 } [get_ports {adcMosi[
 set_property -dict { PACKAGE_PIN AD30 IOSTANDARD LVCMOS18 } [get_ports {adcMosi[1][1]}]
 
 # Fast DAC's SPI Ports
-set_property -dict { PACKAGE_PIN AB26 IOSTANDARD LVCMOS18 } [get_ports {dacCsL[1]}]
-set_property -dict { PACKAGE_PIN AB25 IOSTANDARD LVCMOS18 } [get_ports {dacSck[1]}]
-set_property -dict { PACKAGE_PIN AA27 IOSTANDARD LVCMOS18 } [get_ports {dacMiso[1]}]
-set_property -dict { PACKAGE_PIN AB27 IOSTANDARD LVCMOS18 } [get_ports {dacMosi[1]}]
+set_property -dict { PACKAGE_PIN AB26 IOSTANDARD LVCMOS18  PULLUP true } [get_ports {dacCsL[1]}]
+set_property -dict { PACKAGE_PIN AB25 IOSTANDARD LVCMOS18  PULLUP true } [get_ports {dacSck[1]}]
+set_property -dict { PACKAGE_PIN AB27 IOSTANDARD LVCMOS18  PULLUP true } [get_ports {dacDio[1]}]
 
 # Slow DAC's SPI Ports
 set_property -dict { PACKAGE_PIN AC26 IOSTANDARD LVDS } [get_ports {dacVcoCsP[1]}]
