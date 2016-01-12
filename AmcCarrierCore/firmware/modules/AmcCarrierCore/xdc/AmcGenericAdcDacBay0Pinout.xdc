@@ -40,15 +40,15 @@ set_property -dict { PACKAGE_PIN AH24 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [
 set_property -dict { PACKAGE_PIN AJ25 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {jesdTxSyncN[0]}]
 
 # LMK Ports
-set_property -dict { PACKAGE_PIN V26  IOSTANDARD LVCMOS18 } [get_ports {lmkClkSel[0][0]}]
-set_property -dict { PACKAGE_PIN V29  IOSTANDARD LVCMOS18 } [get_ports {lmkClkSel[0][1]}]
-set_property -dict { PACKAGE_PIN W26  IOSTANDARD LVCMOS18 } [get_ports {lmkStatus[0][0]}]
-set_property -dict { PACKAGE_PIN W29  IOSTANDARD LVCMOS18 } [get_ports {lmkStatus[0][1]}]
-set_property -dict { PACKAGE_PIN T22  IOSTANDARD LVCMOS18 } [get_ports {lmkCsL[0]}]
-set_property -dict { PACKAGE_PIN T23  IOSTANDARD LVCMOS18 } [get_ports {lmkSck[0]}]
-set_property -dict { PACKAGE_PIN AP21 IOSTANDARD LVCMOS18 } [get_ports {lmkDio[0]}]
-set_property -dict { PACKAGE_PIN AM24 IOSTANDARD LVCMOS18 } [get_ports {lmkSync[0]}]
-set_property -dict { PACKAGE_PIN AP20 IOSTANDARD LVCMOS18 } [get_ports {lmkRst[0]}]
+set_property -dict { PACKAGE_PIN V26  IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkClkSel[0][0]}]
+set_property -dict { PACKAGE_PIN V29  IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkClkSel[0][1]}]
+set_property -dict { PACKAGE_PIN W26  IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkStatus[0][0]}]
+set_property -dict { PACKAGE_PIN W29  IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkStatus[0][1]}]
+set_property -dict { PACKAGE_PIN T22  IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkCsL[0]}]
+set_property -dict { PACKAGE_PIN T23  IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkSck[0]}]
+set_property -dict { PACKAGE_PIN AP21 IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkDio[0]}]
+set_property -dict { PACKAGE_PIN AM24 IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkSync[0]}]
+set_property -dict { PACKAGE_PIN AP20 IOSTANDARD LVCMOS18 DRIVE 12 SLEW FAST } [get_ports {lmkRst[0]}]
 
 # Fast ADC's SPI Ports
 set_property -dict { PACKAGE_PIN AH16 IOSTANDARD LVCMOS18 } [get_ports {adcCsL[0][0]}]
