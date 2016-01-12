@@ -7,8 +7,7 @@ vhdl work rtl/AmcCarrierCore.vhd
 vhdl work rtl/AmcCarrierClkAndRst.vhd
 
 vhdl work rtl/AmcCarrierEth.vhd
-vhdl work rtl/AmcCarrierEthNoVlan.vhd
-vhdl work rtl/AmcCarrierEthVlan.vhd
+vhdl work rtl/AmcCarrierSrpV0Wrapper.vhd
 vhdl work rtl/AmcCarrierFfbIbMsg.vhd
 
 vhdl work rtl/AmcCarrierRegMapping.vhd

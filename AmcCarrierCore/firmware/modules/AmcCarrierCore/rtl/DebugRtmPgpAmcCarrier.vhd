@@ -43,10 +43,10 @@ entity DebugRtmPgpAmcCarrier is
       AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Master AXI-Lite Interface
-      mAxilReadMasters  : out AxiLiteReadMasterArray(3 downto 0);
-      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(3 downto 0);
-      mAxilWriteMasters : out AxiLiteWriteMasterArray(3 downto 0);
-      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(3 downto 0);
+      mAxilReadMasters  : out AxiLiteReadMasterArray(0 downto 0);
+      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(0 downto 0);
+      mAxilWriteMasters : out AxiLiteWriteMasterArray(0 downto 0);
+      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(0 downto 0);
       -- AXI-Lite Interface
       axilClk           : in  sl;
       axilRst           : in  sl;
@@ -103,9 +103,6 @@ begin
 
    ffbBus     <= FFB_BUS_INIT_C;
    ffbObSlave <= AXI_STREAM_SLAVE_FORCE_C;
-
-   mAxilReadMasters(3 downto 1)  <= (others => AXI_LITE_READ_MASTER_INIT_C);
-   mAxilWriteMasters(3 downto 1) <= (others => AXI_LITE_WRITE_MASTER_INIT_C);
 
    U_IBUFDS_GTE3 : IBUFDS_GTE3
       generic map (

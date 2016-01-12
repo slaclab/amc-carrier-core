@@ -47,10 +47,10 @@ entity AmcCarrierRegMapping is
       -- Primary AXI-Lite Interface
       axilClk           : in    sl;
       axilRst           : in    sl;
-      sAxilReadMasters  : in    AxiLiteReadMasterArray(3 downto 0);
-      sAxilReadSlaves   : out   AxiLiteReadSlaveArray(3 downto 0);
-      sAxilWriteMasters : in    AxiLiteWriteMasterArray(3 downto 0);
-      sAxilWriteSlaves  : out   AxiLiteWriteSlaveArray(3 downto 0);
+      sAxilReadMasters  : in    AxiLiteReadMasterArray(0 downto 0);
+      sAxilReadSlaves   : out   AxiLiteReadSlaveArray(0 downto 0);
+      sAxilWriteMasters : in    AxiLiteWriteMasterArray(0 downto 0);
+      sAxilWriteSlaves  : out   AxiLiteWriteSlaveArray(0 downto 0);
       -- Timing AXI-Lite Interface
       timingReadMaster  : out   AxiLiteReadMasterType;
       timingReadSlave   : in    AxiLiteReadSlaveType;
@@ -259,7 +259,7 @@ begin
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 4,
+         NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
       port map (

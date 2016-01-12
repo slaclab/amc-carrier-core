@@ -181,10 +181,10 @@ architecture mapping of DebugRtmAmcCarrierCore is
 
    signal axilClk          : sl;
    signal axilRst          : sl;
-   signal axilReadMasters  : AxiLiteReadMasterArray(3 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(3 downto 0);
-   signal axilWriteMasters : AxiLiteWriteMasterArray(3 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(3 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(0 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(0 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(0 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(0 downto 0);
 
    signal axiClk         : sl;
    signal axiRst         : sl;

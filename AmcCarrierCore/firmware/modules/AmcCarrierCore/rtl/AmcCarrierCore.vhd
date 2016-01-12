@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-11-13
+-- Last update: 2016-01-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -184,10 +184,10 @@ architecture mapping of AmcCarrierCore is
 
    signal axilClk          : sl;
    signal axilRst          : sl;
-   signal axilReadMasters  : AxiLiteReadMasterArray(3 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(3 downto 0);
-   signal axilWriteMasters : AxiLiteWriteMasterArray(3 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(3 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(0 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(0 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(0 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(0 downto 0);
 
    signal axiClk         : sl;
    signal axiRst         : sl;
@@ -227,16 +227,16 @@ architecture mapping of AmcCarrierCore is
    signal mpsWriteMaster : AxiLiteWriteMasterType;
    signal mpsWriteSlave  : AxiLiteWriteSlaveType;
 
-   signal obBsaMaster : AxiStreamMasterType;
-   signal obBsaSlave  : AxiStreamSlaveType;
-   signal ibBsaMaster : AxiStreamMasterType;
-   signal ibBsaSlave  : AxiStreamSlaveType;
+   signal obBsaMasters : AxiStreamMasterArray(2 downto 0);
+   signal obBsaSlaves  : AxiStreamSlaveArray(2 downto 0);
+   signal ibBsaMasters : AxiStreamMasterArray(2 downto 0);
+   signal ibBsaSlaves  : AxiStreamSlaveArray(2 downto 0);
 
    signal ffbObMaster : AxiStreamMasterType;
    signal ffbObSlave  : AxiStreamSlaveType;
 
-   signal bsiMac     : slv(47 downto 0);
-   signal bsiIp      : slv(31 downto 0);
+   signal bsiMac : slv(47 downto 0);
+   signal bsiIp  : slv(31 downto 0);
 
    signal localMac   : slv(47 downto 0);
    signal localIp    : slv(31 downto 0);
@@ -244,16 +244,16 @@ architecture mapping of AmcCarrierCore is
 
 begin
 
-  GEN_BSI_OVERRIDE: if OVERRIDE_BSI_G=true generate
-    localIp    <= IP_ADDR_G;
-    localMac   <= MAC_ADDR_G;
-  end generate GEN_BSI_OVERRIDE;
+   GEN_BSI_OVERRIDE : if OVERRIDE_BSI_G = true generate
+      localIp  <= IP_ADDR_G;
+      localMac <= MAC_ADDR_G;
+   end generate GEN_BSI_OVERRIDE;
 
-  GEN_NO_BSI_OVERRIDE: if OVERRIDE_BSI_G=false generate
-    localIp    <= bsiIp;
-    localMac   <= bsiMac;
-  end generate GEN_NO_BSI_OVERRIDE;
-  
+   GEN_NO_BSI_OVERRIDE : if OVERRIDE_BSI_G = false generate
+      localIp  <= bsiIp;
+      localMac <= bsiMac;
+   end generate GEN_NO_BSI_OVERRIDE;
+
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
    -- Note: Install R1063 if you want the FPGA to control AUX power
    enAuxPwrL <= '0';
@@ -322,10 +322,10 @@ begin
          axilWriteMaster   => xauiWriteMaster,
          axilWriteSlave    => xauiWriteSlave,
          -- BSA Ethernet Interface
-         obBsaMaster       => obBsaMaster,
-         obBsaSlave        => obBsaSlave,
-         ibBsaMaster       => ibBsaMaster,
-         ibBsaSlave        => ibBsaSlave,
+         obBsaMasters      => obBsaMasters,
+         obBsaSlaves       => obBsaSlaves,
+         ibBsaMasters      => ibBsaMasters,
+         ibBsaSlaves       => ibBsaSlaves,
          -- Outbound FFB Interface
          ffbObMaster       => ffbObMaster,
          ffbObSlave        => ffbObSlave,
@@ -507,10 +507,10 @@ begin
          axiReadMaster     => axiReadMaster,
          axiReadSlave      => axiReadSlave,
          -- Ethernet Interface (axilClk domain)
-         obBsaMaster       => obBsaMaster,
-         obBsaSlave        => obBsaSlave,
-         ibBsaMaster       => ibBsaMaster,
-         ibBsaSlave        => ibBsaSlave,
+         obBsaMasters      => obBsaMasters,
+         obBsaSlaves       => obBsaSlaves,
+         ibBsaMasters      => ibBsaMasters,
+         ibBsaSlaves       => ibBsaSlaves,
          -- Timing Interface (bsaTimingClk domain)
          bsaTimingClk      => bsaTimingClk,
          bsaTimingRst      => bsaTimingRst,

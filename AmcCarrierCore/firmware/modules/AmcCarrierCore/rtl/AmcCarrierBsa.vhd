@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-13
+-- Last update: 2016-01-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -56,10 +56,10 @@ entity AmcCarrierBsa is
       axiReadMaster     : out AxiReadMasterType;
       axiReadSlave      : in  AxiReadSlaveType;
       -- Ethernet Interface (axilClk domain)
-      obBsaMaster       : in  AxiStreamMasterType;
-      obBsaSlave        : out AxiStreamSlaveType;
-      ibBsaMaster       : out AxiStreamMasterType;
-      ibBsaSlave        : in  AxiStreamSlaveType;
+      obBsaMasters      : in  AxiStreamMasterArray(2 downto 0);
+      obBsaSlaves       : out AxiStreamSlaveArray(2 downto 0);
+      ibBsaMasters      : out AxiStreamMasterArray(2 downto 0);
+      ibBsaSlaves       : in  AxiStreamSlaveArray(2 downto 0);
       -- BSA Interface (bsaTimingClk domain)
       bsaTimingClk      : in  sl;
       bsaTimingRst      : in  sl;
@@ -85,13 +85,13 @@ begin
    -- Place holder for future development
    --------------------------------------
    diagnosticSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
-   obBsaSlave       <= AXI_STREAM_SLAVE_FORCE_C;
-   ibBsaMaster      <= AXI_STREAM_MASTER_INIT_C;
+   obBsaSlaves      <= (others => AXI_STREAM_SLAVE_FORCE_C);
+   ibBsaMasters     <= (others => AXI_STREAM_MASTER_INIT_C);
 
 
-   AxiLiteEmpty_1: entity work.AxiLiteEmpty
+   AxiLiteEmpty_1 : entity work.AxiLiteEmpty
       generic map (
-         TPD_G           => TPD_G)
+         TPD_G => TPD_G)
       port map (
          axiClk         => axilClk,
          axiClkRst      => axilRst,
@@ -99,7 +99,7 @@ begin
          axiReadSlave   => axilReadSlave,
          axiWriteMaster => axilWriteMaster,
          axiWriteSlave  => axilWriteSlave);
-   
+
    ------------------------------------------------------------------------------------------------
    -- Diagnostic Engine
    -- Create circular buffers in DDR Ram for dianostic data
@@ -108,7 +108,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- BSA buffers
    -------------------------------------------------------------------------------------------------
-   
+
 --    BsaBufferControl_1 : entity work.BsaBufferControl
 --       generic map (
 --          TPD_G         => TPD_G,
@@ -128,7 +128,7 @@ begin
 --          axiWriteMaster  => axiWriteMaster,
 --          axiWriteSlave   => axiWriteSlave);
    axiWriteMaster <= AXI_WRITE_MASTER_INIT_C;
-   axiReadMaster <= AXI_READ_MASTER_INIT_C;
+   axiReadMaster  <= AXI_READ_MASTER_INIT_C;
 
    ------------------------------------------------------------------------------------------------
    -- DDR Engine

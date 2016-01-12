@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-10-15
+-- Last update: 2016-01-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -41,10 +41,10 @@ entity AmcCarrierEth is
       localMac          : in  slv(47 downto 0);  --  big-Endian configuration
       localIp           : in  slv(31 downto 0);  --  big-Endian configuration   
       -- Master AXI-Lite Interface
-      mAxilReadMasters  : out AxiLiteReadMasterArray(3 downto 0);
-      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(3 downto 0);
-      mAxilWriteMasters : out AxiLiteWriteMasterArray(3 downto 0);
-      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(3 downto 0);
+      mAxilReadMasters  : out AxiLiteReadMasterArray(0 downto 0);
+      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(0 downto 0);
+      mAxilWriteMasters : out AxiLiteWriteMasterArray(0 downto 0);
+      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(0 downto 0);
       -- AXI-Lite Interface
       axilClk           : in  sl;
       axilRst           : in  sl;
@@ -53,10 +53,10 @@ entity AmcCarrierEth is
       axilWriteMaster   : in  AxiLiteWriteMasterType;
       axilWriteSlave    : out AxiLiteWriteSlaveType;
       -- BSA Ethernet Interface
-      obBsaMaster       : in  AxiStreamMasterType;
-      obBsaSlave        : out AxiStreamSlaveType;
-      ibBsaMaster       : out AxiStreamMasterType;
-      ibBsaSlave        : in  AxiStreamSlaveType;
+      obBsaMasters      : in  AxiStreamMasterArray(2 downto 0);
+      obBsaSlaves       : out AxiStreamSlaveArray(2 downto 0);
+      ibBsaMasters      : out AxiStreamMasterArray(2 downto 0);
+      ibBsaSlaves       : in  AxiStreamSlaveArray(2 downto 0);
       -- FFB Outbound Interface
       ffbObMaster       : in  AxiStreamMasterType;
       ffbObSlave        : out AxiStreamSlaveType;
@@ -91,6 +91,31 @@ architecture mapping of AmcCarrierEth is
    signal ibMacSlave  : AxiStreamSlaveType;
    signal obMacMaster : AxiStreamMasterType;
    signal obMacSlave  : AxiStreamSlaveType;
+
+   constant RX_MTU_C      : positive := 1500;
+   constant SERVER_SIZE_C : positive := 8;
+   constant SERVER_PORTS_C : PositiveArray(SERVER_SIZE_C-1 downto 0) := (
+      0 => 8192,                        -- EPICS IOC[0]
+      1 => 8193,                        -- EPICS IOC[1]
+      2 => 8194,                        -- EPICS IOC[2]
+      3 => 8195,                        -- EPICS IOC[3]
+      4 => 8196,                        -- EPICS BSA[0]
+      5 => 8197,                        -- EPICS BSA[1]
+      6 => 8198,                        -- EPICS BSA[2]      
+      7 => 8199);                       -- FFB Inbound
+   constant SERVER_MTU_C  : positive                                       := RX_MTU_C;
+   signal obServerMasters : AxiStreamMasterArray(SERVER_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal obServerSlaves  : AxiStreamSlaveArray(SERVER_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal ibServerMasters : AxiStreamMasterArray(SERVER_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal ibServerSlaves  : AxiStreamSlaveArray(SERVER_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+
+   constant CLIENT_SIZE_C  : positive range 1 to 32                         := FFB_CLIENT_SIZE_G;
+   constant CLIENT_PORTS_C : PositiveArray(CLIENT_SIZE_C-1 downto 0)        := (others => 8200);
+   constant CLIENT_MTU_C   : positive                                       := RX_MTU_C;
+   signal ibClientMasters  : AxiStreamMasterArray(CLIENT_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal ibClientSlaves   : AxiStreamSlaveArray(CLIENT_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal clientRemotePort : Slv16Array(CLIENT_SIZE_C-1 downto 0)           := (others => toSlv(SERVER_PORTS_C(7), 16));
+   signal clientRemoteIp   : Slv32Array(CLIENT_SIZE_C-1 downto 0)           := (others => (others => '0'));
 
 begin
 
@@ -200,68 +225,127 @@ begin
    dmaObMaster.tId    <= obMaster.tId;
    dmaObMaster.tUser  <= obMaster.tUser;
 
-   --------------------
-   -- No VLAN Interface
-   --------------------
-   U_NoVlan : entity work.AmcCarrierEthNoVlan
+   ----------------------
+   -- IPv4/ARP/UDP Engine
+   ----------------------
+   U_UdpEngineWrapper : entity work.UdpEngineWrapper
       generic map (
-         TPD_G => TPD_G)
+         -- Simulation Generics
+         TPD_G              => TPD_G,
+         SIM_ERROR_HALT_G   => false,
+         -- UDP General Generic
+         RX_MTU_G           => RX_MTU_C,
+         RX_FORWARD_EOFE_G  => false,
+         TX_FORWARD_EOFE_G  => false,
+         TX_CALC_CHECKSUM_G => true,
+         -- UDP Server Generics
+         SERVER_EN_G        => true,
+         SERVER_SIZE_G      => SERVER_SIZE_C,
+         SERVER_PORTS_G     => SERVER_PORTS_C,
+         SERVER_MTU_G       => SERVER_MTU_C,
+         -- UDP Client Generics
+         CLIENT_EN_G        => false,   -- Place holder for future implementation
+         CLIENT_SIZE_G      => CLIENT_SIZE_C,
+         CLIENT_PORTS_G     => CLIENT_PORTS_C,
+         CLIENT_MTU_G       => CLIENT_MTU_C,
+         -- IPv4/ARP Generics
+         CLK_FREQ_G         => 156.25E+06,  -- In units of Hz
+         COMM_TIMEOUT_EN_G  => true,    -- Disable the timeout by setting to false
+         COMM_TIMEOUT_G     => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
+         ARP_TIMEOUT_G      => 156250000,   -- 1 second ARP request timeout
+         VLAN_G             => false)   -- no VLAN
       port map (
-         -- Clock and Reset   
+         -- Local Configurations
+         localMac         => localMac,
+         localIp          => localIp,
+         -- Interface to Ethernet Media Access Controller (MAC)
+         obMacMaster      => obMacMaster,
+         obMacSlave       => obMacSlave,
+         ibMacMaster      => ibMacMaster,
+         ibMacSlave       => ibMacSlave,
+         -- Interface to UDP Server engine(s)
+         obServerMasters  => obServerMasters,
+         obServerSlaves   => obServerSlaves,
+         ibServerMasters  => ibServerMasters,
+         ibServerSlaves   => ibServerSlaves,
+         -- Interface to UDP Client engine(s)
+         clientRemotePort => clientRemotePort,
+         clientRemoteIp   => clientRemoteIp,
+         obClientMasters  => open,
+         obClientSlaves   => (others => AXI_STREAM_SLAVE_FORCE_C),
+         ibClientMasters  => ibClientMasters,
+         ibClientSlaves   => ibClientSlaves,
+         -- Clock and Reset
+         clk              => axilClk,
+         rst              => axilRst);   
+
+   ---------------------
+   -- AXI-Lite Interface
+   ---------------------
+   U_SRP : entity work.AmcCarrierSrpV0Wrapper
+      generic map (
+         -- Simulation Generics
+         TPD_G      => TPD_G,
+         IOC_SIZE_G => 4)
+      port map (
          axilClk           => axilClk,
          axilRst           => axilRst,
-         -- Local Configuration
-         localMac          => localMac,
-         localIp           => localIp,
-         -- Interface to Ethernet Media Access Controller (MAC)
-         obMacMaster       => obMacMaster,
-         obMacSlave        => obMacSlave,
-         ibMacMaster       => ibMacMaster,
-         ibMacSlave        => ibMacSlave,
+         -- UDP Interface Interface
+         obServerMasters   => obServerMasters(3 downto 0),
+         obServerSlaves    => obServerSlaves(3 downto 0),
+         ibServerMasters   => ibServerMasters(3 downto 0),
+         ibServerSlaves    => ibServerSlaves(3 downto 0),
          -- Master AXI-Lite Interface
          mAxilReadMasters  => mAxilReadMasters,
          mAxilReadSlaves   => mAxilReadSlaves,
          mAxilWriteMasters => mAxilWriteMasters,
-         mAxilWriteSlaves  => mAxilWriteSlaves,
-         -- BSA Ethernet Interface
-         obBsaMaster       => obBsaMaster,
-         obBsaSlave        => obBsaSlave,
-         ibBsaMaster       => ibBsaMaster,
-         ibBsaSlave        => ibBsaSlave);
+         mAxilWriteSlaves  => mAxilWriteSlaves);   
 
-   -----------------
-   -- VLAN Interface
-   -----------------   
-   U_Vlan : entity work.AmcCarrierEthVlan
+   ---------------------------------
+   -- BSA Inbound/Outbound Interface
+   ---------------------------------
+   GEN_BSA :
+   for i in 2 downto 0 generate
+      ibServerMasters(4+1) <= obBsaMasters(i);
+      obBsaSlaves(i)       <= ibServerSlaves(4+1);
+      ibBsaMasters(i)      <= obServerMasters(4+1);
+      obServerSlaves(4+1)  <= ibBsaSlaves(i);
+   end generate GEN_BSA;
+
+   ------------------------
+   -- FFB Inbound Interface
+   ------------------------
+   U_FfbIbMsg : entity work.AmcCarrierFfbIbMsg
       generic map (
-         TPD_G             => TPD_G,
-         FFB_CLIENT_SIZE_G => FFB_CLIENT_SIZE_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G)
+         TPD_G => TPD_G) 
       port map (
-         -- AXI-Lite Interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave,
-         -- Local Configuration
-         localMac        => localMac,
-         localIp         => localIp,
-         -- Interface to Ethernet Media Access Controller (MAC)
-         obMacMaster     => AXI_STREAM_MASTER_INIT_C,
-         obMacSlave      => open,
-         ibMacMaster     => open,
-         ibMacSlave      => AXI_STREAM_SLAVE_FORCE_C,
-         -- FFB Outbound Interface
-         ffbObMaster     => ffbObMaster,
-         ffbObSlave      => ffbObSlave,
+         -- Clock and reset
+         clk            => axilClk,
+         rst            => axilRst,
+         obServerMaster => obServerMasters(7),
+         obServerSlave  => obServerSlaves(7),
          ----------------------
          -- Top Level Interface
          ----------------------
          -- FFB Inbound Interface (ffbClk domain)
-         ffbClk          => ffbClk,
-         ffbRst          => ffbRst,
-         ffbBus          => ffbBus);
+         ffbClk         => ffbClk,
+         ffbRst         => ffbRst,
+         ffbBus         => ffbBus);
+
+   -------------------------
+   -- FFB Outbound Interface
+   -------------------------
+   ffbObSlave <= AXI_STREAM_SLAVE_FORCE_C;
+
+   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         axiClk         => axilClk,
+         axiClkRst      => axilRst,
+         axiReadMaster  => axilReadMaster,
+         axiReadSlave   => axilReadSlave,
+         axiWriteMaster => axilWriteMaster,
+         axiWriteSlave  => axilWriteSlave);   
 
 end mapping;
