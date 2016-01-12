@@ -1,2 +1,4 @@
 vhdl work rtl/BsaBufferControl2.vhd
 vhdl work rtl/BsaAccumulator.vhd
+vhdl work cores/BsaAddFpCore/BsaAddFpCore.dcp  
+vhdl work cores/BsaConvFpCore/BsaConvFpCore.dcp  
