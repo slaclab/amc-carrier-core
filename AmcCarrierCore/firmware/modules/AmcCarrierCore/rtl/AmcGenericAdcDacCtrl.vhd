@@ -87,7 +87,7 @@ architecture rtl of AmcGenericAdcDacCtrl is
    signal rin : RegType;
 
    signal update     : sl;
-   signal cnt        : Slv2Array(3 downto 0);
+   signal cnt        : Slv4Array(3 downto 0);
    signal amcClkFreq : slv(31 downto 0);
    signal dacVco     : slv(15 downto 0);
    signal adcSmpl    : Slv16VectorArray(3 downto 0, 3 downto 0);
@@ -105,14 +105,14 @@ begin
    begin
       if rising_edge(clk) then
          if update = '1' then
-            cnt <= (others => "00") after TPD_G;
+            cnt <= (others => x"0") after TPD_G;
          else
             -- Loop through the channel
             for i in 3 downto 0 loop
                -- Check for valid
                if adcValids(i) = '1' then
                   -- Check for max. sampling range
-                  if cnt(i) /= 2 then
+                  if cnt(i) < 2 then
                      -- Sample the ADC
                      adcSmpl(i, conv_integer(cnt(i)+1)) <= adcValues(i)(15 downto 0)  after TPD_G;
                      adcSmpl(i, conv_integer(cnt(i)+0)) <= adcValues(i)(31 downto 16) after TPD_G;
