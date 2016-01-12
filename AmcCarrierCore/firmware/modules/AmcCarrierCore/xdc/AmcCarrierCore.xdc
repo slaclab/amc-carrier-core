@@ -296,18 +296,20 @@ create_clock -name xauiRef    -period  6.400  [get_ports {xauiClkP}]
 create_clock -name mpsClkP    -period  8.000  [get_ports {mpsClkIn}]
 create_clock -name timingRef  -period  2.691  [get_ports {timingRefClkInP}]
 
-create_generated_clock -name mpsClk625MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/*/MmcmGen.U_Mmcm/CLKOUT0}] 
-create_generated_clock -name mpsClk312MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/*/MmcmGen.U_Mmcm/CLKOUT1}] 
-create_generated_clock -name mpsClk125MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/*/MmcmGen.U_Mmcm/CLKOUT2}] 
+create_generated_clock -name axilClk      [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/U_ClkManagerAxiLite/*/CLKOUT0}] 
+create_generated_clock -name mpsClk625MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT0}] 
+create_generated_clock -name mpsClk312MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT1}] 
+create_generated_clock -name mpsClk125MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT2}] 
 create_generated_clock -name iprogClk     [get_pins {U_Core/U_RegMap/U_Version/GEN_ICAP.Iprog_1/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 create_generated_clock -name dnaClk       [get_pins {U_Core/U_RegMap/U_Version/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 create_generated_clock -name xauiPhyClk   [get_pins -hier -filter {name =~ U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/*/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
 create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
 create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT6}]
-create_generated_clock -name timingRecClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/RXOUTCLK}]
+create_generated_clock -name recTimingClk [get_pins {U_Core/U_Timing/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]  
 create_generated_clock -name timingGenClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/TXOUTCLK}]
 create_generated_clock -name timingGenUsrClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TIMING_TXCLK_BUFG_GT/O}]
-create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/recTimingClk}]
+# U_Core/U_Timing/TIMING_RECCLK_BUFG_GT/O
+#create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/recTimingClk}]
 
 set_false_path -to [get_pins -hier -filter {name =~ */U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/SALT_IDELAY_CTRL_Inst*}]
@@ -315,17 +317,23 @@ set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_C
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/serdes_1_to_10_ser8_i/idelay_m}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/*/serdes_1_to_10_ser8_i/idelay_s}]
 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {xauiPhyClk}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrClkIn}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrIntClk1}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {iprogClk}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {dnaClk}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {mpsClk125MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingRecClk}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingGenClk}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingGenUsrClk}] 
-set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {recTimingClk}] 
+# set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {xauiPhyClk}] 
+# set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrClkIn}] 
+# set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrIntClk0}] 
+# set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {ddrIntClk1}] 
+set_clock_groups -asynchronous -group [get_clocks {axiClk}] -group [get_clocks {iprogClk}] 
+set_clock_groups -asynchronous -group [get_clocks {axiClk}] -group [get_clocks {dnaClk}] 
+# set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {mpsClk125MHz}] 
+# set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingGenClk}] 
+# set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {timingGenUsrClk}] 
+# set_clock_groups -asynchronous -group [get_clocks {fabClk}] -group [get_clocks {recTimingClk}] 
+
+set_clock_groups -asynchronous \
+    -group [get_clocks -include_generated_clocks {timingRef}] \
+    -group [get_clocks -include_generated_clocks {ddrClkIn}] \
+    -group [get_clocks -include_generated_clocks {fabClk}] \
+    -group [get_clocks -include_generated_clocks {xauiRef}] \
+    -group [get_clocks -include_generated_clocks {mpsClkP}] \
 
 ##########################
 ## Misc. Configurations ##

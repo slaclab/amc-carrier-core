@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-11-16
+-- Last update: 2016-01-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -62,73 +62,25 @@ entity AmcCarrierClkAndRst is
       fabClkN      : in  sl;
       -- Backplane MPS Ports
       mpsClkIn     : in  sl;
-      mpsClkOut    : out sl);         
+      mpsClkOut    : out sl);
 end AmcCarrierClkAndRst;
 
 architecture mapping of AmcCarrierClkAndRst is
 
-   signal gtClk     : sl;
-   signal fabClk    : sl;
-   signal fabRst    : sl;
-   signal mpsRefClk : sl;
-   signal clk       : sl;
-   signal rst       : sl;
-   signal clkOut    : slv(2 downto 0);
-   signal rstOut    : slv(2 downto 0);
-   signal rstDly    : slv(2 downto 0);
-   signal rstFO     : sl;
-   
-   attribute dont_touch           : string;
-   attribute dont_touch of clk    : signal is "TRUE";
-   attribute dont_touch of rst    : signal is "TRUE";
-   attribute dont_touch of clkOut : signal is "TRUE";
-   attribute dont_touch of rstOut : signal is "TRUE";
-   attribute dont_touch of rstDly : signal is "TRUE";
+   signal gtClk         : sl;
+   signal fabClk        : sl;
+   signal fabRst        : sl;
+   signal fabMmcmClkOut : sl;
+   signal fabMmcmRstOut : sl;
+
+   signal mpsRefClk     : sl;
+   signal mpsClk        : sl;
+   signal mpsRst        : sl;
+   signal mpsMmcmClkOut : slv(2 downto 0);
+   signal mpsMmcmRstOut : slv(2 downto 0);
+
 
 begin
-
-   axilClk      <= fabClk;
-   ref156MHzClk <= fabClk;
-
---   axilRst      <= rstDly(2);
---   ref156MHzRst <= rstDly(2);
-   --  Put large fanout reset onto BUFG
-   axilRst      <= rstFO;
-   ref156MHzRst <= rstFO;
-   U_AXILRST : BUFG
-     port map ( O => rstFO,
-                I => rstDly(2) );
-
-   -- Adding registers to help with timing
-   process(fabClk)
-   begin
-      if rising_edge(fabClk) then
-         rstDly <= rstDly(1 downto 0) & fabRst after TPD_G;
-      end if;
-   end process;
-
-   ref125MHzClk <= clkOut(2);
-   ref125MHzRst <= rstOut(2);
-
-   ref312MHzClk <= clkOut(1);
-   ref312MHzRst <= rstOut(1);
-
-   mps125MHzClk <= clkOut(2);
-   mps125MHzRst <= rstOut(2);
-
-   mps312MHzClk <= clkOut(1);
-   mps312MHzRst <= rstOut(1);
-
-   -- Adding registers to help with timing
-   process(clkOut)
-   begin
-      if rising_edge(clkOut(0)) then
-         mps625MHzRst <= rstOut(0) after TPD_G;
-         ref625MHzRst <= rstOut(0) after TPD_G;
-      end if;
-   end process;
-   ref625MHzClk <= clkOut(0);
-   mps625MHzClk <= clkOut(0);
 
    IBUFDS_GTE3_Inst : IBUFDS_GTE3
       generic map (
@@ -140,7 +92,7 @@ begin
          IB    => fabClkN,
          CEB   => '0',
          ODIV2 => gtClk,
-         O     => gthFabClk);  
+         O     => gthFabClk);
 
    BUFG_GT_Inst : BUFG_GT
       port map (
@@ -158,15 +110,44 @@ begin
          SIM_SPEEDUP_G => SIM_SPEEDUP_G)
       port map(
          clk    => fabClk,
-         rstOut => fabRst); 
+         rstOut => fabRst);
+
+   U_ClkManagerAxiLite : entity work.ClockManagerUltraScale
+      generic map(
+         TPD_G             => TPD_G,
+         TYPE_G            => "PLL",
+         INPUT_BUFG_G      => true,
+         FB_BUFG_G         => true,
+         RST_IN_POLARITY_G => '1',
+         NUM_CLOCKS_G      => 1,
+         -- MMCM attributes
+         BANDWIDTH_G       => "OPTIMIZED",
+         CLKIN_PERIOD_G    => 6.4,
+         DIVCLK_DIVIDE_G   => 1,
+         CLKFBOUT_MULT_G   => 4,
+         CLKOUT0_DIVIDE_G  => 4)
+      port map(
+         -- Clock Input
+         clkIn     => fabClk,
+         rstIn     => fabRst,
+         -- Clock Outputs
+         clkOut(0) => fabMmcmClkOut,
+         -- Reset Outputs
+         rstOut(0) => fabMmcmRstOut);
+
+   axilClk <= fabMmcmClkOut;
+   axilRst <= fabMmcmRstOut;
+
+   ref156MHzClk <= fabMmcmClkOut;
+   ref156MHzRst <= fabMmcmRstOut;
 
    U_IBUF : IBUF
       port map (
          I => mpsClkIn,
-         O => mpsRefClk);  
+         O => mpsRefClk);
 
-   clk <= fabClk when(MPS_SLOT_G) else mpsRefClk;
-   rst <= fabRst when(MPS_SLOT_G) else '0';
+   mpsClk <= fabClk when(MPS_SLOT_G) else mpsRefClk;
+   mpsRst <= fabRst when(MPS_SLOT_G) else '0';
 
    U_ClkManagerMps : entity work.ClockManagerUltraScale
       generic map(
@@ -182,16 +163,37 @@ begin
          DIVCLK_DIVIDE_G    => 1,
          CLKFBOUT_MULT_F_G  => ite(MPS_SLOT_G, 8.0, 10.0),  -- 1.25 GHz
          CLKOUT0_DIVIDE_F_G => 2.0,                         -- 625 MHz = 1.25 GHz/2.0
+         CLKOUT0_RST_HOLD_G => 4,
          CLKOUT1_DIVIDE_G   => 4,                           -- 312.5 MHz = 1.25 GHz/4
          CLKOUT2_DIVIDE_G   => 10)                          -- 125 MHz = 1.25 GHz/10
       port map(
          -- Clock Input
-         clkIn  => clk,
-         rstIn  => rst,
+         clkIn  => mpsClk,
+         rstIn  => mpsRst,
          -- Clock Outputs
-         clkOut => clkOut,
+         clkOut => mpsMmcmClkOut,
          -- Reset Outputs
-         rstOut => rstOut);
+         rstOut => mpsMmcmRstOut);
+
+
+   ref125MHzClk <= mpsMmcmClkOut(2);
+   ref125MHzRst <= mpsMmcmRstOut(2);
+
+   ref312MHzClk <= mpsMmcmClkOut(1);
+   ref312MHzRst <= mpsMmcmRstOut(1);
+
+   ref625MHzClk <= mpsMmcmClkOut(0);
+   ref625MHzRst <= mpsMmcmRstOut(0);
+
+   mps125MHzClk <= mpsMmcmClkOut(2);
+   mps125MHzRst <= mpsMmcmRstOut(2);
+
+   mps312MHzClk <= mpsMmcmClkOut(1);
+   mps312MHzRst <= mpsMmcmRstOut(1);
+
+   mps625MHzClk <= mpsMmcmClkOut(0);
+   mps625MHzRst <= mpsMmcmRstOut(0);
+
 
    U_ClkOutBufSingle : entity work.ClkOutBufSingle
       generic map(
@@ -199,7 +201,7 @@ begin
          XIL_DEVICE_G => "ULTRASCALE")
       port map (
          outEnL => ite(MPS_SLOT_G, '0', '1'),
-         clkIn  => clkOut(2),
-         clkOut => mpsClkOut);    
+         clkIn  => mpsMmcmClkOut(2),
+         clkOut => mpsClkOut);
 
 end mapping;
