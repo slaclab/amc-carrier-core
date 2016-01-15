@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-14
+-- Last update: 2016-01-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -102,8 +102,8 @@ entity AmcGenericAdcDacCore is
       -- Fast DAC's SPI Ports
       dacCsL          : out   sl;
       dacSck          : out   sl;
-      dacMiso         : in   sl;
-      dacMosi         : out sl;
+      dacMiso         : in    sl;
+      dacMosi         : out   sl;
       -- Slow DAC's SPI Ports
       dacVcoCsP       : out   sl;
       dacVcoCsN       : out   sl;
