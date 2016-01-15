@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-01-12
+-- Last update: 2016-01-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -81,12 +81,6 @@ end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
-   signal dmaIbMaster : AxiStreamMasterType;
-   signal dmaIbSlave  : AxiStreamSlaveType;
-   signal dmaObMaster : AxiStreamMasterType;
-   signal dmaObSlave  : AxiStreamSlaveType;
-   signal obMaster    : AxiStreamMasterType;
-
    signal ibMacMaster : AxiStreamMasterType;
    signal ibMacSlave  : AxiStreamSlaveType;
    signal obMacMaster : AxiStreamMasterType;
@@ -131,17 +125,17 @@ begin
          -- AXI-Lite Configurations
          AXI_ERROR_RESP_G => AXI_RESP_SLVERR_C,
          -- AXI Streaming Configurations
-         AXIS_CONFIG_G    => ssiAxiStreamConfig(8))
+         AXIS_CONFIG_G    => IP_ENGINE_CONFIG_C)
       port map (
          -- Local Configurations
          localMac           => localMac,
          -- Streaming DMA Interface 
          dmaClk             => axilClk,
          dmaRst             => axilRst,
-         dmaIbMaster        => dmaIbMaster,
-         dmaIbSlave         => dmaIbSlave,
-         dmaObMaster        => dmaObMaster,
-         dmaObSlave         => dmaObSlave,
+         dmaIbMaster        => obMacMaster,
+         dmaIbSlave         => obMacSlave,
+         dmaObMaster        => ibMacMaster,
+         dmaObSlave         => ibMacSlave,
          -- Slave AXI-Lite Interface 
          axiLiteClk         => axilClk,
          axiLiteRst         => axilRst,
@@ -162,68 +156,6 @@ begin
          gtTxN              => xauiTxN,
          gtRxP              => xauiRxP,
          gtRxN              => xauiRxN);
-
-   ----------------------------------------         
-   -- Retrofitting the "old" MAC
-   -- to work with new IPv4 and UDP engines
-   ----------------------------------------         
-   SsiInsertSof_Inst : entity work.SsiInsertSof
-      generic map (
-         TPD_G               => TPD_G,
-         COMMON_CLK_G        => true,
-         SLAVE_FIFO_G        => true,
-         MASTER_FIFO_G       => true,
-         SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(8),
-         MASTER_AXI_CONFIG_G => IP_ENGINE_CONFIG_C)
-      port map (
-         -- Slave Port
-         sAxisClk    => axilClk,
-         sAxisRst    => axilRst,
-         sAxisMaster => dmaIbMaster,
-         sAxisSlave  => dmaIbSlave,
-         -- Master Port
-         mAxisClk    => axilClk,
-         mAxisRst    => axilRst,
-         mAxisMaster => obMacMaster,
-         mAxisSlave  => obMacSlave);
-
-   FIFO_Inbound : entity work.AxiStreamFifo
-      generic map (
-         -- General Configurations
-         TPD_G               => TPD_G,
-         PIPE_STAGES_G       => 0,
-         SLAVE_READY_EN_G    => true,
-         VALID_THOLD_G       => 1,
-         -- FIFO configurations
-         BRAM_EN_G           => false,
-         USE_BUILT_IN_G      => false,
-         GEN_SYNC_FIFO_G     => true,
-         CASCADE_SIZE_G      => 1,
-         FIFO_ADDR_WIDTH_G   => 4,
-         -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(8))
-      port map (
-         -- Slave Port
-         sAxisClk    => axilClk,
-         sAxisRst    => axilRst,
-         sAxisMaster => ibMacMaster,
-         sAxisSlave  => ibMacSlave,
-         -- Master Port
-         mAxisClk    => axilClk,
-         mAxisRst    => axilRst,
-         mAxisMaster => obMaster,
-         mAxisSlave  => dmaObSlave);
-
-   -- Current MAC only support 64-bit inbound transfers
-   dmaObMaster.tValid <= obMaster.tValid;
-   dmaObMaster.tData  <= obMaster.tData;
-   dmaObMaster.tStrb  <= obMaster.tStrb;
-   dmaObMaster.tKeep  <= x"00FF";
-   dmaObMaster.tLast  <= obMaster.tLast;
-   dmaObMaster.tDest  <= obMaster.tDest;
-   dmaObMaster.tId    <= obMaster.tId;
-   dmaObMaster.tUser  <= obMaster.tUser;
 
    ----------------------
    -- IPv4/ARP/UDP Engine
