@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2015-12-16
+-- Last update: 2016-01-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -191,6 +191,10 @@ architecture mapping of AmcGenericAdcDacCore is
    signal jesdTxSync     : sl;
    signal adcDav         : slv(3 downto 0);
    signal adcData        : sampleDataArray(3 downto 0);
+   signal adcBigEnd      : sampleDataArray(3 downto 0);
+   signal dacBigEnd      : sampleDataArray(1 downto 0);
+   signal dacBigEndMux   : sampleDataArray(1 downto 0);
+   signal loopback       : sl;
    signal lmkSeletL      : sl;
    signal lmkSclk        : sl;
    signal lmkDin         : sl;
@@ -200,15 +204,15 @@ architecture mapping of AmcGenericAdcDacCore is
    signal dacDin         : sl;
    signal dacDout        : sl;
 
-   attribute dont_touch              : string;
-   attribute dont_touch of lmkSeletL : signal is "TRUE";
-   attribute dont_touch of lmkSclk   : signal is "TRUE";
-   attribute dont_touch of lmkDin    : signal is "TRUE";
-   attribute dont_touch of lmkDout   : signal is "TRUE";
-   attribute dont_touch of dacSeletL : signal is "TRUE";
-   attribute dont_touch of dacSclk   : signal is "TRUE";
-   attribute dont_touch of dacDin    : signal is "TRUE";
-   attribute dont_touch of dacDout   : signal is "TRUE";
+   -- attribute dont_touch              : string;
+   -- attribute dont_touch of lmkSeletL : signal is "TRUE";
+   -- attribute dont_touch of lmkSclk   : signal is "TRUE";
+   -- attribute dont_touch of lmkDin    : signal is "TRUE";
+   -- attribute dont_touch of lmkDout   : signal is "TRUE";
+   -- attribute dont_touch of dacSeletL : signal is "TRUE";
+   -- attribute dont_touch of dacSclk   : signal is "TRUE";
+   -- attribute dont_touch of dacDin    : signal is "TRUE";
+   -- attribute dont_touch of dacDout   : signal is "TRUE";
    
    
 begin
@@ -383,10 +387,9 @@ begin
          txWriteMaster   => writeMasters(JESD_TX_INDEX_C),
          txWriteSlave    => writeSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         sampleDataArr_o => adcData,
          dataValidVec_o  => adcDav,
-         -- Sample data input (Use if external data generator core is attached)      
-         sampleDataArr_i => dacValues,
+         sampleDataArr_o => adcBigEnd,
+         sampleDataArr_i => dacBigEndMux,
          -------
          -- JESD
          -------
@@ -407,6 +410,23 @@ begin
          -- Synchronisation output combined from all receivers to be connected to ADC chips
          nSync_o         => jesdRxSync,
          nSync_i         => jesdTxSync);
+
+   GEN_ADC_CH :
+   for i in 3 downto 0 generate
+      adcData(i)(31 downto 24) <= adcBigEnd(i)(23 downto 16);  -- ADC[CH=i][time=1]BIT[7:0]
+      adcData(i)(23 downto 16) <= adcBigEnd(i)(31 downto 24);  -- ADC[CH=i][time=1]BIT[15:8]
+      adcData(i)(15 downto 8)  <= adcBigEnd(i)(7 downto 0);    -- ADC[CH=i][time=0]BIT[7:0]
+      adcData(i)(7 downto 0)   <= adcBigEnd(i)(15 downto 8);   -- ADC[CH=i][time=0]BIT[15:8]  
+   end generate GEN_ADC_CH;
+
+   GEN_DAC_CH :
+   for i in 1 downto 0 generate
+      dacBigEnd(i)(31 downto 24) <= dacValues(i)(23 downto 16);  -- DAC[CH=i][time=1]BIT[7:0]
+      dacBigEnd(i)(23 downto 16) <= dacValues(i)(31 downto 24);  -- DAC[CH=i][time=1]BIT[15:8]
+      dacBigEnd(i)(15 downto 8)  <= dacValues(i)(7 downto 0);    -- DAC[CH=i][time=0]BIT[7:0]
+      dacBigEnd(i)(7 downto 0)   <= dacValues(i)(15 downto 8);   -- DAC[CH=i][time=0]BIT[15:8]
+      dacBigEndMux(i)            <= dacBigEnd(i) when(loopback = '0') else adcBigEnd(i);
+   end generate GEN_DAC_CH;
 
    adcValids <= adcDav;
    adcValues <= adcData;
@@ -454,9 +474,9 @@ begin
          coreSDin       => lmkDin,
          coreSDout      => lmkDout,
          coreCsb        => lmkSeletL);  
-         
+
    lmkCsL <= lmkSeletL;
-   lmkSck <= lmkSclk;         
+   lmkSck <= lmkSclk;
 
    IOBUF_Lmk : IOBUF
       port map (
@@ -515,7 +535,7 @@ begin
 
    dacCsL <= dacSeletL;
    dacSck <= dacSclk;
-         
+
    IOBUF_Dac : IOBUF
       port map (
          I  => '0',
@@ -561,6 +581,7 @@ begin
          adcValues       => adcData,
          dacValues       => dacValues,
          dacVcoCtrl      => dacVcoCtrl,
+         loopback        => loopback,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,

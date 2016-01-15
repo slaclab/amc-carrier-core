@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2015-12-07
+-- Last update: 2016-01-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -43,6 +43,7 @@ entity AmcGenericAdcDacCtrl is
       adcValues       : in  sampleDataArray(3 downto 0);
       dacValues       : in  sampleDataArray(1 downto 0);
       dacVcoCtrl      : in  slv(15 downto 0);
+      loopback        : out sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -65,6 +66,7 @@ architecture rtl of AmcGenericAdcDacCtrl is
    constant MAX_CNT_C : natural := getTimeRatio(AXI_CLK_FREQ_G, 1.0);
 
    type RegType is record
+      loopback       : sl;
       cnt            : natural range 0 to MAX_CNT_C;
       update         : sl;
       lmkClkSel      : slv(1 downto 0);
@@ -75,6 +77,7 @@ architecture rtl of AmcGenericAdcDacCtrl is
    end record;
 
    constant REG_INIT_C : RegType := (
+      loopback       => '0',
       cnt            => 0,
       update         => '0',
       lmkClkSel      => (others => '0'),
@@ -95,8 +98,16 @@ architecture rtl of AmcGenericAdcDacCtrl is
    signal adc        : Slv16VectorArray(3 downto 0, 3 downto 0);
    signal dac        : Slv16VectorArray(1 downto 0, 3 downto 0);
 
-   -- attribute dont_touch      : string;
-   -- attribute dont_touch of r : signal is "TRUE";
+   attribute dont_touch               : string;
+   attribute dont_touch of r          : signal is "TRUE";
+   attribute dont_touch of update     : signal is "TRUE";
+   attribute dont_touch of cnt        : signal is "TRUE";
+   attribute dont_touch of amcClkFreq : signal is "TRUE";
+   attribute dont_touch of dacVco     : signal is "TRUE";
+   attribute dont_touch of adcSmpl    : signal is "TRUE";
+   attribute dont_touch of dacSmpl    : signal is "TRUE";
+   attribute dont_touch of adc        : signal is "TRUE";
+   attribute dont_touch of dac        : signal is "TRUE";
    
 begin
 
@@ -112,18 +123,18 @@ begin
                -- Check for valid
                if adcValids(i) = '1' then
                   -- Check for max. sampling range
-                  if cnt(i) < 2 then
+                  if cnt(i) < 4 then
                      -- Sample the ADC
-                     adcSmpl(i, conv_integer(cnt(i)+1)) <= adcValues(i)(15 downto 0)  after TPD_G;
-                     adcSmpl(i, conv_integer(cnt(i)+0)) <= adcValues(i)(31 downto 16) after TPD_G;
+                     adcSmpl(i, conv_integer(cnt(i))+1) <= adcValues(i)(31 downto 16) after TPD_G;
+                     adcSmpl(i, conv_integer(cnt(i))+0) <= adcValues(i)(15 downto 0)  after TPD_G;
                      -- Check for DAC 
                      if i < 2 then
                         -- Sample the DAC
-                        dacSmpl(i, conv_integer(cnt(i)+1)) <= dacValues(i)(15 downto 0)  after TPD_G;
-                        dacSmpl(i, conv_integer(cnt(i)+0)) <= dacValues(i)(31 downto 16) after TPD_G;
+                        dacSmpl(i, conv_integer(cnt(i))+1) <= dacValues(i)(31 downto 16) after TPD_G;
+                        dacSmpl(i, conv_integer(cnt(i))+0) <= dacValues(i)(15 downto 0)  after TPD_G;
                      end if;
                      -- Increment the counter
-                     cnt(i) <= cnt(i) + 1 after TPD_G;
+                     cnt(i) <= cnt(i) + 2 after TPD_G;
                   end if;
                end if;
             end loop;
@@ -198,6 +209,14 @@ begin
          clkIn   => amcClk,
          locClk  => axilClk,
          refClk  => axilClk);   
+
+   Sync_loopback : entity work.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk,
+         dataIn  => r.loopback,
+         dataOut => loopback);         
 
    comb : process (adc, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dac, dacVco,
                    lmkStatus, r) is
@@ -286,6 +305,7 @@ begin
       axiSlaveRegisterW(x"204", 0, v.lmkRst);
       axiSlaveRegisterW(x"208", 0, v.lmkSync);
       axiSlaveRegisterR(x"20C", 0, lmkStatus);
+      axiSlaveRegisterW(x"210", 0, v.loopback);
 
       -- Set the Slave's response
       axiSlaveDefault(AXI_ERROR_RESP_G);
