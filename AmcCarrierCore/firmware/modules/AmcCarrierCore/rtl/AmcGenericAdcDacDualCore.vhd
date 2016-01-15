@@ -103,7 +103,8 @@ entity AmcGenericAdcDacDualCore is
       -- Fast DAC's SPI Ports
       dacCsL          : out   slv(1 downto 0);
       dacSck          : out   slv(1 downto 0);
-      dacDio          : inout slv(1 downto 0);
+      dacMiso         : in    slv(1 downto 0);
+      dacMosi         : out   slv(1 downto 0);
       -- Slow DAC's SPI Ports
       dacVcoCsP       : out   slv(1 downto 0);
       dacVcoCsN       : out   slv(1 downto 0);
@@ -251,7 +252,8 @@ begin
             -- Fast DAC's SPI Ports
             dacCsL          => dacCsL(i),
             dacSck          => dacSck(i),
-            dacDio          => dacDio(i),
+            dacMiso         => dacMiso(i),
+            dacMosi         => dacMosi(i),
             -- Slow DAC's SPI Ports
             dacVcoCsP       => dacVcoCsP(i),
             dacVcoCsN       => dacVcoCsN(i),

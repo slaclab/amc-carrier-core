@@ -98,7 +98,7 @@
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_TX_USRCLK_FREQUENCY">185.0000000</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CHANNEL_ENABLE">X0Y15 X0Y14 X0Y13 X0Y12</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.Component_Name">AmcGenericAdcDacJesd204bCoregen</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ENABLE_OPTIONAL_PORTS">rxpolarity_in txpd_in txpolarity_in</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ENABLE_OPTIONAL_PORTS">rxpolarity_in txpolarity_in</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FREERUN_FREQUENCY">185</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GT_DIRECTION">BOTH</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GT_REV">0</spirit:configurableElementValue>
@@ -638,7 +638,7 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLED_UBMDMTDO_OUT">-1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLED_UBRSVDOUT_OUT">-1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLED_UBTXUART_OUT">-1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLEMENT_UPDATED">25</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLEMENT_UPDATED">26</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_USAGE_UPDATED">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PRESET">None</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_RX_COMMA_PRESET_UPDATE">6</spirit:configurableElementValue>
@@ -1257,7 +1257,7 @@
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txoutclkpcs_out">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txoutclksel_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpcsreset_in">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpd_in">true</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpd_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpdelecidlemode_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txphalign_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txphaligndone_out">false</spirit:configurableElementValue>

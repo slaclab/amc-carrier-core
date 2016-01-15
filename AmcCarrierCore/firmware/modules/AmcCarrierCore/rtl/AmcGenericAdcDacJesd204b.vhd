@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2015-12-04
+-- Last update: 2016-01-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ architecture mapping of AmcGenericAdcDacJesd204b is
          txctrl0_in                         : in  std_logic_vector(63 downto 0);
          txctrl1_in                         : in  std_logic_vector(63 downto 0);
          txctrl2_in                         : in  std_logic_vector(31 downto 0);
-         txpd_in                            : in  std_logic_vector(7 downto 0);
+         -- txpd_in                            : in  std_logic_vector(7 downto 0);
          txpolarity_in                      : in  std_logic_vector(3 downto 0);
          txusrclk_in                        : in  std_logic_vector(3 downto 0);
          txusrclk2_in                       : in  std_logic_vector(3 downto 0);
@@ -255,8 +255,14 @@ begin
    -- GTH TX signals
    -----------------   
    s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset);
-   s_txData    <= x"00000000_00000000" & r_jesdGtTxArr(1).data & r_jesdGtTxArr(0).data;
-   s_txDataK   <= x"00_00" & x"0" & r_jesdGtTxArr(1).dataK & X"0" & r_jesdGtTxArr(0).dataK;
+   s_txData    <= r_jesdGtTxArr(1).data
+                  & r_jesdGtTxArr(0).data
+                  & r_jesdGtTxArr(1).data
+                  & r_jesdGtTxArr(0).data;
+   s_txDataK <= x"0" & r_jesdGtTxArr(1).dataK
+                  & X"0" & r_jesdGtTxArr(0).dataK
+                  & x"0" & r_jesdGtTxArr(1).dataK
+                  & X"0" & r_jesdGtTxArr(0).dataK;
    s_gtTxReady <= s_txDone & s_txDone;
 
    -----------------
@@ -324,7 +330,7 @@ begin
          txctrl0_in                            => X"0000_0000_0000_0000",
          txctrl1_in                            => X"0000_0000_0000_0000",
          txctrl2_in                            => s_txDataK,
-         txpd_in                               => "00000000",
+         -- txpd_in                               => "00000000",
          txpolarity_in                         => "0000",
          txusrclk_in                           => s_devClkVec,
          txusrclk2_in                          => s_devClk2Vec,

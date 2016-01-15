@@ -102,7 +102,8 @@ entity AmcGenericAdcDacCore is
       -- Fast DAC's SPI Ports
       dacCsL          : out   sl;
       dacSck          : out   sl;
-      dacDio          : inout sl;
+      dacMiso         : in   sl;
+      dacMosi         : out sl;
       -- Slow DAC's SPI Ports
       dacVcoCsP       : out   sl;
       dacVcoCsN       : out   sl;
@@ -195,25 +196,8 @@ architecture mapping of AmcGenericAdcDacCore is
    signal dacBigEnd      : sampleDataArray(1 downto 0);
    signal dacBigEndMux   : sampleDataArray(1 downto 0);
    signal loopback       : sl;
-   signal lmkSeletL      : sl;
-   signal lmkSclk        : sl;
-   signal lmkDin         : sl;
-   signal lmkDout        : sl;
-   signal dacSeletL      : sl;
-   signal dacSclk        : sl;
-   signal dacDin         : sl;
-   signal dacDout        : sl;
-
-   -- attribute dont_touch              : string;
-   -- attribute dont_touch of lmkSeletL : signal is "TRUE";
-   -- attribute dont_touch of lmkSclk   : signal is "TRUE";
-   -- attribute dont_touch of lmkDin    : signal is "TRUE";
-   -- attribute dont_touch of lmkDout   : signal is "TRUE";
-   -- attribute dont_touch of dacSeletL : signal is "TRUE";
-   -- attribute dont_touch of dacSclk   : signal is "TRUE";
-   -- attribute dont_touch of dacDin    : signal is "TRUE";
-   -- attribute dont_touch of dacDout   : signal is "TRUE";
-   
+   signal lmkDataIn      : sl;
+   signal lmkDataOut     : sl;
    
 begin
 
@@ -462,7 +446,7 @@ begin
          ADDRESS_SIZE_G    => 15,
          DATA_SIZE_G       => 8,
          CLK_PERIOD_G      => getRealDiv(1, AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => 10.0E-6)
+         SPI_SCLK_PERIOD_G => 1.0E-6)
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -470,20 +454,17 @@ begin
          axiReadSlave   => readSlaves(LMK_INDEX_C),
          axiWriteMaster => writeMasters(LMK_INDEX_C),
          axiWriteSlave  => writeSlaves(LMK_INDEX_C),
-         coreSclk       => lmkSclk,
-         coreSDin       => lmkDin,
-         coreSDout      => lmkDout,
-         coreCsb        => lmkSeletL);  
-
-   lmkCsL <= lmkSeletL;
-   lmkSck <= lmkSclk;
+         coreSclk       => lmkSck,
+         coreSDin       => lmkDataIn,
+         coreSDout      => lmkDataOut,
+         coreCsb        => lmkCsL);  
 
    IOBUF_Lmk : IOBUF
       port map (
          I  => '0',
-         O  => lmkDin,
+         O  => lmkDataIn,
          IO => lmkDio,
-         T  => lmkDout);   
+         T  => lmkDataOut);   
 
    ----------------------
    -- Fast ADC SPI Module
@@ -520,7 +501,7 @@ begin
          ADDRESS_SIZE_G    => 7,
          DATA_SIZE_G       => 16,
          CLK_PERIOD_G      => getRealDiv(1, AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => 1.0E-6)
+         SPI_SCLK_PERIOD_G => 100.0E-6)
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -528,20 +509,10 @@ begin
          axiReadSlave   => readSlaves(DAC_INDEX_C),
          axiWriteMaster => writeMasters(DAC_INDEX_C),
          axiWriteSlave  => writeSlaves(DAC_INDEX_C),
-         coreSclk       => dacSclk,
-         coreSDin       => dacDin,
-         coreSDout      => dacDout,
-         coreCsb        => dacSeletL);   
-
-   dacCsL <= dacSeletL;
-   dacSck <= dacSclk;
-
-   IOBUF_Dac : IOBUF
-      port map (
-         I  => '0',
-         O  => dacDin,
-         IO => dacDio,
-         T  => dacDout);             
+         coreSclk       => dacSck,
+         coreSDin       => dacMiso,
+         coreSDout      => dacMosi,
+         coreCsb        => dacCsL);   
 
    ----------------------   
    -- SLOW DAC SPI Module
