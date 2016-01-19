@@ -501,7 +501,7 @@ begin
          ADDRESS_SIZE_G    => 7,
          DATA_SIZE_G       => 16,
          CLK_PERIOD_G      => getRealDiv(1, AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => 100.0E-6)
+         SPI_SCLK_PERIOD_G => 1.0E-6)
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
