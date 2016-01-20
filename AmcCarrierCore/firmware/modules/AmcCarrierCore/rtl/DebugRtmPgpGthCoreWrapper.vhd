@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-09
--- Last update: 2015-11-02
+-- Last update: 2016-01-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ entity DebugRtmPgpGthCoreWrapper is
 
    port (
       stableClk : in  sl;
+      stableRst : in  sl;
       -- GTH FPGA IO
       gtRefClk  : in  sl;
       gtRxP     : in  sl;
@@ -41,7 +42,6 @@ entity DebugRtmPgpGthCoreWrapper is
       -- Rx ports
       rxReset        : in  sl;
       rxUsrClkActive : in  sl;
-      rxCdrStable    : out sl;
       rxResetDone    : out sl;
       rxUsrClk       : in  sl;
       rxData         : out slv(15 downto 0);
@@ -58,10 +58,9 @@ entity DebugRtmPgpGthCoreWrapper is
       txResetDone    : out sl;
       txData         : in  slv(15 downto 0);
       txDataK        : in  slv(1 downto 0);
-      txOutClk       : out sl
+      txOutClk       : out sl;
 
-    --loopback : in slv(2 downto 0)
-      );
+      loopback : in slv(2 downto 0));
 end entity DebugRtmPgpGthCoreWrapper;
 
 architecture rtl of DebugRtmPgpGthCoreWrapper is
@@ -85,7 +84,7 @@ architecture rtl of DebugRtmPgpGthCoreWrapper is
          gthrxn_in                          : in  slv(0 downto 0);
          gthrxp_in                          : in  slv(0 downto 0);
          gtrefclk0_in                       : in  slv(0 downto 0);
-         -- loopback_in                        : in  slv(2 downto 0);
+         loopback_in                        : in  slv(2 downto 0);
          rxbufreset_in                      : in  slv(0 downto 0);
          rx8b10ben_in                       : in  slv(0 downto 0);
          rxcommadeten_in                    : in  slv(0 downto 0);
@@ -117,13 +116,14 @@ architecture rtl of DebugRtmPgpGthCoreWrapper is
    end component;
 
 begin
+
    -- Note: Has to be generated from aurora core in order to work properly
    U_PgpGthCore : DebugRtmPgpGthCore
       port map (
          gtwiz_userclk_tx_active_in(0)         => txUsrClkActive,
          gtwiz_userclk_rx_active_in(0)         => rxUsrClkActive,
          gtwiz_reset_clk_freerun_in (0)        => stableClk,
-         gtwiz_reset_all_in(0)                 => '0',
+         gtwiz_reset_all_in(0)                 => stableRst,
          gtwiz_reset_tx_pll_and_datapath_in(0) => '0',
          gtwiz_reset_tx_datapath_in(0)         => txReset,
          gtwiz_reset_rx_pll_and_datapath_in(0) => '0',
@@ -137,7 +137,7 @@ begin
          gthrxn_in(0)                          => gtRxN,
          gthrxp_in(0)                          => gtRxP,
          gtrefclk0_in(0)                       => gtRefClk,
-         -- loopback_in                           => loopback,
+         loopback_in                           => loopback,
          rxbufreset_in(0)                      => '0',
          rx8b10ben_in(0)                       => '1',
          rxcommadeten_in(0)                    => '1',

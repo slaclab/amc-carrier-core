@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2013-06-29
--- Last update: 2015-11-02
+-- Last update: 2016-01-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -51,6 +51,7 @@ entity DebugRtmPgp2bGthUltra is
    port (
       -- GT Clocking
       stableClk        : in  sl;                      -- GT needs a stable clock to "boot up"
+      stableRst        : in  sl;
       gtRefClk         : in  sl;
       -- Gt Serial IO
       pgpGtTxP         : out sl;
@@ -98,7 +99,6 @@ architecture rtl of DebugRtmPgp2bGthUltra is
    signal phyTxLaneOut  : Pgp2bTxPhyLaneOutType;
    signal phyTxReady    : sl;
 
-
 begin
 
    gtRxUserReset <= phyRxInit or pgpRxReset or pgpRxIn.resetRx;
@@ -141,6 +141,7 @@ begin
          TPD_G => TPD_G)
       port map (
          stableClk      => stableClk,
+         stableRst      => stableRst,
          gtRefClk       => gtRefClk,
          gtRxP          => pgpGtRxP,
          gtRxN          => pgpGtRxN,
@@ -148,7 +149,6 @@ begin
          gtTxN          => pgpGtTxN,
          rxReset        => gtRxUserReset,
          rxUsrClkActive => pgpRxMmcmLocked,
-         rxCdrStable    => open,
          rxResetDone    => phyRxReady,
          rxUsrClk       => pgpRxClk,
          rxData         => phyRxLaneIn.data,
@@ -163,8 +163,8 @@ begin
          txResetDone    => phyTxReady,
          txData         => phyTxLaneOut.data,
          txDataK        => phyTxLaneOut.dataK,
-         --loopback       => pgpRxIn.loopback,
-         txOutClk       => pgpTxRecClk);
+         txOutClk       => pgpTxRecClk,
+         loopback       => pgpRxIn.loopback);
 
 
 

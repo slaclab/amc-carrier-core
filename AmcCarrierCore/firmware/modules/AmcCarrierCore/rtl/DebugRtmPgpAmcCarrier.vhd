@@ -143,10 +143,11 @@ begin
          generic map (
             TPD_G             => TPD_G,
             PAYLOAD_CNT_TOP_G => 7,
-            VC_INTERLEAVE_G   => 0,
+            VC_INTERLEAVE_G   => 1,
             NUM_VC_EN_G       => DIAGNOSTIC_SIZE_G+1)
          port map (
             stableClk        => axilClk,
+            stableRst        => axilRst,
             gtRefClk         => pgpRefClk,
             pgpGtTxP         => rtmPgpTxP,
             pgpGtTxN         => rtmPgpTxN,

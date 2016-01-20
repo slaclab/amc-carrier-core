@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-01-19
+-- Last update: 2015-11-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,7 +33,6 @@ use unisim.vcomponents.all;
 entity DebugRtmPgpAmcCarrierDdrMem is
    generic (
       TPD_G            : time            := 1 ns;
-      EN_CORE_G        : boolean         := true;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       FSBL_G           : boolean         := false;
       SIM_SPEEDUP_G    : boolean         := false);
@@ -152,10 +151,10 @@ architecture mapping of DebugRtmPgpAmcCarrierDdrMem is
          sys_rst                 : in    std_logic);
    end component;
 
-   signal ddrWriteMaster : AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
-   signal ddrWriteSlave  : AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
-   signal ddrReadMaster  : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
-   signal ddrReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
+   signal ddrWriteMaster : AxiWriteMasterType;
+   signal ddrWriteSlave  : AxiWriteSlaveType;
+   signal ddrReadMaster  : AxiReadMasterType;
+   signal ddrReadSlave   : AxiReadSlaveType;
 
    signal ddrClk     : sl;
    signal ddrRst     : sl;
@@ -221,113 +220,68 @@ begin
       port map (
          clk      => refClkBufg,
          asyncRst => reset,
-         syncRst  => sysRst);  
+         syncRst  => sysRst);   
 
-   EN_CORE : if (EN_CORE_G = true) generate
-
-      MigCore_Inst : DebugMigCore
-         port map (
-            c0_init_calib_complete  => ddrCalDone,
-            c0_sys_clk_i            => refClkBufg,
-            c0_ddr3_addr            => ddrA,
-            c0_ddr3_ba              => ddrBa,
-            c0_ddr3_cas_n           => ddrCasL,
-            c0_ddr3_cke             => ddrCke,
-            c0_ddr3_ck_n            => ddrCkN,
-            c0_ddr3_ck_p            => ddrCkP,
-            c0_ddr3_cs_n            => ddrCsL,
-            c0_ddr3_dm              => ddrDm,
-            c0_ddr3_dq              => ddrDq,
-            c0_ddr3_dqs_n           => ddrDqsN,
-            c0_ddr3_dqs_p           => ddrDqsP,
-            c0_ddr3_odt             => ddrOdt,
-            c0_ddr3_ras_n           => ddrRasL,
-            c0_ddr3_reset_n         => ddrRstL,
-            c0_ddr3_we_n            => ddrWeL,
-            c0_ddr3_ui_clk          => ddrClk,
-            c0_ddr3_ui_clk_sync_rst => ddrRst,
-            c0_ddr3_aresetn         => axiRstL,
-            c0_ddr3_s_axi_awid      => ddrWriteMaster.awid(3 downto 0),
-            c0_ddr3_s_axi_awaddr    => ddrWriteMaster.awaddr(32 downto 0),
-            c0_ddr3_s_axi_awlen     => ddrWriteMaster.awlen(7 downto 0),
-            c0_ddr3_s_axi_awsize    => ddrWriteMaster.awsize(2 downto 0),
-            c0_ddr3_s_axi_awburst   => ddrWriteMaster.awburst(1 downto 0),
-            c0_ddr3_s_axi_awlock    => ddrWriteMaster.awlock(0 downto 0),
-            c0_ddr3_s_axi_awcache   => ddrWriteMaster.awcache(3 downto 0),
-            c0_ddr3_s_axi_awprot    => ddrWriteMaster.awprot(2 downto 0),
-            c0_ddr3_s_axi_awqos     => ddrWriteMaster.awqos(3 downto 0),
-            c0_ddr3_s_axi_awvalid   => ddrWriteMaster.awvalid,
-            c0_ddr3_s_axi_awready   => ddrWriteSlave.awready,
-            c0_ddr3_s_axi_wdata     => ddrWriteMaster.wdata(127 downto 0),
-            c0_ddr3_s_axi_wstrb     => ddrWriteMaster.wstrb(15 downto 0),
-            c0_ddr3_s_axi_wlast     => ddrWriteMaster.wlast,
-            c0_ddr3_s_axi_wvalid    => ddrWriteMaster.wvalid,
-            c0_ddr3_s_axi_wready    => ddrWriteSlave.wready,
-            c0_ddr3_s_axi_bready    => ddrWriteMaster.bready,
-            c0_ddr3_s_axi_bid       => ddrWriteSlave.bid(3 downto 0),
-            c0_ddr3_s_axi_bresp     => ddrWriteSlave.bresp(1 downto 0),
-            c0_ddr3_s_axi_bvalid    => ddrWriteSlave.bvalid,
-            c0_ddr3_s_axi_arid      => ddrReadMaster.arid(3 downto 0),
-            c0_ddr3_s_axi_araddr    => ddrReadMaster.araddr(32 downto 0),
-            c0_ddr3_s_axi_arlen     => ddrReadMaster.arlen(7 downto 0),
-            c0_ddr3_s_axi_arsize    => ddrReadMaster.arsize(2 downto 0),
-            c0_ddr3_s_axi_arburst   => ddrReadMaster.arburst(1 downto 0),
-            c0_ddr3_s_axi_arlock    => ddrReadMaster.arlock(0 downto 0),
-            c0_ddr3_s_axi_arcache   => ddrReadMaster.arcache(3 downto 0),
-            c0_ddr3_s_axi_arprot    => ddrReadMaster.arprot(2 downto 0),
-            c0_ddr3_s_axi_arqos     => ddrReadMaster.arqos(3 downto 0),
-            c0_ddr3_s_axi_arvalid   => ddrReadMaster.arvalid,
-            c0_ddr3_s_axi_arready   => ddrReadSlave.arready,
-            c0_ddr3_s_axi_rready    => ddrReadMaster.rready,
-            c0_ddr3_s_axi_rlast     => ddrReadSlave.rlast,
-            c0_ddr3_s_axi_rvalid    => ddrReadSlave.rvalid,
-            c0_ddr3_s_axi_rresp     => ddrReadSlave.rresp(1 downto 0),
-            c0_ddr3_s_axi_rid       => ddrReadSlave.rid(3 downto 0),
-            c0_ddr3_s_axi_rdata     => ddrReadSlave.rdata(127 downto 0),
-            sys_rst                 => sysRst); 
-
-   end generate;
-
-   NO_CORE : if (EN_CORE_G = false) generate
-
-      ddrCalDone <= '1';
-      ddrA       <= (others => '0');
-      ddrBa      <= (others => '0');
-      ddrCasL    <= '1';
-      ddrCke     <= (others => '0');
-      ddrCsL     <= (others => '1');
-      ddrDm      <= (others => '0');
-      ddrOdt     <= (others => '0');
-      ddrRasL    <= '1';
-      ddrRstL    <= '1';
-      ddrWeL     <= '1';
-      ddrClk     <= '0';
-      ddrRst     <= '1';
-         
-      OBUFDS_ddrCk_0 : OBUFDS
-         port map (
-            I   => '0',
-            O   => ddrCkP(0),
-            OB  => ddrCkN(0)); 
-
-      OBUFDS_ddrCk_1 : OBUFDS
-         port map (
-            I   => '0',
-            O   => ddrCkP(1),
-            OB  => ddrCkN(1));  
-            
-      GEN_VEC :
-      for i in 7 downto 0 generate
-         
-         OBUFDS_ddrDqs : OBUFDS
-            port map (
-               I   => '0',
-               O   => ddrDqsP(i),
-               OB  => ddrDqsN(i)); 
-
-      end generate GEN_VEC;         
-         
-   end generate;
+   MigCore_Inst : DebugMigCore
+      port map (
+         c0_init_calib_complete  => ddrCalDone,
+         c0_sys_clk_i            => refClkBufg,
+         c0_ddr3_addr            => ddrA,
+         c0_ddr3_ba              => ddrBa,
+         c0_ddr3_cas_n           => ddrCasL,
+         c0_ddr3_cke             => ddrCke,
+         c0_ddr3_ck_n            => ddrCkN,
+         c0_ddr3_ck_p            => ddrCkP,
+         c0_ddr3_cs_n            => ddrCsL,
+         c0_ddr3_dm              => ddrDm,
+         c0_ddr3_dq              => ddrDq,
+         c0_ddr3_dqs_n           => ddrDqsN,
+         c0_ddr3_dqs_p           => ddrDqsP,
+         c0_ddr3_odt             => ddrOdt,
+         c0_ddr3_ras_n           => ddrRasL,
+         c0_ddr3_reset_n         => ddrRstL,
+         c0_ddr3_we_n            => ddrWeL,
+         c0_ddr3_ui_clk          => ddrClk,
+         c0_ddr3_ui_clk_sync_rst => ddrRst,
+         c0_ddr3_aresetn         => axiRstL,
+         c0_ddr3_s_axi_awid      => ddrWriteMaster.awid(3 downto 0),
+         c0_ddr3_s_axi_awaddr    => ddrWriteMaster.awaddr(32 downto 0),
+         c0_ddr3_s_axi_awlen     => ddrWriteMaster.awlen(7 downto 0),
+         c0_ddr3_s_axi_awsize    => ddrWriteMaster.awsize(2 downto 0),
+         c0_ddr3_s_axi_awburst   => ddrWriteMaster.awburst(1 downto 0),
+         c0_ddr3_s_axi_awlock    => ddrWriteMaster.awlock(0 downto 0),
+         c0_ddr3_s_axi_awcache   => ddrWriteMaster.awcache(3 downto 0),
+         c0_ddr3_s_axi_awprot    => ddrWriteMaster.awprot(2 downto 0),
+         c0_ddr3_s_axi_awqos     => ddrWriteMaster.awqos(3 downto 0),
+         c0_ddr3_s_axi_awvalid   => ddrWriteMaster.awvalid,
+         c0_ddr3_s_axi_awready   => ddrWriteSlave.awready,
+         c0_ddr3_s_axi_wdata     => ddrWriteMaster.wdata(127 downto 0),
+         c0_ddr3_s_axi_wstrb     => ddrWriteMaster.wstrb(15 downto 0),
+         c0_ddr3_s_axi_wlast     => ddrWriteMaster.wlast,
+         c0_ddr3_s_axi_wvalid    => ddrWriteMaster.wvalid,
+         c0_ddr3_s_axi_wready    => ddrWriteSlave.wready,
+         c0_ddr3_s_axi_bready    => ddrWriteMaster.bready,
+         c0_ddr3_s_axi_bid       => ddrWriteSlave.bid(3 downto 0),
+         c0_ddr3_s_axi_bresp     => ddrWriteSlave.bresp(1 downto 0),
+         c0_ddr3_s_axi_bvalid    => ddrWriteSlave.bvalid,
+         c0_ddr3_s_axi_arid      => ddrReadMaster.arid(3 downto 0),
+         c0_ddr3_s_axi_araddr    => ddrReadMaster.araddr(32 downto 0),
+         c0_ddr3_s_axi_arlen     => ddrReadMaster.arlen(7 downto 0),
+         c0_ddr3_s_axi_arsize    => ddrReadMaster.arsize(2 downto 0),
+         c0_ddr3_s_axi_arburst   => ddrReadMaster.arburst(1 downto 0),
+         c0_ddr3_s_axi_arlock    => ddrReadMaster.arlock(0 downto 0),
+         c0_ddr3_s_axi_arcache   => ddrReadMaster.arcache(3 downto 0),
+         c0_ddr3_s_axi_arprot    => ddrReadMaster.arprot(2 downto 0),
+         c0_ddr3_s_axi_arqos     => ddrReadMaster.arqos(3 downto 0),
+         c0_ddr3_s_axi_arvalid   => ddrReadMaster.arvalid,
+         c0_ddr3_s_axi_arready   => ddrReadSlave.arready,
+         c0_ddr3_s_axi_rready    => ddrReadMaster.rready,
+         c0_ddr3_s_axi_rlast     => ddrReadSlave.rlast,
+         c0_ddr3_s_axi_rvalid    => ddrReadSlave.rvalid,
+         c0_ddr3_s_axi_rresp     => ddrReadSlave.rresp(1 downto 0),
+         c0_ddr3_s_axi_rid       => ddrReadSlave.rid(3 downto 0),
+         c0_ddr3_s_axi_rdata     => ddrReadSlave.rdata(127 downto 0),
+         sys_rst                 => sysRst); 
 
    FSBL_GEN : if (FSBL_G = true) generate
       
