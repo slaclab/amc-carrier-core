@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-10-16
+-- Last update: 2016-01-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ entity AmcCarrierMpsMsg is
       mpsSlave        : in  AxiStreamSlaveType);   
 end AmcCarrierMpsMsg;
 
-architecture rtl of AmcCarrierMpsMsg is
+architecture mapping of AmcCarrierMpsMsg is
 
    constant MPS_CHANNELS_C    : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
    constant MPS_THRESHOLD_C   : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
@@ -82,37 +82,10 @@ architecture rtl of AmcCarrierMpsMsg is
    signal ramWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal ramReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal ramReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   
-   type StateType is (
-      IDLE_S,
-      HEADER_S,
-      APP_ID_S,
-      TIMESTAMP_S,
-      PAYLOAD_S); 
-
-   type RegType is record
-      cnt       : natural range 0 to 63;
-      timeStamp : slv(15 downto 0);
-      message   : Slv8Array(31 downto 0);
-      mpsMaster : AxiStreamMasterType;
-      state     : StateType;
-   end record RegType;
-   constant REG_INIT_C : RegType := (
-      cnt       => 0,
-      timeStamp => (others => '0'),
-      message   => (others => (others => '0')),
-      mpsMaster => AXI_STREAM_MASTER_INIT_C,
-      state     => IDLE_S);      
-
-   signal r   : RegType := REG_INIT_C;
-   signal rin : RegType;
 
    signal ibValid : sl;
    signal obValid : slv(31 downto 0);
    signal obValue : Slv8Array(31 downto 0);
-
-   -- attribute dont_touch             : string;
-   -- attribute dont_touch of r        : signal is "TRUE";   
 
 begin
 
@@ -186,132 +159,22 @@ begin
       
    end generate;
 
-   comb : process (appId, axilRst, mpsSlave, obValid, obValue, r, testMode, timeStamp) is
-      variable v : RegType;
-   begin
-      -- Latch the current value
-      v := r;
+   U_MsgCore : entity work.AmcCarrierMpsMsgCore
+      generic map (
+         TPD_G            => TPD_G,
+         SIM_ERROR_HALT_G => SIM_ERROR_HALT_G,
+         APP_TYPE_G       => APP_TYPE_G)
+      port map (
+         clk       => axilClk,
+         rst       => axilRst,
+         -- Inbound Message Value
+         validStrb => obValid(0),
+         timeStamp => timeStamp,
+         testMode  => testMode,
+         appId     => appId,
+         message   => obValue,
+         -- Outbound MPS Interface
+         mpsMaster => mpsMaster,
+         mpsSlave  => mpsSlave);     
 
-      -- Reset the flags
-      if mpsSlave.tReady = '1' then
-         v.mpsMaster.tValid := '0';
-         v.mpsMaster.tLast  := '0';
-         v.mpsMaster.tUser  := (others => '0');
-      end if;
-
-      -- State Machine
-      case r.state is
-         ----------------------------------------------------------------------
-         when IDLE_S =>
-            -- Check for update
-            if (obValid(0) = '1') and (APP_TYPE_G /= APP_NULL_TYPE_C) and (MPS_CHANNELS_C /= 0) then
-               -- Reset tData
-               v.mpsMaster.tData := (others => '0');
-               -- Latch the information
-               v.timeStamp       := timeStamp;
-               v.message         := obValue;
-               -- Next state
-               v.state           := HEADER_S;
-            end if;
-         ----------------------------------------------------------------------
-         when HEADER_S =>
-            -- Check if ready to move data
-            if v.mpsMaster.tValid = '0' then
-               -- Send the header 
-               v.mpsMaster.tValid                             := '1';
-               v.mpsMaster.tData(15 downto 8)                 := toSlv(MPS_CHANNELS_C+5, 8);
-               v.mpsMaster.tData(7)                           := testMode;
-               v.mpsMaster.tData((AppType'length)-1 downto 0) := APP_TYPE_G;
-               -- Set SOF               
-               ssiSetUserSof(MPS_CONFIG_C, v.mpsMaster, '1');
-               -- Next state
-               v.state                                        := APP_ID_S;
-            end if;
-         ----------------------------------------------------------------------
-         when APP_ID_S =>
-            -- Check if ready to move data
-            if v.mpsMaster.tValid = '0' then
-               -- Send the application ID 
-               v.mpsMaster.tValid             := '1';
-               v.mpsMaster.tData(15 downto 0) := appId;
-               -- Next state
-               v.state                        := TIMESTAMP_S;
-            end if;
-         ----------------------------------------------------------------------
-         when TIMESTAMP_S =>
-            -- Check if ready to move data
-            if v.mpsMaster.tValid = '0' then
-               -- Send the timestamp 
-               v.mpsMaster.tValid             := '1';
-               v.mpsMaster.tData(15 downto 0) := r.timeStamp;
-               -- Next state
-               v.state                        := PAYLOAD_S;
-            end if;
-         ----------------------------------------------------------------------
-         when PAYLOAD_S =>
-            -- Check if ready to move data
-            if v.mpsMaster.tValid = '0' then
-               -- Send the payload 
-               v.mpsMaster.tValid             := '1';
-               v.mpsMaster.tData(7 downto 0)  := r.message(r.cnt);
-               v.mpsMaster.tData(15 downto 8) := (others => '0');
-               -- Increment the counter
-               v.cnt                          := r.cnt + 1;
-               -- Check if lower byte is tLast
-               if v.cnt = MPS_CHANNELS_C then
-                  -- Reset the counter
-                  v.cnt             := 0;
-                  -- Set EOF
-                  v.mpsMaster.tLast := '1';
-                  -- Next state
-                  v.state           := IDLE_S;
-               else
-                  -- Send the payload 
-                  v.mpsMaster.tData(15 downto 8) := r.message(v.cnt);
-                  -- Increment the counter
-                  v.cnt                          := v.cnt + 1;
-                  -- Check if lower byte is tLast
-                  if v.cnt = MPS_CHANNELS_C then
-                     -- Reset the counter
-                     v.cnt             := 0;
-                     -- Set EOF
-                     v.mpsMaster.tLast := '1';
-                     -- Next state
-                     v.state           := IDLE_S;
-                  end if;
-               end if;
-            end if;
-      ----------------------------------------------------------------------
-      end case;
-
-      -- Check for error condition
-      if (obValid(0) = '1') and (r.state /= IDLE_S) then
-         -- Check the simulation error printing
-         if SIM_ERROR_HALT_G then
-            report "AmcCarrierMpsMsg: Simulation Overflow Detected ...";
-            report "APP_TYPE_G = " & integer'image(conv_integer(APP_TYPE_G));
-            report "APP ID     = " & integer'image(conv_integer(appId)) severity failure;
-         end if;
-      end if;
-
-      -- Reset
-      if (axilRst = '1') then
-         v := REG_INIT_C;
-      end if;
-
-      -- Register the variable for next clock cycle
-      rin <= v;
-
-      -- Outputs        
-      mpsMaster <= r.mpsMaster;
-
-   end process comb;
-
-   seq : process (axilClk) is
-   begin
-      if rising_edge(axilClk) then
-         r <= rin after TPD_G;
-      end if;
-   end process seq;
-
-end rtl;
+end mapping;

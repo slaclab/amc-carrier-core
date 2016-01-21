@@ -21,6 +21,7 @@ vhdl work rtl/AmcCarrierDdrMem.vhd
 vhdl work rtl/AmcCarrierMpsAndFfb.vhd
 vhdl work rtl/AmcCarrierMpsSalt.vhd
 vhdl work rtl/AmcCarrierMpsMsg.vhd
+vhdl work rtl/AmcCarrierMpsMsgCore.vhd
 vhdl work rtl/AmcCarrierMpsEncoder.vhd
 vhdl work rtl/AmcCarrierMpsComparator.vhd
 vhdl work rtl/AmcCarrierFfbObMsg.vhd
