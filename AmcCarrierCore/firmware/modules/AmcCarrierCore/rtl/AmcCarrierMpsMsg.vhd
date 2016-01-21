@@ -86,6 +86,7 @@ architecture mapping of AmcCarrierMpsMsg is
    signal ibValid : sl;
    signal obValid : slv(31 downto 0);
    signal obValue : Slv8Array(31 downto 0);
+   signal msgSize : slv(7 downto 0);
 
 begin
 
@@ -173,8 +174,11 @@ begin
          testMode  => testMode,
          appId     => appId,
          message   => obValue,
+         msgSize   => msgSize,
          -- Outbound MPS Interface
          mpsMaster => mpsMaster,
-         mpsSlave  => mpsSlave);     
+         mpsSlave  => mpsSlave);  
+
+   msgSize <= toSlv(MPS_CHANNELS_C, 8);
 
 end mapping;

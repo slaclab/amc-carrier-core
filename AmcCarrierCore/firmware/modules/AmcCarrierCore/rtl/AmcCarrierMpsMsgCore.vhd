@@ -44,6 +44,7 @@ entity AmcCarrierMpsMsgCore is
       testMode  : in  sl;
       appId     : in  slv(15 downto 0);
       message   : in  Slv8Array(31 downto 0);
+      msgSize   : in  slv(7 downto 0);  -- In units of Bytes
       -- Outbound MPS Interface
       mpsMaster : out AxiStreamMasterType;
       mpsSlave  : in  AxiStreamSlaveType);   
@@ -62,6 +63,7 @@ architecture rtl of AmcCarrierMpsMsgCore is
 
    type RegType is record
       cnt       : natural range 0 to 63;
+      msgSize   : slv(7 downto 0);
       timeStamp : slv(15 downto 0);
       message   : Slv8Array(31 downto 0);
       mpsMaster : AxiStreamMasterType;
@@ -69,6 +71,7 @@ architecture rtl of AmcCarrierMpsMsgCore is
    end record RegType;
    constant REG_INIT_C : RegType := (
       cnt       => 0,
+      msgSize   => (others => '0'),
       timeStamp => (others => '0'),
       message   => (others => (others => '0')),
       mpsMaster => AXI_STREAM_MASTER_INIT_C,
@@ -82,7 +85,7 @@ architecture rtl of AmcCarrierMpsMsgCore is
 
 begin
 
-   comb : process (appId, message, mpsSlave, r, rst, testMode, timeStamp, validStrb) is
+   comb : process (appId, message, mpsSlave, msgSize, r, rst, testMode, timeStamp, validStrb) is
       variable v : RegType;
    begin
       -- Latch the current value
@@ -100,12 +103,17 @@ begin
          ----------------------------------------------------------------------
          when IDLE_S =>
             -- Check for update
-            if (validStrb = '1') and (APP_TYPE_G /= APP_NULL_TYPE_C) and (MPS_CHANNELS_C /= 0) then
+            if (validStrb = '1')
+               and (APP_TYPE_G /= APP_NULL_TYPE_C)
+               and (MPS_CHANNELS_C /= 0)
+               and (msgSize /= 0)
+               and (msgSize      <= MPS_CHANNELS_C) then
                -- Reset tData
                v.mpsMaster.tData := (others => '0');
                -- Latch the information
                v.timeStamp       := timeStamp;
                v.message         := message;
+               v.msgSize         := msgSize;
                -- Next state
                v.state           := HEADER_S;
             end if;
@@ -115,7 +123,7 @@ begin
             if v.mpsMaster.tValid = '0' then
                -- Send the header 
                v.mpsMaster.tValid                             := '1';
-               v.mpsMaster.tData(15 downto 8)                 := toSlv(MPS_CHANNELS_C+5, 8);
+               v.mpsMaster.tData(15 downto 8)                 := r.msgSize+5;  -- Length in units of bytes
                v.mpsMaster.tData(7)                           := testMode;
                v.mpsMaster.tData((AppType'length)-1 downto 0) := APP_TYPE_G;
                -- Set SOF               
@@ -154,7 +162,7 @@ begin
                -- Increment the counter
                v.cnt                          := r.cnt + 1;
                -- Check if lower byte is tLast
-               if v.cnt = MPS_CHANNELS_C then
+               if v.cnt = r.msgSize then
                   -- Reset the counter
                   v.cnt             := 0;
                   -- Set EOF
@@ -167,7 +175,7 @@ begin
                   -- Increment the counter
                   v.cnt                          := v.cnt + 1;
                   -- Check if lower byte is tLast
-                  if v.cnt = MPS_CHANNELS_C then
+                  if v.cnt = r.msgSize then
                      -- Reset the counter
                      v.cnt             := 0;
                      -- Set EOF
