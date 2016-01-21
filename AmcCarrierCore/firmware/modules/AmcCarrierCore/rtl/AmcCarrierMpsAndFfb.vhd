@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-09-30
+-- Last update: 2016-01-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -65,10 +65,10 @@ entity AmcCarrierMpsAndFfb is
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk   : in  sl;
       diagnosticRst   : in  sl;
-      diagnosticBus  : in  DiagnosticBusType;
+      diagnosticBus   : in  DiagnosticBusType;
       -- MPS Interface
-      mpsObMasters    : out AxiStreamMasterArray(14 downto 1);
-      mpsObSlaves     : in  AxiStreamSlaveArray(14 downto 1);
+      mpsObMasters    : out AxiStreamMasterArray(14 downto 0);
+      mpsObSlaves     : in  AxiStreamSlaveArray(14 downto 0);
       ----------------
       -- Core Ports --
       ----------------

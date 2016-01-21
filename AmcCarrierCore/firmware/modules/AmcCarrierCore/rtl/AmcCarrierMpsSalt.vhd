@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2015-10-14
+-- Last update: 2016-01-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -68,8 +68,8 @@ entity AmcCarrierMpsSalt is
       -- Top Level Interface
       ----------------------
       -- MPS Interface
-      mpsObMasters      : out AxiStreamMasterArray(14 downto 1);
-      mpsObSlaves       : in  AxiStreamSlaveArray(14 downto 1);
+      mpsObMasters      : out AxiStreamMasterArray(14 downto 0);
+      mpsObSlaves       : in  AxiStreamSlaveArray(14 downto 0);
       ----------------
       -- Core Ports --
       ----------------
@@ -185,8 +185,9 @@ begin
 
    MPS_SLOT : if (MPS_SLOT_G = true) generate
       
-      mpsTxLinkUp <= '0';
-      mpsIbSlave  <= AXI_STREAM_SLAVE_FORCE_C;
+      mpsTxLinkUp     <= '0';
+      mpsObMasters(0) <= mpsIbMaster;
+      mpsIbSlave      <= mpsObSlaves(0);
 
       U_OBUFDS : OBUFDS
          port map (
