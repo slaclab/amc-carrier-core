@@ -36,8 +36,6 @@ set_property PACKAGE_PIN P1  [get_ports {xauiRxN[3]}]
 set_property PACKAGE_PIN V6  [get_ports {xauiClkP}]
 set_property PACKAGE_PIN V5  [get_ports {xauiClkN}]
 
-# RTM Ports
-
 # Backplane MPS Ports
 set_property -dict { PACKAGE_PIN AD19 IOSTANDARD LVDS DIFF_TERM_ADV TERM_NONE } [get_ports {mpsBusRxP[1]}]
 set_property -dict { PACKAGE_PIN AD18 IOSTANDARD LVDS DIFF_TERM_ADV TERM_NONE } [get_ports {mpsBusRxN[1]}]
