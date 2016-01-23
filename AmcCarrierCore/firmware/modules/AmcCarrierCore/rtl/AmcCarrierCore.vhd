@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-01-21
+-- Last update: 2016-01-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -114,8 +114,6 @@ entity AmcCarrierCore is
       mpsClkOut         : out   sl;
       mpsBusRxP         : in    slv(14 downto 1);
       mpsBusRxN         : in    slv(14 downto 1);
-      mpsBusTxP         : out   slv(14 downto 1);
-      mpsBusTxN         : out   slv(14 downto 1);
       mpsTxP            : out   sl;
       mpsTxN            : out   sl;
       -- LCLS Timing Ports
@@ -621,8 +619,6 @@ begin
          -- Backplane MPS Ports
          mpsBusRxP       => mpsBusRxP,
          mpsBusRxN       => mpsBusRxN,
-         mpsBusTxP       => mpsBusTxP,
-         mpsBusTxN       => mpsBusTxN,
          mpsTxP          => mpsTxP,
          mpsTxN          => mpsTxN);
 

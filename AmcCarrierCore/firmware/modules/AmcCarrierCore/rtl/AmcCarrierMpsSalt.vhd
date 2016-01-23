@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2016-01-21
+-- Last update: 2016-01-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -76,8 +76,6 @@ entity AmcCarrierMpsSalt is
       -- Backplane MPS Ports
       mpsBusRxP         : in  slv(14 downto 1);
       mpsBusRxN         : in  slv(14 downto 1);
-      mpsBusTxP         : out slv(14 downto 1);
-      mpsBusTxN         : out slv(14 downto 1);
       mpsTxP            : out sl;
       mpsTxN            : out sl);
 end AmcCarrierMpsSalt;
@@ -208,8 +206,8 @@ begin
                MASTER_AXI_CONFIG_G => MPS_CONFIG_C)
             port map (
                -- TX Serial Stream
-               txP           => mpsBusTxP(i),
-               txN           => mpsBusTxN(i),
+               txP           => open,
+               txN           => open,
                -- RX Serial Stream
                rxP           => mpsBusRxP(i),
                rxN           => mpsBusRxN(i),
