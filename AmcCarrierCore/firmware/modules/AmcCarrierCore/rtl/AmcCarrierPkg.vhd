@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2015-11-02
+-- Last update: 2016-01-25
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -36,16 +36,17 @@ package AmcCarrierPkg is
    -----------------------------------------------------------
    subtype AppType is slv(6 downto 0);  -- Max. Size is 7-bits
 
-   constant APP_NULL_TYPE_C     : AppType := toSlv(0, AppType'length);
-   constant APP_TIME_GEN_TYPE_C : AppType := toSlv(1, AppType'length);
-   constant APP_MPS_LINK_TYPE_C : AppType := toSlv(2, AppType'length);
-   constant APP_MPS_APP_TYPE_C  : AppType := toSlv(3, AppType'length);
-   constant APP_PLIC_TYPE_C     : AppType := toSlv(4, AppType'length);
-   constant APP_PIC_TYPE_C      : AppType := toSlv(5, AppType'length);
-   constant APP_BCM_TYPE_C      : AppType := toSlv(6, AppType'length);
-   constant APP_BLEN_TYPE_C     : AppType := toSlv(7, AppType'length);
-   constant APP_BPM_TYPE_C      : AppType := toSlv(8, AppType'length);
-   constant APP_LLRF_TYPE_C     : AppType := toSlv(9, AppType'length);
+   constant APP_NULL_TYPE_C           : AppType := toSlv(0, AppType'length);
+   constant APP_TIME_GEN_TYPE_C       : AppType := toSlv(1, AppType'length);
+   constant APP_BCM_TYPE_C            : AppType := toSlv(2, AppType'length);
+   constant APP_BLEN_TYPE_C           : AppType := toSlv(3, AppType'length);
+   constant APP_BPM_TYPE_C            : AppType := toSlv(4, AppType'length);
+   constant APP_LLRF_TYPE_C           : AppType := toSlv(5, AppType'length);
+   constant APP_MPS_APP_TYPE_C        : AppType := toSlv(123, AppType'length);  -- MPS Application Node
+   constant APP_MPS_DIGITAL_TYPE_C    : AppType := toSlv(124, AppType'length);  -- MPS Link Node, RTM and AMC digital inputs
+   constant APP_MPS_LINK_AIN_TYPE_C   : AppType := toSlv(125, AppType'length);  -- MPS Link Node, Dual Analog AMC cards
+   constant APP_MPS_LINK_DIN_TYPE_C   : AppType := toSlv(126, AppType'length);  -- MPS Link Node, Dual Digital AMC cards
+   constant APP_MPS_LINK_MIXED_TYPE_C : AppType := toSlv(127, AppType'length);  -- MPS Link Node, Mixed Signal (1x Analog and 1x Digital AMC cards)
 
    constant APP_REG_BASE_ADDR_C : slv(31 downto 0) := x"80000000";
 
@@ -117,13 +118,15 @@ package body AmcCarrierPkg is
       variable retVar : natural range 0 to 32;
    begin
       case appType is
-         when APP_PLIC_TYPE_C => retVar := 0;  -- TBD value
-         when APP_PIC_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_BCM_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_BLEN_TYPE_C => retVar := 0;  -- TBD value
-         when APP_BPM_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_LLRF_TYPE_C => retVar := 0;  -- TBD value
-         when others          => retVar := 0;
+         when APP_BCM_TYPE_C            => retVar := 0;  -- TBD value
+         when APP_BLEN_TYPE_C           => retVar := 0;  -- TBD value
+         when APP_BPM_TYPE_C            => retVar := 0;  -- TBD value
+         when APP_LLRF_TYPE_C           => retVar := 0;  -- TBD value
+         when APP_MPS_DIGITAL_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_AIN_TYPE_C   => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_DIN_TYPE_C   => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_MIXED_TYPE_C => retVar := 0;  -- TBD value
+         when others                    => retVar := 0;
       end case;
       return retVar;
    end function;
@@ -132,13 +135,15 @@ package body AmcCarrierPkg is
       variable retVar : natural range 0 to 256;
    begin
       case appType is
-         when APP_PLIC_TYPE_C => retVar := 0;  -- TBD value
-         when APP_PIC_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_BCM_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_BLEN_TYPE_C => retVar := 0;  -- TBD value
-         when APP_BPM_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_LLRF_TYPE_C => retVar := 0;  -- TBD value
-         when others          => retVar := 0;
+         when APP_BCM_TYPE_C            => retVar := 0;  -- TBD value
+         when APP_BLEN_TYPE_C           => retVar := 0;  -- TBD value
+         when APP_BPM_TYPE_C            => retVar := 0;  -- TBD value
+         when APP_LLRF_TYPE_C           => retVar := 0;  -- TBD value
+         when APP_MPS_DIGITAL_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_AIN_TYPE_C   => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_DIN_TYPE_C   => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_MIXED_TYPE_C => retVar := 0;  -- TBD value
+         when others                    => retVar := 0;
       end case;
       return retVar;
    end function;
@@ -147,13 +152,15 @@ package body AmcCarrierPkg is
       variable retVar : natural range 0 to 32;
    begin
       case appType is
-         when APP_PLIC_TYPE_C => retVar := 0;  -- TBD value
-         when APP_PIC_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_BCM_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_BLEN_TYPE_C => retVar := 0;  -- TBD value
-         when APP_BPM_TYPE_C  => retVar := 0;  -- TBD value
-         when APP_LLRF_TYPE_C => retVar := 0;  -- TBD value
-         when others          => retVar := 0;
+         when APP_BCM_TYPE_C            => retVar := 0;  -- TBD value
+         when APP_BLEN_TYPE_C           => retVar := 0;  -- TBD value
+         when APP_BPM_TYPE_C            => retVar := 0;  -- TBD value
+         when APP_LLRF_TYPE_C           => retVar := 0;  -- TBD value
+         when APP_MPS_DIGITAL_TYPE_C    => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_AIN_TYPE_C   => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_DIN_TYPE_C   => retVar := 0;  -- TBD value
+         when APP_MPS_LINK_MIXED_TYPE_C => retVar := 0;  -- TBD value
+         when others                    => retVar := 0;
       end case;
       return retVar;
    end function;
