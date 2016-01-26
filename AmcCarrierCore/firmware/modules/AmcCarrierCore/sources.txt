@@ -1,40 +1,40 @@
 
-vhdl work core/AmcCarrierPkg.vhd
-vhdl work core/AmcCarrierRegPkg.vhd
+vhdl work AmcCarrier/AmcCarrierPkg.vhd
+vhdl work AmcCarrier/AmcCarrierRegPkg.vhd
 
-vhdl work core/AmcCarrierEmptyApp.vhd
-vhdl work core/AmcCarrierCore.vhd
-vhdl work core/AmcCarrierClkAndRst.vhd
+vhdl work AmcCarrier/AmcCarrierEmptyApp.vhd
+vhdl work AmcCarrier/AmcCarrierCore.vhd
+vhdl work AmcCarrier/AmcCarrierClkAndRst.vhd
 
-vhdl work core/AmcCarrierEth.vhd
-vhdl work core/AmcCarrierSrpV0Wrapper.vhd
-vhdl work core/AmcCarrierFfbIbMsg.vhd
+vhdl work AmcCarrier/AmcCarrierEth.vhd
+vhdl work AmcCarrier/AmcCarrierSrpV0Wrapper.vhd
+vhdl work AmcCarrier/AmcCarrierFfbIbMsg.vhd
 
-vhdl work core/AmcCarrierRegMapping.vhd
-vhdl work core/AmcCarrierSysMon.vhd
-vhdl work core/AmcCarrierBsi.vhd
+vhdl work AmcCarrier/AmcCarrierRegMapping.vhd
+vhdl work AmcCarrier/AmcCarrierSysMon.vhd
+vhdl work AmcCarrier/AmcCarrierBsi.vhd
 
-vhdl work core/AmcCarrierTiming.vhd
-vhdl work core/AmcCarrierBsa.vhd
-vhdl work core/AmcCarrierDdrMem.vhd
+vhdl work AmcCarrier/AmcCarrierTiming.vhd
+vhdl work AmcCarrier/AmcCarrierBsa.vhd
+vhdl work AmcCarrier/AmcCarrierDdrMem.vhd
 
-vhdl work core/AmcCarrierMpsAndFfb.vhd
-vhdl work core/AmcCarrierMpsSalt.vhd
-vhdl work core/AmcCarrierMpsMsg.vhd
-vhdl work core/AmcCarrierMpsMsgCore.vhd
-vhdl work core/AmcCarrierMpsEncoder.vhd
-vhdl work core/AmcCarrierMpsComparator.vhd
-vhdl work core/AmcCarrierFfbObMsg.vhd
+vhdl work AmcCarrier/AmcCarrierMpsAndFfb.vhd
+vhdl work AmcCarrier/AmcCarrierMpsSalt.vhd
+vhdl work AmcCarrier/AmcCarrierMpsMsg.vhd
+vhdl work AmcCarrier/AmcCarrierMpsMsgCore.vhd
+vhdl work AmcCarrier/AmcCarrierMpsEncoder.vhd
+vhdl work AmcCarrier/AmcCarrierMpsComparator.vhd
+vhdl work AmcCarrier/AmcCarrierFfbObMsg.vhd
 
 vhdl work AmcGenericAdcDac/AmcGenericAdcDacCore.vhd
 vhdl work AmcGenericAdcDac/AmcGenericAdcDacDualCore.vhd
 vhdl work AmcGenericAdcDac/AmcGenericAdcDacJesd204b.vhd
 vhdl work AmcGenericAdcDac/AmcGenericAdcDacCtrl.vhd
 
-vhdl work core/AmcAxisDaq.vhd
-vhdl work core/AmcAxisDaqMux.vhd
-vhdl work core/AmcAxisDaqMuxDecimator.vhd
-vhdl work core/AmcAxiLiteDaqRegItf.vhd
+vhdl work AmcAxisDaq/AmcAxisDaq.vhd
+vhdl work AmcAxisDaq/AmcAxisDaqMux.vhd
+vhdl work AmcAxisDaq/AmcAxisDaqMuxDecimator.vhd
+vhdl work AmcAxisDaq/AmcAxiLiteDaqRegItf.vhd
 
 vhdl work DebugPgp/DebugRtmAmcCarrierCore.vhd
 vhdl work DebugPgp/DebugRtmPgp2bGthUltra.vhd
