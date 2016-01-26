@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-11-02
+-- Last update: 2016-01-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -249,6 +249,8 @@ architecture mapping of AmcCarrierRegMapping is
    signal bootMosi     : sl;
    signal bootMiso     : sl;
    signal fpgaEnReload : sl;
+   signal di           : slv(3 downto 0);
+   signal do           : slv(3 downto 0);
    
 begin
 
@@ -331,7 +333,8 @@ begin
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          MEM_ADDR_MASK_G  => x"00000000",     -- Using hardware write protection
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)  -- units of Hz
+         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C,  -- units of Hz
+         SPI_CLK_FREQ_G   => 1.0E+6)  -- units of Hz
       port map (
          -- FLASH Memory Ports
          csL            => bootCsL,
@@ -354,20 +357,11 @@ begin
       port map (
          CFGCLK    => open,             -- 1-bit output: Configuration main clock output
          CFGMCLK   => open,  -- 1-bit output: Configuration internal oscillator clock output
-         DI(0)     => open,             -- 1-bit output: Allow receiving on the D0 input pin
-         DI(1)     => bootMiso,         -- 1-bit output: Allow receiving on the D1 input pin
-         DI(2)     => open,             -- 1-bit output: Allow receiving on the D2 input pin
-         DI(3)     => open,             -- 1-bit output: Allow receiving on the D3 input pin
+         DI        => di,               -- 4-bit output: Allow receiving on the D[3:0] input pins
          EOS       => open,  -- 1-bit output: Active high output signal indicating the End Of Startup.
-         PREQ      => open,             -- 1-bit output: PROGRAM request to fabric output
-         DO(0)     => bootMosi,         -- 1-bit input: Allows control of the D0 pin output
-         DO(1)     => '1',              -- 1-bit input: Allows control of the D1 pin output
-         DO(2)     => '1',              -- 1-bit input: Allows control of the D2 pin output
-         DO(3)     => '1',              -- 1-bit input: Allows control of the D3 pin output
-         DTS(0)    => '0',              -- 1-bit input: Allows tristate of the D0 pin
-         DTS(1)    => '1',              -- 1-bit input: Allows tristate of the D1 pin
-         DTS(2)    => '1',              -- 1-bit input: Allows tristate of the D2 pin
-         DTS(3)    => '1',              -- 1-bit input: Allows tristate of the D3 pin
+         PREQ      => open,             -- 1-bit output: PROGRAM request to fabric output         
+         DO        => do,               -- 4-bit input: Allows control of the D[3:0] pin outputs
+         DTS       => "1110",           -- 4-bit input: Allows tristate of the D[3:0] pins
          FCSBO     => bootCsL,          -- 1-bit input: Contols the FCS_B pin for flash access
          FCSBTS    => '0',              -- 1-bit input: Tristate the FCS_B pin
          GSR       => '0',  -- 1-bit input: Global Set/Reset input (GSR cannot be used for the port name)
@@ -378,6 +372,9 @@ begin
          USRCCLKTS => '0',              -- 1-bit input: User CCLK 3-state enable input
          USRDONEO  => '1',              -- 1-bit input: User DONE pin output control
          USRDONETS => '1');             -- 1-bit input: User DONE 3-state enable output     
+
+   do       <= "111" & bootMosi;
+   bootMiso <= di(1);
 
    ----------------------------------
    -- AXI-Lite: Clock Crossbar Module
