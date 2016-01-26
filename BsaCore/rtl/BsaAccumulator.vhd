@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2015-10-15
+-- Last update: 2016-01-25
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,8 +22,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
@@ -34,6 +33,7 @@ entity BsaAccumulator is
    generic (
       TPD_G               : time                      := 1 ns;
       BSA_NUMBER_G        : integer range 0 to 64     := 0;
+      BSA_ACCUM_FLOAT_G   : boolean                   := true;
       NUM_ACCUMULATIONS_G : integer range 1 to 32     := 28;
       FRAME_SIZE_BYTES_G  : integer range 128 to 4096 := 2048;
       AXIS_CONFIG_G       : AxiStreamConfigType       := ssiAxiStreamConfig(4));
@@ -46,11 +46,12 @@ entity BsaAccumulator is
       bsaActive      : in  sl;
       bsaAvgDone     : in  sl;
       bsaDone        : in  sl;
+      bsaOverflow : out sl;
       diagnosticData : in  slv(31 downto 0);
       accumulateEn   : in  sl;
       setEn          : in  sl;
       lastEn         : in  sl;
-      axisMaster     : out AxiStreamMasterType;
+      axisMaster     : out AxiStreamMasterType := axiStreamMasterInit(AXIS_CONFIG_G);
       axisSlave      : in  AxiStreamSlaveType);
 
 end entity BsaAccumulator;
@@ -63,23 +64,26 @@ architecture rtl of BsaAccumulator is
    type RegType is record
       count         : integer range 0 to MAX_ENTRIES_C-1;
       accumulations : Slv32Array(NUM_ACCUMULATIONS_G-1 downto 0);
+      overflow : sl;
    end record RegType;
 
 
-   signal r   : RegType;
+   signal r   : RegType := (count => 0, accumulations => (others => X"00000000"), overflow => '0');
    signal rin : RegType;
 
    -- Outputs from FB adder array
-   signal adderEn    : sl;
-   signal adderInA   : slv(31 downto 0);
+   signal adderEn      : sl;
+   signal adderInA     : slv(31 downto 0);
    signal adderInALast : sl;
-   signal adderInB   : slv(31 downto 0);
-   signal adderOut   : slv(31 downto 0);
-   signal adderValid : sl;
+   signal adderInB     : slv(31 downto 0);
+   signal adderOut     : slv(31 downto 0);
+   signal adderValid   : sl;
    signal adderOutLast : sl;
 
    signal shiftEn : sl;
    signal shiftIn : slv(31 downto 0);
+
+   signal axisMasterInt : AxiStreamMasterType := axiStreamMasterInit(AXIS_CONFIG_G);
 
    signal sAxisMaster : AxiStreamMasterType;
    signal sAxisSlave  : AxiStreamSlaveType;
@@ -89,12 +93,12 @@ architecture rtl of BsaAccumulator is
          aclk                 : in  sl;
          s_axis_a_tvalid      : in  sl;
          s_axis_a_tdata       : in  slv(31 downto 0);
-         s_axis_a_tlast : in sl;
+         s_axis_a_tlast       : in  sl;
          s_axis_b_tvalid      : in  sl;
          s_axis_b_tdata       : in  slv(31 downto 0);
          m_axis_result_tvalid : out sl;
          m_axis_result_tdata  : out slv(31 downto 0);
-         m_axis_result_tlast : out sl);
+         m_axis_result_tlast  : out sl);
    end component BsaAddFpCore;
 
    constant INT_AXI_STREAM_CONFIG_C : AxiStreamConfigType := (
@@ -111,26 +115,40 @@ architecture rtl of BsaAccumulator is
 
 begin
 
-   BSA_ADD_FP_CORE : BsaAddFpCore
-      port map (
-         aclk                 => clk,
-         s_axis_a_tvalid      => adderEn,
-         s_axis_a_tdata       => adderInA,
-         s_axis_a_tlast       => adderInALast,
-         s_axis_b_tvalid      => adderEn,
-         s_axis_b_tdata       => adderInB,
-         m_axis_result_tvalid => adderValid,
-         m_axis_result_tdata  => adderOut,
-         m_axis_result_tlast => adderOutLast);
+   FLOAT_ADD_GEN : if (BSA_ACCUM_FLOAT_G) generate
+      BSA_ADD_FP_CORE : BsaAddFpCore
+         port map (
+            aclk                 => clk,
+            s_axis_a_tvalid      => adderEn,
+            s_axis_a_tdata       => adderInA,
+            s_axis_a_tlast       => adderInALast,
+            s_axis_b_tvalid      => adderEn,
+            s_axis_b_tdata       => adderInB,
+            m_axis_result_tvalid => adderValid,
+            m_axis_result_tdata  => adderOut,
+            m_axis_result_tlast  => adderOutLast);
+   end generate FLOAT_ADD_GEN;
+
+   SIGNED_ADD_GEN : if (not BSA_ACCUM_FLOAT_G) generate
+      add_proc : process (clk) is
+      begin
+         if (rising_edge(clk)) then
+            adderOut     <= slv(signed(adderInA) + signed(adderInB));
+            adderOutLast <= adderInALast;
+            adderValid   <= adderEn;
+         end if;
+      end process add_proc;
+   end generate SIGNED_ADD_GEN;
 
    adderInA     <= diagnosticData     when bsaActive = '1'               else X"00000000";
    adderInALast <= lastEn;
-   adderInB     <= r.accumulations(0) when bsaInit = '0' and setEn = '0' else X"00000000";
+   adderInB     <= r.accumulations(0) when (bsaInit = '0' and setEn = '0') or bsaActive = '0' else X"00000000";
    adderEn      <= accumulateEn;
 
    shiftEn <= accumulateEn or adderValid;
    shiftIn <= adderOut when bsaAvgDone = '0' else X"00000000";
 
+   sAxisMaster.tdata(127 downto 32) <= (others => '0');
    sAxisMaster.tdata(31 downto 0) <= adderOut;
    sAxisMaster.tvalid             <= adderValid and bsaAvgDone;
    sAxisMaster.tdest              <= toSlv(BSA_NUMBER_G, 8);
@@ -140,13 +158,16 @@ begin
    sAxisMaster.tUser              <= (others => '0');
    sAxisMaster.tId                <= (others => '0');
 
+   -- Maybe pass bsaDone on tUser so that we can track when it gets to ram.
+
    -- Note: For now, bsaDone must coincide with the last bsaAvgDone
 
    U_AxiStreamFifo_1 : entity work.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
+         INT_PIPE_STAGES_G   => 0,
          PIPE_STAGES_G       => 0,
-         SLAVE_READY_EN_G    => false,
+         SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 0,
          BRAM_EN_G           => true,
          USE_BUILT_IN_G      => false,
@@ -155,29 +176,41 @@ begin
          FIFO_ADDR_WIDTH_G   => 10,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 1,
+         LAST_FIFO_ADDR_WIDTH_G => 4,
          SLAVE_AXI_CONFIG_G  => INT_AXI_STREAM_CONFIG_C,
          MASTER_AXI_CONFIG_G => AXIS_CONFIG_G)
       port map (
          sAxisClk    => clk,            -- [in]
-         sAxisRst    => rst,            -- [in]
+         sAxisRst    => bsaInit,        -- [in]
          sAxisMaster => sAxisMaster,    -- [in]
          sAxisSlave  => sAxisSlave,     -- [out]
          sAxisCtrl   => open,           -- [out]
          mAxisClk    => clk,            -- [in]
          mAxisRst    => rst,            -- [in]
-         mAxisMaster => axisMaster,     -- [out]
+         mAxisMaster => axisMasterInt,  -- [out]
          mAxisSlave  => axisSlave,      -- [in]
          mTLastTUser => open);          -- [out]
 
-   comb : process (r, rst, sAxisMaster, shiftEn, shiftIn) is
+   axisMaster.tValid <= axisMasterInt.tValid;
+   axisMaster.tData  <= axisMasterInt.tData;
+   axisMaster.tLast  <= axisMasterInt.tLast;
+   axisMaster.tDest  <= toSlv(BSA_NUMBER_G, 8);
+
+   comb : process (adderOutLast, r, rst, sAxisMaster, sAxisSlave, shiftEn, shiftIn) is
       variable v : RegType;
 
    begin
       v := r;
 
       if (shiftEn = '1') then
-         v.accumulations(NUM_ACCUMULATIONS_G-1)          := shiftIn;
-         v.accumulations(NUM_ACCUMULATIONS_G-2 downto 0) := r.accumulations(NUM_ACCUMULATIONS_G-1 downto 1);
+         v.accumulations(NUM_ACCUMULATIONS_G-1 downto 0) := shiftIn & r.accumulations(NUM_ACCUMULATIONS_G-1 downto 1);
+      end if;
+
+      -- Need to gracefully handle case when buffer backs up. Can't store half an entry.
+      if (sAxisSlave.tReady = '0') then
+         v.overflow := '1';      -- Latch overflow if tReady ever drops
+      elsif (bsaInit = '1') then
+         v.overflow := '0';             -- clear on init
       end if;
 
       --Count entries
@@ -194,9 +227,12 @@ begin
       ----------------------------------------------------------------------------------------------
       if (rst = '1') then
          v.count := 0;
+         v.overflow := '0';
+--         v.accumulations := (others => (others => '0'));
       end if;
 
       rin <= v;
+      bsaOverflow <= r.overflow;
 
    end process comb;
 
