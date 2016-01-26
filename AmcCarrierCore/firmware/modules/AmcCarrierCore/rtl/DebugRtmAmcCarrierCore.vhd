@@ -79,8 +79,8 @@ entity DebugRtmAmcCarrierCore is
       bsiRst            : in    sl                               := '0';
       bsiBus            : out   BsiBusType;
       -- MPS Concentrator Interface (ref156MHzClk domain)
-      mpsObMasters      : out   AxiStreamMasterArray(14 downto 1);
-      mpsObSlaves       : in    AxiStreamSlaveArray(14 downto 1) := (others => AXI_STREAM_SLAVE_FORCE_C);
+      mpsObMasters      : out   AxiStreamMasterArray(14 downto 0);
+      mpsObSlaves       : in    AxiStreamSlaveArray(14 downto 0) := (others => AXI_STREAM_SLAVE_FORCE_C);
       -- Reference Clocks and Resets
       recTimingClk      : out   sl;
       recTimingRst      : out   sl;
