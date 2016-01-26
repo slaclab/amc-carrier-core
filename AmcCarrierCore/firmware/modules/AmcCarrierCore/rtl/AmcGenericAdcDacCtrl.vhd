@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-14
+-- Last update: 2016-01-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -63,9 +63,12 @@ end AmcGenericAdcDacCtrl;
 
 architecture rtl of AmcGenericAdcDacCtrl is
 
-   constant MAX_CNT_C : natural := getTimeRatio(AXI_CLK_FREQ_G, 1.0);
+   constant MAX_CNT_C     : natural  := getTimeRatio(AXI_CLK_FREQ_G, 1.0);
+   constant STATUS_SIZE_C : positive := 4;
 
    type RegType is record
+      cntRst         : sl;
+      rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       loopback       : sl;
       cnt            : natural range 0 to MAX_CNT_C;
       update         : sl;
@@ -77,6 +80,8 @@ architecture rtl of AmcGenericAdcDacCtrl is
    end record;
 
    constant REG_INIT_C : RegType := (
+      cntRst         => '1',
+      rollOverEn     => (others => '0'),
       loopback       => '0',
       cnt            => 0,
       update         => '0',
@@ -89,6 +94,9 @@ architecture rtl of AmcGenericAdcDacCtrl is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   signal statusCnt     : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
+   signal adcValidsSync : slv(3 downto 0);
+
    signal update     : sl;
    signal cnt        : Slv4Array(3 downto 0);
    signal amcClkFreq : slv(31 downto 0);
@@ -98,16 +106,16 @@ architecture rtl of AmcGenericAdcDacCtrl is
    signal adc        : Slv16VectorArray(3 downto 0, 3 downto 0);
    signal dac        : Slv16VectorArray(1 downto 0, 3 downto 0);
 
-   attribute dont_touch               : string;
-   attribute dont_touch of r          : signal is "TRUE";
-   attribute dont_touch of update     : signal is "TRUE";
-   attribute dont_touch of cnt        : signal is "TRUE";
-   attribute dont_touch of amcClkFreq : signal is "TRUE";
-   attribute dont_touch of dacVco     : signal is "TRUE";
-   attribute dont_touch of adcSmpl    : signal is "TRUE";
-   attribute dont_touch of dacSmpl    : signal is "TRUE";
-   attribute dont_touch of adc        : signal is "TRUE";
-   attribute dont_touch of dac        : signal is "TRUE";
+   -- attribute dont_touch               : string;
+   -- attribute dont_touch of r          : signal is "TRUE";
+   -- attribute dont_touch of update     : signal is "TRUE";
+   -- attribute dont_touch of cnt        : signal is "TRUE";
+   -- attribute dont_touch of amcClkFreq : signal is "TRUE";
+   -- attribute dont_touch of dacVco     : signal is "TRUE";
+   -- attribute dont_touch of adcSmpl    : signal is "TRUE";
+   -- attribute dont_touch of dacSmpl    : signal is "TRUE";
+   -- attribute dont_touch of adc        : signal is "TRUE";
+   -- attribute dont_touch of dac        : signal is "TRUE";
    
 begin
 
@@ -218,8 +226,28 @@ begin
          dataIn  => r.loopback,
          dataOut => loopback);         
 
-   comb : process (adc, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dac, dacVco,
-                   lmkStatus, r) is
+   U_SyncStatusVector : entity work.SyncStatusVector
+      generic map (
+         TPD_G          => TPD_G,
+         OUT_POLARITY_G => '1',
+         CNT_RST_EDGE_G => true,
+         CNT_WIDTH_G    => 32,
+         WIDTH_G        => STATUS_SIZE_C)     
+      port map (
+         -- Input Status bit Signals (wrClk domain)
+         statusIn(3 downto 0)  => adcValids,
+         -- Output Status bit Signals (rdClk domain)  
+         statusOut(3 downto 0) => adcValidsSync,
+         -- Status Bit Counters Signals (rdClk domain) 
+         cntRstIn              => r.cntRst,
+         rollOverEnIn          => r.rollOverEn,
+         cntOut                => statusCnt,
+         -- Clocks and Reset Ports
+         wrClk                 => clk,
+         rdClk                 => axilClk);              
+
+   comb : process (adc, adcValidsSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dac,
+                   dacVco, lmkStatus, r, statusCnt) is
       variable v         : RegType;
       variable axiStatus : AxiLiteStatusType;
 
@@ -256,6 +284,7 @@ begin
 
       -- Reset the strobes
       v.update := '0';
+      v.cntRst := '0';
 
       -- Increment the counter
       v.cnt := r.cnt + 1;
@@ -272,6 +301,11 @@ begin
       axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus);
 
       -- Map the read only registers
+      axiSlaveRegisterR(x"000", 0, muxSlVectorArray(statusCnt, 0));
+      axiSlaveRegisterR(x"004", 0, muxSlVectorArray(statusCnt, 1));
+      axiSlaveRegisterR(x"008", 0, muxSlVectorArray(statusCnt, 2));
+      axiSlaveRegisterR(x"00C", 0, muxSlVectorArray(statusCnt, 3));
+      axiSlaveRegisterR(x"0FC", 0, adcValidsSync);
       axiSlaveRegisterR(x"100", 0, adc(0, 0));
       axiSlaveRegisterR(x"104", 0, adc(0, 1));
       axiSlaveRegisterR(x"108", 0, adc(0, 2));
@@ -306,6 +340,8 @@ begin
       axiSlaveRegisterW(x"208", 0, v.lmkSync);
       axiSlaveRegisterR(x"20C", 0, lmkStatus);
       axiSlaveRegisterW(x"210", 0, v.loopback);
+      axiSlaveRegisterW(x"3F8", 0, v.rollOverEn);
+      axiSlaveRegisterW(x"3FC", 0, v.cntRst);
 
       -- Set the Slave's response
       axiSlaveDefault(AXI_ERROR_RESP_G);
@@ -333,5 +369,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 end rtl;
