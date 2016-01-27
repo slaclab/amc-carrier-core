@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-01-25
+-- Last update: 2016-01-27
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -30,6 +30,9 @@ use work.SsiPkg.all;
 use work.TimingPkg.all;
 
 package AmcCarrierPkg is
+
+   constant AMC_CARRIER_TIMING_186_MHZ_SEL_C : boolean := true;  -- true = LCLS-II timing
+   constant AMC_CARRIER_TIMING_119_MHZ_SEL_C : boolean := ite(AMC_CARRIER_TIMING_186_MHZ_SEL_C, false, true);
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
@@ -167,52 +170,52 @@ package body AmcCarrierPkg is
    function getFfbChCnt (app : AppType) return natural is
       variable retVar : natural range 0 to 32;
    begin
-   if (app = APP_BCM_TYPE_C) then
-      retVar := 0;                      -- TBD value
-   elsif (app = APP_BLEN_TYPE_C) then
-      retVar := 0;                      -- TBD value
-   elsif (app = APP_BPM_TYPE_C) then
-      retVar := 0;                      -- TBD value
-   elsif (app = APP_LLRF_TYPE_C) then
-      retVar := 0;                      -- TBD value
-   elsif (app = APP_MPS_DIGITAL_TYPE_C) then
-      retVar := 0;                      -- TBD value
-   elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
-      retVar := 0;                      -- TBD value
-   elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
-      retVar := 0;                      -- TBD value
-   elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
-      retVar := 0;                      -- TBD value
-   else
-      retVar := 0;
-   end if;
-   return retVar;
-end function;
+      if (app = APP_BCM_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_BLEN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_BPM_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_LLRF_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_DIGITAL_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      else
+         retVar := 0;
+      end if;
+      return retVar;
+   end function;
 
-function toSlv (b : DiagnosticBusType) return slv is
-   variable vector : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0) := (others => '0');
-   variable i      : integer                               := 0;
-begin
-   vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
-   i                                        := TIMING_MESSAGE_BITS_C;
-   for j in 0 to 31 loop
-      assignSlv(i, vector, b.data(j));
-   end loop;
-   assignSlv(i, vector, b.strobe);
-   return vector;
-end function;
+   function toSlv (b : DiagnosticBusType) return slv is
+      variable vector : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0) := (others => '0');
+      variable i      : integer                               := 0;
+   begin
+      vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
+      i                                        := TIMING_MESSAGE_BITS_C;
+      for j in 0 to 31 loop
+         assignSlv(i, vector, b.data(j));
+      end loop;
+      assignSlv(i, vector, b.strobe);
+      return vector;
+   end function;
 
-function toDiagnosticBus (vec : slv) return DiagnosticBusType is
-   variable b : DiagnosticBusType;
-   variable i : integer := 0;
-begin
-   b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
-   i               := TIMING_MESSAGE_BITS_C;
-   for j in 0 to 31 loop
-      assignRecord(i, vec, b.data(j));
-   end loop;
-   assignRecord(i, vec, b.strobe);
-   return b;
-end function;
+   function toDiagnosticBus (vec : slv) return DiagnosticBusType is
+      variable b : DiagnosticBusType;
+      variable i : integer := 0;
+   begin
+      b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
+      i               := TIMING_MESSAGE_BITS_C;
+      for j in 0 to 31 loop
+         assignRecord(i, vec, b.data(j));
+      end loop;
+      assignRecord(i, vec, b.strobe);
+      return b;
+   end function;
 
 end package body AmcCarrierPkg;
