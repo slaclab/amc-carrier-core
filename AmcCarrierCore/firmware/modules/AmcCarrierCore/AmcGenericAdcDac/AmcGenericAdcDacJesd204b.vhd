@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-14
+-- Last update: 2016-01-27
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -255,14 +255,12 @@ begin
    -- GTH TX signals
    -----------------   
    s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset);
-   s_txData    <= r_jesdGtTxArr(1).data
-                  & r_jesdGtTxArr(0).data
+   s_txData    <= x"00000000_00000000"
                   & r_jesdGtTxArr(1).data
                   & r_jesdGtTxArr(0).data;
-   s_txDataK <= x"0" & r_jesdGtTxArr(1).dataK
-                  & X"0" & r_jesdGtTxArr(0).dataK
-                  & x"0" & r_jesdGtTxArr(1).dataK
-                  & X"0" & r_jesdGtTxArr(0).dataK;
+   s_txDataK <= x"00_00"
+                & x"0" & r_jesdGtTxArr(1).dataK
+                & X"0" & r_jesdGtTxArr(0).dataK;
    s_gtTxReady <= s_txDone & s_txDone;
 
    -----------------
