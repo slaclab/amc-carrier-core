@@ -101,7 +101,7 @@ architecture rtl of BsaRawDiagnostic is
          m_axis_tlast             : out std_logic;
          m_axis_tid               : out std_logic_vector(2 downto 0);
          m_axis_tdest             : out std_logic_vector(2 downto 0);
-         m_axi_awid               : out std_logic_vector(0 downto 0);
+         m_axi_awid               : out std_logic_vector(2 downto 0);
          m_axi_awaddr             : out std_logic_vector(31 downto 0);
          m_axi_awlen              : out std_logic_vector(7 downto 0);
          m_axi_awsize             : out std_logic_vector(2 downto 0);
@@ -120,12 +120,12 @@ architecture rtl of BsaRawDiagnostic is
          m_axi_wuser              : out std_logic_vector(0 downto 0);
          m_axi_wvalid             : out std_logic;
          m_axi_wready             : in  std_logic;
-         m_axi_bid                : in  std_logic_vector(0 downto 0);
+         m_axi_bid                : in  std_logic_vector(2 downto 0);
          m_axi_bresp              : in  std_logic_vector(1 downto 0);
          m_axi_buser              : in  std_logic_vector(0 downto 0);
          m_axi_bvalid             : in  std_logic;
          m_axi_bready             : out std_logic;
-         m_axi_arid               : out std_logic_vector(0 downto 0);
+         m_axi_arid               : out std_logic_vector(2 downto 0);
          m_axi_araddr             : out std_logic_vector(31 downto 0);
          m_axi_arlen              : out std_logic_vector(7 downto 0);
          m_axi_arsize             : out std_logic_vector(2 downto 0);
@@ -138,7 +138,7 @@ architecture rtl of BsaRawDiagnostic is
          m_axi_aruser             : out std_logic_vector(0 downto 0);
          m_axi_arvalid            : out std_logic;
          m_axi_arready            : in  std_logic;
-         m_axi_rid                : in  std_logic_vector(0 downto 0);
+         m_axi_rid                : in  std_logic_vector(2 downto 0);
          m_axi_rdata              : in  std_logic_vector(127 downto 0);
          m_axi_rresp              : in  std_logic_vector(1 downto 0);
          m_axi_rlast              : in  std_logic;
@@ -206,7 +206,7 @@ begin
 
    -- Coregen-ed DDR Stream FIFO
    axiRstL <= not axiRst;
-   AxiStreamDdrFifo_1 : entity work.AxiStreamDdrFifo
+   AxiStreamDdrFifo_1 : AxiStreamDdrFifo
       port map (
          aclk    => axiClk,
          aresetn => axiRstL,
