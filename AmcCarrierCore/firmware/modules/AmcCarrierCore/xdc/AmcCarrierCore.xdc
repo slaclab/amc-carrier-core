@@ -289,6 +289,15 @@ resize_pblock [get_pblocks MIG_GRP] -add {CLOCKREGION_X2Y2:CLOCKREGION_X2Y4}
 create_pblock XAUI_GRP; add_cells_to_pblock [get_pblocks XAUI_GRP] [get_cells {U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore}]
 resize_pblock [get_pblocks XAUI_GRP] -add {CLOCKREGION_X3Y2:CLOCKREGION_X3Y2}
 
+# SALT Area Constraint
+create_pblock SALT_GRP; 
+add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/idelay_cal}]
+add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/idelay_m}]
+add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/idelay_s}]
+add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/iserdes_m}]
+add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/iserdes_s}]
+resize_pblock [get_pblocks SALT_GRP] -add {BITSLICE_RX_TX_X0Y52:BITSLICE_RX_TX_X0Y129}
+
 #############################
 ## Core Timing Constraints ##
 #############################
