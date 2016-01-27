@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2016-01-26
+-- Last update: 2016-01-27
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -96,6 +96,7 @@ entity AmcCarrierEmptyApp is
       diagnosticClk        : out sl;
       diagnosticRst        : out sl;
       diagnosticBus        : out DiagnosticBusType;
+      -- Raw Diagnostic Interface (diagnosticRawClks domains)
       diagnosticRawClks    : out slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
       diagnosticRawRsts    : out slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
       diagnosticRawMasters : out AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
@@ -113,7 +114,7 @@ architecture top_level_app of AmcCarrierEmptyApp is
    signal clk : sl;
    signal rst : sl;
 
-   constant AXIL_MASTERS_C : integer := 2;
+   constant AXIL_MASTERS_C : integer := DIAGNOSTIC_RAW_STREAMS_G;
 
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(AXIL_MASTERS_C-1 downto 0);
    signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(AXIL_MASTERS_C-1 downto 0);
@@ -143,7 +144,7 @@ begin
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => AXIL_MASTERS_C,
          DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         MASTERS_CONFIG_G   => genAxiLiteConfig(2, APP_REG_BASE_ADDR_C, 16, 12),
+         MASTERS_CONFIG_G   => genAxiLiteConfig(DIAGNOSTIC_RAW_STREAMS_G, APP_REG_BASE_ADDR_C, 16, 12),
          DEBUG_G            => true)
       port map (
          axiClk              => clk,                  -- [in]
@@ -157,7 +158,7 @@ begin
          mAxiReadMasters     => locAxilReadMasters,   -- [out]
          mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
 
-   PRBS_GEN : for i in 1 downto 0 generate
+   PRBS_GEN : for i in DIAGNOSTIC_RAW_STREAMS_G-1 downto 0 generate
       U_SsiPrbsTx_1 : entity work.SsiPrbsTx
          generic map (
             TPD_G                      => TPD_G,
