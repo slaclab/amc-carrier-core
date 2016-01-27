@@ -5,7 +5,7 @@
 -- File       : SsiAxiMaster.vhd
 -- Author     : Ryan Herbst, rherbst@slac.stanford.edu
 -- Created    : 2014-04-09
--- Last update: 2015-05-29
+-- Last update: 2016-01-27
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -47,8 +47,8 @@ entity SsiAxiMaster is
       FIFO_PAUSE_THRESH_G : integer range 1 to (2**24) := 2**8;
 
       -- AXI IO Config
-      AXI_STREAM_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(16);--AXI_STREAM_CONFIG_INIT_C;
-      AXI_BUS_CONFIG_G    : AxiConfigType       := (ADDR_WIDTH_C => 33, DATA_BYTES_C => 4, ID_BITS_C => 1, LEN_BITS_C => 8); --AXI_CONFIG_INIT_C;
+      AXI_STREAM_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(16);  --AXI_STREAM_CONFIG_INIT_C;
+      AXI_BUS_CONFIG_G    : AxiConfigType       := (ADDR_WIDTH_C => 33, DATA_BYTES_C => 4, ID_BITS_C => 1, LEN_BITS_C => 8);  --AXI_CONFIG_INIT_C;
       AXI_READ_EN_G       : boolean             := true;
       AXI_WRITE_EN_G      : boolean             := false);
    port (
@@ -109,6 +109,7 @@ architecture rtl of SsiAxiMaster is
    type RegType is record
       state           : StateType;
       gotTLast        : sl;
+      gotBlank        : sl;
       rdDmaReq        : AxiReadDmaReqType;
       wrDmaReq        : AxiWriteDmaReqType;
       rdDmaAxisSlave  : AxiStreamSlaveType;
@@ -119,10 +120,11 @@ architecture rtl of SsiAxiMaster is
 
    constant REG_INIT_C : RegType := (
       state           => IDLE_S,
-      gotTLast => '0',
+      gotBlank        => '0',
+      gotTLast        => '0',
       rdDmaReq        => AXI_READ_DMA_REQ_INIT_C,
       wrDmaReq        => AXI_WRITE_DMA_REQ_INIT_C,
-      rdDmaAxisSlave => AXI_STREAM_SLAVE_INIT_C,
+      rdDmaAxisSlave  => AXI_STREAM_SLAVE_INIT_C,
       wrDmaAxisMaster => axiStreamMasterInit(INTERNAL_AXIS_CONFIG_C),
       sFifoAxisSlave  => AXI_STREAM_SLAVE_INIT_C,
       mFifoAxisMaster => axiStreamMasterInit(INTERNAL_AXIS_CONFIG_C));
@@ -217,8 +219,8 @@ begin
             axisMaster    => rdDmaAxisMaster,         -- [out]
             axisSlave     => rdDmaAxisSlave,          -- [in]
             axisCtrl      => AXI_STREAM_CTRL_INIT_C,  -- [in]
-            axiReadMaster => mAxiReadMaster,           -- [out]
-            axiReadSlave  => mAxiReadSlave);           -- [in]
+            axiReadMaster => mAxiReadMaster,          -- [out]
+            axiReadSlave  => mAxiReadSlave);          -- [in]
    end generate AXI_READ_ENABLED;
 
    AXI_READ_DISABLED : if (not AXI_READ_EN_G) generate
@@ -226,7 +228,7 @@ begin
       rdDmaAck.readError  <= '1';
       rdDmaAck.errorValue <= AXI_RESP_SLVERR_C;
       rdDmaAxisMaster     <= AXI_STREAM_MASTER_INIT_C;
-      mAxiReadMaster       <= AXI_READ_MASTER_INIT_C;
+      mAxiReadMaster      <= AXI_READ_MASTER_INIT_C;
    end generate AXI_READ_DISABLED;
 
    AXI_WRITE_ENABLED : if (AXI_WRITE_EN_G) generate
@@ -245,8 +247,8 @@ begin
             dmaAck         => wrDmaAck,         -- [out]
             axisMaster     => wrDmaAxisMaster,  -- [in]
             axisSlave      => wrDmaAxisSlave,   -- [out]
-            axiWriteMaster => mAxiWriteMaster,   -- [out]
-            axiWriteSlave  => mAxiWriteSlave,    -- [in]
+            axiWriteMaster => mAxiWriteMaster,  -- [out]
+            axiWriteSlave  => mAxiWriteSlave,   -- [in]
             axiWriteCtrl   => open);            -- [in]
    end generate AXI_WRITE_ENABLED;
 
@@ -257,9 +259,9 @@ begin
       wrDmaAck.writeError <= '1';
       wrDmaAck.errorValue <= AXI_RESP_SLVERR_C;
       wrDmaAxisSlave      <= AXI_STREAM_SLAVE_FORCE_C;
-      mAxiWriteMaster      <= AXI_WRITE_MASTER_INIT_C;
+      mAxiWriteMaster     <= AXI_WRITE_MASTER_INIT_C;
    end generate AXI_WRITE_DISABLED;
-   
+
    -------------------------------------
    -- Master State Machine
    -------------------------------------
@@ -295,7 +297,11 @@ begin
             if (sFifoAxisMaster.tValid = '1' and v.mFifoAxisMaster.tValid = '0') then
                v.sFifoAxisSlave.tReady := '1';
                v.mFifoAxisMaster       := sFifoAxisMaster;
-               v.state := SIZE_S;
+               v.gotBlank              := '1';
+               if (r.gotBlank = '1') then
+                  v.state    := SIZE_S;
+                  v.gotBlank := '0';
+               end if;
 
                -- Guard against early frame termination
                if (sFifoAxisMaster.tLast = '1') then
@@ -312,7 +318,7 @@ begin
                -- Grab size
                v.wrDmaReq.maxSize(31 downto 2) := sFifoAxisMaster.tData(29 downto 0);
                v.rdDmaReq.size(31 downto 2)    := sFifoAxisMaster.tData(29 downto 0);
-               v.state            := ADDR_S;
+               v.state                         := ADDR_S;
 
                -- Guard against early frame termination
                if sFifoAxisMaster.tLast = '1' then

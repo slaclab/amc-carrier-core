@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-01-12
+-- Last update: 2016-01-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -26,27 +26,27 @@ use work.Pgp2bPkg.all;
 entity BsaRawDiagnostic is
 
    generic (
-      TPD_G               : time                  := 1 ns;
-      DIAGNOSTIC_SIZE_G   : positive range 1 to 8 := 1;
-      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType   := ssiAxiStreamConfig(4);
-      OUTPUT_CONFIG_G     : AxiStreamConfigType   := ssiAxiStreamConfig(16)
+      TPD_G                    : time                  := 1 ns;
+      DIAGNOSTIC_RAW_STREAMS_G : positive range 1 to 8 := 1;
+      DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray  := (0 => ssiAxiStreamConfig(4));
+      OUTPUT_CONFIG_G          : AxiStreamConfigType   := ssiAxiStreamConfig(16)
       );
    port (
-      diagnosticClk     : in  sl;
-      diagnosticRst     : in  sl;
-      diagnosticMasters : in  AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticSlaves  : out AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticCtrl    : out AxiStreamCtrlArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      axiClk            : in  sl;
-      axiRst            : in  sl;
-      axiWriteMaster    : out AxiWriteMasterType;
-      axiWriteSlave     : in  AxiWriteSlaveType;
-      axiReadMaster     : out AxiReadMasterType;
-      axiReadSlave      : in  AxiReadSlaveType;
-      bufClk            : in  sl;
-      bufRst            : in  sl;
-      bufMaster         : out AxiStreamMasterType;
-      bufSlave          : in  AxiStreamSlaveType);
+      diagnosticRawClks    : in  slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawRsts    : in  slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawMasters : in  AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawSlaves  : out AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawCtrl    : out AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      axiClk               : in  sl;
+      axiRst               : in  sl;
+      axiWriteMaster       : out AxiWriteMasterType;
+      axiWriteSlave        : in  AxiWriteSlaveType;
+      axiReadMaster        : out AxiReadMasterType;
+      axiReadSlave         : in  AxiReadSlaveType;
+      bufClk               : in  sl;
+      bufRst               : in  sl;
+      bufMaster            : out AxiStreamMasterType;
+      bufSlave             : in  AxiStreamSlaveType);
 
 end entity BsaRawDiagnostic;
 
@@ -67,8 +67,8 @@ architecture rtl of BsaRawDiagnostic is
    signal full : slv(7 downto 0);
 
    -- Mux in 
-   signal muxInAxisMaster : AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-   signal muxInAxisSlave  : AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+   signal muxInAxisMaster : AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+   signal muxInAxisSlave  : AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
 
    -- Mux out    
    signal muxOutAxisMaster : AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
@@ -156,7 +156,7 @@ begin
 
    -- Input fifos
    -- These should probably be 4k deep for best throughput
-   AXIS_IN_FIFOS : for i in DIAGNOSTIC_SIZE_G-1 downto 0 generate
+   AXIS_IN_FIFOS : for i in DIAGNOSTIC_RAW_STREAMS_G-1 downto 0 generate
       AxiStreamFifo : entity work.AxiStreamFifo
          generic map (
             TPD_G => TPD_G,
@@ -173,13 +173,13 @@ begin
             FIFO_FIXED_THRESH_G => true,
             FIFO_PAUSE_THRESH_G => 1,   --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
 
-            SLAVE_AXI_CONFIG_G  => DIAGNOSTIC_CONFIG_G,    -- 32-bit
+            SLAVE_AXI_CONFIG_G  => DIAGNOSTIC_RAW_CONFIGS_G(i),
             MASTER_AXI_CONFIG_G => INTERNAL_AXI_CONFIG_C)  -- 128-bit
          port map (
-            sAxisClk    => diagnosticClk,
-            sAxisRst    => diagnosticRst,
-            sAxisMaster => diagnosticMasters(i),
-            sAxisSlave  => diagnosticSlaves(i),
+            sAxisClk    => diagnosticRawClks(i),
+            sAxisRst    => diagnosticRawRsts(i),
+            sAxisMaster => diagnosticRawMasters(i),
+            sAxisSlave  => diagnosticRawSlaves(i),
             sAxisCtrl   => open,                           -- Control port assigned by DDR fifo with delay but shows if error occured
             mAxisClk    => axiClk,
             mAxisRst    => axiRst,
@@ -191,7 +191,7 @@ begin
    AxiStreamMux_INST : entity work.AxiStreamMux
       generic map (
          TPD_G         => TPD_G,
-         NUM_SLAVES_G  => DIAGNOSTIC_SIZE_G,
+         NUM_SLAVES_G  => DIAGNOSTIC_RAW_STREAMS_G,
          PIPE_STAGES_G => 1,
          TDEST_HIGH_G  => 7,
          TDEST_LOW_G   => 0,
@@ -282,29 +282,29 @@ begin
          vfifo_idle               => idle);
 
    -------------------------------------------------------------------------------------------------
-   -- Synchronize back to the sAxis clock domain
+   -- Synchronize flow control back to the sAxis clock domain
    -------------------------------------------------------------------------------------------------
-   SYNCS : for i in DIAGNOSTIC_SIZE_G-1 downto 0 generate
+   SYNCS : for i in DIAGNOSTIC_RAW_STREAMS_G-1 downto 0 generate
       Synchronizer_1 : entity work.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
-            clk     => diagnosticClk,
-            rst     => diagnosticRst,
+            clk     => diagnosticRawClks(i),
+            rst     => diagnosticRawRsts(i),
             dataIn  => idle(i),
-            dataOut => diagnosticCtrl(i).idle);
+            dataOut => diagnosticRawCtrl(i).idle);
 
       Synchronizer_2 : entity work.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
-            clk     => diagnosticClk,
-            rst     => diagnosticRst,
+            clk     => diagnosticRawClks(i),
+            rst     => diagnosticRawRsts(i),
             dataIn  => full(i),
-            dataOut => diagnosticCtrl(i).pause);
+            dataOut => diagnosticRawCtrl(i).pause);
 
       -- Put overflow to '0'
-      diagnosticCtrl(i).overflow <= '0';
+      diagnosticRawCtrl(i).overflow <= '0';
 
    end generate SYNCS;
 
