@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2015-10-09
+-- Last update: 2016-01-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -35,11 +35,11 @@ use work.AmcCarrierPkg.all;
 
 entity AmcCarrierEmptyApp is
    generic (
-      TPD_G               : time                := 1 ns;
-      SIM_SPEEDUP_G       : boolean             := false;
-      AXI_ERROR_RESP_G    : slv(1 downto 0)     := AXI_RESP_DECERR_C;
-      DIAGNOSTIC_SIZE_G   : positive            := 1;
-      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
+      TPD_G                    : time                 := 1 ns;
+      SIM_SPEEDUP_G            : boolean              := false;
+      AXI_ERROR_RESP_G         : slv(1 downto 0)      := AXI_RESP_DECERR_C;
+      DIAGNOSTIC_RAW_STREAMS_G : positive             := 1;
+      DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray := (0 => ssiAxiStreamConfig(4)));
    port (
       -----------------------
       -- Application Ports --
@@ -82,27 +82,30 @@ entity AmcCarrierEmptyApp is
       -- Top Level Interface
       ----------------------
       -- AXI-Lite Interface (regClk domain)
-      regClk            : out sl;
-      regRst            : out sl;
-      regReadMaster     : in  AxiLiteReadMasterType;
-      regReadSlave      : out AxiLiteReadSlaveType;
-      regWriteMaster    : in  AxiLiteWriteMasterType;
-      regWriteSlave     : out AxiLiteWriteSlaveType;
+      regClk               : out sl;
+      regRst               : out sl;
+      regReadMaster        : in  AxiLiteReadMasterType;
+      regReadSlave         : out AxiLiteReadSlaveType;
+      regWriteMaster       : in  AxiLiteWriteMasterType;
+      regWriteSlave        : out AxiLiteWriteSlaveType;
       -- Timing Interface (timingClk domain) 
-      timingClk         : out sl;
-      timingRst         : out sl;
-      timingBus         : in  TimingBusType;
+      timingClk            : out sl;
+      timingRst            : out sl;
+      timingBus            : in  TimingBusType;
       -- Diagnostic Interface (diagnosticClk domain)
-      diagnosticClk     : out sl;
-      diagnosticRst     : out sl;
-      diagnosticBus     : out DiagnosticBusType;
-      diagnosticMasters : out AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticSlaves  : in  AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      diagnosticClk        : out sl;
+      diagnosticRst        : out sl;
+      diagnosticBus        : out DiagnosticBusType;
+      diagnosticRawClks    : out slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawRsts    : out slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawMasters : out AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawSlaves  : in  AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawCtrl    : in  AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
       -- Support Reference Clocks and Resets
-      recTimingClk      : in  sl;
-      recTimingRst      : in  sl;
-      ref156MHzClk      : in  sl;
-      ref156MHzRst      : in  sl);
+      recTimingClk         : in  sl;
+      recTimingRst         : in  sl;
+      ref156MHzClk         : in  sl;
+      ref156MHzRst         : in  sl);
 end AmcCarrierEmptyApp;
 
 architecture top_level_app of AmcCarrierEmptyApp is
@@ -110,10 +113,19 @@ architecture top_level_app of AmcCarrierEmptyApp is
    signal clk : sl;
    signal rst : sl;
 
+   constant AXIL_MASTERS_C : integer := 2;
+
+   signal locAxilWriteMasters : AxiLiteWriteMasterArray(AXIL_MASTERS_C-1 downto 0);
+   signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(AXIL_MASTERS_C-1 downto 0);
+   signal locAxilReadMasters  : AxiLiteReadMasterArray(AXIL_MASTERS_C-1 downto 0);
+   signal locAxilReadSlaves   : AxiLiteReadSlaveArray(AXIL_MASTERS_C-1 downto 0);
+
 begin
 
    clk                         <= ref156MHzClk;
    rst                         <= ref156MHzRst;
+   regClk                      <= clk;
+   regRst                      <= rst;
    timingClk                   <= clk;
    timingRst                   <= rst;
    diagnosticClk               <= clk;
@@ -121,17 +133,59 @@ begin
    diagnosticBus.strobe        <= timingBus.strobe;
    diagnosticBus.timingMessage <= timingBus.message;
    diagnosticBus.data          <= (others => x"3F800000");  -- 1.0
-   diagnosticMasters           <= (others => AXI_STREAM_MASTER_INIT_C);
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+   diagnosticRawClks <= (others => clk);
+   diagnosticRawRsts <= (others => rst);
+
+   U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
       generic map (
-         TPD_G => TPD_G)
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => AXIL_MASTERS_C,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         MASTERS_CONFIG_G   => genAxiLiteConfig(2, APP_REG_BASE_ADDR_C, 16, 12),
+         DEBUG_G            => true)
       port map (
-         axiClk         => clk,
-         axiClkRst      => rst,
-         axiReadMaster  => regReadMaster,
-         axiReadSlave   => regReadSlave,
-         axiWriteMaster => regWriteMaster,
-         axiWriteSlave  => regWriteSlave);
+         axiClk              => clk,                  -- [in]
+         axiClkRst           => rst,                  -- [in]
+         sAxiWriteMasters(0) => regWriteMaster,       -- [in]
+         sAxiWriteSlaves(0)  => regWriteSlave,        -- [out]
+         sAxiReadMasters(0)  => regReadMaster,        -- [in]
+         sAxiReadSlaves(0)   => regReadSlave,         -- [out]
+         mAxiWriteMasters    => locAxilWriteMasters,  -- [out]
+         mAxiWriteSlaves     => locAxilWriteSlaves,   -- [in]
+         mAxiReadMasters     => locAxilReadMasters,   -- [out]
+         mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
+
+   PRBS_GEN : for i in 1 downto 0 generate
+      U_SsiPrbsTx_1 : entity work.SsiPrbsTx
+         generic map (
+            TPD_G                      => TPD_G,
+            AXI_ERROR_RESP_G           => AXI_ERROR_RESP_G,
+            BRAM_EN_G                  => false,
+            USE_BUILT_IN_G             => false,
+            GEN_SYNC_FIFO_G            => true,
+            FIFO_ADDR_WIDTH_G          => 4,
+            FIFO_PAUSE_THRESH_G        => 2**4-1,
+            MASTER_AXI_STREAM_CONFIG_G => DIAGNOSTIC_RAW_CONFIGS_G(i),
+            MASTER_AXI_PIPE_STAGES_G   => 0)
+         port map (
+            mAxisClk        => clk,                      -- [in]
+            mAxisRst        => rst,                      -- [in]
+            mAxisMaster     => diagnosticRawMasters(i),  -- [out]
+            mAxisSlave      => diagnosticRawSlaves(i),   -- [in]
+            locClk          => clk,                      -- [in]
+            locRst          => rst,                      -- [in]
+--          trig            => trig,             -- [in]
+--          packetLength    => packetLength,     -- [in]
+--          forceEofe       => forceEofe,        -- [in]
+            busy            => open,                     -- [out]
+--          tDest           => tDest,            -- [in]
+--          tId             => tId,              -- [in]
+            axilReadMaster  => locAxilReadMasters(i),    -- [in]
+            axilReadSlave   => locAxilReadSlaves(i),     -- [out]
+            axilWriteMaster => locAxilWriteMasters(i),   -- [in]
+            axilWriteSlave  => locAxilWriteSlaves(i));   -- [out]
+   end generate PRBS_GEN;
 
 end top_level_app;

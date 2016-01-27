@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-10-16
+-- Last update: 2015-11-17
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ architecture mapping of AmcCarrierDdrMem is
       ADDR_WIDTH_C => 33,
       DATA_BYTES_C => 64,
       ID_BITS_C    => 4,
-      LEN_BITS_C   => 8);
+      LEN_BITS_C => 8);
 
    constant START_ADDR_C : slv(AXI_CONFIG_C.ADDR_WIDTH_C-1 downto 0) := (others => '0');
    constant STOP_ADDR_C  : slv(AXI_CONFIG_C.ADDR_WIDTH_C-1 downto 0) := (others => '1');

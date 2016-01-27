@@ -48,7 +48,7 @@ package AmcCarrierRegPkg is
    constant DDR_ADDR_C        : slv(31 downto 0) := x"0B000000";
    constant MPS_ADDR_C        : slv(31 downto 0) := x"0C000000";
    constant APP_ADDR_C        : slv(31 downto 0) := x"80000000";
-   
+
    constant XBAR_TIME_GEN_C : Slv2Array(3 downto 0) := (
       3 => "01",                        -- OUT[3] = IN[1], DIST1 = FPGA
       2 => "01",                        -- OUT[2] = IN[1], DIST0 = FPGA
@@ -73,42 +73,29 @@ package AmcCarrierRegPkg is
       1 => "10",                        -- OUT[1] = IN[2], FPGA  = Backplane timing
       0 => "00");                       -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)      
 
-   function xbarDefault(appType : AppType; sel : boolean) return Slv2Array;
+   function xbarDefault(app : AppType; sel : boolean) return Slv2Array;
 
 end package AmcCarrierRegPkg;
 
 package body AmcCarrierRegPkg is
 
-   function xbarDefault (appType : AppType; sel : boolean) return Slv2Array is
+   function xbarDefault (app : AppType; sel : boolean) return Slv2Array is
       variable retVar : Slv2Array(3 downto 0);
    begin
-      case appType is
-         -- Check for Timing Generator Node
-         when APP_TIME_GEN_TYPE_C =>
-            retVar := XBAR_TIME_GEN_C;
-         -- Check for MPS Link Node
-         when APP_MPS_LINK_AIN_TYPE_C =>
-            if sel then
-               retVar := XBAR_MPS_I_LINK_C;
-            else
-               retVar := XBAR_MPS_II_LINK_C;
-            end if;
-         when APP_MPS_LINK_DIN_TYPE_C =>
-            if sel then
-               retVar := XBAR_MPS_I_LINK_C;
-            else
-               retVar := XBAR_MPS_II_LINK_C;
-            end if;
-         when APP_MPS_LINK_MIXED_TYPE_C =>
-            if sel then
-               retVar := XBAR_MPS_I_LINK_C;
-            else
-               retVar := XBAR_MPS_II_LINK_C;
-            end if;
-         -- Else Application Node
-         when others =>
-            retVar := XBAR_APP_NODE_C;
-      end case;
+      if (app = APP_TIME_GEN_TYPE_C) then  -- Check for Timing Generator Node
+         retVar := XBAR_TIME_GEN_C;
+      elsif (app = APP_MPS_LINK_AIN_TYPE_C or
+             app = APP_MPS_LINK_DIN_TYPE_C or
+             app = APP_MPS_LINK_MIXED_TYPE_C) then  -- Check for MPS Link Node
+         if sel then
+            retVar := XBAR_MPS_I_LINK_C;
+         else
+            retVar := XBAR_MPS_II_LINK_C;
+         end if;
+
+      else      -- Else Application Node
+         retVar := XBAR_APP_NODE_C;
+      end if;
       return retVar;
    end function;
 

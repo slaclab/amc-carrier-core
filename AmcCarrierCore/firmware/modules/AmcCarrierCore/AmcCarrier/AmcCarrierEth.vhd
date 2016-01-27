@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-01-15
+-- Last update: 2016-01-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -176,16 +176,16 @@ begin
          SERVER_PORTS_G     => SERVER_PORTS_C,
          SERVER_MTU_G       => SERVER_MTU_C,
          -- UDP Client Generics
-         CLIENT_EN_G        => false,   -- Place holder for future implementation
+         CLIENT_EN_G        => false,       -- Place holder for future implementation
          CLIENT_SIZE_G      => CLIENT_SIZE_C,
          CLIENT_PORTS_G     => CLIENT_PORTS_C,
          CLIENT_MTU_G       => CLIENT_MTU_C,
          -- IPv4/ARP Generics
          CLK_FREQ_G         => 156.25E+06,  -- In units of Hz
-         COMM_TIMEOUT_EN_G  => true,    -- Disable the timeout by setting to false
-         COMM_TIMEOUT_G     => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
+         COMM_TIMEOUT_EN_G  => true,        -- Disable the timeout by setting to false
+         COMM_TIMEOUT_G     => 30,          -- In units of seconds, Client's Communication timeout before re-ARPing
          ARP_TIMEOUT_G      => 156250000,   -- 1 second ARP request timeout
-         VLAN_G             => false)   -- no VLAN
+         VLAN_G             => false)       -- no VLAN
       port map (
          -- Local Configurations
          localMac         => localMac,
@@ -209,7 +209,7 @@ begin
          ibClientSlaves   => ibClientSlaves,
          -- Clock and Reset
          clk              => axilClk,
-         rst              => axilRst);   
+         rst              => axilRst);
 
    ---------------------
    -- AXI-Lite Interface
@@ -231,25 +231,22 @@ begin
          mAxilReadMasters  => mAxilReadMasters,
          mAxilReadSlaves   => mAxilReadSlaves,
          mAxilWriteMasters => mAxilWriteMasters,
-         mAxilWriteSlaves  => mAxilWriteSlaves);   
+         mAxilWriteSlaves  => mAxilWriteSlaves);
 
    ---------------------------------
    -- BSA Inbound/Outbound Interface
    ---------------------------------
-   GEN_BSA :
-   for i in 2 downto 0 generate
-      ibServerMasters(4+1) <= obBsaMasters(i);
-      obBsaSlaves(i)       <= ibServerSlaves(4+1);
-      ibBsaMasters(i)      <= obServerMasters(4+1);
-      obServerSlaves(4+1)  <= ibBsaSlaves(i);
-   end generate GEN_BSA;
+   ibServerMasters(6 downto 4) <= obBsaMasters;
+   obBsaSlaves                 <= ibServerSlaves(6 downto 4);
+   ibBsaMasters                <= obServerMasters(6 downto 4);
+   obServerSlaves(6 downto 4)  <= ibBsaSlaves;
 
    ------------------------
    -- FFB Inbound Interface
    ------------------------
    U_FfbIbMsg : entity work.AmcCarrierFfbIbMsg
       generic map (
-         TPD_G => TPD_G) 
+         TPD_G => TPD_G)
       port map (
          -- Clock and reset
          clk            => axilClk,
@@ -278,6 +275,6 @@ begin
          axiReadMaster  => axilReadMaster,
          axiReadSlave   => axilReadSlave,
          axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);   
+         axiWriteSlave  => axilWriteSlave);
 
 end mapping;

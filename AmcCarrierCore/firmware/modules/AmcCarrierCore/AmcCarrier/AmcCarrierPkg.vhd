@@ -55,13 +55,13 @@ package AmcCarrierPkg is
    ---------------------------------------------------   
    constant MPS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(2);
 
-   function getMpsChCnt(appType        : AppType) return natural;
-   function getMpsThresholdCnt(appType : AppType) return natural;
+   function getMpsChCnt(app        : AppType) return natural;
+   function getMpsThresholdCnt(app : AppType) return natural;
 
    -------------------------------------------------------------      
    -- Fast Feedback: Configurations, Constants and Records Types
    -------------------------------------------------------------      
-   function getFfbChCnt(appType : AppType) return natural;
+   function getFfbChCnt(app : AppType) return natural;
 
    type FfbBusType is record
       valid     : sl;
@@ -103,7 +103,7 @@ package AmcCarrierPkg is
    constant DIAGNOSTIC_BUS_INIT_C : DiagnosticBusType := (
       strobe        => '0',
       data          => (others => (others => '0')),
-      timingMessage => TIMING_MESSAGE_INIT_C);   
+      timingMessage => TIMING_MESSAGE_INIT_C);
 
    constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*32 + TIMING_MESSAGE_BITS_C;
 
@@ -114,81 +114,105 @@ end package AmcCarrierPkg;
 
 package body AmcCarrierPkg is
 
-   function getMpsChCnt (appType : AppType) return natural is
+   function getMpsChCnt (app : AppType) return natural is
       variable retVar : natural range 0 to 32;
    begin
-      case appType is
-         when APP_BCM_TYPE_C            => retVar := 0;  -- TBD value
-         when APP_BLEN_TYPE_C           => retVar := 0;  -- TBD value
-         when APP_BPM_TYPE_C            => retVar := 0;  -- TBD value
-         when APP_LLRF_TYPE_C           => retVar := 0;  -- TBD value
-         when APP_MPS_DIGITAL_TYPE_C    => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_AIN_TYPE_C   => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_DIN_TYPE_C   => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_MIXED_TYPE_C => retVar := 0;  -- TBD value
-         when others                    => retVar := 0;
-      end case;
+      if (app = APP_BCM_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_BLEN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_BPM_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_LLRF_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_DIGITAL_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      else
+         retVar := 0;
+      end if;
       return retVar;
    end function;
 
-   function getMpsThresholdCnt (appType : AppType) return natural is
+   function getMpsThresholdCnt (app : AppType) return natural is
       variable retVar : natural range 0 to 256;
    begin
-      case appType is
-         when APP_BCM_TYPE_C            => retVar := 0;  -- TBD value
-         when APP_BLEN_TYPE_C           => retVar := 0;  -- TBD value
-         when APP_BPM_TYPE_C            => retVar := 0;  -- TBD value
-         when APP_LLRF_TYPE_C           => retVar := 0;  -- TBD value
-         when APP_MPS_DIGITAL_TYPE_C    => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_AIN_TYPE_C   => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_DIN_TYPE_C   => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_MIXED_TYPE_C => retVar := 0;  -- TBD value
-         when others                    => retVar := 0;
-      end case;
+      if (app = APP_BCM_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_BLEN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_BPM_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_LLRF_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_DIGITAL_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
+         retVar := 0;                   -- TBD value
+      else
+         retVar := 0;
+      end if;
       return retVar;
    end function;
 
-   function getFfbChCnt (appType : AppType) return natural is
+   function getFfbChCnt (app : AppType) return natural is
       variable retVar : natural range 0 to 32;
    begin
-      case appType is
-         when APP_BCM_TYPE_C            => retVar := 0;  -- TBD value
-         when APP_BLEN_TYPE_C           => retVar := 0;  -- TBD value
-         when APP_BPM_TYPE_C            => retVar := 0;  -- TBD value
-         when APP_LLRF_TYPE_C           => retVar := 0;  -- TBD value
-         when APP_MPS_DIGITAL_TYPE_C    => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_AIN_TYPE_C   => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_DIN_TYPE_C   => retVar := 0;  -- TBD value
-         when APP_MPS_LINK_MIXED_TYPE_C => retVar := 0;  -- TBD value
-         when others                    => retVar := 0;
-      end case;
-      return retVar;
-   end function;
+   if (app = APP_BCM_TYPE_C) then
+      retVar := 0;                      -- TBD value
+   elsif (app = APP_BLEN_TYPE_C) then
+      retVar := 0;                      -- TBD value
+   elsif (app = APP_BPM_TYPE_C) then
+      retVar := 0;                      -- TBD value
+   elsif (app = APP_LLRF_TYPE_C) then
+      retVar := 0;                      -- TBD value
+   elsif (app = APP_MPS_DIGITAL_TYPE_C) then
+      retVar := 0;                      -- TBD value
+   elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
+      retVar := 0;                      -- TBD value
+   elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
+      retVar := 0;                      -- TBD value
+   elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
+      retVar := 0;                      -- TBD value
+   else
+      retVar := 0;
+   end if;
+   return retVar;
+end function;
 
-   function toSlv (b : DiagnosticBusType) return slv is
-      variable vector : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0) := (others => '0');
-      variable i      : integer                               := 0;
-   begin
-      vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
-      i                                        := TIMING_MESSAGE_BITS_C;
-      for j in 0 to 31 loop
-         assignSlv(i, vector, b.data(j));
-      end loop;
-      assignSlv(i, vector, b.strobe);
-      return vector;
-   end function;
+function toSlv (b : DiagnosticBusType) return slv is
+   variable vector : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0) := (others => '0');
+   variable i      : integer                               := 0;
+begin
+   vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
+   i                                        := TIMING_MESSAGE_BITS_C;
+   for j in 0 to 31 loop
+      assignSlv(i, vector, b.data(j));
+   end loop;
+   assignSlv(i, vector, b.strobe);
+   return vector;
+end function;
 
-   function toDiagnosticBus (vec : slv) return DiagnosticBusType is
-      variable b : DiagnosticBusType;
-      variable i : integer := 0;
-   begin
-      b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
-      i               := TIMING_MESSAGE_BITS_C;
-      for j in 0 to 31 loop
-         assignRecord(i, vec, b.data(j));
-      end loop;
-      assignRecord(i, vec, b.strobe);
-      return b;
-   end function;
-   
+function toDiagnosticBus (vec : slv) return DiagnosticBusType is
+   variable b : DiagnosticBusType;
+   variable i : integer := 0;
+begin
+   b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
+   i               := TIMING_MESSAGE_BITS_C;
+   for j in 0 to 31 loop
+      assignRecord(i, vec, b.data(j));
+   end loop;
+   assignRecord(i, vec, b.strobe);
+   return b;
+end function;
+
 end package body AmcCarrierPkg;
