@@ -11,8 +11,8 @@
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 -- 
--- Note: Common-to-Application interface defined here (see URL below)
---       https://confluence.slac.stanford.edu/x/rLyMCw
+-- Note: Common-to-Application interface defined in HPS ESD: LCLSII-2.7-ES-0536
+--
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
