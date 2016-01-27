@@ -3,3 +3,8 @@ vhdl work rtl/BsaAccumulator.vhd
 vhdl work rtl/BsaAxiInterconnectWrapper.vhd
 vhdl work rtl/BsaRawDiagnostic.vhd
 vhdl work rtl/SsiAxiMaster.vhd
+
+vhdl work cores/BsaAxiInterconnect/BsaAxiInterconnect.dcp
+vhdl work cores/AxiStreamDdrFifo/AxiStreamDdrFifo.dcp
+vhdl work cores/BsaAddFpCore/BsaAddFpCore.dcp
+vhdl work cores/BsaConvFpCore/BsaConvFpCore.dcp
