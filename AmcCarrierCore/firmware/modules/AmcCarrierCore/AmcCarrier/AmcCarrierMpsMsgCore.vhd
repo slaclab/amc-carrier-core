@@ -122,14 +122,14 @@ begin
             -- Check if ready to move data
             if v.mpsMaster.tValid = '0' then
                -- Send the header 
-               v.mpsMaster.tValid                             := '1';
-               v.mpsMaster.tData(15 downto 8)                 := r.msgSize+5;  -- Length in units of bytes
-               v.mpsMaster.tData(7)                           := testMode;
-               v.mpsMaster.tData((AppType'length)-1 downto 0) := APP_TYPE_G;
+               v.mpsMaster.tValid                              := '1';
+               v.mpsMaster.tData(15)                           := testMode;
+               v.mpsMaster.tData((AppType'length)+ 7 downto 8) := APP_TYPE_G;
+               v.mpsMaster.tData(7 downto 0)                   := r.msgSize+5; -- Length in units of bytes
                -- Set SOF               
                ssiSetUserSof(MPS_CONFIG_C, v.mpsMaster, '1');
                -- Next state
-               v.state                                        := APP_ID_S;
+               v.state                                         := APP_ID_S;
             end if;
          ----------------------------------------------------------------------
          when APP_ID_S =>
