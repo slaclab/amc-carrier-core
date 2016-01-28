@@ -128,14 +128,16 @@ package body AmcCarrierPkg is
          retVar := 0;                   -- TBD value
       elsif (app = APP_LLRF_TYPE_C) then
          retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_APP_TYPE_C) then
+         retVar := 24;                  -- 6 channels * 4 integrations, RTH 01/27/2016
       elsif (app = APP_MPS_DIGITAL_TYPE_C) then
-         retVar := 0;                   -- TBD value
+         retVar := 12;                  -- 96 bits., RTH 01/27/2016
       elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
-         retVar := 0;                   -- TBD value
+         retVar := 24;                  -- 6 channels * 4 integrations, RTH 01/27/2016
       elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
-         retVar := 0;                   -- TBD value
+         retVar := 0;                   -- 0 channels, RTH 01/27/2016
       elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         retVar := 0;                   -- TBD value
+         retVar := 12;                  -- 3 channels * 4 integrations, RTH 01/27/2016
       else
          retVar := 0;
       end if;
@@ -153,14 +155,16 @@ package body AmcCarrierPkg is
          retVar := 0;                   -- TBD value
       elsif (app = APP_LLRF_TYPE_C) then
          retVar := 0;                   -- TBD value
+      elsif (app = APP_MPS_APP_TYPE_C) then
+         retVar := 16;                  -- 16, RTH 01/27/2016
       elsif (app = APP_MPS_DIGITAL_TYPE_C) then
-         retVar := 0;                   -- TBD value
+         retVar := 0;                   -- None, RTH 01/27/2016
       elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
-         retVar := 0;                   -- TBD value
+         retVar := 16;                  -- 16, RTH 01/27/2016
       elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
-         retVar := 0;                   -- TBD value
+         retVar := 0;                   -- None, RTH 01/27/2016
       elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         retVar := 0;                   -- TBD value
+         retVar := 16;                  -- 16, RTH 01/27/2016
       else
          retVar := 0;
       end if;
