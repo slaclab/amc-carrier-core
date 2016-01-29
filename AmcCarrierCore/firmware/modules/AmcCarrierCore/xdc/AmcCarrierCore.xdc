@@ -285,9 +285,9 @@ set_property -dict { PACKAGE_PIN K17 IOSTANDARD LVCMOS15 } [get_ports {ddrPwrEnL
 # create_pblock MIG_GRP; add_cells_to_pblock [get_pblocks MIG_GRP] [get_cells {U_Core/U_DdrMem/MigCore_Inst}]
 # resize_pblock [get_pblocks MIG_GRP] -add {CLOCKREGION_X2Y2:CLOCKREGION_X2Y4}
 
-# XAUI Area Constraint
-create_pblock XAUI_GRP; add_cells_to_pblock [get_pblocks XAUI_GRP] [get_cells {U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore}]
-resize_pblock [get_pblocks XAUI_GRP] -add {CLOCKREGION_X3Y2:CLOCKREGION_X3Y2}
+# # XAUI Area Constraint
+# create_pblock XAUI_GRP; add_cells_to_pblock [get_pblocks XAUI_GRP] [get_cells {U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore}]
+# resize_pblock [get_pblocks XAUI_GRP] -add {CLOCKREGION_X3Y2:CLOCKREGION_X3Y2}
 
 # SALT Area Constraint
 create_pblock SALT_GRP; 
