@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-15
+-- Last update: 2016-01-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ entity AmcGenericAdcDacCore is
       lmkStatus       : in    slv(1 downto 0);
       lmkSck          : out   sl;
       lmkDio          : inout sl;
-      lmkSync         : out   sl;
+      lmkSync         : out   slv(1 downto 0);
       lmkCsL          : out   sl;
       lmkRst          : out   sl;
       -- Fast ADC's SPI Ports
@@ -360,40 +360,46 @@ begin
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)    
       port map (
          -- AXI interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         rxReadMaster    => readMasters(JESD_RX_INDEX_C),
-         rxReadSlave     => readSlaves(JESD_RX_INDEX_C),
-         rxWriteMaster   => writeMasters(JESD_RX_INDEX_C),
-         rxWriteSlave    => writeSlaves(JESD_RX_INDEX_C),
-         txReadMaster    => readMasters(JESD_TX_INDEX_C),
-         txReadSlave     => readSlaves(JESD_TX_INDEX_C),
-         txWriteMaster   => writeMasters(JESD_TX_INDEX_C),
-         txWriteSlave    => writeSlaves(JESD_TX_INDEX_C),
+         axilClk            => axilClk,
+         axilRst            => axilRst,
+         rxReadMaster       => readMasters(JESD_RX_INDEX_C),
+         rxReadSlave        => readSlaves(JESD_RX_INDEX_C),
+         rxWriteMaster      => writeMasters(JESD_RX_INDEX_C),
+         rxWriteSlave       => writeSlaves(JESD_RX_INDEX_C),
+         txReadMaster       => readMasters(JESD_TX_INDEX_C),
+         txReadSlave        => readSlaves(JESD_TX_INDEX_C),
+         txWriteMaster      => writeMasters(JESD_TX_INDEX_C),
+         txWriteSlave       => writeSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         dataValidVec_o  => adcDav,
-         sampleDataArr_o => adcBigEnd,
-         sampleDataArr_i => dacBigEndMux,
+         dataValidVec_o(0)  => adcDav(1),     -- Swap CH0 and CH1 to match the front panel labels
+         dataValidVec_o(1)  => adcDav(0),     -- Swap CH0 and CH1 to match the front panel labels
+         dataValidVec_o(2)  => adcDav(2),
+         dataValidVec_o(3)  => adcDav(3),
+         sampleDataArr_o(0) => adcBigEnd(1),  -- Swap CH0 and CH1 to match the front panel labels
+         sampleDataArr_o(1) => adcBigEnd(0),  -- Swap CH0 and CH1 to match the front panel labels
+         sampleDataArr_o(2) => adcBigEnd(2),
+         sampleDataArr_o(3) => adcBigEnd(3),
+         sampleDataArr_i    => dacBigEndMux,
          -------
          -- JESD
          -------
          -- Clocks
-         stableClk       => axilClk,
-         refClk          => refClk,
-         devClk_i        => jesdClk185,
-         devClk2_i       => jesdClk185,
-         devRst_i        => jesdRst185,
-         devClkActive_i  => jesdMmcmLocked,
+         stableClk          => axilClk,
+         refClk             => refClk,
+         devClk_i           => jesdClk185,
+         devClk2_i          => jesdClk185,
+         devRst_i           => jesdRst185,
+         devClkActive_i     => jesdMmcmLocked,
          -- GTH Ports
-         gtTxP           => jesdTxP,
-         gtTxN           => jesdTxN,
-         gtRxP           => jesdRxP,
-         gtRxN           => jesdRxN,
+         gtTxP              => jesdTxP,
+         gtTxN              => jesdTxN,
+         gtRxP              => jesdRxP,
+         gtRxN              => jesdRxN,
          -- SYSREF for subclass 1 fixed latency
-         sysRef_i        => jesdSysRef,
+         sysRef_i           => jesdSysRef,
          -- Synchronisation output combined from all receivers to be connected to ADC chips
-         nSync_o         => jesdRxSync,
-         nSync_i         => jesdTxSync);
+         nSync_o            => jesdRxSync,
+         nSync_i            => jesdTxSync);
 
    GEN_ADC_CH :
    for i in 3 downto 0 generate

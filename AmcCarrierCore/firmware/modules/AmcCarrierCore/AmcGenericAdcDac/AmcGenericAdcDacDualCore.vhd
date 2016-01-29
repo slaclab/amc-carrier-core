@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2015-12-16
+-- Last update: 2016-01-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ entity AmcGenericAdcDacDualCore is
       lmkStatus       : in    Slv2Array(1 downto 0);
       lmkSck          : out   slv(1 downto 0);
       lmkDio          : inout slv(1 downto 0);
-      lmkSync         : out   slv(1 downto 0);
+      lmkSync         : out   Slv2Array(1 downto 0);
       lmkCsL          : out   slv(1 downto 0);
       lmkRst          : out   slv(1 downto 0);
       -- Fast ADC's SPI Ports

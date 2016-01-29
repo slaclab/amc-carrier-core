@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-26
+-- Last update: 2016-01-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ entity AmcGenericAdcDacCtrl is
       lmkClkSel       : out slv(1 downto 0);
       lmkStatus       : in  slv(1 downto 0);
       lmkRst          : out sl;
-      lmkSync         : out sl);
+      lmkSync         : out slv(1 downto 0));
 end AmcGenericAdcDacCtrl;
 
 architecture rtl of AmcGenericAdcDacCtrl is
@@ -359,7 +359,7 @@ begin
       axilReadSlave  <= r.axilReadSlave;
       lmkClkSel      <= r.lmkClkSel;
       lmkRst         <= r.lmkRst;
-      lmkSync        <= r.lmkSync;
+      lmkSync        <= (others => r.lmkSync);
       
    end process comb;
 
