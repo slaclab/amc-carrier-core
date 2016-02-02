@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-01-26
+-- Last update: 2016-01-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -21,7 +21,6 @@ use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.AxiPkg.all;
 use work.SsiPkg.all;
-use work.Pgp2bPkg.all;
 
 entity BsaRawDiagnostic is
 
@@ -276,7 +275,14 @@ begin
          m_axi_rvalid   => axiReadSlave.rvalid,
          m_axi_rready   => axiReadMaster.rready,
 
-         vfifo_mm2s_channel_full  => (others => sofOutAxisCtrl.pause),
+         vfifo_mm2s_channel_full(7)  => sofOutAxisCtrl.pause,
+         vfifo_mm2s_channel_full(6)  => sofOutAxisCtrl.pause,
+         vfifo_mm2s_channel_full(5)  => sofOutAxisCtrl.pause,
+         vfifo_mm2s_channel_full(4)  => sofOutAxisCtrl.pause,
+         vfifo_mm2s_channel_full(3)  => sofOutAxisCtrl.pause,
+         vfifo_mm2s_channel_full(2)  => sofOutAxisCtrl.pause,
+         vfifo_mm2s_channel_full(1)  => sofOutAxisCtrl.pause,
+         vfifo_mm2s_channel_full(0)  => sofOutAxisCtrl.pause,         
          vfifo_s2mm_channel_full  => full,
          vfifo_mm2s_channel_empty => open,
          vfifo_idle               => idle);

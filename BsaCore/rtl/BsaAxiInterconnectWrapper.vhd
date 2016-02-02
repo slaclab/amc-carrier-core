@@ -7,18 +7,17 @@ use work.AxiLitePkg.all;
 use work.AxiPkg.all;
 
 entity BsaAxiInterconnectWrapper is
-
    port (
       axiClk           : in  sl;
       axiRst           : in  sl;
-      sAxiWriteMasters : in  AxiWriteMasterArray(2 downto 0);
-      sAxiWriteSlaves  : out AxiWriteSlaveArray(2 downto 0);
-      sAxiReadMasters  : in  AxiReadMasterArray(2 downto 0);
-      sAxiReadSlaves   : out AxiReadSlaveArray(2 downto 0);
-      mAxiWriteMasters : out AxiWriteMasterType;
-      mAxiWriteSlaves  : in  AxiWriteSlaveType;
-      mAxiReadMasters  : out AxiReadMasterType;
-      mAxiReadSlaves   : in  AxiReadSlaveType);
+      sAxiWriteMasters : in  AxiWriteMasterArray(2 downto 0) := (others => AXI_WRITE_MASTER_INIT_C);
+      sAxiWriteSlaves  : out AxiWriteSlaveArray(2 downto 0) := (others => AXI_WRITE_SLAVE_INIT_C);
+      sAxiReadMasters  : in  AxiReadMasterArray(2 downto 0) := (others => AXI_READ_MASTER_INIT_C);
+      sAxiReadSlaves   : out AxiReadSlaveArray(2 downto 0) := (others => AXI_READ_SLAVE_INIT_C);
+      mAxiWriteMasters : out AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+      mAxiWriteSlaves  : in  AxiWriteSlaveType := AXI_WRITE_SLAVE_INIT_C;
+      mAxiReadMasters  : out AxiReadMasterType := AXI_READ_MASTER_INIT_C;
+      mAxiReadSlaves   : in  AxiReadSlaveType := AXI_READ_SLAVE_INIT_C);
 
 end entity BsaAxiInterconnectWrapper;
 
@@ -41,8 +40,8 @@ architecture rtl of BsaAxiInterconnectWrapper is
          S00_AXI_AWQOS        : in  std_logic_vector(3 downto 0);
          S00_AXI_AWVALID      : in  std_logic;
          S00_AXI_AWREADY      : out std_logic;
-         S00_AXI_WDATA        : in  std_logic_vector(31 downto 0);
-         S00_AXI_WSTRB        : in  std_logic_vector(3 downto 0);
+         S00_AXI_WDATA        : in  std_logic_vector(127 downto 0);
+         S00_AXI_WSTRB        : in  std_logic_vector(15 downto 0);
          S00_AXI_WLAST        : in  std_logic;
          S00_AXI_WVALID       : in  std_logic;
          S00_AXI_WREADY       : out std_logic;
@@ -62,7 +61,7 @@ architecture rtl of BsaAxiInterconnectWrapper is
          S00_AXI_ARVALID      : in  std_logic;
          S00_AXI_ARREADY      : out std_logic;
          S00_AXI_RID          : out std_logic_vector(0 downto 0);
-         S00_AXI_RDATA        : out std_logic_vector(31 downto 0);
+         S00_AXI_RDATA        : out std_logic_vector(127 downto 0);
          S00_AXI_RRESP        : out std_logic_vector(1 downto 0);
          S00_AXI_RLAST        : out std_logic;
          S00_AXI_RVALID       : out std_logic;
@@ -196,7 +195,7 @@ begin
    U_BsaAxiInterconnect : BsaAxiInterconnect
       port map (
          INTERCONNECT_ACLK    => axiClk,
-         INTERCONNECT_ARESETN => axiRst,
+         INTERCONNECT_ARESETN => axiRstL,
          S00_AXI_ARESET_OUT_N => open,
          S00_AXI_ACLK         => axiClk,
          S00_AXI_AWID         => sAxiWriteMasters(0).AWID(0 downto 0),
@@ -210,8 +209,8 @@ begin
          S00_AXI_AWQOS        => sAxiWriteMasters(0).AWQOS(3 downto 0),
          S00_AXI_AWVALID      => sAxiWriteMasters(0).AWVALID,
          S00_AXI_AWREADY      => sAxiWriteSlaves(0).AWREADY,
-         S00_AXI_WDATA        => sAxiWriteMasters(0).WDATA(31 downto 0),
-         S00_AXI_WSTRB        => sAxiWriteMasters(0).WSTRB(3 downto 0),
+         S00_AXI_WDATA        => sAxiWriteMasters(0).WDATA(127 downto 0),
+         S00_AXI_WSTRB        => sAxiWriteMasters(0).WSTRB(15 downto 0),
          S00_AXI_WLAST        => sAxiWriteMasters(0).WLAST,
          S00_AXI_WVALID       => sAxiWriteMasters(0).WVALID,
          S00_AXI_WREADY       => sAxiWriteSlaves(0).WREADY,
@@ -231,7 +230,7 @@ begin
          S00_AXI_ARVALID      => sAxiReadMasters(0).ARVALID,
          S00_AXI_ARREADY      => sAxiReadSlaves(0).ARREADY,
          S00_AXI_RID          => sAxiReadSlaves(0).RID(0 downto 0),
-         S00_AXI_RDATA        => sAxiReadSlaves(0).RDATA(31 downto 0),
+         S00_AXI_RDATA        => sAxiReadSlaves(0).RDATA(127 downto 0),
          S00_AXI_RRESP        => sAxiReadSlaves(0).RRESP(1 downto 0),
          S00_AXI_RLAST        => sAxiReadSlaves(0).RLAST,
          S00_AXI_RVALID       => sAxiReadSlaves(0).RVALID,

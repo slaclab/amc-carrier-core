@@ -5,7 +5,7 @@
 -- File       : SsiAxiMaster.vhd
 -- Author     : Ryan Herbst, rherbst@slac.stanford.edu
 -- Created    : 2014-04-09
--- Last update: 2016-01-27
+-- Last update: 2016-02-01
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -297,17 +297,35 @@ begin
             if (sFifoAxisMaster.tValid = '1' and v.mFifoAxisMaster.tValid = '0') then
                v.sFifoAxisSlave.tReady := '1';
                v.mFifoAxisMaster       := sFifoAxisMaster;
-               v.gotBlank              := '1';
-               if (r.gotBlank = '1') then
-                  v.state    := SIZE_S;
-                  v.gotBlank := '0';
+
+               if (AXI_BUS_CONFIG_G.DATA_BYTES_C = 16) then
+                  v.mFifoAxisMaster.tLast := '0';  -- Hold off tlast
+                  v.wrDmaReq.maxSize(31 downto 2) := sFifoAxisMaster.tData(93 downto 64);
+                  v.rdDmaReq.size(31 downto 2)    := sFifoAxisMaster.tData(93 downto 64);
+                  v.wrDmaReq.address(32 downto 2) := sFifoAxisMaster.tData(126 downto 96);
+                  v.rdDmaReq.address(32 downto 2) := sFifoAxisMaster.tData(126 downto 96);
+                  if (sFifoAxisMaster.tData(127) = '0') then
+                     v.rdDmaReq.request := '1';
+                     v.state            := READ_S;
+                  else
+                     v.wrDmaReq.request := '1';
+                     v.state            := WRITE_S;
+                  end if;
+               else
+                  v.gotBlank := '1';
+                  if (r.gotBlank = '1') then
+                     v.state    := SIZE_S;
+                     v.gotBlank := '0';
+                  end if;
+
+                  -- Guard against early frame termination
+                  if (sFifoAxisMaster.tLast = '1') then
+                     v.state := IDLE_S;
+                  end if;
                end if;
 
-               -- Guard against early frame termination
-               if (sFifoAxisMaster.tLast = '1') then
-                  v.state := IDLE_S;
-               end if;
             end if;
+
 
          when SIZE_S =>
             -- Accept next word when ready and echo (SIZE)
@@ -358,7 +376,7 @@ begin
                v.mFifoAxisMaster       := rdDmaAxisMaster;
                v.mFifoAxisMaster.tLast := '0';          -- Suppress tLast
                v.mFifoAxisMaster.tUser := (others => '0');  -- No tUser
-               v.mFifoAxisMaster.tKeep := genTKeep(4);  -- tLast might have smaller tkeep but override
+               v.mFifoAxisMaster.tKeep := genTKeep(INTERNAL_AXIS_CONFIG_C.TDATA_BYTES_C);  -- tLast might have smaller tkeep but override
             end if;
 
             -- Write a tail word to output fifo when rdDma is done

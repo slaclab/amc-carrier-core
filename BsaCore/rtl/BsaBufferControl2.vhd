@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-01-26
+-- Last update: 2016-02-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ entity BsaBufferControl2 is
       BSA_BUFFERS_G           : natural range 1 to 64     := 64;
       BSA_ACCUM_FLOAT_G       : boolean                   := true;
       BSA_STREAM_BYTE_WIDTH_G : integer range 4 to 128    := 4;
-      DIAGNOSTIC_OUTPUTS_G    : integer range 1 to 32     := 24;
+      DIAGNOSTIC_OUTPUTS_G    : integer range 1 to 32     := 28;
       DDR_BURST_BYTES_G       : integer range 128 to 4096 := 2048;
       AXI_CONFIG_G            : AxiConfigType             := AXI_CONFIG_INIT_C);
 
@@ -73,15 +73,15 @@ end entity BsaBufferControl2;
 
 architecture rtl of BsaBufferControl2 is
 
-   constant AXIL_MASTERS_C : integer := 7;
+   constant AXIL_MASTERS_C : integer := 6;
 
    constant LOCAL_AXIL_C     : integer := 0;
    constant START_AXIL_C     : integer := 1;
    constant END_AXIL_C       : integer := 2;
    constant FIRST_AXIL_C     : integer := 3;
    constant LAST_AXIL_C      : integer := 4;
-   constant NEXT_AXIL_C      : integer := 5;
-   constant TIMESTAMP_AXIL_C : integer := 6;
+--   constant NEXT_AXIL_C      : integer := 5;
+   constant TIMESTAMP_AXIL_C : integer := 5;
 
    -- AxiLite bus gets synchronized to axi4 clk
    signal syncAxilWriteMaster : AxiLiteWriteMasterType;
@@ -154,18 +154,20 @@ architecture rtl of BsaBufferControl2 is
       diagnosticData  : Slv32Array(NUM_ACCUMULATIONS_C - 1 downto 0);
       bsaInitAxil     : slv(63 downto 0);
       bsaCompleteAxil : slv(63 downto 0);
+      bsaCompleteTmp : slv(63 downto 0);      
 
       ramAddr32 : sl;
 
-      bsaAddr        : slv(log2(BSA_BUFFERS_G)-1 downto 0);
+      wrBsaAddr      : slv(log2(BSA_BUFFERS_G)-1 downto 0);
+      rdBsaAddr      : slv(log2(BSA_BUFFERS_G)-1 downto 0);
       bsaAddrTemp    : slv(log2(BSA_BUFFERS_G)-1 downto 0);
       clearBsaBuffer : sl;
-      firstRamWe     : sl;
-      lastRamWe      : sl;
-      nextRamWe      : sl;
+      addrRamWe     : sl;
+--       lastRamWe      : sl;
+--       nextRamWe      : sl;
       firstAddr      : slv(31 downto 0);
       lastAddr       : slv(31 downto 0);
-      nextAddr       : slv(31 downto 0);
+--      nextAddr       : slv(31 downto 0);
       startAddr      : slv(31 downto 0);
       endAddr        : slv(31 downto 0);
 
@@ -188,16 +190,18 @@ architecture rtl of BsaBufferControl2 is
       diagnosticData  => (others => (others => '0')),
       bsaInitAxil     => (others => '0'),
       bsaCompleteAxil => (others => '0'),
+      bsaCompleteTmp => (others => '0'),      
       ramAddr32       => '0',
-      bsaAddr         => (others => '0'),
+      wrBsaAddr       => (others => '0'),
+      rdBsaAddr       => (others => '0'),
       bsaAddrTemp     => (others => '0'),
       clearBsaBuffer  => '0',
-      firstRamWe      => '0',
-      lastRamWe       => '0',
-      nextRamWe       => '0',
+      addrRamWe      => '0',
+--       lastRamWe       => '0',
+--       nextRamWe       => '0',
       firstAddr       => (others => '0'),
       lastAddr        => (others => '0'),
-      nextAddr        => (others => '0'),
+--      nextAddr        => (others => '0'),
       startAddr       => (others => '0'),
       endAddr         => (others => '0'),
       timestampEn     => '0',
@@ -221,7 +225,7 @@ architecture rtl of BsaBufferControl2 is
    signal endRamDout     : slv(31 downto 0);
    signal firstRamDout   : slv(31 downto 0);
    signal lastRamDout    : slv(31 downto 0);
-   signal nextRamDout    : slv(31 downto 0);
+--   signal nextRamDout    : slv(31 downto 0);
    signal timeStampRamWe : sl;
 
    signal dmaAck : AxiWriteDmaAckType;
@@ -254,7 +258,7 @@ begin
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => AXIL_MASTERS_C,
          DEC_ERROR_RESP_G   => AXI_RESP_DECERR_C,
-         MASTERS_CONFIG_G   => genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, 12, 8),  -- Up to 64 bsa Buffers
+         MASTERS_CONFIG_G   => genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, 16, 12),  -- Up to 64 bsa Buffers
          DEBUG_G            => true)
       port map (
          axiClk              => axiClk,                                              -- [in]
@@ -290,7 +294,7 @@ begin
          axiWriteSlave  => locAxilWriteSlaves(START_AXIL_C),
          clk            => axiClk,
          rst            => axiRst,
-         addr           => r.bsaAddr,
+         addr           => r.rdBsaAddr,
          dout           => startRamDout);
 
    -- End Addresses
@@ -312,7 +316,7 @@ begin
          axiWriteSlave  => locAxilWriteSlaves(END_AXIL_C),
          clk            => axiClk,
          rst            => axiRst,
-         addr           => r.bsaAddr,
+         addr           => r.rdBsaAddr,
          dout           => endRamDout);
 
    -- First Addresses
@@ -334,8 +338,8 @@ begin
          axiWriteSlave  => locAxilWriteSlaves(FIRST_AXIL_C),
          clk            => axiClk,
          rst            => axiRst,
-         we             => r.firstRamWe,
-         addr           => r.bsaAddr,
+         we             => r.addrRamWe,
+         addr           => r.wrBsaAddr,
          din            => r.firstAddr,
          dout           => firstRamDout);
 
@@ -358,34 +362,34 @@ begin
          axiWriteSlave  => locAxilWriteSlaves(LAST_AXIL_C),
          clk            => axiClk,
          rst            => axiRst,
-         we             => r.lastRamWe,
-         addr           => r.bsaAddr,
+         we             => r.addrRamWe,
+         addr           => r.wrBsaAddr,
          din            => r.lastAddr,
          dout           => lastRamDout);
 
    -- Next Addresses
-   U_AxiDualPortRam_Next : entity work.AxiDualPortRam
-      generic map (
-         TPD_G        => TPD_G,
-         BRAM_EN_G    => false,
-         REG_EN_G     => false,
-         AXI_WR_EN_G  => false,
-         SYS_WR_EN_G  => true,
-         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
-         DATA_WIDTH_G => 32)
-      port map (
-         axiClk         => axiClk,
-         axiRst         => axiRst,
-         axiReadMaster  => locAxilReadMasters(NEXT_AXIL_C),
-         axiReadSlave   => locAxilReadSlaves(NEXT_AXIL_C),
-         axiWriteMaster => locAxilWriteMasters(NEXT_AXIL_C),
-         axiWriteSlave  => locAxilWriteSlaves(NEXT_AXIL_C),
-         clk            => axiClk,
-         rst            => axiRst,
-         we             => r.nextRamWe,
-         addr           => r.bsaAddr,
-         din            => r.nextAddr,
-         dout           => nextRamDout);
+--    U_AxiDualPortRam_Next : entity work.AxiDualPortRam
+--       generic map (
+--          TPD_G        => TPD_G,
+--          BRAM_EN_G    => false,
+--          REG_EN_G     => false,
+--          AXI_WR_EN_G  => false,
+--          SYS_WR_EN_G  => true,
+--          ADDR_WIDTH_G => BSA_ADDR_BITS_C,
+--          DATA_WIDTH_G => 32)
+--       port map (
+--          axiClk         => axiClk,
+--          axiRst         => axiRst,
+--          axiReadMaster  => locAxilReadMasters(NEXT_AXIL_C),
+--          axiReadSlave   => locAxilReadSlaves(NEXT_AXIL_C),
+--          axiWriteMaster => locAxilWriteMasters(NEXT_AXIL_C),
+--          axiWriteSlave  => locAxilWriteSlaves(NEXT_AXIL_C),
+--          clk            => axiClk,
+--          rst            => axiRst,
+--          we             => r.nextRamWe,
+--          addr           => r.wrBsaAddr,
+--          din            => r.nextAddr,
+--          dout           => nextRamDout);
 
    -- Store timestamps during accumulate phase since we are already iterating over
    timestampRamWe <= r.timestampEn and r.timingMessage.bsaInit(conv_integer(r.adderCount));
@@ -563,9 +567,8 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Accumulation sequencing, DMA ring buffer, and AXI-Lite logic
    -------------------------------------------------------------------------------------------------
-   comb : process (axiRst, ddrAxisMaster, diagnosticBus, diagnosticFpData, diagnosticFpValid,
-                   diagnosticStrobeSync, dmaAck, endRamDout, firstRamDout, lastRamDout,
-                   locAxilReadMasters, locAxilWriteMasters, nextRamDout, r, startRamDout) is
+   comb : process (axiRst, ddrAxisMaster, diagnosticBus, diagnosticFpData, diagnosticFpValid, diagnosticStrobeSync, dmaAck, endRamDout, firstRamDout, lastRamDout, locAxilReadMasters,
+                   locAxilWriteMasters, r, startRamDout) is
       variable v         : RegType;
       variable b         : integer range 0 to BSA_BUFFERS_G-1;
       variable axiStatus : AxiLiteStatusType;
@@ -604,7 +607,7 @@ begin
          v.adderCount                                     := (others => '0');
          v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 3) := diagnosticFpData;
 
-         v.bsaCompleteAxil := r.bsaCompleteAxil or r.timingMessage.bsaDone;
+         v.bsaCompleteTmp := r.bsaCompleteTmp or r.timingMessage.bsaDone;
          v.bsaInitAxil     := r.bsaInitAxil or r.timingMessage.bsaInit;
 
       end if;
@@ -639,9 +642,9 @@ begin
       ----------------------------------------------------------------------------------------------
       -- AXI4 Stage - Read entries from FIFO and write to RAM on AXI4 bus
       ----------------------------------------------------------------------------------------------
-      v.nextRamWe      := '0';
-      v.firstRamWe     := '0';
-      v.lastRamWe      := '0';
+      v.addrRamWe      := '0';
+--       v.firstRamWe     := '0';
+--       v.lastRamWe      := '0';
       v.dmaReq.maxSize := toSlv(DDR_BURST_BYTES_G, 32);
       v.clearBsaBuffer := '0';
 
@@ -651,15 +654,17 @@ begin
             -- burst wrapping awkwardly. Whole thing will be reset after readout.
             -- Don't do anything if in the middle of a buffer address clear
             if (ddrAxisMaster.tvalid = '1') then
-               v.bsaAddr := ddrAxisMaster.tdest(BSA_ADDR_BITS_C-1 downto 0);
-               v.state   := LATCH_POINTERS_S;
+               v.wrBsaAddr := ddrAxisMaster.tdest(BSA_ADDR_BITS_C-1 downto 0);
+               v.rdBsaAddr := ddrAxisMaster.tdest(BSA_ADDR_BITS_C-1 downto 0);
+               v.state     := LATCH_POINTERS_S;
             end if;
 
             -- Don't allow dma req to start if a buffer neads to be init
             if (r.timestampEn = '1' and r.timingMessage.bsaInit(conv_integer(r.adderCount)) = '1') then
 --               print("bsaInit in WAIT_TVALID_S: " & str(conv_integer(r.adderCount)));
                v.clearBsaBuffer := '1';
-               v.bsaAddr        := r.adderCount;
+               v.rdBsaAddr      := r.adderCount;
+               v.wrBsaAddr      := r.rdBsaAddr;
                v.state          := WAIT_TVALID_S;
             end if;
 
@@ -669,9 +674,9 @@ begin
             v.endAddr   := endRamDout;
             v.firstAddr := firstRamDout;
             v.lastAddr  := lastRamDout;
-            v.nextAddr  := nextRamDout;
+--            v.nextAddr  := nextRamDout;
 
-            v.dmaReq.address(31 downto 0) := nextRamDout;
+            v.dmaReq.address(31 downto 0) := lastRamDout;
             v.dmaReq.address(32)          := r.ramAddr32;
             v.dmaReq.request              := '1';
             v.state                       := WAIT_DMA_DONE_S;
@@ -680,8 +685,9 @@ begin
             if (r.timestampEn = '1' and r.timingMessage.bsaInit(conv_integer(r.adderCount)) = '1') then
 --               print("bsaInit in LATCH_POINTERS_S: " & str(conv_integer(r.adderCount)));
                v.clearBsaBuffer := '1';
-               v.bsaAddr        := r.adderCount;
-               v.bsaAddrTemp    := r.bsaAddr;
+               v.rdBsaAddr      := r.adderCount;
+               v.wrBsaAddr      := r.adderCount;
+               v.bsaAddrTemp    := r.rdBsaAddr;
                v.state          := BSA_INIT_S;
             end if;
 
@@ -689,11 +695,13 @@ begin
             if (r.timestampEn = '1' and r.timingMessage.bsaInit(conv_integer(r.adderCount)) = '1') then
 --               print("bsaInit in BSA_INIT_S: " & str(conv_integer(r.adderCount)));
                v.clearBsaBuffer := '1';
-               v.bsaAddr        := r.adderCount;
+               v.rdBsaAddr      := r.adderCount;
+               v.wrBsaAddr      := r.rdBsaAddr;
                v.state          := BSA_INIT_S;
             else
-               v.bsaAddr := r.bsaAddrTemp;
-               v.state   := LATCH_POINTERS_S;
+               v.rdBsaAddr := r.bsaAddrTemp;
+               v.wrBsaAddr := r.bsaAddrTemp;
+               v.state     := LATCH_POINTERS_S;
             end if;
 
 
@@ -702,45 +710,65 @@ begin
             if (r.timestampEn = '1' and r.timingMessage.bsaInit(conv_integer(r.adderCount)) = '1') then
 --               print("bsaInit in WAIT_DMA_DONE_S: " & str(conv_integer(r.adderCount)));
                v.clearBsaBuffer := '1';
-               v.bsaAddr        := r.adderCount;
-               v.bsaAddrTemp := r.bsaAddr;
+               v.rdBsaAddr      := r.adderCount;
+               v.wrBsaAddr      := r.adderCount;
+               v.bsaAddrTemp    := r.rdBsaAddr;
                v.state          := BSA_INIT_S;
 
             elsif (dmaAck.done = '1') then
                v.dmaReq.request := '0';
 
+               if (r.bsaCompleteTmp(conv_integer(r.rdBsaAddr)) = '1') then
+                  v.bsaCompleteAxil(conv_integer(r.rdBsaAddr)) := '1';
+                  v.bsaCompleteTmp(conv_integer(r.rdBsaAddr)) := '0';                  
+               end if;
+
                -- Update nextAddr
-               v.nextRamWe := '1';
-               v.nextAddr  := r.nextAddr + dmaAck.size;
-               if (r.nextAddr + dmaAck.size = r.endAddr) then
-                  -- Wrap around
---                  print("Wrapped BSA buffer");
-                  v.nextAddr := r.startAddr;
+--                v.nextRamWe := '1';
+--                v.nextAddr  := r.nextAddr + dmaAck.size;
+--                if (r.nextAddr + dmaAck.size = r.endAddr) then
+--                   -- Wrap around
+-- --                  print("Wrapped BSA buffer");
+--                   v.nextAddr := r.startAddr;
+--                end if;
+
+--                -- Update firstAddr
+--                v.firstRamWe := '1';
+--                if (r.nextAddr = r.firstAddr and r.lastAddr /= r.firstAddr) then
+--                   -- if full and not empty
+-- --                  print("Bumped first addr");
+--                   v.firstAddr := r.firstAddr + dmaAck.size;
+--                   if (v.firstAddr = r.endAddr) then
+--                      v.firstAddr := r.startAddr;
+--                   end if;
+--                end if;
+
+--                -- Update lastAddr
+--                v.lastRamWe := '1';
+--                v.lastAddr  := r.nextAddr + dmaAck.size;-- - BSA_BUFFER_ENTRY_BYTES_C;
+
+               v.addrRamWe := '1';
+
+               v.lastAddr := r.lastAddr + dmaAck.size;
+               if (v.lastAddr = r.endAddr) then
+                  v.lastAddr := r.startAddr;
                end if;
 
-               -- Update firstAddr
-               v.firstRamWe := '1';
-               if (r.nextAddr = r.firstAddr and r.lastAddr /= r.firstAddr) then
-                  -- if full and not empty
---                  print("Bumped first addr");
-                  v.firstAddr := r.firstAddr + dmaAck.size;
+               if (v.lastAddr = r.firstAddr) then
+                  v.firstAddr := r.firstAddr + BSA_BUFFER_ENTRY_BYTES_C;
                end if;
-
-               -- Update lastAddr
-               v.lastRamWe := '1';
-               v.lastAddr  := r.nextAddr + dmaAck.size - BSA_BUFFER_ENTRY_BYTES_C;
 
                v.state := WAIT_TVALID_S;
             end if;
       end case;
 
       if (r.clearBsaBuffer = '1') then
-         v.nextAddr   := startRamDout;
+--         v.nextAddr   := startRamDout;
          v.firstAddr  := startRamDout;
          v.lastAddr   := startRamDout;
-         v.nextRamWe  := '1';
-         v.firstRamWe := '1';
-         v.lastRamWe  := '1';
+         v.addrRamWe  := '1';
+--          v.firstRamWe := '1';
+--          v.lastRamWe  := '1';
       end if;
 
       ----------------------------------------------------------------------------------------------
@@ -753,15 +781,17 @@ begin
          v.axilReadSlave.rdata := (others => '0');
          case (locAxilReadMasters(0).araddr(7 downto 0)) is
             when X"00" =>
-               v.axilReadSlave.rdata := r.bsaInitAxil(31 downto 0);
+               v.axilReadSlave.rdata      := r.bsaInitAxil(31 downto 0);
+               v.bsaInitAxil(31 downto 0) := (others => '0');
             when X"04" =>
-               v.axilReadSlave.rdata := r.bsaInitAxil(63 downto 32);
-               v.bsaInitAxil         := (others => '0');
+               v.axilReadSlave.rdata       := r.bsaInitAxil(63 downto 32);
+               v.bsaInitAxil(63 downto 32) := (others => '0');
             when X"08" =>
-               v.axilReadSlave.rdata := r.bsaCompleteAxil(31 downto 0);
+               v.axilReadSlave.rdata          := r.bsaCompleteAxil(31 downto 0);
+               v.bsaCompleteAxil(31 downto 0) := (others => '0');
             when X"0C" =>
-               v.axilReadSlave.rdata := r.bsaCompleteAxil(63 downto 32);
-               v.bsaCompleteAxil     := (others => '0');
+               v.axilReadSlave.rdata           := r.bsaCompleteAxil(63 downto 32);
+               v.bsaCompleteAxil(63 downto 32) := (others => '0');
             when X"10" =>
                v.axilReadSlave.rdata(0) := r.ramAddr32;
             when others => null;

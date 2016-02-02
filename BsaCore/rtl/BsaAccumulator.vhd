@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-01-25
+-- Last update: 2016-01-27
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ begin
          MASTER_AXI_CONFIG_G => AXIS_CONFIG_G)
       port map (
          sAxisClk    => clk,            -- [in]
-         sAxisRst    => bsaInit,        -- [in]
+         sAxisRst    => rst,        -- [in]
          sAxisMaster => sAxisMaster,    -- [in]
          sAxisSlave  => sAxisSlave,     -- [out]
          sAxisCtrl   => open,           -- [out]
@@ -199,7 +199,7 @@ begin
    comb : process (adderOutLast, r, rst, sAxisMaster, sAxisSlave, shiftEn, shiftIn) is
       variable v : RegType;
 
-   begin
+    begin
       v := r;
 
       if (shiftEn = '1') then
