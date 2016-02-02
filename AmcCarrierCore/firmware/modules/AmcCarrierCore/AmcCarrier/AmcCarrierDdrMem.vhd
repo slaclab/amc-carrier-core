@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2015-11-17
+-- Last update: 2016-01-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -152,10 +152,10 @@ architecture mapping of AmcCarrierDdrMem is
          sys_rst                 : in    std_logic);
    end component;
 
-   signal ddrWriteMaster : AxiWriteMasterType;
-   signal ddrWriteSlave  : AxiWriteSlaveType;
-   signal ddrReadMaster  : AxiReadMasterType;
-   signal ddrReadSlave   : AxiReadSlaveType;
+   signal ddrWriteMaster : AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+   signal ddrWriteSlave  : AxiWriteSlaveType := AXI_WRITE_SLAVE_INIT_C;
+   signal ddrReadMaster  : AxiReadMasterType := AXI_READ_MASTER_INIT_C;
+   signal ddrReadSlave   : AxiReadSlaveType := AXI_READ_SLAVE_INIT_C;
 
    signal ddrClk     : sl;
    signal ddrRst     : sl;

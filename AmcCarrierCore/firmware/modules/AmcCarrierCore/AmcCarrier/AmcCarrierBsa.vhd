@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-01-26
+-- Last update: 2016-01-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierRegPkg.all;
-use work.IpV4EnginePkg.all;
+
 
 entity AmcCarrierBsa is
    generic (
@@ -39,6 +39,7 @@ entity AmcCarrierBsa is
       APP_TYPE_G               : AppType               := APP_NULL_TYPE_C;
       AXI_ERROR_RESP_G         : slv(1 downto 0)       := AXI_RESP_DECERR_C;
       BSA_BUFFERS_G            : integer range 1 to 64 := 64;
+      DIAGNOSTIC_OUTPUTS_G     : integer range 1 to 32 := 28;
       DIAGNOSTIC_RAW_STREAMS_G : positive              := 1;
       DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray  := (0 => ssiAxiStreamConfig(4)));
    port (
@@ -88,8 +89,8 @@ architecture mapping of AmcCarrierBsa is
    constant ASYNC_AXIS_INDEX_C : integer := 1;
    constant DIAG_AXIS_INDEX_C  : integer := 2;
 
-   -- Streams to Eth block use IP engine format
-   constant BSA_AXIS_CONFIG_C : AxiStreamConfigType := IP_ENGINE_CONFIG_C;
+   -- Streams to Eth block are 64 bits wide for RSSI
+   constant BSA_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8);
 
    -- Bsa buffer write word size should be configurable
    constant BSA_AXI_CONFIG_C : AxiConfigType := (
@@ -101,20 +102,22 @@ architecture mapping of AmcCarrierBsa is
    -- Mem read word size is 32 bits
    constant MEM_AXI_CONFIG_C : AxiConfigType := (
       ADDR_WIDTH_C => 33,
-      DATA_BYTES_C => 4,
+      DATA_BYTES_C => 16,
       ID_BITS_C    => 1,
       LEN_BITS_C   => 8);
 
 
    -- AXI busses to interconnect
-   signal bsaAxiWriteMaster  : AxiWriteMasterType;
-   signal bsaAxiWriteSlave   : AxiWriteSlaveType;
-   signal memAxiReadMaster   : AxiReadMasterType;
-   signal memAxiReadSlave    : AxiReadSlaveType;
-   signal diagAxiWriteMaster : AxiWriteMasterType;
-   signal diagAxiWriteSlave  : AxiWriteSlaveType;
-   signal diagAxiReadMaster  : AxiReadMasterType;
-   signal diagAxiReadSlave   : AxiReadSlaveType;
+   signal bsaAxiWriteMaster  : AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+   signal bsaAxiWriteSlave   : AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
+   signal bsaAxiReadSlave    : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
+   signal memAxiReadMaster   : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
+   signal memAxiReadSlave    : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
+   signal memAxiWriteSlave   : AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
+   signal diagAxiWriteMaster : AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+   signal diagAxiWriteSlave  : AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
+   signal diagAxiReadMaster  : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
+   signal diagAxiReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
 
 begin
 
@@ -142,10 +145,10 @@ begin
          diagnosticRawCtrl    => diagnosticRawCtrl,                -- [out]
          axiClk               => axiClk,                           -- [in]
          axiRst               => axiRst,                           -- [in]
-         axiWriteMaster       => diagAxiWriteMaster,               -- [out]
-         axiWriteSlave        => diagAxiWriteSlave,                -- [in]
-         axiReadMaster        => diagAxiReadMaster,                -- [out]
-         axiReadSlave         => diagAxiReadSlave,                 -- [in]
+         axiWriteMaster       => open,                             --diagAxiWriteMaster,               -- [out]
+         axiWriteSlave        => AXI_WRITE_SLAVE_INIT_C,           --diagAxiWriteSlave,                -- [in]
+         axiReadMaster        => open,                             --diagAxiReadMaster,                -- [out]
+         axiReadSlave         => AXI_READ_SLAVE_INIT_C,            --diagAxiReadSlave,                 -- [in]
          bufClk               => axilClk,                          -- [in]
          bufRst               => axilRst,                          -- [in]
          bufMaster            => obBsaMasters(DIAG_AXIS_INDEX_C),  -- [out]
@@ -162,7 +165,7 @@ begin
          BSA_BUFFERS_G           => BSA_BUFFERS_G,
          BSA_ACCUM_FLOAT_G       => false,
          BSA_STREAM_BYTE_WIDTH_G => 4,
-         DIAGNOSTIC_OUTPUTS_G    => 24,
+         DIAGNOSTIC_OUTPUTS_G    => DIAGNOSTIC_OUTPUTS_G,
          DDR_BURST_BYTES_G       => 2048,                         -- explore 4096
          AXI_CONFIG_G            => BSA_AXI_CONFIG_C)
       port map (
@@ -224,14 +227,14 @@ begin
          sAxiWriteMasters(0) => AXI_WRITE_MASTER_INIT_C,  -- [in]
          sAxiWriteMasters(1) => bsaAxiWriteMaster,        -- [in]
          sAxiWriteMasters(2) => diagAxiWriteMaster,       -- [in]
-         sAxiWriteSlaves(0)  => open,                     -- [out]
+         sAxiWriteSlaves(0)  => memAxiWriteSlave,         -- [out]
          sAxiWriteSlaves(1)  => bsaAxiWriteSlave,         -- [out]
          sAxiWriteSlaves(2)  => diagAxiWriteSlave,
          sAxiReadMasters(0)  => memAxiReadMaster,         -- [in]
          sAxiReadMasters(1)  => AXI_READ_MASTER_INIT_C,   -- [in]         
          sAxiReadMasters(2)  => diagAxiReadMaster,
          sAxiReadSlaves(0)   => memAxiReadSlave,          -- [out]
-         sAxiReadSlaves(1)   => open,                     -- [out]         
+         sAxiReadSlaves(1)   => bsaAxiReadSlave,          -- [out]         
          sAxiReadSlaves(2)   => diagAxiReadSlave,
          mAxiWriteMasters    => axiWriteMaster,           -- [out]
          mAxiWriteSlaves     => axiWriteSlave,            -- [in]

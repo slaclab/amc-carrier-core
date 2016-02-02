@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-01-13
+-- Last update: 2016-02-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -176,16 +176,16 @@ begin
          SERVER_PORTS_G     => SERVER_PORTS_C,
          SERVER_MTU_G       => SERVER_MTU_C,
          -- UDP Client Generics
-         CLIENT_EN_G        => false,       -- Place holder for future implementation
+         CLIENT_EN_G        => false,   -- Place holder for future implementation
          CLIENT_SIZE_G      => CLIENT_SIZE_C,
          CLIENT_PORTS_G     => CLIENT_PORTS_C,
          CLIENT_MTU_G       => CLIENT_MTU_C,
          -- IPv4/ARP Generics
          CLK_FREQ_G         => 156.25E+06,  -- In units of Hz
-         COMM_TIMEOUT_EN_G  => true,        -- Disable the timeout by setting to false
-         COMM_TIMEOUT_G     => 30,          -- In units of seconds, Client's Communication timeout before re-ARPing
+         COMM_TIMEOUT_EN_G  => true,    -- Disable the timeout by setting to false
+         COMM_TIMEOUT_G     => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
          ARP_TIMEOUT_G      => 156250000,   -- 1 second ARP request timeout
-         VLAN_G             => false)       -- no VLAN
+         VLAN_G             => false)   -- no VLAN
       port map (
          -- Local Configurations
          localMac         => localMac,
@@ -236,10 +236,79 @@ begin
    ---------------------------------
    -- BSA Inbound/Outbound Interface
    ---------------------------------
-   ibServerMasters(6 downto 4) <= obBsaMasters;
-   obBsaSlaves                 <= ibServerSlaves(6 downto 4);
-   ibBsaMasters                <= obServerMasters(6 downto 4);
-   obServerSlaves(6 downto 4)  <= ibBsaSlaves;
+   PACKETIZER_GEN : for i in 2 downto 0 generate
+      signal depacketizerMasters : AxiStreamMasterArray(2 downto 0);
+      signal depacketizerSlaves  : AxiStreamSlaveArray(2 downto 0);
+      signal packetizerMasters   : AxiStreamMasterArray(2 downto 0);
+      signal packetizerSlaves    : AxiStreamSlaveArray(2 downto 0);
+   begin
+      U_AxiStreamFifo_Depacketizer : entity work.AxiStreamFifo
+         generic map (
+            TPD_G               => TPD_G,
+            SLAVE_READY_EN_G    => true,
+            BRAM_EN_G           => false,
+            GEN_SYNC_FIFO_G     => true,
+            FIFO_ADDR_WIDTH_G   => 4,
+            SLAVE_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
+            MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(8))
+         port map (
+            sAxisClk    => axilClk,                 -- [in]
+            sAxisRst    => axilRst,                 -- [in]
+            sAxisMaster => obServerMasters(i+4),    -- [in]
+            sAxisSlave  => obServerSlaves(i+4),     -- [out]
+            mAxisClk    => axilClk,                 -- [in]
+            mAxisRst    => axilRst,                 -- [in]
+            mAxisMaster => depacketizerMasters(i),  -- [out]
+            mAxisSlave  => depacketizerSlaves(i));  -- [in]
+
+      U_AxiStreamDepacketizer_1 : entity work.AxiStreamDepacketizer
+         generic map (
+            TPD_G                => TPD_G,
+            INPUT_PIPE_STAGES_G  => 1,
+            OUTPUT_PIPE_STAGES_G => 1)
+         port map (
+            axisClk     => axilClk,                 -- [in]
+            axisRst     => axilRst,                 -- [in]
+            sAxisMaster => depacketizerMasters(i),  -- [in]
+            sAxisSlave  => depacketizerSlaves(i),  -- [out]
+            mAxisMaster => ibBsaMasters(i),         -- [out]
+            mAxisSlave  => ibBsaSlaves(i));         -- [in]
+
+
+      U_AxiStreamPacketizer_1 : entity work.AxiStreamPacketizer
+         generic map (
+            TPD_G                => TPD_G,
+            MAX_PACKET_BYTES_C   => 1440,
+            INPUT_PIPE_STAGES_G  => 1,
+            OUTPUT_PIPE_STAGES_G => 1)
+         port map (
+            axisClk     => axilClk,               -- [in]
+            axisRst     => axilRst,               -- [in]
+            sAxisMaster => obBsaMasters(i),       -- [in]
+            sAxisSlave  => obBsaSlaves(i),        -- [out]
+            mAxisMaster => packetizerMasters(i),   -- [out]
+            mAxisSlave  => packetizerSlaves(i));  -- [in]
+
+      U_AxiStreamFifo_Packetizer : entity work.AxiStreamFifo
+         generic map (
+            TPD_G               => TPD_G,
+            SLAVE_READY_EN_G    => true,
+            BRAM_EN_G           => false,
+            GEN_SYNC_FIFO_G     => true,
+            FIFO_ADDR_WIDTH_G   => 4,
+            SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(8),
+            MASTER_AXI_CONFIG_G => IP_ENGINE_CONFIG_C)
+         port map (
+            sAxisClk    => axilClk,               -- [in]
+            sAxisRst    => axilRst,               -- [in]
+            sAxisMaster => packetizerMasters(i),  -- [in]
+            sAxisSlave  => packetizerSlaves(i),   -- [out]
+            mAxisClk    => axilClk,               -- [in]
+            mAxisRst    => axilRst,               -- [in]
+            mAxisMaster => ibServerMasters(i+4),  -- [out]
+            mAxisSlave  => ibServerSlaves(i+4));  -- [in]
+
+   end generate PACKETIZER_GEN;
 
    ------------------------
    -- FFB Inbound Interface
