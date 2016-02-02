@@ -289,14 +289,103 @@ set_property -dict { PACKAGE_PIN K17 IOSTANDARD LVCMOS15 } [get_ports {ddrPwrEnL
 # create_pblock XAUI_GRP; add_cells_to_pblock [get_pblocks XAUI_GRP] [get_cells {U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore}]
 # resize_pblock [get_pblocks XAUI_GRP] -add {CLOCKREGION_X3Y2:CLOCKREGION_X3Y2}
 
-# SALT Area Constraint
-create_pblock SALT_GRP; 
-add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/idelay_cal}]
-add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/idelay_m}]
-add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/idelay_s}]
-add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/iserdes_m}]
-add_cells_to_pblock [get_pblocks SALT_GRP] [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.*/serdes_1_to_10_ser8_i/iserdes_s}]
-resize_pblock [get_pblocks SALT_GRP] -add {BITSLICE_RX_TX_X0Y52:BITSLICE_RX_TX_X0Y129}
+# SALT MPS Backplane: CH1
+set_property LOC BITSLICE_RX_TX_X0Y115 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[1].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y91  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[1].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y91  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[1].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y92  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[1].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y92  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[1].*/iserdes_s}]
+
+# SALT MPS Backplane: CH2
+set_property LOC BITSLICE_RX_TX_X0Y116 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[2].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y88  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[2].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y88  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[2].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y89  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[2].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y89  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[2].*/iserdes_s}]
+
+# SALT MPS Backplane: CH3
+set_property LOC BITSLICE_RX_TX_X0Y93 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[3].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y86  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[3].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y86  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[3].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y87  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[3].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y87  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[3].*/iserdes_s}]
+
+# SALT MPS Backplane: CH4
+set_property LOC BITSLICE_RX_TX_X0Y94 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[4].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y84  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[4].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y84  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[4].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y85  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[4].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y85  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[4].*/iserdes_s}]
+
+# SALT MPS Backplane: CH5
+set_property LOC BITSLICE_RX_TX_X0Y95 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[5].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y82  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[5].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y82  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[5].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y83  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[5].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y83  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[5].*/iserdes_s}]
+
+# SALT MPS Backplane: CH6
+set_property LOC BITSLICE_RX_TX_X0Y96 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[6].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y71  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[6].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y71  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[6].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y72  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[6].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y72  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[6].*/iserdes_s}]
+
+# SALT MPS Backplane: CH7
+set_property LOC BITSLICE_RX_TX_X0Y99 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[7].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y69  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[7].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y69  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[7].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y70  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[7].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y70  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[7].*/iserdes_s}]
+
+# SALT MPS Backplane: CH8
+set_property LOC BITSLICE_RX_TX_X0Y100 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[8].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y67  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[8].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y67  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[8].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y68  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[8].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y68  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[8].*/iserdes_s}]
+
+# SALT MPS Backplane: CH9
+set_property LOC BITSLICE_RX_TX_X0Y101 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[9].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y65  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[9].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y65  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[9].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y66  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[9].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y66  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[9].*/iserdes_s}]
+
+# SALT MPS Backplane: CH10
+set_property LOC BITSLICE_RX_TX_X0Y116 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[10].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y62  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[10].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y62  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[10].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y63  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[10].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y63  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[10].*/iserdes_s}]
+
+# SALT MPS Backplane: CH11
+set_property LOC BITSLICE_RX_TX_X0Y118 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[11].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y60  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[11].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y60  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[11].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y61  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[11].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y61  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[11].*/iserdes_s}]
+
+# SALT MPS Backplane: CH12
+set_property LOC BITSLICE_RX_TX_X0Y120 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[12].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y58  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[12].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y58  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[12].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y59  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[12].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y59  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[12].*/iserdes_s}]
+
+# SALT MPS Backplane: CH13
+set_property LOC BITSLICE_RX_TX_X0Y122 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[13].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y56  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[13].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y56  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[13].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y57  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[13].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y57  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[13].*/iserdes_s}]
+
+# SALT MPS Backplane: CH14
+set_property LOC BITSLICE_RX_TX_X0Y124 [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[14].*/idelay_cal}]
+set_property LOC BITSLICE_RX_TX_X0Y54  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[14].*/idelay_m}]
+set_property LOC BITSLICE_RX_TX_X0Y54  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[14].*/iserdes_m}]
+set_property LOC BITSLICE_RX_TX_X0Y55  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[14].*/idelay_s}]
+set_property LOC BITSLICE_RX_TX_X0Y55  [get_cells -hier -filter {name =~ U_Core/U_MpsandFfb/U_Salt/MPS_SLOT.GEN_VEC[14].*/iserdes_s}]
 
 #############################
 ## Core Timing Constraints ##

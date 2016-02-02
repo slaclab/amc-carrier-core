@@ -28,7 +28,12 @@ add_files ${PROJ_DIR}/../../modules/AmcCarrierCore/coregen/MigCoreMicroblazeCali
 set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.bmm]
 set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0} [get_files MigCoreMicroblazeCalibration.bmm]
 
+## BSA's .DCP files
 add_files -quiet -fileset sources_1 ${PROJ_DIR}/../../modules/BsaCore/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
 add_files -quiet -fileset sources_1 ${PROJ_DIR}/../../modules/BsaCore/cores/AxiStreamDdrFifo/xilinxUltraScale/AxiStreamDdrFifo.dcp
 add_files -quiet -fileset sources_1 ${PROJ_DIR}/../../modules/BsaCore/cores/BsaAddFpCore/xilinxUltraScale/BsaAddFpCore.dcp
 add_files -quiet -fileset sources_1 ${PROJ_DIR}/../../modules/BsaCore/cores/BsaConvFpCore/xilinxUltraScale/BsaConvFpCore.dcp
+
+## Place and Route strategies 
+#set_property strategy Area_Explore [get_runs impl_1]
+#set_property strategy Performance_Explore [get_runs impl_1]
