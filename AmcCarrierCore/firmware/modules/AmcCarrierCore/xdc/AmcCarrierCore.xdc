@@ -445,7 +445,7 @@ set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks 
 ##########################
 
 # BITSTREAM Configurations
-set_property BITSTREAM.CONFIG.CONFIGRATE 90 [current_design] 
+set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design] 
 set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes [current_design]
 set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 1 [current_design]
 set_property BITSTREAM.CONFIG.SPI_FALL_EDGE No [current_design]
