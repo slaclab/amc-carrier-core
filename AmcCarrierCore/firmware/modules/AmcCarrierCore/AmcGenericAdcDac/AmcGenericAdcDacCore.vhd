@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-29
+-- Last update: 2016-02-04
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -87,6 +87,7 @@ entity AmcGenericAdcDacCore is
       jesdTxSyncP     : in    sl;
       jesdTxSyncN     : in    sl;
       -- LMK Ports
+      lmkMuxSel       : out   sl;
       lmkClkSel       : out   slv(1 downto 0);
       lmkStatus       : in    slv(1 downto 0);
       lmkSck          : out   sl;
@@ -127,53 +128,89 @@ end AmcGenericAdcDacCore;
 
 architecture mapping of AmcGenericAdcDacCore is
 
-   constant NUM_AXI_MASTERS_C : natural := 7;
+   constant NUM_AXI_MASTERS_C : natural := 13;
 
-   constant JESD_RX_INDEX_C : natural := 0;
-   constant JESD_TX_INDEX_C : natural := 1;
-   constant LMK_INDEX_C     : natural := 2;
-   constant ADC0_INDEX_C    : natural := 3;
-   constant ADC1_INDEX_C    : natural := 4;
-   constant DAC_INDEX_C     : natural := 5;
-   constant CTRL_INDEX_C    : natural := 6;
+   constant JESD_RX_INDEX_C    : natural := 0;
+   constant JESD_TX_INDEX_C    : natural := 1;
+   constant LMK_INDEX_C        : natural := 2;
+   constant ADC_A_INDEX_C      : natural := 3;
+   constant ADC_B_INDEX_C      : natural := 4;
+   constant DAC_INDEX_C        : natural := 5;
+   constant CTRL_INDEX_C       : natural := 6;
+   constant DEBUG_ADC0_INDEX_C : natural := 7;
+   constant DEBUG_ADC1_INDEX_C : natural := 8;
+   constant DEBUG_ADC2_INDEX_C : natural := 9;
+   constant DEBUG_ADC3_INDEX_C : natural := 10;
+   constant DEBUG_DAC0_INDEX_C : natural := 11;
+   constant DEBUG_DAC1_INDEX_C : natural := 12;
 
-   constant JESD_RX_BASE_ADDR_C : slv(31 downto 0) := X"00000000" + AXI_BASE_ADDR_G;
-   constant JESD_TX_BASE_ADDR_C : slv(31 downto 0) := X"00100000" + AXI_BASE_ADDR_G;
-   constant LMK_BASE_ADDR_C     : slv(31 downto 0) := X"00200000" + AXI_BASE_ADDR_G;
-   constant ADC0_BASE_ADDR_C    : slv(31 downto 0) := X"00300000" + AXI_BASE_ADDR_G;
-   constant ADC1_BASE_ADDR_C    : slv(31 downto 0) := X"00400000" + AXI_BASE_ADDR_G;
-   constant DAC_BASE_ADDR_C     : slv(31 downto 0) := X"00500000" + AXI_BASE_ADDR_G;
-   constant CTRL_BASE_ADDR_C    : slv(31 downto 0) := X"00600000" + AXI_BASE_ADDR_G;
+   constant JESD_RX_BASE_ADDR_C    : slv(31 downto 0) := X"00000000" + AXI_BASE_ADDR_G;
+   constant JESD_TX_BASE_ADDR_C    : slv(31 downto 0) := X"00100000" + AXI_BASE_ADDR_G;
+   constant LMK_BASE_ADDR_C        : slv(31 downto 0) := X"00200000" + AXI_BASE_ADDR_G;
+   constant ADC_A_BASE_ADDR_C      : slv(31 downto 0) := X"00300000" + AXI_BASE_ADDR_G;
+   constant ADC_B_BASE_ADDR_C      : slv(31 downto 0) := X"00400000" + AXI_BASE_ADDR_G;
+   constant DAC_BASE_ADDR_C        : slv(31 downto 0) := X"00500000" + AXI_BASE_ADDR_G;
+   constant CTRL_BASE_ADDR_C       : slv(31 downto 0) := X"00600000" + AXI_BASE_ADDR_G;
+   constant DEBUG_ADC0_BASE_ADDR_C : slv(31 downto 0) := X"00610000" + AXI_BASE_ADDR_G;
+   constant DEBUG_ADC1_BASE_ADDR_C : slv(31 downto 0) := X"00620000" + AXI_BASE_ADDR_G;
+   constant DEBUG_ADC2_BASE_ADDR_C : slv(31 downto 0) := X"00630000" + AXI_BASE_ADDR_G;
+   constant DEBUG_ADC3_BASE_ADDR_C : slv(31 downto 0) := X"00640000" + AXI_BASE_ADDR_G;
+   constant DEBUG_DAC0_BASE_ADDR_C : slv(31 downto 0) := X"00650000" + AXI_BASE_ADDR_G;
+   constant DEBUG_DAC1_BASE_ADDR_C : slv(31 downto 0) := X"00660000" + AXI_BASE_ADDR_G;
    
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      JESD_RX_INDEX_C => (
-         baseAddr     => JESD_RX_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      JESD_TX_INDEX_C => (
-         baseAddr     => JESD_TX_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      LMK_INDEX_C     => (
-         baseAddr     => LMK_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      ADC0_INDEX_C    => (
-         baseAddr     => ADC0_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      ADC1_INDEX_C    => (
-         baseAddr     => ADC1_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      DAC_INDEX_C     => (
-         baseAddr     => DAC_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      CTRL_INDEX_C    => (
-         baseAddr     => CTRL_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001")); 
+      JESD_RX_INDEX_C    => (
+         baseAddr        => JESD_RX_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      JESD_TX_INDEX_C    => (
+         baseAddr        => JESD_TX_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      LMK_INDEX_C        => (
+         baseAddr        => LMK_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      ADC_A_INDEX_C      => (
+         baseAddr        => ADC_A_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      ADC_B_INDEX_C      => (
+         baseAddr        => ADC_B_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      DAC_INDEX_C        => (
+         baseAddr        => DAC_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      CTRL_INDEX_C       => (
+         baseAddr        => CTRL_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      DEBUG_ADC0_INDEX_C => (
+         baseAddr        => DEBUG_ADC0_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      DEBUG_ADC1_INDEX_C => (
+         baseAddr        => DEBUG_ADC1_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      DEBUG_ADC2_INDEX_C => (
+         baseAddr        => DEBUG_ADC2_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      DEBUG_ADC3_INDEX_C => (
+         baseAddr        => DEBUG_ADC3_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      DEBUG_DAC0_INDEX_C => (
+         baseAddr        => DEBUG_DAC0_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      DEBUG_DAC1_INDEX_C => (
+         baseAddr        => DEBUG_DAC1_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"));     
 
    signal writeMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal writeSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -195,10 +232,15 @@ architecture mapping of AmcGenericAdcDacCore is
    signal adcBigEnd      : sampleDataArray(3 downto 0);
    signal dacBigEnd      : sampleDataArray(1 downto 0);
    signal dacBigEndMux   : sampleDataArray(1 downto 0);
+   signal dacLocMux      : sampleDataArray(1 downto 0);
+   signal dacDav         : slv(1 downto 0);
    signal loopback       : sl;
+   signal debugLogEn     : sl;
+   signal debugLogClr    : sl;
    signal lmkDataIn      : sl;
    signal lmkDataOut     : sl;
    
+
 begin
 
    ClkBuf_0 : entity work.ClkOutBufDiff
@@ -416,6 +458,8 @@ begin
       dacBigEnd(i)(15 downto 8)  <= dacValues(i)(7 downto 0);    -- DAC[CH=i][time=0]BIT[7:0]
       dacBigEnd(i)(7 downto 0)   <= dacValues(i)(15 downto 8);   -- DAC[CH=i][time=0]BIT[15:8]
       dacBigEndMux(i)            <= dacBigEnd(i) when(loopback = '0') else adcBigEnd(i);
+      dacLocMux(i)               <= dacValues(i) when(loopback = '0') else adcData(i);
+      dacDav(i)                  <= '1'          when(loopback = '0') else adcDav(i);
    end generate GEN_DAC_CH;
 
    adcValids <= adcDav;
@@ -487,10 +531,10 @@ begin
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
-            axiReadMaster  => readMasters(ADC0_INDEX_C+i),
-            axiReadSlave   => readSlaves(ADC0_INDEX_C+i),
-            axiWriteMaster => writeMasters(ADC0_INDEX_C+i),
-            axiWriteSlave  => writeSlaves(ADC0_INDEX_C+i),
+            axiReadMaster  => readMasters(ADC_A_INDEX_C+i),
+            axiReadSlave   => readSlaves(ADC_A_INDEX_C+i),
+            axiWriteMaster => writeMasters(ADC_A_INDEX_C+i),
+            axiWriteSlave  => writeSlaves(ADC_A_INDEX_C+i),
             coreSclk       => adcSck(i),
             coreSDin       => adcMiso(i),
             coreSDout      => adcMosi(i),
@@ -556,9 +600,11 @@ begin
          rst             => jesdRst185,
          adcValids       => adcDav,
          adcValues       => adcData,
-         dacValues       => dacValues,
+         dacValues       => dacLocMux,
          dacVcoCtrl      => dacVcoCtrl,
          loopback        => loopback,
+         debugLogEn      => debugLogEn,
+         debugLogClr     => debugLogClr,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -570,9 +616,68 @@ begin
          -- Application Ports --
          -----------------------      
          -- LMK Ports
+         lmkMuxSel       => lmkMuxSel,
          lmkClkSel       => lmkClkSel,
          lmkStatus       => lmkStatus,
          lmkRst          => lmkRst,
          lmkSync         => lmkSync);
 
+   --------------------
+   -- Debug ADC Modules
+   --------------------
+   GEN_ADC_DEBUG : for i in 3 downto 0 generate
+      ADC_DEBUG : entity work.AxiLiteRingBuffer
+         generic map (
+            TPD_G            => TPD_G,
+            BRAM_EN_G        => true,
+            REG_EN_G         => true,
+            DATA_WIDTH_G     => 32,
+            RAM_ADDR_WIDTH_G => 10,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         port map (
+            -- Data to store in ring buffer
+            dataClk         => jesdClk185,
+            dataRst         => jesdRst185,
+            dataValid       => adcDav(i),
+            dataValue       => adcData(i),
+            dataLogEn       => debugLogEn,
+            dataLogClr      => debugLogClr,
+            -- AXI-Lite interface for readout
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => readMasters(DEBUG_ADC0_INDEX_C+i),
+            axilReadSlave   => readSlaves(DEBUG_ADC0_INDEX_C+i),
+            axilWriteMaster => writeMasters(DEBUG_ADC0_INDEX_C+i),
+            axilWriteSlave  => writeSlaves(DEBUG_ADC0_INDEX_C+i));             
+   end generate GEN_ADC_DEBUG;
+
+   --------------------
+   -- Debug DAC Modules
+   --------------------
+   GEN_DAC_DEBUG : for i in 1 downto 0 generate
+      DAC_DEBUG : entity work.AxiLiteRingBuffer
+         generic map (
+            TPD_G            => TPD_G,
+            BRAM_EN_G        => true,
+            REG_EN_G         => true,
+            DATA_WIDTH_G     => 32,
+            RAM_ADDR_WIDTH_G => 10,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         port map (
+            -- Data to store in ring buffer
+            dataClk         => jesdClk185,
+            dataRst         => jesdRst185,
+            dataValid       => dacDav(i),
+            dataValue       => dacLocMux(i),
+            dataLogEn       => debugLogEn,
+            dataLogClr      => debugLogClr,
+            -- AXI-Lite interface for readout
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => readMasters(DEBUG_DAC0_INDEX_C+i),
+            axilReadSlave   => readSlaves(DEBUG_DAC0_INDEX_C+i),
+            axilWriteMaster => writeMasters(DEBUG_DAC0_INDEX_C+i),
+            axilWriteSlave  => writeSlaves(DEBUG_DAC0_INDEX_C+i));             
+   end generate GEN_DAC_DEBUG;
+   
 end mapping;

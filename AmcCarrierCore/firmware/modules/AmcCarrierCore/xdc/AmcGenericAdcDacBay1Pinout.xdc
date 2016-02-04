@@ -47,9 +47,10 @@ set_property -dict { PACKAGE_PIN AC23 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [
 set_property -dict { PACKAGE_PIN Y26  IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkCsL[1]}]
 set_property -dict { PACKAGE_PIN Y27  IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkSck[1]}]
 set_property -dict { PACKAGE_PIN AL25 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkDio[1]}]
-set_property -dict { PACKAGE_PIN AL22 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkSync[1][0]}];# LMK SYNC: AMC Card Version C00
-set_property -dict { PACKAGE_PIN AL10 IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {lmkSync[1][1]}];# LMK SYNC: AMC Card Version C01
 set_property -dict { PACKAGE_PIN AL24 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkRst[1]}]
+set_property -dict { PACKAGE_PIN AL22 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkSync[1][0]}];# LMK SYNC: AMC Card Version C00
+set_property -dict { PACKAGE_PIN AL10 IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {lmkSync[1][1]}];# LMK SYNC: AMC Card Version C01 (or later)
+set_property -dict { PACKAGE_PIN AM10 IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {lmkMuxSel[1]}];# LMK MUX SEL: AMC Card Version C01 (or later)
 
 # Fast ADC's SPI Ports
 set_property -dict { PACKAGE_PIN AB30 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcCsL[1][0]}]

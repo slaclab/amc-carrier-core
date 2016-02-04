@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-29
+-- Last update: 2016-02-04
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -44,6 +44,8 @@ entity AmcGenericAdcDacCtrl is
       dacValues       : in  sampleDataArray(1 downto 0);
       dacVcoCtrl      : in  slv(15 downto 0);
       loopback        : out sl;
+      debugLogEn      : out sl;
+      debugLogClr     : out sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -55,6 +57,7 @@ entity AmcGenericAdcDacCtrl is
       -- Application Ports --
       -----------------------      
       -- LMK Ports
+      lmkMuxSel       : out sl;
       lmkClkSel       : out slv(1 downto 0);
       lmkStatus       : in  slv(1 downto 0);
       lmkRst          : out sl;
@@ -75,6 +78,9 @@ architecture rtl of AmcGenericAdcDacCtrl is
       lmkClkSel      : slv(1 downto 0);
       lmkRst         : sl;
       lmkSync        : sl;
+      lmkMuxSel      : sl;
+      debugLogEn     : sl;
+      debugLogClr    : sl;
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -88,6 +94,9 @@ architecture rtl of AmcGenericAdcDacCtrl is
       lmkClkSel      => (others => '0'),
       lmkRst         => '0',
       lmkSync        => '0',
+      lmkMuxSel      => '0',
+      debugLogEn     => '0',
+      debugLogClr    => '0',
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -244,7 +253,23 @@ begin
          cntOut                => statusCnt,
          -- Clocks and Reset Ports
          wrClk                 => clk,
-         rdClk                 => axilClk);              
+         rdClk                 => axilClk);   
+
+   Synchronizer_logEn : entity work.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk,
+         dataIn  => r.debugLogEn,
+         dataOut => debugLogEn);
+
+   Synchronizer_bufferClear : entity work.SynchronizerOneShot
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk,
+         dataIn  => r.debugLogClr,
+         dataOut => debugLogClr);         
 
    comb : process (adc, adcValidsSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dac,
                    dacVco, lmkStatus, r, statusCnt) is
@@ -283,8 +308,9 @@ begin
       v := r;
 
       -- Reset the strobes
-      v.update := '0';
-      v.cntRst := '0';
+      v.update      := '0';
+      v.cntRst      := '0';
+      v.debugLogClr := '0';
 
       -- Increment the counter
       v.cnt := r.cnt + 1;
@@ -340,6 +366,9 @@ begin
       axiSlaveRegisterW(x"208", 0, v.lmkSync);
       axiSlaveRegisterR(x"20C", 0, lmkStatus);
       axiSlaveRegisterW(x"210", 0, v.loopback);
+      axiSlaveRegisterW(x"214", 0, v.lmkMuxSel);
+      axiSlaveRegisterW(x"218", 0, v.debugLogEn);
+      axiSlaveRegisterW(x"21C", 0, v.debugLogClr);
       axiSlaveRegisterW(x"3F8", 0, v.rollOverEn);
       axiSlaveRegisterW(x"3FC", 0, v.cntRst);
 
@@ -360,6 +389,7 @@ begin
       lmkClkSel      <= r.lmkClkSel;
       lmkRst         <= r.lmkRst;
       lmkSync        <= (others => r.lmkSync);
+      lmkMuxSel      <= r.lmkMuxSel;
       
    end process comb;
 

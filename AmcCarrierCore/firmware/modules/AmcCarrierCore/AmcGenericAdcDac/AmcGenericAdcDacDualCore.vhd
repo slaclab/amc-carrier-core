@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-29
+-- Last update: 2016-02-04
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -88,6 +88,7 @@ entity AmcGenericAdcDacDualCore is
       jesdTxSyncP     : in    slv(1 downto 0);
       jesdTxSyncN     : in    slv(1 downto 0);
       -- LMK Ports
+      lmkMuxSel       : out   slv(1 downto 0);
       lmkClkSel       : out   Slv2Array(1 downto 0);
       lmkStatus       : in    Slv2Array(1 downto 0);
       lmkSck          : out   slv(1 downto 0);
@@ -237,6 +238,7 @@ begin
             jesdTxSyncP     => jesdTxSyncP(i),
             jesdTxSyncN     => jesdTxSyncN(i),
             -- LMK Ports
+            lmkMuxSel       => lmkMuxSel(i),
             lmkClkSel       => lmkClkSel(i),
             lmkStatus       => lmkStatus(i),
             lmkSck          => lmkSck(i),
