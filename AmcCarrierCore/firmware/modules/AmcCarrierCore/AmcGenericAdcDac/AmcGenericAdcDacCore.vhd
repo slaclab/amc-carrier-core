@@ -640,8 +640,8 @@ begin
             dataRst         => jesdRst185,
             dataValid       => adcDav(i),
             dataValue       => adcData(i),
-            dataLogEn       => debugLogEn,
-            dataLogClr      => debugLogClr,
+            bufferEnable    => debugLogEn,
+            bufferClear     => debugLogClr,
             -- AXI-Lite interface for readout
             axilClk         => axilClk,
             axilRst         => axilRst,
@@ -669,8 +669,8 @@ begin
             dataRst         => jesdRst185,
             dataValid       => dacDav(i),
             dataValue       => dacLocMux(i),
-            dataLogEn       => debugLogEn,
-            dataLogClr      => debugLogClr,
+            bufferEnable    => debugLogEn,
+            bufferClear     => debugLogClr,
             -- AXI-Lite interface for readout
             axilClk         => axilClk,
             axilRst         => axilRst,
