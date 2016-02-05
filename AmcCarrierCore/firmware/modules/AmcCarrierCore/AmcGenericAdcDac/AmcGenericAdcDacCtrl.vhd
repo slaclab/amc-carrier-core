@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-02-04
+-- Last update: 2016-02-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -66,15 +66,12 @@ end AmcGenericAdcDacCtrl;
 
 architecture rtl of AmcGenericAdcDacCtrl is
 
-   constant MAX_CNT_C     : natural  := getTimeRatio(AXI_CLK_FREQ_G, 1.0);
    constant STATUS_SIZE_C : positive := 4;
 
    type RegType is record
       cntRst         : sl;
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       loopback       : sl;
-      cnt            : natural range 0 to MAX_CNT_C;
-      update         : sl;
       lmkClkSel      : slv(1 downto 0);
       lmkRst         : sl;
       lmkSync        : sl;
@@ -89,8 +86,6 @@ architecture rtl of AmcGenericAdcDacCtrl is
       cntRst         => '1',
       rollOverEn     => (others => '0'),
       loopback       => '0',
-      cnt            => 0,
-      update         => '0',
       lmkClkSel      => (others => '0'),
       lmkRst         => '0',
       lmkSync        => '0',
@@ -103,105 +98,47 @@ architecture rtl of AmcGenericAdcDacCtrl is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal statusCnt     : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
-   signal adcValidsSync : slv(3 downto 0);
-
-   signal update     : sl;
-   signal cnt        : Slv4Array(3 downto 0);
-   signal amcClkFreq : slv(31 downto 0);
-   signal dacVco     : slv(15 downto 0);
-   signal adcSmpl    : Slv16VectorArray(3 downto 0, 3 downto 0);
-   signal dacSmpl    : Slv16VectorArray(1 downto 0, 3 downto 0);
-   signal adc        : Slv16VectorArray(3 downto 0, 3 downto 0);
-   signal dac        : Slv16VectorArray(1 downto 0, 3 downto 0);
+   signal adcDataSync    : Slv16Array(3 downto 0);
+   signal dacDataSync    : Slv16Array(1 downto 0);
+   signal dacVcoCtrlSync : slv(15 downto 0);
+   signal amcClkFreq     : slv(31 downto 0);
+   signal statusCnt      : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
+   signal adcValidsSync  : slv(3 downto 0);
 
    -- attribute dont_touch               : string;
    -- attribute dont_touch of r          : signal is "TRUE";
-   -- attribute dont_touch of update     : signal is "TRUE";
-   -- attribute dont_touch of cnt        : signal is "TRUE";
-   -- attribute dont_touch of amcClkFreq : signal is "TRUE";
-   -- attribute dont_touch of dacVco     : signal is "TRUE";
-   -- attribute dont_touch of adcSmpl    : signal is "TRUE";
-   -- attribute dont_touch of dacSmpl    : signal is "TRUE";
-   -- attribute dont_touch of adc        : signal is "TRUE";
-   -- attribute dont_touch of dac        : signal is "TRUE";
    
 begin
 
-   process(clk)
-      variable i : natural;
-   begin
-      if rising_edge(clk) then
-         if update = '1' then
-            cnt <= (others => x"0") after TPD_G;
-         else
-            -- Loop through the channel
-            for i in 3 downto 0 loop
-               -- Check for valid
-               if adcValids(i) = '1' then
-                  -- Check for max. sampling range
-                  if cnt(i) < 4 then
-                     -- Sample the ADC
-                     adcSmpl(i, conv_integer(cnt(i))+1) <= adcValues(i)(31 downto 16) after TPD_G;
-                     adcSmpl(i, conv_integer(cnt(i))+0) <= adcValues(i)(15 downto 0)  after TPD_G;
-                     -- Check for DAC 
-                     if i < 2 then
-                        -- Sample the DAC
-                        dacSmpl(i, conv_integer(cnt(i))+1) <= dacValues(i)(31 downto 16) after TPD_G;
-                        dacSmpl(i, conv_integer(cnt(i))+0) <= dacValues(i)(15 downto 0)  after TPD_G;
-                     end if;
-                     -- Increment the counter
-                     cnt(i) <= cnt(i) + 2 after TPD_G;
-                  end if;
-               end if;
-            end loop;
-         end if;
-      end if;
-   end process;
-
    GEN_ADC :
    for i in 3 downto 0 generate
-      GEN_ADC_SMPL :
-      for j in 3 downto 0 generate
-         Sync_Adc : entity work.SynchronizerFifo
-            generic map (
-               TPD_G        => TPD_G,
-               DATA_WIDTH_G => 16)
-            port map (
-               -- Write Ports (wr_clk domain)
-               wr_clk => clk,
-               din    => adcSmpl(i, j),
-               -- Read Ports (rd_clk domain)
-               rd_clk => axilClk,
-               dout   => adc(i, j));
-      end generate GEN_ADC_SMPL;
+      Sync_Adc : entity work.SynchronizerFifo
+         generic map (
+            TPD_G        => TPD_G,
+            DATA_WIDTH_G => 16)
+         port map (
+            -- Write Ports (wr_clk domain)
+            wr_clk => clk,
+            din    => adcValues(i)(15 downto 0),
+            -- Read Ports (rd_clk domain)
+            rd_clk => axilClk,
+            dout   => adcDataSync(i));
    end generate GEN_ADC;
 
    GEN_DAC :
    for i in 1 downto 0 generate
-      GEN_DAC_SMPL :
-      for j in 3 downto 0 generate
-         Sync_Dac : entity work.SynchronizerFifo
-            generic map (
-               TPD_G        => TPD_G,
-               DATA_WIDTH_G => 16)
-            port map (
-               -- Write Ports (wr_clk domain)
-               wr_clk => clk,
-               din    => dacSmpl(i, j),
-               -- Read Ports (rd_clk domain)
-               rd_clk => axilClk,
-               dout   => dac(i, j));
-      end generate GEN_DAC_SMPL;
+      Sync_Dac : entity work.SynchronizerFifo
+         generic map (
+            TPD_G        => TPD_G,
+            DATA_WIDTH_G => 16)
+         port map (
+            -- Write Ports (wr_clk domain)
+            wr_clk => clk,
+            din    => dacValues(i)(15 downto 0),
+            -- Read Ports (rd_clk domain)
+            rd_clk => axilClk,
+            dout   => dacDataSync(i));
    end generate GEN_DAC;
-
-   Sync_Update : entity work.SynchronizerOneShot
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk     => clk,
-         dataIn  => r.update,
-         dataOut => update);
 
    Sync_DacVco : entity work.SynchronizerFifo
       generic map (
@@ -213,7 +150,7 @@ begin
          din    => dacVcoCtrl,
          -- Read Ports (rd_clk domain)
          rd_clk => axilClk,
-         dout   => dacVco);   
+         dout   => dacVcoCtrlSync);   
 
    U_SyncClockFreq : entity work.SyncClockFreq
       generic map (
@@ -271,8 +208,8 @@ begin
          dataIn  => r.debugLogClr,
          dataOut => debugLogClr);         
 
-   comb : process (adc, adcValidsSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dac,
-                   dacVco, lmkStatus, r, statusCnt) is
+   comb : process (adcDataSync, adcValidsSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster,
+                   dacDataSync, dacVcoCtrlSync, lmkStatus, r, statusCnt) is
       variable v         : RegType;
       variable axiStatus : AxiLiteStatusType;
 
@@ -308,20 +245,8 @@ begin
       v := r;
 
       -- Reset the strobes
-      v.update      := '0';
       v.cntRst      := '0';
       v.debugLogClr := '0';
-
-      -- Increment the counter
-      v.cnt := r.cnt + 1;
-
-      -- Check for timeout
-      if r.cnt = (MAX_CNT_C-1) then
-         -- Reset the counter
-         v.cnt    := 0;
-         -- Set the flag
-         v.update := '1';
-      end if;
 
       -- Determine the transaction type
       axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus);
@@ -332,32 +257,14 @@ begin
       axiSlaveRegisterR(x"008", 0, muxSlVectorArray(statusCnt, 2));
       axiSlaveRegisterR(x"00C", 0, muxSlVectorArray(statusCnt, 3));
       axiSlaveRegisterR(x"0FC", 0, adcValidsSync);
-      axiSlaveRegisterR(x"100", 0, adc(0, 0));
-      axiSlaveRegisterR(x"104", 0, adc(0, 1));
-      axiSlaveRegisterR(x"108", 0, adc(0, 2));
-      axiSlaveRegisterR(x"10C", 0, adc(0, 3));
-      axiSlaveRegisterR(x"110", 0, adc(1, 0));
-      axiSlaveRegisterR(x"114", 0, adc(1, 1));
-      axiSlaveRegisterR(x"118", 0, adc(1, 2));
-      axiSlaveRegisterR(x"11C", 0, adc(1, 3));
-      axiSlaveRegisterR(x"120", 0, adc(2, 0));
-      axiSlaveRegisterR(x"124", 0, adc(2, 1));
-      axiSlaveRegisterR(x"128", 0, adc(2, 2));
-      axiSlaveRegisterR(x"12C", 0, adc(2, 3));
-      axiSlaveRegisterR(x"130", 0, adc(3, 0));
-      axiSlaveRegisterR(x"134", 0, adc(3, 1));
-      axiSlaveRegisterR(x"138", 0, adc(3, 2));
-      axiSlaveRegisterR(x"13C", 0, adc(3, 3));
-      axiSlaveRegisterR(x"140", 0, dac(0, 0));
-      axiSlaveRegisterR(x"144", 0, dac(0, 1));
-      axiSlaveRegisterR(x"148", 0, dac(0, 2));
-      axiSlaveRegisterR(x"14C", 0, dac(0, 3));
-      axiSlaveRegisterR(x"150", 0, dac(1, 0));
-      axiSlaveRegisterR(x"154", 0, dac(1, 1));
-      axiSlaveRegisterR(x"158", 0, dac(1, 2));
-      axiSlaveRegisterR(x"15C", 0, dac(1, 3));
+      axiSlaveRegisterR(x"100", 0, adcDataSync(0));
+      axiSlaveRegisterR(x"104", 0, adcDataSync(1));
+      axiSlaveRegisterR(x"108", 0, adcDataSync(2));
+      axiSlaveRegisterR(x"10C", 0, adcDataSync(3));
+      axiSlaveRegisterR(x"110", 0, dacDataSync(0));
+      axiSlaveRegisterR(x"114", 0, dacDataSync(1));
 
-      axiSlaveRegisterR(x"1F8", 0, dacVco);
+      axiSlaveRegisterR(x"1F8", 0, dacVcoCtrlSync);
       axiSlaveRegisterR(x"1FC", 0, amcClkFreq);
 
       -- Map the read/write registers
