@@ -134,10 +134,6 @@ begin
          rateClk_o     => s_rateClk);
 
 
-   -- Combine AXIS lane number and JESD lane number
-   s_num    <= intToSlv(laneNum_i, (GT_WORD_SIZE_C*4)) & intToSlv(axiNum_i, (GT_WORD_SIZE_C*4));
-   s_footer <= s_num(15 downto 0) & r.pctCnt;
-
    comb : process (axiNum_i, dataReady_i, devRst_i, enable_i, idle_i, overflow_i, packetSize_i,
                    pause_i, r, ready_i, s_decSampData, s_rateClk, s_trigRe) is
       variable v             : RegType;
@@ -192,7 +188,6 @@ begin
             v.pctCnt := (others => '0');
 
             -- Insert the axi and lane number at the first packet data word (byte swapped so it is transferred correctly)
-            --v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0)   := byteSwapSlv(s_num, GT_WORD_SIZE_C); 
             v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
 
             v.txAxisMaster.tLast := '0';
@@ -251,7 +246,6 @@ begin
             end if;
 
             -- Error if overflow or pause
-            --if  pause_i = '1' or overflow_i = '1' or ready_i = '0' then
             if ready_i = '0' then
                v.error := '1';
             else
@@ -271,7 +265,7 @@ begin
                v.state := LAST_EOF_S;
             elsif (r.error = '1') then               -- Stop sending data if error occurs
                v.state := LAST_EOF_S;
-            elsif (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = "11" & x"fe") then  --((FRAME_BWIDTH_G-1 downto 0 => '1') - 1) ) then  -- Send next frame
+            elsif (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-2)) then
                v.state := EOF_S;
             end if;
          ----------------------------------------------------------------------
@@ -324,7 +318,6 @@ begin
             -- Send zeros as footer
             v.txAxisMaster.tvalid                               := '1';
             v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
-            --v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0)   := byteSwapSlv(s_footer, GT_WORD_SIZE_C);
 
             -- Set the EOF(tlast) bit       
             v.txAxisMaster.tLast := '1';
