@@ -45,7 +45,7 @@ entity DebugRtmPgp2bGthUltra is
       PGP_RX_ENABLE_G   : boolean              := true;
       PGP_TX_ENABLE_G   : boolean              := true;
       PAYLOAD_CNT_TOP_G : integer              := 7;  -- Top bit for payload counter
-      VC_INTERLEAVE_G   : integer              := 1;  -- Interleave Frames
+      VC_INTERLEAVE_G   : integer              := 0;  -- Interleave Frames
       NUM_VC_EN_G       : integer range 1 to 4 := 4
       );
    port (
