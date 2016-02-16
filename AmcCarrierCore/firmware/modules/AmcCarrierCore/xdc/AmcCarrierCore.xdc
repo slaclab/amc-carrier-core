@@ -432,6 +432,8 @@ set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {timingGenClk}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {timingGenUsrClk}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {recTimingClk}] 
+set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks {ddrIntClk0}]
+set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks {ddrIntClk1}]
 
 # set_clock_groups -asynchronous \
     # -group [get_clocks -include_generated_clocks {timingRef}] \
