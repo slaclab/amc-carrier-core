@@ -26,8 +26,8 @@ set_property PACKAGE_PIN AB2 [get_ports {jesdRxP[0][3]}]
 set_property PACKAGE_PIN AB1 [get_ports {jesdRxN[0][3]}]
 
 # JESD Reference Ports
-set_property PACKAGE_PIN AB6 [get_ports {jesdClkP[0]}]
-set_property PACKAGE_PIN AB5 [get_ports {jesdClkN[0]}]
+set_property PACKAGE_PIN AD6 [get_ports {jesdClkP[0]}]
+set_property PACKAGE_PIN AD5 [get_ports {jesdClkN[0]}]
 set_property -dict { PACKAGE_PIN AK22 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {jesdSysRefP[0]}]
 set_property -dict { PACKAGE_PIN AK23 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {jesdSysRefN[0]}]
 
