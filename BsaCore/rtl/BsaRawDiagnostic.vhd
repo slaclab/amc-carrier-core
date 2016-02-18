@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-01-29
+-- Last update: 2016-02-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,10 +38,10 @@ entity BsaRawDiagnostic is
       diagnosticRawCtrl    : out AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
       axiClk               : in  sl;
       axiRst               : in  sl;
-      axiWriteMaster       : out AxiWriteMasterType;
-      axiWriteSlave        : in  AxiWriteSlaveType;
-      axiReadMaster        : out AxiReadMasterType;
-      axiReadSlave         : in  AxiReadSlaveType;
+      axiWriteMaster       : out AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+      axiWriteSlave        : in  AxiWriteSlaveType := AXI_WRITE_SLAVE_INIT_C;
+      axiReadMaster        : out AxiReadMasterType := AXI_READ_MASTER_INIT_C;
+      axiReadSlave         : in  AxiReadSlaveType := AXI_READ_SLAVE_INIT_C;
       bufClk               : in  sl;
       bufRst               : in  sl;
       bufMaster            : out AxiStreamMasterType;

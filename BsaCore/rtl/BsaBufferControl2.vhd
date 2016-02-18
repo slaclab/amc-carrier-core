@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-02-02
+-- Last update: 2016-02-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -225,7 +225,6 @@ architecture rtl of BsaBufferControl2 is
    signal endRamDout     : slv(31 downto 0);
    signal firstRamDout   : slv(31 downto 0);
    signal lastRamDout    : slv(31 downto 0);
---   signal nextRamDout    : slv(31 downto 0);
    signal timeStampRamWe : sl;
 
    signal dmaAck : AxiWriteDmaAckType;
@@ -722,30 +721,6 @@ begin
                   v.bsaCompleteAxil(conv_integer(r.rdBsaAddr)) := '1';
                   v.bsaCompleteTmp(conv_integer(r.rdBsaAddr)) := '0';                  
                end if;
-
-               -- Update nextAddr
---                v.nextRamWe := '1';
---                v.nextAddr  := r.nextAddr + dmaAck.size;
---                if (r.nextAddr + dmaAck.size = r.endAddr) then
---                   -- Wrap around
--- --                  print("Wrapped BSA buffer");
---                   v.nextAddr := r.startAddr;
---                end if;
-
---                -- Update firstAddr
---                v.firstRamWe := '1';
---                if (r.nextAddr = r.firstAddr and r.lastAddr /= r.firstAddr) then
---                   -- if full and not empty
--- --                  print("Bumped first addr");
---                   v.firstAddr := r.firstAddr + dmaAck.size;
---                   if (v.firstAddr = r.endAddr) then
---                      v.firstAddr := r.startAddr;
---                   end if;
---                end if;
-
---                -- Update lastAddr
---                v.lastRamWe := '1';
---                v.lastAddr  := r.nextAddr + dmaAck.size;-- - BSA_BUFFER_ENTRY_BYTES_C;
 
                v.addrRamWe := '1';
 

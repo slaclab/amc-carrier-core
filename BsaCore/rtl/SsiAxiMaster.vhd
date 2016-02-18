@@ -5,7 +5,7 @@
 -- File       : SsiAxiMaster.vhd
 -- Author     : Ryan Herbst, rherbst@slac.stanford.edu
 -- Created    : 2014-04-09
--- Last update: 2016-02-01
+-- Last update: 2016-02-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -299,7 +299,7 @@ begin
                v.mFifoAxisMaster       := sFifoAxisMaster;
 
                if (AXI_BUS_CONFIG_G.DATA_BYTES_C = 16) then
-                  v.mFifoAxisMaster.tLast := '0';  -- Hold off tlast
+                  v.mFifoAxisMaster.tLast         := '0';  -- Hold off tlast
                   v.wrDmaReq.maxSize(31 downto 2) := sFifoAxisMaster.tData(93 downto 64);
                   v.rdDmaReq.size(31 downto 2)    := sFifoAxisMaster.tData(93 downto 64);
                   v.wrDmaReq.address(32 downto 2) := sFifoAxisMaster.tData(126 downto 96);
@@ -374,7 +374,7 @@ begin
             if (rdDmaAxisMaster.tValid = '1' and v.mFifoAxisMaster.tValid = '0') then
                v.rdDmaAxisSlave.tReady := '1';
                v.mFifoAxisMaster       := rdDmaAxisMaster;
-               v.mFifoAxisMaster.tLast := '0';          -- Suppress tLast
+               v.mFifoAxisMaster.tLast := '0';              -- Suppress tLast
                v.mFifoAxisMaster.tUser := (others => '0');  -- No tUser
                v.mFifoAxisMaster.tKeep := genTKeep(INTERNAL_AXIS_CONFIG_C.TDATA_BYTES_C);  -- tLast might have smaller tkeep but override
             end if;
@@ -384,6 +384,7 @@ begin
                -- Tail
                v.mFifoAxisMaster.tValid            := '1';
                v.mFifoAxisMaster.tLast             := '1';
+               v.mFifoAxisMaster.tData             := (others => '0');
                v.mFifoAxisMaster.tData(0)          := rdDmaAck.readError;
                v.mFifoAxisMaster.tData(2 downto 1) := rdDmaAck.errorValue;
                v.rdDmaReq.request                  := '0';

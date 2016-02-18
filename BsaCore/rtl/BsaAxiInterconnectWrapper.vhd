@@ -1,3 +1,25 @@
+-------------------------------------------------------------------------------
+-- Title      : BsaAxiInterconnectWrapper
+-------------------------------------------------------------------------------
+-- File       : BsaAxiInterconnectWrapper.vhd
+-- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
+-- Company    : SLAC National Accelerator Laboratory
+-- Created    : 2016-02-10
+-- Last update: 2016-02-10
+-- Platform   : 
+-- Standard   : VHDL'93/02
+-------------------------------------------------------------------------------
+-- Description: Wrapper around AxiInterconnect Xilinx IP Core.
+-------------------------------------------------------------------------------
+-- This file is part of LCLS2 Timing BSA Core. It is subject to
+-- the license terms in the LICENSE.txt file found in the top-level directory
+-- of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of LCLS2 Timing BSA Core, including this file, may be
+-- copied, modified, propagated, or distributed except according to the terms
+-- contained in the LICENSE.txt file.
+-------------------------------------------------------------------------------
+
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -79,8 +101,8 @@ architecture rtl of BsaAxiInterconnectWrapper is
          S01_AXI_AWQOS        : in  std_logic_vector(3 downto 0);
          S01_AXI_AWVALID      : in  std_logic;
          S01_AXI_AWREADY      : out std_logic;
-         S01_AXI_WDATA        : in  std_logic_vector(63 downto 0);
-         S01_AXI_WSTRB        : in  std_logic_vector(7 downto 0);
+         S01_AXI_WDATA        : in  std_logic_vector(127 downto 0);
+         S01_AXI_WSTRB        : in  std_logic_vector(15 downto 0);
          S01_AXI_WLAST        : in  std_logic;
          S01_AXI_WVALID       : in  std_logic;
          S01_AXI_WREADY       : out std_logic;
@@ -100,7 +122,7 @@ architecture rtl of BsaAxiInterconnectWrapper is
          S01_AXI_ARVALID      : in  std_logic;
          S01_AXI_ARREADY      : out std_logic;
          S01_AXI_RID          : out std_logic_vector(0 downto 0);
-         S01_AXI_RDATA        : out std_logic_vector(63 downto 0);
+         S01_AXI_RDATA        : out std_logic_vector(127 downto 0);
          S01_AXI_RRESP        : out std_logic_vector(1 downto 0);
          S01_AXI_RLAST        : out std_logic;
          S01_AXI_RVALID       : out std_logic;
@@ -248,8 +270,8 @@ begin
          S01_AXI_AWQOS        => sAxiWriteMasters(1).AWQOS(3 downto 0),
          S01_AXI_AWVALID      => sAxiWriteMasters(1).AWVALID,
          S01_AXI_AWREADY      => sAxiWriteSlaves(1).AWREADY,
-         S01_AXI_WDATA        => sAxiWriteMasters(1).WDATA(63 downto 0),
-         S01_AXI_WSTRB        => sAxiWriteMasters(1).WSTRB(7 downto 0),
+         S01_AXI_WDATA        => sAxiWriteMasters(1).WDATA(127 downto 0),
+         S01_AXI_WSTRB        => sAxiWriteMasters(1).WSTRB(15 downto 0),
          S01_AXI_WLAST        => sAxiWriteMasters(1).WLAST,
          S01_AXI_WVALID       => sAxiWriteMasters(1).WVALID,
          S01_AXI_WREADY       => sAxiWriteSlaves(1).WREADY,
@@ -269,7 +291,7 @@ begin
          S01_AXI_ARVALID      => sAxiReadMasters(1).ARVALID,
          S01_AXI_ARREADY      => sAxiReadSlaves(1).ARREADY,
          S01_AXI_RID          => sAxiReadSlaves(1).RID(0 downto 0),
-         S01_AXI_RDATA        => sAxiReadSlaves(1).RDATA(63 downto 0),
+         S01_AXI_RDATA        => sAxiReadSlaves(1).RDATA(127 downto 0),
          S01_AXI_RRESP        => sAxiReadSlaves(1).RRESP(1 downto 0),
          S01_AXI_RLAST        => sAxiReadSlaves(1).RLAST,
          S01_AXI_RVALID       => sAxiReadSlaves(1).RVALID,
