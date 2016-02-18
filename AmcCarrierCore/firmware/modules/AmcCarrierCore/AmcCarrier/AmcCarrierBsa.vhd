@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-01-29
+-- Last update: 2016-02-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -90,12 +90,13 @@ architecture mapping of AmcCarrierBsa is
    constant DIAG_AXIS_INDEX_C  : integer := 2;
 
    -- Streams to Eth block are 64 bits wide for RSSI
-   constant BSA_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8);
+   constant BSA_AXIS_CONFIG_C            : AxiStreamConfigType := ssiAxiStreamConfig(8);
+   constant RAW_DIAGNOSTIC_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(1);
 
    -- Bsa buffer write word size should be configurable
    constant BSA_AXI_CONFIG_C : AxiConfigType := (
       ADDR_WIDTH_C => 33,
-      DATA_BYTES_C => 8,                -- needs to be 64 wide or 2kbyte BSA buffer bursts get split
+      DATA_BYTES_C => 16,                -- needs to be 64 bits wide or 2kbyte BSA buffer bursts get split
       ID_BITS_C    => 1,
       LEN_BITS_C   => 8);
 
@@ -119,6 +120,9 @@ architecture mapping of AmcCarrierBsa is
    signal diagAxiReadMaster  : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
    signal diagAxiReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
 
+   signal diagAxisMaster : AxiStreamMasterType;
+   signal diagAxisSlave  : AxiStreamSlaveType;
+
 begin
 
 
@@ -130,43 +134,67 @@ begin
    -----------------------------------------------------------------------------------------------
    -- Raw diagnostic engine
    -----------------------------------------------------------------------------------------------
-   ibBsaSlaves(DIAG_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;     -- Upstream only.
+   ibBsaSlaves(DIAG_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only.
    U_BsaRawDiagnostic_1 : entity work.BsaRawDiagnostic
       generic map (
          TPD_G                    => TPD_G,
          DIAGNOSTIC_RAW_STREAMS_G => DIAGNOSTIC_RAW_STREAMS_G,
          DIAGNOSTIC_RAW_CONFIGS_G => DIAGNOSTIC_RAW_CONFIGS_G,
-         OUTPUT_CONFIG_G          => BSA_AXIS_CONFIG_C)
+         OUTPUT_CONFIG_G          => RAW_DIAGNOSTIC_AXIS_CONFIG_C)
       port map (
-         diagnosticRawClks    => diagnosticRawClks,                -- [in]
-         diagnosticRawRsts    => diagnosticRawRsts,                -- [in]
-         diagnosticRawMasters => diagnosticRawMasters,             -- [in]
-         diagnosticRawSlaves  => diagnosticRawSlaves,              -- [out]
-         diagnosticRawCtrl    => diagnosticRawCtrl,                -- [out]
-         axiClk               => axiClk,                           -- [in]
-         axiRst               => axiRst,                           -- [in]
-         axiWriteMaster       => open,                             --diagAxiWriteMaster,               -- [out]
-         axiWriteSlave        => AXI_WRITE_SLAVE_INIT_C,           --diagAxiWriteSlave,                -- [in]
-         axiReadMaster        => open,                             --diagAxiReadMaster,                -- [out]
-         axiReadSlave         => AXI_READ_SLAVE_INIT_C,            --diagAxiReadSlave,                 -- [in]
-         bufClk               => axilClk,                          -- [in]
-         bufRst               => axilRst,                          -- [in]
-         bufMaster            => obBsaMasters(DIAG_AXIS_INDEX_C),  -- [out]
-         bufSlave             => obBsaSlaves(DIAG_AXIS_INDEX_C));  -- [in]
+         diagnosticRawClks    => diagnosticRawClks,             -- [in]
+         diagnosticRawRsts    => diagnosticRawRsts,             -- [in]
+         diagnosticRawMasters => diagnosticRawMasters,          -- [in]
+         diagnosticRawSlaves  => diagnosticRawSlaves,           -- [out]
+         diagnosticRawCtrl    => diagnosticRawCtrl,             -- [out]
+         axiClk               => axiClk,                        -- [in]
+         axiRst               => axiRst,                        -- [in]
+         axiWriteMaster       => diagAxiWriteMaster,            -- [out]
+         axiWriteSlave        => diagAxiWriteSlave,             -- [in]
+         axiReadMaster        => diagAxiReadMaster,             -- [out]
+         axiReadSlave         => diagAxiReadSlave,              -- [in]
+         bufClk               => axilClk,                       -- [in]
+         bufRst               => axilRst,                       -- [in]
+         bufMaster            => diagAxisMaster,                -- [out]
+         bufSlave             => diagAxisSlave);                -- [in]
+
+   AxiStreamFifo : entity work.AxiStreamFifo
+      generic map (
+         TPD_G               => TPD_G,
+         --INT_PIPE_STAGES_G   => INT_PIPE_STAGES_G,
+         PIPE_STAGES_G       => 1,
+         SLAVE_READY_EN_G    => true,
+         VALID_THOLD_G       => 1,
+         BRAM_EN_G           => false,
+         USE_BUILT_IN_G      => false,
+         GEN_SYNC_FIFO_G     => true,
+         FIFO_ADDR_WIDTH_G   => 4,
+         SLAVE_AXI_CONFIG_G  => RAW_DIAGNOSTIC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(8))
+      port map (
+         sAxisClk    => axilClk,
+         sAxisRst    => axilRst,
+         sAxisMaster => diagAxisMaster,
+         sAxisSlave  => diagAxisSlave,
+         mAxisClk    => axilClk,
+         mAxisRst    => axilRst,
+         mAxisMaster => obBsaMasters(DIAG_AXIS_INDEX_C),
+         mAxisSlave  => obBsaSlaves(DIAG_AXIS_INDEX_C));
 
    -------------------------------------------------------------------------------------------------
    -- BSA buffers
    -------------------------------------------------------------------------------------------------
    ibBsaSlaves(ASYNC_AXIS_INDEX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
    obBsaMasters(ASYNC_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;  -- Not implemented yet
-   BsaBufferControl_1 : entity work.BsaBufferControl2
+   BsaBufferControl_1 : entity work.BsaBufferControl
       generic map (
          TPD_G                   => TPD_G,
+         AXIL_BASE_ADDR_G        => BSA_ADDR_C,
          BSA_BUFFERS_G           => BSA_BUFFERS_G,
          BSA_ACCUM_FLOAT_G       => false,
-         BSA_STREAM_BYTE_WIDTH_G => 4,
+         BSA_STREAM_BYTE_WIDTH_G => 8,
          DIAGNOSTIC_OUTPUTS_G    => DIAGNOSTIC_OUTPUTS_G,
-         DDR_BURST_BYTES_G       => 2048,                         -- explore 4096
+         BSA_BURST_BYTES_G       => 2048,                         -- explore 4096
          AXI_CONFIG_G            => BSA_AXI_CONFIG_C)
       port map (
          axilClk         => axilClk,
