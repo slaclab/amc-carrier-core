@@ -50,7 +50,7 @@ entity AxiStreamDmaRingWrite is
       axisDataMaster   : in  AxiStreamMasterType;
       axisDataSlave    : out AxiStreamSlaveType;
       axisStatusMaster : out AxiStreamMasterType;
-      axisStatusSlave  : in  AxiStreamSlaveType;
+      axisStatusSlave  : in  AxiStreamSlaveType := AXI_STREAM_SLAVE_FORCE_C;
 
       -- Low level buffer control
       bufferClear   : in  slv(log2(BUFFERS_G)-1 downto 0);
