@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-01-22
+-- Last update: 2016-02-17
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -231,6 +231,7 @@ architecture mapping of DebugRtmAmcCarrierCore is
 
    signal masterResetPgp       : sl;
    signal masterResetAxi       : sl;
+   signal rstDly               : sl;
    signal resetDDR             : sl;
    signal pgpClk               : sl;
    signal pgpRst               : sl;
@@ -502,7 +503,13 @@ begin
          asyncRst => masterResetPgp,
          syncRst  => masterResetAxi);
 
-   resetDDR <= masterResetAxi or axiRst;
+   process(axiClk)
+   begin
+      if rising_edge(axiClk) then
+         rstDly   <= masterResetAxi or axiRst after TPD_G;  -- Register to help with timing
+         resetDDR <= rstDly                   after TPD_G;  -- Register to help with timing
+      end if;
+   end process;
 
    ------------------
    -- DDR Memory Core
