@@ -229,9 +229,6 @@ architecture mapping of AmcGenericAdcDacCore is
    signal jesdTxSync     : sl;
    signal adcDav         : slv(3 downto 0);
    signal adcData        : sampleDataArray(3 downto 0);
-   signal adcBigEnd      : sampleDataArray(3 downto 0);
-   signal dacBigEnd      : sampleDataArray(1 downto 0);
-   signal dacBigEndMux   : sampleDataArray(1 downto 0);
    signal dacLocMux      : sampleDataArray(1 downto 0);
    signal dacDav         : slv(1 downto 0);
    signal loopback       : sl;
@@ -417,11 +414,11 @@ begin
          dataValidVec_o(1)  => adcDav(0),     -- Swap CH0 and CH1 to match the front panel labels
          dataValidVec_o(2)  => adcDav(2),
          dataValidVec_o(3)  => adcDav(3),
-         sampleDataArr_o(0) => adcBigEnd(1),  -- Swap CH0 and CH1 to match the front panel labels
-         sampleDataArr_o(1) => adcBigEnd(0),  -- Swap CH0 and CH1 to match the front panel labels
-         sampleDataArr_o(2) => adcBigEnd(2),
-         sampleDataArr_o(3) => adcBigEnd(3),
-         sampleDataArr_i    => dacBigEndMux,
+         sampleDataArr_o(0) => adcData(1),  -- Swap CH0 and CH1 to match the front panel labels
+         sampleDataArr_o(1) => adcData(0),  -- Swap CH0 and CH1 to match the front panel labels
+         sampleDataArr_o(2) => adcData(2),
+         sampleDataArr_o(3) => adcData(3),
+         sampleDataArr_i    => dacLocMux,
          -------
          -- JESD
          -------
@@ -443,24 +440,11 @@ begin
          nSync_o            => jesdRxSync,
          nSync_i            => jesdTxSync);
 
-   GEN_ADC_CH :
-   for i in 3 downto 0 generate
-      adcData(i)(31 downto 24) <= adcBigEnd(i)(23 downto 16);  -- ADC[CH=i][time=1]BIT[7:0]
-      adcData(i)(23 downto 16) <= adcBigEnd(i)(31 downto 24);  -- ADC[CH=i][time=1]BIT[15:8]
-      adcData(i)(15 downto 8)  <= adcBigEnd(i)(7 downto 0);    -- ADC[CH=i][time=0]BIT[7:0]
-      adcData(i)(7 downto 0)   <= adcBigEnd(i)(15 downto 8);   -- ADC[CH=i][time=0]BIT[15:8]  
-   end generate GEN_ADC_CH;
-
-   GEN_DAC_CH :
+   GEN_DAC_MUX :
    for i in 1 downto 0 generate
-      dacBigEnd(i)(31 downto 24) <= dacValues(i)(23 downto 16);  -- DAC[CH=i][time=1]BIT[7:0]
-      dacBigEnd(i)(23 downto 16) <= dacValues(i)(31 downto 24);  -- DAC[CH=i][time=1]BIT[15:8]
-      dacBigEnd(i)(15 downto 8)  <= dacValues(i)(7 downto 0);    -- DAC[CH=i][time=0]BIT[7:0]
-      dacBigEnd(i)(7 downto 0)   <= dacValues(i)(15 downto 8);   -- DAC[CH=i][time=0]BIT[15:8]
-      dacBigEndMux(i)            <= dacBigEnd(i) when(loopback = '0') else adcBigEnd(i);
-      dacLocMux(i)               <= dacValues(i) when(loopback = '0') else adcData(i);
-      dacDav(i)                  <= '1'          when(loopback = '0') else adcDav(i);
-   end generate GEN_DAC_CH;
+      dacLocMux(i) <= dacValues(i) when(loopback = '0') else adcData(i);
+      dacDav(i)    <= '1'          when(loopback = '0') else adcDav(i);
+   end generate GEN_DAC_MUX;
 
    adcValids <= adcDav;
    adcValues <= adcData;
