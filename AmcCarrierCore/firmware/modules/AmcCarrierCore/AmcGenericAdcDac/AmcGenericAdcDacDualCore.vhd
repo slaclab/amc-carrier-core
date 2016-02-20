@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-02-04
+-- Last update: 2016-02-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -36,14 +36,15 @@ use unisim.vcomponents.all;
 
 entity AmcGenericAdcDacDualCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      SIM_SPEEDUP_G    : boolean          := false;
-      SIMULATION_G     : boolean          := false;
-      TRIG_CLK_G       : boolean          := false;
-      CAL_CLK_G        : boolean          := false;
-      AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));      
+      TPD_G                    : time                   := 1 ns;
+      SIM_SPEEDUP_G            : boolean                := false;
+      SIMULATION_G             : boolean                := false;
+      TRIG_CLK_G               : boolean                := false;
+      CAL_CLK_G                : boolean                := false;
+      RING_BUFFER_ADDR_WIDTH_G : positive range 1 to 14 := 10;
+      AXI_CLK_FREQ_G           : real                   := 156.25E+6;
+      AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G          : slv(31 downto 0)       := (others => '0'));      
    port (
       -- ADC Interface
       adcClk          : out   slv(1 downto 0);
@@ -63,6 +64,7 @@ entity AmcGenericAdcDacDualCore is
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -- Pass through Interfaces
+      debugTrig       : in    sl;
       fpgaClk         : in    slv(1 downto 0);
       smaTrig         : in    slv(1 downto 0);
       adcCal          : in    slv(1 downto 0);
@@ -182,14 +184,15 @@ begin
    GEN_AMC : for i in 1 downto 0 generate
       U_AMC : entity work.AmcGenericAdcDacCore
          generic map (
-            TPD_G            => TPD_G,
-            SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
-            SIMULATION_G     => SIMULATION_G,
-            TRIG_CLK_G       => TRIG_CLK_G,
-            CAL_CLK_G        => CAL_CLK_G,
-            AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
+            TPD_G                    => TPD_G,
+            SIM_SPEEDUP_G            => SIM_SPEEDUP_G,
+            SIMULATION_G             => SIMULATION_G,
+            TRIG_CLK_G               => TRIG_CLK_G,
+            CAL_CLK_G                => CAL_CLK_G,
+            RING_BUFFER_ADDR_WIDTH_G => RING_BUFFER_ADDR_WIDTH_G,
+            AXI_CLK_FREQ_G           => AXI_CLK_FREQ_G,
+            AXI_ERROR_RESP_G         => AXI_ERROR_RESP_G,
+            AXI_BASE_ADDR_G          => AXI_CONFIG_C(i).baseAddr)
          port map(
             -- ADC Interface
             adcClk          => adcClk(i),
@@ -213,6 +216,7 @@ begin
             axilWriteMaster => writeMasters(i),
             axilWriteSlave  => writeSlaves(i),
             -- Pass through Interfaces
+            debugTrig       => debugTrig,
             fpgaClk         => fpgaClk(i),
             smaTrig         => smaTrig(i),
             adcCal          => adcCal(i),

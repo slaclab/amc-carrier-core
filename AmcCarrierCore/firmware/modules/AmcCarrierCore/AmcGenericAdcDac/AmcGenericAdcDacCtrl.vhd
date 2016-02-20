@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-02-05
+-- Last update: 2016-02-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -31,9 +31,10 @@ use work.jesd204bpkg.all;
 
 entity AmcGenericAdcDacCtrl is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_CLK_FREQ_G   : real            := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G                    : time                   := 1 ns;
+      RING_BUFFER_ADDR_WIDTH_G : positive range 1 to 14 := 10;
+      AXI_CLK_FREQ_G           : real                   := 156.25E+6;
+      AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C);
    port (
       -- AMC Debug Signals
       amcClk          : in  sl;
@@ -43,7 +44,10 @@ entity AmcGenericAdcDacCtrl is
       adcValues       : in  sampleDataArray(3 downto 0);
       dacValues       : in  sampleDataArray(1 downto 0);
       dacVcoCtrl      : in  slv(15 downto 0);
+      dacVcoEnable    : out sl;
+      dacVcoSckConfig : out slv(15 downto 0);
       loopback        : out sl;
+      debugTrig       : in  sl;
       debugLogEn      : out sl;
       debugLogClr     : out sl;
       -- AXI-Lite Interface
@@ -66,44 +70,51 @@ end AmcGenericAdcDacCtrl;
 
 architecture rtl of AmcGenericAdcDacCtrl is
 
-   constant STATUS_SIZE_C : positive := 4;
+   constant STATUS_SIZE_C : positive := 5;
 
    type RegType is record
-      cntRst         : sl;
-      rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
-      loopback       : sl;
-      lmkClkSel      : slv(1 downto 0);
-      lmkRst         : sl;
-      lmkSync        : sl;
-      lmkMuxSel      : sl;
-      debugLogEn     : sl;
-      debugLogClr    : sl;
-      axilReadSlave  : AxiLiteReadSlaveType;
-      axilWriteSlave : AxiLiteWriteSlaveType;
+      cntRst          : sl;
+      rollOverEn      : slv(STATUS_SIZE_C-1 downto 0);
+      loopback        : sl;
+      dacVcoEnable    : sl;
+      dacVcoSckConfig : slv(15 downto 0);
+      lmkClkSel       : slv(1 downto 0);
+      lmkRst          : sl;
+      lmkSync         : sl;
+      lmkMuxSel       : sl;
+      softTrig        : sl;
+      softClear       : sl;
+      axilReadSlave   : AxiLiteReadSlaveType;
+      axilWriteSlave  : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      cntRst         => '1',
-      rollOverEn     => (others => '0'),
-      loopback       => '0',
-      lmkClkSel      => (others => '0'),
-      lmkRst         => '0',
-      lmkSync        => '0',
-      lmkMuxSel      => '0',
-      debugLogEn     => '0',
-      debugLogClr    => '0',
-      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
-      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
+      cntRst          => '1',
+      rollOverEn      => (others => '0'),
+      loopback        => '0',
+      dacVcoEnable    => '0',
+      dacVcoSckConfig => (others => '1'),
+      lmkClkSel       => (others => '0'),
+      lmkRst          => '0',
+      lmkSync         => '0',
+      lmkMuxSel       => '0',
+      softTrig        => '0',
+      softClear       => '0',
+      axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   signal statusOut      : slv(STATUS_SIZE_C-1 downto 0);
    signal adcDataSync    : Slv16Array(3 downto 0);
    signal dacDataSync    : Slv16Array(1 downto 0);
    signal dacVcoCtrlSync : slv(15 downto 0);
    signal amcClkFreq     : slv(31 downto 0);
    signal statusCnt      : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
    signal adcValidsSync  : slv(3 downto 0);
+   signal softTrig       : sl;
+   signal softClear      : sl;
 
    -- attribute dont_touch               : string;
    -- attribute dont_touch of r          : signal is "TRUE";
@@ -164,13 +175,57 @@ begin
          locClk  => axilClk,
          refClk  => axilClk);   
 
-   Sync_loopback : entity work.Synchronizer
+   Sync_Config : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
+      port map (
+         clk        => clk,
+         dataIn(0)  => r.loopback,
+         dataIn(1)  => r.dacVcoEnable,
+         dataOut(0) => loopback,
+         dataOut(1) => dacVcoEnable);    
+
+   Sync_DacVcoSckConfig : entity work.SynchronizerFifo
+      generic map (
+         TPD_G        => TPD_G,
+         DATA_WIDTH_G => 16)
+      port map (
+         -- Write Ports (wr_clk domain)
+         wr_clk => axilClk,
+         din    => r.dacVcoSckConfig,
+         -- Read Ports (rd_clk domain)
+         rd_clk => clk,
+         dout   => dacVcoSckConfig);                   
+
+   Synchronizer_softTrig : entity work.SynchronizerOneShot
       generic map (
          TPD_G => TPD_G)
       port map (
          clk     => clk,
-         dataIn  => r.loopback,
-         dataOut => loopback);         
+         dataIn  => r.softTrig,
+         dataOut => softTrig);
+
+   Synchronizer_softClear : entity work.SynchronizerOneShot
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => clk,
+         dataIn  => r.softClear,
+         dataOut => softClear);     
+
+   Synchronizer_DebugTrig : entity work.AmcGenericAdcDacSyncTrig
+      generic map (
+         TPD_G                    => TPD_G,
+         RING_BUFFER_ADDR_WIDTH_G => RING_BUFFER_ADDR_WIDTH_G)
+      port map (
+         clk         => clk,
+         rst         => rst,
+         softTrig    => softTrig,
+         softClear   => softClear,
+         debugTrig   => debugTrig,
+         debugLogEn  => debugLogEn,
+         debugLogClr => debugLogClr);
 
    U_SyncStatusVector : entity work.SyncStatusVector
       generic map (
@@ -181,35 +236,20 @@ begin
          WIDTH_G        => STATUS_SIZE_C)     
       port map (
          -- Input Status bit Signals (wrClk domain)
-         statusIn(3 downto 0)  => adcValids,
+         statusIn(4)          => debugTrig,
+         statusIn(3 downto 0) => adcValids,
          -- Output Status bit Signals (rdClk domain)  
-         statusOut(3 downto 0) => adcValidsSync,
+         statusOut            => statusOut,
          -- Status Bit Counters Signals (rdClk domain) 
-         cntRstIn              => r.cntRst,
-         rollOverEnIn          => r.rollOverEn,
-         cntOut                => statusCnt,
+         cntRstIn             => r.cntRst,
+         rollOverEnIn         => r.rollOverEn,
+         cntOut               => statusCnt,
          -- Clocks and Reset Ports
-         wrClk                 => clk,
-         rdClk                 => axilClk);   
+         wrClk                => clk,
+         rdClk                => axilClk);   
 
-   Synchronizer_logEn : entity work.Synchronizer
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk     => clk,
-         dataIn  => r.debugLogEn,
-         dataOut => debugLogEn);
-
-   Synchronizer_bufferClear : entity work.SynchronizerOneShot
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk     => clk,
-         dataIn  => r.debugLogClr,
-         dataOut => debugLogClr);         
-
-   comb : process (adcDataSync, adcValidsSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster,
-                   dacDataSync, dacVcoCtrlSync, lmkStatus, r, statusCnt) is
+   comb : process (adcDataSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dacDataSync,
+                   dacVcoCtrlSync, lmkStatus, r, statusCnt, statusOut) is
       variable v         : RegType;
       variable axiStatus : AxiLiteStatusType;
 
@@ -245,8 +285,9 @@ begin
       v := r;
 
       -- Reset the strobes
-      v.cntRst      := '0';
-      v.debugLogClr := '0';
+      v.cntRst    := '0';
+      v.softTrig  := '0';
+      v.softClear := '0';
 
       -- Determine the transaction type
       axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus);
@@ -256,7 +297,8 @@ begin
       axiSlaveRegisterR(x"004", 0, muxSlVectorArray(statusCnt, 1));
       axiSlaveRegisterR(x"008", 0, muxSlVectorArray(statusCnt, 2));
       axiSlaveRegisterR(x"00C", 0, muxSlVectorArray(statusCnt, 3));
-      axiSlaveRegisterR(x"0FC", 0, adcValidsSync);
+      axiSlaveRegisterR(x"010", 0, muxSlVectorArray(statusCnt, 4));
+      axiSlaveRegisterR(x"0FC", 0, statusOut);
       axiSlaveRegisterR(x"100", 0, adcDataSync(0));
       axiSlaveRegisterR(x"104", 0, adcDataSync(1));
       axiSlaveRegisterR(x"108", 0, adcDataSync(2));
@@ -274,8 +316,11 @@ begin
       axiSlaveRegisterR(x"20C", 0, lmkStatus);
       axiSlaveRegisterW(x"210", 0, v.loopback);
       axiSlaveRegisterW(x"214", 0, v.lmkMuxSel);
-      axiSlaveRegisterW(x"218", 0, v.debugLogEn);
-      axiSlaveRegisterW(x"21C", 0, v.debugLogClr);
+      axiSlaveRegisterW(x"218", 0, v.softTrig);
+      axiSlaveRegisterW(x"21C", 0, v.softClear);
+      axiSlaveRegisterW(x"220", 0, v.dacVcoSckConfig);
+      axiSlaveRegisterW(x"224", 0, v.dacVcoEnable);
+
       axiSlaveRegisterW(x"3F8", 0, v.rollOverEn);
       axiSlaveRegisterW(x"3FC", 0, v.cntRst);
 
@@ -306,5 +351,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-
+   
 end rtl;

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-02-04
+-- Last update: 2016-02-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -35,14 +35,15 @@ use unisim.vcomponents.all;
 
 entity AmcGenericAdcDacCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      SIM_SPEEDUP_G    : boolean          := false;
-      SIMULATION_G     : boolean          := false;
-      TRIG_CLK_G       : boolean          := false;
-      CAL_CLK_G        : boolean          := false;
-      AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G                    : time                   := 1 ns;
+      SIM_SPEEDUP_G            : boolean                := false;
+      SIMULATION_G             : boolean                := false;
+      TRIG_CLK_G               : boolean                := false;
+      CAL_CLK_G                : boolean                := false;
+      RING_BUFFER_ADDR_WIDTH_G : positive range 1 to 14 := 10;
+      AXI_CLK_FREQ_G           : real                   := 156.25E+6;
+      AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G          : slv(31 downto 0)       := (others => '0'));
    port (
       -- ADC Interface
       adcClk          : out   sl;
@@ -62,6 +63,7 @@ entity AmcGenericAdcDacCore is
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -- Pass through Interfaces
+      debugTrig       : in    sl;
       fpgaClk         : in    sl;
       smaTrig         : in    sl;
       adcCal          : in    sl;
@@ -217,27 +219,28 @@ architecture mapping of AmcGenericAdcDacCore is
    signal readMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal readSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal refClkDiv2     : sl;
-   signal refClk         : sl;
-   signal amcClk         : sl;
-   signal amcRst         : sl;
-   signal jesdClk185     : sl;
-   signal jesdRst185     : sl;
-   signal jesdMmcmLocked : sl;
-   signal jesdSysRef     : sl;
-   signal jesdRxSync     : sl;
-   signal jesdTxSync     : sl;
-   signal adcDav         : slv(3 downto 0);
-   signal adcData        : sampleDataArray(3 downto 0);
-   signal dacLocMux      : sampleDataArray(1 downto 0);
-   signal dacDav         : slv(1 downto 0);
-   signal loopback       : sl;
-   signal debugLogEn     : sl;
-   signal debugLogClr    : sl;
-   signal lmkDataIn      : sl;
-   signal lmkDataOut     : sl;
+   signal refClkDiv2      : sl;
+   signal refClk          : sl;
+   signal amcClk          : sl;
+   signal amcRst          : sl;
+   signal jesdClk185      : sl;
+   signal jesdRst185      : sl;
+   signal jesdMmcmLocked  : sl;
+   signal jesdSysRef      : sl;
+   signal jesdRxSync      : sl;
+   signal jesdTxSync      : sl;
+   signal adcDav          : slv(3 downto 0);
+   signal adcData         : sampleDataArray(3 downto 0);
+   signal dacLocMux       : sampleDataArray(1 downto 0);
+   signal dacDav          : slv(1 downto 0);
+   signal loopback        : sl;
+   signal debugLogEn      : sl;
+   signal debugLogClr     : sl;
+   signal lmkDataIn       : sl;
+   signal lmkDataOut      : sl;
+   signal dacVcoEnable    : sl;
+   signal dacVcoSckConfig : slv(15 downto 0);
    
-
 begin
 
    ClkBuf_0 : entity work.ClkOutBufDiff
@@ -410,8 +413,8 @@ begin
          txWriteMaster      => writeMasters(JESD_TX_INDEX_C),
          txWriteSlave       => writeSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         dataValidVec_o(0)  => adcDav(1),     -- Swap CH0 and CH1 to match the front panel labels
-         dataValidVec_o(1)  => adcDav(0),     -- Swap CH0 and CH1 to match the front panel labels
+         dataValidVec_o(0)  => adcDav(1),   -- Swap CH0 and CH1 to match the front panel labels
+         dataValidVec_o(1)  => adcDav(0),   -- Swap CH0 and CH1 to match the front panel labels
          dataValidVec_o(2)  => adcDav(2),
          dataValidVec_o(3)  => adcDav(3),
          sampleDataArr_o(0) => adcData(1),  -- Swap CH0 and CH1 to match the front panel labels
@@ -551,32 +554,32 @@ begin
    ----------------------   
    -- SLOW DAC SPI Module
    ----------------------   
-   OBUFDS_DacVcoCs : OBUFDS
+   SLOW_SPI_DAC : entity work.AmcGenericAdcDacVcoSpi
+      generic map (
+         TPD_G => TPD_G)
       port map (
-         I  => '1',
-         O  => dacVcoCsP,
-         OB => dacVcoCsN);   
-
-   OBUFDS_DacVcoSck : OBUFDS
-      port map (
-         I  => '1',
-         O  => dacVcoSckP,
-         OB => dacVcoSckN);
-
-   OBUFDS_DacVcoDin : OBUFDS
-      port map (
-         I  => '1',
-         O  => dacVcoDinP,
-         OB => dacVcoDinN);         
+         clk             => jesdClk185,
+         rst             => jesdRst185,
+         dacVcoEnable    => dacVcoEnable,
+         dacVcoCtrl      => dacVcoCtrl,
+         dacVcoSckConfig => dacVcoSckConfig,
+         -- Slow DAC's SPI Ports
+         dacVcoCsP       => dacVcoCsP,
+         dacVcoCsN       => dacVcoCsN,
+         dacVcoSckP      => dacVcoSckP,
+         dacVcoSckN      => dacVcoSckN,
+         dacVcoDinP      => dacVcoDinP,
+         dacVcoDinN      => dacVcoDinN);
 
    -----------------------   
    -- Misc. Control Module
    ----------------------- 
    U_Ctrl : entity work.AmcGenericAdcDacCtrl
       generic map (
-         TPD_G            => TPD_G,
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G                    => TPD_G,
+         RING_BUFFER_ADDR_WIDTH_G => RING_BUFFER_ADDR_WIDTH_G,
+         AXI_CLK_FREQ_G           => AXI_CLK_FREQ_G,
+         AXI_ERROR_RESP_G         => AXI_ERROR_RESP_G)
       port map (
          -- AMC Debug Signals
          amcClk          => amcClk,
@@ -586,7 +589,10 @@ begin
          adcValues       => adcData,
          dacValues       => dacLocMux,
          dacVcoCtrl      => dacVcoCtrl,
+         dacVcoEnable    => dacVcoEnable,
+         dacVcoSckConfig => dacVcoSckConfig,
          loopback        => loopback,
+         debugTrig       => debugTrig,
          debugLogEn      => debugLogEn,
          debugLogClr     => debugLogClr,
          -- AXI-Lite Interface
@@ -616,7 +622,7 @@ begin
             BRAM_EN_G        => true,
             REG_EN_G         => true,
             DATA_WIDTH_G     => 32,
-            RAM_ADDR_WIDTH_G => 10,
+            RAM_ADDR_WIDTH_G => RING_BUFFER_ADDR_WIDTH_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
          port map (
             -- Data to store in ring buffer
@@ -645,7 +651,7 @@ begin
             BRAM_EN_G        => true,
             REG_EN_G         => true,
             DATA_WIDTH_G     => 32,
-            RAM_ADDR_WIDTH_G => 10,
+            RAM_ADDR_WIDTH_G => RING_BUFFER_ADDR_WIDTH_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
          port map (
             -- Data to store in ring buffer
