@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2016-02-08
+-- Last update: 2016-02-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -46,6 +46,7 @@ entity AmcCarrierMpsSalt is
       mps312MHzRst      : in  sl;
       mps625MHzClk      : in  sl;
       mps625MHzRst      : in  sl;
+      mpsPllLocked      : in  sl;
       -- AXI-Lite Interface
       axilClk           : in  sl;
       axilRst           : in  sl;
@@ -232,8 +233,8 @@ begin
       
    end generate;
 
-   comb : process (appId, axilReadMaster, axilRst, axilWriteMaster, cntOut, diagnosticClkFreq, r,
-                   statusOut, timeStrbRate) is
+   comb : process (appId, axilReadMaster, axilRst, axilWriteMaster, cntOut, diagnosticClkFreq,
+                   mpsPllLocked, r, statusOut, timeStrbRate) is
       variable v         : RegType;
       variable axiStatus : AxiLiteStatusType;
 
@@ -299,6 +300,7 @@ begin
       axiSlaveRegisterR(x"118", 0, toSlv(MPS_THRESHOLD_C, 32));
       axiSlaveRegisterR(x"11C", 0, toSlv(FFB_CHANNELS_C, 32));
       axiSlaveRegisterR(x"120", 0, appId);
+      axiSlaveRegisterR(x"124", 0, mpsPllLocked);
 
       -- Map the write registers
       axiSlaveRegisterW(x"200", 0, v.mpsEnable);

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-01-11
+-- Last update: 2016-02-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -54,6 +54,7 @@ entity AmcCarrierClkAndRst is
       mps312MHzRst : out sl;
       mps625MHzClk : out sl;
       mps625MHzRst : out sl;
+      mpsPllLocked : out sl;
       ----------------
       -- Core Ports --
       ----------------   
@@ -78,6 +79,7 @@ architecture mapping of AmcCarrierClkAndRst is
    signal mpsRst        : sl;
    signal mpsMmcmClkOut : slv(2 downto 0);
    signal mpsMmcmRstOut : slv(2 downto 0);
+   signal locked        : sl;
 
 
 begin
@@ -173,8 +175,17 @@ begin
          -- Clock Outputs
          clkOut => mpsMmcmClkOut,
          -- Reset Outputs
-         rstOut => mpsMmcmRstOut);
+         rstOut => mpsMmcmRstOut,
+         -- Locked Status
+         locked => locked);
 
+   Sync_locked : entity work.SynchronizerOneShot
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => fabMmcmClkOut,
+         dataIn  => locked,
+         dataOut => mpsPllLocked);            
 
    ref125MHzClk <= mpsMmcmClkOut(2);
    ref125MHzRst <= mpsMmcmRstOut(2);
@@ -193,7 +204,6 @@ begin
 
    mps625MHzClk <= mpsMmcmClkOut(0);
    mps625MHzRst <= mpsMmcmRstOut(0);
-
 
    U_ClkOutBufSingle : entity work.ClkOutBufSingle
       generic map(

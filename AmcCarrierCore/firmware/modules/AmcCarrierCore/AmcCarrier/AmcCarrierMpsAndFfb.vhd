@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2016-01-22
+-- Last update: 2016-02-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -49,6 +49,7 @@ entity AmcCarrierMpsAndFfb is
       mps312MHzRst    : in  sl;
       mps625MHzClk    : in  sl;
       mps625MHzRst    : in  sl;
+      mpsPllLocked    : in  sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -286,6 +287,7 @@ begin
          mps312MHzRst      => mps312MHzRst,
          mps625MHzClk      => mps625MHzClk,
          mps625MHzRst      => mps625MHzRst,
+         mpsPllLocked      => mpsPllLocked,
          -- AXI-Lite Interface
          axilClk           => axilClk,
          axilRst           => axilRst,
