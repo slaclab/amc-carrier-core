@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2015-11-02
+-- Last update: 2016-02-24
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -54,9 +54,9 @@ entity DebugRtmPgpAmcCarrier is
       axilReadSlave     : out AxiLiteReadSlaveType;
       axilWriteMaster   : in  AxiLiteWriteMasterType;
       axilWriteSlave    : out AxiLiteWriteSlaveType;
-      -- FFB Outbound Interface
-      ffbObMaster       : in  AxiStreamMasterType;
-      ffbObSlave        : out AxiStreamSlaveType;
+      -- Backplane Messaging Interface
+      bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
+      bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
       -- Debug AXI stream Interface
       pgpClock          : out sl;
       pgpReset          : out sl;
@@ -65,10 +65,10 @@ entity DebugRtmPgpAmcCarrier is
       ----------------------
       -- Top Level Interface
       ----------------------
-      -- FFB Inbound Interface (ffbClk domain)
-      ffbClk            : in  sl;
-      ffbRst            : in  sl;
-      ffbBus            : out FfbBusType;
+      -- Backplane Messaging Interface (bpMsgClk domain)
+      bpMsgClk          : in  sl := '0';
+      bpMsgRst          : in  sl := '0';
+      bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
       ----------------
       -- Core Ports --
       ----------------   
@@ -101,8 +101,8 @@ begin
    pgpClock <= pgpClk;
    pgpReset <= pgpRst;
 
-   ffbBus     <= FFB_BUS_INIT_C;
-   ffbObSlave <= AXI_STREAM_SLAVE_FORCE_C;
+   bpMsgBus    <= (others => BP_MSG_BUS_INIT_C);
+   bpMsgSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
 
    U_IBUFDS_GTE3 : IBUFDS_GTE3
       generic map (

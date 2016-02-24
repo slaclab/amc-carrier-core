@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-02-17
+-- Last update: 2016-02-24
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -43,7 +43,6 @@ entity DebugRtmAmcCarrierCore is
       MPS_SLOT_G          : boolean             := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G              : boolean             := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G          : AppType             := APP_NULL_TYPE_C;
-      FFB_CLIENT_SIZE_G   : positive            := 1;
       DIAGNOSTIC_SIZE_G   : positive            := 2;
       DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
    port (
@@ -70,10 +69,10 @@ entity DebugRtmAmcCarrierCore is
       diagnosticMasters : in    AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       diagnosticSlaves  : out   AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
       diagnosticCtrls   : out   AxiStreamCtrlArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      -- FFB Inbound Interface (ffbClk domain)
-      ffbClk            : in    sl                               := '0';
-      ffbRst            : in    sl                               := '0';
-      ffbBus            : out   FfbBusType;
+      -- Backplane Messaging Interface (bpMsgClk domain)
+      bpMsgClk          : in    sl                               := '0';
+      bpMsgRst          : in    sl                               := '0';
+      bpMsgBus          : out   BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
       -- BSI Interface (bsiClk domain) 
       bsiClk            : in    sl                               := '0';
       bsiRst            : in    sl                               := '0';
@@ -176,6 +175,7 @@ architecture mapping of DebugRtmAmcCarrierCore is
    signal mps312MHzRst : sl;
    signal mps625MHzClk : sl;
    signal mps625MHzRst : sl;
+   signal mpsPllLocked : sl;
 
    signal axilClk          : sl;
    signal axilRst          : sl;
@@ -222,8 +222,8 @@ architecture mapping of DebugRtmAmcCarrierCore is
    signal mpsWriteMaster : AxiLiteWriteMasterType;
    signal mpsWriteSlave  : AxiLiteWriteSlaveType;
 
-   signal ffbObMaster : AxiStreamMasterType;
-   signal ffbObSlave  : AxiStreamSlaveType;
+   signal bpMsgMasters : AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
+   signal bpMsgSlaves  : AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
 
    signal localMac   : slv(47 downto 0);
    signal localIp    : slv(31 downto 0);
@@ -273,6 +273,7 @@ begin
          mps312MHzRst => mps312MHzRst,
          mps625MHzClk => mps625MHzClk,
          mps625MHzRst => mps625MHzRst,
+         mpsPllLocked => mpsPllLocked,
          ----------------
          -- Core Ports --
          ----------------   
@@ -306,9 +307,9 @@ begin
          axilReadSlave     => pgpReadSlave,
          axilWriteMaster   => pgpWriteMaster,
          axilWriteSlave    => pgpWriteSlave,
-         -- Outbound FFB Interface
-         ffbObMaster       => ffbObMaster,
-         ffbObSlave        => ffbObSlave,
+         -- Backplane Messaging Interface
+         bpMsgMasters      => bpMsgMasters,
+         bpMsgSlaves       => bpMsgSlaves,
          -- Debug AXI stream Interface
          pgpClock          => pgpClk,
          pgpReset          => pgpRst,
@@ -317,10 +318,10 @@ begin
          ----------------------
          -- Top Level Interface
          ----------------------
-         -- FFB Inbound Interface (ffbClk domain)         
-         ffbClk            => ffbClk,
-         ffbRst            => ffbRst,
-         ffbBus            => ffbBus,
+         -- Backplane Messaging Interface (bpMsgClk domain)
+         bpMsgClk          => bpMsgClk,
+         bpMsgRst          => bpMsgRst,
+         bpMsgBus          => bpMsgBus,
          ----------------
          -- Core Ports --
          ----------------   
@@ -562,10 +563,10 @@ begin
          ddrPg           => ddrPg,
          ddrAlertL       => ddrAlertL);
 
-   -------------------
-   -- MPS and FFB Core
-   -------------------
-   U_MpsandFfb : entity work.AmcCarrierMpsAndFfb
+   ----------------------
+   -- MPS and BP_MSG Core
+   ----------------------
+   U_MpsAndBpMsg : entity work.AmcCarrierMpsAndBpMsg
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
@@ -581,6 +582,7 @@ begin
          mps312MHzRst    => mps312MHzRst,
          mps625MHzClk    => mps625MHzClk,
          mps625MHzRst    => mps625MHzRst,
+         mpsPllLocked    => mpsPllLocked,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -588,9 +590,9 @@ begin
          axilReadSlave   => mpsReadSlave,
          axilWriteMaster => mpsWriteMaster,
          axilWriteSlave  => mpsWriteSlave,
-         -- FFB Interface
-         ffbObMaster     => ffbObMaster,
-         ffbObSlave      => ffbObSlave,
+         -- Backplane Messaging Interface
+         bpMsgMasters    => bpMsgMasters,
+         bpMsgSlaves     => bpMsgSlaves,
          ----------------------
          -- Top Level Interface
          ----------------------
