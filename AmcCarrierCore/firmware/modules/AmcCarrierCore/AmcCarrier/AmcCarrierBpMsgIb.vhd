@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierFfbIbMsg.vhd
+-- File       : AmcCarrierBpMsgIb.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2015-09-30
+-- Last update: 2016-02-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ use work.SsiPkg.all;
 use work.AmcCarrierPkg.all;
 use work.IpV4EnginePkg.all;
 
-entity AmcCarrierFfbIbMsg is
+entity AmcCarrierBpMsgIb is
    generic (
       TPD_G : time := 1 ns);      
    port (
@@ -43,17 +43,17 @@ entity AmcCarrierFfbIbMsg is
       ----------------------
       -- Top Level Interface
       ----------------------
-      -- FFB Inbound Interface (ffbClk domain)
-      ffbClk         : in  sl;
-      ffbRst         : in  sl;
-      ffbBus        : out FfbBusType);
-end AmcCarrierFfbIbMsg;
+      -- Backplane Messaging Interface (bpMsgClk domain)
+      bpMsgClk       : in  sl;
+      bpMsgRst       : in  sl;
+      bpMsgBus       : out BpMsgBusType);
+end AmcCarrierBpMsgIb;
 
-architecture rtl of AmcCarrierFfbIbMsg is
+architecture rtl of AmcCarrierBpMsgIb is
 
    constant BUS_WIDTH_C : natural := 1112;
 
-   function toSlv (ffbBus : FfbBusType) return slv is
+   function toSlv (bpMsgBus : BpMsgBusType) return slv is
       variable retVar : slv(BUS_WIDTH_C-1 downto 0);
       variable i      : natural;
    begin
@@ -62,30 +62,30 @@ architecture rtl of AmcCarrierFfbIbMsg is
 
       -- Load the message array
       for i in 31 downto 0 loop
-         retVar((i*32)+31 downto (i*32)) := ffbBus.message(i);
+         retVar((i*32)+31 downto (i*32)) := bpMsgBus.message(i);
       end loop;
 
       -- Load the time stamp
-      retVar(1087 downto 1024) := ffbBus.timeStamp;
+      retVar(1087 downto 1024) := bpMsgBus.timeStamp;
 
       -- Load the application ID
-      retVar(1103 downto 1088) := ffbBus.appId;
+      retVar(1103 downto 1088) := bpMsgBus.appId;
 
       -- Load the test mode flag
-      retVar(1104) := ffbBus.testMode;
+      retVar(1104) := bpMsgBus.testMode;
 
       -- Load the application type
-      retVar((AppType'length)+1104 downto 1105) := ffbBus.app;
+      retVar((AppType'length)+1104 downto 1105) := bpMsgBus.app;
 
       return retVar;
    end function;
 
-   function fromSlv (valid : sl; dout : slv(BUS_WIDTH_C-1 downto 0)) return FfbBusType is
-      variable retVar : FfbBusType;
+   function fromSlv (valid : sl; dout : slv(BUS_WIDTH_C-1 downto 0)) return BpMsgBusType is
+      variable retVar : BpMsgBusType;
       variable i      : natural;
    begin
       -- Reset the variable
-      retVar := FFB_BUS_INIT_C;
+      retVar := BP_MSG_BUS_INIT_C;
 
       -- Load the valid
       retVar.valid := valid;
@@ -119,14 +119,14 @@ architecture rtl of AmcCarrierFfbIbMsg is
       cnt           : natural range 0 to 63;
       cntSize       : slv(7 downto 0);
       obServerSlave : AxiStreamSlaveType;
-      ffbBus       : FfbBusType;
+      bpMsgBus      : BpMsgBusType;
       state         : StateType;
    end record RegType;
    constant REG_INIT_C : RegType := (
       cnt           => 0,
       cntSize       => (others => '0'),
       obServerSlave => AXI_STREAM_SLAVE_INIT_C,
-      ffbBus       => FFB_BUS_INIT_C,
+      bpMsgBus      => BP_MSG_BUS_INIT_C,
       state         => IDLE_S);      
 
    signal r   : RegType := REG_INIT_C;
@@ -148,8 +148,8 @@ begin
       v := r;
 
       -- Reset the flags
-      v.obServerSlave := AXI_STREAM_SLAVE_INIT_C;
-      v.ffbBus.valid := '0';
+      v.obServerSlave  := AXI_STREAM_SLAVE_INIT_C;
+      v.bpMsgBus.valid := '0';
 
       -- State Machine
       case r.state is
@@ -170,22 +170,22 @@ begin
             -- Check if ready to move data
             if (obServerMaster.tValid = '1') then
                -- Accept the data
-               v.obServerSlave.tReady         := '1';
+               v.obServerSlave.tReady          := '1';
                -- Latch the header and first 32-bit message word
-               v.ffbBus.message(0)           := obServerMaster.tData(127 downto 96);
-               v.ffbBus.timeStamp            := obServerMaster.tData(95 downto 32);
-               v.ffbBus.appId                := obServerMaster.tData(31 downto 16);
-               v.ffbBus.testMode             := obServerMaster.tData(15);
-               v.ffbBus.app                  := obServerMaster.tData((AppType'length)+7 downto 8);
-               v.cntSize                      := obServerMaster.tData(7 downto 0);
+               v.bpMsgBus.message(0)           := obServerMaster.tData(127 downto 96);
+               v.bpMsgBus.timeStamp            := obServerMaster.tData(95 downto 32);
+               v.bpMsgBus.appId                := obServerMaster.tData(31 downto 16);
+               v.bpMsgBus.testMode             := obServerMaster.tData(15);
+               v.bpMsgBus.app                  := obServerMaster.tData((AppType'length)+7 downto 8);
+               v.cntSize                       := obServerMaster.tData(7 downto 0);
                --- Reset the other message data fields
-               v.ffbBus.message(31 downto 1) := (others => (others => '0'));
+               v.bpMsgBus.message(31 downto 1) := (others => (others => '0'));
                -- Check for EOF
                if obServerMaster.tLast = '1' then
                   -- Check for correct length
                   if v.cntSize = 1 then
                      -- Forward the message
-                     v.ffbBus.valid := '1';
+                     v.bpMsgBus.valid := '1';
                   end if;
                   -- Next state
                   v.state := IDLE_S;
@@ -212,7 +212,7 @@ begin
                      -- Check the tKeep
                      if obServerMaster.tKeep((i*4)+3 downto (i*4)) = x"F" then
                         -- Latch the message
-                        v.ffbBus.message(v.cnt) := obServerMaster.tData((i*32)+31 downto (i*32));
+                        v.bpMsgBus.message(v.cnt) := obServerMaster.tData((i*32)+31 downto (i*32));
                      end if;
                      -- Increment the counter
                      v.cnt := v.cnt + 1;
@@ -223,7 +223,7 @@ begin
                   -- Check for EOF
                   if obServerMaster.tLast = '1' then
                      -- Forward the message
-                     v.ffbBus.valid := '1';
+                     v.bpMsgBus.valid := '1';
                   end if;
                   -- Next state
                   v.state := IDLE_S;
@@ -246,8 +246,8 @@ begin
 
       -- Outputs        
       obServerSlave <= v.obServerSlave;
-      din           <= toSlv(r.ffbBus);
-      ffbBus       <= fromSlv(valid, dout);
+      din           <= toSlv(r.bpMsgBus);
+      bpMsgBus      <= fromSlv(valid, dout);
 
    end process comb;
 
@@ -267,10 +267,10 @@ begin
          rst    => rst,
          -- Write Ports (wr_clk domain)
          wr_clk => clk,
-         wr_en  => r.ffbBus.valid,
+         wr_en  => r.bpMsgBus.valid,
          din    => din,
          -- Read Ports (rd_clk domain)
-         rd_clk => ffbClk,
+         rd_clk => bpMsgClk,
          valid  => valid,
          dout   => dout);  
 

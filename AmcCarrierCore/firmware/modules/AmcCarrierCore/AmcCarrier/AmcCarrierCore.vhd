@@ -45,7 +45,6 @@ entity AmcCarrierCore is
       OVERRIDE_BSI_G           : boolean              := false;  -- false = Normal Operation, true = use IP_ADDR, MAC_ADDR generics
       IP_ADDR_G                : slv(31 downto 0)     := x"0A02A8C0";
       MAC_ADDR_G               : slv(47 downto 0)     := x"010300564400";
-      FFB_CLIENT_SIZE_G        : positive             := 1;
       DIAGNOSTIC_RAW_STREAMS_G : positive             := 1;
       DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray := (0 => ssiAxiStreamConfig(4)));  -- Must be same size as DIAGNOSTIC_RAW_STREAMS_G
    port (
@@ -77,10 +76,10 @@ entity AmcCarrierCore is
       diagnosticRawMasters : in  AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
       diagnosticRawSlaves  : out AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
       diagnosticRawCtrl    : out AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      -- FFB Inbound Interface (ffbClk domain)
-      ffbClk               : in  sl                               := '0';
-      ffbRst               : in  sl                               := '0';
-      ffbBus               : out FfbBusType;
+      -- Backplane Messaging Interface (bpMsgClk domain)
+      bpMsgClk             : in  sl                               := '0';
+      bpMsgRst             : in  sl                               := '0';
+      bpMsgBus             : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
       -- BSI Interface (bsiClk domain) 
       bsiClk               : in  sl                               := '0';
       bsiRst               : in  sl                               := '0';
@@ -236,8 +235,8 @@ architecture mapping of AmcCarrierCore is
    signal ibBsaMasters : AxiStreamMasterArray(2 downto 0);
    signal ibBsaSlaves  : AxiStreamSlaveArray(2 downto 0);
 
-   signal ffbObMaster : AxiStreamMasterType;
-   signal ffbObSlave  : AxiStreamSlaveType;
+   signal bpMsgMasters : AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
+   signal bpMsgSlaves  : AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
 
    signal bsiMac : slv(47 downto 0);
    signal bsiIp  : slv(31 downto 0);
@@ -312,9 +311,8 @@ begin
    ------------------------------------
    U_Eth : entity work.AmcCarrierEth
       generic map (
-         TPD_G             => TPD_G,
-         FFB_CLIENT_SIZE_G => FFB_CLIENT_SIZE_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- Local Configuration
          localMac          => localMac,
@@ -336,16 +334,16 @@ begin
          obBsaSlaves       => obBsaSlaves,
          ibBsaMasters      => ibBsaMasters,
          ibBsaSlaves       => ibBsaSlaves,
-         -- Outbound FFB Interface
-         ffbObMaster       => ffbObMaster,
-         ffbObSlave        => ffbObSlave,
+         -- Backplane Messaging Interface
+         bpMsgMasters      => bpMsgMasters,
+         bpMsgSlaves       => bpMsgSlaves,
          ----------------------
          -- Top Level Interface
          ----------------------
-         -- FFB Inbound Interface (ffbClk domain)         
-         ffbClk            => ffbClk,
-         ffbRst            => ffbRst,
-         ffbBus            => ffbBus,
+         -- Backplane Messaging Interface (bpMsgClk domain)
+         bpMsgClk          => bpMsgClk,
+         bpMsgRst          => bpMsgRst,
+         bpMsgBus          => bpMsgBus,
          ----------------
          -- Core Ports --
          ----------------   
@@ -590,10 +588,10 @@ begin
          ddrPg           => ddrPg,
          ddrAlertL       => ddrAlertL);
 
-   -------------------
-   -- MPS and FFB Core
-   -------------------
-   U_MpsandFfb : entity work.AmcCarrierMpsAndFfb
+   ----------------------
+   -- MPS and BP_MSG Core
+   ----------------------
+   U_MpsAndBpMsg : entity work.AmcCarrierMpsAndBpMsg
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
@@ -617,9 +615,9 @@ begin
          axilReadSlave   => mpsReadSlave,
          axilWriteMaster => mpsWriteMaster,
          axilWriteSlave  => mpsWriteSlave,
-         -- FFB Interface
-         ffbObMaster     => ffbObMaster,
-         ffbObSlave      => ffbObSlave,
+         -- Backplane Messaging Interface
+         bpMsgMasters    => bpMsgMasters,
+         bpMsgSlaves     => bpMsgSlaves,
          ----------------------
          -- Top Level Interface
          ----------------------

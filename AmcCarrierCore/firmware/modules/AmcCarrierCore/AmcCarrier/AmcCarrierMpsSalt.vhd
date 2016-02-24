@@ -57,12 +57,12 @@ entity AmcCarrierMpsSalt is
       -- MPS Interface
       mpsIbMaster       : in  AxiStreamMasterType;
       mpsIbSlave        : out AxiStreamSlaveType;
-      -- MPS/FFB configuration/status signals
+      -- MPS/BP_MSG configuration/status signals
       appId             : in  slv(15 downto 0);
       mpsEnable         : out sl;
       mpsTestMode       : out sl;
-      ffbEnable         : out sl;
-      ffbTestMode       : out sl;
+      bpMsgEnable       : out sl;
+      bpMsgTestMode     : out sl;
       timeStrbRate      : in  slv(31 downto 0);
       diagnosticClkFreq : in  slv(31 downto 0);
       ----------------------
@@ -83,16 +83,16 @@ end AmcCarrierMpsSalt;
 
 architecture mapping of AmcCarrierMpsSalt is
 
-   constant STATUS_SIZE_C   : natural                := 15;
-   constant MPS_CHANNELS_C  : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
-   constant MPS_THRESHOLD_C : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
-   constant FFB_CHANNELS_C  : natural range 0 to 32  := getFfbChCnt(APP_TYPE_G);
+   constant STATUS_SIZE_C     : natural                := 15;
+   constant MPS_CHANNELS_C    : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
+   constant MPS_THRESHOLD_C   : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
+   constant BP_MSG_CHANNELS_C : natural range 0 to 32  := getBpMsgChCnt(APP_TYPE_G);
 
    type RegType is record
       mpsEnable      : sl;
       mpsTestMode    : sl;
-      ffbEnable      : sl;
-      ffbTestMode    : sl;
+      bpMsgEnable    : sl;
+      bpMsgTestMode  : sl;
       cntRst         : sl;
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -102,8 +102,8 @@ architecture mapping of AmcCarrierMpsSalt is
    constant REG_INIT_C : RegType := (
       mpsEnable      => '0',
       mpsTestMode    => '0',
-      ffbEnable      => '0',
-      ffbTestMode    => '0',
+      bpMsgEnable    => '0',
+      bpMsgTestMode  => '0',
       cntRst         => '1',
       rollOverEn     => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
@@ -298,15 +298,15 @@ begin
       axiSlaveRegisterR(x"110", 0, APP_TYPE_G);
       axiSlaveRegisterR(x"114", 0, toSlv(MPS_CHANNELS_C, 32));
       axiSlaveRegisterR(x"118", 0, toSlv(MPS_THRESHOLD_C, 32));
-      axiSlaveRegisterR(x"11C", 0, toSlv(FFB_CHANNELS_C, 32));
+      axiSlaveRegisterR(x"11C", 0, toSlv(BP_MSG_CHANNELS_C, 32));
       axiSlaveRegisterR(x"120", 0, appId);
       axiSlaveRegisterR(x"124", 0, mpsPllLocked);
 
       -- Map the write registers
       axiSlaveRegisterW(x"200", 0, v.mpsEnable);
       axiSlaveRegisterW(x"204", 0, v.mpsTestMode);
-      axiSlaveRegisterW(x"208", 0, v.ffbEnable);
-      axiSlaveRegisterW(x"20C", 0, v.ffbTestMode);
+      axiSlaveRegisterW(x"208", 0, v.bpMsgEnable);
+      axiSlaveRegisterW(x"20C", 0, v.bpMsgTestMode);
       axiSlaveRegisterW(x"3F0", 0, v.rollOverEn);
       axiSlaveRegisterW(x"3FC", 0, v.cntRst);
 
@@ -326,8 +326,8 @@ begin
       axilReadSlave  <= r.axilReadSlave;
       mpsEnable      <= r.mpsEnable;
       mpsTestMode    <= r.mpsTestMode;
-      ffbEnable      <= r.ffbEnable;
-      ffbTestMode    <= r.ffbTestMode;
+      bpMsgEnable    <= r.bpMsgEnable;
+      bpMsgTestMode  <= r.bpMsgTestMode;
       
    end process comb;
 

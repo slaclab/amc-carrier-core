@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierMpsAndFfb.vhd
+-- File       : AmcCarrierMpsAndBpMsg.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
@@ -33,7 +33,7 @@ use work.AmcCarrierPkg.all;
 use work.AmcCarrierRegPkg.all;
 use work.TimingPkg.all;
 
-entity AmcCarrierMpsAndFfb is
+entity AmcCarrierMpsAndBpMsg is
    generic (
       TPD_G            : time            := 1 ns;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
@@ -57,9 +57,9 @@ entity AmcCarrierMpsAndFfb is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
-      -- FFB Outbound Interface
-      ffbObMaster     : out AxiStreamMasterType;
-      ffbObSlave      : in  AxiStreamSlaveType;
+      -- Backplane Messaging Interface
+      bpMsgMasters    : out AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
+      bpMsgSlaves     : in  AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
       ----------------------
       -- Top Level Interface
       ----------------------
@@ -78,9 +78,9 @@ entity AmcCarrierMpsAndFfb is
       mpsBusRxN       : in  slv(14 downto 1);
       mpsTxP          : out sl;
       mpsTxN          : out sl);
-end AmcCarrierMpsAndFfb;
+end AmcCarrierMpsAndBpMsg;
 
-architecture mapping of AmcCarrierMpsAndFfb is
+architecture mapping of AmcCarrierMpsAndBpMsg is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
@@ -112,8 +112,8 @@ architecture mapping of AmcCarrierMpsAndFfb is
    signal diagnosticClkFreq : slv(31 downto 0);
    signal mpsTestMode       : sl;
    signal mpsEnable         : sl;
-   signal ffbTestMode       : sl;
-   signal ffbEnable         : sl;
+   signal bpMsgTestMode     : sl;
+   signal bpMsgEnable       : sl;
 
    signal mpsMaster : AxiStreamMasterType;
    signal mpsSlave  : AxiStreamSlaveType;
@@ -220,27 +220,30 @@ begin
          mAxiReadMasters     => readMasters,
          mAxiReadSlaves      => readSlaves);
 
-   --------------------------
-   -- FFB: Outbound Messenger
-   --------------------------
-   U_FfbMsg : entity work.AmcCarrierFfbObMsg
-      generic map (
-         TPD_G      => TPD_G,
-         APP_TYPE_G => APP_TYPE_G)
-      port map (
-         -- Clock and reset
-         clk       => axilClk,
-         rst       => axilRst,
-         -- Inbound Message Value
-         enable    => ffbEnable,
-         message   => message,
-         timeStrb  => timeStrb,
-         timeStamp => timeStamp,
-         testMode  => ffbTestMode,
-         appId     => localAppId,
-         -- FFB Interface
-         ffbMaster => ffbObMaster,
-         ffbSlave  => ffbObSlave);
+   -----------------------
+   -- BP Messenger Network
+   -----------------------
+   GEN_BP_MSG :
+   for i in (BP_MSG_SIZE_C-1) downto 0 generate
+      U_BpMsg : entity work.AmcCarrierBpMsgOb
+         generic map (
+            TPD_G      => TPD_G,
+            APP_TYPE_G => APP_TYPE_G)
+         port map (
+            -- Clock and reset
+            clk         => axilClk,
+            rst         => axilRst,
+            -- Inbound Message Value
+            enable      => bpMsgEnable,
+            message     => message,
+            timeStrb    => timeStrb,
+            timeStamp   => timeStamp,
+            testMode    => bpMsgTestMode,
+            appId       => localAppId,
+            -- Backplane Messaging Inbound Interface
+            bpMsgMaster => bpMsgMasters(i),
+            bpMsgSlave  => bpMsgSlaves(i));
+   end generate GEN_BP_MSG;
 
    --------------------------
    -- MPS: Outbound Messenger
@@ -295,12 +298,12 @@ begin
          axilReadSlave     => readSlaves(MPS_PHY_INDEX_C),
          axilWriteMaster   => writeMasters(MPS_PHY_INDEX_C),
          axilWriteSlave    => writeSlaves(MPS_PHY_INDEX_C),
-         -- MPS/FFB configuration/status signals
+         -- MPS/BP_MSG configuration/status signals
          appId             => localAppId,
          mpsEnable         => mpsEnable,
          mpsTestMode       => mpsTestMode,
-         ffbEnable         => ffbEnable,
-         ffbTestMode       => ffbTestMode,
+         bpMsgEnable       => bpMsgEnable,
+         bpMsgTestMode     => bpMsgTestMode,
          timeStrbRate      => timeStrbRate,
          diagnosticClkFreq => diagnosticClkFreq,
          -- MPS Interface

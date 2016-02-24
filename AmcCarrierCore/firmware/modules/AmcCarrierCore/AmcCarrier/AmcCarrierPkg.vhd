@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-01-27
+-- Last update: 2016-02-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -34,6 +34,9 @@ package AmcCarrierPkg is
    constant AMC_CARRIER_TIMING_186_MHZ_SEL_C : boolean := true;  -- true = LCLS-II timing
    constant AMC_CARRIER_TIMING_119_MHZ_SEL_C : boolean := ite(AMC_CARRIER_TIMING_186_MHZ_SEL_C, false, true);
 
+   constant AXI_CLK_FREQ_C   : real := 156.25E+6;                        -- In units of Hz
+   constant AXI_CLK_PERIOD_C : real := getRealDiv(1.0, AXI_CLK_FREQ_C);  -- In units of seconds   
+
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
    -----------------------------------------------------------
@@ -61,12 +64,13 @@ package AmcCarrierPkg is
    function getMpsChCnt(app        : AppType) return natural;
    function getMpsThresholdCnt(app : AppType) return natural;
 
-   -------------------------------------------------------------      
-   -- Fast Feedback: Configurations, Constants and Records Types
-   -------------------------------------------------------------      
-   function getFfbChCnt(app : AppType) return natural;
+   ---------------------------------------------------------------------------      
+   -- Backplane Messaging Network: Configurations, Constants and Records Types
+   ---------------------------------------------------------------------------    
+   constant BP_MSG_SIZE_C     : natural := 2;
+   function getBpMsgChCnt(app : AppType) return natural;
 
-   type FfbBusType is record
+   type BpMsgBusType is record
       valid     : sl;
       testMode  : sl;
       app       : AppType;
@@ -74,8 +78,8 @@ package AmcCarrierPkg is
       timeStamp : slv(63 downto 0);
       message   : Slv32Array(31 downto 0);
    end record;
-   type FfbBusArray is array (natural range <>) of FfbBusType;
-   constant FFB_BUS_INIT_C : FfbBusType := (
+   type BpMsgBusArray is array (natural range <>) of BpMsgBusType;
+   constant BP_MSG_BUS_INIT_C : BpMsgBusType := (
       valid     => '0',
       testMode  => '0',
       app       => (others => '0'),
@@ -171,7 +175,7 @@ package body AmcCarrierPkg is
       return retVar;
    end function;
 
-   function getFfbChCnt (app : AppType) return natural is
+   function getBpMsgChCnt (app : AppType) return natural is
       variable retVar : natural range 0 to 32;
    begin
       if (app = APP_BCM_TYPE_C) then

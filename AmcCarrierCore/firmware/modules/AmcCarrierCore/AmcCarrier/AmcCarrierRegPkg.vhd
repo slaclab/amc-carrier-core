@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-01-25
+-- Last update: 2016-02-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -27,9 +27,6 @@ use work.StdRtlPkg.all;
 use work.AmcCarrierPkg.all;
 
 package AmcCarrierRegPkg is
-
-   constant AXI_CLK_FREQ_C   : real := 156.25E+6;                        -- In units of Hz
-   constant AXI_CLK_PERIOD_C : real := getRealDiv(1.0, AXI_CLK_FREQ_C);  -- In units of seconds
 
    ---------------------------------------------
    -- Register Mapping: 1st Layer base addresses
@@ -82,7 +79,7 @@ package body AmcCarrierRegPkg is
    function xbarDefault (app : AppType; sel : boolean) return Slv2Array is
       variable retVar : Slv2Array(3 downto 0);
    begin
-      if (app = APP_TIME_GEN_TYPE_C) then  -- Check for Timing Generator Node
+      if (app = APP_TIME_GEN_TYPE_C) then           -- Check for Timing Generator Node
          retVar := XBAR_TIME_GEN_C;
       elsif (app = APP_MPS_LINK_AIN_TYPE_C or
              app = APP_MPS_LINK_DIN_TYPE_C or
@@ -93,7 +90,7 @@ package body AmcCarrierRegPkg is
             retVar := XBAR_MPS_II_LINK_C;
          end if;
 
-      else      -- Else Application Node
+      else                              -- Else Application Node
          retVar := XBAR_APP_NODE_C;
       end if;
       return retVar;

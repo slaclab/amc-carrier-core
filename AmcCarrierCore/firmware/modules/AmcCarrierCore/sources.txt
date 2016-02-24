@@ -7,8 +7,10 @@ vhdl work AmcCarrier/AmcCarrierCore.vhd
 vhdl work AmcCarrier/AmcCarrierClkAndRst.vhd
 
 vhdl work AmcCarrier/AmcCarrierEth.vhd
+vhdl work AmcCarrier/AmcCarrierEthBpMsg.vhd
+vhdl work AmcCarrier/AmcCarrierEthBsa.vhd
+vhdl work AmcCarrier/AmcCarrierEthSrp.vhd
 vhdl work AmcCarrier/AmcCarrierSrpV0Wrapper.vhd
-vhdl work AmcCarrier/AmcCarrierFfbIbMsg.vhd
 
 vhdl work AmcCarrier/AmcCarrierRegMapping.vhd
 vhdl work AmcCarrier/AmcCarrierSysMon.vhd
@@ -18,13 +20,14 @@ vhdl work AmcCarrier/AmcCarrierTiming.vhd
 vhdl work AmcCarrier/AmcCarrierBsa.vhd
 vhdl work AmcCarrier/AmcCarrierDdrMem.vhd
 
-vhdl work AmcCarrier/AmcCarrierMpsAndFfb.vhd
+vhdl work AmcCarrier/AmcCarrierMpsAndBpMsg.vhd
 vhdl work AmcCarrier/AmcCarrierMpsSalt.vhd
 vhdl work AmcCarrier/AmcCarrierMpsMsg.vhd
 vhdl work AmcCarrier/AmcCarrierMpsMsgCore.vhd
 vhdl work AmcCarrier/AmcCarrierMpsEncoder.vhd
 vhdl work AmcCarrier/AmcCarrierMpsComparator.vhd
-vhdl work AmcCarrier/AmcCarrierFfbObMsg.vhd
+vhdl work AmcCarrier/AmcCarrierBpMsgIb.vhd
+vhdl work AmcCarrier/AmcCarrierBpMsgOb.vhd
 
 vhdl work AmcGenericAdcDac/AmcGenericAdcDacCore.vhd
 vhdl work AmcGenericAdcDac/AmcGenericAdcDacDualCore.vhd
