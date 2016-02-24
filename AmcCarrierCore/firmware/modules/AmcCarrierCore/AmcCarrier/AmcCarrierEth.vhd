@@ -301,7 +301,8 @@ begin
          TPD_G            => TPD_G,
          RSSI_G           => RSSI_C,
          TIMEOUT_G        => RSSI_TIMEOUT_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)      
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(SRP_INDEX_C).baseAddr)   
       port map (
          -- Slave AXI-Lite Interface
          axilClk           => axilClk,
@@ -329,7 +330,8 @@ begin
          TPD_G            => TPD_G,
          RSSI_G           => RSSI_C,
          TIMEOUT_G        => RSSI_TIMEOUT_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)      
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(BSA_INDEX_C).baseAddr)     
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,

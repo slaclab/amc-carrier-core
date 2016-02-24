@@ -30,10 +30,11 @@ use work.AmcCarrierPkg.all;
 
 entity AmcCarrierEthSrp is
    generic (
-      TPD_G            : time            := 1 ns;
-      RSSI_G           : boolean         := false;
-      TIMEOUT_G        : real            := 1.0E-3;  -- In units of seconds   
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G            : time             := 1 ns;
+      RSSI_G           : boolean          := false;
+      TIMEOUT_G        : real             := 1.0E-3;  -- In units of seconds   
+      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));   
    port (
       -- Slave AXI-Lite Interface
       axilClk           : in  sl;
