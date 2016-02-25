@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-02-23
+-- Last update: 2016-02-25
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ begin
          U_AxiStreamPacketizer_1 : entity work.AxiStreamPacketizer
             generic map (
                TPD_G                => TPD_G,
-               MAX_PACKET_BYTES_C   => 1440,
+               MAX_PACKET_BYTES_G   => 1440,
                INPUT_PIPE_STAGES_G  => 1,
                OUTPUT_PIPE_STAGES_G => 1)
             port map (
