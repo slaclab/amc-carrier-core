@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-02-23
+-- Last update: 2016-02-25
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -179,7 +179,7 @@ begin
          -- Locked Status
          locked => locked);
 
-   Sync_locked : entity work.SynchronizerOneShot
+   Sync_locked : entity work.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
