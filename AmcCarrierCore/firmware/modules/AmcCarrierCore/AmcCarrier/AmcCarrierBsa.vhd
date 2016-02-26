@@ -217,6 +217,7 @@ begin
    U_SsiAxiMaster_1 : entity work.SsiAxiMaster
       generic map (
          TPD_G               => TPD_G,
+         PIPE_STAGES_G       => 1,
          SLAVE_READY_EN_G    => true,
          BRAM_EN_G           => true,
          USE_BUILT_IN_G      => false,
