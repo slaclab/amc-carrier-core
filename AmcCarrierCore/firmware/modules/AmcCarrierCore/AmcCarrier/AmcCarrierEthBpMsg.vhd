@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-02-23
+-- Last update: 2016-02-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ begin
          ---------------------
          -- RSSI Server Module
          ---------------------
-         U_RssiServer : entity work.RssiCore
+         U_RssiServer : entity work.RssiCoreWrapper
             generic map (
                TPD_G                   => TPD_G,
                CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
@@ -172,8 +172,6 @@ begin
             port map (
                clk_i            => axilClk,
                rst_i            => axilRst,
-               openRq_i         => '0',
-               closeRq_i        => '0',
                -- Application Layer Interface
                sAppAxisMaster_i => bpMsgMasters(i),
                sAppAxisSlave_o  => bpMsgSlaves(i),
@@ -195,7 +193,7 @@ begin
          ---------------------
          -- RSSI Client Module
          ---------------------
-         U_RssiClient : entity work.RssiCore
+         U_RssiClient : entity work.RssiCoreWrapper
             generic map (
                TPD_G                   => TPD_G,
                CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
@@ -211,8 +209,6 @@ begin
             port map (
                clk_i            => axilClk,
                rst_i            => axilRst,
-               openRq_i         => '0',
-               closeRq_i        => '0',
                -- Application Layer Interface
                sAppAxisMaster_i => AXI_STREAM_MASTER_INIT_C,
                sAppAxisSlave_o  => open,
