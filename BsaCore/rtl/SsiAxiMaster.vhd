@@ -33,8 +33,9 @@ use work.AxiLitePkg.all;
 entity SsiAxiMaster is
    generic (
       -- General Config
-      TPD_G : time := 1 ns;
-
+      TPD_G         : time                  := 1 ns;
+      PIPE_STAGES_G : natural range 0 to 16 := 0;
+      
       -- FIFO Config
       SLAVE_READY_EN_G    : boolean                    := true;
       BRAM_EN_G           : boolean                    := true;
@@ -143,7 +144,7 @@ begin
    SlaveAxiStreamFifo : entity work.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
-         PIPE_STAGES_G       => 0,
+         PIPE_STAGES_G       => PIPE_STAGES_G,
          SLAVE_READY_EN_G    => SLAVE_READY_EN_G,
          VALID_THOLD_G       => 1,      -- Must have entire frame
          BRAM_EN_G           => BRAM_EN_G,
@@ -175,7 +176,7 @@ begin
    MasterAxiStreamFifo : entity work.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
-         PIPE_STAGES_G       => 0,
+         PIPE_STAGES_G       => PIPE_STAGES_G,
          SLAVE_READY_EN_G    => true,   -- Use ready and not ctrl
          VALID_THOLD_G       => 1,
          BRAM_EN_G           => BRAM_EN_G,
