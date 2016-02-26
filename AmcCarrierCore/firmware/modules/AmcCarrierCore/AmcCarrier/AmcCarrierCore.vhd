@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-02-23
+-- Last update: 2016-02-25
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -264,7 +264,7 @@ begin
 
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
    -- Note: Install R1063 if you want the FPGA to control AUX power
-   enAuxPwrL <= '0';
+   enAuxPwrL <= '0' when(FSBL_G = false) else '1';
 
    --------------------------------
    -- Common Clock and Reset Module
