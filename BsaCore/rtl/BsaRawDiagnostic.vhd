@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-02-10
+-- Last update: 2016-02-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -74,8 +74,10 @@ architecture rtl of BsaRawDiagnostic is
    signal muxOutAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
 
    -- SOF IO
-   signal sofInAxisMaster  : AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
-   signal sofInAxisSlave   : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
+   signal vFifoOutAxisMaster  : AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
+   signal vFifoOutAxisSlave   : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
+   signal sofInAxisMaster : AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
+   signal sofInAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
    signal sofOutAxisMaster : AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
    signal sofOutAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
    signal sofOutAxisCtrl   : AxiStreamCtrlType   := AXI_STREAM_CTRL_INIT_C;
@@ -221,14 +223,14 @@ begin
          s_axis_tdest  => muxOutAxisMaster.tDest(2 downto 0),
 
          -- DEMUX OUT         
-         m_axis_tvalid => sofInAxisMaster.tValid,
-         m_axis_tready => sofInAxisSlave.tReady,
-         m_axis_tdata  => sofInAxisMaster.tData,
+         m_axis_tvalid => vFifoOutAxisMaster.tValid,
+         m_axis_tready => vFifoOutAxisSlave.tReady,
+         m_axis_tdata  => vFifoOutAxisMaster.tData,
          m_axis_tstrb  => open,
-         m_axis_tkeep  => sofInAxisMaster.tKeep,
-         m_axis_tlast  => sofInAxisMaster.tLast,
-         m_axis_tid    => sofInAxisMaster.tId(2 downto 0),
-         m_axis_tdest  => sofInAxisMaster.tDest(2 downto 0),
+         m_axis_tkeep  => vFifoOutAxisMaster.tKeep,
+         m_axis_tlast  => vFifoOutAxisMaster.tLast,
+         m_axis_tid    => vFifoOutAxisMaster.tId(2 downto 0),
+         m_axis_tdest  => vFifoOutAxisMaster.tDest(2 downto 0),
 
          m_axi_awid     => open,
          m_axi_awaddr   => axiWriteMaster.awaddr(31 downto 0),
@@ -317,27 +319,7 @@ begin
    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    -- Add SOF to frames
    -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   SsiInsertSof_1 : entity work.SsiInsertSof
-      generic map (
-         TPD_G               => TPD_G,
---         TUSER_MASK_G        => TUSER_MASK_G,
-         COMMON_CLK_G        => true,
-         SLAVE_FIFO_G        => false,
-         MASTER_FIFO_G       => false,
-         INSERT_USER_HDR_G   => false,
-         SLAVE_AXI_CONFIG_G  => INTERNAL_AXI_CONFIG_C,
-         MASTER_AXI_CONFIG_G => INTERNAL_AXI_CONFIG_C)
-      port map (
-         sAxisClk               => axiClk,
-         sAxisRst               => axiRst,
-         sAxisMaster            => sofInAxisMaster,
-         sAxisSlave             => sofInAxisSlave,
-         mAxisClk               => axiClk,
-         mAxisRst               => axiRst,
-         mUserHdr(7 downto 0)   => sofInAxisMaster.tDest,
-         mUserHdr(127 downto 8) => (119 downto 0 => '0'),
-         mAxisMaster            => sofOutAxisMaster,
-         mAxisSlave             => sofOutAxisSlave);
+
 
    -- Output fifo
    AxiStreamFifo : entity work.AxiStreamFifo
@@ -360,12 +342,45 @@ begin
       port map (
          sAxisClk    => axiClk,
          sAxisRst    => axiRst,
-         sAxisMaster => sofOutAxisMaster,
-         sAxisSlave  => sofOutAxisSlave,
-         sAxisCtrl   => sofOutAxisCtrl,
+         sAxisMaster => vFifoOutAxisMaster,
+         sAxisSlave  => vFifoOutAxisSlave,
          mAxisClk    => bufClk,
          mAxisRst    => bufRst,
-         mAxisMaster => bufMaster,
-         mAxisSlave  => bufSlave);
+         mAxisMaster => sofInAxisMaster,
+         mAxisSlave  => sofInAxisSlave);
+
+   SsiInsertSof_1 : entity work.SsiInsertSof
+      generic map (
+         TPD_G               => TPD_G,
+--         TUSER_MASK_G        => TUSER_MASK_G,
+         COMMON_CLK_G        => true,
+         SLAVE_FIFO_G        => false,
+         MASTER_FIFO_G       => false,
+         INSERT_USER_HDR_G   => false,
+         SLAVE_AXI_CONFIG_G  => INTERNAL_AXI_CONFIG_C,
+         MASTER_AXI_CONFIG_G => INTERNAL_AXI_CONFIG_C)
+      port map (
+         sAxisClk               => bufClk,
+         sAxisRst               => bufRst,
+         sAxisMaster            => sofInAxisMaster,
+         sAxisSlave             => sofInAxisSlave,
+         mAxisClk               => bufClk,
+         mAxisRst               => bufRst,
+         mUserHdr(7 downto 0)   => sofInAxisMaster.tDest,
+         mUserHdr(127 downto 8) => (119 downto 0 => '0'),
+         mAxisMaster            => sofOutAxisMaster,
+         mAxisSlave             => sofOutAxisSlave);
+
+   U_AxiStreamPipeline_1: entity work.AxiStreamPipeline
+      generic map (
+         TPD_G         => TPD_G,
+         PIPE_STAGES_G => 1)
+      port map (
+         axisClk     => bufClk,        -- [in]
+         axisRst     => bufRst,        -- [in]
+         sAxisMaster => sofOutAxisMaster,    -- [in]
+         sAxisSlave  => sofOutAxisSlave,     -- [out]
+         mAxisMaster => bufMaster,    -- [out]
+         mAxisSlave  => bufSlave);    -- [in]
 
 end architecture rtl;
