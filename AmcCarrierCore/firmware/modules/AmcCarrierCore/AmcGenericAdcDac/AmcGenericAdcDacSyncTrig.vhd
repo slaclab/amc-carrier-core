@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-19
--- Last update: 2016-02-19
+-- Last update: 2016-02-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ begin
             -- Check for timeout
             if r.cnt = TIMEOUT_C then
                -- Next state
-               v.state := LOG_S;
+               v.state := DONE_S;
             else
                -- Increment the counter
                v.cnt := r.cnt + 1;
