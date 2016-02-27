@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-02-25
+-- Last update: 2016-02-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ architecture mapping of AmcCarrierDdrMem is
    signal done       : sl;
    signal refClock   : sl;
    signal refClkBufg : sl;
-   signal coreRst    : slv(2 downto 0);
+   signal coreRst    : slv(1 downto 0);
 
    attribute KEEP_HIERARCHY                : string;
    attribute KEEP_HIERARCHY of IBUFDS_Inst : label is "TRUE";
@@ -289,8 +289,7 @@ begin
    begin
       if rising_edge(ddrClk) then
          coreRst(1) <= coreRst(0) after TPD_G;  -- Register to help with timing
-         coreRst(2) <= coreRst(1) after TPD_G;  -- Register to help with timing
-         ddrRst     <= coreRst(2) after TPD_G;  -- Register to help with timing
+         ddrRst     <= coreRst(1) after TPD_G;  -- Register to help with timing
       end if;
    end process;
 
