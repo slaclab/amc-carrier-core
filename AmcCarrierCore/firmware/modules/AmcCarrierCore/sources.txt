@@ -11,6 +11,7 @@ vhdl work AmcCarrier/AmcCarrierEthBpMsg.vhd
 vhdl work AmcCarrier/AmcCarrierEthBsa.vhd
 vhdl work AmcCarrier/AmcCarrierEthSrp.vhd
 vhdl work AmcCarrier/AmcCarrierSrpV0Wrapper.vhd
+vhdl work AmcCarrier/AmcCarrierSrpV1Wrapper.vhd
 
 vhdl work AmcCarrier/AmcCarrierRegMapping.vhd
 vhdl work AmcCarrier/AmcCarrierSysMon.vhd

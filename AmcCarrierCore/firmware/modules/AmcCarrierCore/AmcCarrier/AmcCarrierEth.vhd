@@ -300,6 +300,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          RSSI_G           => RSSI_C,
+         SRP_VERSION_G    => 0,
          TIMEOUT_G        => RSSI_TIMEOUT_C,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(SRP_INDEX_C).baseAddr)   

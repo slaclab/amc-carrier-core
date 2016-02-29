@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-02-26
+-- Last update: 2016-02-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -27,6 +27,8 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
+use work.UdpEnginePkg.all;
+use work.IpV4EnginePkg.all;
 use work.AmcCarrierPkg.all;
 
 entity AmcCarrierEthBpMsg is
@@ -164,10 +166,10 @@ begin
                SERVER_G                => true,
                RETRANSMIT_ENABLE_G     => true,
                WINDOW_ADDR_SIZE_G      => 3,
-               APP_INPUT_AXI_CONFIG_G  => ssiAxiStreamConfig(16),
-               APP_OUTPUT_AXI_CONFIG_G => ssiAxiStreamConfig(16),
-               TSP_INPUT_AXI_CONFIG_G  => ssiAxiStreamConfig(16),
-               TSP_OUTPUT_AXI_CONFIG_G => ssiAxiStreamConfig(16),
+               APP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
+               APP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
+               TSP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
+               TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
                INIT_SEQ_N_G            => 16#80#)
             port map (
                clk_i            => axilClk,
@@ -201,10 +203,10 @@ begin
                SERVER_G                => false,
                RETRANSMIT_ENABLE_G     => true,
                WINDOW_ADDR_SIZE_G      => 3,
-               APP_INPUT_AXI_CONFIG_G  => ssiAxiStreamConfig(16),
-               APP_OUTPUT_AXI_CONFIG_G => ssiAxiStreamConfig(16),
-               TSP_INPUT_AXI_CONFIG_G  => ssiAxiStreamConfig(16),
-               TSP_OUTPUT_AXI_CONFIG_G => ssiAxiStreamConfig(16),
+               APP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
+               APP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
+               TSP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
+               TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
                INIT_SEQ_N_G            => 16#20#)
             port map (
                clk_i            => axilClk,
