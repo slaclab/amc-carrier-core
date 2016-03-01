@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2016-01-21
+-- Last update: 2016-02-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -68,6 +68,7 @@ architecture rtl of AmcCarrierMpsMsgCore is
       message   : Slv8Array(31 downto 0);
       mpsMaster : AxiStreamMasterType;
       state     : StateType;
+      stateDly  : StateType;
    end record RegType;
    constant REG_INIT_C : RegType := (
       cnt       => 0,
@@ -75,7 +76,8 @@ architecture rtl of AmcCarrierMpsMsgCore is
       timeStamp => (others => '0'),
       message   => (others => (others => '0')),
       mpsMaster => AXI_STREAM_MASTER_INIT_C,
-      state     => IDLE_S);      
+      state     => IDLE_S,
+      stateDly  => IDLE_S);      
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -125,7 +127,7 @@ begin
                v.mpsMaster.tValid                              := '1';
                v.mpsMaster.tData(15)                           := testMode;
                v.mpsMaster.tData((AppType'length)+ 7 downto 8) := APP_TYPE_G;
-               v.mpsMaster.tData(7 downto 0)                   := r.msgSize+5; -- Length in units of bytes
+               v.mpsMaster.tData(7 downto 0)                   := r.msgSize+5;  -- Length in units of bytes
                -- Set SOF               
                ssiSetUserSof(MPS_CONFIG_C, v.mpsMaster, '1');
                -- Next state
@@ -189,7 +191,8 @@ begin
       end case;
 
       -- Check for error condition
-      if (validStrb = '1') and (r.state /= IDLE_S) then
+      v.stateDly := r.state;
+      if (validStrb = '1') and (r.stateDly /= IDLE_S) then
          -- Check the simulation error printing
          if SIM_ERROR_HALT_G then
             report "AmcCarrierMpsMsg: Simulation Overflow Detected ...";
