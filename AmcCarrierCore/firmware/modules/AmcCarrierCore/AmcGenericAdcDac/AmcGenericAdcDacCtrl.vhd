@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-02-19
+-- Last update: 2016-03-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -250,36 +250,8 @@ begin
 
    comb : process (adcDataSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dacDataSync,
                    dacVcoCtrlSync, lmkStatus, r, statusCnt, statusOut) is
-      variable v         : RegType;
-      variable axiStatus : AxiLiteStatusType;
-
-      -- Wrapper procedures to make calls cleaner.
-      procedure axiSlaveRegisterW (addr : in slv; offset : in integer; reg : inout slv; cA : in boolean := false; cV : in slv := "0") is
-      begin
-         axiSlaveRegister(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, addr, offset, reg, cA, cV);
-      end procedure;
-
-      procedure axiSlaveRegisterR (addr : in slv; offset : in integer; reg : in slv) is
-      begin
-         axiSlaveRegister(axilReadMaster, v.axilReadSlave, axiStatus, addr, offset, reg);
-      end procedure;
-
-      procedure axiSlaveRegisterW (addr : in slv; offset : in integer; reg : inout sl) is
-      begin
-         axiSlaveRegister(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, addr, offset, reg);
-      end procedure;
-
-      procedure axiSlaveRegisterR (addr : in slv; offset : in integer; reg : in sl) is
-      begin
-         axiSlaveRegister(axilReadMaster, v.axilReadSlave, axiStatus, addr, offset, reg);
-      end procedure;
-
-      procedure axiSlaveDefault (
-         axiResp : in slv(1 downto 0)) is
-      begin
-         axiSlaveDefault(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, axiResp);
-      end procedure;
-
+      variable v      : RegType;
+      variable regCon : AxiLiteEndPointType;
    begin
       -- Latch the current value
       v := r;
@@ -290,42 +262,42 @@ begin
       v.softClear := '0';
 
       -- Determine the transaction type
-      axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus);
+      axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read only registers
-      axiSlaveRegisterR(x"000", 0, muxSlVectorArray(statusCnt, 0));
-      axiSlaveRegisterR(x"004", 0, muxSlVectorArray(statusCnt, 1));
-      axiSlaveRegisterR(x"008", 0, muxSlVectorArray(statusCnt, 2));
-      axiSlaveRegisterR(x"00C", 0, muxSlVectorArray(statusCnt, 3));
-      axiSlaveRegisterR(x"010", 0, muxSlVectorArray(statusCnt, 4));
-      axiSlaveRegisterR(x"0FC", 0, statusOut);
-      axiSlaveRegisterR(x"100", 0, adcDataSync(0));
-      axiSlaveRegisterR(x"104", 0, adcDataSync(1));
-      axiSlaveRegisterR(x"108", 0, adcDataSync(2));
-      axiSlaveRegisterR(x"10C", 0, adcDataSync(3));
-      axiSlaveRegisterR(x"110", 0, dacDataSync(0));
-      axiSlaveRegisterR(x"114", 0, dacDataSync(1));
+      axiSlaveRegisterR(regCon, x"000", 0, muxSlVectorArray(statusCnt, 0));
+      axiSlaveRegisterR(regCon, x"004", 0, muxSlVectorArray(statusCnt, 1));
+      axiSlaveRegisterR(regCon, x"008", 0, muxSlVectorArray(statusCnt, 2));
+      axiSlaveRegisterR(regCon, x"00C", 0, muxSlVectorArray(statusCnt, 3));
+      axiSlaveRegisterR(regCon, x"010", 0, muxSlVectorArray(statusCnt, 4));
+      axiSlaveRegisterR(regCon, x"0FC", 0, statusOut);
+      axiSlaveRegisterR(regCon, x"100", 0, adcDataSync(0));
+      axiSlaveRegisterR(regCon, x"104", 0, adcDataSync(1));
+      axiSlaveRegisterR(regCon, x"108", 0, adcDataSync(2));
+      axiSlaveRegisterR(regCon, x"10C", 0, adcDataSync(3));
+      axiSlaveRegisterR(regCon, x"110", 0, dacDataSync(0));
+      axiSlaveRegisterR(regCon, x"114", 0, dacDataSync(1));
 
-      axiSlaveRegisterR(x"1F8", 0, dacVcoCtrlSync);
-      axiSlaveRegisterR(x"1FC", 0, amcClkFreq);
+      axiSlaveRegisterR(regCon, x"1F8", 0, dacVcoCtrlSync);
+      axiSlaveRegisterR(regCon, x"1FC", 0, amcClkFreq);
 
       -- Map the read/write registers
-      axiSlaveRegisterW(x"200", 0, v.lmkClkSel);
-      axiSlaveRegisterW(x"204", 0, v.lmkRst);
-      axiSlaveRegisterW(x"208", 0, v.lmkSync);
-      axiSlaveRegisterR(x"20C", 0, lmkStatus);
-      axiSlaveRegisterW(x"210", 0, v.loopback);
-      axiSlaveRegisterW(x"214", 0, v.lmkMuxSel);
-      axiSlaveRegisterW(x"218", 0, v.softTrig);
-      axiSlaveRegisterW(x"21C", 0, v.softClear);
-      axiSlaveRegisterW(x"220", 0, v.dacVcoSckConfig);
-      axiSlaveRegisterW(x"224", 0, v.dacVcoEnable);
+      axiSlaveRegister(regCon, x"200", 0, v.lmkClkSel);
+      axiSlaveRegister(regCon, x"204", 0, v.lmkRst);
+      axiSlaveRegister(regCon, x"208", 0, v.lmkSync);
+      axiSlaveRegisterR(regCon, x"20C", 0, lmkStatus);
+      axiSlaveRegister(regCon, x"210", 0, v.loopback);
+      axiSlaveRegister(regCon, x"214", 0, v.lmkMuxSel);
+      axiSlaveRegister(regCon, x"218", 0, v.softTrig);
+      axiSlaveRegister(regCon, x"21C", 0, v.softClear);
+      axiSlaveRegister(regCon, x"220", 0, v.dacVcoSckConfig);
+      axiSlaveRegister(regCon, x"224", 0, v.dacVcoEnable);
 
-      axiSlaveRegisterW(x"3F8", 0, v.rollOverEn);
-      axiSlaveRegisterW(x"3FC", 0, v.cntRst);
+      axiSlaveRegister(regCon, x"3F8", 0, v.rollOverEn);
+      axiSlaveRegister(regCon, x"3FC", 0, v.cntRst);
 
-      -- Set the Slave's response
-      axiSlaveDefault(AXI_ERROR_RESP_G);
+      -- Closeout the transaction
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
 
       -- Synchronous Reset
       if (axilRst = '1') then

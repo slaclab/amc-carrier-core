@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-02-26
+-- Last update: 2016-03-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -343,36 +343,8 @@ begin
             dataOut => done);      
 
       comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrAlertL, ddrPg, done, r) is
-         variable v         : RegType;
-         variable axiStatus : AxiLiteStatusType;
-
-         -- Wrapper procedures to make calls cleaner.
-         procedure axiSlaveRegisterW (addr : in slv; offset : in integer; reg : inout slv; cA : in boolean := false; cV : in slv := "0") is
-         begin
-            axiSlaveRegister(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, addr, offset, reg, cA, cV);
-         end procedure;
-
-         procedure axiSlaveRegisterR (addr : in slv; offset : in integer; reg : in slv) is
-         begin
-            axiSlaveRegister(axilReadMaster, v.axilReadSlave, axiStatus, addr, offset, reg);
-         end procedure;
-
-         procedure axiSlaveRegisterW (addr : in slv; offset : in integer; reg : inout sl) is
-         begin
-            axiSlaveRegister(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, addr, offset, reg);
-         end procedure;
-
-         procedure axiSlaveRegisterR (addr : in slv; offset : in integer; reg : in sl) is
-         begin
-            axiSlaveRegister(axilReadMaster, v.axilReadSlave, axiStatus, addr, offset, reg);
-         end procedure;
-
-         procedure axiSlaveDefault (
-            axiResp : in slv(1 downto 0)) is
-         begin
-            axiSlaveDefault(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus, axiResp);
-         end procedure;
-
+         variable v      : RegType;
+         variable regCon : AxiLiteEndPointType;
       begin
          -- Latch the current value
          v := r;
@@ -381,29 +353,29 @@ begin
          v.ddrReset := '0';
 
          -- Determine the transaction type
-         axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus);
+         axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
          -- Map the read registers
-         axiSlaveRegisterR(x"100", 0, r.memReady);
-         axiSlaveRegisterR(x"104", 0, r.memError);
-         axiSlaveRegisterR(x"108", 0, x"00000000");  -- AxiMemTester's wTimer
-         axiSlaveRegisterR(x"10C", 0, x"00000000");  -- AxiMemTester's rTimer
-         axiSlaveRegisterR(x"110", 0, x"00000000");  -- AxiMemTester's START_C Upper word
-         axiSlaveRegisterR(x"114", 0, x"00000000");  -- AxiMemTester's START_C Lower word
-         axiSlaveRegisterR(x"118", 0, x"00000000");  -- AxiMemTester's STOP_C Upper word
-         axiSlaveRegisterR(x"11C", 0, x"00000000");  -- AxiMemTester's STOP_C Lower word
-         axiSlaveRegisterR(x"120", 0, toSlv(AXI_CONFIG_C.ADDR_WIDTH_C, 32));
-         axiSlaveRegisterR(x"124", 0, toSlv(AXI_CONFIG_C.DATA_BYTES_C, 32));
-         axiSlaveRegisterR(x"128", 0, toSlv(AXI_CONFIG_C.ID_BITS_C, 32));
-         axiSlaveRegisterR(x"130", 0, ddrAlertL);
-         axiSlaveRegisterR(x"134", 0, ddrPg);
+         axiSlaveRegisterR(regCon, x"100", 0, r.memReady);
+         axiSlaveRegisterR(regCon, x"104", 0, r.memError);
+         axiSlaveRegisterR(regCon, x"108", 0, x"00000000");  -- AxiMemTester's wTimer
+         axiSlaveRegisterR(regCon, x"10C", 0, x"00000000");  -- AxiMemTester's rTimer
+         axiSlaveRegisterR(regCon, x"110", 0, x"00000000");  -- AxiMemTester's START_C Upper word
+         axiSlaveRegisterR(regCon, x"114", 0, x"00000000");  -- AxiMemTester's START_C Lower word
+         axiSlaveRegisterR(regCon, x"118", 0, x"00000000");  -- AxiMemTester's STOP_C Upper word
+         axiSlaveRegisterR(regCon, x"11C", 0, x"00000000");  -- AxiMemTester's STOP_C Lower word
+         axiSlaveRegisterR(regCon, x"120", 0, toSlv(AXI_CONFIG_C.ADDR_WIDTH_C, 32));
+         axiSlaveRegisterR(regCon, x"124", 0, toSlv(AXI_CONFIG_C.DATA_BYTES_C, 32));
+         axiSlaveRegisterR(regCon, x"128", 0, toSlv(AXI_CONFIG_C.ID_BITS_C, 32));
+         axiSlaveRegisterR(regCon, x"130", 0, ddrAlertL);
+         axiSlaveRegisterR(regCon, x"134", 0, ddrPg);
 
          -- Map the write registers
-         axiSlaveRegisterW(x"3F8", 0, v.ddrPwrEn);
-         axiSlaveRegisterW(x"3FC", 0, v.ddrReset);
+         axiSlaveRegister(regCon, x"3F8", 0, v.ddrPwrEn);
+         axiSlaveRegister(regCon, x"3FC", 0, v.ddrReset);
 
-         -- Set the Slave's response
-         axiSlaveDefault(AXI_ERROR_RESP_G);
+         -- Closeout the transaction
+         axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
 
          -- Latch the values from Synchronizers
          v.memReady := done;
