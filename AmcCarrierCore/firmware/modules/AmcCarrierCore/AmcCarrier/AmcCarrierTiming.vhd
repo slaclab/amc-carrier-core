@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-01-26
+-- Last update: 2016-03-03
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ entity AmcCarrierTiming is
       TPD_G               : time            := 1 ns;
       APP_TYPE_G          : AppType         := APP_NULL_TYPE_C;
       AXI_ERROR_RESP_G    : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      RX_CLK_MMCM_G : boolean := false;
+      RX_CLK_MMCM_G       : boolean         := false;
       STANDALONE_TIMING_G : boolean         := false);  -- true = LCLS-I timing only
    port (
       -- AXI-Lite Interface (axilClk domain)
@@ -112,6 +112,8 @@ architecture mapping of AmcCarrierTiming is
    signal loopback       : slv(2 downto 0);
    signal rxPolarity     : sl;
 
+   signal appBus : TimingBusType;
+   
 begin
 
    recTimingClk <= timingRecClk;
@@ -213,32 +215,32 @@ begin
    ------------------------------------------------------------------------------------------------
    -- Pass recovered clock through MMCM (maybe unnecessary?)
    ------------------------------------------------------------------------------------------------
-   RX_CLK_MMCM_GEN: if (RX_CLK_MMCM_G) generate
-   U_ClockManager : entity work.ClockManagerUltraScale
-      generic map(
-         TPD_G              => TPD_G,
-         TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => false,
-         FB_BUFG_G          => true,
-         RST_IN_POLARITY_G  => '0',
-         NUM_CLOCKS_G       => 1,
-         -- MMCM attributes
-         BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 5.355,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 5.375,
-         CLKOUT0_DIVIDE_F_G => 5.375)
-      port map(
-         clkIn     => timingRecClkGt,
-         rstIn     => rxResetDone,
-         clkOut(0) => timingRecClk,
-         rstOut(0) => open,
-         locked    => rxUsrClkActive);
+   RX_CLK_MMCM_GEN : if (RX_CLK_MMCM_G) generate
+      U_ClockManager : entity work.ClockManagerUltraScale
+         generic map(
+            TPD_G              => TPD_G,
+            TYPE_G             => "MMCM",
+            INPUT_BUFG_G       => false,
+            FB_BUFG_G          => true,
+            RST_IN_POLARITY_G  => '0',
+            NUM_CLOCKS_G       => 1,
+            -- MMCM attributes
+            BANDWIDTH_G        => "OPTIMIZED",
+            CLKIN_PERIOD_G     => 5.355,
+            DIVCLK_DIVIDE_G    => 1,
+            CLKFBOUT_MULT_F_G  => 5.375,
+            CLKOUT0_DIVIDE_F_G => 5.375)
+         port map(
+            clkIn     => timingRecClkGt,
+            rstIn     => rxResetDone,
+            clkOut(0) => timingRecClk,
+            rstOut(0) => open,
+            locked    => rxUsrClkActive);
    end generate RX_CLK_MMCM_GEN;
 
-   NO_RX_CLK_MMCM_GEN: if (not RX_CLK_MMCM_G) generate
-    timingRecClk <= timingRecClkGt;
-    rxUsrClkActive <= '1';
+   NO_RX_CLK_MMCM_GEN : if (not RX_CLK_MMCM_G) generate
+      timingRecClk   <= timingRecClkGt;
+      rxUsrClkActive <= '1';
    end generate NO_RX_CLK_MMCM_GEN;
 
    rxUsrClk <= timingRecClk;
@@ -291,7 +293,7 @@ begin
          gtRxPolarity    => rxPolarity,
          appTimingClk    => appTimingClk,
          appTimingRst    => appTimingRst,
-         appTimingBus    => appTimingBus,
+         appTimingBus    => appBus,
          timingPhy       => coreTimingPhy,
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -299,5 +301,16 @@ begin
          axilReadSlave   => axilReadSlave,
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave);
+
+   process(appTimingClk)
+   begin
+      if rising_edge(appTimingClk) then
+         appTimingBus.strobe <= appBus.strobe after TPD_G;  -- Pipeline for register replication during impl_1
+      end if;
+   end process;
+   -- No pipelining: message, V1, and V2 only updated during strobe's HIGH cycle
+   appTimingBus.message <= appBus.message;
+   appTimingBus.v1      <= appBus.v1;
+   appTimingBus.v2      <= appBus.v2;
 
 end mapping;
