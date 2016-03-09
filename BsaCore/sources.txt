@@ -4,4 +4,4 @@ vhdl work rtl/BsaAccumulator.vhd
 vhdl work rtl/BsaAxiInterconnectWrapper.vhd
 vhdl work rtl/BsaRawDiagnostic.vhd
 vhdl work rtl/SsiAxiMaster.vhd
-vhdl work rtl/AxiStreamDmaRingWrite.vhd
+
