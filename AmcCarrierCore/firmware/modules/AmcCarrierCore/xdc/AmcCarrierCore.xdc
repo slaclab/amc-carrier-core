@@ -435,13 +435,6 @@ set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks 
 set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks {ddrIntClk0}]
 set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks {ddrIntClk1}]
 
-# set_clock_groups -asynchronous \
-    # -group [get_clocks -include_generated_clocks {timingRef}] \
-    # -group [get_clocks -include_generated_clocks {ddrClkIn}] \
-    # -group [get_clocks -include_generated_clocks {fabClk}] \
-    # -group [get_clocks -include_generated_clocks {xauiRef}] \
-    # -group [get_clocks -include_generated_clocks {mpsClkP}]
-
 ##########################
 ## Misc. Configurations ##
 ##########################
