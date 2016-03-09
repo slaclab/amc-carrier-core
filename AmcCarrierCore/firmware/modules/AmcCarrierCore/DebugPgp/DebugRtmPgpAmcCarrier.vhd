@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-02-24
+-- Last update: 2016-03-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -39,7 +39,6 @@ entity DebugRtmPgpAmcCarrier is
       SIM_SPEEDUP_G     : boolean         := false;
       SIMULATION_G      : boolean         := false;
       FFB_CLIENT_SIZE_G : positive        := 1;
-      DIAGNOSTIC_SIZE_G : positive        := 1;
       AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Master AXI-Lite Interface
@@ -57,11 +56,12 @@ entity DebugRtmPgpAmcCarrier is
       -- Backplane Messaging Interface
       bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
       bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
+
       -- Debug AXI stream Interface
       pgpClock          : out sl;
       pgpReset          : out sl;
-      axisTxMasters     : in  AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      axisTxSlaves      : out AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+      axisTxMaster     : in  AxiStreamMasterType;
+      axisTxSlave      : out AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
       ----------------------
@@ -81,8 +81,10 @@ entity DebugRtmPgpAmcCarrier is
       rtmPgpClkN        : in  sl);
 end DebugRtmPgpAmcCarrier;
 
-architecture mapping of DebugRtmPgpAmcCarrier is
 
+architecture mapping of DebugRtmPgpAmcCarrier is
+ 
+                                                          
    signal pgpTxIn       : Pgp2bTxInType;
    signal pgpTxOut      : Pgp2bTxOutType;
    signal pgpRxIn       : Pgp2bRxInType;
@@ -144,7 +146,7 @@ begin
             TPD_G             => TPD_G,
             PAYLOAD_CNT_TOP_G => 7,
             VC_INTERLEAVE_G   => 0,
-            NUM_VC_EN_G       => DIAGNOSTIC_SIZE_G+1)
+            NUM_VC_EN_G       => 2)
          port map (
             stableClk        => axilClk,
             stableRst        => axilRst,
@@ -222,10 +224,8 @@ begin
          mAxiLiteReadMaster  => mAxilReadMasters(0),
          mAxiLiteReadSlave   => mAxilReadSlaves(0));
 
-   ADC_AXI_STREAMS : for i in DIAGNOSTIC_SIZE_G-1 downto 0 generate
-      pgpTxMasters(i+1) <= axisTxMasters(i);
-      axisTxSlaves(i)   <= pgpTxSlaves(i+1);
-   end generate ADC_AXI_STREAMS;
+      pgpTxMasters(1) <= axisTxMaster;
+      axisTxSlave   <= pgpTxSlaves(1);
 
    Pgp2bAxi_1 : entity work.Pgp2bAxi
       generic map (

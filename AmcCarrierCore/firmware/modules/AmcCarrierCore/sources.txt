@@ -49,6 +49,7 @@ vhdl work DebugPgp/DebugRtmPgpAmcCarrier.vhd
 vhdl work DebugPgp/DebugRtmPgpAmcCarrierDdrMem.vhd
 vhdl work DebugPgp/DebugRtmPgpGthCoreWrapper.vhd
 vhdl work DebugPgp/DebugAmcAdcDdrFifo.vhd
+vhdl work DebugPgp/DebugRawDiagnostic.vhd
 
 vhdl work coregen/MigCore.dcp
 vhdl work coregen/SysMonCore.dcp

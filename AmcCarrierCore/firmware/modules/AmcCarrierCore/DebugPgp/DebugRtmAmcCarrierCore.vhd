@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-02-24
+-- Last update: 2016-03-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -30,6 +30,7 @@ use work.AxiLitePkg.all;
 use work.AxiPkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
+use work.AmcCarrierRegPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -43,8 +44,8 @@ entity DebugRtmAmcCarrierCore is
       MPS_SLOT_G          : boolean             := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G              : boolean             := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G          : AppType             := APP_NULL_TYPE_C;
-      DIAGNOSTIC_SIZE_G   : positive            := 2;
-      DIAGNOSTIC_CONFIG_G : AxiStreamConfigType := ssiAxiStreamConfig(4));
+      DIAGNOSTIC_RAW_STREAMS_G : positive             := 1;
+      DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray := (0 => ssiAxiStreamConfig(4)));  -- Must be same size as DIAGNOSTIC_RAW_STREAMS_G
    port (
       ----------------------
       -- Top Level Interface
@@ -66,9 +67,13 @@ entity DebugRtmAmcCarrierCore is
       diagnosticClk     : in    sl;
       diagnosticRst     : in    sl;
       diagnosticBus     : in    DiagnosticBusType;
-      diagnosticMasters : in    AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticSlaves  : out   AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-      diagnosticCtrls   : out   AxiStreamCtrlArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+    -- Raw Diagnostic Interface (diagnosticRawClks domains)
+      diagnosticRawClks    : in  slv(DIAGNOSTIC_RAW_STREAMS_G -1 downto 0);
+      diagnosticRawRsts    : in  slv(DIAGNOSTIC_RAW_STREAMS_G -1 downto 0);
+      diagnosticRawMasters : in  AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawSlaves  : out AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticRawCtrl    : out AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      
       -- Backplane Messaging Interface (bpMsgClk domain)
       bpMsgClk          : in    sl                               := '0';
       bpMsgRst          : in    sl                               := '0';
@@ -169,6 +174,13 @@ architecture mapping of DebugRtmAmcCarrierCore is
 
    constant AXI_ERROR_RESP_C : slv(1 downto 0) := AXI_RESP_DECERR_C;
 
+   constant AXI_CONFIG_C : AxiConfigType := (
+      ADDR_WIDTH_C => 33,
+      DATA_BYTES_C => 16,  
+      ID_BITS_C    => 1,
+      LEN_BITS_C   => 8);
+
+
    signal mps125MHzClk : sl;
    signal mps125MHzRst : sl;
    signal mps312MHzClk : sl;
@@ -235,8 +247,8 @@ architecture mapping of DebugRtmAmcCarrierCore is
    signal resetDDR             : sl;
    signal pgpClk               : sl;
    signal pgpRst               : sl;
-   signal bufDiagnosticMasters : AxiStreamMasterArray(DIAGNOSTIC_SIZE_G-1 downto 0);
-   signal bufDiagnosticSlaves  : AxiStreamSlaveArray(DIAGNOSTIC_SIZE_G-1 downto 0);
+   signal bufDiagnosticMaster : AxiStreamMasterType;
+   signal bufDiagnosticSlave  : AxiStreamSlaveType;
    
 begin
 
@@ -292,7 +304,6 @@ begin
          TPD_G             => TPD_G,
          SIM_SPEEDUP_G     => SIM_SPEEDUP_G,
          SIMULATION_G      => SIMULATION_G,
-         DIAGNOSTIC_SIZE_G => DIAGNOSTIC_SIZE_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
       port map (
          -- Master AXI-Lite Interface
@@ -313,8 +324,8 @@ begin
          -- Debug AXI stream Interface
          pgpClock          => pgpClk,
          pgpReset          => pgpRst,
-         axisTxMasters     => bufDiagnosticMasters,
-         axisTxSlaves      => bufDiagnosticSlaves,
+         axisTxMaster     => bufDiagnosticMaster,
+         axisTxSlave      => bufDiagnosticSlave,
          ----------------------
          -- Top Level Interface
          ----------------------
@@ -468,29 +479,61 @@ begin
          timingClkSel     => timingClkSel);
 
    ------------------
-   -- DDR FIFO Module
+   -- DDR Buffer module
    ------------------
-   U_AdcDdrFifo : entity work.DebugAmcAdcDdrFifo
+   U_DebugRawDiagnostic_1: entity work.DebugRawDiagnostic
       generic map (
-         TPD_G              => TPD_G,
-         L_AXI_G            => DIAGNOSTIC_SIZE_G,
-         INPUT_AXI_CONFIG_G => DIAGNOSTIC_CONFIG_G)
+         TPD_G                    => TPD_G,
+         DIAGNOSTIC_RAW_STREAMS_G => DIAGNOSTIC_RAW_STREAMS_G,
+         DIAGNOSTIC_RAW_CONFIGS_G => DIAGNOSTIC_RAW_CONFIGS_G,
+         AXIL_BASE_ADDR_G         => BSA_ADDR_C,
+         AXIL_AXI_ASYNC_G         => true,
+         AXI_CONFIG_G             => AXI_CONFIG_C)
       port map (
-         sAxisClk       => diagnosticClk,
-         sAxisRst       => diagnosticRst,
-         sAxisMaster    => diagnosticMasters,
-         sAxisSlave     => diagnosticSlaves,
-         sAxisCtrl      => diagnosticCtrls,
-         axiClk         => axiClk,
-         axiRst         => resetDDR,    -- axiRst
-         axiWriteMaster => axiWriteMaster,
-         axiWriteSlave  => axiWriteSlave,
-         axiReadMaster  => axiReadMaster,
-         axiReadSlave   => axiReadSlave,
-         mAxisClk       => pgpClk,
-         mAxisRst       => pgpRst,
-         mAxisMaster    => bufDiagnosticMasters,
-         mAxisSlave     => bufDiagnosticSlaves);   
+         diagnosticRawClks    => diagnosticRawClks,     -- [in]
+         diagnosticRawRsts    => diagnosticRawRsts,     -- [in]
+         diagnosticRawMasters => diagnosticRawMasters,  -- [in]
+         diagnosticRawSlaves  => diagnosticRawSlaves,   -- [out]
+         diagnosticRawCtrl    => diagnosticRawCtrl,     -- [out]
+         axilClk              => axilClk,               -- [in]
+         axilRst              => axilRst,               -- [in]
+         axilReadMaster       => bsaReadMaster,        -- [in]
+         axilReadSlave        => bsaReadSlave,         -- [out]
+         axilWriteMaster      => bsaWriteMaster,       -- [in]
+         axilWriteSlave       => bsaWriteSlave,        -- [out]
+         dataClk              => pgpClk,               -- [in]
+         dataRst              => pgpRst,               -- [in]
+         dataMaster           => bufDiagnosticMaster,            -- [out]
+         dataSlave            => bufDiagnosticSlave,             -- [in]
+         axiClk               => axiClk,                -- [in]
+         axiRst               => axiRst,                -- [in]
+         axiWriteMaster       => axiWriteMaster,        -- [out]
+         axiWriteSlave        => axiWriteSlave,         -- [in]
+         axiReadMaster        => axiReadMaster,         -- [out]
+         axiReadSlave         => axiReadSlave);         -- [in]
+
+   
+--    U_AdcDdrFifo : entity work.DebugAmcAdcDdrFifo
+--       generic map (
+--          TPD_G              => TPD_G,
+--          L_AXI_G            => DIAGNOSTIC_SIZE_G,
+--          INPUT_AXI_CONFIG_G => DIAGNOSTIC_CONFIG_G)
+--       port map (
+--          sAxisClk       => diagnosticClk,
+--          sAxisRst       => diagnosticRst,
+--          sAxisMaster    => diagnosticMasters,
+--          sAxisSlave     => diagnosticSlaves,
+--          sAxisCtrl      => diagnosticCtrls,
+--          axiClk         => axiClk,
+--          axiRst         => resetDDR,    -- axiRst
+--          axiWriteMaster => axiWriteMaster,
+--          axiWriteSlave  => axiWriteSlave,
+--          axiReadMaster  => axiReadMaster,
+--          axiReadSlave   => axiReadSlave,
+--          mAxisClk       => pgpClk,
+--          mAxisRst       => pgpRst,
+--          mAxisMaster    => bufDiagnosticMasters,
+--          mAxisSlave     => bufDiagnosticSlaves);   
 
    -- Note: This is a work around. Not to be used in final version nor production! TODO Remove FIX ME ! 
    -- Reset DDR FIFO before requesting next transaction.
