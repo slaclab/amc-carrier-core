@@ -3,5 +3,6 @@ vhdl work rtl/BsaBufferControl.vhd
 vhdl work rtl/BsaAccumulator.vhd
 vhdl work rtl/BsaAxiInterconnectWrapper.vhd
 vhdl work rtl/BsaRawDiagnostic.vhd
+vhdl work rtl/BsaRawDiagnosticRing.vhd
 vhdl work rtl/SsiAxiMaster.vhd
 
