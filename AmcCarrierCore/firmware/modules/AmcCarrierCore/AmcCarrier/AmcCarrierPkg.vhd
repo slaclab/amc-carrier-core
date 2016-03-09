@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-02-23
+-- Last update: 2016-03-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -90,7 +90,9 @@ package AmcCarrierPkg is
    ---------------------------------------------------
    -- BSI: Configurations, Constants and Records Types
    ---------------------------------------------------
-   constant BSI_MAC_SIZE_C : natural := 4;
+   constant BSI_MAJOR_VERSION_C : slv(7 downto 0) := x"01";
+   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"01";
+   constant BSI_MAC_SIZE_C      : natural         := 4;
 
    type BsiBusType is record
       slotNumber : slv(7 downto 0);
