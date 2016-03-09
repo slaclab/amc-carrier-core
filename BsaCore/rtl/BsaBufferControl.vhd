@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-02-17
+-- Last update: 2016-03-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -260,8 +260,8 @@ begin
          ADDR_WIDTH_G => BSA_ADDR_BITS_C,
          DATA_WIDTH_G => 64)
       port map (
-         axiClk         => axiClk,
-         axiRst         => axiRst,
+         axiClk         => axilClk,
+         axiRst         => axilRst,
          axiReadMaster  => locAxilReadMasters(TIMESTAMP_AXIL_C),
          axiReadSlave   => locAxilReadSlaves(TIMESTAMP_AXIL_C),
          axiWriteMaster => locAxilWriteMasters(TIMESTAMP_AXIL_C),
