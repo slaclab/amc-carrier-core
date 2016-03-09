@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2016-03-02
+-- Last update: 2016-03-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -42,6 +42,8 @@ entity AmcCarrierBsi is
       localMac        : out   slv(47 downto 0);
       localIp         : out   slv(31 downto 0);
       localAppId      : out   slv(15 downto 0);
+      startBoot       : out   sl;
+      startBootAddr   : out   slv(31 downto 0);
       -- Application Interface
       bsiClk          : in    sl;
       bsiRst          : in    sl;
@@ -74,19 +76,27 @@ architecture rtl of AmcCarrierBsi is
    end function;
 
    type RegType is record
-      rdEn           : slv(1 downto 0);
+      cnt            : slv(3 downto 0);
       addr           : slv(7 downto 0);
+      we             : sl;
+      ramData        : slv(7 downto 0);
+      startBoot      : sl;
+      startBootAddr  : slv(31 downto 0);
       slotNumber     : slv(7 downto 0);
       crateId        : slv(15 downto 0);
-      macAddress     : Slv48Array(15 downto 0);
+      macAddress     : Slv48Array(BSI_MAC_SIZE_C-1 downto 0);
       localIp        : slv(31 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      rdEn           => "11",
+      cnt            => x"0",
       addr           => x"00",
+      we             => '0',
+      ramData        => x"00",
+      startBoot      => '0',
+      startBootAddr  => x"00000000",
       slotNumber     => x"00",
       crateId        => x"0000",
       macAddress     => (others => (others => '0')),
@@ -150,11 +160,9 @@ begin
    ----------------
    -- Dual port ram
    ----------------   
-   U_RAM : entity work.DualPortRam
+   U_RAM : entity work.TrueDualPortRam
       generic map (
          TPD_G        => TPD_G,
-         BRAM_EN_G    => true,
-         REG_EN_G     => true,
          MODE_G       => "read-first",
          DATA_WIDTH_G => 8,
          ADDR_WIDTH_G => 8)
@@ -167,7 +175,9 @@ begin
          douta => i2cBramDout,
          -- Port B
          clkb  => axilClk,
+         web   => r.we,
          addrb => r.addr,
+         dinb  => r.ramData,
          doutb => ramData);   
 
    --------------------- 
@@ -182,40 +192,74 @@ begin
       -- Latch the current value
       v := r;
 
-      -- Shift Register
-      v.rdEn(0) := '0';
-      v.rdEn(1) := r.rdEn(0);
+      -- Reset the strobe
+      v.we := '0';
+
+      -- Increment the counter
+      v.cnt := r.cnt + 1;
 
       -- Update the index
       index := conv_integer(r.addr(7 downto 4));
 
-      -- Check if read is completed
-      if r.rdEn = "00" then
-         -- Increment the counter
+      -- Check counter phase
+      if r.cnt = x"0" then
+         -- Increment the address
          v.addr := r.addr + 1;
-         -- Set the flag
-         v.rdEn := "11";
-         -- Check for ATCA slot number
-         if r.addr = x"FF" then
-            v.slotNumber := ramData;
-         -- Check for ATCA Crate ID (upper byte)
-         elsif r.addr = x"FE" then
-            v.crateId(15 downto 8) := ramData;
-         -- Check for ATCA Crate ID (lower byte)
-         elsif r.addr = x"FD" then
-            v.crateId(7 downto 0) := ramData;
-         else
-            -- Check for available MAC addresses
-            case (r.addr(3 downto 0)) is
-               when x"0"   => v.macAddress(index)(7 downto 0)   := ramData;
-               when x"1"   => v.macAddress(index)(15 downto 8)  := ramData;
-               when x"2"   => v.macAddress(index)(23 downto 16) := ramData;
-               when x"3"   => v.macAddress(index)(31 downto 24) := ramData;
-               when x"4"   => v.macAddress(index)(39 downto 32) := ramData;
-               when x"5"   => v.macAddress(index)(47 downto 40) := ramData;
-               when others => null;
-            end case;
-         end if;
+      elsif r.cnt = x"8" then
+         -- Check the address bus
+         case (r.addr) is
+            ---------------------------------------
+            -- Check for ATCA slot number
+            ---------------------------------------
+            when x"FF" => v.slotNumber           := ramData;
+            ---------------------------------------
+            -- Check for ATCA Crate ID
+            ---------------------------------------
+            when x"FE" => v.crateId(15 downto 8) := ramData;
+            when x"FD" => v.crateId(7 downto 0)  := ramData;
+            ---------------------------------------
+            -- Check for BSI Major Version
+            ---------------------------------------
+            when x"FC" =>
+               v.we      := '1';
+               v.ramData := BSI_MAJOR_VERSION_C;
+            ---------------------------------------
+            -- Check for BSI Minor Version
+            ---------------------------------------
+            when x"FB" =>
+               v.we      := '1';
+               v.ramData := BSI_MINOR_VERSION_C;
+            ---------------------------------------
+            -- Check for start boot
+            ---------------------------------------
+            when x"FA" =>
+               -- Sample the LSB of the memory byte
+               v.startBoot := ramData(0);
+               -- Reset memory
+               v.we        := '1';
+               v.ramData   := x"00";
+            ---------------------------------------
+            -- Check for boot address
+            ---------------------------------------
+            when x"F9" => v.startBootAddr(31 downto 24) := ramData;
+            when x"F8" => v.startBootAddr(23 downto 16) := ramData;
+            when x"F7" => v.startBootAddr(15 downto 8)  := ramData;
+            when x"F6" => v.startBootAddr(7 downto 0)   := ramData;
+            ---------------------------------------
+            when others =>
+               if (index < BSI_MAC_SIZE_C) then
+                  -- Check for available MAC addresses
+                  case (r.addr(3 downto 0)) is
+                     when x"0"   => v.macAddress(index)(7 downto 0)   := ramData;
+                     when x"1"   => v.macAddress(index)(15 downto 8)  := ramData;
+                     when x"2"   => v.macAddress(index)(23 downto 16) := ramData;
+                     when x"3"   => v.macAddress(index)(31 downto 24) := ramData;
+                     when x"4"   => v.macAddress(index)(39 downto 32) := ramData;
+                     when x"5"   => v.macAddress(index)(47 downto 40) := ramData;
+                     when others => null;
+                  end case;
+               end if;
+         end case;
       end if;
 
       -- Update the local IP addresses
@@ -234,6 +278,9 @@ begin
       end loop;
       axiSlaveRegisterR(regCon, x"80", 0, r.crateId);
       axiSlaveRegisterR(regCon, x"84", 0, r.slotNumber);
+      axiSlaveRegisterR(regCon, x"88", 0, r.startBootAddr);
+      axiSlaveRegisterR(regCon, x"8C", 0, BSI_MINOR_VERSION_C);
+      axiSlaveRegisterR(regCon, x"8C", 8, BSI_MAJOR_VERSION_C);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -249,15 +296,14 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
+      startBoot      <= r.startBoot;
+      startBootAddr  <= r.startBootAddr;
 
       localAppId(3 downto 0)  <= r.slotNumber(3 downto 0);
       localAppId(15 downto 4) <= r.crateId(15 downto 4);
 
-      -- localMac <= ConvertEndianness(r.macAddress(0));
-      -- localIp  <= r.localIp;
-
-      localMac <= x"010300564400";
-      localIp  <= x"0A02A8C0";
+      localMac <= ConvertEndianness(r.macAddress(0));
+      localIp  <= r.localIp;
       
    end process comb;
 
