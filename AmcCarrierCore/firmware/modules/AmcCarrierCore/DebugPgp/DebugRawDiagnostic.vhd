@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-03-09
+-- Last update: 2016-03-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -106,7 +106,9 @@ architecture rtl of DebugRawDiagnostic is
    signal dmaDataCtrl    : AxiStreamCtrlType;
    signal fifoDataMaster : AxiStreamMasterType;
    signal fifoDataSlave  : AxiStreamSlaveType;
-
+   signal packetizerDataMaster : AxiStreamMasterType;
+   signal packetizerDataSlave  : AxiStreamSlaveType;
+   
    signal mAxilReadMaster  : AxiLiteReadMasterType;
    signal mAxilReadSlave   : AxiLiteReadSlaveType;
    signal mAxilWriteMaster : AxiLiteWriteMasterType;
@@ -255,10 +257,10 @@ begin
 
 
 
-   AxiStreamFifo_DATA : entity work.AxiStreamFifo
+   AxiStreamFifo_128_64 : entity work.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
-         SLAVE_READY_EN_G    => true,
+         SLAVE_READY_EN_G    => false,
          VALID_THOLD_G       => 1,
          BRAM_EN_G           => true,
          XIL_DEVICE_G        => "ULTRASCALE",
@@ -269,7 +271,7 @@ begin
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 2**12-32,
          SLAVE_AXI_CONFIG_G  => INTERNAL_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(2))
+         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(8))
       port map (
          sAxisClk    => axiClk,
          sAxisRst    => axiRst,
@@ -281,7 +283,7 @@ begin
          mAxisMaster => fifoDataMaster,
          mAxisSlave  => fifoDataSlave);
 
-   -- Need to add packetizer
+   
    U_AxiStreamPacketizer_1 : entity work.AxiStreamPacketizer
       generic map (
          TPD_G                => TPD_G,
@@ -293,8 +295,32 @@ begin
          axisRst     => dataRst,         -- [in]
          sAxisMaster => fifoDataMaster,  -- [in]
          sAxisSlave  => fifoDataSlave,   -- [out]
-         mAxisMaster => dataMaster,      -- [out]
-         mAxisSlave  => dataSlave);      -- [in]
+         mAxisMaster => packetizerDataMaster,      -- [out]
+         mAxisSlave  => packetizerDataSlave);      -- [in]
 
-
+   -- Need another fifo after packetizer to convert to pgp width
+      AxiStreamFifo_64_16 : entity work.AxiStreamFifo
+      generic map (
+         TPD_G               => TPD_G,
+         SLAVE_READY_EN_G    => true,
+         VALID_THOLD_G       => 1,
+         BRAM_EN_G           => true,
+         XIL_DEVICE_G        => "ULTRASCALE",
+         USE_BUILT_IN_G      => false,
+         GEN_SYNC_FIFO_G     => false,
+         CASCADE_SIZE_G      => 1,
+         FIFO_ADDR_WIDTH_G   => 9,
+         FIFO_FIXED_THRESH_G => true,
+         FIFO_PAUSE_THRESH_G => 2**9-1,
+         SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(8),
+         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(2))
+      port map (
+         sAxisClk    => dataClk,
+         sAxisRst    => dataRst,
+         sAxisMaster => packetizerDataMaster,
+         sAxisSlave  => packetizerDataSlave,
+         mAxisClk    => dataClk,
+         mAxisRst    => dataRst,
+         mAxisMaster => dataMaster,
+         mAxisSlave  => dataSlave);
 end architecture rtl;
