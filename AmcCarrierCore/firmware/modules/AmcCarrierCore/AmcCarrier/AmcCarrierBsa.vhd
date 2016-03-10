@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-02-11
+-- Last update: 2016-03-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -84,19 +84,59 @@ end AmcCarrierBsa;
 
 architecture mapping of AmcCarrierBsa is
 
+   -------------------------------------------------------------------------------------------------
+   -- AXI Lite
+   -------------------------------------------------------------------------------------------------
+   constant FAST_AXIL_CLK_C : boolean := true;
+
+   constant AXIL_MASTERS_C : integer := 2;
+
+   constant BSA_BUFFER_AXIL_C     : integer := 0;
+   constant RAW_DIAGNOSTIC_AXIL_C : integer := 1;
+
+   constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
+      genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, 20, 16);
+
+   signal syncAxilWriteMaster : AxiLiteWriteMasterType;
+   signal syncAxilWriteSlave  : AxiLiteWriteSlaveType;
+   signal syncAxilReadMaster  : AxiLiteReadMasterType;
+   signal syncAxilReadSlave   : AxiLiteReadSlaveType;
+
+   signal syncAxilClk         : sl;
+   signal syncAxilRst         : sl;
+   signal locAxilWriteMasters : AxiLiteWriteMasterArray(AXIL_MASTERS_C-1 downto 0);
+   signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(AXIL_MASTERS_C-1 downto 0);
+   signal locAxilReadMasters  : AxiLiteReadMasterArray(AXIL_MASTERS_C-1 downto 0);
+   signal locAxilReadSlaves   : AxiLiteReadSlaveArray(AXIL_MASTERS_C-1 downto 0);
+
+   -------------------------------------------------------------------------------------------------
+   -- AXI Stream
+   -------------------------------------------------------------------------------------------------
    -- Define streams to eth block
-   constant MEM_AXIS_INDEX_C   : integer := 0;
-   constant ASYNC_AXIS_INDEX_C : integer := 1;
-   constant DIAG_AXIS_INDEX_C  : integer := 2;
+   constant MEM_AXIS_INDEX_C        : integer := 0;
+   constant BSA_STATUS_AXIS_INDEX_C : integer := 1;
+   constant DIAG_STATUS_AXIS_INDEX_C       : integer := 2;
 
    -- Streams to Eth block are 64 bits wide for RSSI
    constant BSA_AXIS_CONFIG_C            : AxiStreamConfigType := ssiAxiStreamConfig(8);
    constant RAW_DIAGNOSTIC_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(1);
 
+   signal diagAxisMaster : AxiStreamMasterType;
+   signal diagAxisSlave  : AxiStreamSlaveType;
+
+   -------------------------------------------------------------------------------------------------
+   -- AXI4
+   -------------------------------------------------------------------------------------------------
+   constant DIAG_AXI_CONFIG_C : AxiConfigType := (
+      ADDR_WIDTH_C => 33,
+      DATA_BYTES_C => 16,  -- needs to be 64 bits wide or 2kbyte BSA buffer bursts get split
+      ID_BITS_C    => 1,
+      LEN_BITS_C   => 8);
+
    -- Bsa buffer write word size should be configurable
    constant BSA_AXI_CONFIG_C : AxiConfigType := (
       ADDR_WIDTH_C => 33,
-      DATA_BYTES_C => 16,                -- needs to be 64 bits wide or 2kbyte BSA buffer bursts get split
+      DATA_BYTES_C => 16,  -- needs to be 64 bits wide or 2kbyte BSA buffer bursts get split
       ID_BITS_C    => 1,
       LEN_BITS_C   => 8);
 
@@ -120,11 +160,58 @@ architecture mapping of AmcCarrierBsa is
    signal diagAxiReadMaster  : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
    signal diagAxiReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
 
-   signal diagAxisMaster : AxiStreamMasterType;
-   signal diagAxisSlave  : AxiStreamSlaveType;
-
 begin
+   AXIL_SYNC_GEN : if (FAST_AXIL_CLK_C) generate
+      syncAxilClk <= axiClk;
+      syncAxilRst <= axiRst;
+      U_AxiLiteAsync_1 : entity work.AxiLiteAsync
+         generic map (
+            TPD_G           => TPD_G,
+            NUM_ADDR_BITS_G => 32,
+            PIPE_STAGES_G   => 0)
+         port map (
+            sAxiClk         => axilClk,              -- [in]
+            sAxiClkRst      => axilRst,              -- [in]
+            sAxiReadMaster  => axilReadMaster,       -- [in]
+            sAxiReadSlave   => axilReadSlave,        -- [out]
+            sAxiWriteMaster => axilWriteMaster,      -- [in]
+            sAxiWriteSlave  => axilWriteSlave,       -- [out]
+            mAxiClk         => axiClk,               -- [in]
+            mAxiClkRst      => axiRst,               -- [in]
+            mAxiReadMaster  => syncAxilReadMaster,   -- [out]
+            mAxiReadSlave   => syncAxilReadSlave,    -- [in]
+            mAxiWriteMaster => syncAxilWriteMaster,  -- [out]
+            mAxiWriteSlave  => syncAxilWriteSlave);  -- [in]
+   end generate AXIL_SYNC_GEN;
 
+   NO_AXIL_SYNC_GEN : if (not FAST_AXIL_CLK_C) generate
+      syncAxilClk         <= axilClk;
+      syncAxilRst         <= axilRst;
+      syncAxilReadMaster  <= axilReadMaster;
+      axilReadSlave       <= syncAxilReadSlave;
+      syncAxilWriteMaster <= axilWriteMaster;
+      axilWriteSlave      <= syncAxilWriteSlave;
+   end generate NO_AXIL_SYNC_GEN;
+
+   U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => AXIL_MASTERS_C,
+         DEC_ERROR_RESP_G   => AXI_RESP_DECERR_C,
+         MASTERS_CONFIG_G   => AXIL_CROSSBAR_CONFIG_C,
+         DEBUG_G            => true)
+      port map (
+         axiClk              => syncAxilClk,          -- [in]
+         axiClkRst           => syncAxilRst,          -- [in]
+         sAxiWriteMasters(0) => syncAxilWriteMaster,  -- [in]
+         sAxiWriteSlaves(0)  => syncAxilWriteSlave,   -- [out]
+         sAxiReadMasters(0)  => syncAxilReadMaster,   -- [in]
+         sAxiReadSlaves(0)   => syncAxilReadSlave,    -- [out]
+         mAxiWriteMasters    => locAxilWriteMasters,  -- [out]
+         mAxiWriteSlaves     => locAxilWriteSlaves,   -- [in]
+         mAxiReadMasters     => locAxilReadMasters,   -- [out]
+         mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
 
    ------------------------------------------------------------------------------------------------
    -- Diagnostic Engine
@@ -134,82 +221,72 @@ begin
    -----------------------------------------------------------------------------------------------
    -- Raw diagnostic engine
    -----------------------------------------------------------------------------------------------
-   ibBsaSlaves(DIAG_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only.
-   U_BsaRawDiagnostic_1 : entity work.BsaRawDiagnostic
+   ibBsaSlaves(DIAG_STATUS_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;                -- Upstream only.
+   U_BsaRawDiagnostic_1 : entity work.BsaRawDiagnosticRing
       generic map (
          TPD_G                    => TPD_G,
          DIAGNOSTIC_RAW_STREAMS_G => DIAGNOSTIC_RAW_STREAMS_G,
          DIAGNOSTIC_RAW_CONFIGS_G => DIAGNOSTIC_RAW_CONFIGS_G,
-         OUTPUT_CONFIG_G          => RAW_DIAGNOSTIC_AXIS_CONFIG_C)
+         AXIL_BASE_ADDR_G         => AXIL_CROSSBAR_CONFIG_C(RAW_DIAGNOSTIC_AXIL_C).baseAddr,
+         AXIL_AXI_ASYNC_G         => not FAST_AXIL_CLK_C,
+         AXI_CONFIG_G             => DIAG_AXI_CONFIG_C)
       port map (
-         diagnosticRawClks    => diagnosticRawClks,             -- [in]
-         diagnosticRawRsts    => diagnosticRawRsts,             -- [in]
-         diagnosticRawMasters => diagnosticRawMasters,          -- [in]
-         diagnosticRawSlaves  => diagnosticRawSlaves,           -- [out]
-         diagnosticRawCtrl    => diagnosticRawCtrl,             -- [out]
-         axiClk               => axiClk,                        -- [in]
-         axiRst               => axiRst,                        -- [in]
-         axiWriteMaster       => diagAxiWriteMaster,            -- [out]
-         axiWriteSlave        => diagAxiWriteSlave,             -- [in]
-         axiReadMaster        => diagAxiReadMaster,             -- [out]
-         axiReadSlave         => diagAxiReadSlave,              -- [in]
-         bufClk               => axilClk,                       -- [in]
-         bufRst               => axilRst,                       -- [in]
-         bufMaster            => diagAxisMaster,                -- [out]
-         bufSlave             => diagAxisSlave);                -- [in]
+         diagnosticRawClks    => diagnosticRawClks,                           -- [in]
+         diagnosticRawRsts    => diagnosticRawRsts,                           -- [in]
+         diagnosticRawMasters => diagnosticRawMasters,                        -- [in]
+         diagnosticRawSlaves  => diagnosticRawSlaves,                         -- [out]
+         diagnosticRawCtrl    => diagnosticRawCtrl,                           -- [out]
+         axilClk              => syncAxilClk,                                 -- [in]
+         axilRst              => syncAxilRst,                                 -- [in]
+         axilWriteMaster      => locAxilWriteMasters(RAW_DIAGNOSTIC_AXIL_C),  -- [out]
+         axilWriteSlave       => locAxilWriteSlaves(RAW_DIAGNOSTIC_AXIL_C),   -- [in]
+         axilReadMaster       => locAxilReadMasters(RAW_DIAGNOSTIC_AXIL_C),   -- [out]
+         axilReadSlave        => locAxilReadSlaves(RAW_DIAGNOSTIC_AXIL_C),    -- [in]
+         axisStatusClk        => axilClk,
+         axisStatusRst        => axilRst,
+         axisStatusMaster     => obBsaMasters(DIAG_STATUS_AXIS_INDEX_C),
+         axisStatusSlave      => obBsaSlaves(DIAG_STATUS_AXIS_INDEX_C),
+         axiClk               => axiClk,                                      -- [in]
+         axiRst               => axiRst,                                      -- [in]
+         axiWriteMaster       => diagAxiWriteMaster,                          -- [out]
+         axiWriteSlave        => diagAxiWriteSlave);                          -- [in]
 
-   AxiStreamFifo : entity work.AxiStreamFifo
-      generic map (
-         TPD_G               => TPD_G,
-         --INT_PIPE_STAGES_G   => INT_PIPE_STAGES_G,
-         PIPE_STAGES_G       => 1,
-         SLAVE_READY_EN_G    => true,
-         VALID_THOLD_G       => 1,
-         BRAM_EN_G           => false,
-         USE_BUILT_IN_G      => false,
-         GEN_SYNC_FIFO_G     => true,
-         FIFO_ADDR_WIDTH_G   => 4,
-         SLAVE_AXI_CONFIG_G  => RAW_DIAGNOSTIC_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(8))
-      port map (
-         sAxisClk    => axilClk,
-         sAxisRst    => axilRst,
-         sAxisMaster => diagAxisMaster,
-         sAxisSlave  => diagAxisSlave,
-         mAxisClk    => axilClk,
-         mAxisRst    => axilRst,
-         mAxisMaster => obBsaMasters(DIAG_AXIS_INDEX_C),
-         mAxisSlave  => obBsaSlaves(DIAG_AXIS_INDEX_C));
+
+
 
    -------------------------------------------------------------------------------------------------
    -- BSA buffers
    -------------------------------------------------------------------------------------------------
-   ibBsaSlaves(ASYNC_AXIS_INDEX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
-   obBsaMasters(ASYNC_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;  -- Not implemented yet
+   ibBsaSlaves(BSA_STATUS_AXIS_INDEX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
    BsaBufferControl_1 : entity work.BsaBufferControl
       generic map (
          TPD_G                   => TPD_G,
-         AXIL_BASE_ADDR_G        => BSA_ADDR_C,
+         AXIL_BASE_ADDR_G        => AXIL_CROSSBAR_CONFIG_C(BSA_BUFFER_AXIL_C).baseAddr,
+         AXIL_AXI_ASYNC_G        => not FAST_AXIL_CLK_C,
          BSA_BUFFERS_G           => BSA_BUFFERS_G,
          BSA_ACCUM_FLOAT_G       => false,
          BSA_STREAM_BYTE_WIDTH_G => 8,
          DIAGNOSTIC_OUTPUTS_G    => DIAGNOSTIC_OUTPUTS_G,
-         BSA_BURST_BYTES_G       => 2048,                         -- explore 4096
+         BSA_BURST_BYTES_G       => 2048,                              -- explore 4096
          AXI_CONFIG_G            => BSA_AXI_CONFIG_C)
       port map (
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave,
-         diagnosticClk   => diagnosticClk,
-         diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBus,
-         axiClk          => axiClk,
-         axiRst          => axiRst,
-         axiWriteMaster  => bsaAxiWriteMaster,
-         axiWriteSlave   => bsaAxiWriteSlave);
+         axilClk          => syncAxilClk,
+         axilRst          => syncAxilRst,
+         axilReadMaster   => locAxilReadMasters(BSA_BUFFER_AXIL_C),
+         axilReadSlave    => locAxilReadSlaves(BSA_BUFFER_AXIL_C),
+         axilWriteMaster  => locAxilWriteMasters(BSA_BUFFER_AXIL_C),
+         axilWriteSlave   => locAxilWriteSlaves(BSA_BUFFER_AXIL_C),
+         diagnosticClk    => diagnosticClk,
+         diagnosticRst    => diagnosticRst,
+         diagnosticBus    => diagnosticBus,
+         axisStatusClk    => axilClk,
+         axisStatusRst    => axilRst,
+         axisStatusMaster => obBsaMasters(BSA_STATUS_AXIS_INDEX_C),
+         axisStatusSlave  => obBsaSlaves(BSA_STATUS_AXIS_INDEX_C),
+         axiClk           => axiClk,
+         axiRst           => axiRst,
+         axiWriteMaster   => bsaAxiWriteMaster,
+         axiWriteSlave    => bsaAxiWriteSlave);
 
    -----------------------------------------------------------------------------------------------
    -- Mem Read engine

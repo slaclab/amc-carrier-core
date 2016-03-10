@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-02-17
+-- Last update: 2016-03-01
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -225,7 +225,9 @@ begin
 
    assert (r.overflow = '0') report "BsaAccumulator " & str(BSA_NUMBER_G) & " overflowed." severity error;
 
-   comb : process (adderOutLast, adderValid, axisSlave, bsaAvgDone, bsaDone, bsaInit, fifoDout, fifoDoutP, fifoFull, fifoProgFull, fifoRdCount, r, rst, shiftEn, shiftIn) is
+   comb : process (adderOutLast, adderValid, axisSlave, bsaAvgDone, bsaDone, bsaInit, fifoDout,
+                   fifoDoutP, fifoFull, fifoProgEmpty, fifoProgFull, fifoRdCount, r, rst, shiftEn,
+                   shiftIn) is
       variable v : RegType;
 
    begin

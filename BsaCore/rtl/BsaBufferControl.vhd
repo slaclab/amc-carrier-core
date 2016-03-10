@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-03-08
+-- Last update: 2016-03-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -43,6 +43,7 @@ entity BsaBufferControl is
    generic (
       TPD_G                   : time                      := 1 ns;
       AXIL_BASE_ADDR_G        : slv(31 downto 0)          := (others => '0');
+      AXIL_AXI_ASYNC_G        : boolean                   := true;
       BSA_BUFFERS_G           : natural range 1 to 64     := 64;
       BSA_ACCUM_FLOAT_G       : boolean                   := true;
       BSA_STREAM_BYTE_WIDTH_G : integer range 4 to 128    := 4;
@@ -64,6 +65,12 @@ entity BsaBufferControl is
       diagnosticRst : in sl;
       diagnosticBus : in DiagnosticBusType;
 
+      -- Status stream
+      axisStatusClk    : in  sl;
+      axisStatusRst    : in  sl;
+      axisStatusMaster : out AxiStreamMasterType;
+      axisStatusSlave  : in  AxiStreamSlaveType := AXI_STREAM_SLAVE_FORCE_C;
+
       -- AXI4 Interface for DDR 
       axiClk         : in  sl;
       axiRst         : in  sl;
@@ -74,22 +81,15 @@ end entity BsaBufferControl;
 
 architecture rtl of BsaBufferControl is
 
-   constant AXIL_MASTERS_C : integer := 3;
+   constant AXIL_MASTERS_C : integer := 2;
 
-   constant LOCAL_AXIL_C     : integer := 0;
-   constant TIMESTAMP_AXIL_C : integer := 1;
-   constant DMA_RING_AXIL_C  : integer := 2;
+   constant TIMESTAMP_AXIL_C : integer := 0;
+   constant DMA_RING_AXIL_C  : integer := 1;
 
    constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
       genAxiLiteConfig(AXIL_MASTERS_C, AXIL_BASE_ADDR_G, 16, 12);
 
-   constant DMA_RING_BASE_ADDR_C : slv(31 downto 0) := AXIL_BASE_ADDR_G + X"2000";
-
-   -- AxiLite bus gets synchronized to axi4 clk
-   signal syncAxilWriteMaster : AxiLiteWriteMasterType;
-   signal syncAxilWriteSlave  : AxiLiteWriteSlaveType;
-   signal syncAxilReadMaster  : AxiLiteReadMasterType;
-   signal syncAxilReadSlave   : AxiLiteReadSlaveType;
+   constant DMA_RING_BASE_ADDR_C : slv(31 downto 0) := AXIL_CROSSBAR_CONFIG_C(DMA_RING_AXIL_C).baseAddr;
 
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(AXIL_MASTERS_C-1 downto 0);
    signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(AXIL_MASTERS_C-1 downto 0);
@@ -97,16 +97,6 @@ architecture rtl of BsaBufferControl is
    signal locAxilReadSlaves   : AxiLiteReadSlaveArray(AXIL_MASTERS_C-1 downto 0);
 
    constant BSA_ADDR_BITS_C : integer := log2(BSA_BUFFERS_G);
-
-   component BsaConvFpCore
-      port (
-         aclk                 : in  sl;
-         s_axis_a_tvalid      : in  sl;
-         s_axis_a_tdata       : in  slv(31 downto 0);
-         m_axis_result_tvalid : out sl;
-         m_axis_result_tdata  : out slv(31 downto 0)
-         );
-   end component;
 
    constant BSA_STREAM_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
@@ -162,12 +152,9 @@ architecture rtl of BsaBufferControl is
 
    type RegType is record
       -- Just register the whole timing message
-      strobe          : sl;
-      timingMessage   : TimingMessageType;
-      diagnosticData  : Slv32Array(NUM_ACCUMULATIONS_C - 1 downto 0);
-      bsaInitAxil     : slv(63 downto 0);
-      bsaCompleteAxil : slv(63 downto 0);
-      bsaCompleteTmp  : slv(63 downto 0);
+      strobe         : sl;
+      timingMessage  : TimingMessageType;
+      diagnosticData : Slv32Array(NUM_ACCUMULATIONS_C - 1 downto 0);
 
       timestampEn  : sl;
       accumulateEn : sl;
@@ -175,38 +162,30 @@ architecture rtl of BsaBufferControl is
       lastEn       : sl;
       adderCount   : slv(5 downto 0);
 
-      axilWriteSlave : AxiLiteWriteSlaveType;
-      axilReadSlave  : AxiLiteReadSlaveType;
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      strobe          => '0',
-      timingMessage   => TIMING_MESSAGE_INIT_C,
-      diagnosticData  => (others => (others => '0')),
-      bsaInitAxil     => (others => '0'),
-      bsaCompleteAxil => (others => '0'),
-      bsaCompleteTmp  => (others => '0'),
-      timestampEn     => '0',
-      setEn           => '0',
-      lastEn          => '0',
-      accumulateEn    => '0',
-      adderCount      => (others => '0'),
-      axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C,
-      axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C);
+      strobe         => '0',
+      timingMessage  => TIMING_MESSAGE_INIT_C,
+      diagnosticData => (others => (others => '0')),
+
+      timestampEn  => '0',
+      setEn        => '0',
+      lastEn       => '0',
+      accumulateEn => '0',
+      adderCount   => (others => '0'));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
    signal diagnosticStrobeSync : sl;
-   signal diagnosticFpValid    : slv(DIAGNOSTIC_OUTPUTS_G downto 0);
-   signal diagnosticFpData     : Slv32Array(DIAGNOSTIC_OUTPUTS_G downto 0);
+   signal timeStampRamWe       : sl;
 
-   signal timeStampRamWe : sl;
-   signal bsaRamDone     : slv(BSA_BUFFERS_G-1 downto 0);
+   -- axilClk signals
+   signal bufferClearEn : sl;
+   signal bufferClear   : slv(BSA_ADDR_BITS_C-1 downto 0);
 
 begin
-
-
 
    U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
       generic map (
@@ -227,26 +206,6 @@ begin
          mAxiWriteSlaves     => locAxilWriteSlaves,   -- [in]
          mAxiReadMasters     => locAxilReadMasters,   -- [out]
          mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
-
-   -- Synchronize Axi-Lite bus to axiClk (ddrClk)
-   AxiLiteAsync_1 : entity work.AxiLiteAsync
-      generic map (
-         TPD_G           => TPD_G,
-         NUM_ADDR_BITS_G => 32,
-         PIPE_STAGES_G   => 1)
-      port map (
-         sAxiClk         => axilClk,
-         sAxiClkRst      => axilRst,
-         sAxiReadMaster  => locAxilReadMasters(0),
-         sAxiReadSlave   => locAxilReadSlaves(0),
-         sAxiWriteMaster => locAxilWriteMasters(0),
-         sAxiWriteSlave  => locAxilWriteSlaves(0),
-         mAxiClk         => axiClk,
-         mAxiClkRst      => axiRst,
-         mAxiReadMaster  => syncAxilReadMaster,
-         mAxiReadSlave   => syncAxilReadSlave,
-         mAxiWriteMaster => syncAxilWriteMaster,
-         mAxiWriteSlave  => syncAxilWriteSlave);
 
    -- Store timestamps during accumulate phase since we are already iterating over
    timestampRamWe <= r.timestampEn and r.timingMessage.bsaInit(conv_integer(r.adderCount));
@@ -291,26 +250,6 @@ begin
          valid  => diagnosticStrobeSync);
 
    -------------------------------------------------------------------------------------------------
-   -- Convert synchronized diagnostic bus to floating point
-   -------------------------------------------------------------------------------------------------
-   FP_CONV_GEN : if (BSA_ACCUM_FLOAT_G) generate
-      DIAGNOSTIC_FP_CONV : for i in DIAGNOSTIC_OUTPUTS_G downto 0 generate
-         U_BsaConvFpCore_1 : BsaConvFpCore
-            port map (
-               aclk                 => axiClk,                 -- [in]
-               s_axis_a_tvalid      => r.strobe,               -- [in]
-               s_axis_a_tdata       => r.diagnosticData(i+3),  -- [in]
-               m_axis_result_tvalid => diagnosticFpValid(i),   -- [out]
-               m_axis_result_tdata  => diagnosticFpData(i));   -- [out]
-      end generate DIAGNOSTIC_FP_CONV;
-   end generate FP_CONV_GEN;
-
-   SIGNED_CONV_GEN : if (not BSA_ACCUM_FLOAT_G) generate
-      diagnosticFpValid <= (others => r.strobe);
-      diagnosticFpData  <= r.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 3);
-   end generate SIGNED_CONV_GEN;
-
-   -------------------------------------------------------------------------------------------------
    -- One accumulator per BSA buffer
    -------------------------------------------------------------------------------------------------
    BsaAccumulator_GEN : for i in BSA_BUFFERS_G-1 downto 0 generate
@@ -349,7 +288,7 @@ begin
 
       mapping : for j in 7 downto 0 generate
          intBsaAxisMasters(j) <= bsaAxisMasters(j*8+i);
-         bsaAxisSlaves(j*8+i)     <= intBsaAxisSlaves(j);
+         bsaAxisSlaves(j*8+i) <= intBsaAxisSlaves(j);
       end generate mapping;
 
       U_AxiStreamMux_INT : entity work.AxiStreamMux
@@ -440,48 +379,72 @@ begin
          mAxisMaster => lastFifoAxisMaster,  -- [out]
          mAxisSlave  => lastFifoAxisSlave);  -- [in]
 
+   -- Synchronize the buffer clear (init) commands to the axil clk
+   U_SynchronizerFifo_BufferClear : entity work.SynchronizerFifo
+      generic map (
+         TPD_G        => TPD_G,
+         COMMON_CLK_G => not AXIL_AXI_ASYNC_G,
+         DATA_WIDTH_G => BSA_ADDR_BITS_C,
+         ADDR_WIDTH_G => 6)
+      port map (
+         rst    => axiRst,              -- [in]
+         wr_clk => axiClk,              -- [in]
+         wr_en  => timeStampRamWe,      -- [in]
+         din    => r.adderCount,        -- [in]
+         rd_clk => axilClk,             -- [in]
+         valid  => bufferClearEn,       -- [out]
+         dout   => bufferClear);        -- [out]
 
 
    U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
       generic map (
-         TPD_G                => TPD_G,
-         BUFFERS_G            => BSA_BUFFERS_G,
-         BURST_SIZE_BYTES_G   => BSA_BURST_BYTES_G,
-         AXI_LITE_BASE_ADDR_G => DMA_RING_BASE_ADDR_C,
-         AXI_STREAM_CONFIG_G  => LAST_STREAM_CONFIG_C,
-         AXI_WRITE_CONFIG_G   => AXI_CONFIG_G)
+         TPD_G                      => TPD_G,
+         BUFFERS_G                  => BSA_BUFFERS_G,
+         BURST_SIZE_BYTES_G         => BSA_BURST_BYTES_G,
+         TRIGGER_USER_BIT_G         => 0,
+         AXIL_AXI_ASYNC_G           => AXIL_AXI_ASYNC_G,
+         AXIL_BASE_ADDR_G           => DMA_RING_BASE_ADDR_C,
+         DATA_AXI_STREAM_CONFIG_G   => LAST_STREAM_CONFIG_C,
+         STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8),
+         AXI_WRITE_CONFIG_G         => AXI_CONFIG_G)
       port map (
-         axilClk         => axilClk,                               -- [in]
-         axilRst         => axilRst,                               -- [in]
-         axilReadMaster  => locAxilReadMasters(DMA_RING_AXIL_C),   -- [in]
-         axilReadSlave   => locAxilReadSlaves(DMA_RING_AXIL_C),    -- [out]
-         axilWriteMaster => locAxilWriteMasters(DMA_RING_AXIL_C),  -- [in]
-         axilWriteSlave  => locAxilWriteSlaves(DMA_RING_AXIL_C),   -- [out]
-         axisClk         => axiClk,                                -- [in]
-         axisRst         => axiRst,                                -- [in]
-         axisDataMaster      => lastFifoAxisMaster,                    -- [in]
-         axisDataSlave       => lastFifoAxisSlave,                     -- [out]
-         bufferClear     => r.adderCount,                          -- [in]
-         bufferClearEn   => timeStampRamWe,                        -- [in]
-         bufferFull      => open,                                  -- [out]
---         bufferDoneEn    => r.bsaCompleteTmp,                      -- [in]
-         bufferDone      => bsaRamDone,                            -- [out]
-         axiClk          => axiClk,                                -- [in]
-         axiRst          => axiRst,                                -- [in]
-         axiWriteMaster  => axiWriteMaster,                        -- [out]
-         axiWriteSlave   => axiWriteSlave);                        -- [in]
+         axilClk          => axilClk,                               -- [in]
+         axilRst          => axilRst,                               -- [in]
+         axilReadMaster   => locAxilReadMasters(DMA_RING_AXIL_C),   -- [in]
+         axilReadSlave    => locAxilReadSlaves(DMA_RING_AXIL_C),    -- [out]
+         axilWriteMaster  => locAxilWriteMasters(DMA_RING_AXIL_C),  -- [in]
+         axilWriteSlave   => locAxilWriteSlaves(DMA_RING_AXIL_C),   -- [out]
+         bufferClear      => bufferClear,                           -- [in]
+         bufferClearEn    => bufferClearEn,                         -- [in]
+         bufferFull       => open,                                  -- [out]
+         bufferEmpty      => open,                                  -- [out]         
+         bufferDone       => open,                                  -- [out]
+         axisStatusClk    => axisStatusClk,
+         axisStatusRst    => axisStatusRst,
+         axisStatusMaster => axisStatusMaster,
+         axisStatusSlave  => axisStatusSlave,
+         axiClk           => axiClk,                                -- [in]
+         axiRst           => axiRst,                                -- [in]
+         axisDataMaster   => lastFifoAxisMaster,                    -- [in]
+         axisDataSlave    => lastFifoAxisSlave,                     -- [out]
+         axiWriteMaster   => axiWriteMaster,                        -- [out]
+         axiWriteSlave    => axiWriteSlave);                        -- [in]
 
    -------------------------------------------------------------------------------------------------
    -- Accumulation sequencing, and AXI-Lite logic
    -------------------------------------------------------------------------------------------------
-   comb : process (axiRst, bsaRamDone, diagnosticBus, diagnosticFpData, diagnosticFpValid,
-                   diagnosticStrobeSync, r, syncAxilReadMaster, syncAxilWriteMaster) is
-      variable v         : RegType;
-      variable b         : integer range 0 to BSA_BUFFERS_G-1;
-      variable axiStatus : AxiLiteStatusType;
+   comb : process (axiRst, diagnosticBus, diagnosticStrobeSync, r) is
+      variable v : RegType;
+      variable b : integer range 0 to BSA_BUFFERS_G-1;
 
    begin
       v := r;
+
+      ----------------------------------------------------------------------------------------------
+      -- Counter is freerunning. Reset at start of new message
+      ----------------------------------------------------------------------------------------------
+      v.adderCount := r.adderCount + 1;
+      v.lastEn     := '0';
 
       ----------------------------------------------------------------------------------------------
       -- Synchronization
@@ -496,30 +459,13 @@ begin
          v.diagnosticData(2)                              := toSlv(DIAGNOSTIC_OUTPUTS_G, 32);  --Make this based on app constants
          v.diagnosticData(1)                              := diagnosticBus.timingMessage.pulseId(63 downto 32);
          v.diagnosticData(0)                              := diagnosticBus.timingMessage.pulseId(31 downto 0);
+
+         v.timestampEn  := '1';
+         v.accumulateEn := '1';
+         v.setEn        := '1';
+         v.adderCount   := (others => '0');
       end if;
 
-      ----------------------------------------------------------------------------------------------
-      -- Counter is freerunning. Reset at start of new message
-      ----------------------------------------------------------------------------------------------
-      v.adderCount := r.adderCount + 1;
-      v.lastEn     := '0';
-
-      ----------------------------------------------------------------------------------------------
-      -- Wiat for FP conversion of diagnostic data
-      ----------------------------------------------------------------------------------------------
-      if (diagnosticFpValid(0) = '1') then
-         v.timestampEn                                    := '1';
-         v.accumulateEn                                   := '1';
-         v.setEn                                          := '1';
-         v.adderCount                                     := (others => '0');
-         v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 3) := diagnosticFpData;
-
-         v.bsaCompleteTmp := r.bsaCompleteTmp or r.timingMessage.bsaDone;
-         v.bsaInitAxil    := r.bsaInitAxil or r.timingMessage.bsaInit;
-
-      end if;
-
-      v.bsaCompleteAxil := r.bsaCompleteAxil or (r.bsaCompleteTmp and bsaRamDone(BSA_BUFFERS_G-1 downto 0));
 
       ----------------------------------------------------------------------------------------------
       -- Accumulation stage - shift new diagnostic data through the accumulators
@@ -548,41 +494,6 @@ begin
          v.timestampEn := '0';
       end if;
 
-      ----------------------------------------------------------------------------------------------
-      -- AXI-Lite bus for register access
-      ----------------------------------------------------------------------------------------------
-      axiSlaveWaitTxn(syncAxilWriteMaster, syncAxilReadMaster, v.axilWriteSlave, v.axilReadSlave, axiStatus);
-
-      --   Special logic for clear on read status registers
-      if (axiStatus.readEnable = '1') then
-         v.axilReadSlave.rdata := (others => '0');
-         case (syncAxilReadMaster.araddr(7 downto 0)) is
-            -- Registers are cleared on read.
-            -- Don't clear any bits that are about to get set next cycle            
-            when X"00" =>
-               v.axilReadSlave.rdata      := r.bsaInitAxil(31 downto 0);
-               v.bsaInitAxil(31 downto 0) := r.bsaInitAxil(31 downto 0) xor v.bsaInitAxil(31 downto 0);
-               v.bsaInitAxil(31 downto 0) := r.bsaInitAxil(31 downto 0) xor v.bsaInitAxil(31 downto 0);
-            when X"04" =>
-               v.axilReadSlave.rdata       := r.bsaInitAxil(63 downto 32);
-               v.bsaInitAxil(63 downto 32) := r.bsaInitAxil(63 downto 32) xor v.bsaInitAxil(63 downto 32);
-            when X"08" =>
-               v.axilReadSlave.rdata          := r.bsaCompleteAxil(31 downto 0);
-               v.bsaCompleteAxil(31 downto 0) := r.bsaCompleteAxil(31 downto 0) xor v.bsaCompleteAxil(31 downto 0);
-               v.bsaCompleteTmp(31 downto 0)  := r.bsaCompleteTmp(31 downto 0) xor r.bsaCompleteAxil(31 downto 0);
-            when X"0C" =>
-               v.axilReadSlave.rdata           := r.bsaCompleteAxil(63 downto 32);
-               v.bsaCompleteAxil(63 downto 32) := r.bsaCompleteAxil(63 downto 32) xor v.bsaCompleteAxil(63 downto 32);
-               v.bsaCompleteTmp(63 downto 32)  := r.bsaCompleteTmp(63 downto 32) xor r.bsaCompleteAxil(63 downto 32);
-            when others => null;
-         end case;
-         axiSlaveReadResponse(v.axilReadSlave, AXI_RESP_OK_C);
-      end if;
-
-      if (axiStatus.writeEnable = '1') then
-         axiSlaveWriteResponse(v.axilWriteSlave, AXI_RESP_OK_C);
-      end if;
-
 
       ----------------------------------------------------------------------------------------------
       -- Reset and output assignment
@@ -592,9 +503,6 @@ begin
       end if;
 
       rin <= v;
-
-      syncAxilWriteSlave <= r.axilWriteSlave;
-      syncAxilReadSlave  <= r.axilReadSlave;
 
    end process comb;
 
