@@ -49,7 +49,11 @@ entity AmcAxisDaqMux is
       L_G : positive := 6;
 
       --Number of AXIS lanes (1 to 2)
-      L_AXI_G : positive := 2
+      L_AXI_G : positive := 2;
+      
+      -- Mode of DAQ - True  - sends the 4k frames continuously no trigger(used in new interface)
+      --             - False - until packet size and needs trigger (used in new interface)
+      CONTINUOUS_G : boolean:= false
       );
    port (
 
@@ -222,7 +226,8 @@ begin
       AxiStreamDaq_INST : entity work.AmcAxisDaq
          generic map (
             TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            CONTINUOUS_G     => CONTINUOUS_G)
          port map (
             enable_i       => s_enAxi(I),
             devClk_i       => devClk_i,

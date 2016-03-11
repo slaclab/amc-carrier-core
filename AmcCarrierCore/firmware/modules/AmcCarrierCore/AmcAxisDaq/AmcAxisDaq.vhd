@@ -9,13 +9,20 @@
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
--- Description:   This module sends to a single virtual Channel Lane.
+-- Description:   This module sends sample data to a single virtual Channel Lane.
+--                In non-continuous mode
 --                - When data is requested by trig_i = '1' (rising edge is detected on trig_i).
 --                - the module sends data a packet at the time to AXI stream FIFO.
 --                - Between packets the FSM waits until txCtrl_i.pause = '0'
 --                  after that it is ready to receive the next trigger.
 --                Note: Tx pause must indicate that the AXI stream FIFO can hold the whole data packet.
---                Note: The data transmission is enabled only if JESD data is valid dataReady_i='1'. 
+--                Note: The data transmission is enabled only if JESD data is valid dataReady_i='1'.
+--                
+--                In continuous mode:
+--                - continuously sends 4k frames
+--                - the packetSize_i, does not have any function
+--                - the trig_i, does not have any function 
+--                - The inputs should have the following values and can be left disconnected: overflow_i ='0', idle_i ='1', pause_i ='0', ready_i ='1'.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -42,8 +49,11 @@ entity AmcAxisDaq is
       -- General Configurations
       TPD_G            : time            := 1 ns;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
-      FRAME_BWIDTH_G   : positive        := 10
-      );
+      FRAME_BWIDTH_G   : positive        := 10;
+      -- Mode of DAQ - True  - sends the 4k frames continuously no trigger(used in new interface)
+      --             - False - until packet size and needs trigger (used in new interface)
+      CONTINUOUS_G     : boolean         := false
+   );
    port (
       enable_i : in sl;
 
@@ -58,17 +68,17 @@ entity AmcAxisDaq is
       -- DAQ
       packetSize_i : in slv(31 downto 0);
       rateDiv_i    : in slv(15 downto 0);
-      trig_i       : in sl;
+      trig_i       : in sl:='0';
 
       -- Axi Stream
       rxAxisMaster_o : out AxiStreamMasterType;
       error_o        : out sl;
       pctCnt_o       : out slv(15 downto 0);
 
-      overflow_i : in sl;
-      idle_i     : in sl;
-      pause_i    : in sl;
-      ready_i    : in sl;
+      overflow_i : in sl:='0';
+      idle_i     : in sl:='1';
+      pause_i    : in sl:='0';
+      ready_i    : in sl:='1';
 
       sampleData_i : in slv((GT_WORD_SIZE_C*8)-1 downto 0);
       dataReady_i  : in sl
@@ -170,7 +180,7 @@ begin
             v.txAxisMaster.tDest  := intToSlv(axiNum_i, 8);
 
             -- Check if fifo and JESD is ready
-            if (pause_i = '0' and idle_i = '1' and enable_i = '1' and ready_i = '1' and dataReady_i = '1' and s_trigRe = '1') then
+            if (pause_i = '0' and enable_i = '1' and ready_i = '1' and dataReady_i = '1' and ( (s_trigRe = '1' and idle_i = '1') or CONTINUOUS_G = True) ) then
                -- Next State
                v.state := FIRST_SOF_S;
             end if;
@@ -211,7 +221,7 @@ begin
             end if;
 
             -- Error if overflow or pause
-            if pause_i = '1' or overflow_i = '1' or ready_i = '0' then
+            if pause_i = '1' or overflow_i = '1' or ready_i = '0' or dataReady_i = '0' then
                v.error := '1';
             else
                v.error := r.error;
@@ -246,7 +256,7 @@ begin
             end if;
 
             -- Error if overflow or pause
-            if ready_i = '0' then
+            if ready_i = '0' or dataReady_i = '0' then
                v.error := '1';
             else
                v.error := r.error;
@@ -261,12 +271,16 @@ begin
             v.txAxisMaster.tLast                                := '0';
 
             -- Wait until the whole packet is sent, error or frame
-            if (r.dataCnt >= (packetSize_i-2)) then  -- Stop sending data if packet size reached 
-               v.state := LAST_EOF_S;
+            if (r.dataCnt >= (packetSize_i-2) and CONTINUOUS_G = False) then  -- Stop sending data if packet size reached 
+               v.state := LAST_EOF_S;                                         -- Do not stop sending data if in continuous mode
             elsif (r.error = '1') then               -- Stop sending data if error occurs
                v.state := LAST_EOF_S;
             elsif (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-2)) then
-               v.state := EOF_S;
+               if enable_i = '1' then
+                  v.state := EOF_S;
+               else
+                  v.state := LAST_EOF_S;             -- Stop sending data if disabled
+               end if;
             end if;
          ----------------------------------------------------------------------
          when EOF_S =>
@@ -282,7 +296,6 @@ begin
             end if;
 
             -- Error if overflow or pause
-            --if  pause_i = '1' or overflow_i = '1' or ready_i = '0' then
             if ready_i = '0' then
                v.error := '1';
             else
@@ -293,7 +306,6 @@ begin
 
             -- Send the JESD data            
             v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
-            --v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0)   := byteSwapSlv(s_footer, GT_WORD_SIZE_C);
 
             -- Set the EOF(tlast) bit       
             v.txAxisMaster.tLast := '1';
