@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-02-23
+-- Last update: 2016-03-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -84,9 +84,10 @@ package body AmcCarrierRegPkg is
       elsif (app = APP_MPS_LINK_AIN_TYPE_C or
              app = APP_MPS_LINK_DIN_TYPE_C or
              app = APP_MPS_LINK_MIXED_TYPE_C) then  -- Check for MPS Link Node
-         if sel then
+         if TIMING_MODE_119MHZ_C then
             retVar := XBAR_MPS_I_LINK_C;
-         else
+            
+         else                           -- Else TIMING_MODE_186MHZ_C
             retVar := XBAR_MPS_II_LINK_C;
          end if;
 

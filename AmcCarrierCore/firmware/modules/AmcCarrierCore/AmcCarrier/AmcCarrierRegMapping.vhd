@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-01-21
+-- Last update: 2016-03-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,11 +38,11 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierRegMapping is
    generic (
-      TPD_G               : time            := 1 ns;
-      AXI_ERROR_RESP_G    : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      APP_TYPE_G          : AppType         := APP_NULL_TYPE_C;
-      STANDALONE_TIMING_G : boolean         := false;  -- false = Normal Operation, = LCLS-I timing only
-      FSBL_G              : boolean         := false);
+      TPD_G            : time            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
+      TIMING_MODE_G    : boolean         := false;  -- false = Normal Operation, = LCLS-I timing only
+      FSBL_G           : boolean         := false);
    port (
       -- Primary AXI-Lite Interface
       axilClk           : in    sl;
@@ -332,8 +332,8 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         MEM_ADDR_MASK_G  => x"00000000",     -- Using hardware write protection
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C,  -- units of Hz
+         MEM_ADDR_MASK_G  => x"00000000",           -- Using hardware write protection
+         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C,        -- units of Hz
          SPI_CLK_FREQ_G   => (AXI_CLK_FREQ_C/4.0))  -- units of Hz
       port map (
          -- FLASH Memory Ports
@@ -383,7 +383,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, STANDALONE_TIMING_G),
+         XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, TIMING_MODE_G),
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C) 
       port map (
          -- XBAR Ports 

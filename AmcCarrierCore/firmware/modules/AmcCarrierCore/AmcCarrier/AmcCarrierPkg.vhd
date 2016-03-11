@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-03-08
+-- Last update: 2016-03-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -31,8 +31,8 @@ use work.TimingPkg.all;
 
 package AmcCarrierPkg is
 
-   constant AMC_CARRIER_TIMING_186_MHZ_SEL_C : boolean := true;  -- true = LCLS-II timing
-   constant AMC_CARRIER_TIMING_119_MHZ_SEL_C : boolean := ite(AMC_CARRIER_TIMING_186_MHZ_SEL_C, false, true);
+   constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
+   constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
 
    constant AXI_CLK_FREQ_C   : real := 156.25E+6;                        -- In units of Hz
    constant AXI_CLK_PERIOD_C : real := getRealDiv(1.0, AXI_CLK_FREQ_C);  -- In units of seconds   

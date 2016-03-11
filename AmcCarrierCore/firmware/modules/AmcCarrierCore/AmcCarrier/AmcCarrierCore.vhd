@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-02-25
+-- Last update: 2016-03-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ entity AmcCarrierCore is
    generic (
       TPD_G                    : time                 := 1 ns;   -- Simulation only parameter
       SIM_SPEEDUP_G            : boolean              := false;  -- Simulation only parameter
-      STANDALONE_TIMING_G      : boolean              := false;  -- false = Normal Operation, = LCLS-I timing only
+      TIMING_MODE_G            : boolean              := TIMING_MODE_186MHZ_C;
       MPS_SLOT_G               : boolean              := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G                   : boolean              := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G               : AppType              := APP_NULL_TYPE_C;
@@ -360,11 +360,11 @@ begin
    ----------------------------------   
    U_RegMap : entity work.AmcCarrierRegMapping
       generic map (
-         TPD_G               => TPD_G,
-         AXI_ERROR_RESP_G    => AXI_ERROR_RESP_C,
-         APP_TYPE_G          => APP_TYPE_G,
-         STANDALONE_TIMING_G => STANDALONE_TIMING_G,
-         FSBL_G              => FSBL_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
+         APP_TYPE_G       => APP_TYPE_G,
+         TIMING_MODE_G    => TIMING_MODE_G,
+         FSBL_G           => FSBL_G)
       port map (
          -- Primary AXI-Lite Interface
          axilClk           => axilClk,
@@ -447,10 +447,10 @@ begin
    --------------
    U_Timing : entity work.AmcCarrierTiming
       generic map (
-         TPD_G               => TPD_G,
-         APP_TYPE_G          => APP_TYPE_G,
-         AXI_ERROR_RESP_G    => AXI_ERROR_RESP_C,
-         STANDALONE_TIMING_G => STANDALONE_TIMING_G)
+         TPD_G            => TPD_G,
+         APP_TYPE_G       => APP_TYPE_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
+         TIMING_MODE_G    => TIMING_MODE_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk          => axilClk,

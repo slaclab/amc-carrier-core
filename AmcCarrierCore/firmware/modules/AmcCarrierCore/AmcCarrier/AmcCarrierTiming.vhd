@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-03-03
+-- Last update: 2016-03-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,11 +37,11 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierTiming is
    generic (
-      TPD_G               : time            := 1 ns;
-      APP_TYPE_G          : AppType         := APP_NULL_TYPE_C;
-      AXI_ERROR_RESP_G    : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      RX_CLK_MMCM_G       : boolean         := false;
-      STANDALONE_TIMING_G : boolean         := false);  -- true = LCLS-I timing only
+      TPD_G            : time            := 1 ns;
+      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      RX_CLK_MMCM_G    : boolean         := false;
+      TIMING_MODE_G    : boolean         := false);  -- true = LCLS-I timing only
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk          : in  sl;
@@ -63,7 +63,7 @@ entity AmcCarrierTiming is
       appTimingClk     : in  sl;
       appTimingRst     : in  sl;
       appTimingBus     : out TimingBusType;
-      appTimingPhy     : in  TimingPhyType;             -- Input for timing generator only
+      appTimingPhy     : in  TimingPhyType;          -- Input for timing generator only
       appTimingPhyClk  : out sl;
       appTimingPhyRst  : out sl;
       ----------------
@@ -258,7 +258,7 @@ begin
 
 
    -- Drive the external CLK MUX to standalone or dual timing mode
-   timingClkSel <= ite(STANDALONE_TIMING_G, '1', '0');
+   timingClkSel <= ite(TIMING_MODE_G, '1', '0');
 
    -- Send a copy of the timing clock to the AMC's clock cleaner
    ClkOutBufDiff_Inst : entity work.ClkOutBufDiff
