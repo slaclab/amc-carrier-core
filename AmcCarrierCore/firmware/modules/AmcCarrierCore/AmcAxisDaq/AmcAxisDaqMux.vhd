@@ -5,7 +5,7 @@
 -- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory (Cosylab)
 -- Created    : 2015-04-14
--- Last update: 2015-11-02
+-- Last update: 2016-03-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -183,21 +183,16 @@ begin
    comb : process (dataValidVec_i, s_muxSel, sampleDataArr_i) is
    begin
       for I in L_AXI_G-1 downto 0 loop
-         if s_muxSel(I) = x"0" then
-            s_sampleDataArrMux(I) <= (others => '0');
-            s_dataValidVecMux(I)  <= '0';
-            s_enAxi(I)            <= '0';
-            s_laneNum(I)          <= 0;
-         elsif s_muxSel(I) > toSlv(L_G, 4) then
-            s_sampleDataArrMux(I) <= (others => '0');
-            s_dataValidVecMux(I)  <= '0';
-            s_enAxi(I)            <= '0';
-            s_laneNum(I)          <= 0;
-         else
+         if (s_muxSel(I) < L_G and s_muxSel(I) > 0) then
             s_sampleDataArrMux(I) <= sampleDataArr_i(conv_integer(s_muxSel(I))-1);
             s_dataValidVecMux(I)  <= dataValidVec_i(conv_integer(s_muxSel(I))-1);
             s_enAxi(I)            <= '1';
             s_laneNum(I)          <= conv_integer(s_muxSel(I));
+         else
+            s_sampleDataArrMux(I) <= (others => '0');
+            s_dataValidVecMux(I)  <= '0';
+            s_enAxi(I)            <= '0';
+            s_laneNum(I)          <= 0;
          end if;
       end loop;
    ----------------------
