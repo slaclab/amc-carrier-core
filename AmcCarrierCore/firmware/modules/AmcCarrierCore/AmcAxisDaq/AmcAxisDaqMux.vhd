@@ -183,7 +183,7 @@ begin
    comb : process (dataValidVec_i, s_muxSel, sampleDataArr_i) is
    begin
       for I in L_AXI_G-1 downto 0 loop
-         if (s_muxSel(I) < L_G and s_muxSel(I) > 0) then
+         if (s_muxSel(I) <= L_G and s_muxSel(I) > 0) then
             s_sampleDataArrMux(I) <= sampleDataArr_i(conv_integer(s_muxSel(I))-1);
             s_dataValidVecMux(I)  <= dataValidVec_i(conv_integer(s_muxSel(I))-1);
             s_enAxi(I)            <= '1';
