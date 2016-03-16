@@ -115,10 +115,10 @@ begin
       
       GEN_BYPASS : if ((RSSI_G = false) or (i = 0)) generate
          
-         obMasters       <= obServerMasters;
-         obServerSlaves  <= obSlaves;
-         ibServerMasters <= ibMasters;
-         ibSlaves        <= ibServerSlaves;
+         obMasters(i)       <= obServerMasters(i);
+         obServerSlaves(i)  <= obSlaves(i);
+         ibServerMasters(i) <= ibMasters(i);
+         ibSlaves(i)        <= ibServerSlaves(i);
 
          U_AxiLiteEmpty : entity work.AxiLiteEmpty
             generic map (
