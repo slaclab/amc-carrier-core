@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-03-02
+-- Last update: 2016-03-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ begin
    GEN_SRP :
    for i in (IOC_SIZE_G-1) downto 0 generate
       
-      GEN_BYPASS : if (RSSI_G = false) generate
+      GEN_BYPASS : if ((RSSI_G = false) or (i = 0)) generate
          
          obMasters       <= obServerMasters;
          obServerSlaves  <= obSlaves;
@@ -134,7 +134,7 @@ begin
 
       end generate;
 
-      GEN_RSSI : if (RSSI_G = true) generate
+      GEN_RSSI : if ((RSSI_G = true) and (i /= 0)) generate
          ---------------------
          -- RSSI Server Module
          ---------------------
