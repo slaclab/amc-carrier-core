@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-03-11
+-- Last update: 2016-03-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -436,60 +436,47 @@ begin
    --------------
    -- Timing Core
    --------------
---    U_Timing : entity work.AmcCarrierTiming
---       generic map (
---          TPD_G            => TPD_G,
---          APP_TYPE_G       => APP_TYPE_G,
---          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
---          TIMING_MODE_G    => TIMING_MODE_G)
---       port map (
---          -- AXI-Lite Interface (axilClk domain)
---          axilClk          => axilClk,
---          axilRst          => axilRst,
---          axilReadMaster   => timingReadMaster,
---          axilReadSlave    => timingReadSlave,
---          axilWriteMaster  => timingWriteMaster,
---          axilWriteSlave   => timingWriteSlave,
---          -- BSA Interface (bsaTimingClk domain)
---          bsaTimingClk     => bsaTimingClk,
---          bsaTimingRst     => bsaTimingRst,
---          bsaTimingBus     => bsaTimingBus,
---          ----------------------
---          -- Top Level Interface
---          ----------------------         
---          -- Timing Interface 
---          recTimingClk     => recTimingClk,
---          recTimingRst     => recTimingRst,
---          appTimingClk     => timingClk,
---          appTimingRst     => timingRst,
---          appTimingBus     => timingBus,
---          appTimingPhy     => timingPhy,
---          ----------------
---          -- Core Ports --
---          ----------------   
---          -- LCLS Timing Ports
---          timingRxP        => timingRxP,
---          timingRxN        => timingRxN,
---          timingTxP        => timingTxP,
---          timingTxN        => timingTxN,
---          timingRefClkInP  => timingRefClkInP,
---          timingRefClkInN  => timingRefClkInN,
---          timingRecClkOutP => timingRecClkOutP,
---          timingRecClkOutN => timingRecClkOutN,
---          timingClkSel     => timingClkSel);
-
-   U_AxiLiteEmpty_Timing : entity work.AxiLiteEmpty
+   U_Timing : entity work.AmcCarrierTiming
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_RESP_DECERR_C)
+         APP_TYPE_G       => APP_TYPE_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
+         TIMING_MODE_G    => TIMING_MODE_G)
       port map (
-         axiClk         => axilClk,            -- [in]
-         axiClkRst      => axilRst,            -- [in]
-         axiReadMaster  => timingReadMaster,   -- [in]
-         axiReadSlave   => timingReadSlave,    -- [out]
-         axiWriteMaster => timingWriteMaster,  -- [in]
-         axiWriteSlave  => timingWriteSlave);  -- [out]
-
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMaster   => timingReadMaster,
+         axilReadSlave    => timingReadSlave,
+         axilWriteMaster  => timingWriteMaster,
+         axilWriteSlave   => timingWriteSlave,
+         -- BSA Interface (bsaTimingClk domain)
+         bsaTimingClk     => bsaTimingClk,
+         bsaTimingRst     => bsaTimingRst,
+         bsaTimingBus     => bsaTimingBus,
+         ----------------------
+         -- Top Level Interface
+         ----------------------         
+         -- Timing Interface 
+         recTimingClk     => recTimingClk,
+         recTimingRst     => recTimingRst,
+         appTimingClk     => timingClk,
+         appTimingRst     => timingRst,
+         appTimingBus     => timingBus,
+         appTimingPhy     => timingPhy,
+         ----------------
+         -- Core Ports --
+         ----------------   
+         -- LCLS Timing Ports
+         timingRxP        => timingRxP,
+         timingRxN        => timingRxN,
+         timingTxP        => timingTxP,
+         timingTxN        => timingTxN,
+         timingRefClkInP  => timingRefClkInP,
+         timingRefClkInN  => timingRefClkInN,
+         timingRecClkOutP => timingRecClkOutP,
+         timingRecClkOutN => timingRecClkOutN,
+         timingClkSel     => timingClkSel);
 
    ------------------
    -- DDR Buffer module
@@ -524,29 +511,6 @@ begin
          axiWriteSlave        => axiWriteSlave,         -- [in]
          axiReadMaster        => axiReadMaster,         -- [out]
          axiReadSlave         => axiReadSlave);         -- [in]
-
-
---    U_AdcDdrFifo : entity work.DebugAmcAdcDdrFifo
---       generic map (
---          TPD_G              => TPD_G,
---          L_AXI_G            => DIAGNOSTIC_SIZE_G,
---          INPUT_AXI_CONFIG_G => DIAGNOSTIC_CONFIG_G)
---       port map (
---          sAxisClk       => diagnosticClk,
---          sAxisRst       => diagnosticRst,
---          sAxisMaster    => diagnosticMasters,
---          sAxisSlave     => diagnosticSlaves,
---          sAxisCtrl      => diagnosticCtrls,
---          axiClk         => axiClk,
---          axiRst         => resetDDR,    -- axiRst
---          axiWriteMaster => axiWriteMaster,
---          axiWriteSlave  => axiWriteSlave,
---          axiReadMaster  => axiReadMaster,
---          axiReadSlave   => axiReadSlave,
---          mAxisClk       => pgpClk,
---          mAxisRst       => pgpRst,
---          mAxisMaster    => bufDiagnosticMasters,
---          mAxisSlave     => bufDiagnosticSlaves);   
 
    -- Note: This is a work around. Not to be used in final version nor production! TODO Remove FIX ME ! 
    -- Reset DDR FIFO before requesting next transaction.
@@ -622,62 +586,50 @@ begin
    ----------------------
    -- MPS and BP_MSG Core
    ----------------------
---    U_MpsAndBpMsg : entity work.AmcCarrierMpsAndBpMsg
---       generic map (
---          TPD_G            => TPD_G,
---          APP_TYPE_G       => APP_TYPE_G,
---          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
---          MPS_SLOT_G       => MPS_SLOT_G)
---       port map (
---          -- Local Configuration
---          localAppId      => localAppId,
---          -- MPS Clocks and Resets
---          mps125MHzClk    => mps125MHzClk,
---          mps125MHzRst    => mps125MHzRst,
---          mps312MHzClk    => mps312MHzClk,
---          mps312MHzRst    => mps312MHzRst,
---          mps625MHzClk    => mps625MHzClk,
---          mps625MHzRst    => mps625MHzRst,
---          mpsPllLocked    => mpsPllLocked,
---          -- AXI-Lite Interface
---          axilClk         => axilClk,
---          axilRst         => axilRst,
---          axilReadMaster  => mpsReadMaster,
---          axilReadSlave   => mpsReadSlave,
---          axilWriteMaster => mpsWriteMaster,
---          axilWriteSlave  => mpsWriteSlave,
---          -- Backplane Messaging Interface
---          bpMsgMasters    => bpMsgMasters,
---          bpMsgSlaves     => bpMsgSlaves,
---          ----------------------
---          -- Top Level Interface
---          ----------------------
---          -- Diagnostic Interface (diagnosticClk domain)
---          diagnosticClk   => diagnosticClk,
---          diagnosticRst   => diagnosticRst,
---          diagnosticBus   => diagnosticBus,
---          -- MPS Interface
---          mpsObMasters    => mpsObMasters,
---          mpsObSlaves     => mpsObSlaves,
---          ----------------
---          -- Core Ports --
---          ----------------
---          -- Backplane MPS Ports
---          mpsBusRxP       => mpsBusRxP,
---          mpsBusRxN       => mpsBusRxN,
---          mpsTxP          => mpsTxP,
---          mpsTxN          => mpsTxN);
-
-   U_AxiLiteEmpty_Mps : entity work.AxiLiteEmpty
+   U_MpsAndBpMsg : entity work.AmcCarrierMpsAndBpMsg
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_RESP_DECERR_C)
+         APP_TYPE_G       => APP_TYPE_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
+         MPS_SLOT_G       => MPS_SLOT_G)
       port map (
-         axiClk         => axilClk,         -- [in]
-         axiClkRst      => axilRst,         -- [in]
-         axiReadMaster  => mpsReadMaster,   -- [in]
-         axiReadSlave   => mpsReadSlave,    -- [out]
-         axiWriteMaster => mpsWriteMaster,  -- [in]
-         axiWriteSlave  => mpsWriteSlave);  -- [out]
+         -- Local Configuration
+         localAppId      => localAppId,
+         -- MPS Clocks and Resets
+         mps125MHzClk    => mps125MHzClk,
+         mps125MHzRst    => mps125MHzRst,
+         mps312MHzClk    => mps312MHzClk,
+         mps312MHzRst    => mps312MHzRst,
+         mps625MHzClk    => mps625MHzClk,
+         mps625MHzRst    => mps625MHzRst,
+         mpsPllLocked    => mpsPllLocked,
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => mpsReadMaster,
+         axilReadSlave   => mpsReadSlave,
+         axilWriteMaster => mpsWriteMaster,
+         axilWriteSlave  => mpsWriteSlave,
+         -- Backplane Messaging Interface
+         bpMsgMasters    => bpMsgMasters,
+         bpMsgSlaves     => bpMsgSlaves,
+         ----------------------
+         -- Top Level Interface
+         ----------------------
+         -- Diagnostic Interface (diagnosticClk domain)
+         diagnosticClk   => diagnosticClk,
+         diagnosticRst   => diagnosticRst,
+         diagnosticBus   => diagnosticBus,
+         -- MPS Interface
+         mpsObMasters    => mpsObMasters,
+         mpsObSlaves     => mpsObSlaves,
+         ----------------
+         -- Core Ports --
+         ----------------
+         -- Backplane MPS Ports
+         mpsBusRxP       => mpsBusRxP,
+         mpsBusRxN       => mpsBusRxN,
+         mpsTxP          => mpsTxP,
+         mpsTxN          => mpsTxN);
 
 end mapping;
