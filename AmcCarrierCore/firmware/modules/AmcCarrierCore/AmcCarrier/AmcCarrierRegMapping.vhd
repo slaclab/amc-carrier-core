@@ -128,8 +128,6 @@ architecture mapping of AmcCarrierRegMapping is
    -- FSBL Timeout Duration
    constant TIMEOUT_C : integer := integer(10.0 / AXI_CLK_PERIOD_C);
 
-   constant NUM_AXI_MASTERS_C : natural := 14;
-
    constant VERSION_INDEX_C    : natural := 0;
    constant SYSMON_INDEX_C     : natural := 1;
    constant BOOT_MEM_INDEX_C   : natural := 2;
@@ -144,6 +142,7 @@ architecture mapping of AmcCarrierRegMapping is
    constant DDR_INDEX_C        : natural := 11;
    constant MPS_INDEX_C        : natural := 12;
    constant APP_INDEX_C        : natural := 13;
+   constant NUM_AXI_MASTERS_C  : natural := 14;
    
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       VERSION_INDEX_C    => (

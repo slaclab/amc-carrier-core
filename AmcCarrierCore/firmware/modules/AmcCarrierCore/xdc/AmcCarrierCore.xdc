@@ -276,6 +276,8 @@ set_property -dict { PACKAGE_PIN C16 IOSTANDARD SSTL15     OUTPUT_IMPEDANCE RDRV
 set_property -dict { PACKAGE_PIN L19 IOSTANDARD LVCMOS15 } [get_ports {ddrScl}] 
 set_property -dict { PACKAGE_PIN L18 IOSTANDARD LVCMOS15 } [get_ports {ddrSda}] 
 set_property -dict { PACKAGE_PIN K17 IOSTANDARD LVCMOS15 } [get_ports {ddrPwrEnL}] 
+set_property -dict { PACKAGE_PIN K18 IOSTANDARD LVCMOS15 } [get_ports {ddrAlertL}] 
+set_property -dict { PACKAGE_PIN J15 IOSTANDARD LVCMOS15 } [get_ports {ddrPg}] 
 
 #####################################
 ## Core Area/Placement Constraints ##
@@ -409,9 +411,9 @@ create_generated_clock -name dnaClk       [get_pins {U_Core/U_RegMap/U_Version/G
 create_generated_clock -name xauiPhyClk   [get_pins -hier -filter {name =~ U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/*/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
 create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
 create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT6}]
-create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/RXOUTCLK}]  
-create_generated_clock -name timingGenClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/TXOUTCLK}]
-create_generated_clock -name timingGenUsrClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TIMING_TXCLK_BUFG_GT/O}]
+#create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/RXOUTCLK}]  
+#create_generated_clock -name timingGenClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/TXOUTCLK}]
+#create_generated_clock -name timingGenUsrClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TIMING_TXCLK_BUFG_GT/O}]
 # U_Core/U_Timing/TIMING_RECCLK_BUFG_GT/O
 #create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/recTimingClk}]
 
@@ -428,9 +430,7 @@ set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {iprogClk}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {dnaClk}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {mpsClk125MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {timingRecClk}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {timingGenClk}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {timingGenUsrClk}] 
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks -include_generated_clocks {timingRef}]
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {recTimingClk}] 
 set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks {ddrIntClk0}]
 set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks {ddrIntClk1}]
