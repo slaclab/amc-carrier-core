@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-03-17
+-- Last update: 2016-03-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ use work.AmcCarrierRegPkg.all;
 entity AmcCarrierEth is
    generic (
       TPD_G            : time            := 1 ns;
+      EN_BP_MSG_G      : boolean          := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration
@@ -351,40 +352,65 @@ begin
    -----------------------
    -- BP Messenger Network
    -----------------------
-   U_BpMsg : entity work.AmcCarrierEthBpMsg
-      generic map(
-         TPD_G            => TPD_G,
-         RSSI_G           => true,
-         TIMEOUT_G        => RSSI_TIMEOUT_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(BP_MSG_INDEX_C).baseAddr)   
-      port map (
-         -- AXI-Lite Interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(BP_MSG_INDEX_C),
-         axilReadSlave   => axilReadSlaves(BP_MSG_INDEX_C),
-         axilWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C),
-         -- Interface to UDP Server engines
-         obServerMasters => obServerMasters(3 downto 2),
-         obServerSlaves  => obServerSlaves(3 downto 2),
-         ibServerMasters => ibServerMasters(3 downto 2),
-         ibServerSlaves  => ibServerSlaves(3 downto 2),
-         -- Interface to UDP Client engines
-         obClientMasters => obClientMasters,
-         obClientSlaves  => obClientSlaves,
-         ibClientMasters => ibClientMasters,
-         ibClientSlaves  => ibClientSlaves,
-         -- Backplane Messaging Interface
-         bpMsgMasters    => bpMsgMasters,
-         bpMsgSlaves     => bpMsgSlaves,
-         ----------------------
-         -- Top Level Interface
-         ----------------------
-         -- Backplane Messaging Interface (bpMsgClk domain)
-         bpMsgClk        => bpMsgClk,
-         bpMsgRst        => bpMsgRst,
-         bpMsgBus        => bpMsgBus);
+   GEN_BP_MSG : if (EN_BP_MSG_G = true) generate
+      U_BpMsg : entity work.AmcCarrierEthBpMsg
+         generic map(
+            TPD_G            => TPD_G,
+            RSSI_G           => true,
+            TIMEOUT_G        => RSSI_TIMEOUT_C,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            AXI_BASE_ADDR_G  => AXI_CONFIG_C(BP_MSG_INDEX_C).baseAddr)   
+         port map (
+            -- AXI-Lite Interface
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => axilReadMasters(BP_MSG_INDEX_C),
+            axilReadSlave   => axilReadSlaves(BP_MSG_INDEX_C),
+            axilWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
+            axilWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C),
+            -- Interface to UDP Server engines
+            obServerMasters => obServerMasters(3 downto 2),
+            obServerSlaves  => obServerSlaves(3 downto 2),
+            ibServerMasters => ibServerMasters(3 downto 2),
+            ibServerSlaves  => ibServerSlaves(3 downto 2),
+            -- Interface to UDP Client engines
+            obClientMasters => obClientMasters,
+            obClientSlaves  => obClientSlaves,
+            ibClientMasters => ibClientMasters,
+            ibClientSlaves  => ibClientSlaves,
+            -- Backplane Messaging Interface
+            bpMsgMasters    => bpMsgMasters,
+            bpMsgSlaves     => bpMsgSlaves,
+            ----------------------
+            -- Top Level Interface
+            ----------------------
+            -- Backplane Messaging Interface (bpMsgClk domain)
+            bpMsgClk        => bpMsgClk,
+            bpMsgRst        => bpMsgRst,
+            bpMsgBus        => bpMsgBus);
+   end generate;
+
+   GEN_BYPASS : if (EN_BP_MSG_G = false) generate
+      
+      U_AxiLiteEmpty : entity work.AxiLiteEmpty
+         generic map (
+            TPD_G            => TPD_G,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         port map (
+            axiClk         => axilClk,
+            axiClkRst      => axilRst,
+            axiReadMaster  => axilReadMasters(BP_MSG_INDEX_C),
+            axiReadSlave   => axilReadSlaves(BP_MSG_INDEX_C),
+            axiWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
+            axiWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C));    
+
+      obServerSlaves  <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibServerMasters <= (others => AXI_STREAM_MASTER_INIT_C);
+      obClientSlaves  <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibClientMasters <= (others => AXI_STREAM_MASTER_INIT_C);
+      bpMsgSlaves     <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      bpMsgBus        <= (others => BP_MSG_BUS_INIT_C);
+
+   end generate;
 
 end mapping;

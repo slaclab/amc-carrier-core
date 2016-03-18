@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-03-10
+-- Last update: 2016-03-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -42,6 +42,7 @@ entity AmcCarrierCore is
       MPS_SLOT_G               : boolean              := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G                   : boolean              := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G               : AppType              := APP_NULL_TYPE_C;
+      EN_BP_MSG_G              : boolean              := false;
       OVERRIDE_BSI_G           : boolean              := false;  -- false = Normal Operation, true = use IP_ADDR, MAC_ADDR generics
       IP_ADDR_G                : slv(31 downto 0)     := x"0A02A8C0";
       MAC_ADDR_G               : slv(47 downto 0)     := x"010300564400";
@@ -312,6 +313,7 @@ begin
    U_Eth : entity work.AmcCarrierEth
       generic map (
          TPD_G            => TPD_G,
+         EN_BP_MSG_G      => EN_BP_MSG_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- Local Configuration
