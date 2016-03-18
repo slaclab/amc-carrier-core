@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-02-23
+-- Last update: 2016-03-17
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -43,10 +43,10 @@ entity AmcCarrierEth is
       localMac          : in  slv(47 downto 0);  --  big-Endian configuration
       localIp           : in  slv(31 downto 0);  --  big-Endian configuration   
       -- Master AXI-Lite Interface
-      mAxilReadMasters  : out AxiLiteReadMasterArray(0 downto 0);
-      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(0 downto 0);
-      mAxilWriteMasters : out AxiLiteWriteMasterArray(0 downto 0);
-      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(0 downto 0);
+      mAxilReadMasters  : out AxiLiteReadMasterArray(1 downto 0);
+      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(1 downto 0);
+      mAxilWriteMasters : out AxiLiteWriteMasterArray(1 downto 0);
+      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(1 downto 0);
       -- AXI-Lite Interface
       axilClk           : in  sl;
       axilRst           : in  sl;
@@ -83,25 +83,22 @@ end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
-   constant RSSI_C         : boolean  := false;
    constant RSSI_TIMEOUT_C : real     := 1.0E-3;  -- In units of seconds
    constant MTU_C          : positive := 1500;
-   constant SERVER_SIZE_C  : positive := 7+BP_MSG_SIZE_C;
-   constant CLIENT_SIZE_C  : positive := BP_MSG_SIZE_C;
+   constant SERVER_SIZE_C  : positive := 4;
+   constant CLIENT_SIZE_C  : positive := 2;
 
-   constant NUM_AXI_MASTERS_C : natural := 5;
+   constant NUM_AXI_MASTERS_C : natural := 4;
 
    constant PHY_INDEX_C    : natural := 0;
    constant UDP_INDEX_C    : natural := 1;
    constant SRP_INDEX_C    : natural := 2;
-   constant BSA_INDEX_C    : natural := 3;
-   constant BP_MSG_INDEX_C : natural := 4;
+   constant BP_MSG_INDEX_C : natural := 3;
 
    constant PHY_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00000000");
    constant UDP_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00010000");
    constant SRP_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00020000");
-   constant BSA_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00030000");
-   constant BP_MSG_ADDR_C : slv(31 downto 0) := (XAUI_ADDR_C + x"00040000");
+   constant BP_MSG_ADDR_C : slv(31 downto 0) := (XAUI_ADDR_C + x"00030000");
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       PHY_INDEX_C     => (
@@ -114,10 +111,6 @@ architecture mapping of AmcCarrierEth is
          connectivity => X"0001"),
       SRP_INDEX_C     => (
          baseAddr     => SRP_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"),
-      BSA_INDEX_C     => (
-         baseAddr     => BSA_ADDR_C,
          addrBits     => 16,
          connectivity => X"0001"),
       BP_MSG_INDEX_C  => (
@@ -166,7 +159,7 @@ architecture mapping of AmcCarrierEth is
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-
+   
 begin
 
    --------------------------
@@ -293,64 +286,67 @@ begin
          clk             => axilClk,
          rst             => axilRst);
 
-   ---------------------
-   -- AXI-Lite Interface
-   ---------------------
-   U_SRP : entity work.AmcCarrierEthSrp
+   ---------------------------------------------
+   -- Legacy AXI-Lite Master without RSSI Server
+   ---------------------------------------------
+   U_SrpV0 : entity work.SsiAxiLiteMaster
+      generic map (
+         TPD_G               => TPD_G,
+         SLAVE_READY_EN_G    => true,
+         EN_32BIT_ADDR_G     => true,
+         BRAM_EN_G           => true,
+         GEN_SYNC_FIFO_G     => true,
+         AXI_STREAM_CONFIG_G => IP_ENGINE_CONFIG_C)   
+      port map (
+         -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+         sAxisClk            => axilClk,
+         sAxisRst            => axilRst,
+         sAxisMaster         => obServerMasters(0),
+         sAxisSlave          => obServerSlaves(0),
+         -- Streaming Master (Tx) Data Interface (mAxisClk domain)
+         mAxisClk            => axilClk,
+         mAxisRst            => axilRst,
+         mAxisMaster         => ibServerMasters(0),
+         mAxisSlave          => ibServerSlaves(0),
+         -- AXI Lite Bus (axiLiteClk domain)
+         axiLiteClk          => axilClk,
+         axiLiteRst          => axilRst,
+         mAxiLiteReadMaster  => mAxilReadMasters(0),
+         mAxiLiteReadSlave   => mAxilReadSlaves(0),
+         mAxiLiteWriteMaster => mAxilWriteMasters(0),
+         mAxiLiteWriteSlave  => mAxilWriteSlaves(0));   
+
+   -----------------------------------
+   -- Software's RSSI Server Interface
+   -----------------------------------
+   U_RssiServer : entity work.AmcCarrierEthRssi
       generic map (
          TPD_G            => TPD_G,
-         RSSI_G           => RSSI_C,
-         SRP_VERSION_G    => 0,
          TIMEOUT_G        => RSSI_TIMEOUT_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(SRP_INDEX_C).baseAddr)   
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
          -- Slave AXI-Lite Interface
-         axilClk           => axilClk,
-         axilRst           => axilRst,
-         axilReadMaster    => axilReadMasters(SRP_INDEX_C),
-         axilReadSlave     => axilReadSlaves(SRP_INDEX_C),
-         axilWriteMaster   => axilWriteMasters(SRP_INDEX_C),
-         axilWriteSlave    => axilWriteSlaves(SRP_INDEX_C),
-         -- Interface to UDP Server engines
-         obServerMasters   => obServerMasters(3 downto 0),
-         obServerSlaves    => obServerSlaves(3 downto 0),
-         ibServerMasters   => ibServerMasters(3 downto 0),
-         ibServerSlaves    => ibServerSlaves(3 downto 0),
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMaster   => axilReadMasters(SRP_INDEX_C),
+         axilReadSlave    => axilReadSlaves(SRP_INDEX_C),
+         axilWriteMaster  => axilWriteMasters(SRP_INDEX_C),
+         axilWriteSlave   => axilWriteSlaves(SRP_INDEX_C),
          -- Master AXI-Lite Interface
-         mAxilReadMasters  => mAxilReadMasters,
-         mAxilReadSlaves   => mAxilReadSlaves,
-         mAxilWriteMasters => mAxilWriteMasters,
-         mAxilWriteSlaves  => mAxilWriteSlaves);     
-
-   ----------------
-   -- BSA Interface
-   ----------------
-   U_BSA : entity work.AmcCarrierEthBsa
-      generic map (
-         TPD_G            => TPD_G,
-         RSSI_G           => RSSI_C,
-         TIMEOUT_G        => RSSI_TIMEOUT_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(BSA_INDEX_C).baseAddr)     
-      port map (
-         -- AXI-Lite Interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(BSA_INDEX_C),
-         axilReadSlave   => axilReadSlaves(BSA_INDEX_C),
-         axilWriteMaster => axilWriteMasters(BSA_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(BSA_INDEX_C),
+         mAxilReadMaster  => mAxilReadMasters(1),
+         mAxilReadSlave   => mAxilReadSlaves(1),
+         mAxilWriteMaster => mAxilWriteMasters(1),
+         mAxilWriteSlave  => mAxilWriteSlaves(1),
          -- BSA Ethernet Interface
-         obBsaMasters    => obBsaMasters,
-         obBsaSlaves     => obBsaSlaves,
-         ibBsaMasters    => ibBsaMasters,
-         ibBsaSlaves     => ibBsaSlaves,
+         obBsaMasters     => obBsaMasters,
+         obBsaSlaves      => obBsaSlaves,
+         ibBsaMasters     => ibBsaMasters,
+         ibBsaSlaves      => ibBsaSlaves,
          -- Interface to UDP Server engines
-         obServerMasters => obServerMasters(6 downto 4),
-         obServerSlaves  => obServerSlaves(6 downto 4),
-         ibServerMasters => ibServerMasters(6 downto 4),
-         ibServerSlaves  => ibServerSlaves(6 downto 4));
+         obServerMaster   => obServerMasters(1),
+         obServerSlave    => obServerSlaves(1),
+         ibServerMaster   => ibServerMasters(1),
+         ibServerSlave    => ibServerSlaves(1));      
 
    -----------------------
    -- BP Messenger Network
@@ -358,7 +354,7 @@ begin
    U_BpMsg : entity work.AmcCarrierEthBpMsg
       generic map(
          TPD_G            => TPD_G,
-         RSSI_G           => RSSI_C,
+         RSSI_G           => true,
          TIMEOUT_G        => RSSI_TIMEOUT_C,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(BP_MSG_INDEX_C).baseAddr)   
@@ -371,10 +367,10 @@ begin
          axilWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C),
          -- Interface to UDP Server engines
-         obServerMasters => obServerMasters((BP_MSG_SIZE_C+6) downto 7),
-         obServerSlaves  => obServerSlaves((BP_MSG_SIZE_C+6) downto 7),
-         ibServerMasters => ibServerMasters((BP_MSG_SIZE_C+6) downto 7),
-         ibServerSlaves  => ibServerSlaves((BP_MSG_SIZE_C+6) downto 7),
+         obServerMasters => obServerMasters(3 downto 2),
+         obServerSlaves  => obServerSlaves(3 downto 2),
+         ibServerMasters => ibServerMasters(3 downto 2),
+         ibServerSlaves  => ibServerSlaves(3 downto 2),
          -- Interface to UDP Client engines
          obClientMasters => obClientMasters,
          obClientSlaves  => obClientSlaves,

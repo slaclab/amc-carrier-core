@@ -187,10 +187,10 @@ architecture mapping of AmcCarrierCore is
 
    signal axilClk          : sl;
    signal axilRst          : sl;
-   signal axilReadMasters  : AxiLiteReadMasterArray(0 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(0 downto 0);
-   signal axilWriteMasters : AxiLiteWriteMasterArray(0 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(0 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
    signal axiClk         : sl;
    signal axiRst         : sl;

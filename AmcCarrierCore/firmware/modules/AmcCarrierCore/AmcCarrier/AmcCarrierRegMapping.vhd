@@ -47,15 +47,15 @@ entity AmcCarrierRegMapping is
       -- Primary AXI-Lite Interface
       axilClk           : in    sl;
       axilRst           : in    sl;
-      sAxilReadMasters  : in    AxiLiteReadMasterArray(0 downto 0);
-      sAxilReadSlaves   : out   AxiLiteReadSlaveArray(0 downto 0);
-      sAxilWriteMasters : in    AxiLiteWriteMasterArray(0 downto 0);
-      sAxilWriteSlaves  : out   AxiLiteWriteSlaveArray(0 downto 0);
+      sAxilReadMasters  : in    AxiLiteReadMasterArray(1 downto 0);
+      sAxilReadSlaves   : out   AxiLiteReadSlaveArray(1 downto 0);
+      sAxilWriteMasters : in    AxiLiteWriteMasterArray(1 downto 0);
+      sAxilWriteSlaves  : out   AxiLiteWriteSlaveArray(1 downto 0);
       -- Timing AXI-Lite Interface
       timingReadMaster  : out   AxiLiteReadMasterType;
       timingReadSlave   : in    AxiLiteReadSlaveType;
       timingWriteMaster : out   AxiLiteWriteMasterType;
-      timingWriteSlave  : in    AxiLiteWriteSlaveType;
+      timingWriteSlave  : in    AxiLiteWriteSlaveType; 
       -- BSA AXI-Lite Interface
       bsaReadMaster     : out   AxiLiteReadMasterType;
       bsaReadSlave      : in    AxiLiteReadSlaveType;
@@ -128,6 +128,8 @@ architecture mapping of AmcCarrierRegMapping is
    -- FSBL Timeout Duration
    constant TIMEOUT_C : integer := integer(10.0 / AXI_CLK_PERIOD_C);
 
+   constant NUM_AXI_MASTERS_C : natural := 14;
+
    constant VERSION_INDEX_C    : natural := 0;
    constant SYSMON_INDEX_C     : natural := 1;
    constant BOOT_MEM_INDEX_C   : natural := 2;
@@ -142,7 +144,6 @@ architecture mapping of AmcCarrierRegMapping is
    constant DDR_INDEX_C        : natural := 11;
    constant MPS_INDEX_C        : natural := 12;
    constant APP_INDEX_C        : natural := 13;
-   constant NUM_AXI_MASTERS_C  : natural := 14;
    
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       VERSION_INDEX_C    => (
@@ -260,7 +261,7 @@ begin
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_SLAVE_SLOTS_G  => 2,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
       port map (

@@ -33,187 +33,87 @@ use work.AmcCarrierPkg.all;
 
 entity AmcCarrierEthSrp is
    generic (
-      TPD_G            : time             := 1 ns;
-      RSSI_G           : boolean          := false;
-      SRP_VERSION_G    : natural          := 0;
-      IOC_SIZE_G       : positive         := 4;
-      TIMEOUT_G        : real             := 1.0E-3;  -- In units of seconds   
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));   
+      TPD_G            : time             := 1 ns);   
    port (
-      -- Slave AXI-Lite Interface
-      axilClk           : in  sl;
-      axilRst           : in  sl;
-      axilReadMaster    : in  AxiLiteReadMasterType;
-      axilReadSlave     : out AxiLiteReadSlaveType;
-      axilWriteMaster   : in  AxiLiteWriteMasterType;
-      axilWriteSlave    : out AxiLiteWriteSlaveType;
-      -- Interface to UDP Server engines
-      obServerMasters   : in  AxiStreamMasterArray(IOC_SIZE_G-1 downto 0);
-      obServerSlaves    : out AxiStreamSlaveArray(IOC_SIZE_G-1 downto 0);
-      ibServerMasters   : out AxiStreamMasterArray(IOC_SIZE_G-1 downto 0);
-      ibServerSlaves    : in  AxiStreamSlaveArray(IOC_SIZE_G-1 downto 0);
+      -- Clock and Reset
+      axilClk         : in  sl;
+      axilRst         : in  sl;   
+      -- Interface to RSSI Server engine
+      obSrpMasters   : out AxiStreamMasterArray(2 downto 0);
+      obSrpSlaves    : in  AxiStreamSlaveArray(2 downto 0);
+      ibSrpMasters   : in  AxiStreamMasterArray(2 downto 0);
+      ibSrpSlaves    : out AxiStreamSlaveArray(2 downto 0);
       -- Master AXI-Lite Interface
-      mAxilReadMasters  : out AxiLiteReadMasterArray(0 downto 0);
-      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(0 downto 0);
-      mAxilWriteMasters : out AxiLiteWriteMasterArray(0 downto 0);
-      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(0 downto 0));      
+      mAxilReadMaster  : out AxiLiteReadMasterType;
+      mAxilReadSlave   : in  AxiLiteReadSlaveType;
+      mAxilWriteMaster : out AxiLiteWriteMasterType;
+      mAxilWriteSlave  : in  AxiLiteWriteSlaveType);      
 end AmcCarrierEthSrp;
 
 architecture mapping of AmcCarrierEthSrp is
 
-   function AxiLiteConfig return AxiLiteCrossbarMasterConfigArray is
-      variable retConf : AxiLiteCrossbarMasterConfigArray(IOC_SIZE_G-1 downto 0);
-      variable addr    : slv(31 downto 0);
-   begin
-      addr := AXI_BASE_ADDR_G;
-      for i in (IOC_SIZE_G-1) downto 0 loop
-         addr(14 downto 10)      := toSlv(i, 5);
-         retConf(i).baseAddr     := addr;
-         retConf(i).addrBits     := 10;
-         retConf(i).connectivity := x"0001";
-      end loop;
-      return retConf;
-   end function;
-
-   signal axilWriteMasters : AxiLiteWriteMasterArray(IOC_SIZE_G-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(IOC_SIZE_G-1 downto 0);
-   signal axilReadMasters  : AxiLiteReadMasterArray(IOC_SIZE_G-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(IOC_SIZE_G-1 downto 0);
-
-   signal obMasters : AxiStreamMasterArray(IOC_SIZE_G-1 downto 0);
-   signal obSlaves  : AxiStreamSlaveArray(IOC_SIZE_G-1 downto 0);
-   signal ibMasters : AxiStreamMasterArray(IOC_SIZE_G-1 downto 0);
-   signal ibSlaves  : AxiStreamSlaveArray(IOC_SIZE_G-1 downto 0);
+   signal obSrpMaster : AxiStreamMasterType;
+   signal obSrpSlave  : AxiStreamSlaveType;
+   signal ibSrpMaster : AxiStreamMasterType;
+   signal ibSrpSlave  : AxiStreamSlaveType;
    
 begin
 
-   --------------------------
-   -- AXI-Lite: Crossbar Core
-   --------------------------  
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_AxiStreamMux : entity work.AxiStreamMux
       generic map (
-         TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => IOC_SIZE_G,
-         MASTERS_CONFIG_G   => AxiLiteConfig)
+         TPD_G        => TPD_G,
+         NUM_SLAVES_G => 3)
       port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => axilWriteMaster,
-         sAxiWriteSlaves(0)  => axilWriteSlave,
-         sAxiReadMasters(0)  => axilReadMaster,
-         sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => axilWriteMasters,
-         mAxiWriteSlaves     => axilWriteSlaves,
-         mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);         
+         -- Clock and reset
+         axisClk      => axilClk,
+         axisRst      => axilRst,
+         -- Slaves
+         sAxisMasters => ibSrpMasters,
+         sAxisSlaves  => ibSrpSlaves,
+         -- Master
+         mAxisMaster  => ibSrpMaster,
+         mAxisSlave   => ibSrpSlave); 
 
-   GEN_SRP :
-   for i in (IOC_SIZE_G-1) downto 0 generate
-      
-      GEN_BYPASS : if ((RSSI_G = false) or (i = 0)) generate
-         
-         obMasters(i)       <= obServerMasters(i);
-         obServerSlaves(i)  <= obSlaves(i);
-         ibServerMasters(i) <= ibMasters(i);
-         ibSlaves(i)        <= ibServerSlaves(i);
+   U_SsiAxiLiteMaster : entity work.SsiAxiLiteMaster
+      generic map (
+         TPD_G               => TPD_G,
+         SLAVE_READY_EN_G    => true,
+         EN_32BIT_ADDR_G     => true,
+         BRAM_EN_G           => true,
+         GEN_SYNC_FIFO_G     => true,
+         AXI_STREAM_CONFIG_G => IP_ENGINE_CONFIG_C)   
+      port map (
+         -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+         sAxisClk            => axilClk,
+         sAxisRst            => axilRst,
+         sAxisMaster         => ibSrpMaster,
+         sAxisSlave          => ibSrpSlave,
+         -- Streaming Master (Tx) Data Interface (mAxisClk domain)
+         mAxisClk            => axilClk,
+         mAxisRst            => axilRst,
+         mAxisMaster         => obSrpMaster,
+         mAxisSlave          => obSrpSlave,
+         -- AXI Lite Bus (axiLiteClk domain)
+         axiLiteClk          => axilClk,
+         axiLiteRst          => axilRst,
+         mAxiLiteReadMaster  => mAxilReadMaster,
+         mAxiLiteReadSlave   => mAxilReadSlave,
+         mAxiLiteWriteMaster => mAxilWriteMaster,
+         mAxiLiteWriteSlave  => mAxilWriteSlave);  
 
-         U_AxiLiteEmpty : entity work.AxiLiteEmpty
-            generic map (
-               TPD_G            => TPD_G,
-               AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-            port map (
-               axiClk         => axilClk,
-               axiClkRst      => axilRst,
-               axiReadMaster  => axilReadMasters(i),
-               axiReadSlave   => axilReadSlaves(i),
-               axiWriteMaster => axilWriteMasters(i),
-               axiWriteSlave  => axilWriteSlaves(i));      
-
-      end generate;
-
-      GEN_RSSI : if ((RSSI_G = true) and (i /= 0)) generate
-         ---------------------
-         -- RSSI Server Module
-         ---------------------
-         U_RssiServer : entity work.RssiCoreWrapper
-            generic map (
-               TPD_G                   => TPD_G,
-               CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
-               TIMEOUT_UNIT_G          => TIMEOUT_G,
-               SERVER_G                => true,
-               RETRANSMIT_ENABLE_G     => true,
-               WINDOW_ADDR_SIZE_G      => 3,
-               PIPE_STAGES_G           => 1,
-               APP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-               APP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
-               TSP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-               TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
-               INIT_SEQ_N_G            => 16#80#)
-            port map (
-               clk_i            => axilClk,
-               rst_i            => axilRst,
-               -- Application Layer Interface
-               sAppAxisMaster_i => obMasters(i),
-               sAppAxisSlave_o  => obSlaves(i),
-               mAppAxisMaster_o => ibMasters(i),
-               mAppAxisSlave_i  => ibSlaves(i),
-               -- Transport Layer Interface
-               sTspAxisMaster_i => obServerMasters(i),
-               sTspAxisSlave_o  => obServerSlaves(i),
-               mTspAxisMaster_o => ibServerMasters(i),
-               mTspAxisSlave_i  => ibServerSlaves(i),
-               -- AXI-Lite Interface
-               axiClk_i         => axilClk,
-               axiRst_i         => axilRst,
-               axilReadMaster   => axilReadMasters(i),
-               axilReadSlave    => axilReadSlaves(i),
-               axilWriteMaster  => axilWriteMasters(i),
-               axilWriteSlave   => axilWriteSlaves(i));   
-      end generate;
-      
-   end generate GEN_SRP;
-
-   GEN_SRPv0 : if (SRP_VERSION_G = 0) generate
-      U_SRPv0 : entity work.AmcCarrierSrpV0Wrapper
-         generic map (
-            TPD_G      => TPD_G,
-            IOC_SIZE_G => IOC_SIZE_G)
-         port map (
-            axilClk           => axilClk,
-            axilRst           => axilRst,
-            -- UDP Interface Interface
-            obServerMasters   => obMasters,
-            obServerSlaves    => obSlaves,
-            ibServerMasters   => ibMasters,
-            ibServerSlaves    => ibSlaves,
-            -- Master AXI-Lite Interface
-            mAxilReadMasters  => mAxilReadMasters,
-            mAxilReadSlaves   => mAxilReadSlaves,
-            mAxilWriteMasters => mAxilWriteMasters,
-            mAxilWriteSlaves  => mAxilWriteSlaves);   
-   end generate;
-
-   GEN_SRPv1 : if (SRP_VERSION_G = 1) generate
-      U_SRPv1 : entity work.AmcCarrierSrpV1Wrapper
-         generic map (
-            TPD_G      => TPD_G,
-            IOC_SIZE_G => IOC_SIZE_G)
-         port map (
-            axilClk           => axilClk,
-            axilRst           => axilRst,
-            -- UDP Interface Interface
-            obServerMasters   => obMasters,
-            obServerSlaves    => obSlaves,
-            ibServerMasters   => ibMasters,
-            ibServerSlaves    => ibSlaves,
-            -- Master AXI-Lite Interface
-            mAxilReadMasters  => mAxilReadMasters,
-            mAxilReadSlaves   => mAxilReadSlaves,
-            mAxilWriteMasters => mAxilWriteMasters,
-            mAxilWriteSlaves  => mAxilWriteSlaves);   
-   end generate;
+   U_AxiStreamDeMux : entity work.AxiStreamDeMux
+      generic map (
+         TPD_G         => TPD_G,
+         NUM_MASTERS_G => 3)
+      port map (
+         -- Clock and reset
+         axisClk      => axilClk,
+         axisRst      => axilRst,
+         -- Slaves
+         sAxisMaster  => obSrpMaster,
+         sAxisSlave   => obSrpSlave,
+         -- Master
+         mAxisMasters => obSrpMasters,
+         mAxisSlaves  => obSrpSlaves);     
    
 end mapping;
