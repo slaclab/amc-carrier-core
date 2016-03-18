@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-03-09
+-- Last update: 2016-03-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -416,9 +416,6 @@ begin
          axilWriteSlave   => locAxilWriteSlaves(DMA_RING_AXIL_C),   -- [out]
          bufferClear      => bufferClear,                           -- [in]
          bufferClearEn    => bufferClearEn,                         -- [in]
-         bufferFull       => open,                                  -- [out]
-         bufferEmpty      => open,                                  -- [out]         
-         bufferDone       => open,                                  -- [out]
          axisStatusClk    => axisStatusClk,
          axisStatusRst    => axisStatusRst,
          axisStatusMaster => axisStatusMaster,
