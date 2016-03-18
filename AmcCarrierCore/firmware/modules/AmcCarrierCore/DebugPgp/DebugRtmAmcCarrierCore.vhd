@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-03-16
+-- Last update: 2016-03-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -191,10 +191,10 @@ architecture mapping of DebugRtmAmcCarrierCore is
 
    signal axilClk          : sl;
    signal axilRst          : sl;
-   signal axilReadMasters  : AxiLiteReadMasterArray(0 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(0 downto 0);
-   signal axilWriteMasters : AxiLiteWriteMasterArray(0 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(0 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
 
    signal axiClk         : sl;
    signal axiRst         : sl;

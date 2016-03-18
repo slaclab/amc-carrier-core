@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-03-09
+-- Last update: 2016-03-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -42,10 +42,10 @@ entity DebugRtmPgpAmcCarrier is
       AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Master AXI-Lite Interface
-      mAxilReadMasters  : out AxiLiteReadMasterArray(0 downto 0);
-      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(0 downto 0);
-      mAxilWriteMasters : out AxiLiteWriteMasterArray(0 downto 0);
-      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(0 downto 0);
+      mAxilReadMasters  : out AxiLiteReadMasterArray(1 downto 0);
+      mAxilReadSlaves   : in  AxiLiteReadSlaveArray(1 downto 0);
+      mAxilWriteMasters : out AxiLiteWriteMasterArray(1 downto 0);
+      mAxilWriteSlaves  : in  AxiLiteWriteSlaveArray(1 downto 0);
       -- AXI-Lite Interface
       axilClk           : in  sl;
       axilRst           : in  sl;
@@ -58,33 +58,33 @@ entity DebugRtmPgpAmcCarrier is
       bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
 
       -- Debug AXI stream Interface
-      pgpClock          : out sl;
-      pgpReset          : out sl;
-      axisTxMaster     : in  AxiStreamMasterType;
-      axisTxSlave      : out AxiStreamSlaveType;
+      pgpClock     : out sl;
+      pgpReset     : out sl;
+      axisTxMaster : in  AxiStreamMasterType;
+      axisTxSlave  : out AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
       ----------------------
       -- Backplane Messaging Interface (bpMsgClk domain)
-      bpMsgClk          : in  sl := '0';
-      bpMsgRst          : in  sl := '0';
-      bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      bpMsgClk     : in  sl := '0';
+      bpMsgRst     : in  sl := '0';
+      bpMsgBus     : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
       ----------------
       -- Core Ports --
       ----------------   
       -- RTM PGP Ports
-      rtmPgpRxP         : in  sl;
-      rtmPgpRxN         : in  sl;
-      rtmPgpTxP         : out sl;
-      rtmPgpTxN         : out sl;
-      rtmPgpClkP        : in  sl;
-      rtmPgpClkN        : in  sl);
+      rtmPgpRxP    : in  sl;
+      rtmPgpRxN    : in  sl;
+      rtmPgpTxP    : out sl;
+      rtmPgpTxN    : out sl;
+      rtmPgpClkP   : in  sl;
+      rtmPgpClkN   : in  sl);
 end DebugRtmPgpAmcCarrier;
 
 
 architecture mapping of DebugRtmPgpAmcCarrier is
- 
-                                                          
+   
+   
    signal pgpTxIn       : Pgp2bTxInType;
    signal pgpTxOut      : Pgp2bTxOutType;
    signal pgpRxIn       : Pgp2bRxInType;
@@ -105,6 +105,10 @@ begin
 
    bpMsgBus    <= (others => BP_MSG_BUS_INIT_C);
    bpMsgSlaves <= (others => AXI_STREAM_SLAVE_FORCE_C);
+
+
+   mAxilReadMasters(1)  <= AXI_LITE_READ_MASTER_INIT_C;
+   mAxilWriteMasters(1) <= AXI_LITE_WRITE_MASTER_INIT_C;
 
    U_IBUFDS_GTE3 : IBUFDS_GTE3
       generic map (
@@ -224,8 +228,8 @@ begin
          mAxiLiteReadMaster  => mAxilReadMasters(0),
          mAxiLiteReadSlave   => mAxilReadSlaves(0));
 
-      pgpTxMasters(1) <= axisTxMaster;
-      axisTxSlave   <= pgpTxSlaves(1);
+   pgpTxMasters(1) <= axisTxMaster;
+   axisTxSlave     <= pgpTxSlaves(1);
 
    Pgp2bAxi_1 : entity work.Pgp2bAxi
       generic map (
