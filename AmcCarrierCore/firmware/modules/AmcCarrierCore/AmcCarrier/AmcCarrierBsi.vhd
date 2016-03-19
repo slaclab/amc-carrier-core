@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2016-03-09
+-- Last update: 2016-03-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -42,8 +42,8 @@ entity AmcCarrierBsi is
       localMac        : out   slv(47 downto 0);
       localIp         : out   slv(31 downto 0);
       localAppId      : out   slv(15 downto 0);
-      startBoot       : out   sl;
-      startBootAddr   : out   slv(31 downto 0);
+      bootReq         : out   sl;
+      bootAddr        : out   slv(31 downto 0);
       -- Application Interface
       bsiClk          : in    sl;
       bsiRst          : in    sl;
@@ -80,8 +80,8 @@ architecture rtl of AmcCarrierBsi is
       addr           : slv(7 downto 0);
       we             : sl;
       ramData        : slv(7 downto 0);
-      startBoot      : sl;
-      startBootAddr  : slv(31 downto 0);
+      bootReq        : sl;
+      bootAddr       : slv(31 downto 0);
       slotNumber     : slv(7 downto 0);
       crateId        : slv(15 downto 0);
       macAddress     : Slv48Array(BSI_MAC_SIZE_C-1 downto 0);
@@ -95,8 +95,8 @@ architecture rtl of AmcCarrierBsi is
       addr           => x"00",
       we             => '0',
       ramData        => x"00",
-      startBoot      => '0',
-      startBootAddr  => x"00000000",
+      bootReq        => '0',
+      bootAddr       => x"00000000",
       slotNumber     => x"00",
       crateId        => x"0000",
       macAddress     => (others => (others => '0')),
@@ -141,7 +141,7 @@ begin
          rdEn   => open,
          rdData => i2cBramDout,
          i2ci   => i2cIn,
-         i2co   => i2cOut);
+         i2co   => i2cOut);       
 
    U_I2cScl : IOBUF
       port map (
@@ -234,17 +234,17 @@ begin
             ---------------------------------------
             when x"FA" =>
                -- Sample the LSB of the memory byte
-               v.startBoot := ramData(0);
+               v.bootReq := ramData(0);
                -- Reset memory
-               v.we        := '1';
-               v.ramData   := x"00";
+               v.we      := '1';
+               v.ramData := x"00";
             ---------------------------------------
             -- Check for boot address
             ---------------------------------------
-            when x"F9" => v.startBootAddr(31 downto 24) := ramData;
-            when x"F8" => v.startBootAddr(23 downto 16) := ramData;
-            when x"F7" => v.startBootAddr(15 downto 8)  := ramData;
-            when x"F6" => v.startBootAddr(7 downto 0)   := ramData;
+            when x"F9" => v.bootAddr(31 downto 24) := ramData;
+            when x"F8" => v.bootAddr(23 downto 16) := ramData;
+            when x"F7" => v.bootAddr(15 downto 8)  := ramData;
+            when x"F6" => v.bootAddr(7 downto 0)   := ramData;
             ---------------------------------------
             when others =>
                if (index < BSI_MAC_SIZE_C) then
@@ -278,9 +278,9 @@ begin
       end loop;
       axiSlaveRegisterR(regCon, x"80", 0, r.crateId);
       axiSlaveRegisterR(regCon, x"84", 0, r.slotNumber);
-      axiSlaveRegisterR(regCon, x"88", 0, r.startBootAddr);
+      axiSlaveRegisterR(regCon, x"88", 0, r.bootAddr);
       axiSlaveRegisterR(regCon, x"8C", 0, BSI_MINOR_VERSION_C);
-      axiSlaveRegisterR(regCon, x"8C", 8, BSI_MAJOR_VERSION_C);
+      axiSlaveRegisterR(regCon, x"90", 8, BSI_MAJOR_VERSION_C);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -296,8 +296,8 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
-      startBoot      <= r.startBoot;
-      startBootAddr  <= r.startBootAddr;
+      bootReq        <= r.bootReq;
+      bootAddr       <= r.bootAddr;
 
       localAppId(3 downto 0)  <= r.slotNumber(3 downto 0);
       localAppId(15 downto 4) <= r.crateId(15 downto 4);
