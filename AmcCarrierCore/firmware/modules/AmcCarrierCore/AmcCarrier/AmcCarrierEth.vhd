@@ -37,7 +37,7 @@ use work.AmcCarrierRegPkg.all;
 entity AmcCarrierEth is
    generic (
       TPD_G            : time            := 1 ns;
-      EN_BP_MSG_G      : boolean          := false;
+      EN_BP_MSG_G      : boolean         := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration
@@ -404,12 +404,12 @@ begin
             axiWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
             axiWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C));    
 
-      obServerSlaves  <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibServerMasters <= (others => AXI_STREAM_MASTER_INIT_C);
-      obClientSlaves  <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibClientMasters <= (others => AXI_STREAM_MASTER_INIT_C);
-      bpMsgSlaves     <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      bpMsgBus        <= (others => BP_MSG_BUS_INIT_C);
+      obServerSlaves(3 downto 2)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibServerMasters(3 downto 2) <= (others => AXI_STREAM_MASTER_INIT_C);
+      obClientSlaves              <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibClientMasters             <= (others => AXI_STREAM_MASTER_INIT_C);
+      bpMsgSlaves                 <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      bpMsgBus                    <= (others => BP_MSG_BUS_INIT_C);
 
    end generate;
 
