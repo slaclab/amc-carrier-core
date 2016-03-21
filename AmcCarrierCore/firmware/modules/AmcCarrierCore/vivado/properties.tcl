@@ -32,5 +32,4 @@ set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0} [get_fil
 add_files -quiet -fileset sources_1 ${PROJ_DIR}/../../modules/BsaCore/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
 
 ## Place and Route strategies 
-#set_property strategy Area_Explore [get_runs impl_1]
-#set_property strategy Performance_Explore [get_runs impl_1]
+set_property strategy Performance_Explore [get_runs impl_1]
