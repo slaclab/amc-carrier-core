@@ -73,7 +73,7 @@ entity AmcAxisDaq is
       -- Axi Stream
       rxAxisMaster_o : out AxiStreamMasterType;
       error_o        : out sl;
-      pctCnt_o       : out slv(15 downto 0);
+      pctCnt_o       : out slv(25 downto 0);
 
       overflow_i : in sl:='0';
       idle_i     : in sl:='1';
@@ -104,7 +104,7 @@ architecture rtl of AmcAxisDaq is
       dataCnt      : slv(packetSize_i'range);
       txAxisMaster : AxiStreamMasterType;
       error        : sl;
-      pctCnt       : slv(15 downto 0);
+      pctCnt       : slv(pctCnt_o'range);
       state        : StateType;
    end record;
    
