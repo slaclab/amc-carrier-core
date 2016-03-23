@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-03-10
+-- Last update: 2016-03-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ entity AmcCarrierRegMapping is
       timingReadMaster  : out   AxiLiteReadMasterType;
       timingReadSlave   : in    AxiLiteReadSlaveType;
       timingWriteMaster : out   AxiLiteWriteMasterType;
-      timingWriteSlave  : in    AxiLiteWriteSlaveType; 
+      timingWriteSlave  : in    AxiLiteWriteSlaveType;
       -- BSA AXI-Lite Interface
       bsaReadMaster     : out   AxiLiteReadMasterType;
       bsaReadSlave      : in    AxiLiteReadSlaveType;
@@ -244,13 +244,19 @@ architecture mapping of AmcCarrierRegMapping is
    signal mAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal bootCsL      : sl;
-   signal bootSck      : sl;
-   signal bootMosi     : sl;
-   signal bootMiso     : sl;
-   signal fpgaEnReload : sl;
-   signal di           : slv(3 downto 0);
-   signal do           : slv(3 downto 0);
+   signal bootCsL  : sl;
+   signal bootSck  : sl;
+   signal bootMosi : sl;
+   signal bootMiso : sl;
+   signal di       : slv(3 downto 0);
+   signal do       : slv(3 downto 0);
+
+   signal axilRstL  : sl;
+   signal bootRdy   : sl;
+   signal bootArmed : sl;
+   signal bootstart : sl;
+   signal bootReq   : sl;
+   signal bootAddr  : slv(31 downto 0);
    
 begin
 
@@ -281,16 +287,13 @@ begin
    --------------------------          
    U_Version : entity work.AxiVersion
       generic map (
-         TPD_G              => TPD_G,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         CLK_PERIOD_G       => AXI_CLK_PERIOD_C,
-         XIL_DEVICE_G       => "ULTRASCALE",
-         EN_DEVICE_DNA_G    => true,
-         EN_DS2411_G        => false,
-         EN_ICAP_G          => true,
-         AUTO_RELOAD_EN_G   => FSBL_G,
-         AUTO_RELOAD_TIME_G => 3.17,  -- Total of 5 seconds: 1.87 seconds for Memory Test and 3.17 second in AxiVersion
-         AUTO_RELOAD_ADDR_G => x"04000000")  -- LCLS-II Image by default
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         XIL_DEVICE_G     => "ULTRASCALE",
+         EN_DEVICE_DNA_G  => true,
+         EN_DS2411_G      => false,
+         EN_ICAP_G        => false,
+         AUTO_RELOAD_EN_G => false)
       port map (
          -- AXI-Lite Interface
          axiClk         => axilClk,
@@ -299,11 +302,43 @@ begin
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(VERSION_INDEX_C),
-         -- Optional: FPGA Reloading Interface
-         fpgaEnReload   => fpgaEnReload);
+         axiWriteSlave  => mAxilWriteSlaves(VERSION_INDEX_C));
 
-   fpgaEnReload <= ddrMemReady and not(ddrMemError);
+   bootRdy <= ddrMemReady and not(ddrMemError);
+
+   process(axilClk)
+   begin
+      if rising_edge(axilClk) then
+         -- Check for reset
+         if axilRst = '1' then
+            bootArmed <= '0' after TPD_G;
+            bootstart <= '0' after TPD_G;
+         else
+            -- Reset the flag
+            bootstart <= '0' after TPD_G;
+            -- Check for boot request
+            if bootReq = '1' then
+               bootArmed <= '1' after TPD_G;
+            -- Check if DDR passed and armed 
+            elsif (bootRdy = '1') and (bootArmed = '1') then
+               -- Set the flag
+               bootstart <= '1' after TPD_G;
+               -- Reset the flag
+               bootArmed <= '0' after TPD_G;
+            end if;
+         end if;
+      end if;
+   end process;
+
+   U_Iprog : entity work.Iprog
+      generic map (
+         TPD_G        => TPD_G,
+         XIL_DEVICE_G => "ULTRASCALE")
+      port map (
+         clk         => axilClk,
+         rst         => axilRst,
+         start       => bootstart,
+         bootAddress => bootAddr);   
 
    --------------------------
    -- AXI-Lite: SYSMON Module
@@ -370,9 +405,10 @@ begin
          PACK      => '0',              -- 1-bit input: PROGRAM acknowledge input
          USRCCLKO  => bootSck,          -- 1-bit input: User CCLK input
          USRCCLKTS => '0',              -- 1-bit input: User CCLK 3-state enable input
-         USRDONEO  => '1',              -- 1-bit input: User DONE pin output control
-         USRDONETS => '1');             -- 1-bit input: User DONE 3-state enable output     
+         USRDONEO  => axilRstL,         -- 1-bit input: User DONE pin output control
+         USRDONETS => '0');             -- 1-bit input: User DONE 3-state enable output     
 
+   axilRstL <= not(axilRst);-- IPMC uses DONE to determine if FPGA is ready
    do       <= "111" & bootMosi;
    bootMiso <= di(1);
 
@@ -478,6 +514,8 @@ begin
          localMac        => localMac,
          localIp         => localIp,
          localAppId      => localAppId,
+         bootReq         => bootReq,
+         bootAddr        => bootAddr,
          -- Application Interface
          bsiClk          => bsiClk,
          bsiRst          => bsiRst,
