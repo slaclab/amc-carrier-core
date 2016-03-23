@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-03-17
+-- Last update: 2016-03-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,32 +33,32 @@ use work.AmcCarrierPkg.all;
 
 entity AmcCarrierEthRssi is
    generic (
-      TPD_G            : time             := 1 ns;
-      TIMEOUT_G        : real             := 1.0E-3;  -- In units of seconds   
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C);   
+      TPD_G            : time            := 1 ns;
+      TIMEOUT_G        : real            := 1.0E-3;  -- In units of seconds   
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);   
    port (
       -- Slave AXI-Lite Interface
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType;
+      axilClk          : in  sl;
+      axilRst          : in  sl;
+      axilReadMaster   : in  AxiLiteReadMasterType;
+      axilReadSlave    : out AxiLiteReadSlaveType;
+      axilWriteMaster  : in  AxiLiteWriteMasterType;
+      axilWriteSlave   : out AxiLiteWriteSlaveType;
       -- Master AXI-Lite Interface
       mAxilReadMaster  : out AxiLiteReadMasterType;
       mAxilReadSlave   : in  AxiLiteReadSlaveType;
       mAxilWriteMaster : out AxiLiteWriteMasterType;
-      mAxilWriteSlave  : in  AxiLiteWriteSlaveType;      
+      mAxilWriteSlave  : in  AxiLiteWriteSlaveType;
       -- BSA Ethernet Interface
-      obBsaMasters    : in  AxiStreamMasterArray(2 downto 0);
-      obBsaSlaves     : out AxiStreamSlaveArray(2 downto 0);
-      ibBsaMasters    : out AxiStreamMasterArray(2 downto 0);
-      ibBsaSlaves     : in  AxiStreamSlaveArray(2 downto 0);
+      obBsaMasters     : in  AxiStreamMasterArray(2 downto 0);
+      obBsaSlaves      : out AxiStreamSlaveArray(2 downto 0);
+      ibBsaMasters     : out AxiStreamMasterArray(2 downto 0);
+      ibBsaSlaves      : in  AxiStreamSlaveArray(2 downto 0);
       -- Interface to UDP Server engines
-      obServerMaster : in  AxiStreamMasterType;
-      obServerSlave  : out AxiStreamSlaveType;
-      ibServerMaster : out AxiStreamMasterType;
-      ibServerSlave  : in  AxiStreamSlaveType);   
+      obServerMaster   : in  AxiStreamMasterType;
+      obServerSlave    : out AxiStreamSlaveType;
+      ibServerMaster   : out AxiStreamMasterType;
+      ibServerSlave    : in  AxiStreamSlaveType);   
 end AmcCarrierEthRssi;
 
 architecture mapping of AmcCarrierEthRssi is
@@ -68,10 +68,10 @@ architecture mapping of AmcCarrierEthRssi is
    signal rssiObMaster : AxiStreamMasterType;
    signal rssiObSlave  : AxiStreamSlaveType;
 
-   signal rssiIbMasters : AxiStreamMasterArray(5 downto 0);
-   signal rssiIbSlaves  : AxiStreamSlaveArray(5 downto 0);
-   signal rssiObMasters : AxiStreamMasterArray(5 downto 0);
-   signal rssiObSlaves  : AxiStreamSlaveArray(5 downto 0);
+   signal rssiIbMasters : AxiStreamMasterArray(3 downto 0);
+   signal rssiIbSlaves  : AxiStreamSlaveArray(3 downto 0);
+   signal rssiObMasters : AxiStreamMasterArray(3 downto 0);
+   signal rssiObSlaves  : AxiStreamSlaveArray(3 downto 0);
 
 begin
 
@@ -105,6 +105,10 @@ begin
          sTspAxisSlave_o  => obServerSlave,
          mTspAxisMaster_o => ibServerMaster,
          mTspAxisSlave_i  => ibServerSlave,
+         -- High level  Application side interface
+         openRq_i         => '1',  -- Automatically start the connection without debug SRP channel
+         closeRq_i        => '0',
+         inject_i         => '0',
          -- AXI-Lite Interface
          axiClk_i         => axilClk,
          axiRst_i         => axilRst,
@@ -116,7 +120,7 @@ begin
    U_AxiStreamMux : entity work.AxiStreamMux
       generic map (
          TPD_G        => TPD_G,
-         NUM_SLAVES_G => 6)
+         NUM_SLAVES_G => 4)
       port map (
          -- Clock and reset
          axisClk      => axilClk,
@@ -131,7 +135,7 @@ begin
    U_AxiStreamDeMux : entity work.AxiStreamDeMux
       generic map (
          TPD_G         => TPD_G,
-         NUM_MASTERS_G => 6)
+         NUM_MASTERS_G => 4)
       port map (
          -- Clock and reset
          axisClk      => axilClk,
@@ -145,31 +149,40 @@ begin
 
    -----------------------------------
    -- AXI-Lite Master with RSSI Server
-   -----------------------------------        
-   U_Srp : entity work.AmcCarrierEthSrp
+   ----------------------------------- 
+   U_SRPv0 : entity work.SsiAxiLiteMaster
       generic map (
-         TPD_G            => TPD_G)   
+         TPD_G               => TPD_G,
+         SLAVE_READY_EN_G    => true,
+         EN_32BIT_ADDR_G     => true,
+         BRAM_EN_G           => true,
+         GEN_SYNC_FIFO_G     => true,
+         AXI_STREAM_CONFIG_G => IP_ENGINE_CONFIG_C)   
       port map (
-         -- Clock and reset
-         axilClk      => axilClk,
-         axilRst      => axilRst,     
-         -- Interface to RSSI Server engine
-         obSrpMasters => rssiIbMasters(2 downto 0),
-         obSrpSlaves  => rssiIbSlaves(2 downto 0),
-         ibSrpMasters => rssiObMasters(2 downto 0),
-         ibSrpSlaves  => rssiObSlaves(2 downto 0),
-         -- Master AXI-Lite Interface
-         mAxilReadMaster  => mAxilReadMaster,
-         mAxilReadSlave   => mAxilReadSlave,
-         mAxilWriteMaster => mAxilWriteMaster,
-         mAxilWriteSlave  => mAxilWriteSlave); 
+         -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+         sAxisClk            => axilClk,
+         sAxisRst            => axilRst,
+         sAxisMaster         => rssiObMasters(0),
+         sAxisSlave          => rssiObSlaves(0),
+         -- Streaming Master (Tx) Data Interface (mAxisClk domain)
+         mAxisClk            => axilClk,
+         mAxisRst            => axilRst,
+         mAxisMaster         => rssiIbMasters(0),
+         mAxisSlave          => rssiIbSlaves(0),
+         -- AXI Lite Bus (axiLiteClk domain)
+         axiLiteClk          => axilClk,
+         axiLiteRst          => axilRst,
+         mAxiLiteReadMaster  => mAxilReadMaster,
+         mAxiLiteReadSlave   => mAxilReadSlave,
+         mAxiLiteWriteMaster => mAxilWriteMaster,
+         mAxiLiteWriteSlave  => mAxilWriteSlave);  
 
    -----------------------------------
    -- AXI-Lite Master with RSSI Server
    -----------------------------------           
-   ibBsaMasters(2 downto 0)  <= rssiObMasters(5 downto 3);
-   rssiObSlaves(5 downto 3)  <= ibBsaSlaves(2 downto 0);
-   rssiIbMasters(5 downto 3) <= obBsaMasters(2 downto 0);
-   obBsaSlaves(2 downto 0)   <= rssiIbSlaves(5 downto 3);
+   ibBsaMasters(2 downto 0)  <= rssiObMasters(3 downto 1);
+   rssiObSlaves(3 downto 1)  <= ibBsaSlaves(2 downto 0);
+   rssiIbMasters(3 downto 1) <= obBsaMasters(2 downto 0);
+   obBsaSlaves(2 downto 0)   <= rssiIbSlaves(3 downto 1);
    
 end mapping;
