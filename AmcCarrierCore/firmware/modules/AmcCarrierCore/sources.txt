@@ -9,7 +9,6 @@ vhdl work AmcCarrier/AmcCarrierClkAndRst.vhd
 vhdl work AmcCarrier/AmcCarrierEth.vhd
 vhdl work AmcCarrier/AmcCarrierEthBpMsg.vhd
 vhdl work AmcCarrier/AmcCarrierEthRssi.vhd
-vhdl work AmcCarrier/AmcCarrierEthSrp.vhd
 
 vhdl work AmcCarrier/AmcCarrierRegMapping.vhd
 vhdl work AmcCarrier/AmcCarrierSysMon.vhd

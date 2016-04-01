@@ -290,7 +290,7 @@ begin
    ---------------------------------------------
    -- Legacy AXI-Lite Master without RSSI Server
    ---------------------------------------------
-   U_SrpV0 : entity work.SsiAxiLiteMaster
+   U_SRPv0 : entity work.SrpV0AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,

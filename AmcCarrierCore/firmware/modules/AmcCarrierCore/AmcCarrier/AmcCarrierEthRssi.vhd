@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-03-23
+-- Last update: 2016-04-01
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -150,32 +150,30 @@ begin
    -----------------------------------
    -- AXI-Lite Master with RSSI Server
    ----------------------------------- 
-   U_SRPv0 : entity work.SsiAxiLiteMaster
+   U_SRPv3 : entity work.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
-         EN_32BIT_ADDR_G     => true,
-         BRAM_EN_G           => true,
          GEN_SYNC_FIFO_G     => true,
-         AXI_STREAM_CONFIG_G => IP_ENGINE_CONFIG_C)   
+         AXI_STREAM_CONFIG_G => IP_ENGINE_CONFIG_C)
       port map (
-         -- Streaming Slave (Rx) Interface (sAxisClk domain) 
-         sAxisClk            => axilClk,
-         sAxisRst            => axilRst,
-         sAxisMaster         => rssiObMasters(0),
-         sAxisSlave          => rssiObSlaves(0),
-         -- Streaming Master (Tx) Data Interface (mAxisClk domain)
-         mAxisClk            => axilClk,
-         mAxisRst            => axilRst,
-         mAxisMaster         => rssiIbMasters(0),
-         mAxisSlave          => rssiIbSlaves(0),
-         -- AXI Lite Bus (axiLiteClk domain)
-         axiLiteClk          => axilClk,
-         axiLiteRst          => axilRst,
-         mAxiLiteReadMaster  => mAxilReadMaster,
-         mAxiLiteReadSlave   => mAxilReadSlave,
-         mAxiLiteWriteMaster => mAxilWriteMaster,
-         mAxiLiteWriteSlave  => mAxilWriteSlave);  
+         -- AXIS Slave Interface (sAxisClk domain)
+         sAxisClk         => axilClk,
+         sAxisRst         => axilRst,
+         sAxisMaster      => rssiObMasters(0),
+         sAxisSlave       => rssiObSlaves(0),
+         -- AXIS Master Interface (mAxisClk domain) 
+         mAxisClk         => axilClk,
+         mAxisRst         => axilRst,
+         mAxisMaster      => rssiIbMasters(0),
+         mAxisSlave       => rssiIbSlaves(0),
+         -- Master AXI-Lite Interface (axilClk domain)
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         mAxilReadMaster  => mAxilReadMaster,
+         mAxilReadSlave   => mAxilReadSlave,
+         mAxilWriteMaster => mAxilWriteMaster,
+         mAxilWriteSlave  => mAxilWriteSlave);        
 
    -----------------------------------
    -- AXI-Lite Master with RSSI Server
