@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2016-03-19
+-- Last update: 2016-04-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -29,6 +29,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.i2cPkg.all;
 use work.AmcCarrierPkg.all;
+use work.Version.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -38,6 +39,9 @@ entity AmcCarrierBsi is
       TPD_G            : time            := 1 ns;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
+      -- DDR Memory Status
+      ddrMemReady     : in    sl;
+      ddrMemError     : in    sl;
       -- Local Configuration
       localMac        : out   slv(47 downto 0);
       localIp         : out   slv(31 downto 0);
@@ -62,6 +66,24 @@ entity AmcCarrierBsi is
 end AmcCarrierBsi;
 
 architecture rtl of AmcCarrierBsi is
+
+   constant BSI_MAJOR_VERSION_C : slv(7 downto 0) := x"01";
+   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"01";
+
+   type RomType is array (0 to 255) of slv(7 downto 0);
+
+   function makeStringRom return RomType is
+      variable ret : RomType := (others => (others => '0'));
+      variable c   : character;
+   begin
+      for i in BUILD_STAMP_C'range loop
+         c      := BUILD_STAMP_C(i);
+         ret(i) := toSlv(character'pos(c), 8);
+      end loop;
+      return ret;
+   end function makeStringRom;
+
+   signal stringRom : RomType := makeStringRom;
 
    function ConvertEndianness (word : slv(47 downto 0)) return slv is
       variable retVar : slv(47 downto 0);
@@ -107,41 +129,18 @@ architecture rtl of AmcCarrierBsi is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal i2cBramWr   : sl;
-   signal i2cBramAddr : slv(7 downto 0);
-   signal i2cBramDout : slv(7 downto 0);
-   signal i2cBramDin  : slv(7 downto 0);
+   signal i2cBramWr   : slv(1 downto 0);
+   signal i2cBramAddr : Slv8Array(1 downto 0);
+   signal i2cBramDout : Slv8Array(1 downto 0);
+   signal i2cBramDin  : Slv8Array(1 downto 0);
    signal bramDout    : slv(7 downto 0);
    signal ramData     : slv(7 downto 0);
+   signal slaveIn     : i2c_in_array(1 downto 0);
+   signal slaveOut    : i2c_out_array(1 downto 0);
    signal i2cIn       : i2c_in_type;
    signal i2cOut      : i2c_out_type;
 
 begin
-
-   ------------
-   -- I2c Slave
-   ------------
-   U_i2cb : entity work.i2cRegSlave
-      generic map (
-         TPD_G                => TPD_G,
-         TENBIT_G             => 0,
-         I2C_ADDR_G           => 73,    -- "1001001";
-         OUTPUT_EN_POLARITY_G => 0,
-         FILTER_G             => 4,
-         ADDR_SIZE_G          => 1,     -- in bytes
-         DATA_SIZE_G          => 1,     -- in bytes
-         ENDIANNESS_G         => 1)     -- 0=LE, 1=BE
-      port map (
-         clk    => axilClk,
-         sRst   => axilRst,
-         aRst   => '0',
-         addr   => i2cBramAddr,
-         wrEn   => i2cBramWr,
-         wrData => i2cBramDin,
-         rdEn   => open,
-         rdData => i2cBramDout,
-         i2ci   => i2cIn,
-         i2co   => i2cOut);       
 
    U_I2cScl : IOBUF
       port map (
@@ -157,8 +156,71 @@ begin
          O  => i2cIn.sda,
          T  => i2cOut.sdaoen);
 
+   -------------------------
+   -- MUX I2C Slave together
+   -------------------------
+   slaveIn(0).scl <= i2cIn.scl;
+   slaveIn(1).scl <= i2cIn.scl;
+   slaveIn(0).sda <= i2cIn.sda;
+   slaveIn(1).sda <= i2cIn.sda;
+
+   i2cOut.scl    <= '0';
+   i2cOut.scloen <= slaveOut(0).scloen and slaveOut(1).scloen;
+   i2cOut.sda    <= '0';
+   i2cOut.sdaoen <= slaveOut(0).sdaoen and slaveOut(1).sdaoen;
+
+   -------------------
+   -- I2c Slave @ 0x49
+   -------------------
+   U_I2C_SLAVE_0x49 : entity work.i2cRegSlave
+      generic map (
+         TPD_G                => TPD_G,
+         TENBIT_G             => 0,
+         I2C_ADDR_G           => 73,    -- "1001001";
+         OUTPUT_EN_POLARITY_G => 0,
+         FILTER_G             => 4,
+         ADDR_SIZE_G          => 1,     -- in bytes
+         DATA_SIZE_G          => 1,     -- in bytes
+         ENDIANNESS_G         => 1)     -- 0=LE, 1=BE
+      port map (
+         clk    => axilClk,
+         sRst   => axilRst,
+         aRst   => '0',
+         addr   => i2cBramAddr(0),
+         wrEn   => i2cBramWr(0),
+         wrData => i2cBramDin(0),
+         rdEn   => open,
+         rdData => i2cBramDout(0),
+         i2ci   => slaveIn(0),
+         i2co   => slaveOut(0)); 
+
+   -------------------
+   -- I2c Slave @ 0x51
+   -------------------
+   U_I2C_SLAVE_0x51 : entity work.i2cRegSlave
+      generic map (
+         TPD_G                => TPD_G,
+         TENBIT_G             => 0,
+         I2C_ADDR_G           => 81,    -- "1010001";
+         OUTPUT_EN_POLARITY_G => 0,
+         FILTER_G             => 4,
+         ADDR_SIZE_G          => 1,     -- in bytes
+         DATA_SIZE_G          => 1,     -- in bytes
+         ENDIANNESS_G         => 1)     -- 0=LE, 1=BE
+      port map (
+         clk    => axilClk,
+         sRst   => axilRst,
+         aRst   => '0',
+         addr   => i2cBramAddr(1),
+         wrEn   => i2cBramWr(1),
+         wrData => i2cBramDin(1),
+         rdEn   => open,
+         rdData => i2cBramDout(1),
+         i2ci   => slaveIn(1),
+         i2co   => slaveOut(1));          
+
    ----------------
-   -- Dual port ram
+   -- Dual port RAM
    ----------------   
    U_RAM : entity work.TrueDualPortRam
       generic map (
@@ -169,10 +231,10 @@ begin
       port map (
          -- Port A     
          clka  => axilClk,
-         wea   => i2cBramWr,
-         addra => i2cBramAddr,
-         dina  => i2cBramDin,
-         douta => i2cBramDout,
+         wea   => i2cBramWr(0),
+         addra => i2cBramAddr(0),
+         dina  => i2cBramDin(0),
+         douta => i2cBramDout(0),
          -- Port B
          clkb  => axilClk,
          web   => r.we,
@@ -180,10 +242,20 @@ begin
          dinb  => r.ramData,
          doutb => ramData);   
 
+   ------------------
+   -- Single port ROM
+   ------------------ 
+   process (axilClk) is
+   begin
+      if (rising_edge(axilClk)) then
+         i2cBramDout(1) <= stringRom(conv_integer(i2cBramAddr(1))) after TPD_G;
+      end if;
+   end process;
+
    --------------------- 
    -- AXI Lite Interface
    --------------------- 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, r, ramData) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrMemError, ddrMemReady, r, ramData) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
       variable i      : natural;
@@ -206,6 +278,8 @@ begin
          -- Increment the address
          v.addr := r.addr + 1;
       elsif r.cnt = x"8" then
+         -- Reset the data bus
+         v.ramData := x"00";
          -- Check the address bus
          case (r.addr) is
             ---------------------------------------
@@ -218,17 +292,14 @@ begin
             when x"FE" => v.crateId(15 downto 8) := ramData;
             when x"FD" => v.crateId(7 downto 0)  := ramData;
             ---------------------------------------
-            -- Check for BSI Major Version
+            -- Check for BSI Version
             ---------------------------------------
             when x"FC" =>
                v.we      := '1';
-               v.ramData := BSI_MAJOR_VERSION_C;
-            ---------------------------------------
-            -- Check for BSI Minor Version
-            ---------------------------------------
+               v.ramData := BSI_MINOR_VERSION_C;
             when x"FB" =>
                v.we      := '1';
-               v.ramData := BSI_MINOR_VERSION_C;
+               v.ramData := BSI_MAJOR_VERSION_C;
             ---------------------------------------
             -- Check for start boot
             ---------------------------------------
@@ -245,6 +316,30 @@ begin
             when x"F8" => v.bootAddr(23 downto 16) := ramData;
             when x"F7" => v.bootAddr(15 downto 8)  := ramData;
             when x"F6" => v.bootAddr(7 downto 0)   := ramData;
+            ---------------------------------------
+            -- Check for FPGA_VERSION_C
+            ---------------------------------------            
+            when x"F5" =>
+               v.we      := '1';
+               v.ramData := FPGA_VERSION_C(31 downto 24);
+            when x"F4" =>
+               v.we      := '1';
+               v.ramData := FPGA_VERSION_C(23 downto 16);
+            when x"F3" =>
+               v.we      := '1';
+               v.ramData := FPGA_VERSION_C(15 downto 8);
+            when x"F2" =>
+               v.we      := '1';
+               v.ramData := FPGA_VERSION_C(7 downto 0);
+            ---------------------------------------
+            -- Check for DDR Memory Status
+            ---------------------------------------               
+            when x"F1" =>
+               v.we         := '1';
+               v.ramData(0) := ddrMemError;
+            when x"F0" =>
+               v.we         := '1';
+               v.ramData(0) := ddrMemReady;
             ---------------------------------------
             when others =>
                if (index < BSI_MAC_SIZE_C) then

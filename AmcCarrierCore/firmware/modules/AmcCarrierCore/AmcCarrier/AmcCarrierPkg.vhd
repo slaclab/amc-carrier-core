@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-03-10
+-- Last update: 2016-04-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -43,12 +43,12 @@ package AmcCarrierPkg is
    subtype AppType is slv(6 downto 0);  -- Max. Size is 7-bits
 
    constant APP_NULL_TYPE_C           : AppType := toSlv(0, AppType'length);
-   constant APP_TIME_GEN_TYPE_C       : AppType := toSlv(1, AppType'length); --Timing Generator with local reference
+   constant APP_TIME_GEN_TYPE_C       : AppType := toSlv(1, AppType'length);  --Timing Generator with local reference
    constant APP_BCM_TYPE_C            : AppType := toSlv(2, AppType'length);
    constant APP_BLEN_TYPE_C           : AppType := toSlv(3, AppType'length);
    constant APP_BPM_TYPE_C            : AppType := toSlv(4, AppType'length);
    constant APP_LLRF_TYPE_C           : AppType := toSlv(5, AppType'length);
-   constant APP_EXTREF_GEN_TYPE_C     : AppType := toSlv(6, AppType'length); --Timing Generator with external reference
+   constant APP_EXTREF_GEN_TYPE_C     : AppType := toSlv(6, AppType'length);  --Timing Generator with external reference
    constant APP_MPS_APP_TYPE_C        : AppType := toSlv(123, AppType'length);  -- MPS Application Node
    constant APP_MPS_DIGITAL_TYPE_C    : AppType := toSlv(124, AppType'length);  -- MPS Link Node, RTM and AMC digital inputs
    constant APP_MPS_LINK_AIN_TYPE_C   : AppType := toSlv(125, AppType'length);  -- MPS Link Node, Dual Analog AMC cards
@@ -91,9 +91,7 @@ package AmcCarrierPkg is
    ---------------------------------------------------
    -- BSI: Configurations, Constants and Records Types
    ---------------------------------------------------
-   constant BSI_MAJOR_VERSION_C : slv(7 downto 0) := x"01";
-   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"01";
-   constant BSI_MAC_SIZE_C      : natural         := 4;
+   constant BSI_MAC_SIZE_C : natural := 4;
 
    type BsiBusType is record
       slotNumber : slv(7 downto 0);

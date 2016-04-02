@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-03-19
+-- Last update: 2016-04-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -408,7 +408,7 @@ begin
          USRDONEO  => axilRstL,         -- 1-bit input: User DONE pin output control
          USRDONETS => '0');             -- 1-bit input: User DONE 3-state enable output     
 
-   axilRstL <= not(axilRst);-- IPMC uses DONE to determine if FPGA is ready
+   axilRstL <= not(axilRst);            -- IPMC uses DONE to determine if FPGA is ready
    do       <= "111" & bootMosi;
    bootMiso <= di(1);
 
@@ -510,6 +510,9 @@ begin
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
+         -- DDR Memory Status
+         ddrMemReady     => ddrMemReady,
+         ddrMemError     => ddrMemError,
          -- Local Configurations
          localMac        => localMac,
          localIp         => localIp,
