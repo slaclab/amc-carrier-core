@@ -59,35 +59,35 @@ architecture rtl of AmcCarrierMpsEncoder is
       0               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00000000"),
          addrBits     => 7,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       1               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00000080"),
          addrBits     => 7,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       2               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00000100"),
          addrBits     => 7,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       3               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00000180"),
          addrBits     => 7,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       4               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00000200"),
          addrBits     => 7,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       5               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00000280"),
          addrBits     => 7,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       6               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00000300"),
          addrBits     => 7,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       7               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00000380"),
          addrBits     => 7,
-         connectivity => X"0001"));  
+         connectivity => X"FFFF"));  
 
    signal ramWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal ramWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);

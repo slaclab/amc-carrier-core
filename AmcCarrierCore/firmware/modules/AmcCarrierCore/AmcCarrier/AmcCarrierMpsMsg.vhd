@@ -71,7 +71,7 @@ architecture mapping of AmcCarrierMpsMsg is
       for i in NUM_AXI_MASTERS_C-1 downto 0 loop
          retVar(i).baseAddr     := baseAddr + toSlv((i*1024), 32);
          retVar(i).addrBits     := 10;
-         retVar(i).connectivity := X"0001";
+         retVar(i).connectivity := X"FFFF";
       end loop;
       return retVar;
    end function;

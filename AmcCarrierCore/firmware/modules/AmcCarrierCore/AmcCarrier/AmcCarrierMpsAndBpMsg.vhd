@@ -94,11 +94,11 @@ architecture mapping of AmcCarrierMpsAndBpMsg is
       MPS_RAM_INDEX_C => (
          baseAddr     => MPS_RAM_ADDR_C,
          addrBits     => 16,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       MPS_PHY_INDEX_C => (
          baseAddr     => MPS_PHY_ADDR_C,
          addrBits     => 16,
-         connectivity => X"0001"));
+         connectivity => X"FFFF"));
 
    signal writeMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal writeSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);

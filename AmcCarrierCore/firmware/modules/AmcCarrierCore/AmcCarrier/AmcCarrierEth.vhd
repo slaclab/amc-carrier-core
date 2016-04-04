@@ -105,19 +105,19 @@ architecture mapping of AmcCarrierEth is
       PHY_INDEX_C     => (
          baseAddr     => PHY_ADDR_C,
          addrBits     => 16,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       UDP_INDEX_C     => (
          baseAddr     => UDP_ADDR_C,
          addrBits     => 16,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       SRP_INDEX_C     => (
          baseAddr     => SRP_ADDR_C,
          addrBits     => 16,
-         connectivity => X"0001"),
+         connectivity => X"FFFF"),
       BP_MSG_INDEX_C  => (
          baseAddr     => BP_MSG_ADDR_C,
          addrBits     => 16,
-         connectivity => X"0001"));   
+         connectivity => X"FFFF"));   
 
    function ServerPorts return PositiveArray is
       variable retConf   : PositiveArray(SERVER_SIZE_C-1 downto 0);

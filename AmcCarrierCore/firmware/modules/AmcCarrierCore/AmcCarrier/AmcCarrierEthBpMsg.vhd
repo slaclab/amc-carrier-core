@@ -79,7 +79,7 @@ architecture mapping of AmcCarrierEthBpMsg is
          addr(14 downto 10)      := toSlv(i, 5);
          retConf(i).baseAddr     := addr;
          retConf(i).addrBits     := 10;
-         retConf(i).connectivity := x"0001";
+         retConf(i).connectivity := x"FFFF";
       end loop;
       return retConf;
    end function;
