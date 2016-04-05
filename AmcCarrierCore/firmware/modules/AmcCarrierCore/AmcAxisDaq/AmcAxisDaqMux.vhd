@@ -10,7 +10,7 @@
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: Data acquisition top module:
---     Choose 2 out of 6 Channels for DAQ.
+--     Choose 2 (L_AXI_G) out of 6 (L_G) Channels for DAQ.
 --     Module handles AXI stream data acquisition on two AXI Stream lanes.       
 --     Each AXI stream contains a multiplexer for channel selection.
 --     According to s_muxSel value the multiplexer works as follows:
@@ -49,12 +49,7 @@ entity AmcAxisDaqMux is
       L_G : positive := 6;
 
       --Number of AXIS lanes (1 to 2)
-      L_AXI_G : positive := 2;
-      
-      -- Mode of DAQ - True  - sends the 4k frames continuously no trigger(used in new interface)
-      --             - False - until packet size and needs trigger (used in new interface)
-      CONTINUOUS_G : boolean:= false
-      );
+      L_AXI_G : positive := 2);
    port (
 
       -- Clocks and Resets
@@ -103,6 +98,7 @@ architecture rtl of AmcAxisDaqMux is
    -- Trigger conditioning
    signal s_trigHw   : sl;
    signal s_trigSw   : sl;
+   signal s_mode     : sl;
    signal s_trigComb : sl;
 
    -- Generate pause signal logic OR
@@ -151,7 +147,8 @@ begin
          trigSw_o         => s_trigSw,
          rateDiv_o        => s_rateDiv,
          axisPacketSize_o => s_axisPacketSizeReg,
-         muxSel_o         => s_muxSel
+         muxSel_o         => s_muxSel,
+         mode_o           => s_mode
          );
    -----------------------------------------------------------
    -- Trigger and rate
@@ -221,8 +218,7 @@ begin
       AxiStreamDaq_INST : entity work.AmcAxisDaq
          generic map (
             TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            CONTINUOUS_G     => CONTINUOUS_G)
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
          port map (
             enable_i       => s_enAxi(I),
             devClk_i       => devClk_i,
@@ -232,6 +228,7 @@ begin
             packetSize_i   => s_axisPacketSizeReg,
             rateDiv_i      => s_rateDiv,
             trig_i         => s_trigComb,
+            mode_i         => s_mode,
             rxAxisMaster_o => rxAxisMasterArr_o(I),
             error_o        => s_errorVec(I),
             pctCnt_o       => s_pctCntVec(I),
@@ -244,7 +241,7 @@ begin
           );
           
       -- Status register assignment
-      s_status(I) <= s_pctCntVec(I) & s_enAxi(I) & s_dataValidVecMux(I) & s_errorVec(I) & s_overflowVec(I) & s_idleVec(I) & s_pauseVec(I);
+      s_status(I) <= s_pctCntVec(I) & s_enAxi(I) & s_dataValidVecMux(I) & s_errorVec(I) & s_overflowVec(I) & rxAxisSlaveArr_i(I).tReady & s_pauseVec(I);
       --
    end generate genAxiStreamLanes;
 ------------------------------------- 

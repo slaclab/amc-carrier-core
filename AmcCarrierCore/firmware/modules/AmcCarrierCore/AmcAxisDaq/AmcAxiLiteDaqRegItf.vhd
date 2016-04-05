@@ -17,7 +17,7 @@
 --                                  2 = Sample rate/4,
 --                                  3 = Sample rate/8, etc.
 --               0x03 (RW) - DAQ packet size (24 bit) (max 0x30000)
---               0x1X (RW) - M
+--               0x1X (RW) - Mux
 --                   bit 7-4: Stream 1 Channel select Multiplexer(0 - Disabled, 1 - Ch1, 2 - Ch2, 3 - Ch3, etc.)
 --                   bit 3-0: Stream 0 Channel select Multiplexer(0 - Disabled, 1 - Ch1, 2 - Ch2, 3 - Ch3, etc.)
 --               0x2X (R) - Status register
@@ -76,6 +76,7 @@ entity AmcAxiLiteDaqRegItf is
 
       -- Control
       trigSw_o         : out sl;
+      mode_o           : out sl;
       axisPacketSize_o : out slv(31 downto 0);
       rateDiv_o        : out slv(15 downto 0);
       muxSel_o         : out Slv4Array(L_AXI_G-1 downto 0)
@@ -86,7 +87,7 @@ architecture rtl of AmcAxiLiteDaqRegItf is
 
    type RegType is record
       -- JESD Control (RW)
-      commonCtrl     : slv(0 downto 0);
+      commonCtrl     : slv(1 downto 0);
       axisPacketSize : slv(axisPacketSize_o'range);
       rateDiv        : slv(15 downto 0);
       muxSel         : Slv4Array(L_AXI_G-1 downto 0);
@@ -97,7 +98,7 @@ architecture rtl of AmcAxiLiteDaqRegItf is
    end record;
    
    constant REG_INIT_C : RegType := (
-      commonCtrl     => "0",
+      commonCtrl     => "00",
       axisPacketSize => x"0030_0000",
       rateDiv        => x"0000",
       muxSel         => (x"2", x"1"),
@@ -130,7 +131,7 @@ begin
       v := r;
 
       -- Auto clear (trigger register) TODO check in simulation
-      v.commonCtrl := "0";
+      v.commonCtrl(0) := '0';
       ----------------------------------------------------------------------------------------------
       -- Axi-Lite interface
       ----------------------------------------------------------------------------------------------
@@ -140,7 +141,7 @@ begin
          axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
          case (s_WrAddr) is
             when 16#00# =>              -- ADDR (0)
-               v.commonCtrl := axilWriteMaster.wdata(0 downto 0);
+               v.commonCtrl := axilWriteMaster.wdata(1 downto 0);
             when 16#02# =>              -- ADDR (8)
                v.rateDiv := axilWriteMaster.wdata(15 downto 0);
             when 16#03# =>              -- ADDR (12)
@@ -162,7 +163,7 @@ begin
          v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0)
-               v.axilReadSlave.rdata(0 downto 0) := r.commonCtrl;
+               v.axilReadSlave.rdata(1 downto 0) := r.commonCtrl;
             when 16#02# =>              -- ADDR (8)
                v.axilReadSlave.rdata(15 downto 0) := r.rateDiv;
             when 16#03# =>              -- ADDR (12)
@@ -232,6 +233,19 @@ begin
          dataIn  => r.commonCtrl(0),
          dataOut => trigSw_o
          );
+         
+   -- Output assignment and synchronisation
+   Sync_OUT2 : entity work.Synchronizer
+      generic map (
+         TPD_G => TPD_G
+         )
+      port map (
+         clk     => devClk_i,
+         rst     => devRst_i,
+         dataIn  => r.commonCtrl(1),
+         dataOut => mode_o
+         );      
+         
 
    SyncFifo_OUT2 : entity work.SynchronizerFifo
       generic map (

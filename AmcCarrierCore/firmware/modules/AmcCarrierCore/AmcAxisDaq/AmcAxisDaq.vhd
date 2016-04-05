@@ -49,11 +49,7 @@ entity AmcAxisDaq is
       -- General Configurations
       TPD_G            : time            := 1 ns;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
-      FRAME_BWIDTH_G   : positive        := 10;
-      -- Mode of DAQ - True  - sends the 4k frames continuously no trigger(used in new interface)
-      --             - False - until packet size and needs trigger (used in new interface)
-      CONTINUOUS_G     : boolean         := false
-   );
+      FRAME_BWIDTH_G   : positive        := 10);
    port (
       enable_i : in sl;
 
@@ -70,6 +66,11 @@ entity AmcAxisDaq is
       rateDiv_i    : in slv(15 downto 0);
       trig_i       : in sl:='0';
 
+      -- Mode of DAQ - '0'  - until packet size and needs trigger (used in new interface)
+      --             - '1'  - sends the 4k frames continuously no trigger(used in new interface)
+      mode_i       : in sl:='0';
+      
+      
       -- Axi Stream
       rxAxisMaster_o : out AxiStreamMasterType;
       error_o        : out sl;
@@ -180,7 +181,7 @@ begin
             v.txAxisMaster.tDest  := intToSlv(axiNum_i, 8);
 
             -- Check if fifo and JESD is ready
-            if (pause_i = '0' and enable_i = '1' and ready_i = '1' and dataReady_i = '1' and ( (s_trigRe = '1' and idle_i = '1') or CONTINUOUS_G = True) ) then
+            if (pause_i = '0' and enable_i = '1' and ready_i = '1' and dataReady_i = '1' and ( (s_trigRe = '1' and idle_i = '1') or mode_i = '1') ) then
                -- Next State
                v.state := FIRST_SOF_S;
             end if;
@@ -271,7 +272,7 @@ begin
             v.txAxisMaster.tLast                                := '0';
 
             -- Wait until the whole packet is sent, error or frame
-            if (r.dataCnt >= (packetSize_i-2) and CONTINUOUS_G = False) then  -- Stop sending data if packet size reached 
+            if (r.dataCnt >= (packetSize_i-2) and mode_i = '0') then  -- Stop sending data if packet size reached 
                v.state := LAST_EOF_S;                                         -- Do not stop sending data if in continuous mode
             elsif (r.error = '1') then               -- Stop sending data if error occurs
                v.state := LAST_EOF_S;
