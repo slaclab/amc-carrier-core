@@ -34,6 +34,7 @@ vhdl work AmcGenericAdcDac/AmcGenericAdcDacCtrl.vhd
 vhdl work AmcGenericAdcDac/AmcGenericAdcDacSyncTrig.vhd
 vhdl work AmcGenericAdcDac/AmcGenericAdcDacVcoSpi.vhd
 vhdl work AmcGenericAdcDac/Jesd32bTo16b.vhd
+vhdl work AmcGenericAdcDac/Jesd16bTo32b.vhd
 
 vhdl work AmcAxisDaq/AmcAxisDaq.vhd
 vhdl work AmcAxisDaq/AmcAxisDaqMux.vhd
