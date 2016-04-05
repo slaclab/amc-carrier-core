@@ -60,7 +60,7 @@ architecture rtl of Jesd16bTo32b is
    
 begin
 
-   comb : process (data, r, wrRst, validIn) is
+   comb : process (r, wrRst, validIn) is
       variable v : RegType;
    begin
       -- Latch the current value
@@ -104,7 +104,7 @@ begin
       ADDR_WIDTH_G  => 4)
    port map (
       -- Asynchronous Reset
-      rst    => rdRst,
+      rst    => wrRst,
       -- Write Ports (wr_clk domain)
       wr_clk => wrClk,
       wr_en  => r.wordSel,
