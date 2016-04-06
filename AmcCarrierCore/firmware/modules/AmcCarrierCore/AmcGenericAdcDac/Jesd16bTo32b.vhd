@@ -47,7 +47,7 @@ architecture rtl of Jesd16bTo32b is
 
    type RegType is record
       wordSel : sl;
-      wrEn    : si;
+      wrEn    : sl;
       data    : slv(31 downto 0);
    end record;
 
