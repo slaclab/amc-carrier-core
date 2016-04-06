@@ -47,11 +47,13 @@ architecture rtl of Jesd16bTo32b is
 
    type RegType is record
       wordSel : sl;
+      wrEn    : si;
       data    : slv(31 downto 0);
    end record;
 
    constant REG_INIT_C : RegType := (
       wordSel => '0',
+      wrEn    => '0',
       data    => (others => '0'));
 
    signal r   : RegType := REG_INIT_C;
@@ -65,21 +67,22 @@ begin
    begin
       -- Latch the current value
       v := r;
-
+      
       -- Check if data valid
       if validIn = '1' then
          if r.wordSel = '0' then
             -- Set the flags and data bus
             v.wordSel := '1';
             v.data(15 downto 0)    := dataIn;
+            v.wrEn := '0';
          else
             -- Set the flags and data bus
             v.wordSel := '0';
             v.data(31 downto 16)    := dataIn;
-
+            v.wrEn := '1';
          end if;
       else
-         v.wordSel := '0';
+         v := REG_INIT_C;
       end if;
 
       -- Synchronous Reset
@@ -107,7 +110,7 @@ begin
       rst    => wrRst,
       -- Write Ports (wr_clk domain)
       wr_clk => wrClk,
-      wr_en  => r.wordSel,
+      wr_en  => r.wrEn,
       din    => r.data,
       -- Read Ports (rd_clk domain)
       rd_clk => rdClk,
