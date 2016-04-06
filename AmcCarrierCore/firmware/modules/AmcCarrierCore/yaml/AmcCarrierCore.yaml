@@ -1,0 +1,72 @@
+include: AxiVersion.yaml
+include: AxiEmpty.yaml
+# include: XilinxSystemMonitor.yaml
+# include: AxiMicronN25Q.yaml
+# include: AxiSy56040.yaml
+include: GenericMemory.yaml
+# include: AxiCdcm6208.yaml
+# include: AmcCarrierBsi.yaml
+# include: AmcCarrierTiming.yaml
+# include: AmcCarrierBsa.yaml
+
+name: AmcCarrierCore
+description: AmcCarrierCore
+size: 0x80000000 # 2GB address space for core firmware
+peripherals:
+  ##################################################
+  - <<: *AxiVersion
+    address: 0x00000000
+  ##################################################
+  - <<: *AxiEmpty
+    name: "XilinxSystemMonitor"  # AxiEmpty is a placeholder
+    address: 0x01000000
+  ##################################################
+  - <<: *AxiEmpty
+    name: "AxiMicronN25Q"  # AxiEmpty is a placeholder
+    address: 0x02000000  
+  ##################################################
+  - <<: *AxiEmpty
+    name: "AxiSy56040"  # AxiEmpty is a placeholder
+    address: 0x03000000      
+  ##################################################
+  - <<: *GenericMemory
+    name: "Axi24LC64FT"
+    address: 0x04000000       
+    size: 0x8000       
+    - <<: *MemoryArray
+      nelms: 0x8000
+      size: 8
+  ##################################################
+  - <<: *AxiEmpty
+    name: "AxiCdcm6208"  # AxiEmpty is a placeholder
+    address: 0x05000000      
+  ##################################################
+  - <<: *AxiEmpty
+    name: "DDR_I2C_Devices"  # AxiEmpty is a placeholder
+    address: 0x06000000        
+  ##################################################
+  - <<: *AxiEmpty
+    name: "AmcCarrierBsi"  # AxiEmpty is a placeholder
+    address: 0x07000000      
+  ##################################################  
+  - <<: *AxiEmpty
+    name: "AmcCarrierTiming"  # AxiEmpty is a placeholder
+    address: 0x08000000      
+  ##################################################
+  - <<: *AxiEmpty
+    name: "AmcCarrierBsa"  # AxiEmpty is a placeholder
+    address: 0x07000000       
+  ##################################################  
+  - <<: *AxiEmpty
+    name: "XauiPhy"  # AxiEmpty is a placeholder
+    address: 0x0A000000      
+  ################################################## 
+  - <<: *AxiEmpty
+    name: "DdrPhy"  # AxiEmpty is a placeholder
+    address: 0x0B000000      
+  ##################################################   
+  - <<: *AxiEmpty
+    name: "MpsPhy"  # AxiEmpty is a placeholder
+    address: 0x0C000000      
+  ##################################################     
+  
