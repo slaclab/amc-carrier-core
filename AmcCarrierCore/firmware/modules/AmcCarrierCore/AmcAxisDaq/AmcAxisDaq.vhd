@@ -181,7 +181,7 @@ begin
             v.txAxisMaster.tDest  := intToSlv(axiNum_i, 8);
 
             -- Check if fifo and JESD is ready
-            if (pause_i = '0' and enable_i = '1' and ready_i = '1' and dataReady_i = '1' and ( (s_trigRe = '1' and idle_i = '1') or mode_i = '1') ) then
+            if (pause_i = '0' and enable_i = '1' and ready_i = '1' and dataReady_i = '1' and  (s_trigRe = '1' or mode_i = '1') ) then
                -- Next State
                v.state := FIRST_SOF_S;
             end if;

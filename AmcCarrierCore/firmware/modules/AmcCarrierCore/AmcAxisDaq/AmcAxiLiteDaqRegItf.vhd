@@ -130,8 +130,6 @@ begin
       -- Latch the current value
       v := r;
 
-      -- Auto clear (trigger register) TODO check in simulation
-      v.commonCtrl(0) := '0';
       ----------------------------------------------------------------------------------------------
       -- Axi-Lite interface
       ----------------------------------------------------------------------------------------------
