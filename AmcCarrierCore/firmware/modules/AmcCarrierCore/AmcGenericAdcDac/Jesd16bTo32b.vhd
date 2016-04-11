@@ -62,7 +62,7 @@ architecture rtl of Jesd16bTo32b is
    
 begin
 
-   comb : process (r, wrRst, validIn) is
+   comb : process (r, wrRst, validIn, dataIn) is
       variable v : RegType;
    begin
       -- Latch the current value
@@ -120,9 +120,9 @@ begin
 
    validOut <= s_valid;
 
-   seq : process (rdClk) is
+   seq : process (wrClk) is
    begin
-      if (rising_edge(rdClk)) then
+      if (rising_edge(wrClk)) then
          r <= rin after TPD_G;
       end if;
    end process seq;
