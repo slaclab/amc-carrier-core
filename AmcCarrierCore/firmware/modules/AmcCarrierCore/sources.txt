@@ -52,6 +52,6 @@ vhdl work DebugPgp/DebugRawDiagnostic.vhd
 vhdl work coregen/MigCore.dcp
 vhdl work coregen/SysMonCore.dcp
 vhdl work coregen/DebugMigCore.dcp
-vhdl work coregen/DebugRtmPgpGthCore.dcp
+#vhdl work coregen/DebugRtmPgpGthCore.dcp
 vhdl work coregen/DebugAxiStreamDdrFifo.dcp
 vhdl work coregen/AmcGenericAdcDacJesd204bCoregen.dcp

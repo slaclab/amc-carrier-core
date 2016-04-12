@@ -207,9 +207,9 @@ architecture mapping of AmcCarrierRegMapping is
       0             => (
          i2cAddress => "0001010000",
          i2cTenbit  => '0',
-         dataSize   => 8,               -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '1'));           -- Big endian  
+         dataSize   => 32,              -- in units of bits
+         addrSize   => 13,              -- in units of bits
+         endianness => '0'));           -- Little endian  
 
    constant TIME_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
       0             => (
@@ -217,27 +217,21 @@ architecture mapping of AmcCarrierRegMapping is
          i2cTenbit  => '0',
          dataSize   => 16,              -- in units of bits
          addrSize   => 16,              -- in units of bits
-         endianness => '1'));           -- Big endian     
+         endianness => '0'));           -- Little endian     
 
-   constant DDR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 2) := (
+   constant DDR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 1) := (
       0             => (
-         i2cAddress => "0001010000",    -- EEPROM memory array (1010)
+         i2cAddress => "0001010000",    -- SRD Memory (1010) (Lookup tool at www.micron.com/spd)
          i2cTenbit  => '0',
-         dataSize   => 8,               -- in units of bits
+         dataSize   => 32,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'),            -- Big endian  
+         endianness => '0'),            -- Little endian    
       1             => (
-         i2cAddress => "0000110000",    -- Write protect settings (0110)
+         i2cAddress => "0000011000",    -- Temperature Sensor (0011)
          i2cTenbit  => '0',
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'),            -- Big endian  
-      2             => (
-         i2cAddress => "0000011000",    -- Temperature sensor (0011)
-         i2cTenbit  => '0',
-         dataSize   => 8,               -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '1'));           -- Big endian           
+         endianness => '0'));           -- Little endian            
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);

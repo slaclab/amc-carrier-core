@@ -1,0 +1,69 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+AmcCarrierBsi: &AmcCarrierBsi 
+  name: AmcCarrierBsi
+  description: AmcCarrier BSI Module
+  size: 0x100
+  registers:
+    #########################################################
+    - address: 0x00
+      name: MAC0
+      nelms: 2
+      mode: RO
+      description: MAC Address[0]
+    #########################################################
+    - address: 0x04
+      name: MAC1
+      nelms: 2
+      mode: RO
+      description: MAC Address[1] 
+    #########################################################
+    - address: 0x08
+      name: MAC2
+      nelms: 2
+      mode: RO
+      description: MAC Address[2]
+    #########################################################
+    - address: 0x0C
+      name: MAC3
+      nelms: 2
+      mode: RO
+      description: MAC Address[3]       
+    #########################################################
+    - address: 0x80
+      name: CrateId
+      mode: RO
+      size: 16
+      description: ATCA Crate ID 
+    #########################################################
+    - address: 0x84
+      name: SlotNumber
+      mode: RO
+      size: 4
+      description: ATCA Logical Slot Number    
+    #########################################################
+    - address: 0x88
+      name: BootStartAddress
+      mode: RO
+      description: Bootloader Start Address    
+    #########################################################
+    - address: 0x8C
+      name: VersionMinor
+      mode: RO
+      size: 8
+      description: BSI's Minor Version Number
+    #########################################################
+    - address: 0x90
+      name: VersionMajor
+      mode: RO
+      size: 8
+      description: BSI's Major Version Number      
+    #########################################################
