@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2016-04-02
+-- Last update: 2016-04-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -48,6 +48,7 @@ entity AmcCarrierBsi is
       localAppId      : out   slv(15 downto 0);
       bootReq         : out   sl;
       bootAddr        : out   slv(31 downto 0);
+      upTimeCnt       : in    slv(31 downto 0);
       -- Application Interface
       bsiClk          : in    sl;
       bsiRst          : in    sl;
@@ -255,7 +256,8 @@ begin
    --------------------- 
    -- AXI Lite Interface
    --------------------- 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrMemError, ddrMemReady, r, ramData) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrMemError, ddrMemReady, r, ramData,
+                   upTimeCnt) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
       variable i      : natural;
@@ -340,6 +342,21 @@ begin
             when x"F0" =>
                v.we         := '1';
                v.ramData(0) := ddrMemReady;
+            ----------------------------------------
+            -- Check for AxiVersion's Uptime Counter
+            ----------------------------------------            
+            when x"EF" =>
+               v.we      := '1';
+               v.ramData := upTimeCnt(31 downto 24);
+            when x"EE" =>
+               v.we      := '1';
+               v.ramData := upTimeCnt(23 downto 16);
+            when x"ED" =>
+               v.we      := '1';
+               v.ramData := upTimeCnt(15 downto 8);
+            when x"EC" =>
+               v.we      := '1';
+               v.ramData := upTimeCnt(7 downto 0);
             ---------------------------------------
             when others =>
                if (index < BSI_MAC_SIZE_C) then
