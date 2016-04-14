@@ -4,6 +4,6 @@
 # coregen/SysMonCore.xci
 # coregen/MigCore.xci
 # coregen/DebugMigCore.xci
-coregen/DebugRtmPgpGthCore.xci 
+# coregen/DebugRtmPgpGthCore.xci 
 # coregen/DebugAxiStreamDdrFifo.xci 
 # coregen/AmcGenericAdcDacJesd204bCoregen.xci 
