@@ -406,7 +406,7 @@ create_generated_clock -name axilClk      [get_pins -hier -filter {NAME =~ U_Cor
 create_generated_clock -name mpsClk625MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT0}] 
 create_generated_clock -name mpsClk312MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT1}] 
 create_generated_clock -name mpsClk125MHz [get_pins -hier -filter {NAME =~ U_Core/U_ClkAndRst/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT2}] 
-create_generated_clock -name iprogClk     [get_pins {U_Core/U_RegMap/U_Version/GEN_ICAP.Iprog_1/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O}]
+create_generated_clock -name iprogClk     [get_pins {U_Core/U_RegMap/U_Iprog/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 create_generated_clock -name dnaClk       [get_pins {U_Core/U_RegMap/U_Version/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
 create_generated_clock -name xauiPhyClk   [get_pins -hier -filter {name =~ U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/*/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
 create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
