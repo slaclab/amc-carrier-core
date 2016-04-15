@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-04-14
+-- Last update: 2016-04-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,12 +37,14 @@ use work.AmcCarrierRegPkg.all;
 entity DebugRtmEth is
    generic (
       TPD_G            : time            := 1 ns;
+      EN_SW_RSSI_G     : boolean         := true;
       EN_BP_MSG_G      : boolean         := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
-      -- Local Configuration
+      -- Local Configuration and status
       localMac          : in  slv(47 downto 0);  --  big-Endian configuration
       localIp           : in  slv(31 downto 0);  --  big-Endian configuration   
+      ethPhyReady       : out sl;
       -- Master AXI-Lite Interface
       mAxilReadMasters  : out AxiLiteReadMasterArray(1 downto 0);
       mAxilReadSlaves   : in  AxiLiteReadSlaveArray(1 downto 0);
@@ -74,10 +76,10 @@ entity DebugRtmEth is
       -- Core Ports --
       ----------------   
       -- RTM Ethernet Ports
-      ethRxP           : in    sl;
-      ethRxN           : in    sl;
-      ethTxP           : out   sl;
-      ethTxN           : out   sl;
+      ethRxP            : in  sl;
+      ethRxN            : in  sl;
+      ethTxP            : out sl;
+      ethTxN            : out sl;
       xauiClkP          : in  sl;
       xauiClkN          : in  sl);
 end DebugRtmEth;
@@ -160,6 +162,8 @@ architecture mapping of DebugRtmEth is
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+
+   signal phyReady : sl;
    
 begin
 
@@ -194,39 +198,47 @@ begin
          REF_CLK_FREQ_G    => 156.25E+6,
          NUM_LANE_G        => 1,
          QPLL_REFCLK_SEL_G => "001",
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          AXIS_CONFIG_G     => (others => IP_ENGINE_CONFIG_C))
       port map (
          -- Local Configurations
-         localMac(0)  => localMac,
+         localMac(0)            => localMac,
          -- Streaming DMA Interface 
-         dmaClk(0)       => axilClk,
-         dmaRst(0)       => axilRst,
-         dmaIbMasters(0) => obMacMaster,
-         dmaIbSlaves(0)  => obMacSlave,
-         dmaObMasters(0) => ibMacMaster,
-         dmaObSlaves(0)  => ibMacSlave,
+         dmaClk(0)              => axilClk,
+         dmaRst(0)              => axilRst,
+         dmaIbMasters(0)        => obMacMaster,
+         dmaIbSlaves(0)         => obMacSlave,
+         dmaObMasters(0)        => ibMacMaster,
+         dmaObSlaves(0)         => ibMacSlave,
          -- Slave AXI-Lite Interface 
-         axiLiteClk(0)         => axilClk,
-         axiLiteRst(0)         => axilRst,
+         axiLiteClk(0)          => axilClk,
+         axiLiteRst(0)          => axilRst,
          axiLiteReadMasters(0)  => axilReadMasters(PHY_INDEX_C),
          axiLiteReadSlaves(0)   => axilReadSlaves(PHY_INDEX_C),
          axiLiteWriteMasters(0) => axilWriteMasters(PHY_INDEX_C),
-         axiLiteWriteSlaves(0)  => axilWriteSlaves(PHY_INDEX_C),         
+         axiLiteWriteSlaves(0)  => axilWriteSlaves(PHY_INDEX_C),
          -- Misc. Signals
-         extRst             => axilRst,
-         phyClk             => open,
-         phyRst             => open,
-         phyReady           => open,
+         extRst                 => axilRst,
+         phyClk                 => open,
+         phyRst                 => open,
+         phyReady(0)            => phyReady,
          -- MGT Clock Port (156.25 MHz or 312.5 MHz)
-         gtClkP       => xauiClkP,
-         gtClkN       => xauiClkN,
+         gtClkP                 => xauiClkP,
+         gtClkN                 => xauiClkN,
          -- MGT Ports
-         gtTxP(0)     => ethTxP,
-         gtTxN(0)     => ethTxN,
-         gtRxP(0)     => ethRxP,
-         gtRxN(0)     => ethRxN);   
-         
+         gtTxP(0)               => ethTxP,
+         gtTxN(0)               => ethTxN,
+         gtRxP(0)               => ethRxP,
+         gtRxN(0)               => ethRxN);   
+
+   U_Sync : entity work.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => axilClk,
+         dataIn  => phyReady,
+         dataOut => ethPhyReady);         
+
    ----------------------
    -- IPv4/ARP/UDP Engine
    ----------------------
@@ -318,34 +330,59 @@ begin
    -----------------------------------
    -- Software's RSSI Server Interface
    -----------------------------------
-   U_RssiServer : entity work.AmcCarrierEthRssi
-      generic map (
-         TPD_G            => TPD_G,
-         TIMEOUT_G        => RSSI_TIMEOUT_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         -- Slave AXI-Lite Interface
-         axilClk          => axilClk,
-         axilRst          => axilRst,
-         axilReadMaster   => axilReadMasters(SRP_INDEX_C),
-         axilReadSlave    => axilReadSlaves(SRP_INDEX_C),
-         axilWriteMaster  => axilWriteMasters(SRP_INDEX_C),
-         axilWriteSlave   => axilWriteSlaves(SRP_INDEX_C),
-         -- Master AXI-Lite Interface
-         mAxilReadMaster  => mAxilReadMasters(1),
-         mAxilReadSlave   => mAxilReadSlaves(1),
-         mAxilWriteMaster => mAxilWriteMasters(1),
-         mAxilWriteSlave  => mAxilWriteSlaves(1),
-         -- BSA Ethernet Interface
-         obBsaMasters     => obBsaMasters,
-         obBsaSlaves      => obBsaSlaves,
-         ibBsaMasters     => ibBsaMasters,
-         ibBsaSlaves      => ibBsaSlaves,
-         -- Interface to UDP Server engines
-         obServerMaster   => obServerMasters(1),
-         obServerSlave    => obServerSlaves(1),
-         ibServerMaster   => ibServerMasters(1),
-         ibServerSlave    => ibServerSlaves(1));      
+   GEN_SW_RSSI : if (EN_SW_RSSI_G = true) generate
+      U_RssiServer : entity work.AmcCarrierEthRssi
+         generic map (
+            TPD_G            => TPD_G,
+            TIMEOUT_G        => RSSI_TIMEOUT_C,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         port map (
+            -- Slave AXI-Lite Interface
+            axilClk          => axilClk,
+            axilRst          => axilRst,
+            axilReadMaster   => axilReadMasters(SRP_INDEX_C),
+            axilReadSlave    => axilReadSlaves(SRP_INDEX_C),
+            axilWriteMaster  => axilWriteMasters(SRP_INDEX_C),
+            axilWriteSlave   => axilWriteSlaves(SRP_INDEX_C),
+            -- Master AXI-Lite Interface
+            mAxilReadMaster  => mAxilReadMasters(1),
+            mAxilReadSlave   => mAxilReadSlaves(1),
+            mAxilWriteMaster => mAxilWriteMasters(1),
+            mAxilWriteSlave  => mAxilWriteSlaves(1),
+            -- BSA Ethernet Interface
+            obBsaMasters     => obBsaMasters,
+            obBsaSlaves      => obBsaSlaves,
+            ibBsaMasters     => ibBsaMasters,
+            ibBsaSlaves      => ibBsaSlaves,
+            -- Interface to UDP Server engines
+            obServerMaster   => obServerMasters(1),
+            obServerSlave    => obServerSlaves(1),
+            ibServerMaster   => ibServerMasters(1),
+            ibServerSlave    => ibServerSlaves(1));   
+   end generate;
+
+   BYPASS_SW_RSSI : if (EN_SW_RSSI_G = false) generate
+      
+      U_AxiLiteEmpty : entity work.AxiLiteEmpty
+         generic map (
+            TPD_G            => TPD_G,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         port map (
+            axiClk         => axilClk,
+            axiClkRst      => axilRst,
+            axiReadMaster  => axilReadMasters(SRP_INDEX_C),
+            axiReadSlave   => axilReadSlaves(SRP_INDEX_C),
+            axiWriteMaster => axilWriteMasters(SRP_INDEX_C),
+            axiWriteSlave  => axilWriteSlaves(SRP_INDEX_C));  
+
+      mAxilReadMasters(1)  <= AXI_LITE_READ_MASTER_INIT_C;
+      mAxilWriteMasters(1) <= AXI_LITE_WRITE_MASTER_INIT_C;
+      obBsaSlaves          <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibBsaMasters         <= (others => AXI_STREAM_MASTER_INIT_C);
+      obServerSlaves(1)    <= AXI_STREAM_SLAVE_FORCE_C;
+      ibServerMasters(1)   <= AXI_STREAM_MASTER_INIT_C;
+      
+   end generate;
 
    -----------------------
    -- BP Messenger Network
@@ -388,7 +425,7 @@ begin
             bpMsgBus        => bpMsgBus);
    end generate;
 
-   GEN_BYPASS : if (EN_BP_MSG_G = false) generate
+   BYPASS_BP_MSG : if (EN_BP_MSG_G = false) generate
       
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
          generic map (
