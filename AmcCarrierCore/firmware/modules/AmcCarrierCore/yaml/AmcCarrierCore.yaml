@@ -25,8 +25,16 @@ AmcCarrierCore: &AmcCarrierCore
   name: AmcCarrierCore
   description: AmcCarrierCore
   size: 0x80000000 # 2GB address space for core firmware
+  ########## 
+  registers:
+  ########## 
+    - address: 0x00000400
+      name: AMC_CARRIER_CORE_VERSION_C
+      mode: RO
+      description: AMC Carrier Core Version Number
+  ############
   peripherals:
-    ##################################################
+  ############
     - <<: *AxiVersion
       address: 0x00000000
     ##################################################

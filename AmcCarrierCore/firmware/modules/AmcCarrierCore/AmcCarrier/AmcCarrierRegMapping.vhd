@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-04-13
+-- Last update: 2016-04-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -295,6 +295,7 @@ begin
          axiRst         => axilRst,
          masterReset    => debugReset,
          upTimeCnt      => upTimeCnt,
+         userValues     => (others => AMC_CARRIER_CORE_VERSION_C),
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),

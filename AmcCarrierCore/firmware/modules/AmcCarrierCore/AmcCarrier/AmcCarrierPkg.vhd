@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-04-02
+-- Last update: 2016-04-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -30,6 +30,8 @@ use work.SsiPkg.all;
 use work.TimingPkg.all;
 
 package AmcCarrierPkg is
+
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000001";
 
    constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
