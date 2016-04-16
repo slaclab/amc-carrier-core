@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-03-16
+-- Last update: 2016-04-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -127,8 +127,6 @@ begin
    end generate NOT_TIMING_GEN_CLK;
 
    bsaTimingBus <= TIMING_BUS_INIT_C;
-
-   loopback <= "000";
 
    txUsrRst        <= not(txResetDone);
    appTimingPhyClk <= txUsrClk;
@@ -258,6 +256,7 @@ begin
          gtRxReset       => rxReset,
          gtRxResetDone   => rxResetDone,
          gtRxPolarity    => rxPolarity,
+         gtLoopback      => loopback,
          appTimingClk    => appTimingClk,
          appTimingRst    => appTimingRst,
          appTimingBus    => appBus,
