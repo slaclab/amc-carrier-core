@@ -61,8 +61,11 @@ entity AmcAxisDaqMux is
       devRst_i : in sl;
 
       -- External DAQ trigger input
-      trigHW_i : in sl;
-
+      trigHw_i : in sl;
+      
+      -- Sw trigger output for external connect between modules
+      trigSw_o : out sl;
+      
       -- AXI-Lite Register Interface
       axilReadMaster  : in  AxiLiteReadMasterType;
       axilReadSlave   : out AxiLiteReadSlaveType;
@@ -96,10 +99,12 @@ architecture rtl of AmcAxisDaqMux is
    -- Axi Stream
 
    -- Trigger conditioning
-   signal s_trigHw   : sl;
-   signal s_trigSw   : sl;
-   signal s_mode     : sl;
-   signal s_trigComb : sl;
+   signal s_trigHwMask  : sl;
+   signal s_trigHw      : sl;   
+   signal s_trigSw      : sl;
+   signal s_trigSwSync  : sl;
+   signal s_mode        : sl;
+   signal s_trigComb    : sl;
 
    -- Generate pause signal logic OR
    signal s_pauseVec    : slv(L_AXI_G-1 downto 0);
@@ -145,6 +150,7 @@ begin
          status_i => s_status,
 
          trigSw_o         => s_trigSw,
+         trigHwMask_o     => s_trigHwMask,
          rateDiv_o        => s_rateDiv,
          axisPacketSize_o => s_axisPacketSizeReg,
          muxSel_o         => s_muxSel,
@@ -155,7 +161,7 @@ begin
    -----------------------------------------------------------
 
    -- Synchronise external HW trigger input to devClk_i
-   Synchronizer_sysref_INST : entity work.Synchronizer
+   U_SynchronizerHW : entity work.Synchronizer
       generic map (
          TPD_G          => TPD_G,
          RST_POLARITY_G => '1',
@@ -170,10 +176,28 @@ begin
          dataIn  => trigHW_i,
          dataOut => s_trigHw
          );
+   
+   -- Synchronise SW trigger to equalize the delay between modules
+   U_SynchronizerSW : entity work.Synchronizer
+      generic map (
+         TPD_G          => TPD_G,
+         RST_POLARITY_G => '1',
+         OUT_POLARITY_G => '1',
+         RST_ASYNC_G    => false,
+         STAGES_G       => 2,
+         BYPASS_SYNC_G  => false,
+         INIT_G         => "0")
+      port map (
+         clk     => devClk_i,
+         rst     => s_trigSw,
+         dataIn  => trigHW_i,
+         dataOut => s_trigSwSync
+         );
 
    -- Combine both SW and HW triggers
-   s_trigComb <= s_trigHw or s_trigSw;
-
+   s_trigComb <= (s_trigHw and s_trigHwMask) or s_trigSwSync;
+   trigSw_o   <= s_trigSw;
+   
    -----------------------------------------------------------
    -- MULTIPLEXER logic
    -----------------------------------------------------------    

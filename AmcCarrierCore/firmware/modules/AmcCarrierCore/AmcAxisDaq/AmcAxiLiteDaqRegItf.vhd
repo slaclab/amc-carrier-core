@@ -10,7 +10,10 @@
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for DAQ
---               0x00 (W) - Trigger data acquisition on both AXI stream channels. Note: This is an Auto clear register!
+--               0x00 (RW) 
+--                   bit 2: - HW Trigger Mask
+--                   bit 1: - Mode (trigger or continuous)
+--                   bit 0: - Trigger data acquisition on both AXI stream channels. 
 --               0x02 (RW)- Sample rate divider(Decimator): 
 --                                  0 = Sample rate,
 --                                  1 = Sample rate/2,
@@ -76,6 +79,7 @@ entity AmcAxiLiteDaqRegItf is
 
       -- Control
       trigSw_o         : out sl;
+      trigHwMask_o     : out sl;
       mode_o           : out sl;
       axisPacketSize_o : out slv(31 downto 0);
       rateDiv_o        : out slv(15 downto 0);
@@ -87,7 +91,7 @@ architecture rtl of AmcAxiLiteDaqRegItf is
 
    type RegType is record
       -- JESD Control (RW)
-      commonCtrl     : slv(1 downto 0);
+      commonCtrl     : slv(2 downto 0);
       axisPacketSize : slv(axisPacketSize_o'range);
       rateDiv        : slv(15 downto 0);
       muxSel         : Slv4Array(L_AXI_G-1 downto 0);
@@ -98,7 +102,7 @@ architecture rtl of AmcAxiLiteDaqRegItf is
    end record;
    
    constant REG_INIT_C : RegType := (
-      commonCtrl     => "00",
+      commonCtrl     => "100",
       axisPacketSize => x"0030_0000",
       rateDiv        => x"0000",
       muxSel         => (x"2", x"1"),
@@ -139,7 +143,7 @@ begin
          axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
          case (s_WrAddr) is
             when 16#00# =>              -- ADDR (0)
-               v.commonCtrl := axilWriteMaster.wdata(1 downto 0);
+               v.commonCtrl := axilWriteMaster.wdata(2 downto 0);
             when 16#02# =>              -- ADDR (8)
                v.rateDiv := axilWriteMaster.wdata(15 downto 0);
             when 16#03# =>              -- ADDR (12)
@@ -161,7 +165,7 @@ begin
          v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0)
-               v.axilReadSlave.rdata(1 downto 0) := r.commonCtrl;
+               v.axilReadSlave.rdata(2 downto 0) := r.commonCtrl;
             when 16#02# =>              -- ADDR (8)
                v.axilReadSlave.rdata(15 downto 0) := r.rateDiv;
             when 16#03# =>              -- ADDR (12)
@@ -207,7 +211,7 @@ begin
 
    -- Input assignment and synchronisation
    GEN_0: for I in L_AXI_G-1 downto 0 generate
-      SyncFifo_IN0 : entity work.SynchronizerFifo
+      SyncFifo_IN : entity work.SynchronizerFifo
       generic map (
         TPD_G        => TPD_G,
         DATA_WIDTH_G => 32
@@ -219,9 +223,11 @@ begin
         dout   => s_status(I) 
       );
    end generate GEN_0;
-
+   
+   ------------------------------------------------
    -- Output assignment and synchronisation
-   Sync_OUT1 : entity work.Synchronizer
+   ------------------------------------------------   
+   Sync_OUT0 : entity work.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -232,8 +238,7 @@ begin
          dataOut => trigSw_o
          );
          
-   -- Output assignment and synchronisation
-   Sync_OUT2 : entity work.Synchronizer
+   Sync_OUT1 : entity work.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -243,9 +248,20 @@ begin
          dataIn  => r.commonCtrl(1),
          dataOut => mode_o
          );      
-         
+   
+   Sync_OUT2 : entity work.Synchronizer
+      generic map (
+         TPD_G => TPD_G
+         )
+      port map (
+         clk     => devClk_i,
+         rst     => devRst_i,
+         dataIn  => r.commonCtrl(2),
+         dataOut => trigHwMask_o
+         );
+   
 
-   SyncFifo_OUT2 : entity work.SynchronizerFifo
+   SyncFifo_OUT0 : entity work.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => axisPacketSize_o'length
@@ -257,7 +273,7 @@ begin
          dout   => axisPacketSize_o
          );
 
-   SyncFifo_OUT3 : entity work.SynchronizerFifo
+   SyncFifo_OUT1 : entity work.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 16
@@ -270,7 +286,7 @@ begin
          );
 
    GEN_1 : for I in L_AXI_G-1 downto 0 generate
-      SyncFifo_OUT0 : entity work.SynchronizerFifo
+      SyncFifo_OUT : entity work.SynchronizerFifo
          generic map (
             TPD_G        => TPD_G,
             DATA_WIDTH_G => 4
