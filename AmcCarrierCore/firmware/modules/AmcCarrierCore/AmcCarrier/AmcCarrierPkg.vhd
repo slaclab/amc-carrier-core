@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-04-15
+-- Last update: 2016-04-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -110,6 +110,7 @@ package AmcCarrierPkg is
       data          : Slv32Array(31 downto 0);
       timingMessage : TimingMessageType;
    end record;
+   type DiagnosticBusArray is array (natural range <>) of DiagnosticBusType;
    constant DIAGNOSTIC_BUS_INIT_C : DiagnosticBusType := (
       strobe        => '0',
       data          => (others => (others => '0')),
