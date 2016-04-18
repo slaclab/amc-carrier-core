@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-04-01
+-- Last update: 2016-04-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -68,10 +68,10 @@ architecture mapping of AmcCarrierEthRssi is
    signal rssiObMaster : AxiStreamMasterType;
    signal rssiObSlave  : AxiStreamSlaveType;
 
-   signal rssiIbMasters : AxiStreamMasterArray(3 downto 0);
-   signal rssiIbSlaves  : AxiStreamSlaveArray(3 downto 0);
-   signal rssiObMasters : AxiStreamMasterArray(3 downto 0);
-   signal rssiObSlaves  : AxiStreamSlaveArray(3 downto 0);
+   signal rssiIbMasters : AxiStreamMasterArray(4 downto 0);
+   signal rssiIbSlaves  : AxiStreamSlaveArray(4 downto 0);
+   signal rssiObMasters : AxiStreamMasterArray(4 downto 0);
+   signal rssiObSlaves  : AxiStreamSlaveArray(4 downto 0);
 
 begin
 
@@ -120,7 +120,7 @@ begin
    U_AxiStreamMux : entity work.AxiStreamMux
       generic map (
          TPD_G        => TPD_G,
-         NUM_SLAVES_G => 4)
+         NUM_SLAVES_G => 5)
       port map (
          -- Clock and reset
          axisClk      => axilClk,
@@ -135,7 +135,7 @@ begin
    U_AxiStreamDeMux : entity work.AxiStreamDeMux
       generic map (
          TPD_G         => TPD_G,
-         NUM_MASTERS_G => 4)
+         NUM_MASTERS_G => 5)
       port map (
          -- Clock and reset
          axisClk      => axilClk,
@@ -182,5 +182,11 @@ begin
    rssiObSlaves(3 downto 1)  <= ibBsaSlaves(2 downto 0);
    rssiIbMasters(3 downto 1) <= obBsaMasters(2 downto 0);
    obBsaSlaves(2 downto 0)   <= rssiIbSlaves(3 downto 1);
+
+   -------------------
+   -- Loopback Channel
+   -------------------
+   rssiIbMasters(4) <= rssiObMasters(4);
+   rssiObSlaves(4)  <= rssiIbSlaves(4);
    
 end mapping;
