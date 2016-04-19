@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-04-15
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -222,6 +222,12 @@ begin
          phyClk                 => open,
          phyRst                 => open,
          phyReady(0)            => phyReady,
+         -- Transceiver Debug Interface
+         gtTxPreCursor          => "01010",  -- 2.50 dB: Tuned for the RTM w/ AFBR-709SMZ
+         gtTxPostCursor         => "01010",  -- 2.50 dB: Tuned for the RTM w/ AFBR-709SMZ
+         gtTxDiffCtrl           => "1010",   -- 924 mV:  Tuned for the RTM w/ AFBR-709SMZ
+         gtRxPolarity           => '0',
+         gtTxPolarity           => '0',
          -- MGT Clock Port (156.25 MHz or 312.5 MHz)
          gtClkP                 => xauiClkP,
          gtClkN                 => xauiClkN,
