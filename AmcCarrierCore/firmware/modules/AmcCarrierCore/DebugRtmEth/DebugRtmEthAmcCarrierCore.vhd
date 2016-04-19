@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-04-15
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -321,7 +321,7 @@ begin
          -- Local Configuration
          localMac          => localMac,
          localIp           => localIp,
-         ethPhyReady       => ethPhyReady,
+         ethPhyReady       => ethLinkUp,
          -- Master AXI-Lite Interface
          mAxilReadMasters  => axilReadMasters,
          mAxilReadSlaves   => axilReadSlaves,
@@ -359,6 +359,8 @@ begin
          ethTxN            => ethTxN,
          xauiClkP          => xauiClkP,
          xauiClkN          => xauiClkN);
+
+   ethPhyReady <= ethLinkUp;
 
    ----------------------------------   
    -- Register Address Mapping Module
@@ -409,6 +411,7 @@ begin
          localMac          => bsiMac,
          localIp           => bsiIp,
          localAppId        => localAppId,
+         ethLinkUp         => ethLinkUp,
          ----------------------
          -- Top Level Interface
          ----------------------              

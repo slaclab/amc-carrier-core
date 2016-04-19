@@ -82,7 +82,7 @@ entity AmcCarrierRegMapping is
       localMac          : out   slv(47 downto 0);
       localIp           : out   slv(31 downto 0);
       localAppId        : out   slv(15 downto 0);
-      ethLinkUp         : in    sl;
+      ethLinkUp         : in    sl := '0';
       -- Misc.
       debugReset        : out   sl;
       ----------------------
