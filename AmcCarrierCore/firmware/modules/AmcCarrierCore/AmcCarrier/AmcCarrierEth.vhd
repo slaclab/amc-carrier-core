@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-04-15
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -195,6 +195,7 @@ begin
    U_Xaui : entity work.XauiGthUltraScaleWrapper
       generic map (
          TPD_G            => TPD_G,
+         EN_WDT_G         => true,
          -- XAUI Configurations
          XAUI_20GIGE_G    => false,
          REF_CLK_FREQ_G   => AXI_CLK_FREQ_C,
@@ -221,6 +222,7 @@ begin
          axiLiteWriteSlave  => axilWriteSlaves(PHY_INDEX_C),
          -- Misc. Signals
          extRst             => axilRst,
+         stableClk          => axilClk,
          phyClk             => open,
          phyRst             => open,
          phyReady           => phyReady,

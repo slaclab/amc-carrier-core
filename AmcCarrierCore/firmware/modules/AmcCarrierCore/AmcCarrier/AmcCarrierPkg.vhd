@@ -31,12 +31,13 @@ use work.TimingPkg.all;
 
 package AmcCarrierPkg is
 
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000002";
    ----------------
    -- Revision Log:
    ----------------
    -- 04/15/2016 (0x00000001): Initial Build
    -- 04/19/2016 (0x00000002): Added ETH status to BSI interface
+   -- 04/19/2016 (0x00000003): Added 10 second WDT to ETH Link Up
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000003";
 
    constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
