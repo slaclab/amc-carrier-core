@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-04-15
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -82,6 +82,7 @@ entity AmcCarrierRegMapping is
       localMac          : out   slv(47 downto 0);
       localIp           : out   slv(31 downto 0);
       localAppId        : out   slv(15 downto 0);
+      ethLinkUp         : in    sl;
       -- Misc.
       debugReset        : out   sl;
       ----------------------
@@ -514,6 +515,7 @@ begin
          localMac        => localMac,
          localIp         => localIp,
          localAppId      => localAppId,
+         ethLinkUp       => ethLinkUp,
          bootReq         => bootReq,
          bootAddr        => bootAddr,
          upTimeCnt       => upTimeCnt,

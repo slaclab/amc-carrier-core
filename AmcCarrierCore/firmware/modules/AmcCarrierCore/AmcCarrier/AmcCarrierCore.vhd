@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-04-15
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -246,6 +246,7 @@ architecture mapping of AmcCarrierCore is
    signal localMac   : slv(47 downto 0);
    signal localIp    : slv(31 downto 0);
    signal localAppId : slv(15 downto 0);
+   signal ethLinkUp  : sl;
 
 begin
 
@@ -321,7 +322,7 @@ begin
          -- Local Configuration
          localMac          => localMac,
          localIp           => localIp,
-         ethPhyReady       => ethPhyReady,
+         ethPhyReady       => ethLinkUp,
          -- Master AXI-Lite Interface
          mAxilReadMasters  => axilReadMasters,
          mAxilReadSlaves   => axilReadSlaves,
@@ -359,6 +360,8 @@ begin
          xauiTxN           => xauiTxN,
          xauiClkP          => xauiClkP,
          xauiClkN          => xauiClkN);
+
+   ethPhyReady <= ethLinkUp;
 
    ----------------------------------   
    -- Register Address Mapping Module
@@ -409,6 +412,7 @@ begin
          localMac          => bsiMac,
          localIp           => bsiIp,
          localAppId        => localAppId,
+         ethLinkUp         => ethLinkUp,
          ----------------------
          -- Top Level Interface
          ----------------------              

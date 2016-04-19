@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2016-04-13
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -46,6 +46,7 @@ entity AmcCarrierBsi is
       localMac        : out   slv(47 downto 0);
       localIp         : out   slv(31 downto 0);
       localAppId      : out   slv(15 downto 0);
+      ethLinkUp       : in    sl;
       bootReq         : out   sl;
       bootAddr        : out   slv(31 downto 0);
       upTimeCnt       : in    slv(31 downto 0);
@@ -256,8 +257,8 @@ begin
    --------------------- 
    -- AXI Lite Interface
    --------------------- 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrMemError, ddrMemReady, r, ramData,
-                   upTimeCnt) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrMemError, ddrMemReady, ethLinkUp, r,
+                   ramData, upTimeCnt) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
       variable i      : natural;
@@ -341,6 +342,7 @@ begin
                v.ramData(0) := ddrMemError;
             when x"F0" =>
                v.we         := '1';
+               v.ramData(1) := ethLinkUp;
                v.ramData(0) := ddrMemReady;
             ----------------------------------------
             -- Check for AxiVersion's Uptime Counter
