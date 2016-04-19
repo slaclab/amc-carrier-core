@@ -190,7 +190,7 @@ begin
       port map (
          clk     => devClk_i,
          rst     => devRst_i,
-         dataIn  => trigHW_i,
+         dataIn  => s_trigSw,
          dataOut => s_trigSwSync
          );
 
