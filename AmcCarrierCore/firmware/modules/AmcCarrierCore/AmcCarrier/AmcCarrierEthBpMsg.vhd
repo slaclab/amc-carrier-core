@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-03-02
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -161,6 +161,7 @@ begin
          U_RssiServer : entity work.RssiCoreWrapper
             generic map (
                TPD_G                   => TPD_G,
+               TDEST_SIZE_G            => 1,
                CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
                TIMEOUT_UNIT_G          => TIMEOUT_G,
                SERVER_G                => true,
@@ -173,25 +174,25 @@ begin
                TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
                INIT_SEQ_N_G            => 16#80#)
             port map (
-               clk_i            => axilClk,
-               rst_i            => axilRst,
+               clk_i                => axilClk,
+               rst_i                => axilRst,
                -- Application Layer Interface
-               sAppAxisMaster_i => bpMsgMasters(i),
-               sAppAxisSlave_o  => bpMsgSlaves(i),
-               mAppAxisMaster_o => open,
-               mAppAxisSlave_i  => AXI_STREAM_SLAVE_FORCE_C,
+               sAppAxisMasters_i(0) => bpMsgMasters(i),
+               sAppAxisSlaves_o(0)  => bpMsgSlaves(i),
+               mAppAxisMasters_o(0) => open,
+               mAppAxisSlaves_i(0)  => AXI_STREAM_SLAVE_FORCE_C,
                -- Transport Layer Interface
-               sTspAxisMaster_i => obServerMasters(i),
-               sTspAxisSlave_o  => obServerSlaves(i),
-               mTspAxisMaster_o => ibServerMasters(i),
-               mTspAxisSlave_i  => ibServerSlaves(i),
+               sTspAxisMaster_i     => obServerMasters(i),
+               sTspAxisSlave_o      => obServerSlaves(i),
+               mTspAxisMaster_o     => ibServerMasters(i),
+               mTspAxisSlave_i      => ibServerSlaves(i),
                -- AXI-Lite Interface
-               axiClk_i         => axilClk,
-               axiRst_i         => axilRst,
-               axilReadMaster   => axilReadMasters((2*i)+0),
-               axilReadSlave    => axilReadSlaves((2*i)+0),
-               axilWriteMaster  => axilWriteMasters((2*i)+0),
-               axilWriteSlave   => axilWriteSlaves((2*i)+0));
+               axiClk_i             => axilClk,
+               axiRst_i             => axilRst,
+               axilReadMaster       => axilReadMasters((2*i)+0),
+               axilReadSlave        => axilReadSlaves((2*i)+0),
+               axilWriteMaster      => axilWriteMasters((2*i)+0),
+               axilWriteSlave       => axilWriteSlaves((2*i)+0));
 
          ---------------------
          -- RSSI Client Module
@@ -199,6 +200,7 @@ begin
          U_RssiClient : entity work.RssiCoreWrapper
             generic map (
                TPD_G                   => TPD_G,
+               TDEST_SIZE_G            => 1,
                CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
                TIMEOUT_UNIT_G          => TIMEOUT_G,
                SERVER_G                => false,
@@ -211,25 +213,25 @@ begin
                TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
                INIT_SEQ_N_G            => 16#20#)
             port map (
-               clk_i            => axilClk,
-               rst_i            => axilRst,
+               clk_i                => axilClk,
+               rst_i                => axilRst,
                -- Application Layer Interface
-               sAppAxisMaster_i => AXI_STREAM_MASTER_INIT_C,
-               sAppAxisSlave_o  => open,
-               mAppAxisMaster_o => msgMasters(i),
-               mAppAxisSlave_i  => msgSlaves(i),
+               sAppAxisMasters_i(0) => AXI_STREAM_MASTER_INIT_C,
+               sAppAxisSlaves_o(0)  => open,
+               mAppAxisMasters_o(0) => msgMasters(i),
+               mAppAxisSlaves_i(0)  => msgSlaves(i),
                -- Transport Layer Interface
-               sTspAxisMaster_i => obClientMasters(i),
-               sTspAxisSlave_o  => obClientSlaves(i),
-               mTspAxisMaster_o => ibClientMasters(i),
-               mTspAxisSlave_i  => ibClientSlaves(i),
+               sTspAxisMaster_i     => obClientMasters(i),
+               sTspAxisSlave_o      => obClientSlaves(i),
+               mTspAxisMaster_o     => ibClientMasters(i),
+               mTspAxisSlave_i      => ibClientSlaves(i),
                -- AXI-Lite Interface
-               axiClk_i         => axilClk,
-               axiRst_i         => axilRst,
-               axilReadMaster   => axilReadMasters((2*i)+1),
-               axilReadSlave    => axilReadSlaves((2*i)+1),
-               axilWriteMaster  => axilWriteMasters((2*i)+1),
-               axilWriteSlave   => axilWriteSlaves((2*i)+1)); 
+               axiClk_i             => axilClk,
+               axiRst_i             => axilRst,
+               axilReadMaster       => axilReadMasters((2*i)+1),
+               axilReadSlave        => axilReadSlaves((2*i)+1),
+               axilWriteMaster      => axilWriteMasters((2*i)+1),
+               axilWriteSlave       => axilWriteSlaves((2*i)+1)); 
       end generate;
 
       -----------------------

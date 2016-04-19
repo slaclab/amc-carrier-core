@@ -58,10 +58,10 @@ entity AmcCarrierEth is
       axilWriteMaster   : in  AxiLiteWriteMasterType;
       axilWriteSlave    : out AxiLiteWriteSlaveType;
       -- BSA Ethernet Interface
-      obBsaMasters      : in  AxiStreamMasterArray(2 downto 0);
-      obBsaSlaves       : out AxiStreamSlaveArray(2 downto 0);
-      ibBsaMasters      : out AxiStreamMasterArray(2 downto 0);
-      ibBsaSlaves       : in  AxiStreamSlaveArray(2 downto 0);
+      obBsaMasters      : in  AxiStreamMasterArray(3 downto 0);
+      obBsaSlaves       : out AxiStreamSlaveArray(3 downto 0);
+      ibBsaMasters      : out AxiStreamMasterArray(3 downto 0);
+      ibBsaSlaves       : in  AxiStreamSlaveArray(3 downto 0);
       -- Backplane Messaging Interface
       bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
       bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
@@ -88,19 +88,19 @@ architecture mapping of AmcCarrierEth is
 
    constant RSSI_TIMEOUT_C : real     := 1.0E-3;  -- In units of seconds
    constant MTU_C          : positive := 1500;
-   constant SERVER_SIZE_C  : positive := 4;
+   constant SERVER_SIZE_C  : positive := 6;
    constant CLIENT_SIZE_C  : positive := 2;
 
    constant NUM_AXI_MASTERS_C : natural := 4;
 
    constant PHY_INDEX_C    : natural := 0;
    constant UDP_INDEX_C    : natural := 1;
-   constant SRP_INDEX_C    : natural := 2;
+   constant RSSI_INDEX_C   : natural := 2;
    constant BP_MSG_INDEX_C : natural := 3;
 
    constant PHY_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00000000");
    constant UDP_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00010000");
-   constant SRP_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00020000");
+   constant RSSI_ADDR_C   : slv(31 downto 0) := (XAUI_ADDR_C + x"00020000");
    constant BP_MSG_ADDR_C : slv(31 downto 0) := (XAUI_ADDR_C + x"00030000");
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
@@ -112,8 +112,8 @@ architecture mapping of AmcCarrierEth is
          baseAddr     => UDP_ADDR_C,
          addrBits     => 16,
          connectivity => X"FFFF"),
-      SRP_INDEX_C     => (
-         baseAddr     => SRP_ADDR_C,
+      RSSI_INDEX_C    => (
+         baseAddr     => RSSI_ADDR_C,
          addrBits     => 16,
          connectivity => X"FFFF"),
       BP_MSG_INDEX_C  => (
@@ -302,7 +302,7 @@ begin
          rst             => axilRst);
 
    ---------------------------------------------
-   -- Legacy AXI-Lite Master without RSSI Server
+   -- Legacy AXI-Lite Master without RSSI Server@8192
    ---------------------------------------------
    U_SRPv0 : entity work.SrpV0AxiLite
       generic map (
@@ -332,22 +332,23 @@ begin
          mAxiLiteWriteSlave  => mAxilWriteSlaves(0));   
 
    -----------------------------------
-   -- Software's RSSI Server Interface
+   -- Software's RSSI Server Interface@[8194:8193]
    -----------------------------------
    GEN_SW_RSSI : if (EN_SW_RSSI_G = true) generate
       U_RssiServer : entity work.AmcCarrierEthRssi
          generic map (
             TPD_G            => TPD_G,
             TIMEOUT_G        => RSSI_TIMEOUT_C,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            AXI_BASE_ADDR_G  => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr) 
          port map (
             -- Slave AXI-Lite Interface
             axilClk          => axilClk,
             axilRst          => axilRst,
-            axilReadMaster   => axilReadMasters(SRP_INDEX_C),
-            axilReadSlave    => axilReadSlaves(SRP_INDEX_C),
-            axilWriteMaster  => axilWriteMasters(SRP_INDEX_C),
-            axilWriteSlave   => axilWriteSlaves(SRP_INDEX_C),
+            axilReadMaster   => axilReadMasters(RSSI_INDEX_C),
+            axilReadSlave    => axilReadSlaves(RSSI_INDEX_C),
+            axilWriteMaster  => axilWriteMasters(RSSI_INDEX_C),
+            axilWriteSlave   => axilWriteSlaves(RSSI_INDEX_C),
             -- Master AXI-Lite Interface
             mAxilReadMaster  => mAxilReadMasters(1),
             mAxilReadSlave   => mAxilReadSlaves(1),
@@ -359,10 +360,10 @@ begin
             ibBsaMasters     => ibBsaMasters,
             ibBsaSlaves      => ibBsaSlaves,
             -- Interface to UDP Server engines
-            obServerMaster   => obServerMasters(1),
-            obServerSlave    => obServerSlaves(1),
-            ibServerMaster   => ibServerMasters(1),
-            ibServerSlave    => ibServerSlaves(1));   
+            obServerMasters  => obServerMasters(2 downto 1),
+            obServerSlaves   => obServerSlaves(2 downto 1),
+            ibServerMasters  => ibServerMasters(2 downto 1),
+            ibServerSlaves   => ibServerSlaves(2 downto 1));   
    end generate;
 
    BYPASS_SW_RSSI : if (EN_SW_RSSI_G = false) generate
@@ -374,23 +375,29 @@ begin
          port map (
             axiClk         => axilClk,
             axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(SRP_INDEX_C),
-            axiReadSlave   => axilReadSlaves(SRP_INDEX_C),
-            axiWriteMaster => axilWriteMasters(SRP_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(SRP_INDEX_C));  
+            axiReadMaster  => axilReadMasters(RSSI_INDEX_C),
+            axiReadSlave   => axilReadSlaves(RSSI_INDEX_C),
+            axiWriteMaster => axilWriteMasters(RSSI_INDEX_C),
+            axiWriteSlave  => axilWriteSlaves(RSSI_INDEX_C));  
 
-      mAxilReadMasters(1)  <= AXI_LITE_READ_MASTER_INIT_C;
-      mAxilWriteMasters(1) <= AXI_LITE_WRITE_MASTER_INIT_C;
-      obBsaSlaves          <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibBsaMasters         <= (others => AXI_STREAM_MASTER_INIT_C);
-      obServerSlaves(1)    <= AXI_STREAM_SLAVE_FORCE_C;
-      ibServerMasters(1)   <= AXI_STREAM_MASTER_INIT_C;
+      mAxilReadMasters(1)         <= AXI_LITE_READ_MASTER_INIT_C;
+      mAxilWriteMasters(1)        <= AXI_LITE_WRITE_MASTER_INIT_C;
+      obBsaSlaves                 <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibBsaMasters                <= (others => AXI_STREAM_MASTER_INIT_C);
+      obServerSlaves(2 downto 1)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibServerMasters(2 downto 1) <= (others => AXI_STREAM_MASTER_INIT_C);
       
    end generate;
 
-   -----------------------
-   -- BP Messenger Network
-   -----------------------
+   --------------------
+   -- Loopback UDP@8195
+   --------------------
+   ibServerMasters(3) <= obServerMasters(3);
+   obServerSlaves(3)  <= ibServerSlaves(3);
+
+   -----------------------------------
+   -- BP Messenger Network@[8197:8196]
+   -----------------------------------
    GEN_BP_MSG : if (EN_BP_MSG_G = true) generate
       U_BpMsg : entity work.AmcCarrierEthBpMsg
          generic map(
@@ -408,10 +415,10 @@ begin
             axilWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
             axilWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C),
             -- Interface to UDP Server engines
-            obServerMasters => obServerMasters(3 downto 2),
-            obServerSlaves  => obServerSlaves(3 downto 2),
-            ibServerMasters => ibServerMasters(3 downto 2),
-            ibServerSlaves  => ibServerSlaves(3 downto 2),
+            obServerMasters => obServerMasters(5 downto 4),
+            obServerSlaves  => obServerSlaves(5 downto 4),
+            ibServerMasters => ibServerMasters(5 downto 4),
+            ibServerSlaves  => ibServerSlaves(5 downto 4),
             -- Interface to UDP Client engines
             obClientMasters => obClientMasters,
             obClientSlaves  => obClientSlaves,
@@ -429,7 +436,7 @@ begin
             bpMsgBus        => bpMsgBus);
    end generate;
 
-   GEN_BYPASS : if (EN_BP_MSG_G = false) generate
+   BYPASS_BP_MSG : if (EN_BP_MSG_G = false) generate
       
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
          generic map (
@@ -443,8 +450,8 @@ begin
             axiWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
             axiWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C));    
 
-      obServerSlaves(3 downto 2)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibServerMasters(3 downto 2) <= (others => AXI_STREAM_MASTER_INIT_C);
+      obServerSlaves(5 downto 4)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibServerMasters(5 downto 4) <= (others => AXI_STREAM_MASTER_INIT_C);
       obClientSlaves              <= (others => AXI_STREAM_SLAVE_FORCE_C);
       ibClientMasters             <= (others => AXI_STREAM_MASTER_INIT_C);
       bpMsgSlaves                 <= (others => AXI_STREAM_SLAVE_FORCE_C);
@@ -453,3 +460,4 @@ begin
    end generate;
 
 end mapping;
+

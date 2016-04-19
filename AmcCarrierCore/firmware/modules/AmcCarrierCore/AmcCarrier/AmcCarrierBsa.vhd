@@ -2,10 +2,10 @@
 -- Title      : 
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierBsa.vhd
--- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
+-- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-04-18
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierRegPkg.all;
-
 
 entity AmcCarrierBsa is
    generic (
@@ -59,10 +58,10 @@ entity AmcCarrierBsa is
       axiReadMaster        : out AxiReadMasterType;
       axiReadSlave         : in  AxiReadSlaveType;
       -- Ethernet Interface (axilClk domain)
-      obBsaMasters         : out AxiStreamMasterArray(2 downto 0);
-      obBsaSlaves          : in  AxiStreamSlaveArray(2 downto 0);
-      ibBsaMasters         : in  AxiStreamMasterArray(2 downto 0);
-      ibBsaSlaves          : out AxiStreamSlaveArray(2 downto 0);
+      obBsaMasters         : out AxiStreamMasterArray(3 downto 0);
+      obBsaSlaves          : in  AxiStreamSlaveArray(3 downto 0);
+      ibBsaMasters         : in  AxiStreamMasterArray(3 downto 0);
+      ibBsaSlaves          : out AxiStreamSlaveArray(3 downto 0);
       -- BSA Interface (bsaTimingClk domain)
       -- Unused
       bsaTimingClk         : in  sl;
@@ -100,7 +99,7 @@ architecture mapping of AmcCarrierBsa is
    signal mAxilWriteSlave  : AxiLiteWriteSlaveType;
    signal mAxilReadMaster  : AxiLiteReadMasterType;
    signal mAxilReadSlave   : AxiLiteReadSlaveType;
-   
+
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(AXIL_MASTERS_C-1 downto 0);
    signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(AXIL_MASTERS_C-1 downto 0);
    signal locAxilReadMasters  : AxiLiteReadMasterArray(AXIL_MASTERS_C-1 downto 0);
@@ -159,6 +158,9 @@ architecture mapping of AmcCarrierBsa is
 
 begin
 
+   obBsaMasters(3) <= AXI_STREAM_MASTER_INIT_C;
+   ibBsaSlaves(3)  <= AXI_STREAM_SLAVE_FORCE_C;
+
    -- FSBL build has no BSA logic.
    FSBL_GEN : if (FSBL_G) generate
       U_AxiLiteEmpty_1 : entity work.AxiLiteEmpty
@@ -195,7 +197,7 @@ begin
             axiClk              => axilClk,              -- [in]
             axiClkRst           => axilRst,              -- [in]
             sAxiWriteMasters(0) => axilWriteMaster,      -- [in]
-            sAxiWriteMasters(1) => mAxilWriteMaster,      -- [in]
+            sAxiWriteMasters(1) => mAxilWriteMaster,     -- [in]
             sAxiWriteSlaves(0)  => axilWriteSlave,       -- [out]
             sAxiWriteSlaves(1)  => mAxilWriteSlave,      -- [out]
             sAxiReadMasters(0)  => axilReadMaster,       -- [in]
