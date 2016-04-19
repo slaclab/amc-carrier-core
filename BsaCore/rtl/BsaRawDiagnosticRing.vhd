@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-03-09
+-- Last update: 2016-04-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ architecture rtl of BsaRawDiagnosticRing is
 
 begin
 
-   diagnosticRawCtrl <= (others => AXI_STREAM_CTRL_INIT_C);
+   diagnosticRawCtrl <= (others => AXI_STREAM_CTRL_UNUSED_C);
 
    -- Input fifos
    -- These should probably be 4k deep for best throughput
