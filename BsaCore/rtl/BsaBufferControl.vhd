@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-03-15
+-- Last update: 2016-03-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -43,9 +43,7 @@ entity BsaBufferControl is
    generic (
       TPD_G                   : time                      := 1 ns;
       AXIL_BASE_ADDR_G        : slv(31 downto 0)          := (others => '0');
-      AXIL_AXI_ASYNC_G        : boolean                   := true;
       BSA_BUFFERS_G           : natural range 1 to 64     := 64;
-      BSA_ACCUM_FLOAT_G       : boolean                   := true;
       BSA_STREAM_BYTE_WIDTH_G : integer range 4 to 128    := 4;
       DIAGNOSTIC_OUTPUTS_G    : integer range 1 to 32     := 28;
       BSA_BURST_BYTES_G       : integer range 128 to 4096 := 2048;
@@ -257,7 +255,6 @@ begin
          generic map (
             TPD_G               => TPD_G,
             BSA_NUMBER_G        => i,
-            BSA_ACCUM_FLOAT_G   => BSA_ACCUM_FLOAT_G,
             NUM_ACCUMULATIONS_G => NUM_ACCUMULATIONS_C,
             FRAME_SIZE_BYTES_G  => BSA_BURST_BYTES_G,
             AXIS_CONFIG_G       => BSA_STREAM_CONFIG_C)
@@ -379,22 +376,6 @@ begin
          mAxisMaster => lastFifoAxisMaster,  -- [out]
          mAxisSlave  => lastFifoAxisSlave);  -- [in]
 
-   -- Synchronize the buffer clear (init) commands to the axil clk
-   U_SynchronizerFifo_BufferClear : entity work.SynchronizerFifo
-      generic map (
-         TPD_G        => TPD_G,
-         COMMON_CLK_G => not AXIL_AXI_ASYNC_G,
-         DATA_WIDTH_G => BSA_ADDR_BITS_C,
-         ADDR_WIDTH_G => 6)
-      port map (
-         rst    => axiRst,              -- [in]
-         wr_clk => axiClk,              -- [in]
-         wr_en  => timeStampRamWe,      -- [in]
-         din    => r.adderCount,        -- [in]
-         rd_clk => axilClk,             -- [in]
-         valid  => bufferClearEn,       -- [out]
-         dout   => bufferClear);        -- [out]
-
 
    U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
       generic map (
@@ -402,7 +383,6 @@ begin
          BUFFERS_G                  => BSA_BUFFERS_G,
          BURST_SIZE_BYTES_G         => BSA_BURST_BYTES_G,
          TRIGGER_USER_BIT_G         => 0,
-         AXIL_AXI_ASYNC_G           => AXIL_AXI_ASYNC_G,
          AXIL_BASE_ADDR_G           => DMA_RING_BASE_ADDR_C,
          DATA_AXI_STREAM_CONFIG_G   => LAST_STREAM_CONFIG_C,
          STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8),
@@ -414,14 +394,14 @@ begin
          axilReadSlave    => locAxilReadSlaves(DMA_RING_AXIL_C),    -- [out]
          axilWriteMaster  => locAxilWriteMasters(DMA_RING_AXIL_C),  -- [in]
          axilWriteSlave   => locAxilWriteSlaves(DMA_RING_AXIL_C),   -- [out]
-         bufferClear      => bufferClear,                           -- [in]
-         bufferClearEn    => bufferClearEn,                         -- [in]
-         axisStatusClk    => axisStatusClk,
-         axisStatusRst    => axisStatusRst,
-         axisStatusMaster => axisStatusMaster,
-         axisStatusSlave  => axisStatusSlave,
+         axisStatusClk    => axisStatusClk,                         -- [in]
+         axisStatusRst    => axisStatusRst,                         -- [in]
+         axisStatusMaster => axisStatusMaster,                      -- [out]
+         axisStatusSlave  => axisStatusSlave,                       -- [in]
          axiClk           => axiClk,                                -- [in]
          axiRst           => axiRst,                                -- [in]
+         bufferClearEn    => timeStampRamWe,                        -- [in]
+         bufferClear      => r.adderCount,                          -- [in]
          axisDataMaster   => lastFifoAxisMaster,                    -- [in]
          axisDataSlave    => lastFifoAxisSlave,                     -- [out]
          axiWriteMaster   => axiWriteMaster,                        -- [out]

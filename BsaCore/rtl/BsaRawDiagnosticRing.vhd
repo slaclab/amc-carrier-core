@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-04-19
+-- Last update: 2016-03-24
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -30,7 +30,6 @@ entity BsaRawDiagnosticRing is
       DIAGNOSTIC_RAW_STREAMS_G : positive range 1 to 8 := 1;
       DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray  := (0      => ssiAxiStreamConfig(4));
       AXIL_BASE_ADDR_G         : slv(31 downto 0)      := (others => '0');
-      AXIL_AXI_ASYNC_G         : boolean               := true;
       AXI_CONFIG_G             : AxiConfigType         := axiConfig(33, 16, 1, 8)
       );
    port (
@@ -85,30 +84,26 @@ architecture rtl of BsaRawDiagnosticRing is
    signal muxOutAxisMaster : AxiStreamMasterType := INTERNAL_AXIS_MASTER_INIT_C;
    signal muxOutAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
 
+   signal bufferDone : slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
 
 begin
-
-   diagnosticRawCtrl <= (others => AXI_STREAM_CTRL_UNUSED_C);
 
    -- Input fifos
    -- These should probably be 4k deep for best throughput
    AXIS_IN_FIFOS : for i in DIAGNOSTIC_RAW_STREAMS_G-1 downto 0 generate
       AxiStreamFifo : entity work.AxiStreamFifo
          generic map (
-            TPD_G => TPD_G,
-
-            SLAVE_READY_EN_G => true,
-            VALID_THOLD_G    => 0,
-            BRAM_EN_G        => true,
-            XIL_DEVICE_G     => "ULTRASCALE",
-
+            TPD_G               => TPD_G,
+            SLAVE_READY_EN_G    => true,
+            VALID_THOLD_G       => 0,
+            BRAM_EN_G           => true,
+            XIL_DEVICE_G        => "ULTRASCALE",
             USE_BUILT_IN_G      => false,
             GEN_SYNC_FIFO_G     => false,
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 9,
             FIFO_FIXED_THRESH_G => true,
-            FIFO_PAUSE_THRESH_G => 1,   --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
-
+            FIFO_PAUSE_THRESH_G => 1,                       --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
             SLAVE_AXI_CONFIG_G  => DIAGNOSTIC_RAW_CONFIGS_G(i),
             MASTER_AXI_CONFIG_G => INTERNAL_AXIS_CONFIG_C)  -- 128-bit
          port map (
@@ -145,14 +140,13 @@ begin
    -------------------------------------------------------------------------------------------------
    U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
       generic map (
-         TPD_G                    => TPD_G,
-         BUFFERS_G                => DIAGNOSTIC_RAW_STREAMS_G,
-         BURST_SIZE_BYTES_G       => 4096,
-         AXIL_AXI_ASYNC_G         => AXIL_AXI_ASYNC_G,
-         AXIL_BASE_ADDR_G         => AXIL_BASE_ADDR_G,
-         DATA_AXI_STREAM_CONFIG_G => INTERNAL_AXIS_CONFIG_C,
+         TPD_G                      => TPD_G,
+         BUFFERS_G                  => DIAGNOSTIC_RAW_STREAMS_G,
+         BURST_SIZE_BYTES_G         => 4096,
+         AXIL_BASE_ADDR_G           => AXIL_BASE_ADDR_G,
+         DATA_AXI_STREAM_CONFIG_G   => INTERNAL_AXIS_CONFIG_C,
          STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8),
-         AXI_WRITE_CONFIG_G       => AXI_CONFIG_G)
+         AXI_WRITE_CONFIG_G         => AXI_CONFIG_G)
       port map (
          axilClk          => axilClk,           -- [in]
          axilRst          => axilRst,           -- [in]
@@ -166,10 +160,25 @@ begin
          axisStatusSlave  => axisStatusSlave,
          axiClk           => axiClk,            -- [in]
          axiRst           => axiRst,            -- [in]
+         bufferDone       => bufferDone,        -- [out]
          axisDataMaster   => muxOutAxisMaster,  -- [in]
          axisDataSlave    => muxOutAxisSlave,   -- [out]
          axiWriteMaster   => axiWriteMaster,    -- [out]
          axiWriteSlave    => axiWriteSlave);    -- [in]
+
+   -- Synchronize bufferDone back to raw clocks and use as ctrl.pause
+   BUFFER_DONE_PAUSE : for i in DIAGNOSTIC_RAW_STREAMS_G-1 downto 0 generate
+      U_Synchronizer_1 : entity work.Synchronizer
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => diagnosticRawClks(i),         -- [in]
+            rst     => diagnosticRawRsts(i),         -- [in]
+            dataIn  => bufferDone(i),                -- [in]
+            dataOut => diagnosticRawCtrl(i).pause);  -- [out]
+      diagnosticRawCtrl(i).overflow <= '0';
+      diagnosticRawCtrl(i).idle     <= '0';
+   end generate BUFFER_DONE_PAUSE;
 
 
 end architecture rtl;

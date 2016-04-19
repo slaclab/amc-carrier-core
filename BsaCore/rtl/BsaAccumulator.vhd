@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-03-01
+-- Last update: 2016-03-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,7 +37,6 @@ entity BsaAccumulator is
    generic (
       TPD_G               : time                      := 1 ns;
       BSA_NUMBER_G        : integer range 0 to 64     := 0;
-      BSA_ACCUM_FLOAT_G   : boolean                   := true;
       NUM_ACCUMULATIONS_G : integer range 1 to 32     := 32;
       FRAME_SIZE_BYTES_G  : integer range 128 to 4096 := 2048;
       AXIS_CONFIG_G       : AxiStreamConfigType       := ssiAxiStreamConfig(4));
