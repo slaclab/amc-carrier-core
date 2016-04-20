@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-04-19
+-- Last update: 2016-04-20
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -42,8 +42,8 @@ entity DebugRtmEth is
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration and status
-      localMac          : in  slv(47 downto 0);  --  big-Endian configuration
-      localIp           : in  slv(31 downto 0);  --  big-Endian configuration   
+      localMac          : in  slv(47 downto 0);           --  big-Endian configuration
+      localIp           : in  slv(31 downto 0);           --  big-Endian configuration   
       ethPhyReady       : out sl;
       -- Master AXI-Lite Interface
       mAxilReadMasters  : out AxiLiteReadMasterArray(1 downto 0);
@@ -65,12 +65,18 @@ entity DebugRtmEth is
       -- Backplane Messaging Interface
       bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
       bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
+      -- Transceiver Debug Interface
+      gtTxPreCursor     : in  slv(4 downto 0) := "11111";  -- 6.02 dB: Tuned for the RTM w/ AFBR-709SMZ
+      gtTxPostCursor    : in  slv(4 downto 0) := "11111";  -- 12.96 dB: Tuned for the RTM w/ AFBR-709SMZ
+      gtTxDiffCtrl      : in  slv(3 downto 0) := "1111";  --  1.122 V:  Tuned for the RTM w/ AFBR-709SMZ
+      gtRxPolarity      : in  sl              := '0';
+      gtTxPolarity      : in  sl              := '0';
       ----------------------
       -- Top Level Interface
       ----------------------
       -- Backplane Messaging Interface (bpMsgClk domain)
-      bpMsgClk          : in  sl := '0';
-      bpMsgRst          : in  sl := '0';
+      bpMsgClk          : in  sl              := '0';
+      bpMsgRst          : in  sl              := '0';
       bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
       ----------------
       -- Core Ports --
@@ -219,15 +225,13 @@ begin
          axiLiteWriteSlaves(0)  => axilWriteSlaves(PHY_INDEX_C),
          -- Misc. Signals
          extRst                 => axilRst,
-         phyClk                 => open,
-         phyRst                 => open,
          phyReady(0)            => phyReady,
          -- Transceiver Debug Interface
-         gtTxPreCursor          => "01010",  -- 2.50 dB: Tuned for the RTM w/ AFBR-709SMZ
-         gtTxPostCursor         => "01010",  -- 2.50 dB: Tuned for the RTM w/ AFBR-709SMZ
-         gtTxDiffCtrl           => "1010",   -- 924 mV:  Tuned for the RTM w/ AFBR-709SMZ
-         gtRxPolarity           => '0',
-         gtTxPolarity           => '0',
+         gtTxPreCursor          => gtTxPreCursor,
+         gtTxPostCursor         => gtTxPostCursor,
+         gtTxDiffCtrl           => gtTxDiffCtrl,
+         gtRxPolarity           => gtRxPolarity,
+         gtTxPolarity           => gtTxPolarity,
          -- MGT Clock Port (156.25 MHz or 312.5 MHz)
          gtClkP                 => xauiClkP,
          gtClkN                 => xauiClkN,
