@@ -232,10 +232,10 @@ architecture mapping of DebugRtmEthAmcCarrierCore is
    signal mpsWriteMaster : AxiLiteWriteMasterType;
    signal mpsWriteSlave  : AxiLiteWriteSlaveType;
 
-   signal obBsaMasters : AxiStreamMasterArray(2 downto 0);
-   signal obBsaSlaves  : AxiStreamSlaveArray(2 downto 0);
-   signal ibBsaMasters : AxiStreamMasterArray(2 downto 0);
-   signal ibBsaSlaves  : AxiStreamSlaveArray(2 downto 0);
+   signal obBsaMasters : AxiStreamMasterArray(3 downto 0);
+   signal obBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
+   signal ibBsaMasters : AxiStreamMasterArray(3 downto 0);
+   signal ibBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
 
    signal bpMsgMasters : AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
    signal bpMsgSlaves  : AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
