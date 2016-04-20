@@ -266,7 +266,7 @@ begin
          TPD_G                      => TPD_G,
          BUFFERS_G                  => DIAGNOSTIC_RAW_STREAMS_G,
          BURST_SIZE_BYTES_G         => 4096,
-         AXIL_AXI_ASYNC_G           => false,
+         --AXIL_AXI_ASYNC_G           => false,
          AXIL_BASE_ADDR_G           => AXIL_BASE_ADDR_G,
          DATA_AXI_STREAM_CONFIG_G   => WRITE_AXIS_CONFIG_C,
          STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8),
