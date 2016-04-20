@@ -40,7 +40,8 @@ package AmcCarrierPkg is
    -- 04/19/2016 (0x00000004): In AmcCarrierEth, separating the RSSI's memory access and data paths 
    --                          from the ASYNC messaging and register access as a work around until 
    --                          AXIS packetizer (A.K.A. "chunker") supports interleaving of TDEST frames 
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000004";
+   -- 04/19/2016 (0x00000005): In AmcCarrierRegPkg, defaulting MPS Link node's XBAR configurations to XBAR_TIME_GEN_C 
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000005";
 
    constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);

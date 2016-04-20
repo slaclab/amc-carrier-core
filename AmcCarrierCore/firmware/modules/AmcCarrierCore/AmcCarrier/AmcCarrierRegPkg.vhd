@@ -84,13 +84,14 @@ package body AmcCarrierRegPkg is
          retVar := XBAR_TIME_GEN_C;
       -- Check for MPS Link Node
       elsif (app = APP_MPS_LINK_AIN_TYPE_C) or (app = APP_MPS_LINK_DIN_TYPE_C) or (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         -- Check for LCLS-I timing
-         if (sel = TIMING_MODE_119MHZ_C) then
-            retVar := XBAR_MPS_I_LINK_C;
-         -- Check for LCLS-II timing
-         else
-            retVar := XBAR_MPS_II_LINK_C;
-         end if;
+         retVar := XBAR_TIME_GEN_C;
+         -- -- Check for LCLS-I timing
+         -- if (sel = TIMING_MODE_119MHZ_C) then
+            -- retVar := XBAR_MPS_I_LINK_C;
+         -- -- Check for LCLS-II timing
+         -- else
+            -- retVar := XBAR_MPS_II_LINK_C;
+         -- end if;
       else
          -- Else Application Node
          retVar := XBAR_APP_NODE_C;
