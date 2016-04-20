@@ -246,6 +246,7 @@ architecture mapping of DebugRtmEthAmcCarrierCore is
    signal localMac   : slv(47 downto 0);
    signal localIp    : slv(31 downto 0);
    signal localAppId : slv(15 downto 0);
+   signal ethLinkUp  : sl;
 
 begin
 
