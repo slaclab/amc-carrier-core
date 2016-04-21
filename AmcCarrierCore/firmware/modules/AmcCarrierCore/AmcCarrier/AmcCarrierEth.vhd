@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-04-19
+-- Last update: 2016-04-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -223,9 +223,13 @@ begin
          -- Misc. Signals
          extRst             => axilRst,
          stableClk          => axilClk,
-         phyClk             => open,
-         phyRst             => open,
          phyReady           => phyReady,
+         -- Transceiver Debug Interface
+         gtTxPreCursor      => (others => '0'),  -- 0 dB
+         gtTxPostCursor     => (others => '0'),  -- 0 dB
+         gtTxDiffCtrl       => x"FFFF",          -- 1.080 V
+         gtRxPolarity       => x"0",
+         gtTxPolarity       => x"0",
          -- MGT Clock Port (156.25 MHz)
          gtClkP             => xauiClkP,
          gtClkN             => xauiClkN,
