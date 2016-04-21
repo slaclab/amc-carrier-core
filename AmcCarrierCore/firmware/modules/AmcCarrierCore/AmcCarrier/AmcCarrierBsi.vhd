@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2016-04-19
+-- Last update: 2016-04-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -72,6 +72,8 @@ architecture rtl of AmcCarrierBsi is
    constant BSI_MAJOR_VERSION_C : slv(7 downto 0) := x"01";
    constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"01";
 
+   constant TIMEOUT_1HZ_C : natural := (getTimeRatio(1.0, 6.4E-9) -1);
+
    type RomType is array (0 to 255) of slv(7 downto 0);
 
    function makeStringRom return RomType is
@@ -100,6 +102,8 @@ architecture rtl of AmcCarrierBsi is
    end function;
 
    type RegType is record
+      ethUpTimeCnt   : slv(31 downto 0);
+      timer          : natural range 0 to TIMEOUT_1HZ_C;
       cnt            : slv(3 downto 0);
       addr           : slv(7 downto 0);
       we             : sl;
@@ -115,6 +119,8 @@ architecture rtl of AmcCarrierBsi is
    end record;
 
    constant REG_INIT_C : RegType := (
+      ethUpTimeCnt   => (others => '0'),
+      timer          => 0,
       cnt            => x"0",
       addr           => x"00",
       we             => '0',
@@ -359,6 +365,21 @@ begin
             when x"EC" =>
                v.we      := '1';
                v.ramData := upTimeCnt(7 downto 0);
+            --------------------------------------
+            -- Check for Ethernet's Uptime Counter
+            --------------------------------------            
+            when x"EB" =>
+               v.we      := '1';
+               v.ramData := r.ethUpTimeCnt(31 downto 24);
+            when x"EA" =>
+               v.we      := '1';
+               v.ramData := r.ethUpTimeCnt(23 downto 16);
+            when x"E9" =>
+               v.we      := '1';
+               v.ramData := r.ethUpTimeCnt(15 downto 8);
+            when x"E8" =>
+               v.we      := '1';
+               v.ramData := r.ethUpTimeCnt(7 downto 0);
             ---------------------------------------
             when others =>
                if (index < BSI_MAC_SIZE_C) then
@@ -395,9 +416,23 @@ begin
       axiSlaveRegisterR(regCon, x"88", 0, r.bootAddr);
       axiSlaveRegisterR(regCon, x"8C", 0, BSI_MINOR_VERSION_C);
       axiSlaveRegisterR(regCon, x"90", 8, BSI_MAJOR_VERSION_C);
+      axiSlaveRegisterR(regCon, x"94", 0, r.ethUpTimeCnt);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+
+      --------------------------
+      -- Ethernet Uptime counter
+      --------------------------
+      if ethLinkUp = '0' then
+         v.timer        := 0;
+         v.ethUpTimeCnt := (others => '0');
+      elsif r.timer = TIMEOUT_1HZ_C then
+         v.timer        := 0;
+         v.ethUpTimeCnt := r.ethUpTimeCnt + 1;
+      else
+         v.timer := r.timer + 1;
+      end if;
 
       -- Synchronous Reset
       if (axilRst = '1') then

@@ -42,7 +42,8 @@ package AmcCarrierPkg is
    --                          AXIS packetizer (A.K.A. "chunker") supports interleaving of TDEST frames 
    -- 04/19/2016 (0x00000005): In AmcCarrierRegPkg, defaulting MPS Link node's XBAR configurations to XBAR_TIME_GEN_C 
    -- 04/21/2016 (0x00000006): Increased gtTxDiffCtrl from 0.95 Vppd to 1.08 Vppd
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000006";
+   -- 04/21/2016 (0x00000007): Added Ethernet Uptime counter in the BSI interface
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000007";
 
    constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
