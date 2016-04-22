@@ -285,6 +285,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         CLK_PERIOD_G     => 6.4E-9,
          XIL_DEVICE_G     => "ULTRASCALE",
          EN_DEVICE_DNA_G  => true,
          EN_DS2411_G      => false,
