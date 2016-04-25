@@ -1,0 +1,135 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl 
+  name: AmcGenericAdcDacCtrl
+  description: Generic ADC/DAC AMC Control Module
+  size: 0x400
+  registers:
+    #########################################################
+    - address: 0x00
+      name: AdcValidCnt
+      nelms: 4
+      mode: RO
+      description: ADC Valid Transistion Counter[3:0]
+    #########################################################
+    - address: 0x0FC
+      name: AdcValid
+      size: 4     
+      lsBit: 0
+      mode: RO
+      description: ADC Valid[3:0]
+    #########################################################
+    - address: 0x0FC
+      name: DebugTrig
+      size: 1    
+      lsBit: 4
+      mode: RO
+      description: Debug Trigger     
+    #########################################################
+    - address: 0x100
+      name: AdcData
+      size: 16
+      stride: 4
+      nelms: 4
+      mode: RO
+      description: ADC Data[3:0]     
+    #########################################################
+    - address: 0x110
+      name: DacData
+      size: 16
+      stride: 4
+      nelms: 2
+      mode: RO
+      description: DAC Data[3:0]           
+    #########################################################
+    - address: 0x1F8
+      name: VcoDac
+      size: 16
+      mode: RO
+      description: VCO's DAC Value     
+    #########################################################
+    - address: 0x1FC
+      name: AmcClkFreq
+      mode: RO
+      description: AMC Clock frequency (in units of Hz)
+    #########################################################
+    - address: 0x200
+      name: LmkClkSel
+      size: 2
+      mode: RW
+      description: LMK Clock Select  
+    #########################################################
+    - address: 0x204
+      name: LmkRst
+      size: 1
+      mode: RW
+      description: LMK Reset      
+    #########################################################
+    - address: 0x208
+      name: LmkSync
+      size: 1
+      mode: RW
+      description: LMK SYNC  
+    #########################################################
+    - address: 0x20C
+      name: LmkStatus
+      size: 2
+      mode: RW
+      description: LMK Status        
+    #########################################################
+    - address: 0x210
+      name: Loopback
+      size: 1
+      mode: RW
+      description: ADC-to-DAC Loopback Enable
+    #########################################################
+    - address: 0x214
+      name: LmkMuxSel
+      size: 1
+      mode: RW
+      description: LMK MUX Select
+    #########################################################
+    - address: 0x218
+      name: SoftTrig
+      size: 1
+      mode: WO
+      description: Software Trigger   
+    #########################################################
+    - address: 0x21C
+      name: SoftClear
+      size: 1
+      mode: WO
+      description: Software Clear
+    #########################################################
+    - address: 0x220
+      name: VcoDacSckConfig
+      size: 16
+      mode: RW
+      description: VCO DAC SCK Rate Configuration        
+    #########################################################
+    - address: 0x224
+      name: VcoDacEnable
+      size: 1
+      mode: RW
+      description: VCO DAC Enable
+    #########################################################
+    - address: 0x3F8
+      name: RollOverEn
+      size: 5
+      mode: RW
+      description: Enable Status counter roll over
+    #########################################################
+    - address: 0x3FC
+      name: LmkMuxSel
+      size: 1
+      mode: RW
+      description: LMK MUX Select           
+    #########################################################

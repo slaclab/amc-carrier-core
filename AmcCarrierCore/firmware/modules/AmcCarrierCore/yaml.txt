@@ -2,3 +2,5 @@ manual yaml/AmcCarrierBsa.yaml
 manual yaml/AmcCarrierBsi.yaml
 manual yaml/AmcCarrierCore.yaml
 manual yaml/AmcCarrierTiming.yaml
+manual yaml/AmcGenericAdcDacCore.yaml
+manual yaml/AmcGenericAdcDacCtrl.yaml

@@ -1,0 +1,94 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+include: JesdRx.yaml
+include: JesdTx.yaml
+include: Lmk04828.yaml
+include: Adc16Dx370.yaml
+include: Dac38J84.yaml
+include: AmcGenericAdcDacCtrl.yaml
+include: GenericMemory.yaml
+
+AmcGenericAdcDacCore: &AmcGenericAdcDacCore 
+  name: AmcGenericAdcDacCore
+  description: Generic ADC/DAC AMC Core
+  size: 0x00800000
+  ############
+  peripherals:
+  ############  
+    - <<: *JesdRx
+      address: 0x00000000  
+    ##################################################     
+    - <<: *JesdTx
+      address: 0x00100000 
+    ##################################################     
+    - <<: *Lmk04828
+      address: 0x00200000 
+    ##################################################     
+    - <<: *Adc16Dx370
+      address: 0x00300000 
+    ##################################################     
+    - <<: *Adc16Dx370
+      address: 0x00400000     
+    ##################################################     
+    - <<: *Dac38J84
+      address: 0x00500000 
+    ##################################################     
+    - <<: *AmcGenericAdcDacCtrl
+      address: 0x00600000       
+    ##################################################
+    - <<: *GenericMemory
+      name: "AxiLiteRingBufferAdc0"
+      address: 0x00610000       
+      size: 0x10000     
+      - <<: *MemoryArray
+        nelms: 0x4000        
+        nmode: RO
+    ##################################################
+    - <<: *GenericMemory
+      name: "AxiLiteRingBufferAdc1"
+      address: 0x00620000       
+      size: 0x10000     
+      - <<: *MemoryArray
+        nelms: 0x4000        
+        nmode: RO    
+    ##################################################
+    - <<: *GenericMemory
+      name: "AxiLiteRingBufferAdc2"
+      address: 0x00630000       
+      size: 0x10000     
+      - <<: *MemoryArray
+        nelms: 0x4000        
+        nmode: RO  
+    ##################################################
+    - <<: *GenericMemory
+      name: "AxiLiteRingBufferAdc3"
+      address: 0x00640000       
+      size: 0x10000     
+      - <<: *MemoryArray
+        nelms: 0x4000        
+        nmode: RO          
+    ##################################################
+    - <<: *GenericMemory
+      name: "AxiLiteRingBufferDac0"
+      address: 0x00650000       
+      size: 0x10000     
+      - <<: *MemoryArray
+        nelms: 0x4000        
+        nmode: RO
+    ##################################################
+    - <<: *GenericMemory
+      name: "AxiLiteRingBufferDac1"
+      address: 0x00660000       
+      size: 0x10000     
+      - <<: *MemoryArray
+        nelms: 0x4000        
+        nmode: RO    
+    ##################################################
