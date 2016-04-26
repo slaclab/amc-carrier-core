@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-03-14
+-- Last update: 2016-04-20
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -30,7 +30,6 @@ entity DebugRawDiagnostic is
       DIAGNOSTIC_RAW_STREAMS_G : positive range 1 to 8 := 1;
       DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray  := (0      => ssiAxiStreamConfig(4));
       AXIL_BASE_ADDR_G         : slv(31 downto 0)      := (others => '0');
-      AXIL_AXI_ASYNC_G         : boolean               := true;
       AXI_CONFIG_G             : AxiConfigType         := axiConfig(33, 16, 1, 8)
       );
    port (
@@ -115,11 +114,6 @@ architecture rtl of DebugRawDiagnostic is
    signal readPacketizerDataMaster : AxiStreamMasterType;
    signal readPacketizerDataSlave  : AxiStreamSlaveType;
 
-   signal syncAxilReadMaster  : AxiLiteReadMasterType;
-   signal syncAxilReadSlave   : AxiLiteReadSlaveType;
-   signal syncAxilWriteMaster : AxiLiteWriteMasterType;
-   signal syncAxilWriteSlave  : AxiLiteWriteSlaveType;
-
    signal mAxilReadMaster  : AxiLiteReadMasterType;
    signal mAxilReadSlave   : AxiLiteReadSlaveType;
    signal mAxilWriteMaster : AxiLiteWriteMasterType;
@@ -139,24 +133,6 @@ architecture rtl of DebugRawDiagnostic is
 begin
 
 
-   -- Synchronize incomming axil bus to axi clk
-   U_AxiLiteAsync_1: entity work.AxiLiteAsync
-      generic map (
-         TPD_G           => TPD_G)
-      port map (
-         sAxiClk         => axilClk,          -- [in]
-         sAxiClkRst      => axilRst,       -- [in]
-         sAxiReadMaster  => axilReadMaster,   -- [in]
-         sAxiReadSlave   => axilReadSlave,    -- [out]
-         sAxiWriteMaster => axilWriteMaster,  -- [in]
-         sAxiWriteSlave  => axilWriteSlave,   -- [out]
-         mAxiClk         => axiClk,          -- [in]
-         mAxiClkRst      => axiRst,       -- [in]
-         mAxiReadMaster  => syncAxilReadMaster,   -- [out]
-         mAxiReadSlave   => syncAxilReadSlave,    -- [in]
-         mAxiWriteMaster => syncAxilWriteMaster,  -- [out]
-         mAxiWriteSlave  => syncAxilWriteSlave);  -- [in]
-   
    diagnosticRawCtrl <= (others => AXI_STREAM_CTRL_UNUSED_C);
 
    -- Input fifos
@@ -209,7 +185,7 @@ begin
          axisClk      => axiClk,
          axisRst      => axiRst);
 
-     AxiStreamFifo_MUX_FIFO : entity work.AxiStreamFifo
+   AxiStreamFifo_MUX_FIFO : entity work.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
@@ -243,15 +219,15 @@ begin
          MASTERS_CONFIG_G   => genAxiLiteConfig(1, AXIL_BASE_ADDR_G, 16, 12),
          DEBUG_G            => true)
       port map (
-         axiClk              => axiClk,             -- [in]
-         axiClkRst           => axiRst,             -- [in]
-         sAxiWriteMasters(0) => syncAxilWriteMaster,     -- [in]
+         axiClk              => axiClk,              -- [in]
+         axiClkRst           => axiRst,              -- [in]
+         sAxiWriteMasters(0) => axilWriteMaster,     -- [in]
          sAxiWriteMasters(1) => mAxilWriteMaster,    -- [in]
-         sAxiWriteSlaves(0)  => syncAxilWriteSlave,      -- [out]
+         sAxiWriteSlaves(0)  => axilWriteSlave,      -- [out]
          sAxiWriteSlaves(1)  => mAxilWriteSlave,     -- [out]
-         sAxiReadMasters(0)  => syncAxilReadMaster,      -- [in]
+         sAxiReadMasters(0)  => axilReadMaster,      -- [in]
          sAxiReadMasters(1)  => mAxilReadMaster,     -- [in]
-         sAxiReadSlaves(0)   => syncAxilReadSlave,       -- [out]
+         sAxiReadSlaves(0)   => axilReadSlave,       -- [out]
          sAxiReadSlaves(1)   => mAxilReadSlave,      -- [out]
          mAxiWriteMasters(0) => locAxilWriteMaster,  -- [out]
          mAxiWriteSlaves(0)  => locAxilWriteSlave,   -- [in]
@@ -266,28 +242,27 @@ begin
          TPD_G                      => TPD_G,
          BUFFERS_G                  => DIAGNOSTIC_RAW_STREAMS_G,
          BURST_SIZE_BYTES_G         => 4096,
-         --AXIL_AXI_ASYNC_G           => false,
          AXIL_BASE_ADDR_G           => AXIL_BASE_ADDR_G,
          DATA_AXI_STREAM_CONFIG_G   => WRITE_AXIS_CONFIG_C,
          STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8),
          AXI_WRITE_CONFIG_G         => AXI_CONFIG_G)
       port map (
-         axilClk          => axiClk,                -- [in]
-         axilRst          => axiRst,                -- [in]
-         axilReadMaster   => locAxilReadMaster,      -- [in]
-         axilReadSlave    => locAxilReadSlave,       -- [out]
-         axilWriteMaster  => locAxilWriteMaster,     -- [in]
-         axilWriteSlave   => locAxilWriteSlave,      -- [out]
+         axilClk          => axiClk,                  -- [in]
+         axilRst          => axiRst,                  -- [in]
+         axilReadMaster   => locAxilReadMaster,       -- [in]
+         axilReadSlave    => locAxilReadSlave,        -- [out]
+         axilWriteMaster  => locAxilWriteMaster,      -- [in]
+         axilWriteSlave   => locAxilWriteSlave,       -- [out]
          axisStatusClk    => axiClk,
          axisStatusRst    => axiRst,
          axisStatusMaster => axisStatusMaster,
          axisStatusSlave  => axisStatusSlave,
-         axiClk           => axiClk,                 -- [in]
-         axiRst           => axiRst,                 -- [in]
-         axisDataMaster   => writeMuxFifoAxisMaster,       -- [in]
-         axisDataSlave    => writeMuxFifoAxisSlave,        -- [out]
-         axiWriteMaster   => locAxiWriteMasters(2),  -- [out]
-         axiWriteSlave    => locAxiWriteSlaves(2));  -- [in]
+         axiClk           => axiClk,                  -- [in]
+         axiRst           => axiRst,                  -- [in]
+         axisDataMaster   => writeMuxFifoAxisMaster,  -- [in]
+         axisDataSlave    => writeMuxFifoAxisSlave,   -- [out]
+         axiWriteMaster   => locAxiWriteMasters(2),   -- [out]
+         axiWriteSlave    => locAxiWriteSlaves(2));   -- [in]
 
    U_AxiStreamDmaRingRead_1 : entity work.AxiStreamDmaRingRead
       generic map (
@@ -299,19 +274,19 @@ begin
          AXI_STREAM_CONFIG_G   => READ_AXIS_CONFIG_C,
          AXI_READ_CONFIG_G     => AXI_CONFIG_G)
       port map (
-         axilClk         => axiClk,               -- [in]
-         axilRst         => axiRst,               -- [in]
+         axilClk         => axiClk,                -- [in]
+         axilRst         => axiRst,                -- [in]
          axilReadMaster  => mAxilReadMaster,       -- [out]
          axilReadSlave   => mAxilReadSlave,        -- [in]
          axilWriteMaster => mAxilWriteMaster,      -- [out]
          axilWriteSlave  => mAxilWriteSlave,       -- [in]
-         statusClk       => axiClk,               -- [in]
-         statusRst       => axiRst,               -- [in]
+         statusClk       => axiClk,                -- [in]
+         statusRst       => axiRst,                -- [in]
          statusMaster    => axisStatusMaster,      -- [out]
          statusSlave     => axisStatusSlave,       -- [in]
-         dataMaster      => readDmaDataMaster,         -- [out]
-         dataSlave       => readDmaDataSlave,          -- [in]
-         dataCtrl        => readDmaDataCtrl,           -- [in]
+         dataMaster      => readDmaDataMaster,     -- [out]
+         dataSlave       => readDmaDataSlave,      -- [in]
+         dataCtrl        => readDmaDataCtrl,       -- [in]
          axiClk          => axiClk,                -- [in]
          axiRst          => axiRst,                -- [in]
          axiReadMaster   => locAxiReadMasters(0),  -- [out]
@@ -350,12 +325,12 @@ begin
       generic map (
          TPD_G                => TPD_G,
          MAX_PACKET_BYTES_G   => 4112,
-         MIN_TKEEP_G => X"000F",
+         MIN_TKEEP_G          => X"000F",
          INPUT_PIPE_STAGES_G  => 0,
          OUTPUT_PIPE_STAGES_G => 1)
       port map (
-         axisClk     => dataClk,               -- [in]
-         axisRst     => dataRst,               -- [in]
+         axisClk     => dataClk,                   -- [in]
+         axisRst     => dataRst,                   -- [in]
          sAxisMaster => readFifoDataMaster,        -- [in]
          sAxisSlave  => readFifoDataSlave,         -- [out]
          mAxisMaster => readPacketizerDataMaster,  -- [out]
@@ -395,8 +370,8 @@ begin
          sAxiWriteSlaves  => locAxiWriteSlaves,   -- [out]
          sAxiReadMasters  => locAxiReadMasters,   -- [in]
          sAxiReadSlaves   => locAxiReadSlaves,    -- [out]
-         mAxiWriteMasters => axiWriteMaster,     -- [out]
-         mAxiWriteSlaves  => axiWriteSlave,      -- [in]
-         mAxiReadMasters  => axiReadMaster,      -- [out]
-         mAxiReadSlaves   => axiReadSlave);      -- [in]
+         mAxiWriteMasters => axiWriteMaster,      -- [out]
+         mAxiWriteSlaves  => axiWriteSlave,       -- [in]
+         mAxiReadMasters  => axiReadMaster,       -- [out]
+         mAxiReadSlaves   => axiReadSlave);       -- [in]
 end architecture rtl;
