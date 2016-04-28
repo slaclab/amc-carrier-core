@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-04-20
+-- Last update: 2016-04-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -219,8 +219,8 @@ begin
          MASTERS_CONFIG_G   => genAxiLiteConfig(1, AXIL_BASE_ADDR_G, 16, 12),
          DEBUG_G            => true)
       port map (
-         axiClk              => axiClk,              -- [in]
-         axiClkRst           => axiRst,              -- [in]
+         axiClk              => axilClk,              -- [in]
+         axiClkRst           => axilRst,              -- [in]
          sAxiWriteMasters(0) => axilWriteMaster,     -- [in]
          sAxiWriteMasters(1) => mAxilWriteMaster,    -- [in]
          sAxiWriteSlaves(0)  => axilWriteSlave,      -- [out]
@@ -247,8 +247,8 @@ begin
          STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8),
          AXI_WRITE_CONFIG_G         => AXI_CONFIG_G)
       port map (
-         axilClk          => axiClk,                  -- [in]
-         axilRst          => axiRst,                  -- [in]
+         axilClk          => axilClk,                  -- [in]
+         axilRst          => axilRst,                  -- [in]
          axilReadMaster   => locAxilReadMaster,       -- [in]
          axilReadSlave    => locAxilReadSlave,        -- [out]
          axilWriteMaster  => locAxilWriteMaster,      -- [in]
@@ -274,8 +274,8 @@ begin
          AXI_STREAM_CONFIG_G   => READ_AXIS_CONFIG_C,
          AXI_READ_CONFIG_G     => AXI_CONFIG_G)
       port map (
-         axilClk         => axiClk,                -- [in]
-         axilRst         => axiRst,                -- [in]
+         axilClk         => axilClk,                -- [in]
+         axilRst         => axilRst,                -- [in]
          axilReadMaster  => mAxilReadMaster,       -- [out]
          axilReadSlave   => mAxilReadSlave,        -- [in]
          axilWriteMaster => mAxilWriteMaster,      -- [out]

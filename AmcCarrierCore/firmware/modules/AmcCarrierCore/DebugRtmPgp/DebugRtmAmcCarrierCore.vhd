@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-03-18
+-- Last update: 2016-04-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -487,7 +487,6 @@ begin
          DIAGNOSTIC_RAW_STREAMS_G => DIAGNOSTIC_RAW_STREAMS_G,
          DIAGNOSTIC_RAW_CONFIGS_G => DIAGNOSTIC_RAW_CONFIGS_G,
          AXIL_BASE_ADDR_G         => BSA_ADDR_C,
-         AXIL_AXI_ASYNC_G         => true,
          AXI_CONFIG_G             => AXI_CONFIG_C)
       port map (
          diagnosticRawClks    => diagnosticRawClks,     -- [in]
