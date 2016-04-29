@@ -21,49 +21,49 @@ include: XauiReg.yaml
 include: UdpEngineWrapper.yaml
 include: RssiCore.yaml
 
-AmcCarrierCore: &AmcCarrierCore 
+Device: &AmcCarrierCore 
   name: AmcCarrierCore
   description: AmcCarrierCore
   size: 0x80000000 # 2GB address space for core firmware
   ########## 
-  registers:
+  IntField:
   ########## 
-    - address: 0x00000400
+    - offset: 0x00000400
       name: AMC_CARRIER_CORE_VERSION_C
       mode: RO
       description: AMC Carrier Core Version Number
   ############
-  peripherals:
+  MMIODev:
   ############
     - <<: *AxiVersion
-      address: 0x00000000
+      offset: 0x00000000
     ##################################################
     - <<: *AxiSysMonUltraScale
-      address: 0x01000000
+      offset: 0x01000000
     ##################################################
     - <<: *AxiMicronN25Q
-      address: 0x02000000  
+      offset: 0x02000000  
     ##################################################
     - <<: *AxiSy56040
-      address: 0x03000000      
+      offset: 0x03000000      
     ##################################################
     - <<: *GenericMemory
       name: "Axi24LC64FT"
-      address: 0x04000000       
+      offset: 0x04000000       
       size: 0x2000       
       - <<: *MemoryArray
         nelms: 0x800
     ##################################################
     - <<: *GenericMemory
       name: "AxiCdcm6208"
-      address: 0x05000000       
+      offset: 0x05000000       
       size: 0x40       
       - <<: *MemoryArray
         nelms: 0x29      
     ##################################################
     - <<: *GenericMemory
       name: "DdrSpdMemory"
-      address: 0x06000000       
+      offset: 0x06000000       
       size: 0x100     
       description: Lookup tool at www.micron.com/spd
       - <<: *MemoryArray
@@ -72,51 +72,51 @@ AmcCarrierCore: &AmcCarrierCore
     ##################################################
     - <<: *GenericMemory
       name: "DdrTempSensor"
-      address: 0x06000100       
+      offset: 0x06000100       
       size: 0x100     
       - <<: *MemoryArray
         nelms: 0x40        
         nmode: RO # Read only
     ##################################################
     - <<: *AmcCarrierBsi
-      address: 0x07000000      
+      offset: 0x07000000      
     ##################################################  
     - <<: *AmcCarrierTiming
-      address: 0x08000000      
+      offset: 0x08000000      
     ##################################################
     - <<: *AmcCarrierBsa
-      address: 0x09000000    
+      offset: 0x09000000    
     ##################################################
     - <<: *XauiReg
-      address: 0x0A000000  
+      offset: 0x0A000000  
     ##################################################
     - <<: *UdpEngineWrapper
-      address: 0x0A010000 # ClientConfig[0]
+      offset: 0x0A010000 # ClientConfig[0]
     ##################################################
     - <<: *UdpEngineWrapper
-      address: 0x0A010010 # ClientConfig[1] 
+      offset: 0x0A010010 # ClientConfig[1] 
     ##################################################
     - <<: *RssiCore
-      address: 0x0A020000 # Server RSSI’s Software    
+      offset: 0x0A020000 # Server RSSI’s Software    
     ##################################################
     - <<: *RssiCore
-      address: 0x0A030000 # Server RSSI’s BP_MSG[0]     
+      offset: 0x0A030000 # Server RSSI’s BP_MSG[0]     
     ##################################################
     - <<: *RssiCore
-      address: 0x0A030400 # Client RSSI’s BP_MSG[0]    
+      offset: 0x0A030400 # Client RSSI’s BP_MSG[0]    
     ##################################################
     - <<: *RssiCore
-      address: 0x0A030800 # Server RSSI’s BP_MSG[1]     
+      offset: 0x0A030800 # Server RSSI’s BP_MSG[1]     
     ##################################################
     - <<: *RssiCore
-      address: 0x0A030C00 # Client RSSI’s BP_MSG[1]        
+      offset: 0x0A030C00 # Client RSSI’s BP_MSG[1]        
     ################################################## 
     - <<: *AxiEmpty
       name: "DdrPhy"  # AxiEmpty is a placeholder
-      address: 0x0B000000      
+      offset: 0x0B000000      
     ##################################################   
     - <<: *AxiEmpty
       name: "MpsPhy"  # AxiEmpty is a placeholder
-      address: 0x0C000000      
+      offset: 0x0C000000      
     ##################################################     
     
