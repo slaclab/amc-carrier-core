@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-04-28
+-- Last update: 2016-04-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -244,7 +244,7 @@ begin
          BURST_SIZE_BYTES_G         => 4096,
          AXIL_BASE_ADDR_G           => AXIL_BASE_ADDR_G,
          DATA_AXI_STREAM_CONFIG_G   => WRITE_AXIS_CONFIG_C,
-         STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8),
+         STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(1),
          AXI_WRITE_CONFIG_G         => AXI_CONFIG_G)
       port map (
          axilClk          => axilClk,                  -- [in]
