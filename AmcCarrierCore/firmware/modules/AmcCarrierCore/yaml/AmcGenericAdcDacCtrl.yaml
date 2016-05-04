@@ -12,7 +12,9 @@ Device: &AmcGenericAdcDacCtrl
   name: AmcGenericAdcDacCtrl
   description: Generic ADC/DAC AMC Control Module
   size: 0x400
+  #########
   IntField:
+  #########
     #########################################################
     - offset: 0x00
       name: AdcValidCnt

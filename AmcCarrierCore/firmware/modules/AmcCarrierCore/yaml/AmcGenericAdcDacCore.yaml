@@ -20,9 +20,9 @@ Device: &AmcGenericAdcDacCore
   name: AmcGenericAdcDacCore
   description: Generic ADC/DAC AMC Core
   size: 0x00800000
-  ############
+  ########
   MMIODev:
-  ############  
+  ########
     - <<: *JesdRx
       offset: 0x00000000  
     ##################################################     
@@ -91,4 +91,36 @@ Device: &AmcGenericAdcDacCore
       - <<: *MemoryArray
         nelms: 0x4000        
         nmode: RO    
+    ##################################################
+  #########
+  Commands:
+  #########
+    ##################################################
+    - name: InitAmcCard
+      description: Initialization for AMC card's JESD modules
+      sequence:
+        # Reset the RX's GTs
+        - command: JesdRx/ResetGTs
+        # Calibrate the JESD ADCs
+        - command: Adc16Dx370/CalibrateAdc
+        # 1000 ms sleep
+        - command: usleep
+          set: 1000000       
+        # Power up the LMK's SYSREF
+        - command: Lmk04828/PwrUpSysRef
+        # 1000 ms sleep
+        - command: usleep
+          set: 1000000          
+        # Init the DACs
+        - command: Dac38J84/InitDac     
+        # 1000 ms sleep
+        - command: usleep
+          set: 1000000          
+        # Clear the Alarms
+        - command: Dac38J84/ClearAlarms  
+        # 1000 ms sleep
+        - command: usleep
+          set: 1000000          
+        # Clear the Alarms
+        - command: Lmk04828/InitLmk          
     ##################################################
