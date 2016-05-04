@@ -1,4 +1,2 @@
-# cores/BsaAxiInterconnect/BsaAxiInterconnect.xci  
-# cores/AxiStreamDdrFifo/AxiStreamDdrFifo.xci
-# cores/BsaAddFpCore/BsaAddFpCore.xci  
-# cores/BsaConvFpCore/BsaConvFpCore.xci  
+## cores/BsaAxiInterconnect/BsaAxiInterconnect.xci  
+
