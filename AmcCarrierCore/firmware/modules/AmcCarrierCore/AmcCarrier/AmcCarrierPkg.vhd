@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-04-21
+-- Last update: 2016-04-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -70,6 +70,23 @@ package AmcCarrierPkg is
    constant APP_MPS_LINK_MIXED_TYPE_C : AppType := toSlv(127, AppType'length);  -- MPS Link Node, Mixed Signal (1x Analog and 1x Digital AMC cards)
 
    constant APP_REG_BASE_ADDR_C : slv(31 downto 0) := x"80000000";
+
+   -------------------------------------------------------------------------------------------------
+   -- Ethernet stream configurations
+   -------------------------------------------------------------------------------------------------
+   -------------------------------------------------------------------------------------------------
+   -- Configuration of AXI Streams in core
+   -------------------------------------------------------------------------------------------------
+   -- All streams to ETH blocks should use this config
+   constant ETH_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8); -- Use 8 tDest bits
+
+   -- BSA stream indicies
+   constant BSA_MEM_AXIS_INDEX_C         : integer := 0;
+   constant BSA_BSA_STATUS_AXIS_INDEX_C  : integer := 1;
+   constant BSA_DIAG_STATUS_AXIS_INDEX_C : integer := 2;
+   constant BSA_DIAG_DATA_AXIS_INDEX_C    : integer := 3;
+
+
 
    ---------------------------------------------------
    -- MPS: Configurations, Constants and Records Types

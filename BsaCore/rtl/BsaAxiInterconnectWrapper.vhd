@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-10
--- Last update: 2016-02-10
+-- Last update: 2016-05-03
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -62,8 +62,8 @@ architecture rtl of BsaAxiInterconnectWrapper is
          S00_AXI_AWQOS        : in  std_logic_vector(3 downto 0);
          S00_AXI_AWVALID      : in  std_logic;
          S00_AXI_AWREADY      : out std_logic;
-         S00_AXI_WDATA        : in  std_logic_vector(127 downto 0);
-         S00_AXI_WSTRB        : in  std_logic_vector(15 downto 0);
+         S00_AXI_WDATA        : in  std_logic_vector(31 downto 0);
+         S00_AXI_WSTRB        : in  std_logic_vector(3 downto 0);
          S00_AXI_WLAST        : in  std_logic;
          S00_AXI_WVALID       : in  std_logic;
          S00_AXI_WREADY       : out std_logic;
@@ -83,7 +83,7 @@ architecture rtl of BsaAxiInterconnectWrapper is
          S00_AXI_ARVALID      : in  std_logic;
          S00_AXI_ARREADY      : out std_logic;
          S00_AXI_RID          : out std_logic_vector(0 downto 0);
-         S00_AXI_RDATA        : out std_logic_vector(127 downto 0);
+         S00_AXI_RDATA        : out std_logic_vector(31 downto 0);
          S00_AXI_RRESP        : out std_logic_vector(1 downto 0);
          S00_AXI_RLAST        : out std_logic;
          S00_AXI_RVALID       : out std_logic;
@@ -231,8 +231,8 @@ begin
          S00_AXI_AWQOS        => sAxiWriteMasters(0).AWQOS(3 downto 0),
          S00_AXI_AWVALID      => sAxiWriteMasters(0).AWVALID,
          S00_AXI_AWREADY      => sAxiWriteSlaves(0).AWREADY,
-         S00_AXI_WDATA        => sAxiWriteMasters(0).WDATA(127 downto 0),
-         S00_AXI_WSTRB        => sAxiWriteMasters(0).WSTRB(15 downto 0),
+         S00_AXI_WDATA        => sAxiWriteMasters(0).WDATA(31 downto 0),
+         S00_AXI_WSTRB        => sAxiWriteMasters(0).WSTRB(3 downto 0),
          S00_AXI_WLAST        => sAxiWriteMasters(0).WLAST,
          S00_AXI_WVALID       => sAxiWriteMasters(0).WVALID,
          S00_AXI_WREADY       => sAxiWriteSlaves(0).WREADY,
@@ -252,7 +252,7 @@ begin
          S00_AXI_ARVALID      => sAxiReadMasters(0).ARVALID,
          S00_AXI_ARREADY      => sAxiReadSlaves(0).ARREADY,
          S00_AXI_RID          => sAxiReadSlaves(0).RID(0 downto 0),
-         S00_AXI_RDATA        => sAxiReadSlaves(0).RDATA(127 downto 0),
+         S00_AXI_RDATA        => sAxiReadSlaves(0).RDATA(31 downto 0),
          S00_AXI_RRESP        => sAxiReadSlaves(0).RRESP(1 downto 0),
          S00_AXI_RLAST        => sAxiReadSlaves(0).RLAST,
          S00_AXI_RVALID       => sAxiReadSlaves(0).RVALID,

@@ -384,8 +384,8 @@ begin
          BURST_SIZE_BYTES_G         => BSA_BURST_BYTES_G,
          TRIGGER_USER_BIT_G         => 0,
          AXIL_BASE_ADDR_G           => DMA_RING_BASE_ADDR_C,
-         DATA_AXI_STREAM_CONFIG_G   => LAST_STREAM_CONFIG_C,
-         STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(8),
+         DATA_AXIS_CONFIG_G   => LAST_STREAM_CONFIG_C,
+         STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1),
          AXI_WRITE_CONFIG_G         => AXI_CONFIG_G)
       port map (
          axilClk          => axilClk,                               -- [in]

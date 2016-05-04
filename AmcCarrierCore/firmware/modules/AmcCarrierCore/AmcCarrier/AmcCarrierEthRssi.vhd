@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-04-20
+-- Last update: 2016-04-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ entity AmcCarrierEthRssi is
       TPD_G            : time             := 1 ns;
       TIMEOUT_G        : real             := 1.0E-3;  -- In units of seconds   
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));        
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- Slave AXI-Lite Interface
       axilClk          : in  sl;
@@ -61,15 +61,15 @@ entity AmcCarrierEthRssi is
       obServerMasters  : in  AxiStreamMasterArray(1 downto 0);
       obServerSlaves   : out AxiStreamSlaveArray(1 downto 0);
       ibServerMasters  : out AxiStreamMasterArray(1 downto 0);
-      ibServerSlaves   : in  AxiStreamSlaveArray(1 downto 0));   
+      ibServerSlaves   : in  AxiStreamSlaveArray(1 downto 0));
 end AmcCarrierEthRssi;
 
 architecture mapping of AmcCarrierEthRssi is
 
-   signal rssiIbMasters : AxiStreamMasterArray(5 downto 0);
-   signal rssiIbSlaves  : AxiStreamSlaveArray(5 downto 0);
-   signal rssiObMasters : AxiStreamMasterArray(5 downto 0);
-   signal rssiObSlaves  : AxiStreamSlaveArray(5 downto 0);
+   signal rssiIbMasters : AxiStreamMasterArray(3 downto 0);
+   signal rssiIbSlaves  : AxiStreamSlaveArray(3 downto 0);
+   signal rssiObMasters : AxiStreamMasterArray(3 downto 0);
+   signal rssiObSlaves  : AxiStreamSlaveArray(3 downto 0);
 
    constant NUM_AXI_MASTERS_C : natural := 2;
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
@@ -80,18 +80,18 @@ architecture mapping of AmcCarrierEthRssi is
       1               => (
          baseAddr     => (AXI_BASE_ADDR_G + x"00038000"),
          addrBits     => 12,
-         connectivity => X"FFFF"));      
+         connectivity => X"FFFF"));
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
 
-   signal tempIbMasters : AxiStreamMasterArray(5 downto 0);
-   signal tempIbSlaves  : AxiStreamSlaveArray(5 downto 0);
-   signal tempObMasters : AxiStreamMasterArray(5 downto 0);
-   signal tempObSlaves  : AxiStreamSlaveArray(5 downto 0);
-   
+   signal tempIbMasters : AxiStreamMasterArray(1 downto 0);
+   signal tempIbSlaves  : AxiStreamSlaveArray(1 downto 0);
+   signal tempObMasters : AxiStreamMasterArray(1 downto 0);
+   signal tempObSlaves  : AxiStreamSlaveArray(1 downto 0);
+
 begin
 
    --------------------------
@@ -121,19 +121,25 @@ begin
    ------------------------------
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
-         TPD_G                   => TPD_G,
-         TDEST_SIZE_G            => 6,
-         CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
-         TIMEOUT_UNIT_G          => TIMEOUT_G,
-         SERVER_G                => true,
-         RETRANSMIT_ENABLE_G     => true,
-         WINDOW_ADDR_SIZE_G      => 3,
-         PIPE_STAGES_G           => 1,
-         APP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         APP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
-         TSP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
-         INIT_SEQ_N_G            => 16#80#)
+         TPD_G                    => TPD_G,
+         APP_STREAMS_G            => 4,
+         APP_STREAM_ROUTES_G      => (
+            0                     => X"00",  -- TDEST 0 routed to stream 0 (SRPv0)
+            1                     => X"02",  -- TDEST 2 routed to stream 1 (BSA async)
+            2                     => X"03",  -- TDEST 3 routed to stream 2 (Diag async)
+            3                     => X"05",  -- TDEST 5 routed to stream 3 (loopback)
+            4                     => "11------"),  -- TDEST 0xC0-0xFF routed to stream 4 (Application)
+         CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
+         TIMEOUT_UNIT_G           => TIMEOUT_G,
+         SERVER_G                 => true,
+         RETRANSMIT_ENABLE_G      => true,
+         WINDOW_ADDR_SIZE_G       => 3,
+         PIPE_STAGES_G            => 1,
+         APP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
+         APP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
+         TSP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
+         TSP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
+         INIT_SEQ_N_G             => 16#80#)
       port map (
          clk_i             => axilClk,
          rst_i             => axilRst,
@@ -157,7 +163,7 @@ begin
          axilReadMaster    => axilReadMasters(0),
          axilReadSlave     => axilReadSlaves(0),
          axilWriteMaster   => axilWriteMasters(0),
-         axilWriteSlave    => axilWriteSlaves(0));          
+         axilWriteSlave    => axilWriteSlaves(0));
 
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
@@ -167,7 +173,7 @@ begin
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
-         AXI_STREAM_CONFIG_G => IP_ENGINE_CONFIG_C)
+         AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)
          sAxisClk         => axilClk,
@@ -185,68 +191,52 @@ begin
          mAxilReadMaster  => mAxilReadMaster,
          mAxilReadSlave   => mAxilReadSlave,
          mAxilWriteMaster => mAxilWriteMaster,
-         mAxilWriteSlave  => mAxilWriteSlave);        
-
-   ------------------------------------
-   -- Future Memory Access: TDEST = 0x1
-   ------------------------------------
-   -- ibBsaMasters(0)  <= rssiObMasters(1);
-   -- rssiObSlaves(1)  <= ibBsaSlaves(0);
-   -- rssiIbMasters(1) <= obBsaMasters(0);
-   -- obBsaSlaves(0)   <= rssiIbSlaves(1);        
-   rssiIbMasters(1) <= AXI_STREAM_MASTER_INIT_C;
-   rssiObSlaves(1)  <= AXI_STREAM_SLAVE_FORCE_C;
+         mAxilWriteSlave  => mAxilWriteSlave);
 
    ----------------------------------
    -- BSA ASYNC Messages: TDEST = 0x2
    ----------------------------------
-   ibBsaMasters(1)  <= rssiObMasters(2);
-   rssiObSlaves(2)  <= ibBsaSlaves(1);
-   rssiIbMasters(2) <= obBsaMasters(1);
-   obBsaSlaves(1)   <= rssiIbSlaves(2);
+   ibBsaMasters(1)  <= rssiObMasters(1);
+   rssiObSlaves(1)  <= ibBsaSlaves(1);
+   rssiIbMasters(1) <= obBsaMasters(1);
+   obBsaSlaves(1)   <= rssiIbSlaves(1);
 
    -----------------------------------------
    -- Diagnostic ASYNC Messages: TDEST = 0x3
    -----------------------------------------
-   ibBsaMasters(2)  <= rssiObMasters(3);
-   rssiObSlaves(3)  <= ibBsaSlaves(2);
-   rssiIbMasters(3) <= obBsaMasters(2);
-   obBsaSlaves(2)   <= rssiIbSlaves(3);
-
-   ------------------------------------
-   -- Future Raw Data Path: TDEST = 0x4
-   ------------------------------------   
-   -- ibBsaMasters(3)  <= rssiObMasters(4);
-   -- rssiObSlaves(4)  <= ibBsaSlaves(3);
-   -- rssiIbMasters(4) <= obBsaMasters(3);
-   -- obBsaSlaves(3)   <= rssiIbSlaves(4);     
-   rssiIbMasters(4) <= AXI_STREAM_MASTER_INIT_C;
-   rssiObSlaves(4)  <= AXI_STREAM_SLAVE_FORCE_C;
+   ibBsaMasters(2)  <= rssiObMasters(2);
+   rssiObSlaves(2)  <= ibBsaSlaves(2);
+   rssiIbMasters(2) <= obBsaMasters(2);
+   obBsaSlaves(2)   <= rssiIbSlaves(2);
 
    --------------------------------
    -- Loopback Channel: TDEST = 0x5
    --------------------------------
-   rssiIbMasters(5) <= rssiObMasters(5);
-   rssiObSlaves(5)  <= rssiIbSlaves(5);
+   rssiIbMasters(3) <= rssiObMasters(3);
+   rssiObSlaves(3)  <= rssiIbSlaves(3);
+
 
    ------------------------------
    -- Software's RSSI Server@8194
    ------------------------------
    U_Temp : entity work.RssiCoreWrapper
       generic map (
-         TPD_G                   => TPD_G,
-         TDEST_SIZE_G            => 6,
-         CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
-         TIMEOUT_UNIT_G          => TIMEOUT_G,
-         SERVER_G                => true,
-         RETRANSMIT_ENABLE_G     => true,
-         WINDOW_ADDR_SIZE_G      => 3,
-         PIPE_STAGES_G           => 1,
-         APP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         APP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
-         TSP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
-         INIT_SEQ_N_G            => 16#80#)
+         TPD_G                    => TPD_G,
+         APP_STREAMS_G            => 2,
+         APP_STREAM_ROUTES_G      => (
+            0                     => X"01",  -- TDEST 1 routed to stream 0 (MEM)
+            1                     => "10------"),  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+         CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
+         TIMEOUT_UNIT_G           => TIMEOUT_G,
+         SERVER_G                 => true,
+         RETRANSMIT_ENABLE_G      => true,
+         WINDOW_ADDR_SIZE_G       => 3,
+         PIPE_STAGES_G            => 1,
+         APP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
+         APP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
+         TSP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
+         TSP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
+         INIT_SEQ_N_G             => 16#80#)
       port map (
          clk_i             => axilClk,
          rst_i             => axilRst,
@@ -270,46 +260,22 @@ begin
          axilReadMaster    => axilReadMasters(1),
          axilReadSlave     => axilReadSlaves(1),
          axilWriteMaster   => axilWriteMasters(1),
-         axilWriteSlave    => axilWriteSlaves(1));           
-
-   --------------------------------
-   -- Unused Channel: TDEST = 0x0
-   --------------------------------
-   tempIbMasters(0) <= AXI_STREAM_MASTER_INIT_C;
-   tempObSlaves(0)  <= AXI_STREAM_SLAVE_FORCE_C;
+         axilWriteSlave    => axilWriteSlaves(1));
 
    -----------------------------
    -- Memory Access: TDEST = 0x1
    -----------------------------
-   ibBsaMasters(0)  <= tempObMasters(1);
-   tempObSlaves(1)  <= ibBsaSlaves(0);
-   tempIbMasters(1) <= obBsaMasters(0);
-   obBsaSlaves(0)   <= tempIbSlaves(1);
-
-   ------------------------------
-   -- Unused Channel: TDEST = 0x2
-   ------------------------------
-   tempIbMasters(2) <= AXI_STREAM_MASTER_INIT_C;
-   tempObSlaves(2)  <= AXI_STREAM_SLAVE_FORCE_C;
-
-   ------------------------------
-   -- Unused Channel: TDEST = 0x3
-   ------------------------------
-   tempIbMasters(3) <= AXI_STREAM_MASTER_INIT_C;
-   tempObSlaves(3)  <= AXI_STREAM_SLAVE_FORCE_C;
+   ibBsaMasters(0)  <= tempObMasters(0);
+   tempObSlaves(0)  <= ibBsaSlaves(0);
+   tempIbMasters(0) <= obBsaMasters(0);
+   obBsaSlaves(0)   <= tempIbSlaves(0);
 
    -----------------------------
-   -- Raw Data Path: TDEST = 0x4
+   -- Raw Data Path: TDEST = X"80"-X"FF"
    -----------------------------
-   ibBsaMasters(3)  <= tempObMasters(4);
-   tempObSlaves(4)  <= ibBsaSlaves(3);
-   tempIbMasters(4) <= obBsaMasters(3);
-   obBsaSlaves(3)   <= tempIbSlaves(4);
+   ibBsaMasters(3)  <= tempObMasters(1);
+   tempObSlaves(1)  <= ibBsaSlaves(3);
+   tempIbMasters(1) <= obBsaMasters(3);
+   obBsaSlaves(3)   <= tempIbSlaves(1);
 
-   ------------------------------
-   -- Unused Channel: TDEST = 0x5
-   ------------------------------
-   tempIbMasters(5) <= AXI_STREAM_MASTER_INIT_C;
-   tempObSlaves(5)  <= AXI_STREAM_SLAVE_FORCE_C;
-   
 end mapping;

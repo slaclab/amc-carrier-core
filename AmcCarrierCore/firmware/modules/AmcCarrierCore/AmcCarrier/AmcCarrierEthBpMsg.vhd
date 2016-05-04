@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-04-19
+-- Last update: 2016-04-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ entity AmcCarrierEthBpMsg is
       RSSI_G           : boolean          := false;
       TIMEOUT_G        : real             := 1.0E-3;  -- In units of seconds   
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));   
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -120,7 +120,7 @@ begin
    for i in (BP_MSG_SIZE_C-1) downto 0 generate
 
       GEN_BYPASS : if (RSSI_G = false) generate
-         
+
          ibServerMasters(i) <= bpMsgMasters(i);
          bpMsgSlaves(i)     <= ibServerSlaves(i);
          obServerSlaves(i)  <= AXI_STREAM_SLAVE_FORCE_C;
@@ -138,7 +138,7 @@ begin
                axiReadMaster  => axilReadMasters((2*i)+0),
                axiReadSlave   => axilReadSlaves((2*i)+0),
                axiWriteMaster => axilWriteMasters((2*i)+0),
-               axiWriteSlave  => axilWriteSlaves((2*i)+0)); 
+               axiWriteSlave  => axilWriteSlaves((2*i)+0));
 
          U_AxiLiteEmpty1 : entity work.AxiLiteEmpty
             generic map (
@@ -150,7 +150,7 @@ begin
                axiReadMaster  => axilReadMasters((2*i)+1),
                axiReadSlave   => axilReadSlaves((2*i)+1),
                axiWriteMaster => axilWriteMasters((2*i)+1),
-               axiWriteSlave  => axilWriteSlaves((2*i)+1));                
+               axiWriteSlave  => axilWriteSlaves((2*i)+1));
 
       end generate;
 
@@ -161,17 +161,18 @@ begin
          U_RssiServer : entity work.RssiCoreWrapper
             generic map (
                TPD_G                   => TPD_G,
-               TDEST_SIZE_G            => 1,
+               APP_STREAMS_G           => 1,
+               APP_STREAM_ROUTES_G     => (0 => X"00"),
                CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
                TIMEOUT_UNIT_G          => TIMEOUT_G,
                SERVER_G                => true,
                RETRANSMIT_ENABLE_G     => true,
                WINDOW_ADDR_SIZE_G      => 3,
                PIPE_STAGES_G           => 1,
-               APP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-               APP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
-               TSP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-               TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
+               APP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
+               APP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
+               TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
+               TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
                INIT_SEQ_N_G            => 16#80#)
             port map (
                clk_i                => axilClk,
@@ -200,17 +201,18 @@ begin
          U_RssiClient : entity work.RssiCoreWrapper
             generic map (
                TPD_G                   => TPD_G,
-               TDEST_SIZE_G            => 1,
+               APP_STREAMS_G           => 1,
+               APP_STREAM_ROUTES_G     => (0 => X"00"),
                CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
                TIMEOUT_UNIT_G          => TIMEOUT_G,
                SERVER_G                => false,
                RETRANSMIT_ENABLE_G     => true,
                WINDOW_ADDR_SIZE_G      => 3,
                PIPE_STAGES_G           => 1,
-               APP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-               APP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
-               TSP_INPUT_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-               TSP_OUTPUT_AXI_CONFIG_G => IP_ENGINE_CONFIG_C,
+               APP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
+               APP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
+               TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
+               TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
                INIT_SEQ_N_G            => 16#20#)
             port map (
                clk_i                => axilClk,
@@ -231,7 +233,7 @@ begin
                axilReadMaster       => axilReadMasters((2*i)+1),
                axilReadSlave        => axilReadSlaves((2*i)+1),
                axilWriteMaster      => axilWriteMasters((2*i)+1),
-               axilWriteSlave       => axilWriteSlaves((2*i)+1)); 
+               axilWriteSlave       => axilWriteSlaves((2*i)+1));
       end generate;
 
       -----------------------
@@ -252,8 +254,8 @@ begin
             -- Backplane Messaging Interface (bpMsgClk domain)
             bpMsgClk       => bpMsgClk,
             bpMsgRst       => bpMsgRst,
-            bpMsgBus       => bpMsgBus(i));     
+            bpMsgBus       => bpMsgBus(i));
 
    end generate GEN_BP_MSG;
-   
+
 end mapping;

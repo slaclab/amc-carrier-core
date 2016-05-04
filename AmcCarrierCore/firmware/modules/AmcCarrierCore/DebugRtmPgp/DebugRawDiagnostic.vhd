@@ -219,8 +219,8 @@ begin
          MASTERS_CONFIG_G   => genAxiLiteConfig(1, AXIL_BASE_ADDR_G, 16, 12),
          DEBUG_G            => true)
       port map (
-         axiClk              => axilClk,              -- [in]
-         axiClkRst           => axilRst,              -- [in]
+         axiClk              => axilClk,             -- [in]
+         axiClkRst           => axilRst,             -- [in]
          sAxiWriteMasters(0) => axilWriteMaster,     -- [in]
          sAxiWriteMasters(1) => mAxilWriteMaster,    -- [in]
          sAxiWriteSlaves(0)  => axilWriteSlave,      -- [out]
@@ -239,16 +239,16 @@ begin
    -------------------------------------------------------------------------------------------------
    U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
       generic map (
-         TPD_G                      => TPD_G,
-         BUFFERS_G                  => DIAGNOSTIC_RAW_STREAMS_G,
-         BURST_SIZE_BYTES_G         => 4096,
-         AXIL_BASE_ADDR_G           => AXIL_BASE_ADDR_G,
-         DATA_AXI_STREAM_CONFIG_G   => WRITE_AXIS_CONFIG_C,
-         STATUS_AXI_STREAM_CONFIG_G => ssiAxiStreamConfig(1),
-         AXI_WRITE_CONFIG_G         => AXI_CONFIG_G)
+         TPD_G                => TPD_G,
+         BUFFERS_G            => DIAGNOSTIC_RAW_STREAMS_G,
+         BURST_SIZE_BYTES_G   => 4096,
+         AXIL_BASE_ADDR_G     => AXIL_BASE_ADDR_G,
+         DATA_AXIS_CONFIG_G   => WRITE_AXIS_CONFIG_C,
+         STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1),
+         AXI_WRITE_CONFIG_G   => AXI_CONFIG_G)
       port map (
-         axilClk          => axilClk,                  -- [in]
-         axilRst          => axilRst,                  -- [in]
+         axilClk          => axilClk,                 -- [in]
+         axilRst          => axilRst,                 -- [in]
          axilReadMaster   => locAxilReadMaster,       -- [in]
          axilReadSlave    => locAxilReadSlave,        -- [out]
          axilWriteMaster  => locAxilWriteMaster,      -- [in]
@@ -274,8 +274,8 @@ begin
          AXI_STREAM_CONFIG_G   => READ_AXIS_CONFIG_C,
          AXI_READ_CONFIG_G     => AXI_CONFIG_G)
       port map (
-         axilClk         => axilClk,                -- [in]
-         axilRst         => axilRst,                -- [in]
+         axilClk         => axilClk,               -- [in]
+         axilRst         => axilRst,               -- [in]
          axilReadMaster  => mAxilReadMaster,       -- [out]
          axilReadSlave   => mAxilReadSlave,        -- [in]
          axilWriteMaster => mAxilWriteMaster,      -- [out]

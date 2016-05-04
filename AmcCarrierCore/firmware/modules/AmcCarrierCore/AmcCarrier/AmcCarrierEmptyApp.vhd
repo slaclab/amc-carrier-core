@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-10
--- Last update: 2016-01-27
+-- Last update: 2016-04-28
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,8 +38,11 @@ entity AmcCarrierEmptyApp is
       TPD_G                    : time                 := 1 ns;
       SIM_SPEEDUP_G            : boolean              := false;
       AXI_ERROR_RESP_G         : slv(1 downto 0)      := AXI_RESP_DECERR_C;
-      DIAGNOSTIC_RAW_STREAMS_G : positive             := 1;
-      DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray := (0 => ssiAxiStreamConfig(4)));
+      DIAGNOSTIC_RAW_STREAMS_G : positive             := 4;
+      DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray := (0 => ssiAxiStreamConfig(4),
+                                                          1 => ssiAxiStreamConfig(4),
+                                                          2 => ssiAxiStreamConfig(4),
+                                                          3 => ssiAxiStreamConfig(4)));
    port (
       -----------------------
       -- Application Ports --
