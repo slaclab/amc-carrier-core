@@ -1,0 +1,15 @@
+## LLR - 29APRIL2016
+## After generating each of the .DCP files from their corresponding .XCI files, 
+## performed the following TCL commands in the DCP to generate a modified DCP file:
+
+# Changed TXDIFFCTRL from "1100" to "1111"
+disconnect_net -prune -net [get_nets <const0>] -objects [get_pins inst/txdiffctrl_in[0]]
+disconnect_net -prune -net [get_nets <const0>] -objects [get_pins inst/txdiffctrl_in[1]]
+
+
+connect_net -net [get_nets <const1>] -objects [get_pins inst/txdiffctrl_in[0]]
+connect_net -net [get_nets <const1>] -objects [get_pins inst/txdiffctrl_in[1]]
+
+
+#Note: Vivado doesn't automatically recongize disconnect and connect operations as requiring to have.  You will have to do this manually:
+#      Example: write_checkpoint -force I:/projects/LCLS_II/AmcCarrierCore/firmware/modules/AmcCarrierCore/coregen/DebugRtmPgpGthCore.dcp
