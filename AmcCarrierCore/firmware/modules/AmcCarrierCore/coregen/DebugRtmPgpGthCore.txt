@@ -11,5 +11,5 @@ connect_net -net [get_nets <const1>] -objects [get_pins inst/txdiffctrl_in[0]]
 connect_net -net [get_nets <const1>] -objects [get_pins inst/txdiffctrl_in[1]]
 
 
-#Note: Vivado doesn't automatically recongize disconnect and connect operations as requiring to have.  You will have to do this manually:
+#Note: Vivado doesn't automatically recognize disconnect and connect operations as requiring to have.  You will have to do this manually:
 #      Example: write_checkpoint -force I:/projects/LCLS_II/AmcCarrierCore/firmware/modules/AmcCarrierCore/coregen/DebugRtmPgpGthCore.dcp
