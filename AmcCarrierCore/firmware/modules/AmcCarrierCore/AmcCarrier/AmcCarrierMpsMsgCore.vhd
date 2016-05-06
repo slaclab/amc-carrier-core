@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2016-02-29
+-- Last update: 2016-05-06
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -39,12 +39,7 @@ entity AmcCarrierMpsMsgCore is
       clk       : in  sl;
       rst       : in  sl;
       -- Inbound Message Value
-      validStrb : in  sl;
-      timeStamp : in  slv(15 downto 0);
-      testMode  : in  sl;
-      appId     : in  slv(15 downto 0);
-      message   : in  Slv8Array(31 downto 0);
-      msgSize   : in  slv(7 downto 0);  -- In units of Bytes
+      mpsMessage : in MpsMessageType;
       -- Outbound MPS Interface
       mpsMaster : out AxiStreamMasterType;
       mpsSlave  : in  AxiStreamSlaveType);   
@@ -63,21 +58,17 @@ architecture rtl of AmcCarrierMpsMsgCore is
 
    type RegType is record
       cnt       : natural range 0 to 63;
-      msgSize   : slv(7 downto 0);
-      timeStamp : slv(15 downto 0);
-      message   : Slv8Array(31 downto 0);
+      mpsMessage : MpsMessageType;
       mpsMaster : AxiStreamMasterType;
       state     : StateType;
       stateDly  : StateType;
    end record RegType;
    constant REG_INIT_C : RegType := (
-      cnt       => 0,
-      msgSize   => (others => '0'),
-      timeStamp => (others => '0'),
-      message   => (others => (others => '0')),
-      mpsMaster => AXI_STREAM_MASTER_INIT_C,
-      state     => IDLE_S,
-      stateDly  => IDLE_S);      
+      cnt        => 0,
+      mpsMessage => MPS_MESSAGE_INIT_C,
+      mpsMaster  => AXI_STREAM_MASTER_INIT_C,
+      state      => IDLE_S,
+      stateDly   => IDLE_S);      
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -87,7 +78,7 @@ architecture rtl of AmcCarrierMpsMsgCore is
 
 begin
 
-   comb : process (appId, message, mpsSlave, msgSize, r, rst, testMode, timeStamp, validStrb) is
+   comb : process (mpsSlave, r, rst, mpsMessage) is
       variable v : RegType;
    begin
       -- Latch the current value
@@ -105,17 +96,15 @@ begin
          ----------------------------------------------------------------------
          when IDLE_S =>
             -- Check for update
-            if (validStrb = '1')
+            if (mpsMessage.valid = '1')
                and (APP_TYPE_G /= APP_NULL_TYPE_C)
                and (MPS_CHANNELS_C /= 0)
-               and (msgSize /= 0)
-               and (msgSize      <= MPS_CHANNELS_C) then
+               and (mpsMessage.msgSize /= 0)
+               and (mpsMessage.msgSize <= MPS_CHANNELS_C) then
                -- Reset tData
                v.mpsMaster.tData := (others => '0');
                -- Latch the information
-               v.timeStamp       := timeStamp;
-               v.message         := message;
-               v.msgSize         := msgSize;
+               v.mpsMessage      := mpsMessage;
                -- Next state
                v.state           := HEADER_S;
             end if;
@@ -125,9 +114,9 @@ begin
             if v.mpsMaster.tValid = '0' then
                -- Send the header 
                v.mpsMaster.tValid                              := '1';
-               v.mpsMaster.tData(15)                           := testMode;
+               v.mpsMaster.tData(15)                           := r.mpsMessage.testMode;
                v.mpsMaster.tData((AppType'length)+ 7 downto 8) := APP_TYPE_G;
-               v.mpsMaster.tData(7 downto 0)                   := r.msgSize+5;  -- Length in units of bytes
+               v.mpsMaster.tData(7 downto 0)                   := r.mpsMessage.msgSize+5; -- Length in units of bytes
                -- Set SOF               
                ssiSetUserSof(MPS_CONFIG_C, v.mpsMaster, '1');
                -- Next state
@@ -139,7 +128,7 @@ begin
             if v.mpsMaster.tValid = '0' then
                -- Send the application ID 
                v.mpsMaster.tValid             := '1';
-               v.mpsMaster.tData(15 downto 0) := appId;
+               v.mpsMaster.tData(15 downto 0) := r.mpsMessage.appId;
                -- Next state
                v.state                        := TIMESTAMP_S;
             end if;
@@ -149,7 +138,7 @@ begin
             if v.mpsMaster.tValid = '0' then
                -- Send the timestamp 
                v.mpsMaster.tValid             := '1';
-               v.mpsMaster.tData(15 downto 0) := r.timeStamp;
+               v.mpsMaster.tData(15 downto 0) := r.mpsMessage.timeStamp;
                -- Next state
                v.state                        := PAYLOAD_S;
             end if;
@@ -159,12 +148,12 @@ begin
             if v.mpsMaster.tValid = '0' then
                -- Send the payload 
                v.mpsMaster.tValid             := '1';
-               v.mpsMaster.tData(7 downto 0)  := r.message(r.cnt);
+               v.mpsMaster.tData(7 downto 0)  := r.mpsMessage.message(r.cnt);
                v.mpsMaster.tData(15 downto 8) := (others => '0');
                -- Increment the counter
                v.cnt                          := r.cnt + 1;
                -- Check if lower byte is tLast
-               if v.cnt = r.msgSize then
+               if v.cnt = r.mpsMessage.msgSize then
                   -- Reset the counter
                   v.cnt             := 0;
                   -- Set EOF
@@ -173,11 +162,11 @@ begin
                   v.state           := IDLE_S;
                else
                   -- Send the payload 
-                  v.mpsMaster.tData(15 downto 8) := r.message(v.cnt);
+                  v.mpsMaster.tData(15 downto 8) := r.mpsMessage.message(v.cnt);
                   -- Increment the counter
                   v.cnt                          := v.cnt + 1;
                   -- Check if lower byte is tLast
-                  if v.cnt = r.msgSize then
+                  if v.cnt = r.mpsMessage.msgSize then
                      -- Reset the counter
                      v.cnt             := 0;
                      -- Set EOF
@@ -192,12 +181,12 @@ begin
 
       -- Check for error condition
       v.stateDly := r.state;
-      if (validStrb = '1') and (r.stateDly /= IDLE_S) then
+      if (mpsMessage.valid = '1') and (r.stateDly /= IDLE_S) then
          -- Check the simulation error printing
          if SIM_ERROR_HALT_G then
             report "AmcCarrierMpsMsg: Simulation Overflow Detected ...";
             report "APP_TYPE_G = " & integer'image(conv_integer(APP_TYPE_G));
-            report "APP ID     = " & integer'image(conv_integer(appId)) severity failure;
+            report "APP ID     = " & integer'image(conv_integer(mpsMessage.appId)) severity failure;
          end if;
       end if;
 

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-04-29
+-- Last update: 2016-05-06
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -92,9 +92,51 @@ package AmcCarrierPkg is
    -- MPS: Configurations, Constants and Records Types
    ---------------------------------------------------   
    constant MPS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(2);
+   constant MPS_MITIGATION_BITS_C : integer := 114;
+   constant MPS_MESSAGE_BITS_C    : integer := 298;
 
    function getMpsChCnt(app        : AppType) return natural;
    function getMpsThresholdCnt(app : AppType) return natural;
+
+   type MpsMitigationMsgType is record
+      strobe    : sl;                      -- valid
+      latchDiag : sl;                      -- latch the beam diagnostics with 'tag'
+      tag       : slv(15 downto 0);
+      class     : Slv4Array(15 downto 0);  -- power class limits for each of 16 destinations
+      permit    : Slv2Array(15 downto 0);  -- Permit level for each of 16 destinations
+   end record;
+
+   constant MPS_MITIGATION_MSG_INIT_C : MpsMitigationMsgType := (
+      strobe    => '0',
+      latchDiag => '0',
+      tag       => (others=>'0'),
+      class     => (others=>(others=>'0')),
+      permit    => (others=>(others=>'0')));
+
+   function toSlv (m : MpsMitigationMsgType) return slv;
+   function toMpsMitigationMsg (vec : slv) return MpsMitigationMsgType;
+
+   type MpsMessageType is record
+      valid     : sl;
+      timeStamp : slv(15 downto 0);
+      testMode  : sl;
+      appId     : slv(15 downto 0);
+      message   : Slv8Array(31 downto 0);
+      msgSize   : slv(7 downto 0);  -- In units of Bytes
+   end record;
+
+   type MpsMessageArray is array (natural range <>) of MpsMessageType;
+
+   constant MPS_MESSAGE_INIT_C : MpsMessageType := (
+      valid     => '0',
+      timeStamp => (others=>'0'),
+      testMode  => '0',
+      appId     => (others=>'0'),
+      message   => (others=>(others=>'0')),
+      msgSize   => (others=>'0'));
+
+   function toSlv (m : MpsMessageType) return slv;
+   function toMpsMessage (vec : slv) return MpsMessageType;
 
    ---------------------------------------------------------------------------      
    -- Backplane Messaging Network: Configurations, Constants and Records Types
@@ -257,6 +299,78 @@ package body AmcCarrierPkg is
       end loop;
       assignRecord(i, vec, b.strobe);
       return b;
+   end function;
+
+   function toSlv (m : MpsMitigationMsgType) return slv is
+      variable vector : slv(MPS_MITIGATION_BITS_C-1 downto 0) := (others => '0');
+      variable i      : integer                               := 0;
+   begin
+      assignSlv(i,vector,m.strobe);
+      assignSlv(i,vector,m.latchDiag);
+      assignSlv(i,vector,m.tag);
+
+      for j in 0 to 15 loop
+         assignslv(i, vector, m.class(j));
+      end loop;
+
+      for j in 0 to 15 loop
+         assignslv(i, vector, m.permit(j));
+      end loop;
+
+      return vector;
+   end function;
+
+   function toMpsMitigationMsg (vec : slv) return MpsMitigationMsgType is
+      variable m : MpsMitigationMsgType;
+      variable i : integer := 0;
+   begin
+      assignrecord(i,vec,m.strobe);
+      assignrecord(i,vec,m.latchDiag);
+      assignrecord(i,vec,m.tag);
+
+      for j in 0 to 15 loop
+         assignrecord(i,vec,m.class(j));
+      end loop;
+
+      for j in 0 to 15 loop
+         assignrecord(i,vec,m.permit(j));
+      end loop;
+
+      return m;
+   end function;
+
+   function toSlv (m : MpsMessageType) return slv is
+      variable vector : slv(MPS_MESSAGE_BITS_C-1 downto 0) := (others => '0');
+      variable i      : integer                            := 0;
+   begin
+      assignSlv(i,vector,m.valid);
+      assignSlv(i,vector,m.timeStamp);
+      assignSlv(i,vector,m.testMode);
+      assignSlv(i,vector,m.appId);
+
+      for j in 0 to 31 loop
+         assignSlv(i,vector,m.message(j));
+      end loop;
+
+      assignSlv(i,vector,m.msgSize);
+      return vector;
+   end function;
+
+   function toMpsMessage (vec : slv) return MpsMessageType is
+      variable m : MpsMessageType;
+      variable i : integer := 0;
+   begin
+      assignRecord(i,vec,m.valid);
+      assignRecord(i,vec,m.timeStamp);
+      assignRecord(i,vec,m.testMode);
+      assignRecord(i,vec,m.appId);
+
+      for j in 0 to 31 loop
+         assignRecord(i,vec,m.message(j));
+      end loop;
+
+      assignRecord(i,vec,m.msgSize);
+      return m;
    end function;
 
 end package body AmcCarrierPkg;

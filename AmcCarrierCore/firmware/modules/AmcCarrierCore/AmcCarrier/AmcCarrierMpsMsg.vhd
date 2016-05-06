@@ -83,10 +83,10 @@ architecture mapping of AmcCarrierMpsMsg is
    signal ramReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal ramReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal ibValid : sl;
-   signal obValid : slv(31 downto 0);
-   signal obValue : Slv8Array(31 downto 0);
-   signal msgSize : slv(7 downto 0);
+   signal ibValid    : sl;
+   signal obValid    : slv(31 downto 0);
+   signal obValue    : Slv8Array(31 downto 0);
+   signal mpsMessage : MpsMessageType;
 
 begin
 
@@ -169,16 +169,16 @@ begin
          clk       => axilClk,
          rst       => axilRst,
          -- Inbound Message Value
-         validStrb => obValid(0),
-         timeStamp => timeStamp,
-         testMode  => testMode,
-         appId     => appId,
-         message   => obValue,
-         msgSize   => msgSize,
+         mpsMessage => mpsMessage,
          -- Outbound MPS Interface
          mpsMaster => mpsMaster,
          mpsSlave  => mpsSlave);  
 
-   msgSize <= toSlv(MPS_CHANNELS_C, 8);
+   mpsMessage.valid     <= obValid(0);
+   mpsMessage.timeStamp <= timeStamp;
+   mpsMessage.testMode  <= testMode;
+   mpsMessage.appId     <= appId;
+   mpsMessage.message   <= obValue;
+   mpsMessage.msgSize   <= toSlv(MPS_CHANNELS_C, 8);
 
 end mapping;
