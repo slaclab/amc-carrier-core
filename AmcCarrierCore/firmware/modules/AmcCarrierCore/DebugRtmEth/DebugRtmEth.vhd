@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-04-20
+-- Last update: 2016-05-06
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -78,6 +78,11 @@ entity DebugRtmEth is
       bpMsgClk          : in  sl              := '0';
       bpMsgRst          : in  sl              := '0';
       bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      -- Application Debug Interface
+      obDebugMaster     : in  AxiStreamMasterType;
+      obDebugSlave      : out AxiStreamSlaveType;
+      ibDebugMaster     : out AxiStreamMasterType;
+      ibDebugSlave      : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
       ----------------   
@@ -94,7 +99,7 @@ architecture mapping of DebugRtmEth is
 
    constant RSSI_TIMEOUT_C : real     := 1.0E-3;  -- In units of seconds
    constant MTU_C          : positive := 1500;
-   constant SERVER_SIZE_C  : positive := 6;
+   constant SERVER_SIZE_C  : positive := 5;
    constant CLIENT_SIZE_C  : positive := 2;
 
    constant NUM_AXI_MASTERS_C : natural := 4;
@@ -307,9 +312,9 @@ begin
          clk             => axilClk,
          rst             => axilRst);
 
-   ---------------------------------------------
+   --------------------------------------------------
    -- Legacy AXI-Lite Master without RSSI Server@8192
-   ---------------------------------------------
+   --------------------------------------------------
    U_SRPv0 : entity work.SrpV0AxiLite
       generic map (
          TPD_G               => TPD_G,
@@ -337,9 +342,9 @@ begin
          mAxiLiteWriteMaster => mAxilWriteMasters(0),
          mAxiLiteWriteSlave  => mAxilWriteSlaves(0));   
 
-   -----------------------------------
+   -----------------------------------------------
    -- Software's RSSI Server Interface@[8194:8193]
-   -----------------------------------
+   -----------------------------------------------
    GEN_SW_RSSI : if (EN_SW_RSSI_G = true) generate
       U_RssiServer : entity work.AmcCarrierEthRssi
          generic map (
@@ -360,6 +365,11 @@ begin
             mAxilReadSlave   => mAxilReadSlaves(1),
             mAxilWriteMaster => mAxilWriteMasters(1),
             mAxilWriteSlave  => mAxilWriteSlaves(1),
+            -- Application Debug Interface
+            obDebugMaster    => obDebugMaster,
+            obDebugSlave     => obDebugSlave,
+            ibDebugMaster    => ibDebugMaster,
+            ibDebugSlave     => ibDebugSlave,
             -- BSA Ethernet Interface
             obBsaMasters     => obBsaMasters,
             obBsaSlaves      => obBsaSlaves,
@@ -388,6 +398,8 @@ begin
 
       mAxilReadMasters(1)         <= AXI_LITE_READ_MASTER_INIT_C;
       mAxilWriteMasters(1)        <= AXI_LITE_WRITE_MASTER_INIT_C;
+      obDebugSlave                <= AXI_STREAM_SLAVE_FORCE_C;
+      ibDebugMaster               <= AXI_STREAM_MASTER_INIT_C;
       obBsaSlaves                 <= (others => AXI_STREAM_SLAVE_FORCE_C);
       ibBsaMasters                <= (others => AXI_STREAM_MASTER_INIT_C);
       obServerSlaves(2 downto 1)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
@@ -395,14 +407,8 @@ begin
       
    end generate;
 
-   --------------------
-   -- Loopback UDP@8195
-   --------------------
-   ibServerMasters(3) <= obServerMasters(3);
-   obServerSlaves(3)  <= ibServerSlaves(3);
-
    -----------------------------------
-   -- BP Messenger Network@[8197:8196]
+   -- BP Messenger Network@[8198:8195]
    -----------------------------------
    GEN_BP_MSG : if (EN_BP_MSG_G = true) generate
       U_BpMsg : entity work.AmcCarrierEthBpMsg
@@ -421,10 +427,10 @@ begin
             axilWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
             axilWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C),
             -- Interface to UDP Server engines
-            obServerMasters => obServerMasters(5 downto 4),
-            obServerSlaves  => obServerSlaves(5 downto 4),
-            ibServerMasters => ibServerMasters(5 downto 4),
-            ibServerSlaves  => ibServerSlaves(5 downto 4),
+            obServerMasters => obServerMasters(4 downto 3),
+            obServerSlaves  => obServerSlaves(4 downto 3),
+            ibServerMasters => ibServerMasters(4 downto 3),
+            ibServerSlaves  => ibServerSlaves(4 downto 3),
             -- Interface to UDP Client engines
             obClientMasters => obClientMasters,
             obClientSlaves  => obClientSlaves,
@@ -456,8 +462,8 @@ begin
             axiWriteMaster => axilWriteMasters(BP_MSG_INDEX_C),
             axiWriteSlave  => axilWriteSlaves(BP_MSG_INDEX_C));    
 
-      obServerSlaves(5 downto 4)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibServerMasters(5 downto 4) <= (others => AXI_STREAM_MASTER_INIT_C);
+      obServerSlaves(4 downto 3)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
+      ibServerMasters(4 downto 3) <= (others => AXI_STREAM_MASTER_INIT_C);
       obClientSlaves              <= (others => AXI_STREAM_SLAVE_FORCE_C);
       ibClientMasters             <= (others => AXI_STREAM_MASTER_INIT_C);
       bpMsgSlaves                 <= (others => AXI_STREAM_SLAVE_FORCE_C);

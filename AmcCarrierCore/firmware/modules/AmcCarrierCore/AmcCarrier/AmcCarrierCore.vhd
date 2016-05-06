@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-04-29
+-- Last update: 2016-05-06
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -82,6 +82,11 @@ entity AmcCarrierCore is
       bpMsgClk             : in    sl                               := '0';
       bpMsgRst             : in    sl                               := '0';
       bpMsgBus             : out   BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      -- Application Debug Interface
+      obDebugMaster        : in    AxiStreamMasterType              := AXI_STREAM_MASTER_INIT_C;
+      obDebugSlave         : out   AxiStreamSlaveType;
+      ibDebugMaster        : out   AxiStreamMasterType;
+      ibDebugSlave         : in    AxiStreamSlaveType               := AXI_STREAM_SLAVE_FORCE_C;
       -- BSI Interface (bsiClk domain) 
       bsiClk               : in    sl                               := '0';
       bsiRst               : in    sl                               := '0';
@@ -350,6 +355,11 @@ begin
          bpMsgClk          => bpMsgClk,
          bpMsgRst          => bpMsgRst,
          bpMsgBus          => bpMsgBus,
+         -- Application Debug Interface
+         obDebugMaster     => obDebugMaster,
+         obDebugSlave      => obDebugSlave,
+         ibDebugMaster     => ibDebugMaster,
+         ibDebugSlave      => ibDebugSlave,
          ----------------
          -- Core Ports --
          ----------------   
