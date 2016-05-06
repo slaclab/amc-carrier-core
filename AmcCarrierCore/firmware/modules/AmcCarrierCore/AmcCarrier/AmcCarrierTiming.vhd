@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-03-21
+-- Last update: 2016-05-06
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -84,10 +84,10 @@ end AmcCarrierTiming;
 architecture mapping of AmcCarrierTiming is
 
    constant TIME_GEN_APP : boolean := (APP_TYPE_G = APP_TIME_GEN_TYPE_C or APP_TYPE_G = APP_EXTREF_GEN_TYPE_C);
-     
-   signal timingRefClk     : sl;
-   signal timingRecClkGt   : sl;
-   signal timingRecClk     : sl;
+
+   signal timingRefClk   : sl;
+   signal timingRecClkGt : sl;
+   signal timingRecClk   : sl;
 
    -- Rx ports
    signal rxReset        : sl;
@@ -158,35 +158,41 @@ begin
    TimingGthCoreWrapper_1 : entity work.TimingGthCoreWrapper
       generic map (
          TPD_G    => TPD_G,
-         EXTREF_G => ite(APP_TYPE_G = APP_EXTREF_GEN_TYPE_C,true,false))
+         EXTREF_G => ite(APP_TYPE_G = APP_EXTREF_GEN_TYPE_C, true, false))
       port map (
-         stableClk      => axilClk,
-         gtRefClk       => timingRefClk,
-         gtRxP          => timingRxP,
-         gtRxN          => timingRxN,
-         gtTxP          => timingTxP,
-         gtTxN          => timingTxN,
-         rxReset        => rxReset,
-         rxUsrClkActive => rxUsrClkActive,
-         rxCdrStable    => rxCdrStable,
-         rxResetDone    => rxResetDone,
-         rxUsrClk       => rxUsrClk,
-         rxPolarity     => rxPolarity,
-         rxData         => rxData,
-         rxDataK        => rxDataK,
-         rxDispErr      => rxDispErr,
-         rxDecErr       => rxDecErr,
-         rxOutClk       => timingRecClkGt,
-         txInhibit      => '0',
-         txPolarity     => timingPhy.polarity,
-         txReset        => txReset,
-         txUsrClk       => txUsrClk,
-         txUsrClkActive => txUsrClkActive,
-         txResetDone    => txResetDone,
-         txData         => timingPhy.data,
-         txDataK        => timingPhy.dataK,
-         txOutClk       => txUsrClk,
-         loopback       => loopback);
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => AXI_LITE_READ_MASTER_INIT_C,
+         axilReadSlave   => open,
+         axilWriteMaster => AXI_LITE_WRITE_MASTER_INIT_C,
+         axilWriteSlave  => open,
+         stableClk       => axilClk,
+         gtRefClk        => timingRefClk,
+         gtRxP           => timingRxP,
+         gtRxN           => timingRxN,
+         gtTxP           => timingTxP,
+         gtTxN           => timingTxN,
+         rxReset         => rxReset,
+         rxUsrClkActive  => rxUsrClkActive,
+         rxCdrStable     => rxCdrStable,
+         rxResetDone     => rxResetDone,
+         rxUsrClk        => rxUsrClk,
+         rxPolarity      => rxPolarity,
+         rxData          => rxData,
+         rxDataK         => rxDataK,
+         rxDispErr       => rxDispErr,
+         rxDecErr        => rxDecErr,
+         rxOutClk        => timingRecClkGt,
+         txInhibit       => '0',
+         txPolarity      => timingPhy.polarity,
+         txReset         => txReset,
+         txUsrClk        => txUsrClk,
+         txUsrClkActive  => txUsrClkActive,
+         txResetDone     => txResetDone,
+         txData          => timingPhy.data,
+         txDataK         => timingPhy.dataK,
+         txOutClk        => txUsrClk,
+         loopback        => loopback);
 
    ------------------------------------------------------------------------------------------------
    -- Pass recovered clock through MMCM (maybe unnecessary?)
@@ -244,7 +250,7 @@ begin
          TPGEN_G           => TIME_GEN_APP,
          AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
          AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C,
-         LCLSV1_G          => TIMING_MODE_119MHZ_C )
+         LCLSV1_G          => TIMING_MODE_119MHZ_C)
       port map (
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,
