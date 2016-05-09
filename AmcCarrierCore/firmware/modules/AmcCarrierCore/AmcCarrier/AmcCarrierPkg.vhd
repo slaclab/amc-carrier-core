@@ -121,6 +121,7 @@ package AmcCarrierPkg is
       timeStamp : slv(15 downto 0);
       testMode  : sl;
       appId     : slv(15 downto 0);
+      appType   : AppType;
       message   : Slv8Array(31 downto 0);
       msgSize   : slv(7 downto 0);  -- In units of Bytes
    end record;
@@ -132,6 +133,7 @@ package AmcCarrierPkg is
       timeStamp => (others=>'0'),
       testMode  => '0',
       appId     => (others=>'0'),
+      appType   => (others=>'0'),
       message   => (others=>(others=>'0')),
       msgSize   => (others=>'0'));
 
