@@ -158,4 +158,16 @@ Device: &AxisDaqMux
       lsBit: 6
       mode: R
       description: Number of frames (4096 bytes) sent. In the last transfer.
-    #########################################################    
+    #########################################################
+  #########
+  Commands:
+  #########
+    - name: TriggerDaq
+      description: Trigger data aquisition from software.
+      sequence:
+        - ScalVal: SoftwareTrigger
+          SetVal: 0x1
+        - ScalVal: SoftwareTrigger
+          SetVal: 0x0               
+    ######################################################### 
+    
