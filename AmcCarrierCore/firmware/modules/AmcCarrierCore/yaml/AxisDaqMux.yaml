@@ -1,0 +1,161 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+Device: &AxisDaqMux 
+  name: AxisDaqMux
+  description: Data acquisition control
+  size: 0x400
+  #########
+  IntField:
+  #########
+    #########################################################
+    - offset: 0x00
+      name: SoftwareTrigger
+      sizeBits: 1    
+      lsBit: 0 
+      mode: RW
+      description: Trigger data acquisition (bit0 - Auto clear register)
+    #########################################################
+    - offset: 0x00
+      name: Mode
+      sizeBits: 1    
+      lsBit: 1
+      mode: RW
+      description: Mode of DAQ - '0'  - until packet size and needs trigger - '1'  - sends the 4k frames continuously no trigger
+    #########################################################
+    - offset: 0x00
+      name: HwTriggerMask
+      sizeBits: 1    
+      lsBit: 2
+      mode: RW
+      description: Hardware Trigger Mask '1' - Enabled, '0' - Disabled
+    #########################################################
+    - offset: 0x08
+      name: SampleDecimation
+      sizeBits: 16   
+      mode: RW
+      description: Reduces the sample rate (0 - SR, 1 - SR/2, 2 - SR/4, 2 - SR/6 etc)
+    #########################################################
+    - offset: 0x0C
+      name: DaqBufferSize
+      sizeBits: 32   
+      mode: RW
+      description: Size of a single continuous data buffer (number of 32-bit words)
+    #########################################################
+    - offset: 0x40
+      name: S0ChannelSelect
+      sizeBits: 4   
+      mode: RW
+      description: Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)
+    #########################################################
+    - offset: 0x44
+      name: S1ChannelSelect
+      sizeBits: 4   
+      mode: RW
+      description: Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)
+    #########################################################
+    - offset: 0x80
+      name: S0Pause
+      sizeBits: 1
+      lsBit: 0      
+      mode: R
+      description: DAQ interface busy
+    ######################################################### 
+    - offset: 0x80
+      name: S0Ready
+      sizeBits: 1
+      lsBit: 1      
+      mode: R
+      description: Ready to take new data packet
+    #########################################################    
+    - offset: 0x80
+      name: S0Overflow
+      sizeBits: 1
+      lsBit: 2
+      mode: R
+      description: Buffer overflow
+    #########################################################
+    - offset: 0x80
+      name: S0Error
+      sizeBits: 1
+      lsBit: 3
+      mode: R
+      description: Error during last Acquisition - received buffer might be shorter then requested
+    #########################################################
+    - offset: 0x80
+      name: S0DataInValid
+      sizeBits: 1
+      lsBit: 4
+      mode: R
+      description: The incoming data is Valid (Usually connected to JESD valid signal).
+    #########################################################
+    - offset: 0x80
+      name: S0Enabled
+      sizeBits: 1
+      lsBit: 5
+      mode: R
+      description: Streamming is: 1-enabled, 0-Disabled
+    #########################################################
+    - offset: 0x80
+      name: S0FrameCnt
+      sizeBits: 26
+      lsBit: 6
+      mode: R
+      description: Number of frames (4096 bytes) sent. In the last transfer.
+    #########################################################
+    - offset: 0x84
+      name: S1Pause
+      sizeBits: 1
+      lsBit: 0      
+      mode: R
+      description: DAQ interface busy
+    ######################################################### 
+    - offset: 0x84
+      name: S1Ready
+      sizeBits: 1
+      lsBit: 1      
+      mode: R
+      description: Ready to take new data packet
+    #########################################################    
+    - offset: 0x84
+      name: S1Overflow
+      sizeBits: 1
+      lsBit: 2
+      mode: R
+      description: Buffer overflow
+    #########################################################
+    - offset: 0x84
+      name: S1Error
+      sizeBits: 1
+      lsBit: 3
+      mode: R
+      description: Error during last Acquisition - received buffer might be shorter then requested
+    #########################################################
+    - offset: 0x84
+      name: S1DataInValid
+      sizeBits: 1
+      lsBit: 4
+      mode: R
+      description: The incoming data is Valid (Usually connected to JESD valid signal).
+    #########################################################
+    - offset: 0x84
+      name: S1Enabled
+      sizeBits: 1
+      lsBit: 5
+      mode: R
+      description: Streamming is: 1-enabled, 0-Disabled
+    #########################################################
+    - offset: 0x84
+      name: S1FrameCnt
+      sizeBits: 26
+      lsBit: 6
+      mode: R
+      description: Number of frames (4096 bytes) sent. In the last transfer.
+    #########################################################    
