@@ -65,98 +65,98 @@ Device: &AxisDaqMux
       name: S0Pause
       sizeBits: 1
       lsBit: 0      
-      mode: R
+      mode: RO
       description: DAQ interface busy
     ######################################################### 
     - offset: 0x80
       name: S0Ready
       sizeBits: 1
       lsBit: 1      
-      mode: R
+      mode: RO
       description: Ready to take new data packet
     #########################################################    
     - offset: 0x80
       name: S0Overflow
       sizeBits: 1
       lsBit: 2
-      mode: R
+      mode: RO
       description: Buffer overflow
     #########################################################
     - offset: 0x80
       name: S0Error
       sizeBits: 1
       lsBit: 3
-      mode: R
+      mode: RO
       description: Error during last Acquisition - received buffer might be shorter then requested
     #########################################################
     - offset: 0x80
       name: S0DataInValid
       sizeBits: 1
       lsBit: 4
-      mode: R
+      mode: RO
       description: The incoming data is Valid (Usually connected to JESD valid signal).
     #########################################################
     - offset: 0x80
       name: S0Enabled
       sizeBits: 1
       lsBit: 5
-      mode: R
+      mode: RO
       description: Streamming is: 1-enabled, 0-Disabled
     #########################################################
     - offset: 0x80
       name: S0FrameCnt
       sizeBits: 26
       lsBit: 6
-      mode: R
+      mode: RO
       description: Number of frames (4096 bytes) sent. In the last transfer.
     #########################################################
     - offset: 0x84
       name: S1Pause
       sizeBits: 1
       lsBit: 0      
-      mode: R
+      mode: RO
       description: DAQ interface busy
     ######################################################### 
     - offset: 0x84
       name: S1Ready
       sizeBits: 1
       lsBit: 1      
-      mode: R
+      mode: RO
       description: Ready to take new data packet
     #########################################################    
     - offset: 0x84
       name: S1Overflow
       sizeBits: 1
       lsBit: 2
-      mode: R
+      mode: RO
       description: Buffer overflow
     #########################################################
     - offset: 0x84
       name: S1Error
       sizeBits: 1
       lsBit: 3
-      mode: R
+      mode: RO
       description: Error during last Acquisition - received buffer might be shorter then requested
     #########################################################
     - offset: 0x84
       name: S1DataInValid
       sizeBits: 1
       lsBit: 4
-      mode: R
+      mode: RO
       description: The incoming data is Valid (Usually connected to JESD valid signal).
     #########################################################
     - offset: 0x84
       name: S1Enabled
       sizeBits: 1
       lsBit: 5
-      mode: R
+      mode: RO
       description: Streamming is: 1-enabled, 0-Disabled
     #########################################################
     - offset: 0x84
       name: S1FrameCnt
       sizeBits: 26
       lsBit: 6
-      mode: R
+      mode: RO
       description: Number of frames (4096 bytes) sent. In the last transfer.
     #########################################################
   #########
