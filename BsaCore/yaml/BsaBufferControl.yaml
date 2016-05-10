@@ -1,0 +1,32 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+Device: &BsaBufferControl
+  name: BsaBufferControl
+  description: Configuration and status of the BSA dignosic buffers
+  size: 0x10000 # Double check this
+  #########
+  MMIODev:
+    - <<: *GenericMemory
+      offset: 0x00000000
+      size: 512 # 64 64-bit values
+      - <<: *MemoryArray
+        nelms: 64
+        bitSize: 64
+        mode: RO
+
+    - <<: *AxiStreamDmaRingWrite
+      offset: 0x00010000
+      name: BsaBuffers
+      metadata:
+        - numBuffers: 64
+
+
+      

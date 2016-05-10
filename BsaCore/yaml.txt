@@ -1,0 +1,2 @@
+manual yaml/BsaBufferControl.yaml
+manual yaml/BsaRawDiagnosticRing.yaml
