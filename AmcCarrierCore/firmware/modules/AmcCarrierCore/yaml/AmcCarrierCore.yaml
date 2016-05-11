@@ -91,25 +91,25 @@ Device: &AmcCarrierCore
       offset: 0x0A000000  
     ##################################################
     - <<: *UdpEngineWrapper
-      offset: 0x0A010000 # ClientConfig[0]
-    ##################################################
-    - <<: *UdpEngineWrapper
-      offset: 0x0A010010 # ClientConfig[1] 
+      offset: 0x0A010000 # ClientConfig[1:0]
+      nelms: 2
+      stride: 0x10      
     ##################################################
     - <<: *RssiCore
+      name: "RssiServerSw"
       offset: 0x0A020000 # Server RSSI’s Software    
     ##################################################
     - <<: *RssiCore
-      offset: 0x0A030000 # Server RSSI’s BP_MSG[0]     
+      name: "RssiServerBp"
+      offset: 0x0A030000 # Server RSSI’s BP_MSG[1:0]     
+      nelms: 2
+      stride: 0x800
     ##################################################
     - <<: *RssiCore
-      offset: 0x0A030400 # Client RSSI’s BP_MSG[0]    
-    ##################################################
-    - <<: *RssiCore
-      offset: 0x0A030800 # Server RSSI’s BP_MSG[1]     
-    ##################################################
-    - <<: *RssiCore
-      offset: 0x0A030C00 # Client RSSI’s BP_MSG[1]        
+      name: "RssiClientBp"
+      offset: 0x0A030400 # Client RSSI’s BP_MSG[1:0]    
+      nelms: 2
+      stride: 0x800            
     ################################################## 
     - <<: *AxiEmpty
       name: "DdrPhy"  # AxiEmpty is a placeholder
