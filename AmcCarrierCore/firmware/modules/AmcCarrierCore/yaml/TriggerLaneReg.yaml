@@ -1,0 +1,65 @@
+##############################################################################
+## This file is part of 'LCLS2 Common Carrier Core'.
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+TriggerLaneReg: &TriggerLaneReg
+  name: TriggerLaneReg
+  description: To process timing and external signal for internal and external single line trigger generation
+  size: 0x010000 #
+  ############
+  registers:
+    #########################################################
+    - address: 0x0000
+      name: SelectSource
+      size: 2
+      mode: RW
+      description: Select trigger source: soft - b00,  timing - b01, ext.trig 0 - b10, ext trig 1 - b11
+    #########################################################
+    - address: 0x0004
+      name: SelectField
+      size: 2
+      mode: RW
+      description: Select which fields to use for trigger message comparison:select fixedRate field -  bX1, select beamRequest field - b1X
+    #########################################################
+    - address: 0x0008
+      name: fixedRate
+      size: 10
+      mode: RW
+      description: use field to compare against fixedRate field of trigger message
+    #########################################################
+    - address: 0x000C
+      name: beamRequest
+      size: 32
+      mode: RW
+      description: used field to compare against beamREquest field of timing
+    #########################################################
+    - address: 0x0010
+      name: trigDelay
+      size: 8
+      mode: RW
+      description: trigger delay in clock cycles
+    #########################################################
+    - address: 0x0014
+      name: trigStretch
+      size: 8
+      mode: RW
+      description: trigger stretch in clock cycles
+    #########################################################
+    - address: 0x0018
+      name: outPolarity
+      size: 1
+      mode: RW
+      description: trigger invert : normal polarity - b0, inverted polarity - b1
+    #########################################################
+    - address: 0x001C
+      name: SoftTrig
+      size: 1
+      mode: RW
+      description: trigger software pulse, write generate 1 clock pulse when value of 1 written, to generate next need to write 0 and 1
+    #########################################################

@@ -1,0 +1,68 @@
+##############################################################################
+## This file is part of 'LCLS2 Common Carrier Core'.
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+include: AxiEmpty.yaml
+include: TriggerLaneReg.yaml
+
+TimingProc: &TimingProc
+  name: TimingProc
+  description: To process timing and external signal for internal and external triggers generation
+  size: 0x01000000 #
+  ############
+  peripherals:
+  ############
+    - <<: *AxiEmpty
+      address: 0x00000000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00010000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00020000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00030000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00040000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00050000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00060000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00070000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00080000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x00090000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x000A0000
+    ##################################################
+    - <<: *TriggerLaneReg
+      address: 0x000B0000
+    ##################################################
+    - <<: *AxiEmpty
+      address: 0x000C0000
+    ##################################################
+    - <<: *AxiEmpty
+      address: 0x000D0000
+    ##################################################
+    - <<: *AxiEmpty
+      address: 0x000E0000
+    ##################################################
+    - <<: *AxiEmpty
+      address: 0x000F0000
+    ##################################################
