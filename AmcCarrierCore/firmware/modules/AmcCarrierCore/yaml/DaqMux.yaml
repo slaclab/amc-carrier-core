@@ -1,0 +1,129 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'SLAC Firmware Standard Library', including this file,
+## may be copied, modified, propagated, or distributed except according to
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+DaqMux: &DaqMux
+  name: DaqMux
+  description: To select and set data for Raw Diagnostic data
+  size: 0x1000
+  registers:
+    #########################################################
+    - address: 0x000
+      name: HwTrigMask
+      size: 1
+      lsBit: 0
+      mode: RW
+      description: HW trigger MAsk
+    #########################################################
+    - address: 0x000
+      name: Mode
+      size: 1
+      lsBit: 1
+      mode: RW
+      description: Set continious mode (1)
+    #########################################################
+    - address: 0x000
+      name: SoftTrig
+      size: 1
+      lsBit: 2
+      mode: RW
+      description: Software trigger and both output channels
+    #########################################################
+    - address: 0x008
+      name: rateDiv
+      size: 16
+      mode: RW
+      description: Divide input rate by 2^rateDiv
+    #########################################################
+    - address: 0x00C
+      name: PacketSize
+      size: 32
+      mode: RW
+      description: Packet size
+    #########################################################
+    - address: 0x040
+      name: InMuxSel
+      size: 4
+      stride: 4
+      nelms: 2
+      mode: RW
+      description: Input Mux select
+    #########################################################
+    - address: 0x080
+      name: Pause
+      size: 1
+      stride: 4
+      nelms: 2
+      mode: R0
+      description: Pause per output stream
+    #########################################################
+    - address: 0x080
+      name: Pause
+      size: 1
+      lsBit: 0
+      stride: 4
+      nelms: 2
+      mode: R0
+      description: Pause per output stream
+    #########################################################
+    - address: 0x080
+      name: Ready
+      size: 1
+      lsBit: 1
+      stride: 4
+      nelms: 2
+      mode: R0
+      description: Ready per output stream
+    #########################################################
+    - address: 0x080
+      name: Overflow
+      size: 1
+      lsBit: 2
+      stride: 4
+      nelms: 2
+      mode: R0
+      description: Overflow per output stream
+    #########################################################
+    - address: 0x080
+      name: Error
+      size: 1
+      lsBit: 3
+      stride: 4
+      nelms: 2
+      mode: R0
+      description: Error per output stream
+    #########################################################
+    - address: 0x080
+      name: JESDValid
+      size: 1
+      lsBit: 4
+      stride: 4
+      nelms: 2
+      mode: R0
+      description: Jesd Valid data signal
+    #########################################################
+    - address: 0x080
+      name: Enable
+      size: 1
+      lsBit: 5
+      stride: 4
+      nelms: 2
+      mode: R0
+      description: Output link enabled
+    #########################################################
+    - address: 0x080
+      name: PktCnt
+      size: 26
+      lsBit: 6
+      stride: 4
+      nelms: 2
+      mode: R0
+      description: Output packet count
+    #########################################################
+
