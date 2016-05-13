@@ -8,6 +8,9 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+include: GenericMemory.yaml
+include: AxiStreamDmaRingWrite.yaml
+
 Device: &BsaBufferControl
   name: BsaBufferControl
   description: Configuration and status of the BSA dignosic buffers
@@ -16,6 +19,7 @@ Device: &BsaBufferControl
   MMIODev:
     - <<: *GenericMemory
       offset: 0x00000000
+      name: Timestamps
       size: 512 # 64 64-bit values
       - <<: *MemoryArray
         nelms: 64
