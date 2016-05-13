@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-04-28
+-- Last update: 2016-05-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -160,20 +160,19 @@ begin
          ---------------------
          U_RssiServer : entity work.RssiCoreWrapper
             generic map (
-               TPD_G                   => TPD_G,
-               APP_STREAMS_G           => 1,
-               APP_STREAM_ROUTES_G     => (0 => X"00"),
-               CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
-               TIMEOUT_UNIT_G          => TIMEOUT_G,
-               SERVER_G                => true,
-               RETRANSMIT_ENABLE_G     => true,
-               WINDOW_ADDR_SIZE_G      => 3,
-               PIPE_STAGES_G           => 1,
+               TPD_G                    => TPD_G,
+               CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
+               TIMEOUT_UNIT_G           => TIMEOUT_G,
+               SERVER_G                 => true,
+               RETRANSMIT_ENABLE_G      => true,
+               WINDOW_ADDR_SIZE_G       => 1,
+               MAX_NUM_OUTS_SEG_G       => (2**1),
+               PIPE_STAGES_G            => 1,
                APP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
                APP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
                TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
                TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
-               INIT_SEQ_N_G            => 16#80#)
+               INIT_SEQ_N_G             => 16#80#)
             port map (
                clk_i                => axilClk,
                rst_i                => axilRst,
@@ -200,20 +199,19 @@ begin
          ---------------------
          U_RssiClient : entity work.RssiCoreWrapper
             generic map (
-               TPD_G                   => TPD_G,
-               APP_STREAMS_G           => 1,
-               APP_STREAM_ROUTES_G     => (0 => X"00"),
-               CLK_FREQUENCY_G         => AXI_CLK_FREQ_C,
-               TIMEOUT_UNIT_G          => TIMEOUT_G,
-               SERVER_G                => false,
-               RETRANSMIT_ENABLE_G     => true,
-               WINDOW_ADDR_SIZE_G      => 3,
-               PIPE_STAGES_G           => 1,
+               TPD_G                    => TPD_G,
+               CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
+               TIMEOUT_UNIT_G           => TIMEOUT_G,
+               SERVER_G                 => false,
+               RETRANSMIT_ENABLE_G      => true,
+               WINDOW_ADDR_SIZE_G       => 1,
+               MAX_NUM_OUTS_SEG_G       => (2**1),
+               PIPE_STAGES_G            => 1,
                APP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
                APP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
                TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
                TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
-               INIT_SEQ_N_G            => 16#20#)
+               INIT_SEQ_N_G             => 16#20#)
             port map (
                clk_i                => axilClk,
                rst_i                => axilRst,
