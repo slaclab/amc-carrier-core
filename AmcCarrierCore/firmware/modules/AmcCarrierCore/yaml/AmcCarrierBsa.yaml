@@ -8,6 +8,9 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+include: BsaRawDiagnostic.yaml
+include: BsaBufferControl.yaml
+
 Device: &AmcCarrierBsa 
   name: AmcCarrierBsa
   description: AmcCarrier BSA Module
