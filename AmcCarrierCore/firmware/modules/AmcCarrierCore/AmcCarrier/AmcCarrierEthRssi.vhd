@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-05-06
+-- Last update: 2016-05-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -36,7 +36,6 @@ use work.AmcCarrierPkg.all;
 entity AmcCarrierEthRssi is
    generic (
       TPD_G            : time             := 1 ns;
-      TIMEOUT_G        : real             := 1.0E-3;  -- In units of seconds   
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
@@ -70,6 +69,11 @@ entity AmcCarrierEthRssi is
 end AmcCarrierEthRssi;
 
 architecture mapping of AmcCarrierEthRssi is
+
+   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
+   constant WINDOW_ADDR_SIZE_C : positive := 3;
+   constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
+   constant MAX_RETRANS_CNT_C  : positive := ite((WINDOW_ADDR_SIZE_C > 1), WINDOW_ADDR_SIZE_C-1, 1);
 
    signal rssiIbMasters : AxiStreamMasterArray(3 downto 0);
    signal rssiIbSlaves  : AxiStreamSlaveArray(3 downto 0);
@@ -134,16 +138,18 @@ begin
             2                     => X"02",   -- TDEST 2 routed to stream 2 (BSA async)
             3                     => X"03"),  -- TDEST 3 routed to stream 3 (Diag async)
          CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
-         TIMEOUT_UNIT_G           => TIMEOUT_G,
+         TIMEOUT_UNIT_G           => TIMEOUT_C,
          SERVER_G                 => true,
          RETRANSMIT_ENABLE_G      => true,
-         WINDOW_ADDR_SIZE_G       => 3,
+         WINDOW_ADDR_SIZE_G       => WINDOW_ADDR_SIZE_C,
+         MAX_NUM_OUTS_SEG_G       => (2**WINDOW_ADDR_SIZE_C),
          PIPE_STAGES_G            => 1,
          APP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
          APP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
          TSP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
          TSP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
-         INIT_SEQ_N_G             => 16#80#)
+         MAX_RETRANS_CNT_G        => MAX_RETRANS_CNT_C,
+         MAX_CUM_ACK_CNT_G        => MAX_CUM_ACK_CNT_C)
       port map (
          clk_i             => axilClk,
          rst_i             => axilRst,
@@ -231,16 +237,18 @@ begin
             1                     => "10------",   -- TDEST x80-0xBF routed to stream 1 (Raw Data)
             2                     => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)            
          CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
-         TIMEOUT_UNIT_G           => TIMEOUT_G,
+         TIMEOUT_UNIT_G           => TIMEOUT_C,
          SERVER_G                 => true,
          RETRANSMIT_ENABLE_G      => true,
-         WINDOW_ADDR_SIZE_G       => 3,
+         WINDOW_ADDR_SIZE_G       => WINDOW_ADDR_SIZE_C,
+         MAX_NUM_OUTS_SEG_G       => (2**WINDOW_ADDR_SIZE_C),
          PIPE_STAGES_G            => 1,
          APP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
          APP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
          TSP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
          TSP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
-         INIT_SEQ_N_G             => 16#80#)
+         MAX_RETRANS_CNT_G        => MAX_RETRANS_CNT_C,
+         MAX_CUM_ACK_CNT_G        => MAX_CUM_ACK_CNT_C)
       port map (
          clk_i             => axilClk,
          rst_i             => axilRst,

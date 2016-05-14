@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-05-06
+-- Last update: 2016-05-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -91,10 +91,9 @@ end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
-   constant RSSI_TIMEOUT_C : real     := 1.0E-3;  -- In units of seconds
-   constant MTU_C          : positive := 1500;
-   constant SERVER_SIZE_C  : positive := 5;
-   constant CLIENT_SIZE_C  : positive := 2;
+   constant MTU_C         : positive := 1500;
+   constant SERVER_SIZE_C : positive := 5;
+   constant CLIENT_SIZE_C : positive := 2;
 
    constant NUM_AXI_MASTERS_C : natural := 4;
 
@@ -347,7 +346,6 @@ begin
       U_RssiServer : entity work.AmcCarrierEthRssi
          generic map (
             TPD_G            => TPD_G,
-            TIMEOUT_G        => RSSI_TIMEOUT_C,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             AXI_BASE_ADDR_G  => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr) 
          port map (
@@ -413,7 +411,6 @@ begin
          generic map(
             TPD_G            => TPD_G,
             RSSI_G           => true,
-            TIMEOUT_G        => RSSI_TIMEOUT_C,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             AXI_BASE_ADDR_G  => AXI_CONFIG_C(BP_MSG_INDEX_C).baseAddr)   
          port map (

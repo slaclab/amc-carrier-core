@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-05-12
+-- Last update: 2016-05-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -35,7 +35,6 @@ entity AmcCarrierEthBpMsg is
    generic (
       TPD_G            : time             := 1 ns;
       RSSI_G           : boolean          := false;
-      TIMEOUT_G        : real             := 1.0E-3;  -- In units of seconds   
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
@@ -69,6 +68,12 @@ entity AmcCarrierEthBpMsg is
 end AmcCarrierEthBpMsg;
 
 architecture mapping of AmcCarrierEthBpMsg is
+
+   constant WINDOW_ADDR_SIZE_C : positive := 2;
+   constant TIMEOUT_C          : real     := 1.0E-6;  -- In units of seconds 
+   constant RETRANS_TOUT_C     : positive := 100;  -- unit depends on TIMEOUT_UNIT_G  
+   constant ACK_TOUT_C         : positive := 50;   -- unit depends on TIMEOUT_UNIT_G  
+   constant NULL_TOUT_C        : positive := 400;  -- unit depends on TIMEOUT_UNIT_G                 
 
    function AxiLiteConfig return AxiLiteCrossbarMasterConfigArray is
       variable retConf : AxiLiteCrossbarMasterConfigArray((2*BP_MSG_SIZE_C)-1 downto 0);
@@ -162,17 +167,21 @@ begin
             generic map (
                TPD_G                    => TPD_G,
                CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
-               TIMEOUT_UNIT_G           => TIMEOUT_G,
+               TIMEOUT_UNIT_G           => TIMEOUT_C,
                SERVER_G                 => true,
                RETRANSMIT_ENABLE_G      => true,
-               WINDOW_ADDR_SIZE_G       => 1,
-               MAX_NUM_OUTS_SEG_G       => (2**1),
+               WINDOW_ADDR_SIZE_G       => WINDOW_ADDR_SIZE_C,
+               MAX_NUM_OUTS_SEG_G       => (2**WINDOW_ADDR_SIZE_C),
                PIPE_STAGES_G            => 1,
                APP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
                APP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
                TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
                TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
-               INIT_SEQ_N_G             => 16#80#)
+               RETRANS_TOUT_G           => RETRANS_TOUT_C,
+               ACK_TOUT_G               => ACK_TOUT_C,
+               NULL_TOUT_G              => NULL_TOUT_C,
+               MAX_RETRANS_CNT_G        => 1,  -- 0x1 for HW-to-HW communication
+               MAX_CUM_ACK_CNT_G        => 1)  -- 0x1 for HW-to-HW communication
             port map (
                clk_i                => axilClk,
                rst_i                => axilRst,
@@ -201,17 +210,21 @@ begin
             generic map (
                TPD_G                    => TPD_G,
                CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
-               TIMEOUT_UNIT_G           => TIMEOUT_G,
+               TIMEOUT_UNIT_G           => TIMEOUT_C,
                SERVER_G                 => false,
                RETRANSMIT_ENABLE_G      => true,
-               WINDOW_ADDR_SIZE_G       => 1,
-               MAX_NUM_OUTS_SEG_G       => (2**1),
+               WINDOW_ADDR_SIZE_G       => WINDOW_ADDR_SIZE_C,
+               MAX_NUM_OUTS_SEG_G       => (2**WINDOW_ADDR_SIZE_C),
                PIPE_STAGES_G            => 1,
                APP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
                APP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
                TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
                TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
-               INIT_SEQ_N_G             => 16#20#)
+               RETRANS_TOUT_G           => RETRANS_TOUT_C,
+               ACK_TOUT_G               => ACK_TOUT_C,
+               NULL_TOUT_G              => NULL_TOUT_C,
+               MAX_RETRANS_CNT_G        => 1,  -- 0x1 for HW-to-HW communication
+               MAX_CUM_ACK_CNT_G        => 1)  -- 0x1 for HW-to-HW communication
             port map (
                clk_i                => axilClk,
                rst_i                => axilRst,

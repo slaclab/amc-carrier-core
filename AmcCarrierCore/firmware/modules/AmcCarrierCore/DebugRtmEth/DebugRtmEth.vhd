@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-05-06
+-- Last update: 2016-05-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,13 +37,14 @@ use work.AmcCarrierRegPkg.all;
 entity DebugRtmEth is
    generic (
       TPD_G            : time            := 1 ns;
+      ETH_10G_G        : boolean         := false;            -- false = 1 GigE, true = 10 GigE
       EN_SW_RSSI_G     : boolean         := true;
       EN_BP_MSG_G      : boolean         := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration and status
-      localMac          : in  slv(47 downto 0);           --  big-Endian configuration
-      localIp           : in  slv(31 downto 0);           --  big-Endian configuration   
+      localMac          : in  slv(47 downto 0);               --  big-Endian configuration
+      localIp           : in  slv(31 downto 0);               --  big-Endian configuration   
       ethPhyReady       : out sl;
       -- Master AXI-Lite Interface
       mAxilReadMasters  : out AxiLiteReadMasterArray(1 downto 0);
@@ -66,23 +67,23 @@ entity DebugRtmEth is
       bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
       bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
       -- Transceiver Debug Interface
-      gtTxPreCursor     : in  slv(4 downto 0) := "11111";  -- 6.02 dB: Tuned for the RTM w/ AFBR-709SMZ
-      gtTxPostCursor    : in  slv(4 downto 0) := "11111";  -- 12.96 dB: Tuned for the RTM w/ AFBR-709SMZ
-      gtTxDiffCtrl      : in  slv(3 downto 0) := "1111";  --  1.122 V:  Tuned for the RTM w/ AFBR-709SMZ
-      gtRxPolarity      : in  sl              := '0';
-      gtTxPolarity      : in  sl              := '0';
+      gtTxPreCursor     : in  slv(4 downto 0)     := "11111";  -- 6.02 dB: Tuned for the RTM w/ AFBR-709SMZ
+      gtTxPostCursor    : in  slv(4 downto 0)     := "11111";  -- 12.96 dB: Tuned for the RTM w/ AFBR-709SMZ
+      gtTxDiffCtrl      : in  slv(3 downto 0)     := "1111";  --  1.122 V:  Tuned for the RTM w/ AFBR-709SMZ
+      gtRxPolarity      : in  sl                  := '0';
+      gtTxPolarity      : in  sl                  := '0';
       ----------------------
       -- Top Level Interface
       ----------------------
       -- Backplane Messaging Interface (bpMsgClk domain)
-      bpMsgClk          : in  sl              := '0';
-      bpMsgRst          : in  sl              := '0';
+      bpMsgClk          : in  sl                  := '0';
+      bpMsgRst          : in  sl                  := '0';
       bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
       -- Application Debug Interface
-      obDebugMaster     : in  AxiStreamMasterType;
+      obDebugMaster     : in  AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
       obDebugSlave      : out AxiStreamSlaveType;
       ibDebugMaster     : out AxiStreamMasterType;
-      ibDebugSlave      : in  AxiStreamSlaveType;
+      ibDebugSlave      : in  AxiStreamSlaveType  := AXI_STREAM_SLAVE_FORCE_C;
       ----------------
       -- Core Ports --
       ----------------   
@@ -97,10 +98,9 @@ end DebugRtmEth;
 
 architecture mapping of DebugRtmEth is
 
-   constant RSSI_TIMEOUT_C : real     := 1.0E-3;  -- In units of seconds
-   constant MTU_C          : positive := 1500;
-   constant SERVER_SIZE_C  : positive := 5;
-   constant CLIENT_SIZE_C  : positive := 2;
+   constant MTU_C         : positive := 1500;
+   constant SERVER_SIZE_C : positive := 5;
+   constant CLIENT_SIZE_C : positive := 2;
 
    constant NUM_AXI_MASTERS_C : natural := 4;
 
@@ -203,48 +203,97 @@ begin
    -----------------
    -- 10 GigE Module
    -----------------
-   U_10GigE : entity work.TenGigEthGthUltraScaleWrapper
-      generic map (
-         TPD_G             => TPD_G,
-         REF_CLK_FREQ_G    => 156.25E+6,
-         NUM_LANE_G        => 1,
-         QPLL_REFCLK_SEL_G => "001",
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
-         AXIS_CONFIG_G     => (others => IP_ENGINE_CONFIG_C))
-      port map (
-         -- Local Configurations
-         localMac(0)            => localMac,
-         -- Streaming DMA Interface 
-         dmaClk(0)              => axilClk,
-         dmaRst(0)              => axilRst,
-         dmaIbMasters(0)        => obMacMaster,
-         dmaIbSlaves(0)         => obMacSlave,
-         dmaObMasters(0)        => ibMacMaster,
-         dmaObSlaves(0)         => ibMacSlave,
-         -- Slave AXI-Lite Interface 
-         axiLiteClk(0)          => axilClk,
-         axiLiteRst(0)          => axilRst,
-         axiLiteReadMasters(0)  => axilReadMasters(PHY_INDEX_C),
-         axiLiteReadSlaves(0)   => axilReadSlaves(PHY_INDEX_C),
-         axiLiteWriteMasters(0) => axilWriteMasters(PHY_INDEX_C),
-         axiLiteWriteSlaves(0)  => axilWriteSlaves(PHY_INDEX_C),
-         -- Misc. Signals
-         extRst                 => axilRst,
-         phyReady(0)            => phyReady,
-         -- Transceiver Debug Interface
-         gtTxPreCursor          => gtTxPreCursor,
-         gtTxPostCursor         => gtTxPostCursor,
-         gtTxDiffCtrl           => gtTxDiffCtrl,
-         gtRxPolarity           => gtRxPolarity,
-         gtTxPolarity           => gtTxPolarity,
-         -- MGT Clock Port (156.25 MHz or 312.5 MHz)
-         gtClkP                 => xauiClkP,
-         gtClkN                 => xauiClkN,
-         -- MGT Ports
-         gtTxP(0)               => ethTxP,
-         gtTxN(0)               => ethTxN,
-         gtRxP(0)               => ethRxP,
-         gtRxN(0)               => ethRxN);   
+   GEN_10GigE : if (ETH_10G_G = true) generate
+      U_10GigE : entity work.TenGigEthGthUltraScaleWrapper
+         generic map (
+            TPD_G             => TPD_G,
+            REF_CLK_FREQ_G    => 156.25E+6,
+            NUM_LANE_G        => 1,
+            QPLL_REFCLK_SEL_G => "001",
+            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
+            AXIS_CONFIG_G     => (others => IP_ENGINE_CONFIG_C))
+         port map (
+            -- Local Configurations
+            localMac(0)            => localMac,
+            -- Streaming DMA Interface 
+            dmaClk(0)              => axilClk,
+            dmaRst(0)              => axilRst,
+            dmaIbMasters(0)        => obMacMaster,
+            dmaIbSlaves(0)         => obMacSlave,
+            dmaObMasters(0)        => ibMacMaster,
+            dmaObSlaves(0)         => ibMacSlave,
+            -- Slave AXI-Lite Interface 
+            axiLiteClk(0)          => axilClk,
+            axiLiteRst(0)          => axilRst,
+            axiLiteReadMasters(0)  => axilReadMasters(PHY_INDEX_C),
+            axiLiteReadSlaves(0)   => axilReadSlaves(PHY_INDEX_C),
+            axiLiteWriteMasters(0) => axilWriteMasters(PHY_INDEX_C),
+            axiLiteWriteSlaves(0)  => axilWriteSlaves(PHY_INDEX_C),
+            -- Misc. Signals
+            extRst                 => axilRst,
+            phyReady(0)            => phyReady,
+            -- Transceiver Debug Interface
+            gtTxPreCursor          => gtTxPreCursor,
+            gtTxPostCursor         => gtTxPostCursor,
+            gtTxDiffCtrl           => gtTxDiffCtrl,
+            gtRxPolarity           => gtRxPolarity,
+            gtTxPolarity           => gtTxPolarity,
+            -- MGT Clock Port (156.25 MHz or 312.5 MHz)
+            gtClkP                 => xauiClkP,
+            gtClkN                 => xauiClkN,
+            -- MGT Ports
+            gtTxP(0)               => ethTxP,
+            gtTxN(0)               => ethTxN,
+            gtRxP(0)               => ethRxP,
+            gtRxN(0)               => ethRxN);   
+   end generate;
+
+   ----------------
+   -- 1 GigE Module
+   ----------------
+   GEN_1GigE : if (ETH_10G_G = false) generate
+      U_1GigE : entity work.GigEthGthUltraScaleWrapper
+         generic map (
+            TPD_G              => TPD_G,
+            -- DMA/MAC Configurations
+            NUM_LANE_G         => 1,
+            -- QUAD PLL Configurations
+            USE_GTREFCLK_G     => false,
+            CLKIN_PERIOD_G     => 6.4,   -- 156.25 MHz
+            DIVCLK_DIVIDE_G    => 5,     -- 31.25 MHz = (156.25 MHz/5)
+            CLKFBOUT_MULT_F_G  => 32.0,  -- 1 GHz = (32 x 31.25 MHz)
+            CLKOUT0_DIVIDE_F_G => 8.0,   -- 125 MHz = (1.0 GHz/8)         
+            -- AXI Streaming Configurations
+            AXIS_CONFIG_G      => (others => IP_ENGINE_CONFIG_C))  
+         port map (
+            -- Local Configurations
+            localMac(0)            => localMac,
+            -- Streaming DMA Interface 
+            dmaClk(0)              => axilClk,
+            dmaRst(0)              => axilRst,
+            dmaIbMasters(0)        => obMacMaster,
+            dmaIbSlaves(0)         => obMacSlave,
+            dmaObMasters(0)        => ibMacMaster,
+            dmaObSlaves(0)         => ibMacSlave,
+            -- Slave AXI-Lite Interface 
+            axiLiteClk(0)          => axilClk,
+            axiLiteRst(0)          => axilRst,
+            axiLiteReadMasters(0)  => axilReadMasters(PHY_INDEX_C),
+            axiLiteReadSlaves(0)   => axilReadSlaves(PHY_INDEX_C),
+            axiLiteWriteMasters(0) => axilWriteMasters(PHY_INDEX_C),
+            axiLiteWriteSlaves(0)  => axilWriteSlaves(PHY_INDEX_C),
+            -- Misc. Signals
+            extRst                 => axilRst,
+            phyReady(0)            => phyReady,
+            -- MGT Clock Port
+            gtClkP                 => xauiClkP,
+            gtClkN                 => xauiClkN,
+            -- MGT Ports
+            gtTxP(0)               => ethTxP,
+            gtTxN(0)               => ethTxN,
+            gtRxP(0)               => ethRxP,
+            gtRxN(0)               => ethRxN);          
+   end generate;
 
    U_Sync : entity work.Synchronizer
       generic map (
@@ -349,7 +398,6 @@ begin
       U_RssiServer : entity work.AmcCarrierEthRssi
          generic map (
             TPD_G            => TPD_G,
-            TIMEOUT_G        => RSSI_TIMEOUT_C,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             AXI_BASE_ADDR_G  => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr) 
          port map (
@@ -415,7 +463,6 @@ begin
          generic map(
             TPD_G            => TPD_G,
             RSSI_G           => true,
-            TIMEOUT_G        => RSSI_TIMEOUT_C,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             AXI_BASE_ADDR_G  => AXI_CONFIG_C(BP_MSG_INDEX_C).baseAddr)   
          port map (

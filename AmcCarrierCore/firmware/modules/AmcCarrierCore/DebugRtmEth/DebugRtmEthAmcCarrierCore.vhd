@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-05-06
+-- Last update: 2016-05-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,6 +38,7 @@ entity DebugRtmEthAmcCarrierCore is
    generic (
       TPD_G                    : time                 := 1 ns;   -- Simulation only parameter
       SIM_SPEEDUP_G            : boolean              := false;  -- Simulation only parameter
+      ETH_10G_G                : boolean              := false;  -- false = 1 GigE, true = 10 GigE
       TIMING_MODE_G            : boolean              := TIMING_MODE_186MHZ_C;
       MPS_SLOT_G               : boolean              := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G                   : boolean              := false;  -- false = Normal Operation, true = First Stage Boot loader
@@ -326,6 +327,7 @@ begin
    U_Eth : entity work.DebugRtmEth
       generic map (
          TPD_G            => TPD_G,
+         ETH_10G_G        => ETH_10G_G,
          EN_SW_RSSI_G     => EN_SW_RSSI_G,
          EN_BP_MSG_G      => EN_BP_MSG_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
