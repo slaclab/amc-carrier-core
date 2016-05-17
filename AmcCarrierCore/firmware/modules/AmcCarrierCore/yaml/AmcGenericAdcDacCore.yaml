@@ -100,27 +100,27 @@ Device: &AmcGenericAdcDacCore
       description: Initialization for AMC card's JESD modules
       sequence:
         # Reset the RX's GTs
-        - command: JesdRx/ResetGTs
+        - entry: JesdRx/ResetGTs
         # Calibrate the JESD ADCs
-        - command: Adc16Dx370/CalibrateAdc
+        - entry: Adc16Dx370/CalibrateAdc
         # 1000 ms sleep
-        - command: usleep
+        - entry: usleep
           set: 1000000       
         # Power up the LMK's SYSREF
-        - command: Lmk04828/PwrUpSysRef
+        - entry: Lmk04828/PwrUpSysRef
         # 1000 ms sleep
-        - command: usleep
+        - entry: usleep
           set: 1000000          
         # Init the DACs
-        - command: Dac38J84/InitDac     
+        - entry: Dac38J84/InitDac     
         # 1000 ms sleep
-        - command: usleep
+        - entry: usleep
           set: 1000000          
         # Clear the Alarms
-        - command: Dac38J84/ClearAlarms  
+        - entry: Dac38J84/ClearAlarms  
         # 1000 ms sleep
-        - command: usleep
+        - entry: usleep
           set: 1000000          
         # Clear the Alarms
-        - command: Lmk04828/InitLmk          
+        - entry: Lmk04828/InitLmk          
     ##################################################
