@@ -17,14 +17,14 @@ Device: &BsaBufferControl
   size: 0x10000 # Double check this
   #########
   MMIODev:
-    - <<: *GenericMemory
-      offset: 0x00000000
+    - offset: 0x00000000
       name: Timestamps
       size: 512 # 64 64-bit values
-      - <<: *MemoryArray
-        nelms: 64
-        bitSize: 64
-        mode: RO
+      IntField:
+        - <<: *MemoryArray
+          nelms: 64
+          bitSize: 64
+          mode: RO
 
     - <<: *AxiStreamDmaRingWrite
       offset: 0x00010000

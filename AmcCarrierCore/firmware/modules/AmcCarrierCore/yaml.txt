@@ -5,3 +5,4 @@ manual yaml/AmcCarrierTiming.yaml
 manual yaml/AmcGenericAdcDacCore.yaml
 manual yaml/AmcGenericAdcDacCtrl.yaml
 manual yaml/AxisDaqMux.yaml
+manual yaml/DaqMux.yaml

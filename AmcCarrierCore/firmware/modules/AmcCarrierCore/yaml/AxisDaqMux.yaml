@@ -165,9 +165,9 @@ Device: &AxisDaqMux
     - name: TriggerDaq
       description: Trigger data aquisition from software.
       sequence:
-        - ScalVal: SoftwareTrigger
-          SetVal: 0x1
-        - ScalVal: SoftwareTrigger
-          SetVal: 0x0               
+        - entry: SoftwareTrigger
+          value: 0x1
+        - entry: SoftwareTrigger
+          value: 0x0               
     ######################################################### 
     
