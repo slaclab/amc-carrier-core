@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-05-13
+-- Last update: 2016-05-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,6 +22,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
+use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
@@ -77,13 +79,10 @@ architecture mapping of AmcCarrierEthBpMsg is
 
    function AxiLiteConfig return AxiLiteCrossbarMasterConfigArray is
       variable retConf : AxiLiteCrossbarMasterConfigArray((2*BP_MSG_SIZE_C)-1 downto 0);
-      variable addr    : slv(31 downto 0);
    begin
-      addr := AXI_BASE_ADDR_G;
       for i in (2*BP_MSG_SIZE_C)-1 downto 0 loop
-         addr(14 downto 10)      := toSlv(i, 5);
-         retConf(i).baseAddr     := addr;
-         retConf(i).addrBits     := 10;
+         retConf(i).baseAddr     := AXI_BASE_ADDR_G + i*(2**16);
+         retConf(i).addrBits     := 16;
          retConf(i).connectivity := x"FFFF";
       end loop;
       return retConf;

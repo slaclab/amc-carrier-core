@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-05-13
+-- Last update: 2016-05-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -83,12 +83,12 @@ architecture mapping of AmcCarrierEthRssi is
    constant NUM_AXI_MASTERS_C : natural := 2;
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       0               => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"00030000"),
-         addrBits     => 12,
+         baseAddr     => (AXI_BASE_ADDR_G + x"00000000"),
+         addrBits     => 16,
          connectivity => X"FFFF"),
       1               => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"00038000"),
-         addrBits     => 12,
+         baseAddr     => (AXI_BASE_ADDR_G + x"00010000"),
+         addrBits     => 16,
          connectivity => X"FFFF"));
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
