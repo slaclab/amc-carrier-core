@@ -20,12 +20,12 @@ if { [VersionCheck 2015.4] < 0 } {
 }
 
 ## Add the Microblaze Calibration Code
-add_files ${PROJ_DIR}/../../modules/AmcCarrierCore/coregen/DebugMigCoreMicroblazeCalibration.elf
+add_files ${TOP_DIR}/modules/AmcCarrierCore/coregen/DebugMigCoreMicroblazeCalibration.elf
 set_property SCOPED_TO_REF   {DebugMigCore} [get_files DebugMigCoreMicroblazeCalibration.elf]
 set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/microblaze_I} [get_files DebugMigCoreMicroblazeCalibration.elf]
 
-add_files ${PROJ_DIR}/../../modules/AmcCarrierCore/coregen/DebugMigCoreMicroblazeCalibration.bmm
+add_files ${TOP_DIR}/modules/AmcCarrierCore/coregen/DebugMigCoreMicroblazeCalibration.bmm
 set_property SCOPED_TO_REF   {DebugMigCore} [get_files DebugMigCoreMicroblazeCalibration.bmm]
 set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0} [get_files DebugMigCoreMicroblazeCalibration.bmm]
 
-add_files -quiet -fileset sources_1 ${PROJ_DIR}/../../modules/BsaCore/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
+add_files -quiet -fileset sources_1 ${TOP_DIR}/modules/BsaCore/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
