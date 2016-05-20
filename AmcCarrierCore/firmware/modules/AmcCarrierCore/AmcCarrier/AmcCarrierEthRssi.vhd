@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-05-18
+-- Last update: 2016-05-20
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -75,10 +75,10 @@ architecture mapping of AmcCarrierEthRssi is
    constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
    constant MAX_RETRANS_CNT_C  : positive := ite((WINDOW_ADDR_SIZE_C > 1), WINDOW_ADDR_SIZE_C-1, 1);
 
-   signal rssiIbMasters : AxiStreamMasterArray(3 downto 0);
-   signal rssiIbSlaves  : AxiStreamSlaveArray(3 downto 0);
-   signal rssiObMasters : AxiStreamMasterArray(3 downto 0);
-   signal rssiObSlaves  : AxiStreamSlaveArray(3 downto 0);
+   signal rssiIbMasters : AxiStreamMasterArray(4 downto 0);
+   signal rssiIbSlaves  : AxiStreamSlaveArray(4 downto 0);
+   signal rssiObMasters : AxiStreamMasterArray(4 downto 0);
+   signal rssiObSlaves  : AxiStreamSlaveArray(4 downto 0);
 
    constant NUM_AXI_MASTERS_C : natural := 2;
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
@@ -96,10 +96,10 @@ architecture mapping of AmcCarrierEthRssi is
    signal axilReadMasters  : AxiLiteReadMasterArray(1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
 
-   signal tempIbMasters : AxiStreamMasterArray(2 downto 0);
-   signal tempIbSlaves  : AxiStreamSlaveArray(2 downto 0);
-   signal tempObMasters : AxiStreamMasterArray(2 downto 0);
-   signal tempObSlaves  : AxiStreamSlaveArray(2 downto 0);
+   signal tempIbMasters : AxiStreamMasterArray(1 downto 0);
+   signal tempIbSlaves  : AxiStreamSlaveArray(1 downto 0);
+   signal tempObMasters : AxiStreamMasterArray(1 downto 0);
+   signal tempObSlaves  : AxiStreamSlaveArray(1 downto 0);
 
 begin
 
@@ -131,12 +131,13 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G                    => TPD_G,
-         APP_STREAMS_G            => 4,
+         APP_STREAMS_G            => 5,
          APP_STREAM_ROUTES_G      => (
-            0                     => X"00",   -- TDEST 0 routed to stream 0 (SRPv0)
-            1                     => X"01",   -- TDEST 1 routed to stream 1 (loopback)
-            2                     => X"02",   -- TDEST 2 routed to stream 2 (BSA async)
-            3                     => X"03"),  -- TDEST 3 routed to stream 3 (Diag async)
+            0                     => X"00",        -- TDEST 0 routed to stream 0 (SRPv0)
+            1                     => X"01",        -- TDEST 1 routed to stream 1 (loopback)
+            2                     => X"02",        -- TDEST 2 routed to stream 2 (BSA async)
+            3                     => X"03",        -- TDEST 3 routed to stream 3 (Diag async)
+            4                     => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
          CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G           => TIMEOUT_C,
          SERVER_G                 => true,
@@ -225,17 +226,42 @@ begin
    rssiIbMasters(3) <= obBsaMasters(2);
    obBsaSlaves(2)   <= rssiIbSlaves(3);
 
+   --------------------------------
+   -- Debug Path: TDEST = 0xFF:0xC0
+   --------------------------------
+   ibDebugMaster   <= rssiObMasters(4);
+   rssiObSlaves(4) <= ibDebugSlave;
+   U_IbLimiter : entity work.SsiFrameLimiter
+      generic map (
+         TPD_G               => TPD_G,
+         FRAME_LIMIT_G       => (1024/16),  -- 1kB limit
+         COMMON_CLK_G        => true,
+         SLAVE_FIFO_G        => false,
+         MASTER_FIFO_G       => false,
+         SLAVE_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
+         MASTER_AXI_CONFIG_G => IP_ENGINE_CONFIG_C)      
+      port map (
+         -- Slave Port
+         sAxisClk    => axilClk,
+         sAxisRst    => axilRst,
+         sAxisMaster => obDebugMaster,
+         sAxisSlave  => obDebugSlave,
+         -- Master Port
+         mAxisClk    => axilClk,
+         mAxisRst    => axilRst,
+         mAxisMaster => rssiIbMasters(4),
+         mAxisSlave  => rssiIbSlaves(4));   
+
    ------------------------------
    -- Software's RSSI Server@8194
    ------------------------------
    U_Temp : entity work.RssiCoreWrapper
       generic map (
          TPD_G                    => TPD_G,
-         APP_STREAMS_G            => 3,
+         APP_STREAMS_G            => 2,
          APP_STREAM_ROUTES_G      => (
             0                     => X"04",        -- TDEST 4 routed to stream 0 (MEM)
-            1                     => "10------",   -- TDEST x80-0xBF routed to stream 1 (Raw Data)
-            2                     => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)            
+            1                     => "10------"),  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
          CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G           => TIMEOUT_C,
          SERVER_G                 => true,
@@ -289,13 +315,5 @@ begin
    tempObSlaves(1)  <= ibBsaSlaves(3);
    tempIbMasters(1) <= obBsaMasters(3);
    obBsaSlaves(3)   <= tempIbSlaves(1);
-
-   --------------------------------
-   -- Debug Path: TDEST = 0xFF:0xC0
-   --------------------------------
-   ibDebugMaster    <= tempObMasters(2);
-   tempObSlaves(2)  <= ibDebugSlave;
-   tempIbMasters(2) <= obDebugMaster;
-   obDebugSlave     <= tempIbSlaves(2);
 
 end mapping;
