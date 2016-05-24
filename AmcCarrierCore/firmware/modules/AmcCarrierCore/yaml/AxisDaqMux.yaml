@@ -37,11 +37,18 @@ Device: &AxisDaqMux
       mode: RW
       description: "Hardware Trigger Mask '1' - Enabled, '0' - Disabled"
     #########################################################
+    - offset: 0x00
+      name: DecimationMode
+      sizeBits: 1    
+      lsBit: 3
+      mode: RW
+      description: "Decimation mode '1' - 16-bit, '0' - 32-bit"
+    #########################################################
     - offset: 0x08
       name: SampleDecimation
       sizeBits: 16   
       mode: RW
-      description: "Reduces the sample rate (0 - SR, 1 - SR/2, 2 - SR/4, 2 - SR/6 etc)"
+      description: "Reduces the sample rate. 16bit DecimationMode: 0 - SR, 1 - SR/2, 2 - SR/4, 3 - SR/6 etc. 32bit DecimationMode: 0 - SR, 1 - SR, 2 - SR/2, 3 - SR/3 etc."
     #########################################################
     - offset: 0x0C
       name: DaqBufferSize
