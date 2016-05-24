@@ -105,7 +105,8 @@ architecture rtl of AmcAxisDaqMux is
    signal s_trigSwSync  : sl;
    signal s_mode        : sl;
    signal s_trigComb    : sl;
-
+   signal s_dec16or32   : sl;
+   
    -- Generate pause signal logic OR
    signal s_pauseVec    : slv(L_AXI_G-1 downto 0);
    signal s_overflowVec : slv(L_AXI_G-1 downto 0);
@@ -154,7 +155,8 @@ begin
          rateDiv_o        => s_rateDiv,
          axisPacketSize_o => s_axisPacketSizeReg,
          muxSel_o         => s_muxSel,
-         mode_o           => s_mode
+         mode_o           => s_mode,
+         dec16or32_o      => s_dec16or32
          );
    -----------------------------------------------------------
    -- Trigger and rate
@@ -252,6 +254,7 @@ begin
             packetSize_i   => s_axisPacketSizeReg,
             rateDiv_i      => s_rateDiv,
             trig_i         => s_trigComb,
+            dec16or32_i    => s_dec16or32,
             mode_i         => s_mode,
             rxAxisMaster_o => rxAxisMasterArr_o(I),
             error_o        => s_errorVec(I),

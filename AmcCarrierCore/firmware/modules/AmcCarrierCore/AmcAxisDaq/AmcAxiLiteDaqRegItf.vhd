@@ -11,14 +11,19 @@
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for DAQ
 --               0x00 (RW) 
+--                   bit 3: - Decimation mode:
+--                            '0' - 32 bit
+--                            '1' - 16 bit
 --                   bit 2: - HW Trigger Mask
 --                   bit 1: - Mode (trigger or continuous)
 --                   bit 0: - Trigger data acquisition on both AXI stream channels. 
---               0x02 (RW)- Sample rate divider(Decimator): 
---                                  0 = Sample rate,
---                                  1 = Sample rate/2,
---                                  2 = Sample rate/4,
---                                  3 = Sample rate/8, etc.
+--               0x02 (RW)- Sample rate divider(Decimator):
+--                          Decimation mode 16-bit:  Decimation mode 32-bit:
+--                          0 = Sample rate,         0 = Sample rate,
+--                          1 = Sample rate/2,       1 = Sample rate,
+--                          2 = Sample rate/4,       2 = Sample rate/2,
+--                          3 = Sample rate/6,       3 = Sample rate/3,
+--                          4 = Sample rate/8, etc.  4 = Sample rate/4, etc.
 --               0x03 (RW) - DAQ packet size (24 bit) (max 0x30000)
 --               0x1X (RW) - Mux
 --                   bit 7-4: Stream 1 Channel select Multiplexer(0 - Disabled, 1 - Ch1, 2 - Ch2, 3 - Ch3, etc.)
@@ -81,6 +86,7 @@ entity AmcAxiLiteDaqRegItf is
       trigSw_o         : out sl;
       trigHwMask_o     : out sl;
       mode_o           : out sl;
+      dec16or32_o      : out  sl;      
       axisPacketSize_o : out slv(31 downto 0);
       rateDiv_o        : out slv(15 downto 0);
       muxSel_o         : out Slv4Array(L_AXI_G-1 downto 0)
@@ -91,7 +97,7 @@ architecture rtl of AmcAxiLiteDaqRegItf is
 
    type RegType is record
       -- JESD Control (RW)
-      commonCtrl     : slv(2 downto 0);
+      commonCtrl     : slv(3 downto 0);
       axisPacketSize : slv(axisPacketSize_o'range);
       rateDiv        : slv(15 downto 0);
       muxSel         : Slv4Array(L_AXI_G-1 downto 0);
@@ -102,7 +108,7 @@ architecture rtl of AmcAxiLiteDaqRegItf is
    end record;
    
    constant REG_INIT_C : RegType := (
-      commonCtrl     => "100",
+      commonCtrl     => "0100",
       axisPacketSize => x"0030_0000",
       rateDiv        => x"0000",
       muxSel         => (x"2", x"1"),
@@ -143,7 +149,7 @@ begin
          axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
          case (s_WrAddr) is
             when 16#00# =>              -- ADDR (0)
-               v.commonCtrl := axilWriteMaster.wdata(2 downto 0);
+               v.commonCtrl := axilWriteMaster.wdata(3 downto 0);
             when 16#02# =>              -- ADDR (8)
                v.rateDiv := axilWriteMaster.wdata(15 downto 0);
             when 16#03# =>              -- ADDR (12)
@@ -165,7 +171,7 @@ begin
          v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0)
-               v.axilReadSlave.rdata(2 downto 0) := r.commonCtrl;
+               v.axilReadSlave.rdata(3 downto 0) := r.commonCtrl;
             when 16#02# =>              -- ADDR (8)
                v.axilReadSlave.rdata(15 downto 0) := r.rateDiv;
             when 16#03# =>              -- ADDR (12)
@@ -259,7 +265,17 @@ begin
          dataIn  => r.commonCtrl(2),
          dataOut => trigHwMask_o
          );
-   
+         
+   Sync_OUT3 : entity work.Synchronizer
+      generic map (
+         TPD_G => TPD_G
+         )
+      port map (
+         clk     => devClk_i,
+         rst     => devRst_i,
+         dataIn  => r.commonCtrl(3),
+         dataOut => dec16or32_o
+         );   
 
    SyncFifo_OUT0 : entity work.SynchronizerFifo
       generic map (

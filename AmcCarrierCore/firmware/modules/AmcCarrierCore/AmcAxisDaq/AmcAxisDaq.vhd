@@ -65,6 +65,7 @@ entity AmcAxisDaq is
       packetSize_i : in slv(31 downto 0);
       rateDiv_i    : in slv(15 downto 0);
       trig_i       : in sl:='0';
+      dec16or32_i  : in sl:='0';
 
       -- Mode of DAQ - '0'  - until packet size and needs trigger (used in new interface)
       --             - '1'  - sends the 4k frames continuously no trigger(used in new interface)
@@ -139,6 +140,7 @@ begin
          rst           => devRst_i,
          sampleData_i  => sampleData_i,
          decSampData_o => s_decSampData,
+         dec16or32_i   => dec16or32_i,
          rateDiv_i     => rateDiv_i,
          trig_i        => trig_i,
          trigRe_o      => s_trigRe,

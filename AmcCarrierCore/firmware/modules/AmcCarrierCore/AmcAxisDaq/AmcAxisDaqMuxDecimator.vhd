@@ -5,7 +5,7 @@
 -- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory (Cosylab)
 -- Created    : 2015-04-15
--- Last update: 2015-11-02
+-- Last update: 2016-05-24
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,121 +33,125 @@ use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
-use work.jesd204bpkg.all; 
+use work.jesd204bpkg.all;
 
-   entity AmcAxisDaqMuxDecimator is
-                               generic (
-                                     TPD_G  : time     := 1 ns;
-                                        -- Number of bytes in a frame
-                                        F_G : positive := 2
-                                        );
-                                  port (
-                                        clk    : in sl;
-                                           rst : in sl;
+entity AmcAxisDaqMuxDecimator is
+   generic (
+      TPD_G : time     := 1 ns;
+      -- Number of bytes in a frame
+      F_G   : positive := 2
+      );
+   port (
+      clk : in sl;
+      rst : in sl;
 
-                                        -- Sample data I/O
-                                              sampleData_i     : in  slv((GT_WORD_SIZE_C*8)-1 downto 0);
-                                                 decSampData_o : out slv((GT_WORD_SIZE_C*8)-1 downto 0);
+      -- Sample data I/O
+      sampleData_i      : in  slv((GT_WORD_SIZE_C*8)-1 downto 0);
+      decSampData_o     : out slv((GT_WORD_SIZE_C*8)-1 downto 0);
+      dec16or32_i       : in  sl;
 
-                                                    rateDiv_i      : in  slv(15 downto 0);
-                                                       trig_i      : in  sl;
-                                                          trigRe_o : out sl;
+      rateDiv_i : in  slv(15 downto 0);
+      trig_i    : in  sl;
+      trigRe_o  : out sl;
 
-                                        -- Divided rate clk
-                                                             rateClk_o : out sl
-                                           );
-                            end entity AmcAxisDaqMuxDecimator;
+      -- Divided rate clk
+      rateClk_o : out sl
+      );
+end entity AmcAxisDaqMuxDecimator;
 
-                                  architecture rtl of AmcAxisDaqMuxDecimator is
-                                     
-                                     type RegType is record
-                                        trigD1 : sl;
-                                        cnt    : slv(15 downto 0);
-                                        divClk : sl; 
-                                           trigRe : sl;
-                                        shft      : slv(1 downto 0);
-                                        prevFrame : slv((F_G*8)-1 downto 0);
-                                     end record RegType;
+architecture rtl of AmcAxisDaqMuxDecimator is
 
-                                     constant REG_INIT_C : RegType := (
-                                        trigD1    => '0',
-                                        cnt       => (others => '0'),
-                                        divClk    => '0', 
-                                        trigRe    => '0',
-                                        shft      => "01",
-                                        prevFrame => (others => '0')
-                                        );
+   type RegType is record
+      trigD1    : sl;
+      cnt       : slv(15 downto 0);
+      divClk    : sl;
+      trigRe    : sl;
+      shft      : slv(1 downto 0);
+      prevFrame : slv((F_G*8)-1 downto 0);
+   end record RegType;
 
-                                     signal r   : RegType := REG_INIT_C;
-                                     signal rin : RegType;
-                                     
-                                  begin
+   constant REG_INIT_C : RegType := (
+      trigD1    => '0',
+      cnt       => (others => '0'),
+      divClk    => '0',
+      trigRe    => '0',
+      shft      => "01",
+      prevFrame => (others => '0')
+      );
 
-                                     comb : process (r, rst, trig_i, rateDiv_i, sampleData_i) is
-                                        variable v : RegType;
-                                     begin
-                                        v := r;
+   signal r   : RegType := REG_INIT_C;
+   signal rin : RegType;
+
+begin
+
+   comb : process (r, rst, trig_i, rateDiv_i, sampleData_i, dec16or32_i) is
+      variable v : RegType;
+   begin
+      v := r;
 
                                         -- Delay trig for one clock cycle 
-                                        v.trigD1 := trig_i;
+      v.trigD1 := trig_i;
 
                                         -- Detect rising edge on trig
-                                        v.trigRe := trig_i and not r.trigD1;
+      v.trigRe := trig_i and not r.trigD1;
 
                                         -- rateDiv clock generator 
                                         -- divClk is aligned to trig on rising edge of trig_i. 
-                                        if (r.trigRe = '1') then
-                                           v.cnt    := (others => '0');
-                                           v.divClk := '1';
-                                        elsif (rateDiv_i = (rateDiv_i'range => '0')) then
-                                           v.cnt    := (others => '0');
-                                           v.divClk := '1';
-                                        elsif (r.cnt = rateDiv_i-1) then
-                                           v.cnt    := (others => '0');
-                                           v.divClk := '1';
-                                        else
-                                           v.cnt    := r.cnt + 1;
-                                           v.divClk := '0';
-                                        end if;
+      if (r.trigRe = '1') then
+         v.cnt    := (others => '0');
+         v.divClk := '1';
+      elsif (rateDiv_i = (rateDiv_i'range => '0')) then
+         v.cnt    := (others => '0');
+         v.divClk := '1';
+      elsif (r.cnt = rateDiv_i-1) then
+         v.cnt    := (others => '0');
+         v.divClk := '1';
+      else
+         v.cnt    := r.cnt + 1;
+         v.divClk := '0';
+      end if;
 
-                                        -- make a shifted control signal that indicates when to save and when to sample data
-                                        if (r.trigRe = '1') then
-                                           v.shft := "01";
-                                        elsif (r.divClk = '1') then
-                                           v.shft := r.shft(0) & r.shft(1);
-                                        else
-                                           v.shft := r.shft;
-                                        end if;
+      -- make a shifted control signal that indicates when to save and when to sample data
+      if (dec16or32_i = '0') then
+         -- Shift and store disabled
+         v.shft := "10";
+      elsif (r.trigRe = '1') then
+         v.shft := "01";
+      elsif (r.divClk = '1') then
+         v.shft := r.shft(0) & r.shft(1);
+      else
+         v.shft := r.shft;
+      end if;
 
-                                        -- Save frame
-                                        if (r.divClk = '1' and r.shft = "01") then
-                                           v.prevFrame := sampleData_i((F_G*8)-1 downto 0);
-                                        else
-                                           v.prevFrame := r.prevFrame;
-                                        end if;
+      -- Save frame
+      if (r.divClk = '1' and r.shft = "01") then
+         v.prevFrame := sampleData_i((F_G*8)-1 downto 0);
+      else
+         v.prevFrame := r.prevFrame;
+      end if;
 
-                                        -- Reset
-                                        if (rst = '1') then
-                                           v := REG_INIT_C;
-                                        end if;
+      -- Reset
+      if (rst = '1') then
+         v := REG_INIT_C;
+      end if;
 
-                                        rin <= v;
-                                        
-                                     end process comb;
+      rin <= v;
 
-                                     seq : process (clk) is
-                                     begin
-                                        if (rising_edge(clk)) then
-                                           r <= rin after TPD_G;
-                                        end if;
-                                     end process seq;
+   end process comb;
 
-                                     -- Output assignment
-                                     rateClk_o <= '1' when (r.divClk = '1' and r.shft = "10") or rateDiv_i = (rateDiv_i'range => '0') else '0';
+   seq : process (clk) is
+   begin
+      if (rising_edge(clk)) then
+         r <= rin after TPD_G;
+      end if;
+   end process seq;
 
-                                     decSampData_o <= sampleData_i((F_G*8)-1 downto 0) & r.prevFrame when (GT_WORD_SIZE_C = 4 and rateDiv_i /= (rateDiv_i'range => '0')) else
-                                                      sampleData_i;
-                                     
-                                     trigRe_o <= r.trigRe;
+   -- Output assignment
+   rateClk_o <= '1' when (r.divClk = '1' and r.shft = "10") or rateDiv_i = (rateDiv_i'range => '0') else '0';
+
+   decSampData_o <= sampleData_i((F_G*8)-1 downto 0) & r.prevFrame when (GT_WORD_SIZE_C = 4 and rateDiv_i /= (rateDiv_i'range => '0') and dec16or32_i = '1') else
+                    sampleData_i;
+
+   trigRe_o <= r.trigRe;
 ---------------------------------------   
-                                  end architecture rtl;
+end architecture rtl;
