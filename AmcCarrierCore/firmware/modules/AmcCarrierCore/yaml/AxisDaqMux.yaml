@@ -10,7 +10,7 @@
 
 Device: &AxisDaqMux 
   name: AxisDaqMux
-  description: Data acquisition control
+  description: "Data acquisition control"
   size: 0x400
   #########
   IntField:
@@ -21,149 +21,149 @@ Device: &AxisDaqMux
       sizeBits: 1    
       lsBit: 0 
       mode: RW
-      description: Trigger data acquisition (bit0 - Auto clear register)
+      description: "Trigger data acquisition (bit0 - Auto clear register)"
     #########################################################
     - offset: 0x00
       name: Mode
       sizeBits: 1    
       lsBit: 1
       mode: RW
-      description: Mode of DAQ - '0'  - until packet size and needs trigger - '1'  - sends the 4k frames continuously no trigger
+      description: "Mode of DAQ - '0'  - until packet size and needs trigger - '1'  - sends the 4k frames continuously no trigger"
     #########################################################
     - offset: 0x00
       name: HwTriggerMask
       sizeBits: 1    
       lsBit: 2
       mode: RW
-      description: Hardware Trigger Mask '1' - Enabled, '0' - Disabled
+      description: "Hardware Trigger Mask '1' - Enabled, '0' - Disabled"
     #########################################################
     - offset: 0x08
       name: SampleDecimation
       sizeBits: 16   
       mode: RW
-      description: Reduces the sample rate (0 - SR, 1 - SR/2, 2 - SR/4, 2 - SR/6 etc)
+      description: "Reduces the sample rate (0 - SR, 1 - SR/2, 2 - SR/4, 2 - SR/6 etc)"
     #########################################################
     - offset: 0x0C
       name: DaqBufferSize
       sizeBits: 32   
       mode: RW
-      description: Size of a single continuous data buffer (number of 32-bit words)
+      description: "Size of a single continuous data buffer (number of 32-bit words)"
     #########################################################
     - offset: 0x40
       name: S0ChannelSelect
       sizeBits: 4   
       mode: RW
-      description: Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)
+      description: "Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)"
     #########################################################
     - offset: 0x44
       name: S1ChannelSelect
       sizeBits: 4   
       mode: RW
-      description: Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)
+      description: "Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)"
     #########################################################
     - offset: 0x80
       name: S0Pause
       sizeBits: 1
       lsBit: 0      
       mode: RO
-      description: DAQ interface busy
+      description: "DAQ interface busy"
     ######################################################### 
     - offset: 0x80
       name: S0Ready
       sizeBits: 1
       lsBit: 1      
       mode: RO
-      description: Ready to take new data packet
+      description: "Ready to take new data packet"
     #########################################################    
     - offset: 0x80
       name: S0Overflow
       sizeBits: 1
       lsBit: 2
       mode: RO
-      description: Buffer overflow
+      description: "Buffer overflow"
     #########################################################
     - offset: 0x80
       name: S0Error
       sizeBits: 1
       lsBit: 3
       mode: RO
-      description: Error during last Acquisition - received buffer might be shorter then requested
+      description: "Error during last Acquisition - received buffer might be shorter then requested"
     #########################################################
     - offset: 0x80
       name: S0DataInValid
       sizeBits: 1
       lsBit: 4
       mode: RO
-      description: The incoming data is Valid (Usually connected to JESD valid signal).
+      description: "The incoming data is Valid (Usually connected to JESD valid signal)."
     #########################################################
     - offset: 0x80
       name: S0Enabled
       sizeBits: 1
       lsBit: 5
       mode: RO
-      description: Streamming is: 1-enabled, 0-Disabled
+      description: "Streamming is: 1-enabled, 0-Disabled"
     #########################################################
     - offset: 0x80
       name: S0FrameCnt
       sizeBits: 26
       lsBit: 6
       mode: RO
-      description: Number of frames (4096 bytes) sent. In the last transfer.
+      description: "Number of frames (4096 bytes) sent. In the last transfer."
     #########################################################
     - offset: 0x84
       name: S1Pause
       sizeBits: 1
       lsBit: 0      
       mode: RO
-      description: DAQ interface busy
+      description: "DAQ interface busy"
     ######################################################### 
     - offset: 0x84
       name: S1Ready
       sizeBits: 1
       lsBit: 1      
       mode: RO
-      description: Ready to take new data packet
+      description: "Ready to take new data packet"
     #########################################################    
     - offset: 0x84
       name: S1Overflow
       sizeBits: 1
       lsBit: 2
       mode: RO
-      description: Buffer overflow
+      description: "Buffer overflow"
     #########################################################
     - offset: 0x84
       name: S1Error
       sizeBits: 1
       lsBit: 3
       mode: RO
-      description: Error during last Acquisition - received buffer might be shorter then requested
+      description: "Error during last Acquisition - received buffer might be shorter then requested"
     #########################################################
     - offset: 0x84
       name: S1DataInValid
       sizeBits: 1
       lsBit: 4
       mode: RO
-      description: The incoming data is Valid (Usually connected to JESD valid signal).
+      description: "The incoming data is Valid (Usually connected to JESD valid signal)."
     #########################################################
     - offset: 0x84
       name: S1Enabled
       sizeBits: 1
       lsBit: 5
       mode: RO
-      description: Streamming is: 1-enabled, 0-Disabled
+      description: "Streamming is: 1-enabled, 0-Disabled"
     #########################################################
     - offset: 0x84
       name: S1FrameCnt
       sizeBits: 26
       lsBit: 6
       mode: RO
-      description: Number of frames (4096 bytes) sent. In the last transfer.
+      description: "Number of frames (4096 bytes) sent. In the last transfer."
     #########################################################
   #########
   Commands:
   #########
     - name: TriggerDaq
-      description: Trigger data aquisition from software.
+      description: "Trigger data aquisition from software."
       sequence:
         - entry: SoftwareTrigger
           value: 0x1
