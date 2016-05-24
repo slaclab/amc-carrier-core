@@ -101,26 +101,36 @@ Device: &AmcGenericAdcDacCore
       sequence:
         # Reset the RX's GTs
         - entry: JesdRx/ResetGTs
+          value: 0x1       
         # Calibrate the JESD ADCs
         - entry: Adc16Dx370/CalibrateAdc
+          value: 0x1       
         # 1000 ms sleep
         - entry: usleep
-          set: 1000000       
+          value: 1000000       
+
         # Power up the LMK's SYSREF
         - entry: Lmk04828/PwrUpSysRef
+          value: 0x1       
         # 1000 ms sleep
         - entry: usleep
-          set: 1000000          
+          value: 1000000          
+
         # Init the DACs
         - entry: Dac38J84/InitDac     
+          value: 0x1       
         # 1000 ms sleep
         - entry: usleep
-          set: 1000000          
+          value: 1000000          
+
         # Clear the Alarms
         - entry: Dac38J84/ClearAlarms  
+          value: 0x1       
         # 1000 ms sleep
         - entry: usleep
-          set: 1000000          
+          value: 1000000          
+
         # Clear the Alarms
         - entry: Lmk04828/InitLmk          
+          value: 0x1       
     ##################################################
