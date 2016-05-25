@@ -104,17 +104,17 @@ Device: &AmcCarrierCore
       nelms: 2
       stride: 0x10000        
     ##################################################
-    - <<: *RssiCore
-      name: "RssiServerBp"
-      offset: 0x0A040000 # Server RSSI’s BP_MSG[1:0]     
-      nelms: 2
-      stride: 0x20000
-    ##################################################
-    - <<: *RssiCore
-      name: "RssiClientBp"
-      offset: 0x0A050000 # Client RSSI’s BP_MSG[1:0]    
-      nelms: 2
-      stride: 0x20000            
+    # - <<: *RssiCore
+      # name: "RssiServerBp"
+      # offset: 0x0A040000 # Server RSSI’s BP_MSG[1:0]     
+      # nelms: 2
+      # stride: 0x20000
+    # ##################################################
+    # - <<: *RssiCore
+      # name: "RssiClientBp"
+      # offset: 0x0A050000 # Client RSSI’s BP_MSG[1:0]    
+      # nelms: 2
+      # stride: 0x20000            
     ################################################## 
     - <<: *AxiEmpty
       name: "DdrPhy"  # AxiEmpty is a placeholder
