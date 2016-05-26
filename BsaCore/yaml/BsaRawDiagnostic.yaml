@@ -13,7 +13,7 @@ include: AxiStreamDmaRingWrite.yaml
 Device: &BsaRawDiagnostic
   name: BsaRawDiagnostic
   description: Configuration and status of the BSA dignosic buffers
-  size: 0x1000 # Double check this
+  size: 0x20000 # Double check this
   #########
   MMIODev:
 
