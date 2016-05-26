@@ -8,6 +8,8 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+include: AxiStreamDmaRingWrite.yaml
+
 Device: &BsaRawDiagnostic
   name: BsaRawDiagnostic
   description: Configuration and status of the BSA dignosic buffers
