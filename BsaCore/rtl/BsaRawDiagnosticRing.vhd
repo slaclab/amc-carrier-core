@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-04-29
+-- Last update: 2016-05-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -180,11 +180,11 @@ begin
          BURST_SIZE_BYTES_G   => 4096,
          AXIL_BASE_ADDR_G     => AXIL_BASE_ADDR_G,
          DATA_AXIS_CONFIG_G   => INTERNAL_AXIS_CONFIG_C,
-         STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8), -- Shoud this be 4 tDest bits?
+         STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8),  -- Shoud this be 4 tDest bits?
          AXI_WRITE_CONFIG_G   => AXI_CONFIG_G)
       port map (
-         axilClk          => axilClk,              -- [in]
-         axilRst          => axilRst,              -- [in]
+         axilClk          => axilClk,   -- [in]
+         axilRst          => axilRst,   -- [in]
          axilReadMaster   => locAxilReadMaster,    -- [in]
          axilReadSlave    => locAxilReadSlave,     -- [out]
          axilWriteMaster  => locAxilWriteMaster,   -- [in]
@@ -193,8 +193,8 @@ begin
          axisStatusRst    => axisStatusRst,        -- [in]
          axisStatusMaster => axisStatusMasterInt,  -- [out]
          axisStatusSlave  => axisStatusSlaveInt,   -- [in]
-         axiClk           => axiClk,               -- [in]
-         axiRst           => axiRst,               -- [in]
+         axiClk           => axiClk,    -- [in]
+         axiRst           => axiRst,    -- [in]
          bufferDone       => bufferDone,           -- [out]
          axisDataMaster   => muxOutAxisMaster,     -- [in]
          axisDataSlave    => muxOutAxisSlave,      -- [out]
@@ -240,6 +240,7 @@ begin
       generic map (
          TPD_G                 => TPD_G,
          BUFFERS_G             => DIAGNOSTIC_RAW_STREAMS_G,
+         BURST_SIZE_BYTES_G    => 4096,
          SSI_OUTPUT_G          => true,
          AXIL_BASE_ADDR_G      => AXIL_BASE_ADDR_G,
          AXI_STREAM_READY_EN_G => false,

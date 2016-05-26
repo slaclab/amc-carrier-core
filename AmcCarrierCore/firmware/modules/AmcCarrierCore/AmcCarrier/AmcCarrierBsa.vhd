@@ -42,9 +42,9 @@ entity AmcCarrierBsa is
       DIAGNOSTIC_OUTPUTS_G     : integer range 1 to 32 := 28;
       DIAGNOSTIC_RAW_STREAMS_G : positive              := 4;
       DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray  := (0 => ssiAxiStreamConfig(4),
-                                                           1 => ssiAxiStreamConfig(4),
-                                                           2 => ssiAxiStreamConfig(4),
-                                                           3 => ssiAxiStreamConfig(4)));
+                                                          1  => ssiAxiStreamConfig(4),
+                                                          2  => ssiAxiStreamConfig(4),
+                                                          3  => ssiAxiStreamConfig(4)));
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk              : in  sl;
@@ -291,9 +291,9 @@ begin
 --          AXI_CACHE_G         => AXI_CACHE_G,
             ACK_WAIT_BVALID_G   => false,
             AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C,
-            UNALIGNED_ACCESS_G  => true,
-            BYTE_ACCESS_G       => true,
-            WRITE_EN_G          => true,
+            UNALIGNED_ACCESS_G  => false,
+            BYTE_ACCESS_G       => false,
+            WRITE_EN_G          => false,
             READ_EN_G           => true)
          port map (
             sAxisClk       => axilClk,                             -- [in]
