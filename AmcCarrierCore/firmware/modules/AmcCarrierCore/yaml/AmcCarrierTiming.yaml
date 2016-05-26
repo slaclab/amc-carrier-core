@@ -8,7 +8,19 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+#include: TimingFrameRx.yaml
+#include: TPGMiniCore.yaml
+
 Device: &AmcCarrierTiming 
   name: AmcCarrierTiming
-  description: Empty Module as a placeholder for future module
-  size: 0x0
+  description: Timing receiver module for AMC Carrier
+  size: 0x40000
+  ############
+  peripherals:
+  ############
+    - <<: *TimingFrameRx
+      address: 0x00000000
+    ##################################################
+    - <<: *TPGMiniCore
+      address: 0x00030000
+    ##################################################
