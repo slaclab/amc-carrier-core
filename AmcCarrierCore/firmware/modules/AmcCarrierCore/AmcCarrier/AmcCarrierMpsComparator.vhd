@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-17
--- Last update: 2015-10-16
+-- Last update: 2016-05-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ begin
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
          generic map (
             TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)            
+            AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- Don't respond with error          
          port map (
             axiClk         => axilClk,
             axiClkRst      => axilRst,

@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-05-03
+-- Last update: 2016-05-26
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -42,9 +42,9 @@ entity AmcCarrierBsa is
       DIAGNOSTIC_OUTPUTS_G     : integer range 1 to 32 := 28;
       DIAGNOSTIC_RAW_STREAMS_G : positive              := 4;
       DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray  := (0 => ssiAxiStreamConfig(4),
-                                                          1  => ssiAxiStreamConfig(4),
-                                                          2  => ssiAxiStreamConfig(4),
-                                                          3  => ssiAxiStreamConfig(4)));
+                                                           1 => ssiAxiStreamConfig(4),
+                                                           2 => ssiAxiStreamConfig(4),
+                                                           3 => ssiAxiStreamConfig(4)));
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk              : in  sl;
@@ -157,7 +157,7 @@ begin
       U_AxiLiteEmpty_1 : entity work.AxiLiteEmpty
          generic map (
             TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_RESP_OK_C)
+            AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- Don't respond with error
          port map (
             axiClk         => axilClk,          -- [in]
             axiClkRst      => axilRst,          -- [in]
