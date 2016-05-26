@@ -14,7 +14,7 @@ include: AxiStreamDmaRingWrite.yaml
 Device: &BsaBufferControl
   name: BsaBufferControl
   description: Configuration and status of the BSA dignosic buffers
-  size: 0x20000 # Double check this
+  size: 0x2000 # Double check this
   #########
   MMIODev:
     - offset: 0x00000000
@@ -27,7 +27,7 @@ Device: &BsaBufferControl
           mode: RO
 
     - <<: *AxiStreamDmaRingWrite
-      offset: 0x00010000
+      offset: 0x00001000
       name: BsaBuffers
       metadata:
         - numBuffers: 64
