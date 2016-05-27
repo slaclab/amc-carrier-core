@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-05-26
+-- Last update: 2016-05-27
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -81,8 +81,8 @@ architecture mapping of AmcCarrierEthBpMsg is
       variable retConf : AxiLiteCrossbarMasterConfigArray((2*BP_MSG_SIZE_C)-1 downto 0);
    begin
       for i in (2*BP_MSG_SIZE_C)-1 downto 0 loop
-         retConf(i).baseAddr     := AXI_BASE_ADDR_G + i*(2**16);
-         retConf(i).addrBits     := 16;
+         retConf(i).baseAddr     := AXI_BASE_ADDR_G + i*(2**12);
+         retConf(i).addrBits     := 12;
          retConf(i).connectivity := x"FFFF";
       end loop;
       return retConf;

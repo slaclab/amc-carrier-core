@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-05-26
+-- Last update: 2016-05-27
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ architecture mapping of AmcCarrierEth is
    constant PHY_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00000000");
    constant UDP_ADDR_C    : slv(31 downto 0) := (XAUI_ADDR_C + x"00010000");
    constant RSSI_ADDR_C   : slv(31 downto 0) := (XAUI_ADDR_C + x"00020000");
-   constant BP_MSG_ADDR_C : slv(31 downto 0) := (XAUI_ADDR_C + x"00040000");
+   constant BP_MSG_ADDR_C : slv(31 downto 0) := (XAUI_ADDR_C + x"00030000");
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       PHY_INDEX_C     => (
