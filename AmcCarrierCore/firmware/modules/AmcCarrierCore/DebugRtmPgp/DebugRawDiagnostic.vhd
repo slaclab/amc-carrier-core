@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-04-29
+-- Last update: 2016-06-01
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -268,6 +268,7 @@ begin
       generic map (
          TPD_G                 => TPD_G,
          BUFFERS_G             => DIAGNOSTIC_RAW_STREAMS_G,
+         BURST_SIZE_BYTES_G => 4096,
          SSI_OUTPUT_G          => true,
          AXIL_BASE_ADDR_G      => AXIL_BASE_ADDR_G,
          AXI_STREAM_READY_EN_G => false,
@@ -289,8 +290,8 @@ begin
          dataCtrl        => readDmaDataCtrl,       -- [in]
          axiClk          => axiClk,                -- [in]
          axiRst          => axiRst,                -- [in]
-         axiReadMaster   => locAxiReadMasters(0),  -- [out]
-         axiReadSlave    => locAxiReadSlaves(0));  -- [in]
+         axiReadMaster   => locAxiReadMasters(2),  -- [out]
+         axiReadSlave    => locAxiReadSlaves(2));  -- [in]
 
 
 
