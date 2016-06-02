@@ -17,11 +17,7 @@ Device: &AmcCarrierBsa
   size: 0x20000 # Double check this
   #########
   MMIODev:
-  - <<: *BsaBufferControl
+    - <<: *BsaBufferControl
       offset: 0x00000000
-  - <<: *BsaRawDiagnostic
+    - <<: *BsaRawDiagnostic
       offset: 0x00010000
-
-
-
-      

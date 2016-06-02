@@ -100,7 +100,7 @@ Device: &AmcGenericAdcDacCore
       description: Initialization for AMC card's JESD modules
       sequence:
         # Reset the RX's GTs
-        - entry: JesdRx/ResetGTs
+        - entry: JesdRx/C_ResetGTs
           value: 0x1       
         # Calibrate the JESD ADCs
         - entry: Adc16Dx370/CalibrateAdc

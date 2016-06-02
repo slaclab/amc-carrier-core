@@ -44,51 +44,51 @@ Device: &AmcCarrierCore
     - <<: *AxiMicronN25Q
       offset: 0x02000000  
     ##################################################
-    - <<: *AxiSy56040
-      offset: 0x03000000      
+    # - <<: *AxiSy56040
+      # offset: 0x03000000      
     ##################################################
-    - name: "Axi24LC64FT"
-      offset: 0x04000000       
-      size: 0x2000       
-      IntField:
-        - <<: *MemoryArray
-          nelms: 0x800
+    # - name: "Axi24LC64FT"
+      # offset: 0x04000000       
+      # size: 0x2000       
+      # IntField:
+        # - <<: *MemoryArray
+          # nelms: 0x800
     ##################################################
-    - name: "AxiCdcm6208"
-      offset: 0x05000000       
-      size: 0x40       
-      IntField:
-        - <<: *MemoryArray
-          nelms: 0x29      
+    # - name: "AxiCdcm6208"
+      # offset: 0x05000000       
+      # size: 0x40       
+      # IntField:
+        # - <<: *MemoryArray
+          # nelms: 0x29      
     ##################################################
-    - name: "DdrSpdMemory"
-      offset: 0x06000000       
-      size: 0x100     
-      description: Lookup tool at www.micron.com/spd
-      IntField:
-        - <<: *MemoryArray
-          nelms: 0x40        
-          nmode: RO # Read only
-    ##################################################
-    - name: "DdrTempSensor"
-      offset: 0x06000100       
-      size: 0x100     
-      IntField:
-        - <<: *MemoryArray
-          nelms: 0x40        
-          nmode: RO # Read only
+    # - name: "DdrSpdMemory"
+      # offset: 0x06000000       
+      # size: 0x100     
+      # description: Lookup tool at www.micron.com/spd
+      # IntField:
+        # - <<: *MemoryArray
+          # nelms: 0x40        
+          # nmode: RO # Read only
+    # ##################################################
+    # - name: "DdrTempSensor"
+      # offset: 0x06000100       
+      # size: 0x100     
+      # IntField:
+        # - <<: *MemoryArray
+          # nelms: 0x40        
+          # nmode: RO # Read only
     ##################################################
     - <<: *AmcCarrierBsi
       offset: 0x07000000      
     ##################################################  
-    - <<: *AmcCarrierTiming
-      offset: 0x08000000      
+    # - <<: *AmcCarrierTiming
+      # offset: 0x08000000      
     ##################################################
     - <<: *AmcCarrierBsa
       offset: 0x09000000    
     ##################################################
-    - <<: *XauiReg
-      offset: 0x0A000000  
+    # - <<: *XauiReg
+      # offset: 0x0A000000  
     ##################################################
     - <<: *UdpEngineWrapper
       offset: 0x0A010000 # ClientConfig[1:0]
@@ -101,23 +101,23 @@ Device: &AmcCarrierCore
       nelms: 2
       stride: 0x1000        
     ##################################################
-    - <<: *RssiCore
-      name: "RssiServerBp"
-      offset: 0x0A030000 # Server RSSI’s BP_MSG[1:0]     
-      nelms: 2
-      stride: 0x2000
-    ##################################################
-    - <<: *RssiCore
-      name: "RssiClientBp"
-      offset: 0x0A031000 # Client RSSI’s BP_MSG[1:0]    
-      nelms: 2
-      stride: 0x2000            
+    # - <<: *RssiCore
+      # name: "RssiServerBp"
+      # offset: 0x0A030000 # Server RSSI’s BP_MSG[1:0]     
+      # nelms: 2
+      # stride: 0x2000
+    # ##################################################
+    # - <<: *RssiCore
+      # name: "RssiClientBp"
+      # offset: 0x0A031000 # Client RSSI’s BP_MSG[1:0]    
+      # nelms: 2
+      # stride: 0x2000            
     ################################################## 
-    - <<: *AxiEmpty
-      name: "DdrPhy"  # AxiEmpty is a placeholder
-      offset: 0x0B000000      
-    ##################################################   
-    - <<: *AxiEmpty
-      name: "MpsPhy"  # AxiEmpty is a placeholder
-      offset: 0x0C000000      
+    # - <<: *AxiEmpty
+      # name: "DdrPhy"  # AxiEmpty is a placeholder
+      # offset: 0x0B000000      
+    # ##################################################   
+    # - <<: *AxiEmpty
+      # name: "MpsPhy"  # AxiEmpty is a placeholder
+      # offset: 0x0C000000      
     #########################################################
