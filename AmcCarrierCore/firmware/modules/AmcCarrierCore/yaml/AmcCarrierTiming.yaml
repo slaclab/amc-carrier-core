@@ -8,13 +8,14 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-#include: TimingFrameRx.yaml
-#include: TPGMiniCore.yaml
+include: TimingFrameRx.yaml
+include: TPGMiniCore.yaml
+include: Gthe3Channel.yaml
 
 Device: &AmcCarrierTiming 
   name: AmcCarrierTiming
   description: Timing receiver module for AMC Carrier
-  size: 0x40000
+  size: 0x01000000
   ############
   peripherals:
   ############
@@ -24,3 +25,6 @@ Device: &AmcCarrierTiming
     - <<: *TPGMiniCore
       address: 0x00030000
     ##################################################
+    - <<: *Gthe3Channel
+      address: 0x00800000
+    ##################################################    
