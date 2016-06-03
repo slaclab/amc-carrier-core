@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-05-06
+-- Last update: 2016-06-03
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -22,6 +22,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
@@ -83,6 +85,16 @@ end AmcCarrierTiming;
 
 architecture mapping of AmcCarrierTiming is
 
+   constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(1 downto 0) := (
+      0               => (
+         baseAddr     => (TIMING_ADDR_C+x"00000000"),
+         addrBits     => 23,
+         connectivity => x"FFFF"),
+      1               => (
+         baseAddr     => (TIMING_ADDR_C+x"00800000"),
+         addrBits     => 23,
+         connectivity => x"FFFF"));  
+
    constant TIME_GEN_APP : boolean := (APP_TYPE_G = APP_TIME_GEN_TYPE_C or APP_TYPE_G = APP_EXTREF_GEN_TYPE_C);
 
    signal timingRefClk   : sl;
@@ -111,7 +123,34 @@ architecture mapping of AmcCarrierTiming is
    signal refclksel      : slv(2 downto 0);
    signal appBus         : TimingBusType;
 
+   signal axilWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+
 begin
+
+   --------------------------
+   -- AXI-Lite: Crossbar Core
+   --------------------------  
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 2,
+         MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
 
    recTimingClk <= timingRecClk;
    recTimingRst <= not(rxResetDone);
@@ -162,10 +201,10 @@ begin
       port map (
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => AXI_LITE_READ_MASTER_INIT_C,
-         axilReadSlave   => open,
-         axilWriteMaster => AXI_LITE_WRITE_MASTER_INIT_C,
-         axilWriteSlave  => open,
+         axilReadMaster  => axilReadMasters(1),
+         axilReadSlave   => axilReadSlaves(1),
+         axilWriteMaster => axilWriteMasters(1),
+         axilWriteSlave  => axilWriteSlaves(1),
          stableClk       => axilClk,
          gtRefClk        => timingRefClk,
          gtRxP           => timingRxP,
@@ -269,10 +308,10 @@ begin
          timingPhy       => coreTimingPhy,
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave);
+         axilReadMaster  => axilReadMasters(0),
+         axilReadSlave   => axilReadSlaves(0),
+         axilWriteMaster => axilWriteMasters(0),
+         axilWriteSlave  => axilWriteSlaves(0));
 
    process(appTimingClk)
    begin
