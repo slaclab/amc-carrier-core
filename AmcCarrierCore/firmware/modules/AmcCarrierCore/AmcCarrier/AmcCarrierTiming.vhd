@@ -266,9 +266,6 @@ begin
 
    rxUsrClk <= timingRecClk;
 
-   -- Drive the external CLK MUX to standalone or dual timing mode
-   timingClkSel <= ite(TIMING_MODE_G, '1', '0');
-
    -- Send a copy of the timing clock to the AMC's clock cleaner
    ClkOutBufDiff_Inst : entity work.ClkOutBufDiff
       generic map (
@@ -306,6 +303,7 @@ begin
          appTimingRst    => appTimingRst,
          appTimingBus    => appBus,
          timingPhy       => coreTimingPhy,
+         timingClkSel    => timingClkSel,
          axilClk         => axilClk,
          axilRst         => axilRst,
          axilReadMaster  => axilReadMasters(0),
