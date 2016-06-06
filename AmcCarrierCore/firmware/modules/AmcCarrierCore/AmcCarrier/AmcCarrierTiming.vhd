@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-06-03
+-- Last update: 2016-06-06
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -286,7 +286,7 @@ begin
          TPGEN_G           => TIME_GEN_APP,
          AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
          AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C,
-         LCLSV1_G          => TIMING_MODE_119MHZ_C)
+         TIMING_MODE_G     => TIMING_MODE_G)
       port map (
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,
