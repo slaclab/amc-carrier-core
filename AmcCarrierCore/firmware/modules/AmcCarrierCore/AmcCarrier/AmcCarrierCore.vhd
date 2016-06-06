@@ -82,7 +82,7 @@ entity AmcCarrierCore is
       bpMsgClk             : in    sl                               := '0';
       bpMsgRst             : in    sl                               := '0';
       bpMsgBus             : out   BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
-      -- Application Debug Interface
+      -- Application Debug Interface (ref156MHzClk domain)
       obDebugMaster        : in    AxiStreamMasterType              := AXI_STREAM_MASTER_INIT_C;
       obDebugSlave         : out   AxiStreamSlaveType;
       ibDebugMaster        : out   AxiStreamMasterType;
