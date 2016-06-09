@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-06-08
+-- Last update: 2016-06-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -75,6 +75,9 @@ architecture mapping of AmcCarrierEthRssi is
    constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
    constant MAX_RETRANS_CNT_C  : positive := ite((WINDOW_ADDR_SIZE_C > 1), WINDOW_ADDR_SIZE_C-1, 1);
 
+   constant APP_AXIS_CONFIG_C  : AxiStreamConfigArray(4 downto 0) := (others => ETH_AXIS_CONFIG_C);
+   constant TEMP_AXIS_CONFIG_C : AxiStreamConfigArray(1 downto 0) := (others => ETH_AXIS_CONFIG_C);
+
    signal rssiIbMasters : AxiStreamMasterArray(4 downto 0);
    signal rssiIbSlaves  : AxiStreamSlaveArray(4 downto 0);
    signal rssiObMasters : AxiStreamMasterArray(4 downto 0);
@@ -130,27 +133,25 @@ begin
    ------------------------------
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
-         TPD_G                    => TPD_G,
-         APP_STREAMS_G            => 5,
-         APP_STREAM_ROUTES_G      => (
-            0                     => X"00",        -- TDEST 0 routed to stream 0 (SRPv0)
-            1                     => X"01",        -- TDEST 1 routed to stream 1 (loopback)
-            2                     => X"02",        -- TDEST 2 routed to stream 2 (BSA async)
-            3                     => X"03",        -- TDEST 3 routed to stream 3 (Diag async)
-            4                     => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
-         CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
-         TIMEOUT_UNIT_G           => TIMEOUT_C,
-         SERVER_G                 => true,
-         RETRANSMIT_ENABLE_G      => true,
-         WINDOW_ADDR_SIZE_G       => WINDOW_ADDR_SIZE_C,
-         MAX_NUM_OUTS_SEG_G       => (2**WINDOW_ADDR_SIZE_C),
-         PIPE_STAGES_G            => 1,
-         APP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         APP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
-         TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
-         MAX_RETRANS_CNT_G        => MAX_RETRANS_CNT_C,
-         MAX_CUM_ACK_CNT_G        => MAX_CUM_ACK_CNT_C)
+         TPD_G               => TPD_G,
+         APP_STREAMS_G       => 5,
+         APP_STREAM_ROUTES_G => (
+            0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv0)
+            1                => X"01",  -- TDEST 1 routed to stream 1 (loopback)
+            2                => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
+            3                => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
+            4                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
+         CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
+         TIMEOUT_UNIT_G      => TIMEOUT_C,
+         SERVER_G            => true,
+         RETRANSMIT_ENABLE_G => true,
+         WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
+         MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
+         PIPE_STAGES_G       => 1,
+         APP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
+         TSP_AXIS_CONFIG_G   => IP_ENGINE_CONFIG_C,
+         MAX_RETRANS_CNT_G   => MAX_RETRANS_CNT_C,
+         MAX_CUM_ACK_CNT_G   => MAX_CUM_ACK_CNT_C)
       port map (
          clk_i             => axilClk,
          rst_i             => axilRst,
@@ -238,8 +239,8 @@ begin
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         MASTER_AXI_CONFIG_G => IP_ENGINE_CONFIG_C)      
+         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)      
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
@@ -257,24 +258,22 @@ begin
    ------------------------------
    U_Temp : entity work.RssiCoreWrapper
       generic map (
-         TPD_G                    => TPD_G,
-         APP_STREAMS_G            => 2,
-         APP_STREAM_ROUTES_G      => (
-            0                     => X"04",        -- TDEST 4 routed to stream 0 (MEM)
-            1                     => "10------"),  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
-         CLK_FREQUENCY_G          => AXI_CLK_FREQ_C,
-         TIMEOUT_UNIT_G           => TIMEOUT_C,
-         SERVER_G                 => true,
-         RETRANSMIT_ENABLE_G      => true,
-         WINDOW_ADDR_SIZE_G       => WINDOW_ADDR_SIZE_C,
-         MAX_NUM_OUTS_SEG_G       => (2**WINDOW_ADDR_SIZE_C),
-         PIPE_STAGES_G            => 1,
-         APP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         APP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
-         TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
-         MAX_RETRANS_CNT_G        => MAX_RETRANS_CNT_C,
-         MAX_CUM_ACK_CNT_G        => MAX_CUM_ACK_CNT_C)
+         TPD_G               => TPD_G,
+         APP_STREAMS_G       => 2,
+         APP_STREAM_ROUTES_G => (
+            0                => X"04",  -- TDEST 4 routed to stream 0 (MEM)
+            1                => "10------"),  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+         CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
+         TIMEOUT_UNIT_G      => TIMEOUT_C,
+         SERVER_G            => true,
+         RETRANSMIT_ENABLE_G => true,
+         WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
+         MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
+         PIPE_STAGES_G       => 1,
+         APP_AXIS_CONFIG_G   => TEMP_AXIS_CONFIG_C,
+         TSP_AXIS_CONFIG_G   => IP_ENGINE_CONFIG_C,
+         MAX_RETRANS_CNT_G   => MAX_RETRANS_CNT_C,
+         MAX_CUM_ACK_CNT_G   => MAX_CUM_ACK_CNT_C)
       port map (
          clk_i             => axilClk,
          rst_i             => axilRst,
