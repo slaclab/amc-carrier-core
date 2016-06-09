@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-05-27
+-- Last update: 2016-06-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -145,8 +145,8 @@ begin
          WINDOW_ADDR_SIZE_G       => WINDOW_ADDR_SIZE_C,
          MAX_NUM_OUTS_SEG_G       => (2**WINDOW_ADDR_SIZE_C),
          PIPE_STAGES_G            => 1,
-         APP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         APP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
+         APP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
+         APP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
          TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
          TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
          MAX_RETRANS_CNT_G        => MAX_RETRANS_CNT_C,
@@ -184,7 +184,7 @@ begin
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
-         AXI_STREAM_CONFIG_G => IP_ENGINE_CONFIG_C)
+         AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)
          sAxisClk         => axilClk,
@@ -269,8 +269,8 @@ begin
          WINDOW_ADDR_SIZE_G       => WINDOW_ADDR_SIZE_C,
          MAX_NUM_OUTS_SEG_G       => (2**WINDOW_ADDR_SIZE_C),
          PIPE_STAGES_G            => 1,
-         APP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
-         APP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
+         APP_INPUT_AXIS_CONFIG_G  => ETH_AXIS_CONFIG_C,
+         APP_OUTPUT_AXIS_CONFIG_G => ETH_AXIS_CONFIG_C,
          TSP_INPUT_AXIS_CONFIG_G  => IP_ENGINE_CONFIG_C,
          TSP_OUTPUT_AXIS_CONFIG_G => IP_ENGINE_CONFIG_C,
          MAX_RETRANS_CNT_G        => MAX_RETRANS_CNT_C,
