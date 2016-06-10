@@ -176,7 +176,7 @@ begin
          PIPE_STAGES_G => 1,
          TDEST_HIGH_G  => 7,
          TDEST_LOW_G   => 0,
-         KEEP_TDEST_G  => false)
+         MODE_G        => "INDEXED")
       port map (
          sAxisMasters => writeMuxInAxisMaster,
          sAxisSlaves  => writeMuxInAxisSlave,

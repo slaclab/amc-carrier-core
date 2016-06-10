@@ -295,7 +295,7 @@ begin
             PIPE_STAGES_G => 1,
             TDEST_HIGH_G  => 7,
             TDEST_LOW_G   => 0,
-            KEEP_TDEST_G  => true)
+            MODE_G        => "ROUTED")
          port map (
             sAxisMasters => intBsaAxisMasters,     -- [in]
             sAxisSlaves  => intBsaAxisSlaves,      -- [out]
@@ -339,7 +339,7 @@ begin
          PIPE_STAGES_G => 1,
          TDEST_HIGH_G  => 7,
          TDEST_LOW_G   => 0,
-         KEEP_TDEST_G  => true)
+         MODE_G        => "ROUTED")
       port map (
          sAxisMasters => intAxisMasters,     -- [in]
          sAxisSlaves  => intAxisSlaves,      -- [out]
