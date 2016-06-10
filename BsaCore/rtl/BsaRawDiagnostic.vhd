@@ -51,6 +51,8 @@ end entity BsaRawDiagnostic;
 
 architecture rtl of BsaRawDiagnostic is
 
+   constant TDEST_ROUTES_C : Slv8Array(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0) := (others => "--------");
+
    constant INTERNAL_AXI_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => 16,
@@ -191,12 +193,13 @@ begin
    -- Mux of two streams
    AxiStreamMux_INST : entity work.AxiStreamMux
       generic map (
-         TPD_G         => TPD_G,
-         NUM_SLAVES_G  => DIAGNOSTIC_RAW_STREAMS_G,
-         PIPE_STAGES_G => 1,
-         TDEST_HIGH_G  => 7,
-         TDEST_LOW_G   => 0,
-         MODE_G        => "INDEXED")
+         TPD_G          => TPD_G,
+         NUM_SLAVES_G   => DIAGNOSTIC_RAW_STREAMS_G,
+         PIPE_STAGES_G  => 1,
+         TDEST_HIGH_G   => 7,
+         TDEST_LOW_G    => 0,
+         TDEST_ROUTES_G => TDEST_ROUTES_C,
+         MODE_G         => "INDEXED")
       port map (
          sAxisMasters => muxInAxisMaster,
          sAxisSlaves  => muxInAxisSlave,

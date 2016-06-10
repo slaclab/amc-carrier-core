@@ -130,6 +130,7 @@ architecture rtl of BsaBufferControl is
 --       LEN_BITS_C   => 8);
 
    constant INT_AXIS_COUNT_C : integer := 8;  --integer(ceil(real(BSA_BUFFERS_G)/8.0));
+   constant TDEST_ROUTES_C    : Slv8Array(INT_AXIS_COUNT_C-1 downto 0) := (others => "--------");
 
    signal bsaAxisMasters     : AxiStreamMasterArray(BSA_BUFFERS_G-1 downto 0);
    signal bsaAxisSlaves      : AxiStreamSlaveArray(BSA_BUFFERS_G-1 downto 0);
@@ -290,12 +291,13 @@ begin
 
       U_AxiStreamMux_INT : entity work.AxiStreamMux
          generic map (
-            TPD_G         => TPD_G,
-            NUM_SLAVES_G  => 8,
-            PIPE_STAGES_G => 1,
-            TDEST_HIGH_G  => 7,
-            TDEST_LOW_G   => 0,
-            MODE_G        => "ROUTED")
+            TPD_G          => TPD_G,
+            NUM_SLAVES_G   => 8,
+            PIPE_STAGES_G  => 1,
+            TDEST_HIGH_G   => 7,
+            TDEST_LOW_G    => 0,
+            TDEST_ROUTES_G => TDEST_ROUTES_C,
+            MODE_G         => "ROUTED")
          port map (
             sAxisMasters => intBsaAxisMasters,     -- [in]
             sAxisSlaves  => intBsaAxisSlaves,      -- [out]
@@ -334,12 +336,13 @@ begin
 
    U_AxiStreamMux_LAST : entity work.AxiStreamMux
       generic map (
-         TPD_G         => TPD_G,
-         NUM_SLAVES_G  => INT_AXIS_COUNT_C,
-         PIPE_STAGES_G => 1,
-         TDEST_HIGH_G  => 7,
-         TDEST_LOW_G   => 0,
-         MODE_G        => "ROUTED")
+         TPD_G          => TPD_G,
+         NUM_SLAVES_G   => INT_AXIS_COUNT_C,
+         PIPE_STAGES_G  => 1,
+         TDEST_HIGH_G   => 7,
+         TDEST_LOW_G    => 0,
+         TDEST_ROUTES_G => TDEST_ROUTES_C,
+         MODE_G         => "ROUTED")
       port map (
          sAxisMasters => intAxisMasters,     -- [in]
          sAxisSlaves  => intAxisSlaves,      -- [out]
