@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-05-05
+-- Last update: 2016-06-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -97,6 +97,10 @@ architecture rtl of BsaRawDiagnosticRing is
    signal muxOutAxisMaster : AxiStreamMasterType := INTERNAL_AXIS_MASTER_INIT_C;
    signal muxOutAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
 
+   -- Mux Fifo
+   signal muxFifoAxisMaster : AxiStreamMasterType := INTERNAL_AXIS_MASTER_INIT_C;
+   signal muxFifoAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
+
    signal bufferDone : slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
 
    -- Status streams
@@ -171,8 +175,32 @@ begin
          axisClk      => axiClk,
          axisRst      => axiRst);
 
-   -- Maybe add another buffer here
-
+   -- Extra buffer on output of mux
+   AxiStreamFifo_MUX_FIFO : entity work.AxiStreamFifo
+      generic map (
+         TPD_G               => TPD_G,
+         SLAVE_READY_EN_G    => true,
+         VALID_THOLD_G       => 1,
+         BRAM_EN_G           => true,
+         XIL_DEVICE_G        => "ULTRASCALE",
+         USE_BUILT_IN_G      => false,
+         GEN_SYNC_FIFO_G     => false,
+         CASCADE_SIZE_G      => 1,
+         FIFO_ADDR_WIDTH_G   => 9,
+         FIFO_FIXED_THRESH_G => true,
+         FIFO_PAUSE_THRESH_G => 2**9-32,
+         SLAVE_AXI_CONFIG_G  => INTERNAL_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => INTERNAL_AXIS_CONFIG_C)
+      port map (
+         sAxisClk    => axiClk,
+         sAxisRst    => axiRst,
+         sAxisMaster => muxOutAxisMaster,
+         sAxisSlave  => muxOutAxisSlave,
+         mAxisClk    => axiClk,
+         mAxisRst    => axiRst,
+         mAxisMaster => muxFifoAxisMaster,
+         mAxisSlave  => muxFifoAxisSlave);
+   
    -------------------------------------------------------------------------------------------------
    -- AxiStreamDma Ring Buffers
    -------------------------------------------------------------------------------------------------
@@ -199,8 +227,8 @@ begin
          axiClk           => axiClk,    -- [in]
          axiRst           => axiRst,    -- [in]
          bufferDone       => bufferDone,           -- [out]
-         axisDataMaster   => muxOutAxisMaster,     -- [in]
-         axisDataSlave    => muxOutAxisSlave,      -- [out]
+         axisDataMaster   => muxFifoAxisMaster,     -- [in]
+         axisDataSlave    => muxFifoAxisSlave,      -- [out]
          axiWriteMaster   => axiWriteMaster,       -- [out]
          axiWriteSlave    => axiWriteSlave);       -- [in]
 
