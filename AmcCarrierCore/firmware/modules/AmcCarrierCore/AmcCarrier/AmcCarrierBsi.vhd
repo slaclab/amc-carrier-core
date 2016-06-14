@@ -70,7 +70,7 @@ end AmcCarrierBsi;
 architecture rtl of AmcCarrierBsi is
 
    constant BSI_MAJOR_VERSION_C : slv(7 downto 0) := x"01";
-   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"01";
+   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"02";
 
    constant TIMEOUT_1HZ_C : natural := (getTimeRatio(1.0, 6.4E-9) -1);
 
