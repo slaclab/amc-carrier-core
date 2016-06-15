@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-06-13
+-- Last update: 2016-06-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -200,7 +200,7 @@ begin
          mAxisRst    => axiRst,
          mAxisMaster => muxFifoAxisMaster,
          mAxisSlave  => muxFifoAxisSlave);
-   
+
    -------------------------------------------------------------------------------------------------
    -- AxiStreamDma Ring Buffers
    -------------------------------------------------------------------------------------------------
@@ -227,8 +227,8 @@ begin
          axiClk           => axiClk,    -- [in]
          axiRst           => axiRst,    -- [in]
          bufferDone       => bufferDone,           -- [out]
-         axisDataMaster   => muxFifoAxisMaster,     -- [in]
-         axisDataSlave    => muxFifoAxisSlave,      -- [out]
+         axisDataMaster   => muxFifoAxisMaster,    -- [in]
+         axisDataSlave    => muxFifoAxisSlave,     -- [out]
          axiWriteMaster   => axiWriteMaster,       -- [out]
          axiWriteSlave    => axiWriteSlave);       -- [in]
 
@@ -251,8 +251,13 @@ begin
    -------------------------------------------------------------------------------------------------
    U_AxiStreamDeMux_1 : entity work.AxiStreamDeMux
       generic map (
-         TPD_G         => TPD_G,
-         NUM_MASTERS_G => 2)
+         TPD_G          => TPD_G,
+         NUM_MASTERS_G  => 2,
+         MODE_G         => "ROUTED",
+         TDEST_ROUTES_G => (
+            0           => "-------0",
+            1           => "00000001"),
+         PIPE_STAGES_G  => 0)
       port map (
          axisClk         => axisStatusClk,         -- [in]
          axisRst         => axisStatusRst,         -- [in]
