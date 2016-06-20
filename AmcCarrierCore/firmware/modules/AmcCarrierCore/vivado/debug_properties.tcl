@@ -29,3 +29,6 @@ set_property SCOPED_TO_REF   {DebugMigCore} [get_files DebugMigCoreMicroblazeCal
 set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0} [get_files DebugMigCoreMicroblazeCalibration.bmm]
 
 add_files -quiet -fileset sources_1 ${TOP_DIR}/modules/BsaCore/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
+
+## Place and Route strategies 
+set_property strategy Performance_Explore [get_runs impl_1]
