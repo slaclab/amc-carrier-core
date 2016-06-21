@@ -72,7 +72,7 @@ end AmcCarrierEthBpMsg;
 architecture mapping of AmcCarrierEthBpMsg is
 
    constant WINDOW_ADDR_SIZE_C : positive := 2;
-   constant TIMEOUT_C          : real     := 1.0E-6;  -- In units of seconds 
+   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds 
    constant RETRANS_TOUT_C     : positive := 100;     -- unit depends on TIMEOUT_UNIT_G  
    constant ACK_TOUT_C         : positive := 50;      -- unit depends on TIMEOUT_UNIT_G  
    constant NULL_TOUT_C        : positive := 400;     -- unit depends on TIMEOUT_UNIT_G        
