@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-06-09
+-- Last update: 2016-06-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ architecture mapping of AmcCarrierEthBpMsg is
    constant ACK_TOUT_C         : positive := 50;      -- unit depends on TIMEOUT_UNIT_G  
    constant NULL_TOUT_C        : positive := 400;     -- unit depends on TIMEOUT_UNIT_G        
 
-   constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(0 downto 0) := (others => ETH_AXIS_CONFIG_C);
+   constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(0 downto 0) := (others => IP_ENGINE_CONFIG_C);
 
    function AxiLiteConfig return AxiLiteCrossbarMasterConfigArray is
       variable retConf : AxiLiteCrossbarMasterConfigArray((2*BP_MSG_SIZE_C)-1 downto 0);
@@ -179,8 +179,8 @@ begin
                RETRANS_TOUT_G      => RETRANS_TOUT_C,
                ACK_TOUT_G          => ACK_TOUT_C,
                NULL_TOUT_G         => NULL_TOUT_C,
-               MAX_RETRANS_CNT_G   => 1,  -- 0x1 for HW-to-HW communication
-               MAX_CUM_ACK_CNT_G   => 1)  -- 0x1 for HW-to-HW communication
+               MAX_RETRANS_CNT_G   => 1,     -- 0x1 for HW-to-HW communication
+               MAX_CUM_ACK_CNT_G   => 1)     -- 0x1 for HW-to-HW communication
             port map (
                clk_i                => axilClk,
                rst_i                => axilRst,
@@ -194,6 +194,10 @@ begin
                sTspAxisSlave_o      => obServerSlaves(i),
                mTspAxisMaster_o     => ibServerMasters(i),
                mTspAxisSlave_i      => ibServerSlaves(i),
+               -- High level  Application side interface
+               openRq_i             => '1',  -- Automatically start the connection
+               closeRq_i            => '0',
+               inject_i             => '0',
                -- AXI-Lite Interface
                axiClk_i             => axilClk,
                axiRst_i             => axilRst,
@@ -220,8 +224,8 @@ begin
                RETRANS_TOUT_G      => RETRANS_TOUT_C,
                ACK_TOUT_G          => ACK_TOUT_C,
                NULL_TOUT_G         => NULL_TOUT_C,
-               MAX_RETRANS_CNT_G   => 1,  -- 0x1 for HW-to-HW communication
-               MAX_CUM_ACK_CNT_G   => 1)  -- 0x1 for HW-to-HW communication
+               MAX_RETRANS_CNT_G   => 1,     -- 0x1 for HW-to-HW communication
+               MAX_CUM_ACK_CNT_G   => 1)     -- 0x1 for HW-to-HW communication
             port map (
                clk_i                => axilClk,
                rst_i                => axilRst,
@@ -235,6 +239,10 @@ begin
                sTspAxisSlave_o      => obClientSlaves(i),
                mTspAxisMaster_o     => ibClientMasters(i),
                mTspAxisSlave_i      => ibClientSlaves(i),
+               -- High level  Application side interface
+               openRq_i             => '0',  -- Enabled via software
+               closeRq_i            => '0',
+               inject_i             => '0',
                -- AXI-Lite Interface
                axiClk_i             => axilClk,
                axiRst_i             => axilRst,
