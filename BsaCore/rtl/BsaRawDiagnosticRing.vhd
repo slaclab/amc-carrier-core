@@ -6,7 +6,7 @@
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-06-15
+-- Last update: 2016-06-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -106,6 +106,8 @@ architecture rtl of BsaRawDiagnosticRing is
    -- Status streams
    signal axisStatusMasterInt  : AxiStreamMasterType;
    signal axisStatusSlaveInt   : AxiStreamSlaveType;
+   signal axisStatusMaster8  : AxiStreamMasterType;
+   signal axisStatusSlave8   : AxiStreamSlaveType;   
    signal axisStatusMasterRead : AxiStreamMasterType;
    signal axisStatusSlaveRead  : AxiStreamSlaveType;
 
@@ -211,7 +213,7 @@ begin
          BURST_SIZE_BYTES_G   => 4096,
          AXIL_BASE_ADDR_G     => AXIL_BASE_ADDR_G,
          DATA_AXIS_CONFIG_G   => INTERNAL_AXIS_CONFIG_C,
-         STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8),  -- Shoud this be 4 tDest bits?
+         STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 4),  -- Shoud this be 4 tDest bits?
          AXI_WRITE_CONFIG_G   => AXI_CONFIG_G)
       port map (
          axilClk          => axilClk,   -- [in]
@@ -263,11 +265,41 @@ begin
          axisRst         => axisStatusRst,         -- [in]
          sAxisMaster     => axisStatusMasterInt,   -- [in]
          sAxisSlave      => axisStatusSlaveInt,    -- [out]
-         mAxisMasters(0) => axisStatusMaster,      -- [out]
+         mAxisMasters(0) => axisStatusMaster8,      -- [out]
          mAxisMasters(1) => axisStatusMasterRead,  -- [out]         
-         mAxisSlaves(0)  => axisStatusSlave,       -- [in]
+         mAxisSlaves(0)  => axisStatusSlave8,       -- [in]
          mAxisSlaves(1)  => axisStatusSlaveRead);  -- [in]         
 
+   -------------------------------------------------------------------------------------------------
+   -- Async messages to software need to be converted to 64 bits wide
+   -------------------------------------------------------------------------------------------------
+      AxiStreamFifo_StatusMsg : entity work.AxiStreamFifo
+      generic map (
+         TPD_G               => TPD_G,
+         SLAVE_READY_EN_G    => true,
+         VALID_THOLD_G       => 1,
+         BRAM_EN_G           => false,
+         XIL_DEVICE_G        => "ULTRASCALE",
+         USE_BUILT_IN_G      => false,
+         GEN_SYNC_FIFO_G     => true,
+         CASCADE_SIZE_G      => 1,
+         FIFO_ADDR_WIDTH_G   => 4,
+         FIFO_FIXED_THRESH_G => true,
+         FIFO_PAUSE_THRESH_G => 1,
+         SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 4),
+         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+      port map (
+         sAxisClk    => axisStatusClk,
+         sAxisRst    => axisStatusRst,
+         sAxisMaster => axisStatusMaster8,
+         sAxisSlave  => axisStatusSlave8,
+         sAxisCtrl   => open,
+         mAxisClk    => axisstatusClk,
+         mAxisRst    => axisstatusRst,
+         mAxisMaster => axisStatusMaster,
+         mAxisSlave  => axisStatusSlave);
+
+   
    -------------------------------------------------------------------------------------------------
    -- AxiStreamDmaRingRead module optionally catches status messages from ring write
    -- Peforms the read itself and outputs the resulting data stream
@@ -314,9 +346,9 @@ begin
          USE_BUILT_IN_G      => false,
          GEN_SYNC_FIFO_G     => false,
          CASCADE_SIZE_G      => 1,
-         FIFO_ADDR_WIDTH_G   => 10,
+         FIFO_ADDR_WIDTH_G   => 12,
          FIFO_FIXED_THRESH_G => true,
-         FIFO_PAUSE_THRESH_G => 2**10-256,
+         FIFO_PAUSE_THRESH_G => 2**12-512,
          SLAVE_AXI_CONFIG_G  => INTERNAL_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
