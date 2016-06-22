@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-02-19
+-- Last update: 2016-06-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ end AmcGenericAdcDacCore;
 
 architecture mapping of AmcGenericAdcDacCore is
 
-   constant NUM_AXI_MASTERS_C : natural := 13;
+   constant NUM_AXI_MASTERS_C : natural := 17;
 
    constant JESD_RX_INDEX_C    : natural := 0;
    constant JESD_TX_INDEX_C    : natural := 1;
@@ -145,6 +145,10 @@ architecture mapping of AmcGenericAdcDacCore is
    constant DEBUG_ADC3_INDEX_C : natural := 10;
    constant DEBUG_DAC0_INDEX_C : natural := 11;
    constant DEBUG_DAC1_INDEX_C : natural := 12;
+   constant GTH0_INDEX_C       : natural := 13;
+   constant GTH1_INDEX_C       : natural := 14;
+   constant GTH2_INDEX_C       : natural := 15;
+   constant GTH3_INDEX_C       : natural := 16;
 
    constant JESD_RX_BASE_ADDR_C    : slv(31 downto 0) := X"00000000" + AXI_BASE_ADDR_G;
    constant JESD_TX_BASE_ADDR_C    : slv(31 downto 0) := X"00100000" + AXI_BASE_ADDR_G;
@@ -159,6 +163,10 @@ architecture mapping of AmcGenericAdcDacCore is
    constant DEBUG_ADC3_BASE_ADDR_C : slv(31 downto 0) := X"00640000" + AXI_BASE_ADDR_G;
    constant DEBUG_DAC0_BASE_ADDR_C : slv(31 downto 0) := X"00650000" + AXI_BASE_ADDR_G;
    constant DEBUG_DAC1_BASE_ADDR_C : slv(31 downto 0) := X"00660000" + AXI_BASE_ADDR_G;
+   constant GTH0_BASE_ADDR_C       : slv(31 downto 0) := X"00700000" + AXI_BASE_ADDR_G;
+   constant GTH1_BASE_ADDR_C       : slv(31 downto 0) := X"00710000" + AXI_BASE_ADDR_G;
+   constant GTH2_BASE_ADDR_C       : slv(31 downto 0) := X"00720000" + AXI_BASE_ADDR_G;
+   constant GTH3_BASE_ADDR_C       : slv(31 downto 0) := X"00730000" + AXI_BASE_ADDR_G;
    
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       JESD_RX_INDEX_C    => (
@@ -212,7 +220,23 @@ architecture mapping of AmcGenericAdcDacCore is
       DEBUG_DAC1_INDEX_C => (
          baseAddr        => DEBUG_DAC1_BASE_ADDR_C,
          addrBits        => 16,
-         connectivity    => X"0001"));     
+         connectivity    => X"0001"),
+      GTH0_INDEX_C       => (
+         baseAddr        => GTH0_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      GTH1_INDEX_C       => (
+         baseAddr        => GTH1_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      GTH2_INDEX_C       => (
+         baseAddr        => GTH2_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"),
+      GTH3_INDEX_C       => (
+         baseAddr        => GTH3_BASE_ADDR_C,
+         addrBits        => 16,
+         connectivity    => X"0001"));              
 
    signal writeMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal writeSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -240,6 +264,14 @@ architecture mapping of AmcGenericAdcDacCore is
    signal lmkDataOut      : sl;
    signal dacVcoEnable    : sl;
    signal dacVcoSckConfig : slv(15 downto 0);
+
+   signal drpClk  : slv(3 downto 0);
+   signal drpRdy  : slv(3 downto 0);
+   signal drpEn   : slv(3 downto 0);
+   signal drpWe   : slv(3 downto 0);
+   signal drpAddr : slv(35 downto 0);
+   signal drpDi   : slv(63 downto 0);
+   signal drpDo   : slv(63 downto 0);
    
 begin
 
@@ -401,6 +433,14 @@ begin
          SYSREF_GEN_G     => false,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)    
       port map (
+         -- DRP Interface
+         drpClk             => drpClk,
+         drpRdy             => drpRdy,
+         drpEn              => drpEn,
+         drpWe              => drpWe,
+         drpAddr            => drpAddr,
+         drpDi              => drpDi,
+         drpDo              => drpDo,
          -- AXI interface
          axilClk            => axilClk,
          axilRst            => axilRst,
@@ -669,5 +709,38 @@ begin
             axilWriteMaster => writeMasters(DEBUG_DAC0_INDEX_C+i),
             axilWriteSlave  => writeSlaves(DEBUG_DAC0_INDEX_C+i));             
    end generate GEN_DAC_DEBUG;
-   
+
+   -----------------------
+   -- GTH's DRP Interfaces
+   -----------------------
+   GEN_GTH_DRP : for i in 3 downto 0 generate
+      U_AxiLiteToDrp : entity work.AxiLiteToDrp
+         generic map (
+            TPD_G            => TPD_G,
+            AXI_ERROR_RESP_G => AXI_RESP_DECERR_C,
+            COMMON_CLK_G     => true,
+            EN_ARBITRATION_G => false,
+            TIMEOUT_G        => 4096,
+            ADDR_WIDTH_G     => 9,
+            DATA_WIDTH_G     => 16)      
+         port map (
+            -- AXI-Lite Port
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => readMasters(GTH0_INDEX_C+i),
+            axilReadSlave   => readSlaves(GTH0_INDEX_C+i),
+            axilWriteMaster => writeMasters(GTH0_INDEX_C+i),
+            axilWriteSlave  => writeSlaves(GTH0_INDEX_C+i),
+            -- DRP Interface
+            drpClk          => axilClk,
+            drpRst          => axilRst,
+            drpRdy          => drpRdy(i),
+            drpEn           => drpEn(i),
+            drpWe           => drpWe(i),
+            drpAddr         => drpAddr((i*9)+8 downto (i*9)),
+            drpDi           => drpDi((i*16)+15 downto (i*16)),
+            drpDo           => drpDo((i*16)+15 downto (i*16)));
+      drpClk(i) <= axilClk;
+   end generate GEN_GTH_DRP;
+
 end mapping;

@@ -15,6 +15,7 @@ include: Adc16Dx370.yaml
 include: Dac38J84.yaml
 include: AmcGenericAdcDacCtrl.yaml
 include: GenericMemory.yaml
+include: Gthe3Channel.yaml
 
 Device: &AmcGenericAdcDacCore 
   name: AmcGenericAdcDacCore
@@ -34,9 +35,8 @@ Device: &AmcGenericAdcDacCore
     ##################################################     
     - <<: *Adc16Dx370
       offset: 0x00300000 
-    ##################################################     
-    - <<: *Adc16Dx370
-      offset: 0x00400000     
+      nelms: 2
+      stride: 0x00100000              
     ##################################################     
     - <<: *Dac38J84
       offset: 0x00500000 
@@ -45,52 +45,19 @@ Device: &AmcGenericAdcDacCore
       offset: 0x00600000       
     ##################################################
     - <<: *GenericMemory
-      name: "AxiLiteRingBufferAdc0"
+      name: "AxiLiteRingBuffer"
       offset: 0x00610000       
       size: 0x10000     
+      nelms: 6
+      stride: 0x10000      
       - <<: *MemoryArray
         nelms: 0x4000        
-        nmode: RO
+        nmode: RO 
     ##################################################
-    - <<: *GenericMemory
-      name: "AxiLiteRingBufferAdc1"
-      offset: 0x00620000       
-      size: 0x10000     
-      - <<: *MemoryArray
-        nelms: 0x4000        
-        nmode: RO    
-    ##################################################
-    - <<: *GenericMemory
-      name: "AxiLiteRingBufferAdc2"
-      offset: 0x00630000       
-      size: 0x10000     
-      - <<: *MemoryArray
-        nelms: 0x4000        
-        nmode: RO  
-    ##################################################
-    - <<: *GenericMemory
-      name: "AxiLiteRingBufferAdc3"
-      offset: 0x00640000       
-      size: 0x10000     
-      - <<: *MemoryArray
-        nelms: 0x4000        
-        nmode: RO          
-    ##################################################
-    - <<: *GenericMemory
-      name: "AxiLiteRingBufferDac0"
-      offset: 0x00650000       
-      size: 0x10000     
-      - <<: *MemoryArray
-        nelms: 0x4000        
-        nmode: RO
-    ##################################################
-    - <<: *GenericMemory
-      name: "AxiLiteRingBufferDac1"
-      offset: 0x00660000       
-      size: 0x10000     
-      - <<: *MemoryArray
-        nelms: 0x4000        
-        nmode: RO    
+    - <<: *Gthe3Channel
+      offset: 0x00700000   
+      nelms: 4
+      stride: 0x10000         
     ##################################################
   #########
   Commands:

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-01-27
+-- Last update: 2016-06-22
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -41,6 +41,14 @@ entity AmcGenericAdcDacJesd204b is
       SYSREF_GEN_G     : boolean         := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C);
    port (
+      -- DRP Interface
+      drpClk          : in  slv(3 downto 0);
+      drpRdy          : out slv(3 downto 0);
+      drpEn           : in  slv(3 downto 0);
+      drpWe           : in  slv(3 downto 0);
+      drpAddr         : in  slv(35 downto 0);
+      drpDi           : in  slv(63 downto 0);
+      drpDo           : out slv(63 downto 0);
       -- AXI interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -100,7 +108,11 @@ architecture mapping of AmcGenericAdcDacJesd204b is
          gtwiz_reset_rx_done_out            : out std_logic_vector(0 downto 0);
          gtwiz_userdata_tx_in               : in  std_logic_vector(127 downto 0);
          gtwiz_userdata_rx_out              : out std_logic_vector(127 downto 0);
+         drpaddr_in                         : in  std_logic_vector(35 downto 0);
          drpclk_in                          : in  std_logic_vector(3 downto 0);
+         drpdi_in                           : in  std_logic_vector(63 downto 0);
+         drpen_in                           : in  std_logic_vector(3 downto 0);
+         drpwe_in                           : in  std_logic_vector(3 downto 0);
          gthrxn_in                          : in  std_logic_vector(3 downto 0);
          gthrxp_in                          : in  std_logic_vector(3 downto 0);
          gtrefclk0_in                       : in  std_logic_vector(3 downto 0);
@@ -115,10 +127,12 @@ architecture mapping of AmcGenericAdcDacJesd204b is
          txctrl0_in                         : in  std_logic_vector(63 downto 0);
          txctrl1_in                         : in  std_logic_vector(63 downto 0);
          txctrl2_in                         : in  std_logic_vector(31 downto 0);
-         -- txpd_in                            : in  std_logic_vector(7 downto 0);
+         txdiffctrl_in                      : in  std_logic_vector(15 downto 0);
          txpolarity_in                      : in  std_logic_vector(3 downto 0);
          txusrclk_in                        : in  std_logic_vector(3 downto 0);
          txusrclk2_in                       : in  std_logic_vector(3 downto 0);
+         drpdo_out                          : out std_logic_vector(63 downto 0);
+         drprdy_out                         : out std_logic_vector(3 downto 0);
          gthtxn_out                         : out std_logic_vector(3 downto 0);
          gthtxp_out                         : out std_logic_vector(3 downto 0);
          rxbyteisaligned_out                : out std_logic_vector(3 downto 0);
@@ -313,7 +327,11 @@ begin
          gtwiz_reset_rx_done_out(0)            => s_rxDone,
          gtwiz_userdata_tx_in                  => s_txData,
          gtwiz_userdata_rx_out                 => s_rxData,
-         drpclk_in                             => s_stableClkVec,
+         drpaddr_in                            => drpAddr,
+         drpclk_in                             => drpClk,
+         drpdi_in                              => drpDi,
+         drpen_in                              => drpEn,
+         drpwe_in                              => drpWe,
          gthrxn_in                             => gtRxN,
          gthrxp_in                             => gtRxP,
          gtrefclk0_in                          => s_gtRefClkVec,
@@ -328,10 +346,12 @@ begin
          txctrl0_in                            => X"0000_0000_0000_0000",
          txctrl1_in                            => X"0000_0000_0000_0000",
          txctrl2_in                            => s_txDataK,
-         -- txpd_in                               => "00000000",
+         txdiffctrl_in                         => x"FFFF",
          txpolarity_in                         => "0000",
          txusrclk_in                           => s_devClkVec,
          txusrclk2_in                          => s_devClk2Vec,
+         drpdo_out                             => drpDo,
+         drprdy_out                            => drpRdy,
          gthtxn_out                            => gtTxN,
          gthtxp_out                            => gtTxP,
          rxbyteisaligned_out                   => open,
