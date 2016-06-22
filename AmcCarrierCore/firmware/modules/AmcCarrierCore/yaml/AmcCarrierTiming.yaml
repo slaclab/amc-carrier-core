@@ -17,14 +17,14 @@ Device: &AmcCarrierTiming
   description: Timing receiver module for AMC Carrier
   size: 0x01000000
   ############
-  peripherals:
+  MMIODev:
   ############
     - <<: *TimingFrameRx
-      address: 0x00000000
+      offset: 0x00000000
     ##################################################
     - <<: *TPGMiniCore
-      address: 0x00030000
+      offset: 0x00030000
     ##################################################
     - <<: *Gthe3Channel
-      address: 0x00800000
+      offset: 0x00800000
     ##################################################    
