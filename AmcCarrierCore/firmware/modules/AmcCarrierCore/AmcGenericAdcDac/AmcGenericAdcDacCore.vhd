@@ -130,26 +130,6 @@ end AmcGenericAdcDacCore;
 
 architecture mapping of AmcGenericAdcDacCore is
 
-   constant NUM_AXI_MASTERS_C : natural := 17;
-
-   constant JESD_RX_INDEX_C    : natural := 0;
-   constant JESD_TX_INDEX_C    : natural := 1;
-   constant LMK_INDEX_C        : natural := 2;
-   constant ADC_A_INDEX_C      : natural := 3;
-   constant ADC_B_INDEX_C      : natural := 4;
-   constant DAC_INDEX_C        : natural := 5;
-   constant CTRL_INDEX_C       : natural := 6;
-   constant DEBUG_ADC0_INDEX_C : natural := 7;
-   constant DEBUG_ADC1_INDEX_C : natural := 8;
-   constant DEBUG_ADC2_INDEX_C : natural := 9;
-   constant DEBUG_ADC3_INDEX_C : natural := 10;
-   constant DEBUG_DAC0_INDEX_C : natural := 11;
-   constant DEBUG_DAC1_INDEX_C : natural := 12;
-   constant GTH0_INDEX_C       : natural := 13;
-   constant GTH1_INDEX_C       : natural := 14;
-   constant GTH2_INDEX_C       : natural := 15;
-   constant GTH3_INDEX_C       : natural := 16;
-
    constant JESD_RX_BASE_ADDR_C    : slv(31 downto 0) := X"00000000" + AXI_BASE_ADDR_G;
    constant JESD_TX_BASE_ADDR_C    : slv(31 downto 0) := X"00100000" + AXI_BASE_ADDR_G;
    constant LMK_BASE_ADDR_C        : slv(31 downto 0) := X"00200000" + AXI_BASE_ADDR_G;
@@ -167,81 +147,114 @@ architecture mapping of AmcGenericAdcDacCore is
    constant GTH1_BASE_ADDR_C       : slv(31 downto 0) := X"00710000" + AXI_BASE_ADDR_G;
    constant GTH2_BASE_ADDR_C       : slv(31 downto 0) := X"00720000" + AXI_BASE_ADDR_G;
    constant GTH3_BASE_ADDR_C       : slv(31 downto 0) := X"00730000" + AXI_BASE_ADDR_G;
+
+   constant NUM_AXI_MASTERS_C : natural := 8;
+
+   constant JESD_RX_INDEX_C : natural := 0;
+   constant JESD_TX_INDEX_C : natural := 1;
+   constant LMK_INDEX_C     : natural := 2;
+   constant ADC_A_INDEX_C   : natural := 3;
+   constant ADC_B_INDEX_C   : natural := 4;
+   constant DAC_INDEX_C     : natural := 5;
+   constant CTRL_INDEX_C    : natural := 6;
+   constant GTH_INDEX_C     : natural := 7;
    
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      JESD_RX_INDEX_C    => (
-         baseAddr        => JESD_RX_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      JESD_TX_INDEX_C    => (
-         baseAddr        => JESD_TX_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      LMK_INDEX_C        => (
-         baseAddr        => LMK_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      ADC_A_INDEX_C      => (
-         baseAddr        => ADC_A_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      ADC_B_INDEX_C      => (
-         baseAddr        => ADC_B_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      DAC_INDEX_C        => (
-         baseAddr        => DAC_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      CTRL_INDEX_C       => (
-         baseAddr        => CTRL_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      DEBUG_ADC0_INDEX_C => (
-         baseAddr        => DEBUG_ADC0_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      DEBUG_ADC1_INDEX_C => (
-         baseAddr        => DEBUG_ADC1_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      DEBUG_ADC2_INDEX_C => (
-         baseAddr        => DEBUG_ADC2_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      DEBUG_ADC3_INDEX_C => (
-         baseAddr        => DEBUG_ADC3_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      DEBUG_DAC0_INDEX_C => (
-         baseAddr        => DEBUG_DAC0_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      DEBUG_DAC1_INDEX_C => (
-         baseAddr        => DEBUG_DAC1_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      GTH0_INDEX_C       => (
-         baseAddr        => GTH0_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      GTH1_INDEX_C       => (
-         baseAddr        => GTH1_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      GTH2_INDEX_C       => (
-         baseAddr        => GTH2_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"),
-      GTH3_INDEX_C       => (
-         baseAddr        => GTH3_BASE_ADDR_C,
-         addrBits        => 16,
-         connectivity    => X"0001"));              
+      JESD_RX_INDEX_C => (
+         baseAddr     => JESD_RX_BASE_ADDR_C,
+         addrBits     => 20,
+         connectivity => X"0001"),
+      JESD_TX_INDEX_C => (
+         baseAddr     => JESD_TX_BASE_ADDR_C,
+         addrBits     => 20,
+         connectivity => X"0001"),
+      LMK_INDEX_C     => (
+         baseAddr     => LMK_BASE_ADDR_C,
+         addrBits     => 20,
+         connectivity => X"0001"),
+      ADC_A_INDEX_C   => (
+         baseAddr     => ADC_A_BASE_ADDR_C,
+         addrBits     => 20,
+         connectivity => X"0001"),
+      ADC_B_INDEX_C   => (
+         baseAddr     => ADC_B_BASE_ADDR_C,
+         addrBits     => 20,
+         connectivity => X"0001"),
+      DAC_INDEX_C     => (
+         baseAddr     => DAC_BASE_ADDR_C,
+         addrBits     => 20,
+         connectivity => X"0001"),
+      CTRL_INDEX_C    => (
+         baseAddr     => CTRL_BASE_ADDR_C,
+         addrBits     => 20,
+         connectivity => X"0001"),
+      GTH_INDEX_C     => (
+         baseAddr     => GTH0_BASE_ADDR_C,
+         addrBits     => 20,
+         connectivity => X"0001"));    
 
-   signal writeMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal writeSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal readMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal readSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   constant CTRL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(6 downto 0) := (
+      0               => (
+         baseAddr     => CTRL_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      1               => (
+         baseAddr     => DEBUG_ADC0_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      2               => (
+         baseAddr     => DEBUG_ADC1_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      3               => (
+         baseAddr     => DEBUG_ADC2_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      4               => (
+         baseAddr     => DEBUG_ADC3_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      5               => (
+         baseAddr     => DEBUG_DAC0_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      6               => (
+         baseAddr     => DEBUG_DAC1_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"));          
+
+   constant GTH_CONFIG_C : AxiLiteCrossbarMasterConfigArray(3 downto 0) := (
+      0               => (
+         baseAddr     => GTH0_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      1               => (
+         baseAddr     => GTH1_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      2               => (
+         baseAddr     => GTH2_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"),
+      3               => (
+         baseAddr     => GTH3_BASE_ADDR_C,
+         addrBits     => 16,
+         connectivity => X"0001"));             
+
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+
+   signal ctrlWriteMasters : AxiLiteWriteMasterArray(6 downto 0);
+   signal ctrlWriteSlaves  : AxiLiteWriteSlaveArray(6 downto 0);
+   signal ctrlReadMasters  : AxiLiteReadMasterArray(6 downto 0);
+   signal ctrlReadSlaves   : AxiLiteReadSlaveArray(6 downto 0);
+
+   signal gthWriteMasters : AxiLiteWriteMasterArray(3 downto 0);
+   signal gthWriteSlaves  : AxiLiteWriteSlaveArray(3 downto 0);
+   signal gthReadMasters  : AxiLiteReadMasterArray(3 downto 0);
+   signal gthReadSlaves   : AxiLiteReadSlaveArray(3 downto 0);
 
    signal refClkDiv2      : sl;
    signal refClk          : sl;
@@ -342,9 +355,9 @@ begin
    bcmL <= not(bcm);
 
    ---------------------
-   -- AXI-Lite Crossbar
+   -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
@@ -358,10 +371,48 @@ begin
          sAxiWriteSlaves(0)  => axilWriteSlave,
          sAxiReadMasters(0)  => axilReadMaster,
          sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => writeMasters,
-         mAxiWriteSlaves     => writeSlaves,
-         mAxiReadMasters     => readMasters,
-         mAxiReadSlaves      => readSlaves);
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
+
+   U_XBAR1 : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 7,
+         MASTERS_CONFIG_G   => CTRL_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMasters(CTRL_INDEX_C),
+         sAxiWriteSlaves(0)  => axilWriteSlaves(CTRL_INDEX_C),
+         sAxiReadMasters(0)  => axilReadMasters(CTRL_INDEX_C),
+         sAxiReadSlaves(0)   => axilReadSlaves(CTRL_INDEX_C),
+         mAxiWriteMasters    => ctrlWriteMasters,
+         mAxiWriteSlaves     => ctrlWriteSlaves,
+         mAxiReadMasters     => ctrlReadMasters,
+         mAxiReadSlaves      => ctrlReadSlaves);   
+
+   U_XBAR2 : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 4,
+         MASTERS_CONFIG_G   => GTH_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMasters(GTH_INDEX_C),
+         sAxiWriteSlaves(0)  => axilWriteSlaves(GTH_INDEX_C),
+         sAxiReadMasters(0)  => axilReadMasters(GTH_INDEX_C),
+         sAxiReadSlaves(0)   => axilReadSlaves(GTH_INDEX_C),
+         mAxiWriteMasters    => gthWriteMasters,
+         mAxiWriteSlaves     => gthWriteSlaves,
+         mAxiReadMasters     => gthReadMasters,
+         mAxiReadSlaves      => gthReadSlaves);            
 
    ----------------
    -- JESD Clocking
@@ -444,14 +495,14 @@ begin
          -- AXI interface
          axilClk            => axilClk,
          axilRst            => axilRst,
-         rxReadMaster       => readMasters(JESD_RX_INDEX_C),
-         rxReadSlave        => readSlaves(JESD_RX_INDEX_C),
-         rxWriteMaster      => writeMasters(JESD_RX_INDEX_C),
-         rxWriteSlave       => writeSlaves(JESD_RX_INDEX_C),
-         txReadMaster       => readMasters(JESD_TX_INDEX_C),
-         txReadSlave        => readSlaves(JESD_TX_INDEX_C),
-         txWriteMaster      => writeMasters(JESD_TX_INDEX_C),
-         txWriteSlave       => writeSlaves(JESD_TX_INDEX_C),
+         rxReadMaster       => axilReadMasters(JESD_RX_INDEX_C),
+         rxReadSlave        => axilReadSlaves(JESD_RX_INDEX_C),
+         rxWriteMaster      => axilWriteMasters(JESD_RX_INDEX_C),
+         rxWriteSlave       => axilWriteSlaves(JESD_RX_INDEX_C),
+         txReadMaster       => axilReadMasters(JESD_TX_INDEX_C),
+         txReadSlave        => axilReadSlaves(JESD_TX_INDEX_C),
+         txWriteMaster      => axilWriteMasters(JESD_TX_INDEX_C),
+         txWriteSlave       => axilWriteSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
          dataValidVec_o(0)  => adcDav(1),   -- Swap CH0 and CH1 to match the front panel labels
          dataValidVec_o(1)  => adcDav(0),   -- Swap CH0 and CH1 to match the front panel labels
@@ -527,10 +578,10 @@ begin
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
-         axiReadMaster  => readMasters(LMK_INDEX_C),
-         axiReadSlave   => readSlaves(LMK_INDEX_C),
-         axiWriteMaster => writeMasters(LMK_INDEX_C),
-         axiWriteSlave  => writeSlaves(LMK_INDEX_C),
+         axiReadMaster  => axilReadMasters(LMK_INDEX_C),
+         axiReadSlave   => axilReadSlaves(LMK_INDEX_C),
+         axiWriteMaster => axilWriteMasters(LMK_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(LMK_INDEX_C),
          coreSclk       => lmkSck,
          coreSDin       => lmkDataIn,
          coreSDout      => lmkDataOut,
@@ -558,10 +609,10 @@ begin
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
-            axiReadMaster  => readMasters(ADC_A_INDEX_C+i),
-            axiReadSlave   => readSlaves(ADC_A_INDEX_C+i),
-            axiWriteMaster => writeMasters(ADC_A_INDEX_C+i),
-            axiWriteSlave  => writeSlaves(ADC_A_INDEX_C+i),
+            axiReadMaster  => axilReadMasters(ADC_A_INDEX_C+i),
+            axiReadSlave   => axilReadSlaves(ADC_A_INDEX_C+i),
+            axiWriteMaster => axilWriteMasters(ADC_A_INDEX_C+i),
+            axiWriteSlave  => axilWriteSlaves(ADC_A_INDEX_C+i),
             coreSclk       => adcSck(i),
             coreSDin       => adcMiso(i),
             coreSDout      => adcMosi(i),
@@ -582,10 +633,10 @@ begin
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
-         axiReadMaster  => readMasters(DAC_INDEX_C),
-         axiReadSlave   => readSlaves(DAC_INDEX_C),
-         axiWriteMaster => writeMasters(DAC_INDEX_C),
-         axiWriteSlave  => writeSlaves(DAC_INDEX_C),
+         axiReadMaster  => axilReadMasters(DAC_INDEX_C),
+         axiReadSlave   => axilReadSlaves(DAC_INDEX_C),
+         axiWriteMaster => axilWriteMasters(DAC_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(DAC_INDEX_C),
          coreSclk       => dacSck,
          coreSDin       => dacMiso,
          coreSDout      => dacMosi,
@@ -638,10 +689,10 @@ begin
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => readMasters(CTRL_INDEX_C),
-         axilReadSlave   => readSlaves(CTRL_INDEX_C),
-         axilWriteMaster => writeMasters(CTRL_INDEX_C),
-         axilWriteSlave  => writeSlaves(CTRL_INDEX_C),
+         axilReadMaster  => ctrlReadMasters(0),
+         axilReadSlave   => ctrlReadSlaves(0),
+         axilWriteMaster => ctrlWriteMasters(0),
+         axilWriteSlave  => ctrlWriteSlaves(0),
          -----------------------
          -- Application Ports --
          -----------------------      
@@ -675,10 +726,10 @@ begin
             -- AXI-Lite interface for readout
             axilClk         => axilClk,
             axilRst         => axilRst,
-            axilReadMaster  => readMasters(DEBUG_ADC0_INDEX_C+i),
-            axilReadSlave   => readSlaves(DEBUG_ADC0_INDEX_C+i),
-            axilWriteMaster => writeMasters(DEBUG_ADC0_INDEX_C+i),
-            axilWriteSlave  => writeSlaves(DEBUG_ADC0_INDEX_C+i));             
+            axilReadMaster  => ctrlReadMasters(1+i),
+            axilReadSlave   => ctrlReadSlaves(1+i),
+            axilWriteMaster => ctrlWriteMasters(1+i),
+            axilWriteSlave  => ctrlWriteSlaves(1+i));             
    end generate GEN_ADC_DEBUG;
 
    --------------------
@@ -704,10 +755,10 @@ begin
             -- AXI-Lite interface for readout
             axilClk         => axilClk,
             axilRst         => axilRst,
-            axilReadMaster  => readMasters(DEBUG_DAC0_INDEX_C+i),
-            axilReadSlave   => readSlaves(DEBUG_DAC0_INDEX_C+i),
-            axilWriteMaster => writeMasters(DEBUG_DAC0_INDEX_C+i),
-            axilWriteSlave  => writeSlaves(DEBUG_DAC0_INDEX_C+i));             
+            axilReadMaster  => ctrlReadMasters(5+i),
+            axilReadSlave   => ctrlReadSlaves(5+i),
+            axilWriteMaster => ctrlWriteMasters(5+i),
+            axilWriteSlave  => ctrlWriteSlaves(5+i));             
    end generate GEN_DAC_DEBUG;
 
    -----------------------
@@ -727,10 +778,10 @@ begin
             -- AXI-Lite Port
             axilClk         => axilClk,
             axilRst         => axilRst,
-            axilReadMaster  => readMasters(GTH0_INDEX_C+i),
-            axilReadSlave   => readSlaves(GTH0_INDEX_C+i),
-            axilWriteMaster => writeMasters(GTH0_INDEX_C+i),
-            axilWriteSlave  => writeSlaves(GTH0_INDEX_C+i),
+            axilReadMaster  => gthReadMasters(i),
+            axilReadSlave   => gthReadSlaves(i),
+            axilWriteMaster => gthWriteMasters(i),
+            axilWriteSlave  => gthWriteSlaves(i),
             -- DRP Interface
             drpClk          => axilClk,
             drpRst          => axilRst,
