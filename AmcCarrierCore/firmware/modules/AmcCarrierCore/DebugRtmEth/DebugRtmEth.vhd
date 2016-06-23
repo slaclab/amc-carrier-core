@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-05-27
+-- Last update: 2016-06-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,14 +37,14 @@ use work.AmcCarrierRegPkg.all;
 entity DebugRtmEth is
    generic (
       TPD_G            : time            := 1 ns;
-      ETH_10G_G        : boolean         := false;            -- false = 1 GigE, true = 10 GigE
+      ETH_10G_G        : boolean         := false;  -- false = 1 GigE, true = 10 GigE
       EN_SW_RSSI_G     : boolean         := true;
       EN_BP_MSG_G      : boolean         := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration and status
-      localMac          : in  slv(47 downto 0);               --  big-Endian configuration
-      localIp           : in  slv(31 downto 0);               --  big-Endian configuration   
+      localMac          : in  slv(47 downto 0);     --  big-Endian configuration
+      localIp           : in  slv(31 downto 0);     --  big-Endian configuration   
       ethPhyReady       : out sl;
       -- Master AXI-Lite Interface
       mAxilReadMasters  : out AxiLiteReadMasterArray(1 downto 0);
@@ -67,9 +67,9 @@ entity DebugRtmEth is
       bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
       bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
       -- Transceiver Debug Interface
-      gtTxPreCursor     : in  slv(4 downto 0)     := "11111";  -- 6.02 dB: Tuned for the RTM w/ AFBR-709SMZ
-      gtTxPostCursor    : in  slv(4 downto 0)     := "11111";  -- 12.96 dB: Tuned for the RTM w/ AFBR-709SMZ
-      gtTxDiffCtrl      : in  slv(3 downto 0)     := "1111";  --  1.122 V:  Tuned for the RTM w/ AFBR-709SMZ
+      gtTxPreCursor     : in  slv(4 downto 0)     := "00000";
+      gtTxPostCursor    : in  slv(4 downto 0)     := "00000";
+      gtTxDiffCtrl      : in  slv(3 downto 0)     := "1111";
       gtRxPolarity      : in  sl                  := '0';
       gtTxPolarity      : in  sl                  := '0';
       ----------------------

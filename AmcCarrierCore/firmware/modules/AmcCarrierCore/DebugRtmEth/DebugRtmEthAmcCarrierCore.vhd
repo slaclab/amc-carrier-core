@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-05-11
+-- Last update: 2016-06-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -109,9 +109,9 @@ entity DebugRtmEthAmcCarrierCore is
       gthFabClk            : out   sl;
       ethPhyReady          : out   sl;
       -- Transceiver Debug Interface
-      gtTxPreCursor        : in    slv(4 downto 0)                  := "11111";  -- 6.02 dB: Tuned for the RTM w/ AFBR-709SMZ
-      gtTxPostCursor       : in    slv(4 downto 0)                  := "11111";  -- 12.96 dB: Tuned for the RTM w/ AFBR-709SMZ
-      gtTxDiffCtrl         : in    slv(3 downto 0)                  := "1111";  --  1.122 V:  Tuned for the RTM w/ AFBR-709SMZ
+      gtTxPreCursor        : in    slv(4 downto 0)                  := "00000";
+      gtTxPostCursor       : in    slv(4 downto 0)                  := "00000";
+      gtTxDiffCtrl         : in    slv(3 downto 0)                  := "1111";
       gtRxPolarity         : in    sl                               := '0';
       gtTxPolarity         : in    sl                               := '0';
       ----------------
