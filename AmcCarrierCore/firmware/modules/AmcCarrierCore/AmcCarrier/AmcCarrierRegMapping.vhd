@@ -1,22 +1,22 @@
 -------------------------------------------------------------------------------
--- Title      : 
+-- Title      :
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierRegMapping.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
 -- Last update: 2016-04-19
--- Platform   : 
+-- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -87,7 +87,7 @@ entity AmcCarrierRegMapping is
       debugReset        : out   sl;
       ----------------------
       -- Top Level Interface
-      ----------------------           
+      ----------------------
       -- AXI-Lite Interface
       regClk            : in    sl;
       regRst            : in    sl;
@@ -101,7 +101,7 @@ entity AmcCarrierRegMapping is
       bsiBus            : out   bsiBusType;
       ----------------
       -- Core Ports --
-      ----------------   
+      ----------------
       -- Crossbar Ports
       xBarSin           : out   slv(1 downto 0);
       xBarSout          : out   slv(1 downto 0);
@@ -121,7 +121,7 @@ entity AmcCarrierRegMapping is
       ddrSda            : inout sl;
       -- SYSMON Ports
       vPIn              : in    sl;
-      vNIn              : in    sl);         
+      vNIn              : in    sl);
 end AmcCarrierRegMapping;
 
 architecture mapping of AmcCarrierRegMapping is
@@ -145,7 +145,7 @@ architecture mapping of AmcCarrierRegMapping is
    constant DDR_INDEX_C        : natural := 11;
    constant MPS_INDEX_C        : natural := 12;
    constant APP_INDEX_C        : natural := 13;
-   
+
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       VERSION_INDEX_C    => (
          baseAddr        => VERSION_ADDR_C,
@@ -202,7 +202,7 @@ architecture mapping of AmcCarrierRegMapping is
       APP_INDEX_C        => (
          baseAddr        => APP_ADDR_C,
          addrBits        => 31,
-         connectivity    => x"FFFF"));   
+         connectivity    => x"FFFF"));
 
    constant CONFIG_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
       0             => (
@@ -210,7 +210,7 @@ architecture mapping of AmcCarrierRegMapping is
          i2cTenbit  => '0',
          dataSize   => 32,              -- in units of bits
          addrSize   => 13,              -- in units of bits
-         endianness => '0'));           -- Little endian  
+         endianness => '0'));           -- Little endian
 
    constant TIME_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
       0             => (
@@ -218,7 +218,7 @@ architecture mapping of AmcCarrierRegMapping is
          i2cTenbit  => '0',
          dataSize   => 16,              -- in units of bits
          addrSize   => 16,              -- in units of bits
-         endianness => '0'));           -- Little endian     
+         endianness => '1'));           -- Big endian
 
    constant DDR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 1) := (
       0             => (
@@ -226,13 +226,13 @@ architecture mapping of AmcCarrierRegMapping is
          i2cTenbit  => '0',
          dataSize   => 32,              -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '0'),            -- Little endian    
+         endianness => '0'),            -- Little endian
       1             => (
          i2cAddress => "0000011000",    -- Temperature Sensor (0011)
          i2cTenbit  => '0',
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '0'));           -- Little endian            
+         endianness => '0'));           -- Little endian
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -253,12 +253,12 @@ architecture mapping of AmcCarrierRegMapping is
    signal bootReq   : sl;
    signal bootAddr  : slv(31 downto 0);
    signal upTimeCnt : slv(31 downto 0);
-   
+
 begin
 
    --------------------------
    -- AXI-Lite: Crossbar Core
-   --------------------------  
+   --------------------------
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
@@ -276,11 +276,11 @@ begin
          mAxiWriteMasters => mAxilWriteMasters,
          mAxiWriteSlaves  => mAxilWriteSlaves,
          mAxiReadMasters  => mAxilReadMasters,
-         mAxiReadSlaves   => mAxilReadSlaves);      
+         mAxiReadSlaves   => mAxilReadSlaves);
 
    --------------------------
    -- AXI-Lite Version Module
-   --------------------------          
+   --------------------------
    U_Version : entity work.AxiVersion
       generic map (
          TPD_G            => TPD_G,
@@ -318,7 +318,7 @@ begin
             -- Check for boot request
             if bootReq = '1' then
                bootArmed <= '1' after TPD_G;
-            -- Check if DDR passed and armed 
+            -- Check if DDR passed and armed
             elsif (bootRdy = '1') and (bootArmed = '1') then
                -- Set the flag
                bootstart <= '1' after TPD_G;
@@ -337,7 +337,7 @@ begin
          clk         => axilClk,
          rst         => axilRst,
          start       => bootstart,
-         bootAddress => bootAddr);   
+         bootAddress => bootAddr);
 
    --------------------------
    -- AXI-Lite: SYSMON Module
@@ -357,7 +357,7 @@ begin
          axilWriteSlave  => mAxilWriteSlaves(SYSMON_INDEX_C),
          -- Clocks and Resets
          axilClk         => axilClk,
-         axilRst         => axilRst);  
+         axilRst         => axilRst);
 
    ------------------------------
    -- AXI-Lite: Boot Flash Module
@@ -393,7 +393,7 @@ begin
          CFGMCLK   => open,  -- 1-bit output: Configuration internal oscillator clock output
          DI        => di,               -- 4-bit output: Allow receiving on the D[3:0] input pins
          EOS       => open,  -- 1-bit output: Active high output signal indicating the End Of Startup.
-         PREQ      => open,             -- 1-bit output: PROGRAM request to fabric output         
+         PREQ      => open,             -- 1-bit output: PROGRAM request to fabric output
          DO        => do,               -- 4-bit input: Allows control of the D[3:0] pin outputs
          DTS       => "1110",           -- 4-bit input: Allows tristate of the D[3:0] pins
          FCSBO     => bootCsL,          -- 1-bit input: Contols the FCS_B pin for flash access
@@ -405,7 +405,7 @@ begin
          USRCCLKO  => bootSck,          -- 1-bit input: User CCLK input
          USRCCLKTS => '0',              -- 1-bit input: User CCLK 3-state enable input
          USRDONEO  => axilRstL,         -- 1-bit input: User DONE pin output control
-         USRDONETS => '0');             -- 1-bit input: User DONE 3-state enable output     
+         USRDONETS => '0');             -- 1-bit input: User DONE 3-state enable output
 
    axilRstL <= not(axilRst);            -- IPMC uses DONE to determine if FPGA is ready
    do       <= "111" & bootMosi;
@@ -419,9 +419,9 @@ begin
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, TIMING_MODE_G),
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C) 
+         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
-         -- XBAR Ports 
+         -- XBAR Ports
          xBarSin        => xBarSin,
          xBarSout       => xBarSout,
          xBarConfig     => xBarConfig,
@@ -433,7 +433,7 @@ begin
          axiWriteSlave  => mAxilWriteSlaves(XBAR_INDEX_C),
          -- Clocks and Resets
          axiClk         => axilClk,
-         axiRst         => axilRst);  
+         axiRst         => axilRst);
 
    ----------------------------------------
    -- AXI-Lite: Configuration Memory Module
@@ -455,7 +455,7 @@ begin
          axiWriteSlave  => mAxilWriteSlaves(CONFIG_I2C_INDEX_C),
          -- Clocks and Resets
          axiClk         => axilClk,
-         axiRst         => axilRst); 
+         axiRst         => axilRst);
 
    ---------------------------------
    -- AXI-Lite: Clock Cleaner Module
@@ -477,7 +477,7 @@ begin
          axiWriteSlave  => mAxilWriteSlaves(CLK_I2C_INDEX_C),
          -- Clocks and Resets
          axiClk         => axilClk,
-         axiRst         => axilRst);    
+         axiRst         => axilRst);
 
    -------------------------------
    -- AXI-Lite: DDR Monitor Module
@@ -499,11 +499,11 @@ begin
          axiWriteSlave  => mAxilWriteSlaves(DDR_I2C_INDEX_C),
          -- Clocks and Resets
          axiClk         => axilClk,
-         axiRst         => axilRst);             
+         axiRst         => axilRst);
 
    -----------------------
    -- AXI-Lite: BSI Module
-   -----------------------  
+   -----------------------
    U_Bsi : entity work.AmcCarrierBsi
       generic map (
          TPD_G            => TPD_G,
@@ -534,7 +534,7 @@ begin
          axilWriteSlave  => mAxilWriteSlaves(IPMC_INDEX_C),
          -- Clocks and Resets
          axilClk         => axilClk,
-         axilRst         => axilRst);    
+         axilRst         => axilRst);
 
    --------------------------------------
    -- Map the AXI-Lite to Timing Firmware
@@ -596,6 +596,6 @@ begin
          mAxiReadMaster  => regReadMaster,
          mAxiReadSlave   => regReadSlave,
          mAxiWriteMaster => regWriteMaster,
-         mAxiWriteSlave  => regWriteSlave);     
+         mAxiWriteSlave  => regWriteSlave);
 
 end mapping;
