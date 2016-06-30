@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : DebugRtmAmcCarrierCore.vhd
+-- File       : DebugRtmPgpAmcCarrierCore.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
@@ -35,7 +35,7 @@ use work.AmcCarrierRegPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity DebugRtmAmcCarrierCore is
+entity DebugRtmPgpAmcCarrierCore is
    generic (
       TPD_G                    : time                 := 1 ns;   -- Simulation only parameter
       SIM_SPEEDUP_G            : boolean              := false;  -- Simulation only parameter
@@ -168,9 +168,9 @@ entity DebugRtmAmcCarrierCore is
       -- SYSMON Ports
       vPIn             : in    sl;
       vNIn             : in    sl);
-end DebugRtmAmcCarrierCore;
+end DebugRtmPgpAmcCarrierCore;
 
-architecture mapping of DebugRtmAmcCarrierCore is
+architecture mapping of DebugRtmPgpAmcCarrierCore is
 
    constant AXI_ERROR_RESP_C : slv(1 downto 0) := AXI_RESP_DECERR_C;
 
@@ -481,7 +481,7 @@ begin
    ------------------
    -- DDR Buffer module
    ------------------
-   U_DebugRawDiagnostic_1 : entity work.DebugRawDiagnostic
+   U_DebugRawDiagnostic_1 : entity work.DebugRtmPgpRawDiagnostic
       generic map (
          TPD_G                    => TPD_G,
          DIAGNOSTIC_RAW_STREAMS_G => DIAGNOSTIC_RAW_STREAMS_G,

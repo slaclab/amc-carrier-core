@@ -41,20 +41,17 @@ vhdl work AmcAxisDaq/AmcAxisDaqMux.vhd
 vhdl work AmcAxisDaq/AmcAxisDaqMuxDecimator.vhd
 vhdl work AmcAxisDaq/AmcAxiLiteDaqRegItf.vhd
 
-vhdl work DebugRtmPgp/DebugRtmAmcCarrierCore.vhd
+vhdl work DebugRtmPgp/DebugRtmPgpAmcCarrierCore.vhd
 vhdl work DebugRtmPgp/DebugRtmPgp2bGthUltra.vhd
 vhdl work DebugRtmPgp/DebugRtmPgpAmcCarrier.vhd
 vhdl work DebugRtmPgp/DebugRtmPgpAmcCarrierDdrMem.vhd
 vhdl work DebugRtmPgp/DebugRtmPgpGthCoreWrapper.vhd
-vhdl work DebugRtmPgp/DebugAmcAdcDdrFifo.vhd
-vhdl work DebugRtmPgp/DebugRawDiagnostic.vhd
+vhdl work DebugRtmPgp/DebugRtmPgpRawDiagnostic.vhd
 
 vhdl work DebugRtmEth/DebugRtmEthAmcCarrierCore.vhd
 vhdl work DebugRtmEth/DebugRtmEth.vhd
 
 vhdl work coregen/MigCore.dcp
 vhdl work coregen/SysMonCore.dcp
-vhdl work coregen/DebugMigCore.dcp
 vhdl work coregen/DebugRtmPgpGthCore.dcp
-vhdl work coregen/DebugAxiStreamDdrFifo.dcp
 vhdl work coregen/AmcGenericAdcDacJesd204bCoregen.dcp

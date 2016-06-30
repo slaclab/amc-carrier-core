@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : BsaRawDiagnostic.vhd
+-- File       : DebugRtmPgpRawDiagnostic.vhd
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 --              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
@@ -23,7 +23,7 @@ use work.AxiStreamPkg.all;
 use work.AxiPkg.all;
 use work.SsiPkg.all;
 
-entity DebugRawDiagnostic is
+entity DebugRtmPgpRawDiagnostic is
 
    generic (
       TPD_G                    : time                  := 1 ns;
@@ -61,9 +61,9 @@ entity DebugRawDiagnostic is
 
 
 
-end entity DebugRawDiagnostic;
+end entity DebugRtmPgpRawDiagnostic;
 
-architecture rtl of DebugRawDiagnostic is
+architecture rtl of DebugRtmPgpRawDiagnostic is
 
    constant TDEST_ROUTES_C : Slv8Array(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0) := (others => "--------");
 
