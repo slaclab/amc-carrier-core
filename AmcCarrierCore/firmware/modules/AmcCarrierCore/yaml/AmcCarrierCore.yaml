@@ -15,7 +15,7 @@ include: AxiMicronN25Q.yaml
 include: AxiSy56040.yaml
 include: GenericMemory.yaml
 include: AmcCarrierBsi.yaml
-include: AmcCarrierTiming.yaml
+#include: AmcCarrierTiming.yaml
 include: AmcCarrierBsa.yaml
 include: XauiReg.yaml
 include: UdpEngineWrapper.yaml
