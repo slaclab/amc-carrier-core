@@ -44,15 +44,15 @@ Device: &AmcGenericAdcDacCore
     - <<: *AmcGenericAdcDacCtrl
       offset: 0x00600000       
     ##################################################
-    - <<: *GenericMemory
-      name: "AxiLiteRingBuffer"
+    - name: "AxiLiteRingBuffer"
       offset: 0x00610000       
       size: 0x10000     
       nelms: 6
       stride: 0x10000      
-      - <<: *MemoryArray
-        nelms: 0x4000        
-        nmode: RO 
+      IntField:
+        - <<: *MemoryArray
+          nelms: 0x4000        
+          mode: RO 
     ##################################################
     - <<: *Gthe3Channel
       offset: 0x00700000   
