@@ -44,8 +44,8 @@ Device: &AmcCarrierCore
     - <<: *AxiMicronN25Q
       offset: 0x02000000  
     ##################################################
-    # - <<: *AxiSy56040
-      # offset: 0x03000000      
+    - <<: *AxiSy56040
+      offset: 0x03000000      
     ##################################################
     # - name: "Axi24LC64FT"
       # offset: 0x04000000       
@@ -54,12 +54,12 @@ Device: &AmcCarrierCore
         # - <<: *MemoryArray
           # nelms: 0x800
     ##################################################
-    # - name: "AxiCdcm6208"
-      # offset: 0x05000000       
-      # size: 0x40       
-      # IntField:
-        # - <<: *MemoryArray
-          # nelms: 0x29      
+    - name: "AxiCdcm6208"
+      offset: 0x05000000       
+      size: 0x100       
+      IntField:
+        - <<: *MemoryArray
+          nelms: 0x29      
     ##################################################
     # - name: "DdrSpdMemory"
       # offset: 0x06000000       
