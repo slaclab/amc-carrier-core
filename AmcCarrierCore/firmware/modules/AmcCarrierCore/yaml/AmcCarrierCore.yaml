@@ -93,7 +93,7 @@ Device: &AmcCarrierCore
     - <<: *UdpEngineWrapper
       offset: 0x0A010000 # ClientConfig[1:0]
       nelms: 2
-      stride: 0x10      
+      stride: 8 
     ##################################################
     - <<: *RssiCore
       name: "RssiServerSw"
