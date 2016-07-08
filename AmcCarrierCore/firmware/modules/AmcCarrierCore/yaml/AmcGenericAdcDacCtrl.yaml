@@ -130,8 +130,8 @@ Device: &AmcGenericAdcDacCtrl
       description: Enable Status counter roll over
     #########################################################
     - offset: 0x3FC
-      name: LmkMuxSel
+      name: CntRst
       sizeBits: 1
-      mode: RW
-      description: LMK MUX Select           
+      mode: WO
+      description: Status counter reset
     #########################################################
