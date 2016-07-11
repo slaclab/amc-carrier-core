@@ -48,35 +48,44 @@ Device: &AmcCarrierCore
       offset: 0x03000000      
     ##################################################
     # - name: "Axi24LC64FT"
-      # offset: 0x04000000       
-      # size: 0x2000       
+      # offset: 0x04000000
+      # size: 0x2000
       # IntField:
         # - <<: *MemoryArray
           # nelms: 0x800
+          # stride: 4
+          # sizeBits: 32
     ##################################################
     - name: "AxiCdcm6208"
-      offset: 0x05000000       
+      offset: 0x05000000
       size: 0x100       
       IntField:
         - <<: *MemoryArray
-          nelms: 0x29      
+          nelms: 0x29
+          stride: 4
+          sizeBits: 16
     ##################################################
-    # - name: "DdrSpdMemory"
-      # offset: 0x06000000       
-      # size: 0x100     
+    - name: "DdrSpdMemory"
+      offset: 0x06000000
+      size: 0x400
+      description: Lookup tool at www.micron.com/spd
+      IntField:
+        - <<: *MemoryArray
+          nelms: 0x100
+          stride: 4
+          sizeBits: 8
+          mode: RO # Read only
+    ##################################################
+    # - name: "DdrTempSensor"
+      # offset: 0x06000400       
+      # size: 0x400     
       # description: Lookup tool at www.micron.com/spd
       # IntField:
         # - <<: *MemoryArray
-          # nelms: 0x40        
-          # nmode: RO # Read only
-    # ##################################################
-    # - name: "DdrTempSensor"
-      # offset: 0x06000100       
-      # size: 0x100     
-      # IntField:
-        # - <<: *MemoryArray
-          # nelms: 0x40        
-          # nmode: RO # Read only
+          # nelms: 0x100
+          # stride: 4
+          # sizeBits: 16
+          # mode: RO # Read only
     ##################################################
     - <<: *AmcCarrierBsi
       offset: 0x07000000      
