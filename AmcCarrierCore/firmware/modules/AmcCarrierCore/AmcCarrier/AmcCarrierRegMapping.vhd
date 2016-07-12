@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-04-19
+-- Last update: 2016-07-12
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -205,34 +205,31 @@ architecture mapping of AmcCarrierRegMapping is
          connectivity    => x"FFFF"));
 
    constant CONFIG_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
-      0             => (
-         i2cAddress => "0001010000",
-         i2cTenbit  => '0',
+      0             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1010000",
          dataSize   => 32,              -- in units of bits
          addrSize   => 13,              -- in units of bits
          endianness => '0'));           -- Little endian
 
    constant TIME_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
-      0             => (
-         i2cAddress => "0001010100",
-         i2cTenbit  => '0',
+      0             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1010100",
          dataSize   => 16,              -- in units of bits
          addrSize   => 16,              -- in units of bits
          endianness => '1'));           -- Big endian
 
    constant DDR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 1) := (
-      0             => (
-         i2cAddress => "0001010000",    -- SRD Memory (1010) (Lookup tool at www.micron.com/spd)
-         i2cTenbit  => '0',
-         dataSize   => 32,              -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '0'),            -- Little endian
-      1             => (
-         i2cAddress => "0000011000",    -- Temperature Sensor (0011)
-         i2cTenbit  => '0',
-         dataSize   => 8,               -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '0'));           -- Little endian
+      0              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "1010000",      -- SRD Memory (1010) (Lookup tool at www.micron.com/spd)
+         dataSize    => 32,             -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '0'),           -- Little endian
+      1              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "0011000",      -- Temperature Sensor (0011)
+         dataSize    => 16,             -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '0',            -- Little endian
+         repeatStart => '1'));          -- Use repeated start for reads
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
