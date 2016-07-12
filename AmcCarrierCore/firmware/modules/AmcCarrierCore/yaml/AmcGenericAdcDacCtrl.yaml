@@ -84,7 +84,7 @@ Device: &AmcGenericAdcDacCtrl
     - offset: 0x20C
       name: LmkStatus
       sizeBits: 2
-      mode: RW
+      mode: RO
       description: LMK Status        
     #########################################################
     - offset: 0x210
