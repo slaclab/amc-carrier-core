@@ -15,7 +15,7 @@ include: AxiMicronN25Q.yaml
 include: AxiSy56040.yaml
 include: GenericMemory.yaml
 include: AmcCarrierBsi.yaml
-#include: AmcCarrierTiming.yaml
+include: AmcCarrierTiming.yaml
 include: AmcCarrierBsa.yaml
 include: EthMacPhy.yaml
 include: UdpEngineWrapper.yaml
@@ -92,27 +92,33 @@ Device: &AmcCarrierCore
       offset: 0x0A000000  
     ##################################################
     - <<: *UdpEngineWrapper
-      offset: 0x0A010000 # ClientConfig[1:0]
+      offset: 0x0A010000
       nelms: 2
-      stride: 8 
+      stride: 8
+      description: "ClientConfig[1:0]"
     ##################################################
     - <<: *RssiCore
       name: "RssiServerSw"
-      offset: 0x0A020000 # Server RSSI’s Software 
+      offset: 0x0A020000 
       nelms: 2
-      stride: 0x1000        
+      stride: 0x1000   
+      description: Server RSSI’s Software
     ##################################################
     # - <<: *RssiCore
       # name: "RssiServerBp"
-      # offset: 0x0A030000 # Server RSSI’s BP_MSG[1:0]     
+      # offset: 0x0A030000     
       # nelms: 2
       # stride: 0x2000
+      # description: Server RSSI BP_MSG[1:0]
+      # instantiate: false
     # ##################################################
     # - <<: *RssiCore
       # name: "RssiClientBp"
-      # offset: 0x0A031000 # Client RSSI’s BP_MSG[1:0]    
+      # offset: 0x0A031000    
       # nelms: 2
-      # stride: 0x2000            
+      # stride: 0x2000
+      # description: Client RSSI BP_MSG[1:0]
+      # instantiate: false
     ##################################################
     - <<: *AxiMemTester
       offset: 0x0B000000  
