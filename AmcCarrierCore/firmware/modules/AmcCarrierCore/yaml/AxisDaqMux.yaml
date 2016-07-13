@@ -29,6 +29,11 @@ Device: &AxisDaqMux
       lsBit: 1
       mode: RW
       description: "Mode of DAQ - '0'  - until packet size and needs trigger - '1'  - sends the 4k frames continuously no trigger"
+      enums:
+        - name:  Triggered
+          value: 0
+        - name:  Continuous
+          value: 1
     #########################################################
     - offset: 0x00
       name: HwTriggerMask
@@ -36,6 +41,11 @@ Device: &AxisDaqMux
       lsBit: 2
       mode: RW
       description: "Hardware Trigger Mask '1' - Enabled, '0' - Disabled"
+      enums:
+        - name:  Disabled
+          value: 0
+        - name:  Enabled
+          value: 1
     #########################################################
     - offset: 0x00
       name: DecimationMode
@@ -43,6 +53,11 @@ Device: &AxisDaqMux
       lsBit: 3
       mode: RW
       description: "Decimation mode '1' - 16-bit, '0' - 32-bit"
+      enums:
+        - name:  32-bit
+          value: 0
+        - name:  16-bit
+          value: 1
     #########################################################
     - offset: 0x08
       name: SampleDecimation
