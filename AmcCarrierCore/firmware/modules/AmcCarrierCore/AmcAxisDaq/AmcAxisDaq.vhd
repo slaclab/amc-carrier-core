@@ -132,8 +132,7 @@ begin
    -- Rate divider module
    Decimator_INST : entity work.AmcAxisDaqMuxDecimator
       generic map (
-         TPD_G => TPD_G,
-         F_G   => 2
+         TPD_G => TPD_G
          )
       port map (
          clk           => devClk_i,

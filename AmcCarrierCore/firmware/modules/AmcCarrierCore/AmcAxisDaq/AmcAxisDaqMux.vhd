@@ -49,7 +49,7 @@ entity AmcAxisDaqMux is
       L_G : positive := 6;
 
       --Number of AXIS lanes (1 to 2)
-      L_AXI_G : positive := 2);
+      L_AXI_G : positive := 8);
    port (
 
       -- Clocks and Resets
@@ -123,7 +123,7 @@ architecture rtl of AmcAxisDaqMux is
 begin
    -- Check JESD generics
    assert (1 <= L_G and L_G <= 16) report "L_G must be between 1 and 16" severity failure;
-   assert (1 <= L_AXI_G and L_AXI_G <= 2) report "L_AXI_G must be between 1 and 2"severity failure;
+   assert (1 <= L_AXI_G and L_AXI_G <= 16) report "L_AXI_G must be between 1 and 16"severity failure;
 
    -----------------------------------------------------------
    -- AXI lite
