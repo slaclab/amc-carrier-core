@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-06-03
+-- Last update: 2016-07-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -43,7 +43,8 @@ package AmcCarrierPkg is
    -- 04/19/2016 (0x00000005): In AmcCarrierRegPkg, defaulting MPS Link node's XBAR configurations to XBAR_TIME_GEN_C 
    -- 04/21/2016 (0x00000006): Increased gtTxDiffCtrl from 0.95 Vppd to 1.08 Vppd
    -- 04/21/2016 (0x00000007): Added Ethernet Uptime counter in the BSI interface
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000007";
+   -- 07/08/2016 (0x00000008): Updated the I2C device configurations
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000008";
 
    constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
@@ -78,22 +79,22 @@ package AmcCarrierPkg is
    -- Configuration of AXI Streams in core
    -------------------------------------------------------------------------------------------------
    -- All streams to ETH blocks should use this config
-   constant ETH_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8); -- Use 8 tDest bits
+   constant ETH_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);  -- Use 8 tDest bits
 
    -- BSA stream indicies
    constant BSA_MEM_AXIS_INDEX_C         : integer := 0;
    constant BSA_BSA_STATUS_AXIS_INDEX_C  : integer := 1;
    constant BSA_DIAG_STATUS_AXIS_INDEX_C : integer := 2;
-   constant BSA_DIAG_DATA_AXIS_INDEX_C    : integer := 3;
+   constant BSA_DIAG_DATA_AXIS_INDEX_C   : integer := 3;
 
 
 
    ---------------------------------------------------
    -- MPS: Configurations, Constants and Records Types
    ---------------------------------------------------   
-   constant MPS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(2);
-   constant MPS_MITIGATION_BITS_C : integer := 114;
-   constant MPS_MESSAGE_BITS_C    : integer := 298;
+   constant MPS_CONFIG_C          : AxiStreamConfigType := ssiAxiStreamConfig(2);
+   constant MPS_MITIGATION_BITS_C : integer             := 114;
+   constant MPS_MESSAGE_BITS_C    : integer             := 298;
 
    function getMpsChCnt(app        : AppType) return natural;
    function getMpsThresholdCnt(app : AppType) return natural;
@@ -109,11 +110,11 @@ package AmcCarrierPkg is
    constant MPS_MITIGATION_MSG_INIT_C : MpsMitigationMsgType := (
       strobe    => '0',
       latchDiag => '0',
-      tag       => (others=>'0'),
-      class     => (others=>(others=>'0')),
-      permit    => (others=>(others=>'0')));
+      tag       => (others => '0'),
+      class     => (others => (others => '0')),
+      permit    => (others => (others => '0')));
 
-   function toSlv (m : MpsMitigationMsgType) return slv;
+   function toSlv (m                : MpsMitigationMsgType) return slv;
    function toMpsMitigationMsg (vec : slv) return MpsMitigationMsgType;
 
    type MpsMessageType is record
@@ -123,21 +124,21 @@ package AmcCarrierPkg is
       appId     : slv(15 downto 0);
       appType   : AppType;
       message   : Slv8Array(31 downto 0);
-      msgSize   : slv(7 downto 0);  -- In units of Bytes
+      msgSize   : slv(7 downto 0);      -- In units of Bytes
    end record;
 
    type MpsMessageArray is array (natural range <>) of MpsMessageType;
 
    constant MPS_MESSAGE_INIT_C : MpsMessageType := (
       valid     => '0',
-      timeStamp => (others=>'0'),
+      timeStamp => (others => '0'),
       testMode  => '0',
-      appId     => (others=>'0'),
-      appType   => (others=>'0'),
-      message   => (others=>(others=>'0')),
-      msgSize   => (others=>'0'));
+      appId     => (others => '0'),
+      appType   => (others => '0'),
+      message   => (others => (others => '0')),
+      msgSize   => (others => '0'));
 
-   function toSlv (m : MpsMessageType) return slv;
+   function toSlv (m          : MpsMessageType) return slv;
    function toMpsMessage (vec : slv) return MpsMessageType;
 
    ---------------------------------------------------------------------------      
@@ -307,9 +308,9 @@ package body AmcCarrierPkg is
       variable vector : slv(MPS_MITIGATION_BITS_C-1 downto 0) := (others => '0');
       variable i      : integer                               := 0;
    begin
-      assignSlv(i,vector,m.strobe);
-      assignSlv(i,vector,m.latchDiag);
-      assignSlv(i,vector,m.tag);
+      assignSlv(i, vector, m.strobe);
+      assignSlv(i, vector, m.latchDiag);
+      assignSlv(i, vector, m.tag);
 
       for j in 0 to 15 loop
          assignslv(i, vector, m.class(j));
@@ -326,16 +327,16 @@ package body AmcCarrierPkg is
       variable m : MpsMitigationMsgType;
       variable i : integer := 0;
    begin
-      assignrecord(i,vec,m.strobe);
-      assignrecord(i,vec,m.latchDiag);
-      assignrecord(i,vec,m.tag);
+      assignrecord(i, vec, m.strobe);
+      assignrecord(i, vec, m.latchDiag);
+      assignrecord(i, vec, m.tag);
 
       for j in 0 to 15 loop
-         assignrecord(i,vec,m.class(j));
+         assignrecord(i, vec, m.class(j));
       end loop;
 
       for j in 0 to 15 loop
-         assignrecord(i,vec,m.permit(j));
+         assignrecord(i, vec, m.permit(j));
       end loop;
 
       return m;
@@ -345,16 +346,16 @@ package body AmcCarrierPkg is
       variable vector : slv(MPS_MESSAGE_BITS_C-1 downto 0) := (others => '0');
       variable i      : integer                            := 0;
    begin
-      assignSlv(i,vector,m.valid);
-      assignSlv(i,vector,m.timeStamp);
-      assignSlv(i,vector,m.testMode);
-      assignSlv(i,vector,m.appId);
+      assignSlv(i, vector, m.valid);
+      assignSlv(i, vector, m.timeStamp);
+      assignSlv(i, vector, m.testMode);
+      assignSlv(i, vector, m.appId);
 
       for j in 0 to 31 loop
-         assignSlv(i,vector,m.message(j));
+         assignSlv(i, vector, m.message(j));
       end loop;
 
-      assignSlv(i,vector,m.msgSize);
+      assignSlv(i, vector, m.msgSize);
       return vector;
    end function;
 
@@ -362,16 +363,16 @@ package body AmcCarrierPkg is
       variable m : MpsMessageType;
       variable i : integer := 0;
    begin
-      assignRecord(i,vec,m.valid);
-      assignRecord(i,vec,m.timeStamp);
-      assignRecord(i,vec,m.testMode);
-      assignRecord(i,vec,m.appId);
+      assignRecord(i, vec, m.valid);
+      assignRecord(i, vec, m.timeStamp);
+      assignRecord(i, vec, m.testMode);
+      assignRecord(i, vec, m.appId);
 
       for j in 0 to 31 loop
-         assignRecord(i,vec,m.message(j));
+         assignRecord(i, vec, m.message(j));
       end loop;
 
-      assignRecord(i,vec,m.msgSize);
+      assignRecord(i, vec, m.msgSize);
       return m;
    end function;
 

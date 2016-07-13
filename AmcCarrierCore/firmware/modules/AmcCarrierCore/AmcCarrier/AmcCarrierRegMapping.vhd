@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-07-12
+-- Last update: 2016-07-13
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -204,13 +204,6 @@ architecture mapping of AmcCarrierRegMapping is
          addrBits        => 31,
          connectivity    => x"FFFF"));
 
-   constant CONFIG_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
-      0             => MakeI2cAxiLiteDevType(
-         i2cAddress => "1010000",
-         dataSize   => 32,              -- in units of bits
-         addrSize   => 13,              -- in units of bits
-         endianness => '0'));           -- Little endian
-
    constant TIME_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
       0             => MakeI2cAxiLiteDevType(
          i2cAddress => "1010100",
@@ -221,14 +214,14 @@ architecture mapping of AmcCarrierRegMapping is
    constant DDR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 1) := (
       0              => MakeI2cAxiLiteDevType(
          i2cAddress  => "1010000",      -- SRD Memory (1010) (Lookup tool at www.micron.com/spd)
-         dataSize    => 32,             -- in units of bits
+         dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '0'),           -- Little endian
+         endianness  => '1'),           -- Big endian
       1              => MakeI2cAxiLiteDevType(
          i2cAddress  => "0011000",      -- Temperature Sensor (0011)
          dataSize    => 16,             -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '0',            -- Little endian
+         endianness  => '1',            -- Big endian
          repeatStart => '1'));          -- Use repeated start for reads
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -435,24 +428,25 @@ begin
    ----------------------------------------
    -- AXI-Lite: Configuration Memory Module
    ----------------------------------------
-   AxiI2cRegMaster_0 : entity work.AxiI2cRegMaster
+   AxiI2cRegMaster_0 : entity work.AxiI2cEeprom
       generic map (
          TPD_G            => TPD_G,
+         ADDR_WIDTH_G     => 13,
+         I2C_ADDR_G       => "1010000",
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         DEVICE_MAP_G     => CONFIG_DEVICE_MAP_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
          -- I2C Ports
-         scl            => calScl,
-         sda            => calSda,
+         scl             => calScl,
+         sda             => calSda,
          -- AXI-Lite Register Interface
-         axiReadMaster  => mAxilReadMasters(CONFIG_I2C_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(CONFIG_I2C_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(CONFIG_I2C_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(CONFIG_I2C_INDEX_C),
+         axilReadMaster  => mAxilReadMasters(CONFIG_I2C_INDEX_C),
+         axilReadSlave   => mAxilReadSlaves(CONFIG_I2C_INDEX_C),
+         axilWriteMaster => mAxilWriteMasters(CONFIG_I2C_INDEX_C),
+         axilWriteSlave  => mAxilWriteSlaves(CONFIG_I2C_INDEX_C),
          -- Clocks and Resets
-         axiClk         => axilClk,
-         axiRst         => axilRst);
+         axilClk         => axilClk,
+         axilRst         => axilRst);
 
    ---------------------------------
    -- AXI-Lite: Clock Cleaner Module

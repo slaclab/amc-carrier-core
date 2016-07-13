@@ -47,14 +47,15 @@ Device: &AmcCarrierCore
     - <<: *AxiSy56040
       offset: 0x03000000      
     ##################################################
-    # - name: "Axi24LC64FT"
-      # offset: 0x04000000
-      # size: 0x2000
-      # IntField:
-        # - <<: *MemoryArray
-          # nelms: 0x800
-          # stride: 4
-          # sizeBits: 32
+    - name: "Axi24LC64FT"
+      offset: 0x04000000
+      size: 0x2000
+      description: AMC Carrier core's Non-volatile memory (100k endurance)
+      IntField:
+        - <<: *MemoryArray
+          nelms: 0x800
+          stride: 4
+          sizeBits: 32
     ##################################################
     - name: "AxiCdcm6208"
       offset: 0x05000000
