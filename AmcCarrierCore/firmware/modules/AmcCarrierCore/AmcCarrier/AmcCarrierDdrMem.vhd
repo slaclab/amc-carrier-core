@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-03-02
+-- Last update: 2016-07-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -360,10 +360,10 @@ begin
          axiSlaveRegisterR(regCon, x"104", 0, r.memError);
          axiSlaveRegisterR(regCon, x"108", 0, x"00000000");  -- AxiMemTester's wTimer
          axiSlaveRegisterR(regCon, x"10C", 0, x"00000000");  -- AxiMemTester's rTimer
-         axiSlaveRegisterR(regCon, x"110", 0, x"00000000");  -- AxiMemTester's START_C Upper word
-         axiSlaveRegisterR(regCon, x"114", 0, x"00000000");  -- AxiMemTester's START_C Lower word
-         axiSlaveRegisterR(regCon, x"118", 0, x"00000000");  -- AxiMemTester's STOP_C Upper word
-         axiSlaveRegisterR(regCon, x"11C", 0, x"00000000");  -- AxiMemTester's STOP_C Lower word
+         axiSlaveRegisterR(regCon, x"110", 0, x"00000000");  -- AxiMemTester's START_C Lower word
+         axiSlaveRegisterR(regCon, x"114", 0, x"00000000");  -- AxiMemTester's START_C Upper word
+         axiSlaveRegisterR(regCon, x"118", 0, x"00000000");  -- AxiMemTester's STOP_C Lower word
+         axiSlaveRegisterR(regCon, x"11C", 0, x"00000000");  -- AxiMemTester's STOP_C Upper word
          axiSlaveRegisterR(regCon, x"120", 0, toSlv(AXI_CONFIG_C.ADDR_WIDTH_C, 32));
          axiSlaveRegisterR(regCon, x"124", 0, toSlv(AXI_CONFIG_C.DATA_BYTES_C, 32));
          axiSlaveRegisterR(regCon, x"128", 0, toSlv(AXI_CONFIG_C.ID_BITS_C, 32));
