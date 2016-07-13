@@ -211,18 +211,12 @@ architecture mapping of AmcCarrierRegMapping is
          addrSize   => 16,              -- in units of bits
          endianness => '1'));           -- Big endian
 
-   constant DDR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 1) := (
+   constant DDR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
       0              => MakeI2cAxiLiteDevType(
          i2cAddress  => "1010000",      -- SRD Memory (1010) (Lookup tool at www.micron.com/spd)
          dataSize    => 8,              -- in units of bits
          addrSize    => 8,              -- in units of bits
-         endianness  => '1'),           -- Big endian
-      1              => MakeI2cAxiLiteDevType(
-         i2cAddress  => "0011000",      -- Temperature Sensor (0011)
-         dataSize    => 16,             -- in units of bits
-         addrSize    => 8,              -- in units of bits
-         endianness  => '1',            -- Big endian
-         repeatStart => '1'));          -- Use repeated start for reads
+         endianness => '1'));           -- Big endian
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);

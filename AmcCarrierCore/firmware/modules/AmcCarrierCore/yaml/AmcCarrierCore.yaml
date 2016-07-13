@@ -77,17 +77,6 @@ Device: &AmcCarrierCore
           sizeBits: 8
           mode: RO # Read only
     ##################################################
-    # - name: "DdrTempSensor"
-      # offset: 0x06000400       
-      # size: 0x400     
-      # description: Lookup tool at www.micron.com/spd
-      # IntField:
-        # - <<: *MemoryArray
-          # nelms: 0x100
-          # stride: 4
-          # sizeBits: 16
-          # mode: RO # Read only
-    ##################################################
     - <<: *AmcCarrierBsi
       offset: 0x07000000      
     ##################################################  
