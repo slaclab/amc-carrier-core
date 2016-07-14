@@ -21,7 +21,7 @@ include: EthMacPhy.yaml
 include: UdpEngineWrapper.yaml
 include: RssiCore.yaml
 include: AxiMemTester.yaml
-# include: AmcCarrierMps.yaml
+include: AmcCarrierMps.yaml
 
 Device: &AmcCarrierCore 
   name: AmcCarrierCore
@@ -30,13 +30,16 @@ Device: &AmcCarrierCore
   ######### 
   IntField:
   ######### 
+    ##################################################
     - offset: 0x00000400
       name: AMC_CARRIER_CORE_VERSION_C
       mode: RO
       description: AMC Carrier Core Version Number
+    ##################################################
   ########
   MMIODev:
   ########
+    ##################################################
     - <<: *AxiVersion
       offset: 0x00000000
     ##################################################
@@ -68,7 +71,7 @@ Device: &AmcCarrierCore
           stride: 4
           sizeBits: 16
     ##################################################
-    - name: "DdrSpdMemory"
+    - name: "DdrSpd"
       offset: 0x06000000
       size: 0x400
       description: Lookup tool at www.micron.com/spd
@@ -104,25 +107,25 @@ Device: &AmcCarrierCore
       stride: 0x1000   
       description: Server RSSI’s Software
     ##################################################
-    # - <<: *RssiCore
-      # name: "RssiServerBp"
-      # offset: 0x0A030000     
-      # nelms: 2
-      # stride: 0x2000
-      # description: Server RSSI BP_MSG[1:0]
-      # instantiate: false
-    # ##################################################
-    # - <<: *RssiCore
-      # name: "RssiClientBp"
-      # offset: 0x0A031000    
-      # nelms: 2
-      # stride: 0x2000
-      # description: Client RSSI BP_MSG[1:0]
-      # instantiate: false
+    - <<: *RssiCore
+      name: "RssiServerBp"
+      offset: 0x0A030000     
+      nelms: 2
+      stride: 0x2000
+      description: Server RSSI BP_MSG[1:0]
+      instantiate: false
+    ##################################################
+    - <<: *RssiCore
+      name: "RssiClientBp"
+      offset: 0x0A031000    
+      nelms: 2
+      stride: 0x2000
+      description: Client RSSI BP_MSG[1:0]
+      instantiate: false
     ##################################################
     - <<: *AxiMemTester
       offset: 0x0B000000  
-    # ##################################################   
-    # - <<: *AmcCarrierMps
-      # offset: 0x0C000000   
-    #########################################################
+    ##################################################   
+    - <<: *AmcCarrierMps
+      offset: 0x0C000000   
+    ##################################################
