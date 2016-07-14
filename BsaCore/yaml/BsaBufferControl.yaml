@@ -26,8 +26,12 @@ Device: &BsaBufferControl
           bitSize: 64
           mode: RO
 
-    - <<: *AxiStreamDmaRingWrite
-      offset: 0x00001000
+    - offset: 0x00001000
       name: BsaBuffers
       metadata:
-        - numBuffers: 64
+       - numBuffers: &numBuffers 64
+       - destEnums: &destEnums
+           - name: Default
+             value: 0
+       - destHidden: &destHidden true
+      <<: *AxiStreamDmaRingWrite

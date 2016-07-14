@@ -17,17 +17,14 @@ Device: &BsaRawDiagnostic
   #########
   MMIODev:
 
-    - <<: *AxiStreamDmaRingWrite
-      offset: 0x00000000
+    - offset: 0x00000000
       name: RawDiagnosticBuffers
       metadata:
-        - numBuffers: 4
-        - destHidden: false
-        - destEnums:
+        - numBuffers: &numBuffers 4
+        - destHidden: &destHidden false
+        - destEnums: &destEnums
             - name: Software
               value: 0
             - name: Auto-Readout
               value: 1
-
-
-      
+      <<: *AxiStreamDmaRingWrite
