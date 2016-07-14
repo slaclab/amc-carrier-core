@@ -8,16 +8,16 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-include: BsaRawDiagnostic.yaml
-include: BsaBufferControl.yaml
+include: AmcCarrierMpsPhy.yaml
 
-Device: &AmcCarrierBsa 
-  name: AmcCarrierBsa
-  description: AmcCarrier BSA Module
-  size: 0x20000 # Double check this
-  #########
+Device: &AmcCarrierMps 
+  name: AmcCarrierMps
+  description: AmcCarrierMps
+  size: 0x01000000 
+  ########
   MMIODev:
-    - <<: *BsaBufferControl
-      offset: 0x00000000
-    - <<: *BsaRawDiagnostic
+  ########
+    ##################################################
+    - <<: *AmcCarrierMpsPhy
       offset: 0x00010000
+    ##################################################

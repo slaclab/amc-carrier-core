@@ -1,0 +1,145 @@
+##############################################################################
+## This file is part of 'LCLS2 Common Carrier Core'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'LCLS2 Common Carrier Core', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+
+Device: &AmcCarrierMpsPhy 
+  name: AmcCarrierMpsPhy
+  description: AmcCarrier MPS PHY Module
+  size: 0x400
+  #########
+  IntField:
+  #########
+    #########################################################
+    - offset: 0x000
+      name: MpsTxLinkUpCnt
+      mode: RO
+      sizeBits: 32
+      description: MPS TX LinkUp Counter  
+    #########################################################
+    - offset: 0x004
+      name: MpsRxLinkUpCnt
+      mode: RO
+      sizeBits: 32
+      stride: 4
+      nelms: 14      
+      description: MPS RX LinkUp Counter[13:0]
+    #########################################################
+    - offset: 0x100
+      name: MpsTxLinkUP
+      mode: RO
+      lsBit: 0
+      sizeBits: 1
+      description: MPS TX LinkUp   
+    #########################################################
+    - offset: 0x100
+      name: MpsRxLinkUP
+      mode: RO
+      lsBit: 1
+      sizeBits: 14
+      description: MPS TX LinkUp[13:0]
+    #########################################################
+    - offset: 0x104
+      name: MPS_SLOT_G
+      mode: RO
+      lsBit: 0
+      sizeBits: 1
+      description: MPS_SLOT_G        
+    #########################################################
+    - offset: 0x108
+      name: TimeStrbRate
+      mode: RO
+      sizeBits: 32
+      description: Time Strobe Rate (units of Hz) 
+    #########################################################
+    - offset: 0x10C
+      name: DiagnosticClkFreq
+      mode: RO
+      sizeBits: 32
+      description: Diagnostic Clock Frequency (units of Hz)    
+    #########################################################
+    - offset: 0x110
+      name: APP_TYPE_G
+      mode: RO
+      lsBit: 0
+      sizeBits: 7
+      description: See AmcCarrierPkg.vhd for defination
+    #########################################################
+    - offset: 0x114
+      name: MPS_CHANNELS_C
+      mode: RO
+      sizeBits: 32
+      description: Number of MPS channels
+    #########################################################
+    - offset: 0x118
+      name: MPS_THRESHOLD_C
+      mode: RO
+      sizeBits: 32
+      description: Number of MPS Thresholds 
+    #########################################################
+    - offset: 0x11C
+      name: BP_MSG_CHANNELS_C
+      mode: RO
+      sizeBits: 32
+      description: Number of backplane messaging Thresholds 
+    #########################################################
+    - offset: 0x120
+      name: AppId
+      mode: RO
+      sizeBits: 16
+      description: Application ID  
+    #########################################################
+    - offset: 0x124
+      name: MpsPllLocked
+      mode: RO
+      lsBit: 0
+      sizeBits: 1
+      description: MPS PLL Lock Status
+    #########################################################
+    - offset: 0x200
+      name: MpsEnable
+      mode: RW
+      lsBit: 0
+      sizeBits: 1    
+      description: MPS Enable Flag  
+    #########################################################
+    - offset: 0x204
+      name: MpsTestMode
+      mode: RW
+      lsBit: 0
+      sizeBits: 1    
+      description: MPS Test Mode Flag  
+    #########################################################
+    - offset: 0x208
+      name: BpMsgEnable
+      mode: RW
+      lsBit: 0
+      sizeBits: 1    
+      description: BP_MSG Enable Flag  
+    #########################################################
+    - offset: 0x20C
+      name: BpMsgTestMode
+      mode: RW
+      lsBit: 0
+      sizeBits: 1    
+      description: BP_MSG Test Mode Flag      
+    #########################################################
+    - offset: 0x3F0
+      name: RollOverEn
+      mode: RW
+      lsBit: 0
+      sizeBits: 15  
+      description: Status Counter Roll Over Enable 
+    #########################################################
+    - offset: 0x3FC
+      name: CntRst
+      mode: WO
+      lsBit: 0
+      sizeBits: 1  
+      description: Status Counter Reset
+    #########################################################
