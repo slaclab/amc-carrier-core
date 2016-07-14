@@ -49,7 +49,6 @@ Device: &AmcGenericAdcDacCore
       nelms: 4
       stride: 0x10000         
     ##################################################
-    ##################################################
     - name: "AxiLiteRingBuffer"
       offset: 0x00610000       
       size: 0x10000     
@@ -59,6 +58,7 @@ Device: &AmcGenericAdcDacCore
         - <<: *MemoryArray
           nelms: 0x4000        
           mode: RO 
+    ##################################################
   #########
   Commands:
   #########

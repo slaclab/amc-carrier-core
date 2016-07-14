@@ -85,8 +85,8 @@ Device: &AmcCarrierCore
     - <<: *AmcCarrierBsi
       offset: 0x07000000      
     ##################################################  
-    # - <<: *AmcCarrierTiming
-      # offset: 0x08000000      
+    - <<: *AmcCarrierTiming
+      offset: 0x08000000      
     ##################################################
     - <<: *AmcCarrierBsa
       offset: 0x09000000    
