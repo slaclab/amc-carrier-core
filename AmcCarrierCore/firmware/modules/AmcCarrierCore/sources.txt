@@ -56,8 +56,8 @@ vhdl work coregen/SysMonCore.dcp
 vhdl work coregen/DebugRtmPgpGthCore.dcp
 vhdl work coregen/AmcGenericAdcDacJesd204bCoregen.dcp
 
-vhdl work rtl/DaqMuxV2/DaqDecimator.vhd
-vhdl work rtl/DaqMuxV2/DaqRegItf.vhd
-vhdl work rtl/DaqMuxV2/DaqTrigger.vhd
-vhdl work rtl/DaqMuxV2/DaqLane.vhd
-vhdl work rtl/DaqMuxV2/DaqMuxV2.vhd
+#vhdl work rtl/DaqMuxV2/DaqDecimator.vhd
+#vhdl work rtl/DaqMuxV2/DaqRegItf.vhd
+#vhdl work rtl/DaqMuxV2/DaqTrigger.vhd
+#vhdl work rtl/DaqMuxV2/DaqLane.vhd
+#vhdl work rtl/DaqMuxV2/DaqMuxV2.vhd
