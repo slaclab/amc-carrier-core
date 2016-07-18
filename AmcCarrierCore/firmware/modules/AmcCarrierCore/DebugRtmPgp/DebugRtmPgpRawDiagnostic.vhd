@@ -245,6 +245,7 @@ begin
          TPD_G                => TPD_G,
          BUFFERS_G            => DIAGNOSTIC_RAW_STREAMS_G,
          BURST_SIZE_BYTES_G   => 4096,
+         TRIGGER_USER_BIT_G   => 0,
          AXIL_BASE_ADDR_G     => AXIL_BASE_ADDR_G,
          DATA_AXIS_CONFIG_G   => WRITE_AXIS_CONFIG_C,
          STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1),
