@@ -102,9 +102,8 @@ architecture rtl of DaqMuxV2 is
    signal s_dataSize          : slv(31 downto 0);
    signal s_muxSel            : Slv5Array(N_DATA_OUT_G-1 downto 0);
    signal s_rateDiv           : slv(15 downto 0);
-   
-   -- Axi Stream
-
+   signal s_timeStampSync     : slv(63 downto 0);   
+  
    -- Trigger related signals
    signal s_trigCascMask      : sl;
    signal s_trigHwAutoRearm   : sl;
@@ -136,11 +135,10 @@ architecture rtl of DaqMuxV2 is
    signal s_daqStatus   : Slv32Array(N_DATA_OUT_G-1 downto 0);
    signal s_pctCntVec   : Slv26Array(N_DATA_OUT_G-1 downto 0);
    
-   -- Axi stream synchronisation
+   -- Axi Stream synchronization to external interface
    signal s_rxAxisMasterArr : AxiStreamMasterArray(N_DATA_OUT_G-1 downto 0);
    signal s_rxAxisSlaveArr  : AxiStreamSlaveArray(N_DATA_OUT_G-1 downto 0);
    signal s_rxAxisCtrlArr   : AxiStreamCtrlArray(N_DATA_OUT_G-1 downto 0);
-   
    
 begin
    -- Check JESD generics
@@ -148,9 +146,22 @@ begin
    assert (1 <= N_DATA_OUT_G and N_DATA_OUT_G <= 16) report "N_DATA_OUT_G must be between 1 and 16"severity failure;
 
    -----------------------------------------------------------
+   -- Synchronize timestamp_i 
+   -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
+   -----------------------------------------------------------    
+   U_SyncTimestamp: entity work.SynchronizerVector
+   generic map (
+      TPD_G          => TPD_G,
+      WIDTH_G        => 64)
+   port map (
+      clk     => devClk_i,
+      rst     => devRst_i,
+      dataIn  => timeStamp_i,
+      dataOut => s_timeStampSync);
+
+   -----------------------------------------------------------
    -- AXI lite
    ----------------------------------------------------------- 
-
    -- axiLite register interface
    U_DaqRegItf: entity work.DaqRegItf
    generic map (
@@ -268,7 +279,7 @@ begin
             -- Controls from registers
             enable_i       => s_enAxi(i),
             test_i         => s_enTest(i),
-            timeStamp_i    => timeStamp_i,
+            timeStamp_i    => s_timeStampSync,
             headerEn_i     => s_headerEn,
             header_i       => s_header,
             axiNum_i       => i,

@@ -19,7 +19,7 @@ DaqMux: &DaqMux
       sizeBits: 1
       lsBit: 0
       mode: RW
-      description: HW trigger MAsk
+      description: HW trigger Mask
     #########################################################
     - address: 0x000
       name: Mode

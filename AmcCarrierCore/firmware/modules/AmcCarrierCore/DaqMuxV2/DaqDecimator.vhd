@@ -73,7 +73,7 @@ architecture rtl of DaqDecimator is
       prevFrame      : slv(15 downto 0);
       sum            : slv(63 downto 0);
       average        : slv(sampleData_i'range);
-      rateClk         : sl;
+      rateClk        : sl;
       decSampleData  : slv(sampleData_i'range);
    end record RegType;
 
