@@ -105,7 +105,7 @@ DaqMux: &DaqMuxV2
         - name: Enabled 
           value: 1
       description: "Mask for enabling/disabling hardware freaze buffer request."   
-   #########################################################
+    #########################################################
     - address: 0x004
       name: TriggerSwStatus
       sizeBits: 1
@@ -275,7 +275,7 @@ DaqMux: &DaqMuxV2
       stride: 4
       nelms: &numOutPorts
       mode: RO
-      description: "Incomming data lane valid."
+      description: "The incoming data is Valid (Usually connected to JESD valid signal)."
     #########################################################
     - address: 0x080
       name: StreamEnabled
@@ -305,7 +305,7 @@ DaqMux: &DaqMuxV2
       description: "Indicating sign extension point."
     #########################################################
     - address: 0x0C0
-      name: FormatWidth
+      name: FormatDataWidth
       sizeBits: 1
       lsBit: 5
       stride: 4
@@ -316,7 +316,7 @@ DaqMux: &DaqMuxV2
           value: 0
         - name: D16-bit
           value: 1
-      description: "Data width indicating sign extension point."
+      description: "Data width 32-bit or 16-bit."
     #########################################################
     - address: 0x0C0
       name: FormatSign
@@ -346,4 +346,30 @@ DaqMux: &DaqMuxV2
         - name: Enabled
           value: 1
       description: "Decimation Averaging."
+    #########################################################
+  #########
+  Commands:
+  #########
+    - name: TriggerDaq
+      description: "Trigger data aquisition from software."
+      sequence:
+        - entry: TriggerSw
+          value: 0x1
+        - entry: TriggerSw
+          value: 0x0               
+    #########################################################
+    - name: ArmHwTrigger
+      description: "Arm Hardware Trigger."
+      sequence:
+        - entry: ArmHwTrigger
+          value: 0x1
+        - entry: ArmHwTrigger
+          value: 0x0               
+    #########################################################
+    - name: FreezeBuffers
+      description: "Freeze circular buffers from software."
+        - entry: FreezeSw
+          value: 0x1
+        - entry: FreezeSw
+          value: 0x0               
     #########################################################

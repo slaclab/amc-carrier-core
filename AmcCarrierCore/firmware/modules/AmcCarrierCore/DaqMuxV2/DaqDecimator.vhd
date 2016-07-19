@@ -14,7 +14,7 @@
 --                   test_i = '0' : Output sample data
 --                   averaging_i = '1':
 --                         rateDiv_i (only powers of two)
---                         0 - SR, 1 - SR, 2 - SR/2, 4 - SR/4, 8 - SR/8 up to 2^12
+--                         0 - SR, 1 - SR, 2 - SR/2, 4 - SR/4, 8 - SR/8 up to 2^10
 --                         Averages the samples with the window size of rateDiv_i
 --                   averaging_i = '0':
 --                         rateDiv_i
@@ -158,7 +158,7 @@ begin
       vSum := v.sum;
       
       -- Power of 2 Divide (reduced to 12 to see if improves timing)
-      for i in 0 to 12 loop
+      for i in 0 to 10 loop
          if (rateDiv_i(i)= '1') then
             v.average := vSum(v.average'range);            
          else 
