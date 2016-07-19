@@ -20,9 +20,9 @@ Device: &BsaRawDiagnostic
     - offset: 0x00000000
       name: RawDiagnosticBuffers
       metadata:
-        - numBuffers: &numBuffers 4
-        - destHidden: &destHidden false
-        - destEnums: &destEnums
+        - numBuffers: 4
+        - destHidden: false
+        - destEnums:
             - name: Software
               value: 0
             - name: Auto-Readout

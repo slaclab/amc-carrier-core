@@ -29,9 +29,9 @@ Device: &BsaBufferControl
     - offset: 0x00001000
       name: BsaBuffers
       metadata:
-       - numBuffers: &numBuffers 64
-       - destEnums: &destEnums
+       - numBuffers: 64
+       - destEnums:
            - name: Default
              value: 0
-       - destHidden: &destHidden true
+       - destHidden: true
       <<: *AxiStreamDmaRingWrite
