@@ -2,7 +2,6 @@
 vhdl work AmcCarrier/AmcCarrierPkg.vhd
 vhdl work AmcCarrier/AmcCarrierRegPkg.vhd
 
-vhdl work AmcCarrier/AmcCarrierEmptyApp.vhd
 vhdl work AmcCarrier/AmcCarrierCore.vhd
 vhdl work AmcCarrier/AmcCarrierClkAndRst.vhd
 
