@@ -14,7 +14,7 @@ DaqMux: &DaqMuxV2
   size: 0x1000
   
   metadata:
-    - numBuffers: &numOutPorts 4
+    - numOutPorts: &numOutPorts 4
   
   registers:
     #########################################################
@@ -158,13 +158,13 @@ DaqMux: &DaqMuxV2
       name: DataBufferSize
       sizeBits: 32
       mode: RW
-      description:"Number of 32-bit words. Minimum size is 4."
+      description: "Number of 32-bit words. Minimum size is 4."
     #########################################################
     - address: 0x040
       name: InputMuxSel
       sizeBits: 5
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RW
       enums:
         - name: Disabled
@@ -237,7 +237,7 @@ DaqMux: &DaqMuxV2
       name: StreamPause
       sizeBits: 1
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RO
       description: "Raw diagnostic stream control Pause."
     #########################################################
@@ -246,7 +246,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 1
       lsBit: 1
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RO
       description: "Raw diagnostic stream control Ready."
     #########################################################
@@ -255,7 +255,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 1
       lsBit: 2
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RO
       description: "Raw diagnostic stream control Overflow."
     #########################################################
@@ -264,7 +264,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 1
       lsBit: 3
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RO
       description: "Error during last Acquisition (Raw diagnostic stream control Ready or incoming data valid dropped)."
     #########################################################
@@ -273,7 +273,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 1
       lsBit: 4
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RO
       description: "The incoming data is Valid (Usually connected to JESD valid signal)."
     #########################################################
@@ -282,7 +282,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 1
       lsBit: 5
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RO
       description: "Output stream enabled."
     #########################################################
@@ -291,7 +291,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 26
       lsBit: 6
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RO
       description: "Number of 4096 byte frames sent."
     #########################################################
@@ -299,7 +299,7 @@ DaqMux: &DaqMuxV2
       name: FormatSignWidth
       sizeBits: 5
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RW
       hidden: true
       description: "Indicating sign extension point."
@@ -309,7 +309,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 1
       lsBit: 5
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RW
       enums: 
         - name: D32-bit
@@ -323,7 +323,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 1
       lsBit: 6
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RW
       enums: 
         - name: Unsigned
@@ -338,7 +338,7 @@ DaqMux: &DaqMuxV2
       sizeBits: 1
       lsBit: 7
       stride: 4
-      nelms: &numOutPorts
+      nelms: *numOutPorts
       mode: RW
       enums: 
         - name: Disabled
@@ -368,6 +368,7 @@ DaqMux: &DaqMuxV2
     #########################################################
     - name: FreezeBuffers
       description: "Freeze circular buffers from software."
+      sequence:
         - entry: FreezeSw
           value: 0x1
         - entry: FreezeSw
