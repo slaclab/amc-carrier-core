@@ -16,16 +16,16 @@ DaqMux: &DaqMuxV2
   metadata:
     - numOutPorts: &numOutPorts 4
   
-  registers:
+  IntField:
     #########################################################
-    - address: 0x000
+    - offset: 0x000
       name: TriggerSw
       sizeBits: 1
       lsBit: 0
       mode: RW
       description: "Software Trigger (triggers DAQ on all enabled channels)."
     #########################################################
-    - address: 0x000
+    - offset: 0x000
       name: TriggerCascMask
       sizeBits: 1
       lsBit: 1
@@ -37,7 +37,7 @@ DaqMux: &DaqMuxV2
           value: 1
       description: "Mask for enabling/disabling cascaded trigger."
     #########################################################
-    - address: 0x000
+    - offset: 0x000
       name: TriggerHwAutoRearm
       sizeBits: 1
       lsBit: 2
@@ -49,21 +49,21 @@ DaqMux: &DaqMuxV2
           value: 1
       description: "Mask for enabling/disabling hardware trigger. If disabled it has to be rearmed by ArmHwTrigger."
     #########################################################
-    - address: 0x000
+    - offset: 0x000
       name: TriggerHwArm
       sizeBits: 1
       lsBit: 3
       mode: RW
       description: "Arm the Hardware trigger (On the rising edge). After trigger occurs the trigger has to be rearmed."
     #########################################################
-    - address: 0x000
+    - offset: 0x000
       name: TriggerClearStatus
       sizeBits: 1
       lsBit: 4
       mode: RW
       description: "Trigger status will be cleared (On the rising edge)."
     #########################################################
-    - address: 0x000
+    - offset: 0x000
       name: DaqMode
       sizeBits: 1
       lsBit: 5
@@ -75,7 +75,7 @@ DaqMux: &DaqMuxV2
           value: 1
       description: "Select the data ackuisition mode."
     #########################################################
-    - address: 0x000
+    - offset: 0x000
       name: PacketHeaderEn
       sizeBits: 1
       lsBit: 6
@@ -87,17 +87,17 @@ DaqMux: &DaqMuxV2
           value: 1
       description: "Applies only to Triggered mode."   
     #########################################################
-    - address: 0x000
+    - offset: 0x000
       name: FreezeSw
       sizeBits: 1
       lsBit: 7
       mode: RW
       description: "Software freeze buffer (Freezes all enabled circular buffers)."
     #########################################################
-    - address: 0x000
+    - offset: 0x001
       name: FreezeHwMask
       sizeBits: 1
-      lsBit: 8
+      lsBit: 0
       mode: RW
       enums:
         - name: Disabled
@@ -106,61 +106,61 @@ DaqMux: &DaqMuxV2
           value: 1
       description: "Mask for enabling/disabling hardware freaze buffer request."   
     #########################################################
-    - address: 0x004
+    - offset: 0x004
       name: TriggerSwStatus
       sizeBits: 1
       lsBit: 0
       mode: RO
       description: "Software Trigger Status (Registered on first trigger until cleared by TriggerClearStatus)."
     #########################################################
-    - address: 0x004
+    - offset: 0x004
       name: TriggerCascStatus
       sizeBits: 1
       lsBit: 1
       mode: RO
       description: "Cascade Trigger Status (Registered on first trigger until cleared by TriggerClearStatus)."
     #########################################################
-    - address: 0x004
+    - offset: 0x004
       name: TriggerHwStatus
       sizeBits: 1
       lsBit: 2
       mode: RO
       description: "Hardware Trigger Status (Registered on first trigger until cleared by TriggerClearStatus)."
     #########################################################
-    - address: 0x004
+    - offset: 0x004
       name: TriggerHwArmed
       sizeBits: 1
       lsBit: 3
       mode: RO
       description: "Hardware Trigger Armed Status (Registered on rising edge Control(3) and cleared when Hw trigger occurs)."
     #########################################################
-    - address: 0x004
+    - offset: 0x004
       name: TriggerStatus
       sizeBits: 1
       lsBit: 4
       mode: RO
       description: "Combined Trigger Status (Registered on first trigger until cleared by TriggerClearStatus)."
     #########################################################    
-    - address: 0x004
+    - offset: 0x004
       name: FreezeStatus
       sizeBits: 1
       lsBit: 5
       mode: RO
       description: "Freeze Buffers Status (Registered on first freeze until cleared by TriggerClearStatus)"
     #########################################################      
-    - address: 0x008
+    - offset: 0x008
       name: DecimationRateDiv
       sizeBits: 16
       mode: RW
       description: "Averaging Enabled: (powers of two) 1,2,4,8,16,etc (max 2^12). Averaging Disabled (32-bit): 1,2,3,4,etc (max 2^16-1). Averaging Disabled (16-bit): 1,2,4,6,8,etc (max 2^16-1)."
     #########################################################
-    - address: 0x00C
+    - offset: 0x00C
       name: DataBufferSize
       sizeBits: 32
       mode: RW
       description: "Number of 32-bit words. Minimum size is 4."
     #########################################################
-    - address: 0x040
+    - offset: 0x040
       name: InputMuxSel
       sizeBits: 5
       stride: 4
@@ -233,7 +233,7 @@ DaqMux: &DaqMuxV2
           value: 31     
       description: "Input Mux select. Maximum number of channels is 29."
     #########################################################
-    - address: 0x080
+    - offset: 0x080
       name: StreamPause
       sizeBits: 1
       stride: 4
@@ -241,7 +241,7 @@ DaqMux: &DaqMuxV2
       mode: RO
       description: "Raw diagnostic stream control Pause."
     #########################################################
-    - address: 0x080
+    - offset: 0x080
       name: StreamReady
       sizeBits: 1
       lsBit: 1
@@ -250,7 +250,7 @@ DaqMux: &DaqMuxV2
       mode: RO
       description: "Raw diagnostic stream control Ready."
     #########################################################
-    - address: 0x080
+    - offset: 0x080
       name: StreamOverflow
       sizeBits: 1
       lsBit: 2
@@ -259,7 +259,7 @@ DaqMux: &DaqMuxV2
       mode: RO
       description: "Raw diagnostic stream control Overflow."
     #########################################################
-    - address: 0x080
+    - offset: 0x080
       name: StreamError
       sizeBits: 1
       lsBit: 3
@@ -268,7 +268,7 @@ DaqMux: &DaqMuxV2
       mode: RO
       description: "Error during last Acquisition (Raw diagnostic stream control Ready or incoming data valid dropped)."
     #########################################################
-    - address: 0x080
+    - offset: 0x080
       name: InputDataValid
       sizeBits: 1
       lsBit: 4
@@ -277,7 +277,7 @@ DaqMux: &DaqMuxV2
       mode: RO
       description: "The incoming data is Valid (Usually connected to JESD valid signal)."
     #########################################################
-    - address: 0x080
+    - offset: 0x080
       name: StreamEnabled
       sizeBits: 1
       lsBit: 5
@@ -286,7 +286,7 @@ DaqMux: &DaqMuxV2
       mode: RO
       description: "Output stream enabled."
     #########################################################
-    - address: 0x080
+    - offset: 0x080
       name: FrameCnt
       sizeBits: 26
       lsBit: 6
@@ -295,7 +295,7 @@ DaqMux: &DaqMuxV2
       mode: RO
       description: "Number of 4096 byte frames sent."
     #########################################################
-    - address: 0x0C0
+    - offset: 0x0C0
       name: FormatSignWidth
       sizeBits: 5
       stride: 4
@@ -304,7 +304,7 @@ DaqMux: &DaqMuxV2
       hidden: true
       description: "Indicating sign extension point."
     #########################################################
-    - address: 0x0C0
+    - offset: 0x0C0
       name: FormatDataWidth
       sizeBits: 1
       lsBit: 5
@@ -318,7 +318,7 @@ DaqMux: &DaqMuxV2
           value: 1
       description: "Data width 32-bit or 16-bit."
     #########################################################
-    - address: 0x0C0
+    - offset: 0x0C0
       name: FormatSign
       sizeBits: 1
       lsBit: 6
@@ -333,7 +333,7 @@ DaqMux: &DaqMuxV2
       hidden: true
       description: "Sign format."
     #########################################################
-    - address: 0x0C0
+    - offset: 0x0C0
       name: DecimationAveraging
       sizeBits: 1
       lsBit: 7
@@ -361,9 +361,9 @@ DaqMux: &DaqMuxV2
     - name: ArmHwTrigger
       description: "Arm Hardware Trigger."
       sequence:
-        - entry: ArmHwTrigger
+        - entry: TriggerHwArm
           value: 0x1
-        - entry: ArmHwTrigger
+        - entry: TriggerHwArm
           value: 0x0               
     #########################################################
     - name: FreezeBuffers

@@ -62,14 +62,14 @@ Device: &AmcCarrierCore
           stride: 4
           sizeBits: 32
     ##################################################
-    - name: "AxiCdcm6208"
-      offset: 0x05000000
-      size: 0x100       
-      IntField:
-        - <<: *MemoryArray
-          nelms: 0x29
-          stride: 4
-          sizeBits: 16
+#    - name: "AxiCdcm6208"
+#      offset: 0x05000000
+#      size: 0x100       
+#      IntField:
+#        - <<: *MemoryArray
+#          nelms: 0x29
+#          stride: 4
+#          sizeBits: 16
     ##################################################
     - name: "DdrSpd"
       offset: 0x06000000
