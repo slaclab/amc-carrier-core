@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-06-06
+-- Last update: 2016-07-21
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -319,6 +319,7 @@ begin
    end process;
    -- No pipelining: message, V1, and V2 only updated during strobe's HIGH cycle
    appTimingBus.message <= appBus.message;
+   appTimingBus.stream  <= appBus.stream;
    appTimingBus.v1      <= appBus.v1;
    appTimingBus.v2      <= appBus.v2;
 
