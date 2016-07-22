@@ -19,14 +19,17 @@ if { [VersionCheck 2016.1] < 0 } {
    exit -1
 }
 
-## Add the Microblaze Calibration Code
-add_files ${TOP_DIR}/modules/AmcCarrierCore/coregen/MigCoreMicroblazeCalibration.elf
-set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.elf]
-set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/microblaze_I} [get_files MigCoreMicroblazeCalibration.elf]
+# Check for Application Microblaze build
+if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {
+   ## Add the Microblaze Calibration Code
+   add_files ${TOP_DIR}/modules/AmcCarrierCore/coregen/MigCoreMicroblazeCalibration.elf
+   set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.elf]
+   set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/microblaze_I} [get_files MigCoreMicroblazeCalibration.elf]
 
-add_files ${TOP_DIR}/modules/AmcCarrierCore/coregen/MigCoreMicroblazeCalibration.bmm
-set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.bmm]
-set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0} [get_files MigCoreMicroblazeCalibration.bmm]
+   add_files ${TOP_DIR}/modules/AmcCarrierCore/coregen/MigCoreMicroblazeCalibration.bmm
+   set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.bmm]
+   set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0} [get_files MigCoreMicroblazeCalibration.bmm]
+}
 
 ## BSA's .DCP files
 add_files -quiet -fileset sources_1 ${TOP_DIR}/modules/BsaCore/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
