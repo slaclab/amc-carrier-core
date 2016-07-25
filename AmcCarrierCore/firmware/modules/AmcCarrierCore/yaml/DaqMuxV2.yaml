@@ -381,3 +381,11 @@ DaqMux: &DaqMuxV2
         - entry: FreezeSw
           value: 0x0               
     #########################################################
+    - name: ClearTrigStatus
+      description: "Clear the status."
+      sequence:
+        - entry: TriggerClearStatus
+          value: 0x1
+        - entry: TriggerClearStatus
+          value: 0x0               
+    #########################################################
