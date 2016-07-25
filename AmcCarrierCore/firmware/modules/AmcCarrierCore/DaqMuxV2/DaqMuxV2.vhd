@@ -183,6 +183,7 @@ begin
       -- Status
       daqStatus_i       => s_daqStatus,
       trigStatus_i      => s_trigStatus,
+      timeStamp_i       => s_timeStampSync,
       -- Config
       trigSw_o          => s_trigSw,
       trigCascMask_o    => s_trigCascMask,

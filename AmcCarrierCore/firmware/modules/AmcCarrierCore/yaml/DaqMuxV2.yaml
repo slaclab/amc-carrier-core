@@ -160,6 +160,13 @@ DaqMux: &DaqMuxV2
       mode: RW
       description: "Number of 32-bit words. Minimum size is 4."
     #########################################################
+    - offset: 0x010
+      name: Timestamp
+      sizeBits: 32
+      nelms: 2
+      mode: RO
+      description: "Timestamp 63:0"
+    #########################################################
     - offset: 0x040
       name: InputMuxSel
       sizeBits: 5

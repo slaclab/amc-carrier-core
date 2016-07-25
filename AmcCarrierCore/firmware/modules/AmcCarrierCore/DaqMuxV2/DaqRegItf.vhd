@@ -58,6 +58,7 @@ entity DaqRegItf is
       -- Registers
       daqStatus_i      : in  Slv32Array(N_DATA_OUT_G-1 downto 0);
       trigStatus_i     : in  slv(5 downto 0);
+      timeStamp_i      : in slv(64-1 downto 0);
       
       -- Control
       trigSw_o          : out sl;
@@ -118,6 +119,7 @@ architecture rtl of DaqRegItf is
    
    signal s_trigStatus     : slv(trigStatus_i'range);
    signal s_daqStatus      : slv32Array(N_DATA_OUT_G-1 downto 0);
+   signal s_timeStamp      : slv(64-1 downto 0);
    
 begin
 
@@ -125,7 +127,7 @@ begin
    s_RdAddr <= conv_integer(axilReadMaster.araddr(9 downto 2));
    s_WrAddr <= conv_integer(axilWriteMaster.awaddr(9 downto 2));
 
-   comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr, s_WrAddr, s_daqStatus, s_trigStatus) is
+   comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr, s_WrAddr, s_daqStatus, s_trigStatus, s_timeStamp) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -178,6 +180,10 @@ begin
                v.axilReadSlave.rdata(r.rateDiv'range) := r.rateDiv;
             when 16#03# =>              -- ADDR (12)
                v.axilReadSlave.rdata(r.dataSize'range) := r.dataSize;
+            when 16#04# =>              -- ADDR (12)
+               v.axilReadSlave.rdata(r.dataSize'range) := s_timeStamp(64-1 downto 32);
+            when 16#05# =>              -- ADDR (12)
+               v.axilReadSlave.rdata(r.dataSize'range) := s_timeStamp(32-1 downto 0);
             when 16#10# to 16#1F# =>    -- ADDR (64)
                for I in (N_DATA_OUT_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = I) then
@@ -238,7 +244,7 @@ begin
       );
    end generate GEN_IN_0;
    
-   SyncFifo_IN : entity work.SynchronizerFifo
+   SyncFifo_IN0 : entity work.SynchronizerFifo
    generic map (
      TPD_G        => TPD_G,
      DATA_WIDTH_G => 6
@@ -249,6 +255,19 @@ begin
      rd_clk => axiClk_i,
      dout   => s_trigStatus 
    );
+
+   SyncFifo_IN1 : entity work.SynchronizerFifo
+   generic map (
+     TPD_G        => TPD_G,
+     DATA_WIDTH_G => 64
+   )
+   port map (
+     wr_clk => devClk_i,
+     din    => timeStamp_i,
+     rd_clk => axiClk_i,
+     dout   => s_timeStamp
+   );
+
 
    ------------------------------------------------
    -- Output assignment and synchronisation
