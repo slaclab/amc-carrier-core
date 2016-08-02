@@ -183,6 +183,14 @@ begin
       -- Latch the configuration
       v.txAxisMaster.tKeep := KEEP_C;
       v.txAxisMaster.tStrb := TSTRB_C;
+      
+      -- Latch Freeze buffers flag if applied
+      if (freeze_i = '1') then
+         v.freeze  := '1';
+      else
+         v.freeze := r.freeze;
+      end if;
+      
 
       -- State Machine
       case (r.state) is
@@ -192,7 +200,6 @@ begin
             -- Put packet data count to zero 
             v.dataCnt := (others => '0');
             v.error   := r.error;
-            v.freeze  := '0';
             v.busy    := '0';
             v.pctCnt  := r.pctCnt;
               
@@ -222,7 +229,6 @@ begin
              
             v.busy   := '1';          
             v.pctCnt := (others => '0');
-            v.freeze  := '0';
             
             -- Increment the counter
             -- and sample data on s_rateClk rate
@@ -263,7 +269,6 @@ begin
              
             v.busy   := '1';          
             v.pctCnt := (others => '0');
-            v.freeze  := '0';
             
             -- Increment the counter
             -- and sample data on s_rateClk rate
@@ -301,7 +306,6 @@ begin
              
             v.busy   := '1';          
             v.pctCnt := (others => '0');
-            v.freeze  := '0';
             
             -- Increment the counter
             -- and sample data on s_rateClk rate
@@ -339,7 +343,6 @@ begin
              
             v.busy   := '1';          
             v.pctCnt := (others => '0');
-            v.freeze  := '0';
             
             -- Increment the counter
             -- and sample data on s_rateClk rate
@@ -407,13 +410,6 @@ begin
                v.error := r.error;
             end if;
 
-            -- Freeze buffers if triggered in continuous mode
-            if (freeze_i = '1') then
-               v.freeze  := '1';
-            else
-               v.freeze := r.freeze;
-            end if;
-
             v.pctCnt := r.pctCnt;
 
             -- Send the JESD data
@@ -438,6 +434,13 @@ begin
             -- Go further after next data
             if (s_rateClk = '1') then
                if (r.dataCnt >= (packetSize_i-1) and mode_i = '0') then
+                  -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
+                  if (freeze_i = '1') then
+                     v.freeze := '1';
+                  else
+                     v.freeze := '0';
+                  end if;
+                  
                   v.pctCnt := r.pctCnt+1;
                   v.state := IDLE_S;
                else
@@ -467,13 +470,6 @@ begin
                v.error := r.error;
             end if;
 
-            -- Freeze buffers if triggered in continuous mode
-            if (freeze_i = '1') then
-               v.freeze  := '1';
-            else
-               v.freeze := r.freeze;
-            end if;
-
             v.pctCnt := r.pctCnt;
 
             -- Send the JESD data 
@@ -499,23 +495,27 @@ begin
             if (s_rateClk = '1') then
                if ((r.error = '1') or                               -- Immediately stop sending data if error occurs
                    (r.dataCnt >= (packetSize_i-1) and mode_i = '0') -- Stop sending data if packet size reached 
-               ) then                                               -- Do not stop sending data if in continuous mode
+               ) then                                                -- Do not stop sending data if in continuous mode
+
+                  v.freeze := '0';
                   v.pctCnt := r.pctCnt+1;
                   v.state := IDLE_S;                   
                elsif (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) then -- Finish a frame if frame size reached
                   if enable_i = '1' then
-                     -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
-                     if (freeze_i = '1') then
-                        v.freeze := '1';
-                     else
-                        v.freeze := '0';
-                     end if;
                      v.pctCnt := r.pctCnt+1;
                      v.state := SOF_S;                              -- Go to next frame                 
                   else
                      v.pctCnt := r.pctCnt+1;
                      v.state := IDLE_S;                             -- End packet if disabled                             
                   end if;
+                  
+                  -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
+                  if (freeze_i = '1') then
+                     v.freeze := '1';
+                  else
+                     v.freeze := '0';
+                  end if;
+                  ---------------------------
                end if;
             end if;
          ----------------------------------------------------------------------
