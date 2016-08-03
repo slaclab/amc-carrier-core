@@ -13,8 +13,8 @@ set VIVADO_BUILD_DIR $::env(VIVADO_BUILD_DIR)
 source -quiet ${VIVADO_BUILD_DIR}/vivado_env_var_v1.tcl
 source -quiet ${VIVADO_BUILD_DIR}/vivado_proc_v1.tcl
 
-## Check for version 2016.1 of Vivado
-if { [VersionCheck 2016.1] < 0 } {
+## Check for version 2016.2 of Vivado
+if { [VersionCheck 2016.2] < 0 } {
    close_project
    exit -1
 }
