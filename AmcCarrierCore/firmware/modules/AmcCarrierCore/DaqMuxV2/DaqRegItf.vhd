@@ -101,10 +101,10 @@ architecture rtl of DaqRegItf is
    end record;
    
    constant REG_INIT_C : RegType := (
-      control        => "101000010",
+      control        => "101000110",
       rateDiv        => x"0001",      
       dataSize       => x"0000_0800",
-      muxSel         => (others => (others =>'0')), --(1 => '0'&x"1"  ,0 => '0'&x"3"),
+      muxSel         => (1 => '0'&x"1"  ,0 => '0'&x"3"), --(others => (others =>'0')),
       dataFormat     => (others => "00100000"),    --(1 => "00000000",0 => "00100000"),
       
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,

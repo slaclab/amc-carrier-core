@@ -324,8 +324,8 @@ begin
             FIFO_FIXED_THRESH_G => true,
             INT_PIPE_STAGES_G   => 0,
             PIPE_STAGES_G       => 1,
-            SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C),
-            MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C))
+            SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 4, 3),
+            MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 4, 3))
          port map (
             sAxisClk    => devClk_i,
             sAxisRst    => devRst_i,
