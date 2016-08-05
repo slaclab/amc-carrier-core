@@ -22,11 +22,11 @@ if { [VersionCheck 2016.2] < 0 } {
 # Check for Application Microblaze build
 if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {
    ## Add the Microblaze Calibration Code
-   add_files ${TOP_DIR}/modules/AmcCarrierCore/coregen/MigCoreMicroblazeCalibration.elf
+   add_files ${TOP_DIR}/modules/AmcCarrierCore/$::env(AMC_TAG)/coregen/MigCoreMicroblazeCalibration.elf
    set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.elf]
    set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/microblaze_I} [get_files MigCoreMicroblazeCalibration.elf]
 
-   add_files ${TOP_DIR}/modules/AmcCarrierCore/coregen/MigCoreMicroblazeCalibration.bmm
+   add_files ${TOP_DIR}/modules/AmcCarrierCore/$::env(AMC_TAG)/coregen/MigCoreMicroblazeCalibration.bmm
    set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.bmm]
    set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0} [get_files MigCoreMicroblazeCalibration.bmm]
 }
