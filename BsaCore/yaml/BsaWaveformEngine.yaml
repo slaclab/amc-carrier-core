@@ -10,15 +10,15 @@
 
 include: AxiStreamDmaRingWrite.yaml
 
-Device: &BsaRawDiagnostic
-  name: BsaRawDiagnostic
+Device: &BsaWaveformEngine
+  name: BsaWaveformEngine
   description: Configuration and status of the BSA dignosic buffers
   size: 0x1000 
   #########
   MMIODev:
 
     - offset: 0x00000000
-      name: RawDiagnosticBuffers
+      name: WaveformEngineBuffers
       metadata:
         - numBuffers: 4
         - destHidden: false

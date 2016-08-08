@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-10
--- Last update: 2016-05-03
+-- Last update: 2016-07-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -32,10 +32,10 @@ entity BsaAxiInterconnectWrapper is
    port (
       axiClk           : in  sl;
       axiRst           : in  sl;
-      sAxiWriteMasters : in  AxiWriteMasterArray(2 downto 0) := (others => AXI_WRITE_MASTER_INIT_C);
-      sAxiWriteSlaves  : out AxiWriteSlaveArray(2 downto 0) := (others => AXI_WRITE_SLAVE_INIT_C);
-      sAxiReadMasters  : in  AxiReadMasterArray(2 downto 0) := (others => AXI_READ_MASTER_INIT_C);
-      sAxiReadSlaves   : out AxiReadSlaveArray(2 downto 0) := (others => AXI_READ_SLAVE_INIT_C);
+      sAxiWriteMasters : in  AxiWriteMasterArray(3 downto 0) := (others => AXI_WRITE_MASTER_INIT_C);
+      sAxiWriteSlaves  : out AxiWriteSlaveArray(3 downto 0) := (others => AXI_WRITE_SLAVE_INIT_C);
+      sAxiReadMasters  : in  AxiReadMasterArray(3 downto 0) := (others => AXI_READ_MASTER_INIT_C);
+      sAxiReadSlaves   : out AxiReadSlaveArray(3 downto 0) := (others => AXI_READ_SLAVE_INIT_C);
       mAxiWriteMasters : out AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
       mAxiWriteSlaves  : in  AxiWriteSlaveType := AXI_WRITE_SLAVE_INIT_C;
       mAxiReadMasters  : out AxiReadMasterType := AXI_READ_MASTER_INIT_C;
@@ -166,6 +166,45 @@ architecture rtl of BsaAxiInterconnectWrapper is
          S02_AXI_RLAST        : out std_logic;
          S02_AXI_RVALID       : out std_logic;
          S02_AXI_RREADY       : in  std_logic;
+         S03_AXI_ARESET_OUT_N : out std_logic;
+         S03_AXI_ACLK         : in  std_logic;
+         S03_AXI_AWID         : in  std_logic_vector(0 downto 0);
+         S03_AXI_AWADDR       : in  std_logic_vector(32 downto 0);
+         S03_AXI_AWLEN        : in  std_logic_vector(7 downto 0);
+         S03_AXI_AWSIZE       : in  std_logic_vector(2 downto 0);
+         S03_AXI_AWBURST      : in  std_logic_vector(1 downto 0);
+         S03_AXI_AWLOCK       : in  std_logic;
+         S03_AXI_AWCACHE      : in  std_logic_vector(3 downto 0);
+         S03_AXI_AWPROT       : in  std_logic_vector(2 downto 0);
+         S03_AXI_AWQOS        : in  std_logic_vector(3 downto 0);
+         S03_AXI_AWVALID      : in  std_logic;
+         S03_AXI_AWREADY      : out std_logic;
+         S03_AXI_WDATA        : in  std_logic_vector(127 downto 0);
+         S03_AXI_WSTRB        : in  std_logic_vector(15 downto 0);
+         S03_AXI_WLAST        : in  std_logic;
+         S03_AXI_WVALID       : in  std_logic;
+         S03_AXI_WREADY       : out std_logic;
+         S03_AXI_BID          : out std_logic_vector(0 downto 0);
+         S03_AXI_BRESP        : out std_logic_vector(1 downto 0);
+         S03_AXI_BVALID       : out std_logic;
+         S03_AXI_BREADY       : in  std_logic;
+         S03_AXI_ARID         : in  std_logic_vector(0 downto 0);
+         S03_AXI_ARADDR       : in  std_logic_vector(32 downto 0);
+         S03_AXI_ARLEN        : in  std_logic_vector(7 downto 0);
+         S03_AXI_ARSIZE       : in  std_logic_vector(2 downto 0);
+         S03_AXI_ARBURST      : in  std_logic_vector(1 downto 0);
+         S03_AXI_ARLOCK       : in  std_logic;
+         S03_AXI_ARCACHE      : in  std_logic_vector(3 downto 0);
+         S03_AXI_ARPROT       : in  std_logic_vector(2 downto 0);
+         S03_AXI_ARQOS        : in  std_logic_vector(3 downto 0);
+         S03_AXI_ARVALID      : in  std_logic;
+         S03_AXI_ARREADY      : out std_logic;
+         S03_AXI_RID          : out std_logic_vector(0 downto 0);
+         S03_AXI_RDATA        : out std_logic_vector(127 downto 0);
+         S03_AXI_RRESP        : out std_logic_vector(1 downto 0);
+         S03_AXI_RLAST        : out std_logic;
+         S03_AXI_RVALID       : out std_logic;
+         S03_AXI_RREADY       : in  std_logic;
          M00_AXI_ARESET_OUT_N : out std_logic;
          M00_AXI_ACLK         : in  std_logic;
          M00_AXI_AWID         : out std_logic_vector(3 downto 0);
@@ -218,6 +257,7 @@ begin
       port map (
          INTERCONNECT_ACLK    => axiClk,
          INTERCONNECT_ARESETN => axiRstL,
+         -- Port 0
          S00_AXI_ARESET_OUT_N => open,
          S00_AXI_ACLK         => axiClk,
          S00_AXI_AWID         => sAxiWriteMasters(0).AWID(0 downto 0),
@@ -257,6 +297,7 @@ begin
          S00_AXI_RLAST        => sAxiReadSlaves(0).RLAST,
          S00_AXI_RVALID       => sAxiReadSlaves(0).RVALID,
          S00_AXI_RREADY       => sAxiReadMasters(0).RREADY,
+         -- Port 1
          S01_AXI_ARESET_OUT_N => open,
          S01_AXI_ACLK         => axiClk,
          S01_AXI_AWID         => sAxiWriteMasters(1).AWID(0 downto 0),
@@ -296,6 +337,7 @@ begin
          S01_AXI_RLAST        => sAxiReadSlaves(1).RLAST,
          S01_AXI_RVALID       => sAxiReadSlaves(1).RVALID,
          S01_AXI_RREADY       => sAxiReadMasters(1).RREADY,
+         -- Port 2
          S02_AXI_ARESET_OUT_N => open,
          S02_AXI_ACLK         => axiClk,
          S02_AXI_AWID         => sAxiWriteMasters(2).AWID(0 downto 0),
@@ -335,6 +377,48 @@ begin
          S02_AXI_RLAST        => sAxiReadSlaves(2).RLAST,
          S02_AXI_RVALID       => sAxiReadSlaves(2).RVALID,
          S02_AXI_RREADY       => sAxiReadMasters(2).RREADY,
+         -- Port 3
+         S03_AXI_ARESET_OUT_N => open,
+         S03_AXI_ACLK         => axiClk,
+         S03_AXI_AWID         => sAxiWriteMasters(3).AWID(0 downto 0),
+         S03_AXI_AWADDR       => sAxiWriteMasters(3).AWADDR(32 downto 0),
+         S03_AXI_AWLEN        => sAxiWriteMasters(3).AWLEN(7 downto 0),
+         S03_AXI_AWSIZE       => sAxiWriteMasters(3).AWSIZE(2 downto 0),
+         S03_AXI_AWBURST      => sAxiWriteMasters(3).AWBURST(1 downto 0),
+         S03_AXI_AWLOCK       => sAxiWriteMasters(3).AWLOCK(0),
+         S03_AXI_AWCACHE      => sAxiWriteMasters(3).AWCACHE(3 downto 0),
+         S03_AXI_AWPROT       => sAxiWriteMasters(3).AWPROT(2 downto 0),
+         S03_AXI_AWQOS        => sAxiWriteMasters(3).AWQOS(3 downto 0),
+         S03_AXI_AWVALID      => sAxiWriteMasters(3).AWVALID,
+         S03_AXI_AWREADY      => sAxiWriteSlaves(3).AWREADY,
+         S03_AXI_WDATA        => sAxiWriteMasters(3).WDATA(127 downto 0),
+         S03_AXI_WSTRB        => sAxiWriteMasters(3).WSTRB(15 downto 0),
+         S03_AXI_WLAST        => sAxiWriteMasters(3).WLAST,
+         S03_AXI_WVALID       => sAxiWriteMasters(3).WVALID,
+         S03_AXI_WREADY       => sAxiWriteSlaves(3).WREADY,
+         S03_AXI_BID          => sAxiWriteSlaves(3).BID(0 downto 0),
+         S03_AXI_BRESP        => sAxiWriteSlaves(3).BRESP(1 downto 0),
+         S03_AXI_BVALID       => sAxiWriteSlaves(3).BVALID,
+         S03_AXI_BREADY       => sAxiWriteMasters(3).BREADY,
+         S03_AXI_ARID         => sAxiReadMasters(3).ARID(0 downto 0),
+         S03_AXI_ARADDR       => sAxiReadMasters(3).ARADDR(32 downto 0),
+         S03_AXI_ARLEN        => sAxiReadMasters(3).ARLEN(7 downto 0),
+         S03_AXI_ARSIZE       => sAxiReadMasters(3).ARSIZE(2 downto 0),
+         S03_AXI_ARBURST      => sAxiReadMasters(3).ARBURST(1 downto 0),
+         S03_AXI_ARLOCK       => sAxiReadMasters(3).ARLOCK(0),
+         S03_AXI_ARCACHE      => sAxiReadMasters(3).ARCACHE(3 downto 0),
+         S03_AXI_ARPROT       => sAxiReadMasters(3).ARPROT(2 downto 0),
+         S03_AXI_ARQOS        => sAxiReadMasters(3).ARQOS(3 downto 0),
+         S03_AXI_ARVALID      => sAxiReadMasters(3).ARVALID,
+         S03_AXI_ARREADY      => sAxiReadSlaves(3).ARREADY,
+         S03_AXI_RID          => sAxiReadSlaves(3).RID(0 downto 0),
+         S03_AXI_RDATA        => sAxiReadSlaves(3).RDATA(127 downto 0),
+         S03_AXI_RRESP        => sAxiReadSlaves(3).RRESP(1 downto 0),
+         S03_AXI_RLAST        => sAxiReadSlaves(3).RLAST,
+         S03_AXI_RVALID       => sAxiReadSlaves(3).RVALID,
+         S03_AXI_RREADY       => sAxiReadMasters(3).RREADY,
+         
+         -- MIG DDR Port
          M00_AXI_ARESET_OUT_N => open,
          M00_AXI_ACLK         => axiClk,
          M00_AXI_AWID         => mAxiWriteMasters.AWID(3 downto 0),
@@ -378,9 +462,4 @@ begin
 
 end architecture rtl;
 
--- COMP_TAG_END ------ End COMPONENT Declaration ------------
 
--- The following code must appear in the VHDL architecture
--- body. Substitute your own instance name and net names.
-
-------------- Begin Cut here for INSTANTIATION Template ----- INST_TAG

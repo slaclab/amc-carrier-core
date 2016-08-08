@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-03-21
+-- Last update: 2016-06-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -129,8 +129,8 @@ architecture rtl of BsaBufferControl is
 --       ID_BITS_C    => 1,
 --       LEN_BITS_C   => 8);
 
-   constant INT_AXIS_COUNT_C : integer := 8;  --integer(ceil(real(BSA_BUFFERS_G)/8.0));
-   constant TDEST_ROUTES_C    : Slv8Array(INT_AXIS_COUNT_C-1 downto 0) := (others => "--------");
+   constant INT_AXIS_COUNT_C : integer                                := 8;  --integer(ceil(real(BSA_BUFFERS_G)/8.0));
+   constant TDEST_ROUTES_C   : Slv8Array(INT_AXIS_COUNT_C-1 downto 0) := (others => "--------");
 
    signal bsaAxisMasters     : AxiStreamMasterArray(BSA_BUFFERS_G-1 downto 0);
    signal bsaAxisSlaves      : AxiStreamSlaveArray(BSA_BUFFERS_G-1 downto 0);
@@ -150,35 +150,33 @@ architecture rtl of BsaBufferControl is
    constant BSA_BUFFER_ENTRY_BYTES_C : integer := NUM_ACCUMULATIONS_C * 4;
 
    type RegType is record
-      -- Just register the whole timing message
-      strobe         : sl;
-      timingMessage  : TimingMessageType;
       diagnosticData : Slv32Array(NUM_ACCUMULATIONS_C - 1 downto 0);
-
-      timestampEn  : sl;
-      accumulateEn : sl;
-      setEn        : sl;
-      lastEn       : sl;
-      adderCount   : slv(5 downto 0);
+      syncRdEn       : sl;
+      timestampEn    : sl;
+      accumulateEn   : sl;
+      setEn          : sl;
+      lastEn         : sl;
+      adderCount     : slv(5 downto 0);
 
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      strobe         => '0',
-      timingMessage  => TIMING_MESSAGE_INIT_C,
       diagnosticData => (others => (others => '0')),
-
-      timestampEn  => '0',
-      setEn        => '0',
-      lastEn       => '0',
-      accumulateEn => '0',
-      adderCount   => (others => '0'));
+      syncRdEn       => '0',
+      timestampEn    => '0',
+      setEn          => '0',
+      lastEn         => '0',
+      accumulateEn   => '0',
+      adderCount     => (others => '0'));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal diagnosticStrobeSync : sl;
-   signal timeStampRamWe       : sl;
+   signal diagnosticBusSyncValid : sl;
+   signal diagnosticBusSync      : DiagnosticBusType;
+   signal diagnosticBusSyncSlv   : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0);
+
+   signal timeStampRamWe : sl;
 
    -- axilClk signals
    signal bufferClearEn : sl;
@@ -207,12 +205,12 @@ begin
          mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
 
    -- Store timestamps during accumulate phase since we are already iterating over
-   timestampRamWe <= r.timestampEn and r.timingMessage.bsaInit(conv_integer(r.adderCount));
+   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.adderCount));
    U_AxiDualPortRam_TimeStamps : entity work.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
          BRAM_EN_G    => false,
-         REG_EN_G     => false,
+         REG_EN_G     => true,
          AXI_WR_EN_G  => false,
          SYS_WR_EN_G  => true,
          ADDR_WIDTH_G => BSA_ADDR_BITS_C,
@@ -228,7 +226,7 @@ begin
          rst            => axiRst,
          we             => timeStampRamWe,
          addr           => r.adderCount(BSA_ADDR_BITS_C-1 downto 0),
-         din            => r.timingMessage.timeStamp,
+         din            => diagnosticBusSync.timingMessage.timeStamp,
          dout           => open);
 
 
@@ -239,14 +237,18 @@ begin
       generic map (
          TPD_G        => TPD_G,
          BRAM_EN_G    => false,
-         DATA_WIDTH_G => 1)
+         DATA_WIDTH_G => DIAGNOSTIC_BUS_BITS_C)
       port map (
          rst    => diagnosticRst,
          wr_clk => diagnosticClk,
          wr_en  => diagnosticBus.strobe,
-         din    => "1",
+         din    => toSlv(diagnosticBus),
          rd_clk => axiClk,
-         valid  => diagnosticStrobeSync);
+         valid  => diagnosticBusSyncValid,
+         dout   => diagnosticBusSyncSlv,
+         rd_en  => r.syncRdEn);
+
+   diagnosticBusSync <= toDiagnosticBus(diagnosticBusSyncSlv);
 
    -------------------------------------------------------------------------------------------------
    -- One accumulator per BSA buffer
@@ -260,18 +262,18 @@ begin
             FRAME_SIZE_BYTES_G  => BSA_BURST_BYTES_G,
             AXIS_CONFIG_G       => BSA_STREAM_CONFIG_C)
          port map (
-            clk            => axiClk,                         -- [in]
-            rst            => axiRst,                         -- [in]
-            bsaInit        => r.timingMessage.bsaInit(i),     -- [in]
-            bsaActive      => r.timingMessage.bsaActive(i),   -- [in]
-            bsaAvgDone     => r.timingMessage.bsaAvgDone(i),  -- [in]
-            bsaDone        => r.timingMessage.bsaDone(i),     -- [in]
-            diagnosticData => r.diagnosticData(0),            -- [in]
-            accumulateEn   => r.accumulateEn,                 -- [in]
-            setEn          => r.setEn,                        -- [in]
-            lastEn         => r.lastEn,                       -- [in]
-            axisMaster     => bsaAxisMasters(i),              -- [out]
-            axisSlave      => bsaAxisSlaves(i));              -- [in]
+            clk            => axiClk,                                         -- [in]
+            rst            => axiRst,                                         -- [in]
+            bsaInit        => diagnosticBusSync.timingMessage.bsaInit(i),     -- [in]
+            bsaActive      => diagnosticBusSync.timingMessage.bsaActive(i),   -- [in]
+            bsaAvgDone     => diagnosticBusSync.timingMessage.bsaAvgDone(i),  -- [in]
+            bsaDone        => diagnosticBusSync.timingMessage.bsaDone(i),     -- [in]
+            diagnosticData => r.diagnosticData(0),                            -- [in]
+            accumulateEn   => r.accumulateEn,                                 -- [in]
+            setEn          => r.setEn,                                        -- [in]
+            lastEn         => r.lastEn,                                       -- [in]
+            axisMaster     => bsaAxisMasters(i),                              -- [out]
+            axisSlave      => bsaAxisSlaves(i));                              -- [in]
    end generate;
 
    -------------------------------------------------------------------------------------------------
@@ -382,14 +384,14 @@ begin
 
    U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
       generic map (
-         TPD_G                      => TPD_G,
-         BUFFERS_G                  => BSA_BUFFERS_G,
-         BURST_SIZE_BYTES_G         => BSA_BURST_BYTES_G,
-         TRIGGER_USER_BIT_G         => 0,
-         AXIL_BASE_ADDR_G           => DMA_RING_BASE_ADDR_C,
+         TPD_G                => TPD_G,
+         BUFFERS_G            => BSA_BUFFERS_G,
+         BURST_SIZE_BYTES_G   => BSA_BURST_BYTES_G,
+         TRIGGER_USER_BIT_G   => 0,
+         AXIL_BASE_ADDR_G     => DMA_RING_BASE_ADDR_C,
          DATA_AXIS_CONFIG_G   => LAST_STREAM_CONFIG_C,
          STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1),
-         AXI_WRITE_CONFIG_G         => AXI_CONFIG_G)
+         AXI_WRITE_CONFIG_G   => AXI_CONFIG_G)
       port map (
          axilClk          => axilClk,                               -- [in]
          axilRst          => axilRst,                               -- [in]
@@ -413,7 +415,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Accumulation sequencing, and AXI-Lite logic
    -------------------------------------------------------------------------------------------------
-   comb : process (axiRst, diagnosticBus, diagnosticStrobeSync, r) is
+   comb : process (axiRst, diagnosticBusSync, diagnosticBusSyncValid, r) is
       variable v : RegType;
       variable b : integer range 0 to BSA_BUFFERS_G-1;
 
@@ -425,20 +427,18 @@ begin
       ----------------------------------------------------------------------------------------------
       v.adderCount := r.adderCount + 1;
       v.lastEn     := '0';
+      v.syncRdEn   := '0';
 
       ----------------------------------------------------------------------------------------------
       -- Synchronization
       -- Wait for synchronized strobe signal, then latch the timing message onto the local clock      
       ----------------------------------------------------------------------------------------------
-      v.strobe := '0';
-      if (diagnosticStrobeSync = '1') then
-         v.strobe                                         := '1';
-         v.timingMessage                                  := diagnosticBus.timingMessage;
-         v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 4) := diagnosticBus.data(DIAGNOSTIC_OUTPUTS_G-1 downto 0);
+      if (diagnosticBusSyncValid = '1' and r.accumulateEn = '0' and r.timeStampEn = '0' and r.syncRdEn = '0') then
+         v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 4) := diagnosticBusSync.data(DIAGNOSTIC_OUTPUTS_G-1 downto 0);
          v.diagnosticData(3)                              := X"00000001";  -- 1.0 (for number of accumulations)
          v.diagnosticData(2)                              := toSlv(DIAGNOSTIC_OUTPUTS_G, 32);  --Make this based on app constants
-         v.diagnosticData(1)                              := diagnosticBus.timingMessage.pulseId(63 downto 32);
-         v.diagnosticData(0)                              := diagnosticBus.timingMessage.pulseId(31 downto 0);
+         v.diagnosticData(1)                              := diagnosticBusSync.timingMessage.pulseId(63 downto 32);
+         v.diagnosticData(0)                              := diagnosticBusSync.timingMessage.pulseId(31 downto 0);
 
          v.timestampEn  := '1';
          v.accumulateEn := '1';
@@ -472,6 +472,9 @@ begin
       ----------------------------------------------------------------------------------------------
       if (r.adderCount = 63) then
          v.timestampEn := '0';
+         if (r.timestampEn = '1') then
+            v.syncRdEn    := '1';            
+         end if;
       end if;
 
 

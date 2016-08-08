@@ -1,19 +1,25 @@
 -------------------------------------------------------------------------------
--- Title      : 
+-- Title      : BsaWaveformEngine
 -------------------------------------------------------------------------------
--- File       : BsaRawDiagnostic.vhd
+-- File       : BsaWaveformEngine.vhd
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
---              Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-06-22
+-- Last update: 2016-07-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
--- Copyright (c) 2015 SLAC National Accelerator Laboratory
+-- This file is part of <PROJECT_NAME>. It is subject to
+-- the license terms in the LICENSE.txt file found in the top-level directory
+-- of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of <PROJECT_NAME>, including this file, may be
+-- copied, modified, propagated, or distributed except according to the terms
+-- contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 
@@ -24,73 +30,67 @@ use work.AxiPkg.all;
 use work.SsiPkg.all;
 use work.AmcCarrierPkg.all;
 
-entity BsaRawDiagnosticRing is
+entity BsaWaveformEngine is
 
    generic (
-      TPD_G                    : time                  := 1 ns;
-      DIAGNOSTIC_RAW_STREAMS_G : positive range 2 to 8 := 4;
-      DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray  := (0      => ssiAxiStreamConfig(4),
-                                                          1       => ssiAxiStreamConfig(4),
-                                                          2       => ssiAxiStreamConfig(4),
-                                                          3       => ssiAxiStreamConfig(4));
-      AXIL_BASE_ADDR_G         : slv(31 downto 0)      := (others => '0');
-      AXI_CONFIG_G             : AxiConfigType         := axiConfig(33, 16, 1, 8)
+      TPD_G            : time             := 1 ns;
+      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
+      AXI_CONFIG_G     : AxiConfigType    := axiConfig(33, 16, 1, 8)
       );
    port (
       -- Diagnostic data interface
-      diagnosticRawClks    : in  slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      diagnosticRawRsts    : in  slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      diagnosticRawMasters : in  AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      diagnosticRawSlaves  : out AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      diagnosticRawCtrl    : out AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      ibWaveformMasters : in  WaveformMasterType;
+      ibWaveformSlaves  : out WaveformSlaveType;
       -- AXI-Lite configuration interface
-      axilClk              : in  sl;
-      axilRst              : in  sl;
-      axilReadMaster       : in  AxiLiteReadMasterType;
-      axilReadSlave        : out AxiLiteReadSlaveType;
-      axilWriteMaster      : in  AxiLiteWriteMasterType;
-      axilWriteSlave       : out AxiLiteWriteSlaveType;
+      axilClk           : in  sl;
+      axilRst           : in  sl;
+      axilReadMaster    : in  AxiLiteReadMasterType;
+      axilReadSlave     : out AxiLiteReadSlaveType;
+      axilWriteMaster   : in  AxiLiteWriteMasterType;
+      axilWriteSlave    : out AxiLiteWriteSlaveType;
       -- Status stream
-      axisStatusClk        : in  sl;
-      axisStatusRst        : in  sl;
-      axisStatusMaster     : out AxiStreamMasterType;
-      axisStatusSlave      : in  AxiStreamSlaveType := AXI_STREAM_SLAVE_FORCE_C;
+      axisStatusClk     : in  sl;
+      axisStatusRst     : in  sl;
+      axisStatusMaster  : out AxiStreamMasterType;
+      axisStatusSlave   : in  AxiStreamSlaveType := AXI_STREAM_SLAVE_FORCE_C;
       -- Data autoread output stream
-      axisDataClk          : in  sl;
-      axisDataRst          : in  sl;
-      axisDataMaster       : out AxiStreamMasterType;
-      axisDataSlave        : in  AxiStreamSlaveType;
+      axisDataClk       : in  sl;
+      axisDataRst       : in  sl;
+      axisDataMaster    : out AxiStreamMasterType;
+      axisDataSlave     : in  AxiStreamSlaveType;
       -- Axi Interface to RAM
-      axiClk               : in  sl;
-      axiRst               : in  sl;
-      axiWriteMaster       : out AxiWriteMasterType := axiWriteMasterInit(AXI_CONFIG_G);
-      axiWriteSlave        : in  AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
-      axiReadMaster        : out AxiReadMasterType  := axiReadMasterInit(AXI_CONFIG_G);
-      axiReadSlave         : in  AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C);
+      axiClk            : in  sl;
+      axiRst            : in  sl;
+      axiWriteMaster    : out AxiWriteMasterType := axiWriteMasterInit(AXI_CONFIG_G);
+      axiWriteSlave     : in  AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
+      axiReadMaster     : out AxiReadMasterType  := axiReadMasterInit(AXI_CONFIG_G);
+      axiReadSlave      : in  AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C);
 
 
 
-end entity BsaRawDiagnosticRing;
+end entity BsaWaveformEngine;
 
-architecture rtl of BsaRawDiagnosticRing is
+architecture rtl of BsaWaveformEngine is
 
-   constant TDEST_ROUTES_C : Slv8Array(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0) := (others => "--------");
+   constant STREAMS_C : integer := WaveformMasterType'length;
+
+   constant TDEST_ROUTES_C : Slv8Array(STREAMS_C-1 downto 0) := (others => "--------");
 
    constant INTERNAL_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => AXI_CONFIG_G.DATA_BYTES_C,
-      TDEST_BITS_C  => log2(DIAGNOSTIC_RAW_STREAMS_G),
+      TDEST_BITS_C  => log2(STREAMS_C),
       TID_BITS_C    => 0,
-      TKEEP_MODE_C  => TKEEP_COMP_C,
+      TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 3,
       TUSER_MODE_C  => TUSER_LAST_C);
 
    constant INTERNAL_AXIS_MASTER_INIT_C : AxiStreamMasterType := axiStreamMasterInit(INTERNAL_AXIS_CONFIG_C);
 
    -- Mux in 
-   signal muxInAxisMaster : AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0) :=
+   signal muxInAxisMaster : AxiStreamMasterArray(STREAMS_C-1 downto 0) :=
       (others => INTERNAL_AXIS_MASTER_INIT_C);
-   signal muxInAxisSlave : AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0) :=
+   signal muxInAxisSlave : AxiStreamSlaveArray(STREAMS_C-1 downto 0) :=
       (others => AXI_STREAM_SLAVE_INIT_C);
 
    -- Mux out    
@@ -101,13 +101,11 @@ architecture rtl of BsaRawDiagnosticRing is
    signal muxFifoAxisMaster : AxiStreamMasterType := INTERNAL_AXIS_MASTER_INIT_C;
    signal muxFifoAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
 
-   signal bufferDone : slv(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+   signal bufferDone : slv(STREAMS_C-1 downto 0);
 
    -- Status streams
    signal axisStatusMasterInt  : AxiStreamMasterType;
    signal axisStatusSlaveInt   : AxiStreamSlaveType;
-   signal axisStatusMaster8  : AxiStreamMasterType;
-   signal axisStatusSlave8   : AxiStreamSlaveType;   
    signal axisStatusMasterRead : AxiStreamMasterType;
    signal axisStatusSlaveRead  : AxiStreamSlaveType;
 
@@ -130,8 +128,8 @@ architecture rtl of BsaRawDiagnosticRing is
 begin
 
    -- Input fifos
-   -- These should probably be 4k deep for best throughput
-   AXIS_IN_FIFOS : for i in DIAGNOSTIC_RAW_STREAMS_G-1 downto 0 generate
+   -- These should probably be 4k bytes deep for best throughput
+   AXIS_IN_FIFOS : for i in STREAMS_C-1 downto 0 generate
       AxiStreamFifo : entity work.AxiStreamFifo
          generic map (
             TPD_G               => TPD_G,
@@ -140,18 +138,18 @@ begin
             BRAM_EN_G           => true,
             XIL_DEVICE_G        => "ULTRASCALE",
             USE_BUILT_IN_G      => false,
-            GEN_SYNC_FIFO_G     => false,
+            GEN_SYNC_FIFO_G     => true,
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 9,
             FIFO_FIXED_THRESH_G => true,
             FIFO_PAUSE_THRESH_G => 1,                       --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
-            SLAVE_AXI_CONFIG_G  => DIAGNOSTIC_RAW_CONFIGS_G(i),
+            SLAVE_AXI_CONFIG_G  => WAVEFORM_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => INTERNAL_AXIS_CONFIG_C)  -- 128-bit
          port map (
-            sAxisClk    => diagnosticRawClks(i),
-            sAxisRst    => diagnosticRawRsts(i),
-            sAxisMaster => diagnosticRawMasters(i),
-            sAxisSlave  => diagnosticRawSlaves(i),
+            sAxisClk    => axiClk,
+            sAxisRst    => axiRst,
+            sAxisMaster => ibWaveformMasters(i),
+            sAxisSlave  => ibWaveformSlaves(i).slave,
             sAxisCtrl   => open,
             mAxisClk    => axiClk,
             mAxisRst    => axiRst,
@@ -163,7 +161,7 @@ begin
    AxiStreamMux_INST : entity work.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
-         NUM_SLAVES_G   => DIAGNOSTIC_RAW_STREAMS_G,
+         NUM_SLAVES_G   => STREAMS_C,
          PIPE_STAGES_G  => 1,
          TDEST_HIGH_G   => 7,
          TDEST_LOW_G    => 0,
@@ -209,15 +207,16 @@ begin
    U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
       generic map (
          TPD_G                => TPD_G,
-         BUFFERS_G            => DIAGNOSTIC_RAW_STREAMS_G,
+         BUFFERS_G            => STREAMS_C,
          BURST_SIZE_BYTES_G   => 4096,
+         TRIGGER_USER_BIT_G   => WAVEFORM_TRIGGER_BIT_C,
          AXIL_BASE_ADDR_G     => AXIL_BASE_ADDR_G,
          DATA_AXIS_CONFIG_G   => INTERNAL_AXIS_CONFIG_C,
-         STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 4),  -- Shoud this be 4 tDest bits?
+         STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 4),
          AXI_WRITE_CONFIG_G   => AXI_CONFIG_G)
       port map (
-         axilClk          => axilClk,   -- [in]
-         axilRst          => axilRst,   -- [in]
+         axilClk          => axilClk,              -- [in]
+         axilRst          => axilRst,              -- [in]
          axilReadMaster   => locAxilReadMaster,    -- [in]
          axilReadSlave    => locAxilReadSlave,     -- [out]
          axilWriteMaster  => locAxilWriteMaster,   -- [in]
@@ -226,27 +225,20 @@ begin
          axisStatusRst    => axisStatusRst,        -- [in]
          axisStatusMaster => axisStatusMasterInt,  -- [out]
          axisStatusSlave  => axisStatusSlaveInt,   -- [in]
-         axiClk           => axiClk,    -- [in]
-         axiRst           => axiRst,    -- [in]
+         axiClk           => axiClk,               -- [in]
+         axiRst           => axiRst,               -- [in]
          bufferDone       => bufferDone,           -- [out]
          axisDataMaster   => muxFifoAxisMaster,    -- [in]
          axisDataSlave    => muxFifoAxisSlave,     -- [out]
          axiWriteMaster   => axiWriteMaster,       -- [out]
          axiWriteSlave    => axiWriteSlave);       -- [in]
 
-   -- Synchronize bufferDone back to raw clocks and use as ctrl.pause
-   BUFFER_DONE_PAUSE : for i in DIAGNOSTIC_RAW_STREAMS_G-1 downto 0 generate
-      U_Synchronizer_1 : entity work.Synchronizer
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            clk     => diagnosticRawClks(i),         -- [in]
-            rst     => diagnosticRawRsts(i),         -- [in]
-            dataIn  => bufferDone(i),                -- [in]
-            dataOut => diagnosticRawCtrl(i).pause);  -- [out]
-      diagnosticRawCtrl(i).overflow <= '0';
-      diagnosticRawCtrl(i).idle     <= '0';
-   end generate BUFFER_DONE_PAUSE;
+   -- Use bufferDone as ctrl.pause
+   CTRL : for i in STREAMS_C-1 downto 0 generate
+      ibWaveformSlaves(i).ctrl.pause    <= bufferDone(i);
+      ibWaveformSlaves(i).ctrl.overflow <= '0';
+      ibWaveformSlaves(i).ctrl.idle     <= '0';
+   end generate CTRL;
 
    -------------------------------------------------------------------------------------------------
    -- Route status message based on tdest
@@ -265,41 +257,12 @@ begin
          axisRst         => axisStatusRst,         -- [in]
          sAxisMaster     => axisStatusMasterInt,   -- [in]
          sAxisSlave      => axisStatusSlaveInt,    -- [out]
-         mAxisMasters(0) => axisStatusMaster8,      -- [out]
+         mAxisMasters(0) => axisStatusMaster,      -- [out]
          mAxisMasters(1) => axisStatusMasterRead,  -- [out]         
-         mAxisSlaves(0)  => axisStatusSlave8,       -- [in]
+         mAxisSlaves(0)  => axisStatusSlave,       -- [in]
          mAxisSlaves(1)  => axisStatusSlaveRead);  -- [in]         
 
-   -------------------------------------------------------------------------------------------------
-   -- Async messages to software need to be converted to 64 bits wide
-   -------------------------------------------------------------------------------------------------
-      AxiStreamFifo_StatusMsg : entity work.AxiStreamFifo
-      generic map (
-         TPD_G               => TPD_G,
-         SLAVE_READY_EN_G    => true,
-         VALID_THOLD_G       => 1,
-         BRAM_EN_G           => false,
-         XIL_DEVICE_G        => "ULTRASCALE",
-         USE_BUILT_IN_G      => false,
-         GEN_SYNC_FIFO_G     => true,
-         CASCADE_SIZE_G      => 1,
-         FIFO_ADDR_WIDTH_G   => 4,
-         FIFO_FIXED_THRESH_G => true,
-         FIFO_PAUSE_THRESH_G => 1,
-         SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 4),
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
-      port map (
-         sAxisClk    => axisStatusClk,
-         sAxisRst    => axisStatusRst,
-         sAxisMaster => axisStatusMaster8,
-         sAxisSlave  => axisStatusSlave8,
-         sAxisCtrl   => open,
-         mAxisClk    => axisstatusClk,
-         mAxisRst    => axisstatusRst,
-         mAxisMaster => axisStatusMaster,
-         mAxisSlave  => axisStatusSlave);
 
-   
    -------------------------------------------------------------------------------------------------
    -- AxiStreamDmaRingRead module optionally catches status messages from ring write
    -- Peforms the read itself and outputs the resulting data stream
@@ -307,7 +270,7 @@ begin
    U_AxiStreamDmaRingRead_1 : entity work.AxiStreamDmaRingRead
       generic map (
          TPD_G                 => TPD_G,
-         BUFFERS_G             => DIAGNOSTIC_RAW_STREAMS_G,
+         BUFFERS_G             => STREAMS_C,
          BURST_SIZE_BYTES_G    => 4096,
          SSI_OUTPUT_G          => true,
          AXIL_BASE_ADDR_G      => AXIL_BASE_ADDR_G,
@@ -334,7 +297,7 @@ begin
          axiReadSlave    => axiReadSlave);         -- [in]
 
    -------------------------------------------------------------------------------------------------
-   -- Buffer the read dma data to transition to data clk and use CTRL for flow control with DmaRead
+   -- Buffer the read dma data to transition to data clk 
    -------------------------------------------------------------------------------------------------
    AxiStreamFifo_RD_DATA : entity work.AxiStreamFifo
       generic map (
