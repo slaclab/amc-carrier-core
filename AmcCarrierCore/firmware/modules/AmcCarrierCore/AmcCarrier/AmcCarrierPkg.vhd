@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-07-13
+-- Last update: 2016-08-04
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -75,18 +75,45 @@ package AmcCarrierPkg is
    -------------------------------------------------------------------------------------------------
    -- Ethernet stream configurations
    -------------------------------------------------------------------------------------------------
-   -------------------------------------------------------------------------------------------------
-   -- Configuration of AXI Streams in core
-   -------------------------------------------------------------------------------------------------
-   -- All streams to ETH blocks should use this config
    constant ETH_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);  -- Use 8 tDest bits
 
    -- BSA stream indicies
-   constant BSA_MEM_AXIS_INDEX_C         : integer := 0;
-   constant BSA_BSA_STATUS_AXIS_INDEX_C  : integer := 1;
-   constant BSA_DIAG_STATUS_AXIS_INDEX_C : integer := 2;
-   constant BSA_DIAG_DATA_AXIS_INDEX_C   : integer := 3;
+   constant BSA_MEM_AXIS_INDEX_C             : integer := 0;
+   constant BSA_BSA_STATUS_AXIS_INDEX_C      : integer := 1;
+   constant BSA_WAVEFORM_STATUS_AXIS_INDEX_C : integer := 2;
+   constant BSA_WAVEFORM_DATA_AXIS_INDEX_C   : integer := 3;
 
+   -------------------------------------------------------------------------------------------------
+   -- BSA configuration
+   -------------------------------------------------------------------------------------------------
+   constant BSA_BUFFERS_C            : integer := 64;
+   constant BSA_DIAGNOSTIC_OUTPUTS_C : integer := 28;
+   constant BSA_STREAM_BYTE_WIDTH_C  : integer := 8;
+   constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data
+
+
+   constant WAVEFORM_STREAMS_C     : integer             := 8;
+   constant WAVEFORM_AXIS_CONFIG_C : AxiStreamConfigType :=
+      ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
+
+   constant WAVEFORM_TRIGGER_BIT_C : integer := 2;
+
+   subtype WaveformMasterType is AxiStreamMasterArray(3 downto 0);
+   type WaveformMasterArrayType is array (1 downto 0) of WaveformMasterType;
+
+   constant WAVEFORM_MASTER_ARRAY_INIT_C : WaveformMasterArrayType := (others => (others => AXI_STREAM_MASTER_INIT_C));   
+   
+   type WaveformSlaveRecType is record
+      slave : AxiStreamSlaveType;
+      ctrl  : AxiStreamCtrlType;
+   end record;
+   type WaveformSlaveType is array (3 downto 0) of WaveformSlaveRecType;
+   type WaveformSlaveArrayType is array (1 downto 0) of WaveformSlaveType;
+
+   constant WAVEFORM_SLAVE_REC_INIT_C : WaveformSlaveRecType := (
+      slave => AXI_STREAM_SLAVE_INIT_C,
+      ctrl  => AXI_STREAM_CTRL_INIT_C);
+   constant WAVEFORM_SLAVE_ARRAY_INIT_C : WaveformSlaveArrayType := (others => (others => WAVEFORM_SLAVE_REC_INIT_C));
 
 
    ---------------------------------------------------

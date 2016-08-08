@@ -40,15 +40,13 @@ entity DebugRtmPgpAmcCarrierCore is
       TPD_G                    : time                 := 1 ns;   -- Simulation only parameter
       SIM_SPEEDUP_G            : boolean              := false;  -- Simulation only parameter
       SIMULATION_G             : boolean              := false;  -- Simulation only parameter
-      TIMING_MODE_G            : boolean              := false;  -- false = Normal Operation, = LCLS-I timing only
       MPS_SLOT_G               : boolean              := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G                   : boolean              := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G               : AppType              := APP_NULL_TYPE_C;
-      DIAGNOSTIC_RAW_STREAMS_G : positive             := 1;
-      DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray := (0 => ssiAxiStreamConfig(4)));  -- Must be same size as DIAGNOSTIC_RAW_STREAMS_G
+      EN_BP_MSG_G   : boolean := false);
    port (
       ----------------------
-      -- Top Level Interface
+      -- Core Ports to Application
       ----------------------
       -- AXI-Lite Interface (regClk domain)
       -- Address Range = [0x80000000:0xFFFFFFFF]
@@ -63,17 +61,19 @@ entity DebugRtmPgpAmcCarrierCore is
       timingRst            : in  sl;
       timingBus            : out TimingBusType := TIMING_BUS_INIT_C;
       timingPhy            : in  TimingPhyType := TIMING_PHY_INIT_C;  -- Input for timing generator only
+      timingPhyClk         : out sl;
+      timingPhyRst         : out sl;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in  sl;
       diagnosticRst        : in  sl;
       diagnosticBus        : in  DiagnosticBusType;
-      -- Raw Diagnostic Interface (diagnosticRawClks domains)
-      diagnosticRawClks    : in  slv(DIAGNOSTIC_RAW_STREAMS_G -1 downto 0);
-      diagnosticRawRsts    : in  slv(DIAGNOSTIC_RAW_STREAMS_G -1 downto 0);
-      diagnosticRawMasters : in  AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      diagnosticRawSlaves  : out AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      diagnosticRawCtrl    : out AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-
+      --  Waveform interface (waveformClk domain)
+      waveformClk          : out sl;
+      waveformRst          : out sl;
+      obAppWaveformMasters : in  WaveformMasterArrayType := WAVEFORM_MASTER_ARRAY_INIT_C;
+      obAppWaveformSlaves  : out WaveformSlaveArrayType;
+      ibAppWaveformMasters : out WaveformMasterArrayType;
+      ibAppWaveformSlaves  : in  WaveformSlaveArrayType := WAVEFORM_SLAVE_ARRAY_INIT_C;
       -- Backplane Messaging Interface (bpMsgClk domain)
       bpMsgClk         : in    sl                               := '0';
       bpMsgRst         : in    sl                               := '0';
@@ -96,9 +96,10 @@ entity DebugRtmPgpAmcCarrierCore is
       ref312MHzRst     : out   sl;
       ref625MHzClk     : out   sl;
       ref625MHzRst     : out   sl;
+
       gthFabClk        : out   sl;
       ----------------
-      -- Core Ports --
+      --  Top Level Interface to IO
       ----------------
       -- Common Fabricate Clock
       fabClkP          : in    sl;
@@ -203,10 +204,6 @@ architecture mapping of DebugRtmPgpAmcCarrierCore is
    signal axiReadMaster  : AxiReadMasterType;
    signal axiReadSlave   : AxiReadSlaveType;
 
-   signal bsaTimingClk : sl            := '0';
-   signal bsaTimingRst : sl            := '0';
-   signal bsaTimingBus : TimingBusType := TIMING_BUS_INIT_C;
-
    signal timingReadMaster  : AxiLiteReadMasterType;
    signal timingReadSlave   : AxiLiteReadSlaveType;
    signal timingWriteMaster : AxiLiteWriteMasterType;
@@ -234,6 +231,8 @@ architecture mapping of DebugRtmPgpAmcCarrierCore is
    signal mpsWriteMaster : AxiLiteWriteMasterType;
    signal mpsWriteSlave  : AxiLiteWriteSlaveType;
 
+   signal bufDiagnosticMaster : AxiStreamMasterType;
+   signal bufDiagnosticSlave  : AxiStreamSlaveType;
    signal bpMsgMasters : AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
    signal bpMsgSlaves  : AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
@@ -247,14 +246,16 @@ architecture mapping of DebugRtmPgpAmcCarrierCore is
    signal resetDDR            : sl;
    signal pgpClk              : sl;
    signal pgpRst              : sl;
-   signal bufDiagnosticMaster : AxiStreamMasterType;
-   signal bufDiagnosticSlave  : AxiStreamSlaveType;
 
 begin
 
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
    -- Note: Install R1063 if you want the FPGA to control AUX power
    enAuxPwrL <= '0';
+   -- Send axiClk to application as ddrClk
+   waveformClk <= axiClk;
+   waveformRst <= axiRst;
+
 
    --------------------------------
    -- Common Clock and Reset Module
@@ -289,7 +290,7 @@ begin
          ----------------
          -- Core Ports --
          ----------------   
-         -- Common Fabricate Clock
+         -- Common Fabric Clock
          fabClkP      => fabClkP,
          fabClkN      => fabClkN,
          -- Backplane MPS Ports
@@ -318,14 +319,14 @@ begin
          axilReadSlave     => pgpReadSlave,
          axilWriteMaster   => pgpWriteMaster,
          axilWriteSlave    => pgpWriteSlave,
-         -- Backplane Messaging Interface
-         bpMsgMasters      => bpMsgMasters,
-         bpMsgSlaves       => bpMsgSlaves,
          -- Debug AXI stream Interface
          pgpClock          => pgpClk,
          pgpReset          => pgpRst,
          axisTxMaster      => bufDiagnosticMaster,
          axisTxSlave       => bufDiagnosticSlave,
+         -- Backplane Messaging Interface
+         bpMsgMasters      => bpMsgMasters,
+         bpMsgSlaves       => bpMsgSlaves,
          ----------------------
          -- Top Level Interface
          ----------------------
@@ -352,7 +353,6 @@ begin
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          APP_TYPE_G       => APP_TYPE_G,
-         TIMING_MODE_G    => TIMING_MODE_G,
          FSBL_G           => FSBL_G)
       port map (
          -- Primary AXI-Lite Interface
@@ -440,8 +440,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         TIMING_MODE_G    => TIMING_MODE_G)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk          => axilClk,
@@ -450,10 +449,6 @@ begin
          axilReadSlave    => timingReadSlave,
          axilWriteMaster  => timingWriteMaster,
          axilWriteSlave   => timingWriteSlave,
-         -- BSA Interface (bsaTimingClk domain)
-         bsaTimingClk     => bsaTimingClk,
-         bsaTimingRst     => bsaTimingRst,
-         bsaTimingBus     => bsaTimingBus,
          ----------------------
          -- Top Level Interface
          ----------------------         
@@ -464,6 +459,8 @@ begin
          appTimingRst     => timingRst,
          appTimingBus     => timingBus,
          appTimingPhy     => timingPhy,
+         appTimingPhyClk  => timingPhyClk,
+         appTimingPhyRst  => timingPhyRst,
          ----------------
          -- Core Ports --
          ----------------   
@@ -484,16 +481,12 @@ begin
    U_DebugRawDiagnostic_1 : entity work.DebugRtmPgpRawDiagnostic
       generic map (
          TPD_G                    => TPD_G,
-         DIAGNOSTIC_RAW_STREAMS_G => DIAGNOSTIC_RAW_STREAMS_G,
-         DIAGNOSTIC_RAW_CONFIGS_G => DIAGNOSTIC_RAW_CONFIGS_G,
          AXIL_BASE_ADDR_G         => BSA_ADDR_C,
          AXI_CONFIG_G             => AXI_CONFIG_C)
       port map (
-         diagnosticRawClks    => diagnosticRawClks,     -- [in]
-         diagnosticRawRsts    => diagnosticRawRsts,     -- [in]
-         diagnosticRawMasters => diagnosticRawMasters,  -- [in]
-         diagnosticRawSlaves  => diagnosticRawSlaves,   -- [out]
-         diagnosticRawCtrl    => diagnosticRawCtrl,     -- [out]
+         -- Waveform interface (axiClk domain)
+         ibWaveformMasters => obAppWaveformMasters(0),
+         ibWaveformSlaves  => obAppWaveformSlaves(0),
          axilClk              => axilClk,               -- [in]
          axilRst              => axilRst,               -- [in]
          axilReadMaster       => bsaReadMaster,         -- [in]

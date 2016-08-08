@@ -53,15 +53,14 @@ entity DebugRtmPgpAmcCarrier is
       axilReadSlave     : out AxiLiteReadSlaveType;
       axilWriteMaster   : in  AxiLiteWriteMasterType;
       axilWriteSlave    : out AxiLiteWriteSlaveType;
-      -- Backplane Messaging Interface
-      bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
-      bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
-
       -- Debug AXI stream Interface
       pgpClock     : out sl;
       pgpReset     : out sl;
       axisTxMaster : in  AxiStreamMasterType;
       axisTxSlave  : out AxiStreamSlaveType;
+      -- Backplane Messaging Interface
+      bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
+      bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
       ----------------------
       -- Top Level Interface
       ----------------------

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-06-09
+-- Last update: 2016-07-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -52,10 +52,10 @@ entity AmcCarrierEthRssi is
       mAxilWriteMaster : out AxiLiteWriteMasterType;
       mAxilWriteSlave  : in  AxiLiteWriteSlaveType;
       -- Application Debug Interface
-      obDebugMaster    : in  AxiStreamMasterType;
-      obDebugSlave     : out AxiStreamSlaveType;
-      ibDebugMaster    : out AxiStreamMasterType;
-      ibDebugSlave     : in  AxiStreamSlaveType;
+      obAppDebugMaster    : in  AxiStreamMasterType;
+      obAppDebugSlave     : out AxiStreamSlaveType;
+      ibAppDebugMaster    : out AxiStreamMasterType;
+      ibAppDebugSlave     : in  AxiStreamSlaveType;
       -- BSA Ethernet Interface
       obBsaMasters     : in  AxiStreamMasterArray(3 downto 0);
       obBsaSlaves      : out AxiStreamSlaveArray(3 downto 0);
@@ -230,8 +230,8 @@ begin
    --------------------------------
    -- Debug Path: TDEST = 0xFF:0xC0
    --------------------------------
-   ibDebugMaster   <= rssiObMasters(4);
-   rssiObSlaves(4) <= ibDebugSlave;
+   ibAppDebugMaster   <= rssiObMasters(4);
+   rssiObSlaves(4) <= ibAppDebugSlave;
    U_IbLimiter : entity work.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
@@ -245,8 +245,8 @@ begin
          -- Slave Port
          sAxisClk    => axilClk,
          sAxisRst    => axilRst,
-         sAxisMaster => obDebugMaster,
-         sAxisSlave  => obDebugSlave,
+         sAxisMaster => obAppDebugMaster,
+         sAxisSlave  => obAppDebugSlave,
          -- Master Port
          mAxisClk    => axilClk,
          mAxisRst    => axilRst,

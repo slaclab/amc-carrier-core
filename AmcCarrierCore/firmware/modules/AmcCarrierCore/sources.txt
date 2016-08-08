@@ -46,6 +46,8 @@ vhdl work DebugRtmPgp/DebugRtmPgpAmcCarrier.vhd
 vhdl work DebugRtmPgp/DebugRtmPgpAmcCarrierDdrMem.vhd
 vhdl work DebugRtmPgp/DebugRtmPgpGthCoreWrapper.vhd
 vhdl work DebugRtmPgp/DebugRtmPgpRawDiagnostic.vhd
+vhdl work DebugRtmPgp/DebugRtmPgpAmcCarrierCore2.vhd
+vhdl work DebugRtmPgp/AmcCarrierPgp.vhd
 
 vhdl work DebugRtmEth/DebugRtmEthAmcCarrierCore.vhd
 vhdl work DebugRtmEth/DebugRtmEth.vhd

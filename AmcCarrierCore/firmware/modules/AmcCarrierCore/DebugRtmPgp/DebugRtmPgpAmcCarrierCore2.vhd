@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierCore.vhd
+-- File       : DebugRtmPgpAmcCarrierCore2.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-07-18
+-- Last update: 2016-08-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -34,10 +34,11 @@ use work.AmcCarrierPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcCarrierCore is
+entity DebugRtmPgpAmcCarrierCore2 is
    generic (
       TPD_G         : time    := 1 ns;  -- Simulation only parameter
       SIM_SPEEDUP_G : boolean := false;  -- Simulation only parameter
+      SIMULATION_G             : boolean              := false;  -- Simulation only parameter
       MPS_SLOT_G    : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G        : boolean := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G    : AppType := APP_NULL_TYPE_C;
@@ -57,7 +58,7 @@ entity AmcCarrierCore is
       -- Timing Interface (timingClk domain) 
       timingClk            : in  sl;
       timingRst            : in  sl;
-      timingBus            : out TimingBusType;
+      timingBus            : out TimingBusType := TIMING_BUS_INIT_C;
       timingPhy            : in  TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
       timingPhyClk         : out sl;
       timingPhyRst         : out sl;
@@ -76,11 +77,6 @@ entity AmcCarrierCore is
       bpMsgClk             : in  sl                               := '0';
       bpMsgRst             : in  sl                               := '0';
       bpMsgBus             : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
-      -- Application Debug Interface (ref156MHzClk domain)
-      obAppDebugMaster     : in  AxiStreamMasterType              := AXI_STREAM_MASTER_INIT_C;
-      obAppDebugSlave      : out AxiStreamSlaveType;
-      ibAppDebugMaster     : out AxiStreamMasterType;
-      ibAppDebugSlave      : in  AxiStreamSlaveType               := AXI_STREAM_SLAVE_FORCE_C;
       -- BSI Interface (bsiClk domain) 
       bsiClk               : in  sl                               := '0';
       bsiRst               : in  sl                               := '0';
@@ -101,20 +97,19 @@ entity AmcCarrierCore is
       ref625MHzRst         : out sl;
 
       gthFabClk        : out   sl;
-      ethPhyReady      : out   sl;
       ----------------
       --  Top Level Interface to IO
       ----------------
       -- Common Fabricate Clock
       fabClkP          : in    sl;
       fabClkN          : in    sl;
-      -- Backplane Ethernet Ports
-      xauiRxP          : in    slv(3 downto 0);
-      xauiRxN          : in    slv(3 downto 0);
-      xauiTxP          : out   slv(3 downto 0);
-      xauiTxN          : out   slv(3 downto 0);
-      xauiClkP         : in    sl;
-      xauiClkN         : in    sl;
+      -- RTM PGP Ports
+      rtmPgpRxP        : in    sl;
+      rtmPgpRxN        : in    sl;
+      rtmPgpTxP        : out   sl;
+      rtmPgpTxN        : out   sl;
+      rtmPgpClkP       : in    sl;
+      rtmPgpClkN       : in    sl;
       -- Backplane MPS Ports
       mpsClkIn         : in    sl;
       mpsClkOut        : out   sl;
@@ -173,9 +168,9 @@ entity AmcCarrierCore is
       -- SYSMON Ports
       vPIn             : in    sl;
       vNIn             : in    sl);
-end AmcCarrierCore;
+end DebugRtmPgpAmcCarrierCore2;
 
-architecture mapping of AmcCarrierCore is
+architecture mapping of DebugRtmPgpAmcCarrierCore2 is
 
    constant AXI_ERROR_RESP_C : slv(1 downto 0) := AXI_RESP_DECERR_C;
 
@@ -211,10 +206,10 @@ architecture mapping of AmcCarrierCore is
    signal bsaWriteMaster : AxiLiteWriteMasterType;
    signal bsaWriteSlave  : AxiLiteWriteSlaveType;
 
-   signal xauiReadMaster  : AxiLiteReadMasterType;
-   signal xauiReadSlave   : AxiLiteReadSlaveType;
-   signal xauiWriteMaster : AxiLiteWriteMasterType;
-   signal xauiWriteSlave  : AxiLiteWriteSlaveType;
+   signal pgpReadMaster  : AxiLiteReadMasterType;
+   signal pgpReadSlave   : AxiLiteReadSlaveType;
+   signal pgpWriteMaster : AxiLiteWriteMasterType;
+   signal pgpWriteSlave  : AxiLiteWriteSlaveType;
 
    signal ddrReadMaster  : AxiLiteReadMasterType;
    signal ddrReadSlave   : AxiLiteReadSlaveType;
@@ -242,7 +237,7 @@ architecture mapping of AmcCarrierCore is
    signal localMac   : slv(47 downto 0);
    signal localIp    : slv(31 downto 0);
    signal localAppId : slv(15 downto 0);
-   signal ethLinkUp  : sl;
+
 
 begin
 
@@ -298,64 +293,42 @@ begin
          mpsClkIn     => mpsClkIn,
          mpsClkOut    => mpsClkOut);
 
-   ------------------------------------
-   -- Ethernet Module (ATCA ZONE 2)
-   ------------------------------------
-   U_Eth : entity work.AmcCarrierEth
+   -------------------------------------------------------------------------------------------------
+   -- PGP interface (RTM)
+   -------------------------------------------------------------------------------------------------
+   U_AmcCarrierPgp_1: entity work.AmcCarrierPgp
       generic map (
          TPD_G            => TPD_G,
-         EN_BP_MSG_G      => EN_BP_MSG_G,
+         SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
+         SIMULATION_G     => SIMULATION_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
-         -- Local Configuration
-         localMac          => localMac,
-         localIp           => localIp,
-         ethPhyReady       => ethLinkUp,
-         -- Master AXI-Lite Interface
-         mAxilReadMasters  => axilReadMasters,
-         mAxilReadSlaves   => axilReadSlaves,
-         mAxilWriteMasters => axilWriteMasters,
-         mAxilWriteSlaves  => axilWriteSlaves,
-         -- AXI-Lite Interface
-         axilClk           => axilClk,
-         axilRst           => axilRst,
-         axilReadMaster    => xauiReadMaster,
-         axilReadSlave     => xauiReadSlave,
-         axilWriteMaster   => xauiWriteMaster,
-         axilWriteSlave    => xauiWriteSlave,
-         -- BSA Ethernet Interface
-         obBsaMasters      => obBsaMasters,
-         obBsaSlaves       => obBsaSlaves,
-         ibBsaMasters      => ibBsaMasters,
-         ibBsaSlaves       => ibBsaSlaves,
-         -- Backplane Messaging Interface
-         bpMsgMasters      => bpMsgMasters,
-         bpMsgSlaves       => bpMsgSlaves,
-         ----------------------
-         -- Top Level Interface
-         ----------------------
-         -- Backplane Messaging Interface (bpMsgClk domain)
-         bpMsgClk          => bpMsgClk,
-         bpMsgRst          => bpMsgRst,
-         bpMsgBus          => bpMsgBus,
-         -- Application Debug Interface
-         obAppDebugMaster  => obAppDebugMaster,
-         obAppDebugSlave   => obAppDebugSlave,
-         ibAppDebugMaster  => ibAppDebugMaster,
-         ibAppDebugSlave   => ibAppDebugSlave,
-         ----------------
-         -- Core Ports --
-         ----------------   
-         -- XAUI Ports
-         xauiRxP           => xauiRxP,
-         xauiRxN           => xauiRxN,
-         xauiTxP           => xauiTxP,
-         xauiTxN           => xauiTxN,
-         xauiClkP          => xauiClkP,
-         xauiClkN          => xauiClkN);
-
-   ethPhyReady <= ethLinkUp;
-
+         mAxilReadMasters  => axilReadMasters,   -- [out]
+         mAxilReadSlaves   => axilReadSlaves,    -- [in]
+         mAxilWriteMasters => axilWriteMasters,  -- [out]
+         mAxilWriteSlaves  => axilWriteSlaves,   -- [in]
+         axilClk           => axilClk,            -- [in]
+         axilRst           => axilRst,            -- [in]
+         axilReadMaster    => pgpReadMaster,     -- [in]
+         axilReadSlave     => pgpReadSlave,      -- [out]
+         axilWriteMaster   => pgpWriteMaster,    -- [in]
+         axilWriteSlave    => pgpWriteSlave,     -- [out]
+         obBsaMasters      => obBsaMasters,       -- [in]
+         obBsaSlaves       => obBsaSlaves,        -- [out]
+         ibBsaMasters      => ibBsaMasters,       -- [out]
+         ibBsaSlaves       => ibBsaSlaves,        -- [in]
+         bpMsgMasters      => bpMsgMasters,       -- [in]
+         bpMsgSlaves       => bpMsgSlaves,        -- [out]
+         bpMsgClk          => bpMsgClk,           -- [in]
+         bpMsgRst          => bpMsgRst,           -- [in]
+         bpMsgBus          => bpMsgBus,           -- [out]
+         rtmPgpRxP         => rtmPgpRxP,          -- [in]
+         rtmPgpRxN         => rtmPgpRxN,          -- [in]
+         rtmPgpTxP         => rtmPgpTxP,          -- [out]
+         rtmPgpTxN         => rtmPgpTxN,          -- [out]
+         rtmPgpClkP        => rtmPgpClkP,         -- [in]
+         rtmPgpClkN        => rtmPgpClkN);        -- [in]
+   
    ----------------------------------   
    -- Register Address Mapping Module
    ----------------------------------   
@@ -378,16 +351,16 @@ begin
          timingReadSlave   => timingReadSlave,
          timingWriteMaster => timingWriteMaster,
          timingWriteSlave  => timingWriteSlave,
-         -- Bsa AXI-Lite Interface
+         -- BSA AXI-Lite Interface
          bsaReadMaster     => bsaReadMaster,
          bsaReadSlave      => bsaReadSlave,
          bsaWriteMaster    => bsaWriteMaster,
          bsaWriteSlave     => bsaWriteSlave,
          -- XAUI PHY AXI-Lite Interface
-         xauiReadMaster    => xauiReadMaster,
-         xauiReadSlave     => xauiReadSlave,
-         xauiWriteMaster   => xauiWriteMaster,
-         xauiWriteSlave    => xauiWriteSlave,
+         xauiReadMaster    => pgpReadMaster,
+         xauiReadSlave     => pgpReadSlave,
+         xauiWriteMaster   => pgpWriteMaster,
+         xauiWriteSlave    => pgpWriteSlave,
          -- DDR PHY AXI-Lite Interface
          ddrReadMaster     => ddrReadMaster,
          ddrReadSlave      => ddrReadSlave,
@@ -401,10 +374,9 @@ begin
          mpsWriteMaster    => mpsWriteMaster,
          mpsWriteSlave     => mpsWriteSlave,
          -- Local Configuration
-         localMac          => bsiMac,
-         localIp           => bsiIp,
+         localMac          => localMac,
+         localIp           => localIp,
          localAppId        => localAppId,
-         ethLinkUp         => ethLinkUp,
          ----------------------
          -- Top Level Interface
          ----------------------              

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-05-27
+-- Last update: 2016-07-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,7 +37,6 @@ use work.AmcCarrierRegPkg.all;
 entity AmcCarrierEth is
    generic (
       TPD_G            : time            := 1 ns;
-      EN_SW_RSSI_G     : boolean         := true;
       EN_BP_MSG_G      : boolean         := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
@@ -73,10 +72,10 @@ entity AmcCarrierEth is
       bpMsgRst          : in  sl := '0';
       bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
       -- Application Debug Interface
-      obDebugMaster     : in  AxiStreamMasterType;
-      obDebugSlave      : out AxiStreamSlaveType;
-      ibDebugMaster     : out AxiStreamMasterType;
-      ibDebugSlave      : in  AxiStreamSlaveType;
+      obAppDebugMaster     : in  AxiStreamMasterType;
+      obAppDebugSlave      : out AxiStreamSlaveType;
+      ibAppDebugMaster     : out AxiStreamMasterType;
+      ibAppDebugSlave      : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
       ----------------   
@@ -342,7 +341,6 @@ begin
    -----------------------------------------------
    -- Software's RSSI Server Interface@[8194:8193]
    -----------------------------------------------
-   GEN_SW_RSSI : if (EN_SW_RSSI_G = true) generate
       U_RssiServer : entity work.AmcCarrierEthRssi
          generic map (
             TPD_G            => TPD_G,
@@ -362,10 +360,10 @@ begin
             mAxilWriteMaster => mAxilWriteMasters(1),
             mAxilWriteSlave  => mAxilWriteSlaves(1),
             -- Application Debug Interface
-            obDebugMaster    => obDebugMaster,
-            obDebugSlave     => obDebugSlave,
-            ibDebugMaster    => ibDebugMaster,
-            ibDebugSlave     => ibDebugSlave,
+            obAppDebugMaster    => obAppDebugMaster,
+            obAppDebugSlave     => obAppDebugSlave,
+            ibAppDebugMaster    => ibAppDebugMaster,
+            ibAppDebugSlave     => ibAppDebugSlave,
             -- BSA Ethernet Interface
             obBsaMasters     => obBsaMasters,
             obBsaSlaves      => obBsaSlaves,
@@ -376,32 +374,6 @@ begin
             obServerSlaves   => obServerSlaves(2 downto 1),
             ibServerMasters  => ibServerMasters(2 downto 1),
             ibServerSlaves   => ibServerSlaves(2 downto 1));   
-   end generate;
-
-   BYPASS_SW_RSSI : if (EN_SW_RSSI_G = false) generate
-      
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- Don't respond with error
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(RSSI_INDEX_C),
-            axiReadSlave   => axilReadSlaves(RSSI_INDEX_C),
-            axiWriteMaster => axilWriteMasters(RSSI_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(RSSI_INDEX_C));  
-
-      mAxilReadMasters(1)         <= AXI_LITE_READ_MASTER_INIT_C;
-      mAxilWriteMasters(1)        <= AXI_LITE_WRITE_MASTER_INIT_C;
-      obDebugSlave                <= AXI_STREAM_SLAVE_FORCE_C;
-      ibDebugMaster               <= AXI_STREAM_MASTER_INIT_C;
-      obBsaSlaves                 <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibBsaMasters                <= (others => AXI_STREAM_MASTER_INIT_C);
-      obServerSlaves(2 downto 1)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibServerMasters(2 downto 1) <= (others => AXI_STREAM_MASTER_INIT_C);
-      
-   end generate;
 
    -----------------------------------
    -- BP Messenger Network@[8198:8195]

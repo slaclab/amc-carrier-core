@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-07-21
+-- Last update: 2016-07-18
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -42,8 +42,7 @@ entity AmcCarrierTiming is
       TPD_G            : time            := 1 ns;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      RX_CLK_MMCM_G    : boolean         := false;
-      TIMING_MODE_G    : boolean         := false);  -- true = LCLS-I timing only
+      RX_CLK_MMCM_G    : boolean         := false);
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk          : in  sl;
@@ -52,10 +51,6 @@ entity AmcCarrierTiming is
       axilReadSlave    : out AxiLiteReadSlaveType;
       axilWriteMaster  : in  AxiLiteWriteMasterType;
       axilWriteSlave   : out AxiLiteWriteSlaveType;
-      -- BSA Interface (bsaTimingClk domain)
-      bsaTimingClk     : out sl;
-      bsaTimingRst     : out sl;
-      bsaTimingBus     : out TimingBusType;
       ----------------------
       -- Top Level Interface
       ----------------------      
@@ -154,8 +149,6 @@ begin
 
    recTimingClk <= timingRecClk;
    recTimingRst <= not(rxResetDone);
-   bsaTimingClk <= timingRecClk;
-   bsaTimingRst <= not(rxResetDone);
 
    TIMING_GEN_CLK : if TIME_GEN_APP generate
       timingPhy <= appTimingPhy;
@@ -164,8 +157,6 @@ begin
    NOT_TIMING_GEN_CLK : if not TIME_GEN_APP generate
       timingPhy <= coreTimingPhy;
    end generate NOT_TIMING_GEN_CLK;
-
-   bsaTimingBus <= TIMING_BUS_INIT_C;
 
    txUsrRst        <= not(txResetDone);
    appTimingPhyClk <= txUsrClk;
@@ -285,8 +276,7 @@ begin
          TPD_G             => TPD_G,
          TPGEN_G           => TIME_GEN_APP,
          AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
-         AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C,
-         TIMING_MODE_G     => TIMING_MODE_G)
+         AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
       port map (
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,

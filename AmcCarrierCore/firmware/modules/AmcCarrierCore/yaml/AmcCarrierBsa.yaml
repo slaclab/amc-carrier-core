@@ -8,16 +8,18 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-include: BsaRawDiagnostic.yaml
+include: BsaWaveformEngine.yaml
 include: BsaBufferControl.yaml
 
 Device: &AmcCarrierBsa 
   name: AmcCarrierBsa
   description: AmcCarrier BSA Module
-  size: 0x20000 # Double check this
+  size: 0x30000 # Double check this
   #########
   MMIODev:
     - <<: *BsaBufferControl
       offset: 0x00000000
-    - <<: *BsaRawDiagnostic
+    - <<: *BsaWaveformEngine
+      nemls: 2
       offset: 0x00010000
+      stride: 0x00010000 
