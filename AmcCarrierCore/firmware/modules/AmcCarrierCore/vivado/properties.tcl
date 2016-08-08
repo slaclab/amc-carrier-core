@@ -32,7 +32,7 @@ if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {
 }
 
 ## BSA's .DCP files
-add_files -quiet -fileset sources_1 ${TOP_DIR}/modules/BsaCore/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
+add_files -quiet -fileset sources_1 ${TOP_DIR}/modules/BsaCore/$::env(BSA_TAG)/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
 
 ## Place and Route strategies 
 set_property strategy Performance_Explore [get_runs impl_1]
