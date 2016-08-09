@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-07-18
+-- Last update: 2016-08-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -76,29 +76,32 @@ architecture rtl of BsaWaveformEngine is
 
    constant TDEST_ROUTES_C : Slv8Array(STREAMS_C-1 downto 0) := (others => "--------");
 
-   constant INTERNAL_AXIS_CONFIG_C : AxiStreamConfigType := (
+   -------------------------------------------------------------------------------------------------
+   -- Write side constants and signals
+   -------------------------------------------------------------------------------------------------
+   constant WRITE_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => AXI_CONFIG_G.DATA_BYTES_C,
       TDEST_BITS_C  => log2(STREAMS_C),
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 3,
-      TUSER_MODE_C  => TUSER_LAST_C);
+      TUSER_MODE_C  => TUSER_FIRST_LAST_C);
 
-   constant INTERNAL_AXIS_MASTER_INIT_C : AxiStreamMasterType := axiStreamMasterInit(INTERNAL_AXIS_CONFIG_C);
+   constant WRITE_AXIS_MASTER_INIT_C : AxiStreamMasterType := axiStreamMasterInit(WRITE_AXIS_CONFIG_C);
 
    -- Mux in 
    signal muxInAxisMaster : AxiStreamMasterArray(STREAMS_C-1 downto 0) :=
-      (others => INTERNAL_AXIS_MASTER_INIT_C);
+      (others => WRITE_AXIS_MASTER_INIT_C);
    signal muxInAxisSlave : AxiStreamSlaveArray(STREAMS_C-1 downto 0) :=
       (others => AXI_STREAM_SLAVE_INIT_C);
 
    -- Mux out    
-   signal muxOutAxisMaster : AxiStreamMasterType := INTERNAL_AXIS_MASTER_INIT_C;
+   signal muxOutAxisMaster : AxiStreamMasterType := WRITE_AXIS_MASTER_INIT_C;
    signal muxOutAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
 
    -- Mux Fifo
-   signal muxFifoAxisMaster : AxiStreamMasterType := INTERNAL_AXIS_MASTER_INIT_C;
+   signal muxFifoAxisMaster : AxiStreamMasterType := WRITE_AXIS_MASTER_INIT_C;
    signal muxFifoAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
 
    signal bufferDone : slv(STREAMS_C-1 downto 0);
@@ -109,10 +112,26 @@ architecture rtl of BsaWaveformEngine is
    signal axisStatusMasterRead : AxiStreamMasterType;
    signal axisStatusSlaveRead  : AxiStreamSlaveType;
 
+   -------------------------------------------------------------------------------------------------
+   -- Read side constants and signals
+   -------------------------------------------------------------------------------------------------
+   constant READ_AXIS_CONFIG_C : AxiStreamConfigType := (
+      TSTRB_EN_C    => false,
+      TDATA_BYTES_C => AXI_CONFIG_G.DATA_BYTES_C,
+      TDEST_BITS_C  => log2(STREAMS_C),
+      TID_BITS_C    => 0,
+      TKEEP_MODE_C  => TKEEP_COMP_C,
+      TUSER_BITS_C  => 2,
+      TUSER_MODE_C  => TUSER_FIRST_LAST_C);
+   
    -- Data readout stream
    signal readDmaDataMaster : AxiStreamMasterType;
    signal readDmaDataSlave  : AxiStreamSlaveType;
    signal readDmaDataCtrl   : AxiStreamCtrlType;
+
+   -------------------------------------------------------------------------------------------------
+   -- AXI-Lite local bus
+   -------------------------------------------------------------------------------------------------
 
    -- Read Dma AxiLite bus
    signal mAxilReadMaster  : AxiLiteReadMasterType;
@@ -144,7 +163,7 @@ begin
             FIFO_FIXED_THRESH_G => true,
             FIFO_PAUSE_THRESH_G => 1,                       --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
             SLAVE_AXI_CONFIG_G  => WAVEFORM_AXIS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => INTERNAL_AXIS_CONFIG_C)  -- 128-bit
+            MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)  -- 128-bit
          port map (
             sAxisClk    => axiClk,
             sAxisRst    => axiRst,
@@ -189,8 +208,8 @@ begin
          FIFO_ADDR_WIDTH_G   => 9,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 2**9-32,
-         SLAVE_AXI_CONFIG_G  => INTERNAL_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => INTERNAL_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => WRITE_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)
       port map (
          sAxisClk    => axiClk,
          sAxisRst    => axiRst,
@@ -211,7 +230,7 @@ begin
          BURST_SIZE_BYTES_G   => 4096,
          TRIGGER_USER_BIT_G   => WAVEFORM_TRIGGER_BIT_C,
          AXIL_BASE_ADDR_G     => AXIL_BASE_ADDR_G,
-         DATA_AXIS_CONFIG_G   => INTERNAL_AXIS_CONFIG_C,
+         DATA_AXIS_CONFIG_G   => WRITE_AXIS_CONFIG_C,
          STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 4),
          AXI_WRITE_CONFIG_G   => AXI_CONFIG_G)
       port map (
@@ -274,8 +293,8 @@ begin
          BURST_SIZE_BYTES_G    => 4096,
          SSI_OUTPUT_G          => true,
          AXIL_BASE_ADDR_G      => AXIL_BASE_ADDR_G,
-         AXI_STREAM_READY_EN_G => false,
-         AXI_STREAM_CONFIG_G   => INTERNAL_AXIS_CONFIG_C,
+         AXI_STREAM_READY_EN_G => true,
+         AXI_STREAM_CONFIG_G   => READ_AXIS_CONFIG_C,
          AXI_READ_CONFIG_G     => AXI_CONFIG_G)
       port map (
          axilClk         => axilClk,               -- [in]
@@ -302,17 +321,17 @@ begin
    AxiStreamFifo_RD_DATA : entity work.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
-         SLAVE_READY_EN_G    => false,
+         SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => true,
+         BRAM_EN_G           => false,
          XIL_DEVICE_G        => "ULTRASCALE",
          USE_BUILT_IN_G      => false,
          GEN_SYNC_FIFO_G     => false,
          CASCADE_SIZE_G      => 1,
-         FIFO_ADDR_WIDTH_G   => 12,
+         FIFO_ADDR_WIDTH_G   => 4,
          FIFO_FIXED_THRESH_G => true,
-         FIFO_PAUSE_THRESH_G => 2**12-512,
-         SLAVE_AXI_CONFIG_G  => INTERNAL_AXIS_CONFIG_C,
+         FIFO_PAUSE_THRESH_G => 15,
+         SLAVE_AXI_CONFIG_G  => READ_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
          sAxisClk    => axiClk,
