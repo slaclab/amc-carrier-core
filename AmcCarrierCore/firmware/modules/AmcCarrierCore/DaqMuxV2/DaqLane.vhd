@@ -4,7 +4,7 @@
 -- File       : DaqLane.vhd
 -- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2014-04-02
+-- Created    : 2015-04-02
 -- Last update: 2015-11-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
@@ -75,9 +75,9 @@ entity DaqLane is
       freeze_i     : in sl:='0';          -- Must be 1 c-c pulse
       averaging_i  : in sl:='0';          -- Enable decination averaging
       dec16or32_i  : in sl:='0';          -- Data format
-      timeStamp_i  : in slv(63 downto 0); 
-      headerEn_i   : in sl:='0';          -- Additional/external header byte
-      header_i     : in slv(7 downto 0):=x"00";
+      timeStamp_i  : in slv(63 downto 0); -- Connected from timing system
+      headerEn_i   : in sl:='0';          
+      header_i     : in slv(7 downto 0):=x"00";-- Additional/external header byte
       
       -- Mode of DAQ - '0'  - until packet size and needs trigger (used in new interface)
       --             - '1'  - sends the 4k frames continuously no trigger(used in new interface)
