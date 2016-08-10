@@ -152,7 +152,7 @@ DaqMux: &DaqMuxV2
       name: DecimationRateDiv
       sizeBits: 16
       mode: RW
-      description: "Averaging Enabled: (powers of two) 1,2,4,8,16,etc (max 2^12). Averaging Disabled (32-bit): 1,2,3,4,etc (max 2^16-1). Averaging Disabled (16-bit): 1,2,4,6,8,etc (max 2^16-1)."
+      description: "Averaging Enabled: (powers of two) 1,2,4,8,16,etc (max 2^10). Averaging Disabled (32-bit): 1,2,3,4,etc (max 2^16-1). Averaging Disabled (16-bit): 1,2,4,6,8,etc (max 2^16-1)."
     #########################################################
     - offset: 0x00C
       name: DataBufferSize
