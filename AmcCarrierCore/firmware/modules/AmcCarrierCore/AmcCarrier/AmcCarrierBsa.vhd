@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-07-15
+-- Last update: 2016-08-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -67,6 +67,8 @@ entity AmcCarrierBsa is
       diagnosticBus   : in  DiagnosticBusType;
 
       -- Waveform interface
+      waveformClk          : in  sl;
+      waveformRst          : in  sl;
       obAppWaveformMasters : in  WaveformMasterArrayType;
       obAppWaveformSlaves  : out WaveformSlaveArrayType);
 
@@ -213,6 +215,8 @@ begin
             AXIL_BASE_ADDR_G => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_0_AXIL_C).baseAddr,
             AXI_CONFIG_G     => WAVEFORM_AXI_CONFIG_C)
          port map (
+            waveformClk       => waveformClk,
+            waveformRst       => waveformRst,
             ibWaveformMasters => obAppWaveformMasters(0),                         -- [in]
             ibWaveformSlaves  => obAppWaveformSlaves(0),                          -- [out]
             axilClk           => axilClk,                                         -- [in]
@@ -242,6 +246,8 @@ begin
             AXIL_BASE_ADDR_G => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_1_AXIL_C).baseAddr,
             AXI_CONFIG_G     => WAVEFORM_AXI_CONFIG_C)
          port map (
+            waveformClk       => waveformClk,
+            waveformRst       => waveformRst,
             ibWaveformMasters => obAppWaveformMasters(1),                 -- [in]
             ibWaveformSlaves  => obAppWaveformSlaves(1),                  -- [out]
             axilClk           => axilClk,                                 -- [in]

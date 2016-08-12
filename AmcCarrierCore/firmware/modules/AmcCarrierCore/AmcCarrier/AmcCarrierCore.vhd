@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-07-18
+-- Last update: 2016-08-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -68,10 +68,10 @@ entity AmcCarrierCore is
       --  Waveform interface (waveformClk domain)
       waveformClk          : out sl;
       waveformRst          : out sl;
-      obAppWaveformMasters : in  WaveformMasterArrayType := WAVEFORM_MASTER_ARRAY_INIT_C;
+      obAppWaveformMasters : in  WaveformMasterArrayType          := WAVEFORM_MASTER_ARRAY_INIT_C;
       obAppWaveformSlaves  : out WaveformSlaveArrayType;
       ibAppWaveformMasters : out WaveformMasterArrayType;
-      ibAppWaveformSlaves  : in  WaveformSlaveArrayType := WAVEFORM_SLAVE_ARRAY_INIT_C;
+      ibAppWaveformSlaves  : in  WaveformSlaveArrayType           := WAVEFORM_SLAVE_ARRAY_INIT_C;
       -- Backplane Messaging Interface (bpMsgClk domain)
       bpMsgClk             : in  sl                               := '0';
       bpMsgRst             : in  sl                               := '0';
@@ -244,6 +244,9 @@ architecture mapping of AmcCarrierCore is
    signal localAppId : slv(15 downto 0);
    signal ethLinkUp  : sl;
 
+   signal waveformClkInt : sl;
+   signal waveformRstInt : sl;
+
 begin
 
    localIp  <= bsiIp;
@@ -254,9 +257,10 @@ begin
    enAuxPwrL <= '0' when(FSBL_G = false) else '1';
 
    -- Send axiClk to application as ddrClk
-   waveformClk <= axiClk;
-   waveformRst <= axiRst;
-
+   waveformClkInt <= axiClk;
+   waveformRstInt <= axiRst;
+   waveformClk    <= waveformClkInt;
+   waveformRst    <= waveformRstInt;
 
    --------------------------------
    -- Common Clock and Reset Module
@@ -522,6 +526,8 @@ begin
          diagnosticRst        => diagnosticRst,
          diagnosticBus        => diagnosticBus,
          -- Waveform interface (axiClk domain)
+         waveformClk          => waveformClkInt,
+         waveformRst          => waveformRstInt,
          obAppWaveformMasters => obAppWaveformMasters,
          obAppWaveformSlaves  => obAppWaveformSlaves);
 
