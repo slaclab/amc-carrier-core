@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-08-09
+-- Last update: 2016-08-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -39,6 +39,8 @@ entity BsaWaveformEngine is
       );
    port (
       -- Diagnostic data interface
+      waveformClk : in sl;
+      waveformRst : in sl;
       ibWaveformMasters : in  WaveformMasterType;
       ibWaveformSlaves  : out WaveformSlaveType;
       -- AXI-Lite configuration interface
@@ -86,7 +88,7 @@ architecture rtl of BsaWaveformEngine is
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 3,
-      TUSER_MODE_C  => TUSER_FIRST_LAST_C);
+      TUSER_MODE_C  => TUSER_LAST_C);
 
    constant WRITE_AXIS_MASTER_INIT_C : AxiStreamMasterType := axiStreamMasterInit(WRITE_AXIS_CONFIG_C);
 
@@ -120,7 +122,7 @@ architecture rtl of BsaWaveformEngine is
       TDATA_BYTES_C => AXI_CONFIG_G.DATA_BYTES_C,
       TDEST_BITS_C  => log2(STREAMS_C),
       TID_BITS_C    => 0,
-      TKEEP_MODE_C  => TKEEP_COMP_C,
+      TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 2,
       TUSER_MODE_C  => TUSER_FIRST_LAST_C);
    
@@ -157,7 +159,7 @@ begin
             BRAM_EN_G           => true,
             XIL_DEVICE_G        => "ULTRASCALE",
             USE_BUILT_IN_G      => false,
-            GEN_SYNC_FIFO_G     => true,
+            GEN_SYNC_FIFO_G     => false,
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 9,
             FIFO_FIXED_THRESH_G => true,
@@ -165,8 +167,8 @@ begin
             SLAVE_AXI_CONFIG_G  => WAVEFORM_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)  -- 128-bit
          port map (
-            sAxisClk    => axiClk,
-            sAxisRst    => axiRst,
+            sAxisClk    => waveformClk,
+            sAxisRst    => waveformRst,
             sAxisMaster => ibWaveformMasters(i),
             sAxisSlave  => ibWaveformSlaves(i).slave,
             sAxisCtrl   => open,
