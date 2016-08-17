@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-04-14
--- Last update: 2016-06-23
+-- Last update: 2016-08-17
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -326,13 +326,11 @@ begin
          CLIENT_SIZE_G      => CLIENT_SIZE_C,
          CLIENT_PORTS_G     => ClientPorts,
          CLIENT_MTU_G       => MTU_C,
+         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          -- IPv4/ARP Generics
          CLK_FREQ_G         => AXI_CLK_FREQ_C,  -- In units of Hz
-         COMM_TIMEOUT_EN_G  => true,    -- Disable the timeout by setting to false
          COMM_TIMEOUT_G     => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
-         ARP_TIMEOUT_G      => 156250000,       -- 1 second ARP request timeout
-         VLAN_G             => false,   -- no VLAN
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)            
+         VLAN_G             => false)   -- no VLAN
       port map (
          -- Local Configurations
          localMac        => localMac,

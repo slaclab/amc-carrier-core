@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-07-15
+-- Last update: 2016-08-17
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -72,10 +72,10 @@ entity AmcCarrierEth is
       bpMsgRst          : in  sl := '0';
       bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
       -- Application Debug Interface
-      obAppDebugMaster     : in  AxiStreamMasterType;
-      obAppDebugSlave      : out AxiStreamSlaveType;
-      ibAppDebugMaster     : out AxiStreamMasterType;
-      ibAppDebugSlave      : in  AxiStreamSlaveType;
+      obAppDebugMaster  : in  AxiStreamMasterType;
+      obAppDebugSlave   : out AxiStreamSlaveType;
+      ibAppDebugMaster  : out AxiStreamMasterType;
+      ibAppDebugSlave   : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
       ----------------   
@@ -273,13 +273,11 @@ begin
          CLIENT_SIZE_G      => CLIENT_SIZE_C,
          CLIENT_PORTS_G     => ClientPorts,
          CLIENT_MTU_G       => MTU_C,
+         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          -- IPv4/ARP Generics
          CLK_FREQ_G         => AXI_CLK_FREQ_C,  -- In units of Hz
-         COMM_TIMEOUT_EN_G  => true,    -- Disable the timeout by setting to false
          COMM_TIMEOUT_G     => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
-         ARP_TIMEOUT_G      => 156250000,       -- 1 second ARP request timeout
-         VLAN_G             => false,   -- no VLAN
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)            
+         VLAN_G             => false)   -- no VLAN       
       port map (
          -- Local Configurations
          localMac        => localMac,
@@ -341,39 +339,39 @@ begin
    -----------------------------------------------
    -- Software's RSSI Server Interface@[8194:8193]
    -----------------------------------------------
-      U_RssiServer : entity work.AmcCarrierEthRssi
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G  => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr) 
-         port map (
-            -- Slave AXI-Lite Interface
-            axilClk          => axilClk,
-            axilRst          => axilRst,
-            axilReadMaster   => axilReadMasters(RSSI_INDEX_C),
-            axilReadSlave    => axilReadSlaves(RSSI_INDEX_C),
-            axilWriteMaster  => axilWriteMasters(RSSI_INDEX_C),
-            axilWriteSlave   => axilWriteSlaves(RSSI_INDEX_C),
-            -- Master AXI-Lite Interface
-            mAxilReadMaster  => mAxilReadMasters(1),
-            mAxilReadSlave   => mAxilReadSlaves(1),
-            mAxilWriteMaster => mAxilWriteMasters(1),
-            mAxilWriteSlave  => mAxilWriteSlaves(1),
-            -- Application Debug Interface
-            obAppDebugMaster    => obAppDebugMaster,
-            obAppDebugSlave     => obAppDebugSlave,
-            ibAppDebugMaster    => ibAppDebugMaster,
-            ibAppDebugSlave     => ibAppDebugSlave,
-            -- BSA Ethernet Interface
-            obBsaMasters     => obBsaMasters,
-            obBsaSlaves      => obBsaSlaves,
-            ibBsaMasters     => ibBsaMasters,
-            ibBsaSlaves      => ibBsaSlaves,
-            -- Interface to UDP Server engines
-            obServerMasters  => obServerMasters(2 downto 1),
-            obServerSlaves   => obServerSlaves(2 downto 1),
-            ibServerMasters  => ibServerMasters(2 downto 1),
-            ibServerSlaves   => ibServerSlaves(2 downto 1));   
+   U_RssiServer : entity work.AmcCarrierEthRssi
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr) 
+      port map (
+         -- Slave AXI-Lite Interface
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMaster   => axilReadMasters(RSSI_INDEX_C),
+         axilReadSlave    => axilReadSlaves(RSSI_INDEX_C),
+         axilWriteMaster  => axilWriteMasters(RSSI_INDEX_C),
+         axilWriteSlave   => axilWriteSlaves(RSSI_INDEX_C),
+         -- Master AXI-Lite Interface
+         mAxilReadMaster  => mAxilReadMasters(1),
+         mAxilReadSlave   => mAxilReadSlaves(1),
+         mAxilWriteMaster => mAxilWriteMasters(1),
+         mAxilWriteSlave  => mAxilWriteSlaves(1),
+         -- Application Debug Interface
+         obAppDebugMaster => obAppDebugMaster,
+         obAppDebugSlave  => obAppDebugSlave,
+         ibAppDebugMaster => ibAppDebugMaster,
+         ibAppDebugSlave  => ibAppDebugSlave,
+         -- BSA Ethernet Interface
+         obBsaMasters     => obBsaMasters,
+         obBsaSlaves      => obBsaSlaves,
+         ibBsaMasters     => ibBsaMasters,
+         ibBsaSlaves      => ibBsaSlaves,
+         -- Interface to UDP Server engines
+         obServerMasters  => obServerMasters(2 downto 1),
+         obServerSlaves   => obServerSlaves(2 downto 1),
+         ibServerMasters  => ibServerMasters(2 downto 1),
+         ibServerSlaves   => ibServerSlaves(2 downto 1));   
 
    -----------------------------------
    -- BP Messenger Network@[8198:8195]
