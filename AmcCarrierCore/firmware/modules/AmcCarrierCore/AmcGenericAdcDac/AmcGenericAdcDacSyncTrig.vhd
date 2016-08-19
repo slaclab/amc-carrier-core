@@ -88,7 +88,7 @@ begin
          ----------------------------------------------------------------------
          when LOG_S =>
             -- Set the flag
-            v.debugLogEn := '1';
+            v.debugLogEn := valid;
             -- Check for timeout
             if r.cnt = TIMEOUT_C then
                -- Next state
