@@ -114,7 +114,7 @@ begin
       rin <= v;
 
       -- Outputs
-      debugLogEn  <= r.debugLogEn;
+      debugLogEn  <= v.debugLogEn;
       debugLogClr <= softClear;
       
    end process comb;
