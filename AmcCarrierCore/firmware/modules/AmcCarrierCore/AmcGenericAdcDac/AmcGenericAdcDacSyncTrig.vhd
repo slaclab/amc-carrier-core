@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-19
--- Last update: 2016-02-26
+-- Last update: 2016-08-19
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -32,6 +32,7 @@ entity AmcGenericAdcDacSyncTrig is
       TPD_G                    : time                   := 1 ns;
       RING_BUFFER_ADDR_WIDTH_G : positive range 1 to 14 := 10);
    port (
+      valid       : in  sl := '1';
       clk         : in  sl;
       rst         : in  sl;
       softTrig    : in  sl;
@@ -69,7 +70,7 @@ architecture rtl of AmcGenericAdcDacSyncTrig is
    
 begin
 
-   comb : process (debugTrig, r, rst, softClear, softTrig) is
+   comb : process (debugTrig, r, rst, softClear, softTrig, valid) is
       variable v : regType;
    begin
       -- Latch the current value
@@ -92,7 +93,7 @@ begin
             if r.cnt = TIMEOUT_C then
                -- Next state
                v.state := DONE_S;
-            else
+            elsif valid = '1' then
                -- Increment the counter
                v.cnt := r.cnt + 1;
             end if;
