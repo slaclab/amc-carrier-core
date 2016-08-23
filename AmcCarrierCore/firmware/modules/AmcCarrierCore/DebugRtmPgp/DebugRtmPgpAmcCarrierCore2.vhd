@@ -493,7 +493,9 @@ begin
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
          diagnosticBus        => diagnosticBus,
-         -- Waveform interface (axiClk domain)
+      -- Waveform interface
+         waveformClk          => axiClk,
+         waveformRst          => axiRst,
          obAppWaveformMasters => obAppWaveformMasters,
          obAppWaveformSlaves  => obAppWaveformSlaves);
 

@@ -4,7 +4,7 @@
 -- File       : DebugRtmEth.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-04-14
+-- Created    : 2015-09-21
 -- Last update: 2016-08-17
 -- Platform   : 
 -- Standard   : VHDL'93/02
@@ -37,14 +37,13 @@ use work.AmcCarrierRegPkg.all;
 entity DebugRtmEth is
    generic (
       TPD_G            : time            := 1 ns;
-      ETH_10G_G        : boolean         := false;  -- false = 1 GigE, true = 10 GigE
-      EN_SW_RSSI_G     : boolean         := true;
       EN_BP_MSG_G      : boolean         := false;
+      ETH_10G_G        : boolean         := false;  -- false = 1 GigE, true = 10 GigE
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration and status
-      localMac          : in  slv(47 downto 0);     --  big-Endian configuration
-      localIp           : in  slv(31 downto 0);     --  big-Endian configuration   
+      localMac          : in  slv(47 downto 0);  --  big-Endian configuration
+      localIp           : in  slv(31 downto 0);  --  big-Endian configuration   
       ethPhyReady       : out sl;
       -- Master AXI-Lite Interface
       mAxilReadMasters  : out AxiLiteReadMasterArray(1 downto 0);
@@ -66,24 +65,24 @@ entity DebugRtmEth is
       -- Backplane Messaging Interface
       bpMsgMasters      : in  AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
       bpMsgSlaves       : out AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
+      ----------------------
+      -- Top Level Interface
+      ----------------------
+      -- Backplane Messaging Interface (bpMsgClk domain)
+      bpMsgClk          : in  sl := '0';
+      bpMsgRst          : in  sl := '0';
+      bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      -- Application Debug Interface
+      obAppDebugMaster  : in  AxiStreamMasterType;
+      obAppDebugSlave   : out AxiStreamSlaveType;
+      ibAppDebugMaster  : out AxiStreamMasterType;
+      ibAppDebugSlave   : in  AxiStreamSlaveType;
       -- Transceiver Debug Interface
       gtTxPreCursor     : in  slv(4 downto 0)     := "00000";
       gtTxPostCursor    : in  slv(4 downto 0)     := "00000";
       gtTxDiffCtrl      : in  slv(3 downto 0)     := "1111";
       gtRxPolarity      : in  sl                  := '0';
       gtTxPolarity      : in  sl                  := '0';
-      ----------------------
-      -- Top Level Interface
-      ----------------------
-      -- Backplane Messaging Interface (bpMsgClk domain)
-      bpMsgClk          : in  sl                  := '0';
-      bpMsgRst          : in  sl                  := '0';
-      bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
-      -- Application Debug Interface
-      obDebugMaster     : in  AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
-      obDebugSlave      : out AxiStreamSlaveType;
-      ibDebugMaster     : out AxiStreamMasterType;
-      ibDebugSlave      : in  AxiStreamSlaveType  := AXI_STREAM_SLAVE_FORCE_C;
       ----------------
       -- Core Ports --
       ----------------   
@@ -130,7 +129,7 @@ architecture mapping of DebugRtmEth is
       BP_MSG_INDEX_C  => (
          baseAddr     => BP_MSG_ADDR_C,
          addrBits     => 16,
-         connectivity => X"FFFF"));      
+         connectivity => X"FFFF"));   
 
    function ServerPorts return PositiveArray is
       variable retConf   : PositiveArray(SERVER_SIZE_C-1 downto 0);
@@ -200,7 +199,7 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   -----------------
+    -----------------
    -- 10 GigE Module
    -----------------
    GEN_10GigE : if (ETH_10G_G = true) generate
@@ -295,13 +294,14 @@ begin
             gtRxN(0)               => ethRxN);          
    end generate;
 
+
    U_Sync : entity work.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
          clk     => axilClk,
          dataIn  => phyReady,
-         dataOut => ethPhyReady);         
+         dataOut => ethPhyReady);    
 
    ----------------------
    -- IPv4/ARP/UDP Engine
@@ -330,7 +330,7 @@ begin
          -- IPv4/ARP Generics
          CLK_FREQ_G         => AXI_CLK_FREQ_C,  -- In units of Hz
          COMM_TIMEOUT_G     => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
-         VLAN_G             => false)   -- no VLAN
+         VLAN_G             => false)   -- no VLAN       
       port map (
          -- Local Configurations
          localMac        => localMac,
@@ -392,66 +392,39 @@ begin
    -----------------------------------------------
    -- Software's RSSI Server Interface@[8194:8193]
    -----------------------------------------------
-   GEN_SW_RSSI : if (EN_SW_RSSI_G = true) generate
-      U_RssiServer : entity work.AmcCarrierEthRssi
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G  => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr) 
-         port map (
-            -- Slave AXI-Lite Interface
-            axilClk          => axilClk,
-            axilRst          => axilRst,
-            axilReadMaster   => axilReadMasters(RSSI_INDEX_C),
-            axilReadSlave    => axilReadSlaves(RSSI_INDEX_C),
-            axilWriteMaster  => axilWriteMasters(RSSI_INDEX_C),
-            axilWriteSlave   => axilWriteSlaves(RSSI_INDEX_C),
-            -- Master AXI-Lite Interface
-            mAxilReadMaster  => mAxilReadMasters(1),
-            mAxilReadSlave   => mAxilReadSlaves(1),
-            mAxilWriteMaster => mAxilWriteMasters(1),
-            mAxilWriteSlave  => mAxilWriteSlaves(1),
-            -- Application Debug Interface
-            obDebugMaster    => obDebugMaster,
-            obDebugSlave     => obDebugSlave,
-            ibDebugMaster    => ibDebugMaster,
-            ibDebugSlave     => ibDebugSlave,
-            -- BSA Ethernet Interface
-            obBsaMasters     => obBsaMasters,
-            obBsaSlaves      => obBsaSlaves,
-            ibBsaMasters     => ibBsaMasters,
-            ibBsaSlaves      => ibBsaSlaves,
-            -- Interface to UDP Server engines
-            obServerMasters  => obServerMasters(2 downto 1),
-            obServerSlaves   => obServerSlaves(2 downto 1),
-            ibServerMasters  => ibServerMasters(2 downto 1),
-            ibServerSlaves   => ibServerSlaves(2 downto 1));   
-   end generate;
-
-   BYPASS_SW_RSSI : if (EN_SW_RSSI_G = false) generate
-      
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- Don't respond with error
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(RSSI_INDEX_C),
-            axiReadSlave   => axilReadSlaves(RSSI_INDEX_C),
-            axiWriteMaster => axilWriteMasters(RSSI_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(RSSI_INDEX_C));  
-
-      mAxilReadMasters(1)         <= AXI_LITE_READ_MASTER_INIT_C;
-      mAxilWriteMasters(1)        <= AXI_LITE_WRITE_MASTER_INIT_C;
-      obDebugSlave                <= AXI_STREAM_SLAVE_FORCE_C;
-      ibDebugMaster               <= AXI_STREAM_MASTER_INIT_C;
-      obBsaSlaves                 <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibBsaMasters                <= (others => AXI_STREAM_MASTER_INIT_C);
-      obServerSlaves(2 downto 1)  <= (others => AXI_STREAM_SLAVE_FORCE_C);
-      ibServerMasters(2 downto 1) <= (others => AXI_STREAM_MASTER_INIT_C);
-      
-   end generate;
+   U_RssiServer : entity work.AmcCarrierEthRssi
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr) 
+      port map (
+         -- Slave AXI-Lite Interface
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMaster   => axilReadMasters(RSSI_INDEX_C),
+         axilReadSlave    => axilReadSlaves(RSSI_INDEX_C),
+         axilWriteMaster  => axilWriteMasters(RSSI_INDEX_C),
+         axilWriteSlave   => axilWriteSlaves(RSSI_INDEX_C),
+         -- Master AXI-Lite Interface
+         mAxilReadMaster  => mAxilReadMasters(1),
+         mAxilReadSlave   => mAxilReadSlaves(1),
+         mAxilWriteMaster => mAxilWriteMasters(1),
+         mAxilWriteSlave  => mAxilWriteSlaves(1),
+         -- Application Debug Interface
+         obAppDebugMaster => obAppDebugMaster,
+         obAppDebugSlave  => obAppDebugSlave,
+         ibAppDebugMaster => ibAppDebugMaster,
+         ibAppDebugSlave  => ibAppDebugSlave,
+         -- BSA Ethernet Interface
+         obBsaMasters     => obBsaMasters,
+         obBsaSlaves      => obBsaSlaves,
+         ibBsaMasters     => ibBsaMasters,
+         ibBsaSlaves      => ibBsaSlaves,
+         -- Interface to UDP Server engines
+         obServerMasters  => obServerMasters(2 downto 1),
+         obServerSlaves   => obServerSlaves(2 downto 1),
+         ibServerMasters  => ibServerMasters(2 downto 1),
+         ibServerSlaves   => ibServerSlaves(2 downto 1));   
 
    -----------------------------------
    -- BP Messenger Network@[8198:8195]

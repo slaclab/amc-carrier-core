@@ -4,8 +4,8 @@
 -- File       : DebugRtmEthAmcCarrierCore.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-04-14
--- Last update: 2016-06-23
+-- Created    : 2015-07-08
+-- Last update: 2016-08-08
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -36,90 +36,86 @@ use unisim.vcomponents.all;
 
 entity DebugRtmEthAmcCarrierCore is
    generic (
-      TPD_G                    : time                 := 1 ns;   -- Simulation only parameter
-      SIM_SPEEDUP_G            : boolean              := false;  -- Simulation only parameter
-      ETH_10G_G                : boolean              := false;  -- false = 1 GigE, true = 10 GigE
-      TIMING_MODE_G            : boolean              := TIMING_MODE_186MHZ_C;
-      MPS_SLOT_G               : boolean              := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
-      FSBL_G                   : boolean              := false;  -- false = Normal Operation, true = First Stage Boot loader
-      APP_TYPE_G               : AppType              := APP_NULL_TYPE_C;
-      EN_SW_RSSI_G             : boolean              := true;
-      EN_BP_MSG_G              : boolean              := false;
-      OVERRIDE_BSI_G           : boolean              := false;  -- false = Normal Operation, true = use IP_ADDR, MAC_ADDR generics
-      IP_ADDR_G                : slv(31 downto 0)     := x"0A02A8C0";
-      MAC_ADDR_G               : slv(47 downto 0)     := x"010300564400";
-      DIAGNOSTIC_RAW_STREAMS_G : positive             := 1;
-      DIAGNOSTIC_RAW_CONFIGS_G : AxiStreamConfigArray := (0 => ssiAxiStreamConfig(4)));  -- Must be same size as DIAGNOSTIC_RAW_STREAMS_G
+      TPD_G         : time    := 1 ns;  -- Simulation only parameter
+      SIM_SPEEDUP_G : boolean := false;  -- Simulation only parameter
+      ETH_10G_G     : boolean := false;  -- false = 1 GigE, true = 10 GigE
+      MPS_SLOT_G    : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
+      FSBL_G        : boolean := false;  -- false = Normal Operation, true = First Stage Boot loader
+      APP_TYPE_G    : AppType := APP_NULL_TYPE_C;
+      EN_BP_MSG_G   : boolean := false);
    port (
       ----------------------
-      -- Top Level Interface
+      -- Core Ports to Application
       ----------------------
       -- AXI-Lite Interface (regClk domain)
       -- Address Range = [0x80000000:0xFFFFFFFF]
-      regClk               : in    sl;
-      regRst               : in    sl;
-      regReadMaster        : out   AxiLiteReadMasterType;
-      regReadSlave         : in    AxiLiteReadSlaveType;
-      regWriteMaster       : out   AxiLiteWriteMasterType;
-      regWriteSlave        : in    AxiLiteWriteSlaveType;
+      regClk               : in  sl;
+      regRst               : in  sl;
+      regReadMaster        : out AxiLiteReadMasterType;
+      regReadSlave         : in  AxiLiteReadSlaveType;
+      regWriteMaster       : out AxiLiteWriteMasterType;
+      regWriteSlave        : in  AxiLiteWriteSlaveType;
       -- Timing Interface (timingClk domain) 
-      timingClk            : in    sl;
-      timingRst            : in    sl;
-      timingBus            : out   TimingBusType;
-      timingPhy            : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
-      timingPhyClk         : out   sl;
-      timingPhyRst         : out   sl;
+      timingClk            : in  sl;
+      timingRst            : in  sl;
+      timingBus            : out TimingBusType;
+      timingPhy            : in  TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
+      timingPhyClk         : out sl;
+      timingPhyRst         : out sl;
       -- Diagnostic Interface (diagnosticClk domain)
-      diagnosticClk        : in    sl;
-      diagnosticRst        : in    sl;
-      diagnosticBus        : in    DiagnosticBusType;
-      -- Raw Diagnostic Interface (diagnosticRawClks domains)
-      diagnosticRawClks    : in    slv(DIAGNOSTIC_RAW_STREAMS_G -1 downto 0);
-      diagnosticRawRsts    : in    slv(DIAGNOSTIC_RAW_STREAMS_G -1 downto 0);
-      diagnosticRawMasters : in    AxiStreamMasterArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      diagnosticRawSlaves  : out   AxiStreamSlaveArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
-      diagnosticRawCtrl    : out   AxiStreamCtrlArray(DIAGNOSTIC_RAW_STREAMS_G-1 downto 0);
+      diagnosticClk        : in  sl;
+      diagnosticRst        : in  sl;
+      diagnosticBus        : in  DiagnosticBusType;
+      --  Waveform interface (waveformClk domain)
+      waveformClk          : out sl;
+      waveformRst          : out sl;
+      obAppWaveformMasters : in  WaveformMasterArrayType          := WAVEFORM_MASTER_ARRAY_INIT_C;
+      obAppWaveformSlaves  : out WaveformSlaveArrayType;
+      ibAppWaveformMasters : out WaveformMasterArrayType;
+      ibAppWaveformSlaves  : in  WaveformSlaveArrayType           := WAVEFORM_SLAVE_ARRAY_INIT_C;
       -- Backplane Messaging Interface (bpMsgClk domain)
-      bpMsgClk             : in    sl                               := '0';
-      bpMsgRst             : in    sl                               := '0';
-      bpMsgBus             : out   BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
-      -- Application Debug Interface
-      obDebugMaster        : in    AxiStreamMasterType              := AXI_STREAM_MASTER_INIT_C;
-      obDebugSlave         : out   AxiStreamSlaveType;
-      ibDebugMaster        : out   AxiStreamMasterType;
-      ibDebugSlave         : in    AxiStreamSlaveType               := AXI_STREAM_SLAVE_FORCE_C;
+      bpMsgClk             : in  sl                               := '0';
+      bpMsgRst             : in  sl                               := '0';
+      bpMsgBus             : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      -- Application Debug Interface (ref156MHzClk domain)
+      obAppDebugMaster     : in  AxiStreamMasterType              := AXI_STREAM_MASTER_INIT_C;
+      obAppDebugSlave      : out AxiStreamSlaveType;
+      ibAppDebugMaster     : out AxiStreamMasterType;
+      ibAppDebugSlave      : in  AxiStreamSlaveType               := AXI_STREAM_SLAVE_FORCE_C;
       -- BSI Interface (bsiClk domain) 
-      bsiClk               : in    sl                               := '0';
-      bsiRst               : in    sl                               := '0';
-      bsiBus               : out   BsiBusType;
+      bsiClk               : in  sl                               := '0';
+      bsiRst               : in  sl                               := '0';
+      bsiBus               : out BsiBusType;
       -- MPS Concentrator Interface (ref156MHzClk domain)
-      mpsObMasters         : out   AxiStreamMasterArray(14 downto 0);
-      mpsObSlaves          : in    AxiStreamSlaveArray(14 downto 0) := (others => AXI_STREAM_SLAVE_FORCE_C);
+      mpsObMasters         : out AxiStreamMasterArray(14 downto 0);
+      mpsObSlaves          : in  AxiStreamSlaveArray(14 downto 0) := (others => AXI_STREAM_SLAVE_FORCE_C);
       -- Reference Clocks and Resets
-      recTimingClk         : out   sl;
-      recTimingRst         : out   sl;
-      ref125MHzClk         : out   sl;
-      ref125MHzRst         : out   sl;
-      ref156MHzClk         : out   sl;
-      ref156MHzRst         : out   sl;
-      ref312MHzClk         : out   sl;
-      ref312MHzRst         : out   sl;
-      ref625MHzClk         : out   sl;
-      ref625MHzRst         : out   sl;
-      gthFabClk            : out   sl;
-      ethPhyReady          : out   sl;
+      recTimingClk         : out sl;
+      recTimingRst         : out sl;
+      ref125MHzClk         : out sl;
+      ref125MHzRst         : out sl;
+      ref156MHzClk         : out sl;
+      ref156MHzRst         : out sl;
+      ref312MHzClk         : out sl;
+      ref312MHzRst         : out sl;
+      ref625MHzClk         : out sl;
+      ref625MHzRst         : out sl;
+
+      gthFabClk        : out   sl;
+      ethPhyReady      : out   sl;
+      ----------------
+      --  Top Level Interface to IO
+      ----------------
+      -- Common Fabricate Clock
+      fabClkP          : in    sl;
+      fabClkN          : in    sl;
+      
       -- Transceiver Debug Interface
       gtTxPreCursor        : in    slv(4 downto 0)                  := "00000";
       gtTxPostCursor       : in    slv(4 downto 0)                  := "00000";
       gtTxDiffCtrl         : in    slv(3 downto 0)                  := "1111";
       gtRxPolarity         : in    sl                               := '0';
       gtTxPolarity         : in    sl                               := '0';
-      ----------------
-      -- Core Ports --
-      ----------------
-      -- Common Fabricate Clock
-      fabClkP              : in    sl;
-      fabClkN              : in    sl;
       -- RTM Ethernet Ports
       ethRxP               : in    sl;
       ethRxN               : in    sl;
@@ -128,63 +124,63 @@ entity DebugRtmEthAmcCarrierCore is
       xauiClkP             : in    sl;
       xauiClkN             : in    sl;
       -- Backplane MPS Ports
-      mpsClkIn             : in    sl;
-      mpsClkOut            : out   sl;
-      mpsBusRxP            : in    slv(14 downto 1);
-      mpsBusRxN            : in    slv(14 downto 1);
-      mpsTxP               : out   sl;
-      mpsTxN               : out   sl;
+      mpsClkIn         : in    sl;
+      mpsClkOut        : out   sl;
+      mpsBusRxP        : in    slv(14 downto 1);
+      mpsBusRxN        : in    slv(14 downto 1);
+      mpsTxP           : out   sl;
+      mpsTxN           : out   sl;
       -- LCLS Timing Ports
-      timingRxP            : in    sl;
-      timingRxN            : in    sl;
-      timingTxP            : out   sl;
-      timingTxN            : out   sl;
-      timingRefClkInP      : in    sl;
-      timingRefClkInN      : in    sl;
-      timingRecClkOutP     : out   sl;
-      timingRecClkOutN     : out   sl;
-      timingClkSel         : out   sl;
-      timingClkScl         : inout sl;
-      timingClkSda         : inout sl;
+      timingRxP        : in    sl;
+      timingRxN        : in    sl;
+      timingTxP        : out   sl;
+      timingTxN        : out   sl;
+      timingRefClkInP  : in    sl;
+      timingRefClkInN  : in    sl;
+      timingRecClkOutP : out   sl;
+      timingRecClkOutN : out   sl;
+      timingClkSel     : out   sl;
+      timingClkScl     : inout sl;
+      timingClkSda     : inout sl;
       -- Crossbar Ports
-      xBarSin              : out   slv(1 downto 0);
-      xBarSout             : out   slv(1 downto 0);
-      xBarConfig           : out   sl;
-      xBarLoad             : out   sl;
+      xBarSin          : out   slv(1 downto 0);
+      xBarSout         : out   slv(1 downto 0);
+      xBarConfig       : out   sl;
+      xBarLoad         : out   sl;
       -- Secondary AMC Auxiliary Power Enable Port
-      enAuxPwrL            : out   sl;
+      enAuxPwrL        : out   sl;
       -- IPMC Ports
-      ipmcScl              : inout sl;
-      ipmcSda              : inout sl;
+      ipmcScl          : inout sl;
+      ipmcSda          : inout sl;
       -- Configuration PROM Ports
-      calScl               : inout sl;
-      calSda               : inout sl;
+      calScl           : inout sl;
+      calSda           : inout sl;
       -- DDR3L SO-DIMM Ports
-      ddrClkP              : in    sl;
-      ddrClkN              : in    sl;
-      ddrDm                : out   slv(7 downto 0);
-      ddrDqsP              : inout slv(7 downto 0);
-      ddrDqsN              : inout slv(7 downto 0);
-      ddrDq                : inout slv(63 downto 0);
-      ddrA                 : out   slv(15 downto 0);
-      ddrBa                : out   slv(2 downto 0);
-      ddrCsL               : out   slv(1 downto 0);
-      ddrOdt               : out   slv(1 downto 0);
-      ddrCke               : out   slv(1 downto 0);
-      ddrCkP               : out   slv(1 downto 0);
-      ddrCkN               : out   slv(1 downto 0);
-      ddrWeL               : out   sl;
-      ddrRasL              : out   sl;
-      ddrCasL              : out   sl;
-      ddrRstL              : out   sl;
-      ddrAlertL            : in    sl;
-      ddrPg                : in    sl;
-      ddrPwrEnL            : out   sl;
-      ddrScl               : inout sl;
-      ddrSda               : inout sl;
+      ddrClkP          : in    sl;
+      ddrClkN          : in    sl;
+      ddrDm            : out   slv(7 downto 0);
+      ddrDqsP          : inout slv(7 downto 0);
+      ddrDqsN          : inout slv(7 downto 0);
+      ddrDq            : inout slv(63 downto 0);
+      ddrA             : out   slv(15 downto 0);
+      ddrBa            : out   slv(2 downto 0);
+      ddrCsL           : out   slv(1 downto 0);
+      ddrOdt           : out   slv(1 downto 0);
+      ddrCke           : out   slv(1 downto 0);
+      ddrCkP           : out   slv(1 downto 0);
+      ddrCkN           : out   slv(1 downto 0);
+      ddrWeL           : out   sl;
+      ddrRasL          : out   sl;
+      ddrCasL          : out   sl;
+      ddrRstL          : out   sl;
+      ddrAlertL        : in    sl;
+      ddrPg            : in    sl;
+      ddrPwrEnL        : out   sl;
+      ddrScl           : inout sl;
+      ddrSda           : inout sl;
       -- SYSMON Ports
-      vPIn                 : in    sl;
-      vNIn                 : in    sl);
+      vPIn             : in    sl;
+      vNIn             : in    sl);
 end DebugRtmEthAmcCarrierCore;
 
 architecture mapping of DebugRtmEthAmcCarrierCore is
@@ -212,10 +208,6 @@ architecture mapping of DebugRtmEthAmcCarrierCore is
    signal axiWriteSlave  : AxiWriteSlaveType;
    signal axiReadMaster  : AxiReadMasterType;
    signal axiReadSlave   : AxiReadSlaveType;
-
-   signal bsaTimingClk : sl;
-   signal bsaTimingRst : sl;
-   signal bsaTimingBus : TimingBusType;
 
    signal timingReadMaster  : AxiLiteReadMasterType;
    signal timingReadSlave   : AxiLiteReadSlaveType;
@@ -260,26 +252,23 @@ architecture mapping of DebugRtmEthAmcCarrierCore is
    signal localAppId : slv(15 downto 0);
    signal ethLinkUp  : sl;
 
+   signal waveformClkInt : sl;
+   signal waveformRstInt : sl;
+
 begin
 
-   assert (DIAGNOSTIC_RAW_STREAMS_G = DIAGNOSTIC_RAW_CONFIGS_G'length)
-      report "Length of DIAGNOSTIC_RAW_CONFIGS_G array (" & integer'image(DIAGNOSTIC_RAW_CONFIGS_G'length) &
-      ") must be the equal to DIAGNOSTIC_RAW_STREAMS_G (" & integer'image(DIAGNOSTIC_RAW_STREAMS_G) & ")"
-      severity error;
-
-   GEN_BSI_OVERRIDE : if OVERRIDE_BSI_G = true generate
-      localIp  <= IP_ADDR_G;
-      localMac <= MAC_ADDR_G;
-   end generate GEN_BSI_OVERRIDE;
-
-   GEN_NO_BSI_OVERRIDE : if OVERRIDE_BSI_G = false generate
-      localIp  <= bsiIp;
-      localMac <= bsiMac;
-   end generate GEN_NO_BSI_OVERRIDE;
+   localIp  <= bsiIp;
+   localMac <= bsiMac;
 
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
    -- Note: Install R1063 if you want the FPGA to control AUX power
    enAuxPwrL <= '0' when(FSBL_G = false) else '1';
+
+   -- Send axiClk to application as ddrClk
+   waveformClkInt <= axiClk;
+   waveformRstInt <= axiRst;
+   waveformClk    <= waveformClkInt;
+   waveformRst    <= waveformRstInt;
 
    --------------------------------
    -- Common Clock and Reset Module
@@ -327,9 +316,8 @@ begin
    U_Eth : entity work.DebugRtmEth
       generic map (
          TPD_G            => TPD_G,
-         ETH_10G_G        => ETH_10G_G,
-         EN_SW_RSSI_G     => EN_SW_RSSI_G,
          EN_BP_MSG_G      => EN_BP_MSG_G,
+         ETH_10G_G        => ETH_10G_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- Local Configuration
@@ -356,12 +344,6 @@ begin
          -- Backplane Messaging Interface
          bpMsgMasters      => bpMsgMasters,
          bpMsgSlaves       => bpMsgSlaves,
-         -- Transceiver Debug Interface
-         gtTxPreCursor     => gtTxPreCursor,
-         gtTxPostCursor    => gtTxPostCursor,
-         gtTxDiffCtrl      => gtTxDiffCtrl,
-         gtRxPolarity      => gtRxPolarity,
-         gtTxPolarity      => gtTxPolarity,
          ----------------------
          -- Top Level Interface
          ----------------------
@@ -370,10 +352,16 @@ begin
          bpMsgRst          => bpMsgRst,
          bpMsgBus          => bpMsgBus,
          -- Application Debug Interface
-         obDebugMaster     => obDebugMaster,
-         obDebugSlave      => obDebugSlave,
-         ibDebugMaster     => ibDebugMaster,
-         ibDebugSlave      => ibDebugSlave,
+         obAppDebugMaster  => obAppDebugMaster,
+         obAppDebugSlave   => obAppDebugSlave,
+         ibAppDebugMaster  => ibAppDebugMaster,
+         ibAppDebugSlave   => ibAppDebugSlave,
+         -- Transceiver Debug Interface
+         gtTxPreCursor     => gtTxPreCursor,
+         gtTxPostCursor    => gtTxPostCursor,
+         gtTxDiffCtrl      => gtTxDiffCtrl,
+         gtRxPolarity      => gtRxPolarity,
+         gtTxPolarity      => gtTxPolarity,
          ----------------
          -- Core Ports --
          ----------------   
@@ -395,7 +383,6 @@ begin
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          APP_TYPE_G       => APP_TYPE_G,
-         TIMING_MODE_G    => TIMING_MODE_G,
          FSBL_G           => FSBL_G)
       port map (
          -- Primary AXI-Lite Interface
@@ -482,8 +469,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         TIMING_MODE_G    => TIMING_MODE_G)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk          => axilClk,
@@ -492,10 +478,6 @@ begin
          axilReadSlave    => timingReadSlave,
          axilWriteMaster  => timingWriteMaster,
          axilWriteSlave   => timingWriteSlave,
-         -- BSA Interface (bsaTimingClk domain)
-         bsaTimingClk     => bsaTimingClk,
-         bsaTimingRst     => bsaTimingRst,
-         bsaTimingBus     => bsaTimingBus,
          ----------------------
          -- Top Level Interface
          ----------------------         
@@ -527,12 +509,10 @@ begin
    --------------
    U_Bsa : entity work.AmcCarrierBsa
       generic map (
-         TPD_G                    => TPD_G,
-         APP_TYPE_G               => APP_TYPE_G,
-         AXI_ERROR_RESP_G         => AXI_ERROR_RESP_C,
-         DIAGNOSTIC_OUTPUTS_G     => 28,  -- Hard code for now
-         DIAGNOSTIC_RAW_STREAMS_G => DIAGNOSTIC_RAW_STREAMS_G,
-         DIAGNOSTIC_RAW_CONFIGS_G => DIAGNOSTIC_RAW_CONFIGS_G)
+         TPD_G            => TPD_G,
+         FSBL_G           => FSBL_G,
+         APP_TYPE_G       => APP_TYPE_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
@@ -553,10 +533,6 @@ begin
          obBsaSlaves          => obBsaSlaves,
          ibBsaMasters         => ibBsaMasters,
          ibBsaSlaves          => ibBsaSlaves,
-         -- Timing Interface (bsaTimingClk domain)
-         bsaTimingClk         => bsaTimingClk,
-         bsaTimingRst         => bsaTimingRst,
-         bsaTimingBus         => bsaTimingBus,
          ----------------------
          -- Top Level Interface
          ----------------------         
@@ -564,11 +540,11 @@ begin
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
          diagnosticBus        => diagnosticBus,
-         diagnosticRawClks    => diagnosticRawClks,
-         diagnosticRawRsts    => diagnosticRawRsts,
-         diagnosticRawMasters => diagnosticRawMasters,
-         diagnosticRawSlaves  => diagnosticRawSlaves,
-         diagnosticRawCtrl    => diagnosticRawCtrl);
+         -- Waveform interface (axiClk domain)
+         waveformClk          => waveformClkInt,
+         waveformRst          => waveformRstInt,
+         obAppWaveformMasters => obAppWaveformMasters,
+         obAppWaveformSlaves  => obAppWaveformSlaves);
 
    ------------------
    -- DDR Memory Core
