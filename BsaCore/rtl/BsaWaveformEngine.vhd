@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-08-15
+-- Last update: 2016-08-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ architecture rtl of BsaWaveformEngine is
       TDATA_BYTES_C => AXI_CONFIG_G.DATA_BYTES_C,
       TDEST_BITS_C  => log2(STREAMS_C),
       TID_BITS_C    => 0,
-      TKEEP_MODE_C  => TKEEP_FIXED_C,
+      TKEEP_MODE_C  => TKEEP_COMP_C,
       TUSER_BITS_C  => 3,
       TUSER_MODE_C  => TUSER_LAST_C);
 
@@ -122,7 +122,7 @@ architecture rtl of BsaWaveformEngine is
       TDATA_BYTES_C => AXI_CONFIG_G.DATA_BYTES_C,
       TDEST_BITS_C  => log2(STREAMS_C),
       TID_BITS_C    => 0,
-      TKEEP_MODE_C  => TKEEP_FIXED_C,
+      TKEEP_MODE_C  => TKEEP_COMP_C,
       TUSER_BITS_C  => 2,
       TUSER_MODE_C  => TUSER_FIRST_LAST_C);
    

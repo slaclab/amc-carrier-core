@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-08-04
+-- Last update: 2016-08-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ package AmcCarrierPkg is
 
    constant WAVEFORM_STREAMS_C     : integer             := 8;
    constant WAVEFORM_AXIS_CONFIG_C : AxiStreamConfigType :=
-      ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
+      ssiAxiStreamConfig(4, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
 
    constant WAVEFORM_TRIGGER_BIT_C : integer := 2;
 
