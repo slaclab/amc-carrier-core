@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-08-23
+-- Last update: 2016-08-24
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -295,7 +295,7 @@ begin
          BURST_SIZE_BYTES_G    => 4096,
          SSI_OUTPUT_G          => true,
          AXIL_BASE_ADDR_G      => AXIL_BASE_ADDR_G,
-         AXI_STREAM_READY_EN_G => true,
+         AXI_STREAM_READY_EN_G => false,
          AXI_STREAM_CONFIG_G   => READ_AXIS_CONFIG_C,
          AXI_READ_CONFIG_G     => AXI_CONFIG_G)
       port map (
@@ -323,16 +323,16 @@ begin
    AxiStreamFifo_RD_DATA : entity work.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
-         SLAVE_READY_EN_G    => true,
+         SLAVE_READY_EN_G    => false,
          VALID_THOLD_G       => 1,
          BRAM_EN_G           => false,
          XIL_DEVICE_G        => "ULTRASCALE",
          USE_BUILT_IN_G      => false,
          GEN_SYNC_FIFO_G     => false,
          CASCADE_SIZE_G      => 1,
-         FIFO_ADDR_WIDTH_G   => 4,
+         FIFO_ADDR_WIDTH_G   => 12,
          FIFO_FIXED_THRESH_G => true,
-         FIFO_PAUSE_THRESH_G => 15,
+         FIFO_PAUSE_THRESH_G => 2**12-512,
          SLAVE_AXI_CONFIG_G  => READ_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
