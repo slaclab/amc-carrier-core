@@ -62,3 +62,4 @@ vhdl work DaqMuxV2/DaqRegItf.vhd
 vhdl work DaqMuxV2/DaqTrigger.vhd
 vhdl work DaqMuxV2/DaqLane.vhd
 vhdl work DaqMuxV2/DaqMuxV2.vhd
+vhdl work DaqMuxV2/DaqMuxV2Pkg.vhd

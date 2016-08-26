@@ -449,6 +449,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         I2C_SCL_FREQ_G   => 10.0E+3, -- 10k clk
          DEVICE_MAP_G     => TIME_DEVICE_MAP_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
