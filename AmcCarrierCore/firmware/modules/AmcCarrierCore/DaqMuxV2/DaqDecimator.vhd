@@ -14,7 +14,7 @@
 --                   test_i = '0' : Output sample data
 --                   averaging_i = '1':
 --                         rateDiv_i (only powers of two)
---                         0 - SR, 1 - SR, 2 - SR/2, 4 - SR/4, 8 - SR/8 up to 2^10
+--                         0 - SR, 1 - SR, 2 - SR/2, 4 - SR/4, 8 - SR/8 up to 2^15
 --                         Averages the samples with the window size of rateDiv_i
 --                   averaging_i = '0':
 --                         rateDiv_i
@@ -36,7 +36,7 @@ use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
-
+use work.DaqMuxV2Pkg.all;
 
 entity DaqDecimator is
    generic (
@@ -104,7 +104,6 @@ begin
    
    comb : process (r, rst, trig_i, rateDiv_i, s_countPeriod, sampleData_i, dec16or32_i, averaging_i, test_i) is
       variable v        : RegType;
-      variable vSum     : slv(r.sum'range);
    begin
       v := r;
       
@@ -155,16 +154,8 @@ begin
          v.sum := r.sum+r.sampleData(31 downto 16)+r.sampleData(15 downto 0);
       end if;
       
-      vSum := v.sum;
-      
-      -- Power of 2 Divide (reduced to 12 to see if improves timing)
-      for i in 0 to 10 loop
-         if (rateDiv_i(i)= '1') then
-            v.average := vSum(v.average'range);            
-         else 
-            vSum := '0' & vSum(v.sum'left downto 1);
-         end if;
-      end loop;
+      -- Power of 2 Divide
+      v.average := power2div(v.sum,rateDiv_i);
       
       -- Zero data if period reached
       -- so next sum starts fresh
