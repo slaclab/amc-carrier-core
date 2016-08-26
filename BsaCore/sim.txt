@@ -1,1 +1,1 @@
-vhdl work tb/BsaBufferControl2Tb.vhd  
+#vhdl work tb/BsaBufferControl2Tb.vhd  

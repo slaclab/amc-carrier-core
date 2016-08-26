@@ -1,2 +1,2 @@
 manual yaml/BsaBufferControl.yaml
-manual yaml/BsaRawDiagnostic.yaml
+manual yaml/BsaWaveformEngine.yaml
