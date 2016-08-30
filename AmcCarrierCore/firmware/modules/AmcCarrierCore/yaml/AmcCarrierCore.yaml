@@ -67,7 +67,7 @@ Device: &AmcCarrierCore
       size: 0x100       
       IntField:
         - <<: *MemoryArray
-          nelms: 0x29
+          nelms: 0x14
           stride: 4
           sizeBits: 16
     ##################################################
