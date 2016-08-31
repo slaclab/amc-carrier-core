@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-07-18
+-- Last update: 2016-08-30
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -100,21 +100,20 @@ architecture mapping of AmcCarrierTiming is
    signal rxReset        : sl;
    signal rxUsrClkActive : sl;
    signal rxCdrStable    : sl;
-   signal rxResetDone    : sl;
+   signal rxStatus       : TimingPhyStatusType;
+   signal rxControl      : TimingPhyControlType;
    signal rxUsrClk       : sl;
    signal rxData         : slv(15 downto 0);
    signal rxDataK        : slv(1 downto 0);
    signal rxDispErr      : slv(1 downto 0);
    signal rxDecErr       : slv(1 downto 0);
-   signal txReset        : sl;
    signal txUsrClk       : sl;
    signal txUsrRst       : sl;
    signal txUsrClkActive : sl;
-   signal txResetDone    : sl;
+   signal txStatus       : TimingPhyStatusType := TIMING_PHY_STATUS_INIT_C;
    signal timingPhy      : TimingPhyType;
    signal coreTimingPhy  : TimingPhyType;
    signal loopback       : slv(2 downto 0);
-   signal rxPolarity     : sl;
    signal refclksel      : slv(2 downto 0);
    signal appBus         : TimingBusType;
 
@@ -148,7 +147,7 @@ begin
          mAxiReadSlaves      => axilReadSlaves);
 
    recTimingClk <= timingRecClk;
-   recTimingRst <= not(rxResetDone);
+   recTimingRst <= not(rxStatus.resetDone);
 
    TIMING_GEN_CLK : if TIME_GEN_APP generate
       timingPhy <= appTimingPhy;
@@ -158,11 +157,10 @@ begin
       timingPhy <= coreTimingPhy;
    end generate NOT_TIMING_GEN_CLK;
 
-   txUsrRst        <= not(txResetDone);
+   txUsrRst        <= not(txStatus.resetDone);
    appTimingPhyClk <= txUsrClk;
    appTimingPhyRst <= txUsrRst;
    txUsrClkActive  <= '1';
-   txReset         <= '0';
 --   txReset         <= rxReset;
 --    rxUsrClk        <= timingRecClkG;
 --    rxUsrClkActive  <= '1';
@@ -202,23 +200,20 @@ begin
          gtRxN           => timingRxN,
          gtTxP           => timingTxP,
          gtTxN           => timingTxN,
-         rxReset         => rxReset,
+         rxControl       => rxControl,
+         rxStatus        => rxStatus,
          rxUsrClkActive  => rxUsrClkActive,
          rxCdrStable     => rxCdrStable,
-         rxResetDone     => rxResetDone,
          rxUsrClk        => rxUsrClk,
-         rxPolarity      => rxPolarity,
          rxData          => rxData,
          rxDataK         => rxDataK,
          rxDispErr       => rxDispErr,
          rxDecErr        => rxDecErr,
          rxOutClk        => timingRecClkGt,
-         txInhibit       => '0',
-         txPolarity      => timingPhy.polarity,
-         txReset         => txReset,
+         txControl       => timingPhy.control,
+         txStatus        => txStatus,
          txUsrClk        => txUsrClk,
          txUsrClkActive  => txUsrClkActive,
-         txResetDone     => txResetDone,
          txData          => timingPhy.data,
          txDataK         => timingPhy.dataK,
          txOutClk        => txUsrClk,
@@ -244,7 +239,7 @@ begin
             CLKOUT0_DIVIDE_F_G => 5.375)
          port map(
             clkIn     => timingRecClkGt,
-            rstIn     => rxResetDone,
+            rstIn     => rxStatus.resetDone,
             clkOut(0) => timingRecClk,
             rstOut(0) => open,
             locked    => rxUsrClkActive);
@@ -285,9 +280,8 @@ begin
          gtRxDataK       => rxDataK,
          gtRxDispErr     => rxDispErr,
          gtRxDecErr      => rxDecErr,
-         gtRxReset       => rxReset,
-         gtRxResetDone   => rxResetDone,
-         gtRxPolarity    => rxPolarity,
+         gtRxControl     => rxControl,
+         gtRxStatus      => rxStatus,
          gtLoopback      => loopback,
          appTimingClk    => appTimingClk,
          appTimingRst    => appTimingRst,
