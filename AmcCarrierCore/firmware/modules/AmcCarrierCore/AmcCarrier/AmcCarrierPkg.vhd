@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-08-30
+-- Last update: 2016-09-01
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -44,7 +44,8 @@ package AmcCarrierPkg is
    -- 04/21/2016 (0x00000006): Increased gtTxDiffCtrl from 0.95 Vppd to 1.08 Vppd
    -- 04/21/2016 (0x00000007): Added Ethernet Uptime counter in the BSI interface
    -- 07/08/2016 (0x00000008): Updated the I2C device configurations
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000008";
+   -- 09/01/2016 (0x00000009): Backing up to 1.2 TAG
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000009";
 
    constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
@@ -92,7 +93,7 @@ package AmcCarrierPkg is
    constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data
 
 
-   constant WAVEFORM_STREAMS_C     : integer             := 8;
+   constant WAVEFORM_STREAMS_C     : integer := 8;
    constant WAVEFORM_AXIS_CONFIG_C : AxiStreamConfigType :=
       ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
 
@@ -101,8 +102,8 @@ package AmcCarrierPkg is
    subtype WaveformMasterType is AxiStreamMasterArray(3 downto 0);
    type WaveformMasterArrayType is array (1 downto 0) of WaveformMasterType;
 
-   constant WAVEFORM_MASTER_ARRAY_INIT_C : WaveformMasterArrayType := (others => (others => AXI_STREAM_MASTER_INIT_C));   
-   
+   constant WAVEFORM_MASTER_ARRAY_INIT_C : WaveformMasterArrayType := (others => (others => AXI_STREAM_MASTER_INIT_C));
+
    type WaveformSlaveRecType is record
       slave : AxiStreamSlaveType;
       ctrl  : AxiStreamCtrlType;
