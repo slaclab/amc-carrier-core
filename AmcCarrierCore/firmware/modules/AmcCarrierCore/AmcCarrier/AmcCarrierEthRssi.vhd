@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-07-15
+-- Last update: 2016-09-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -52,10 +52,10 @@ entity AmcCarrierEthRssi is
       mAxilWriteMaster : out AxiLiteWriteMasterType;
       mAxilWriteSlave  : in  AxiLiteWriteSlaveType;
       -- Application Debug Interface
-      obAppDebugMaster    : in  AxiStreamMasterType;
-      obAppDebugSlave     : out AxiStreamSlaveType;
-      ibAppDebugMaster    : out AxiStreamMasterType;
-      ibAppDebugSlave     : in  AxiStreamSlaveType;
+      obAppDebugMaster : in  AxiStreamMasterType;
+      obAppDebugSlave  : out AxiStreamSlaveType;
+      ibAppDebugMaster : out AxiStreamMasterType;
+      ibAppDebugSlave  : in  AxiStreamSlaveType;
       -- BSA Ethernet Interface
       obBsaMasters     : in  AxiStreamMasterArray(3 downto 0);
       obBsaSlaves      : out AxiStreamSlaveArray(3 downto 0);
@@ -230,12 +230,15 @@ begin
    --------------------------------
    -- Debug Path: TDEST = 0xFF:0xC0
    --------------------------------
-   ibAppDebugMaster   <= rssiObMasters(4);
-   rssiObSlaves(4) <= ibAppDebugSlave;
+   ibAppDebugMaster <= rssiObMasters(4);
+   rssiObSlaves(4)  <= ibAppDebugSlave;
    U_IbLimiter : entity work.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
-         FRAME_LIMIT_G       => (1024/16),  -- 1kB limit
+         EN_TIMEOUT_G        => true,
+         MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
+         TIMEOUT_G           => TIMEOUT_C,
+         FRAME_LIMIT_G       => (4096/16),  -- 4kB limit
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
