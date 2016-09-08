@@ -7,120 +7,156 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
+#include AxiVersion.yaml
+#include AxiEmpty.yaml
+#include AxiSysMonUltraScale.yaml
+#include AxiMicronN25Q.yaml
+#include AxiSy56040.yaml
+#include GenericMemory.yaml
+#include AmcCarrierBsi.yaml
+#include AmcCarrierTiming.yaml
+#include AmcCarrierBsa.yaml
+#include EthMacPhy.yaml
+#include UdpEngineWrapper.yaml
+#include RssiCore.yaml
+#include AxiMemTester.yaml
+#include AmcCarrierMps.yaml
 
-include: AxiVersion.yaml
-include: AxiEmpty.yaml
-include: AxiSysMonUltraScale.yaml
-include: AxiMicronN25Q.yaml
-include: AxiSy56040.yaml
-include: GenericMemory.yaml
-include: AmcCarrierBsi.yaml
-include: AmcCarrierTiming.yaml
-include: AmcCarrierBsa.yaml
-include: EthMacPhy.yaml
-include: UdpEngineWrapper.yaml
-include: RssiCore.yaml
-include: AxiMemTester.yaml
-include: AmcCarrierMps.yaml
-include: AxiCdcm6208.yaml
-
-Device: &AmcCarrierCore 
+AmcCarrierCore: &AmcCarrierCore 
   name: AmcCarrierCore
   description: AmcCarrierCore
+  class: MMIODev
+  configPrio: 1
   size: 0x80000000 # 2GB address space for core firmware
   ######### 
-  IntField:
+  children:
   ######### 
     ##################################################
-    - offset: 0x00000400
-      name: AMC_CARRIER_CORE_VERSION_C
+    AMC_CARRIER_CORE_VERSION_C:
+      at:
+        offset: 0x00000400
+      class: IntField
       mode: RO
       description: AMC Carrier Core Version Number
     ##################################################
-  ########
-  MMIODev:
-  ########
+    AxiVersion:
+      <<: *AxiVersion
+      at:
+        offset: 0x00000000
     ##################################################
-    - <<: *AxiVersion
-      offset: 0x00000000
+    AxiSysMonUltraScale:
+      <<: *AxiSysMonUltraScale
+      at:
+        offset: 0x01000000
     ##################################################
-    - <<: *AxiSysMonUltraScale
-      offset: 0x01000000
+    AxiMicronN25Q:
+      <<: *AxiMicronN25Q
+      at:
+        offset: 0x02000000  
     ##################################################
-    - <<: *AxiMicronN25Q
-      offset: 0x02000000  
+    AxiSy56040:
+      <<: *AxiSy56040
+      at:
+        offset: 0x03000000      
     ##################################################
-    - <<: *AxiSy56040
-      offset: 0x03000000      
-    ##################################################
-    - name: "Axi24LC64FT"
-      offset: 0x04000000
+    Axi24LC64FT:
+      at:
+        offset: 0x04000000
+      class: MMIODev
       size: 0x2000
       description: AMC Carrier core's Non-volatile memory (100k endurance)
-      IntField:
-        - <<: *MemoryArray
-          nelms: 0x800
-          stride: 4
+      children:
+        MemoryArray:
+          <<: *MemoryArray
+          at:
+            offset: 0x0
+            nelms: 0x800
+            stride: 4
           sizeBits: 32
+   ##################################################
+    AxiCdcm6208:
+      <<: *AxiCdcm6208
+      at:
+        offset: 0x05000000
     ##################################################
-    - <<: *AxiCdcm6208
-      offset: 0x05000000
-    ##################################################
-    - name: "DdrSpd"
-      offset: 0x06000000
+    DdrSpd:
+      at:
+        offset: 0x06000000
       size: 0x400
+      class: MMIODev
       description: Lookup tool at www.micron.com/spd
-      IntField:
-        - <<: *MemoryArray
-          nelms: 0x100
-          stride: 4
+      children:
+        MemoryArray:
+          <<: *MemoryArray
+          at:
+            offset: 0x0
+            nelms: 0x100
+            stride: 4
           sizeBits: 8
           mode: RO # Read only
     ##################################################
-    - <<: *AmcCarrierBsi
-      offset: 0x07000000      
+    AmcCarrierBsi:
+      <<: *AmcCarrierBsi
+      at:
+        offset: 0x07000000      
     ##################################################  
-    - <<: *AmcCarrierTiming
-      offset: 0x08000000      
+    AmcCarrierTiming:
+      <<: *AmcCarrierTiming
+      at:
+        offset: 0x08000000      
     ##################################################
-    - <<: *AmcCarrierBsa
-      offset: 0x09000000    
+    AmcCarrierBsa:
+      <<: *AmcCarrierBsa
+      at:
+        offset: 0x09000000    
     ##################################################
-    - <<: *EthMacPhy
-      offset: 0x0A000000  
+    EthMacPhy:
+      <<: *EthMacPhy
+      at:
+        offset: 0x0A000000  
     ##################################################
-    - <<: *UdpEngineWrapper
-      offset: 0x0A010000
-      nelms: 2
-      stride: 8
+    UdpEngineWrapper:
+      <<: *UdpEngineWrapper
+      at:
+        offset: 0x0A010000
+        nelms: 2
+        stride: 8
       description: "ClientConfig[1:0]"
     ##################################################
-    - <<: *RssiCore
-      name: "RssiServerSw"
-      offset: 0x0A020000 
-      nelms: 2
-      stride: 0x1000   
-      description: Server RSSI’s Software
+    RssiServerSw:
+      <<: *RssiCore
+      at:
+        offset: 0x0A020000 
+        nelms: 2
+        stride: 0x1000   
+      description: Server RSSI Software
     ##################################################
-    - <<: *RssiCore
-      name: "RssiServerBp"
-      offset: 0x0A030000     
-      nelms: 2
-      stride: 0x2000
-      description: Server RSSI BP_MSG[1:0]
+    RssiServerBp:
+      <<: *RssiCore
+      at:
+        offset: 0x0A030000     
+        nelms: 2
+        stride: 0x2000
+      description: "Server RSSI BP_MSG[1:0]"
       instantiate: false
     ##################################################
-    - <<: *RssiCore
-      name: "RssiClientBp"
-      offset: 0x0A031000    
-      nelms: 2
-      stride: 0x2000
-      description: Client RSSI BP_MSG[1:0]
+    RssiClientBp:
+      <<: *RssiCore
+      at:
+        offset: 0x0A031000    
+        nelms: 2
+        stride: 0x2000
+      description: "Client RSSI BP_MSG[1:0]"
       instantiate: false
     ##################################################
-    - <<: *AxiMemTester
-      offset: 0x0B000000  
+    AxiMemTester:
+      <<: *AxiMemTester
+      at:
+        offset: 0x0B000000  
     ##################################################   
-    - <<: *AmcCarrierMps
-      offset: 0x0C000000   
-    ##################################################
+    AmcCarrierMps:
+      <<: *AmcCarrierMps
+      at:
+        offset: 0x0C000000   

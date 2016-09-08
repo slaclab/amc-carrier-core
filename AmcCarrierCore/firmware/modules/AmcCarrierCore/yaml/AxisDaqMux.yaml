@@ -1,195 +1,271 @@
 ##############################################################################
-## This file is part of 'LCLS2 Common Carrier Core'.
+## This file is part of 'SLAC Firmware Standard Library'.
 ## It is subject to the license terms in the LICENSE.txt file found in the 
 ## top-level directory of this distribution and at: 
 ##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
+## No part of 'SLAC Firmware Standard Library', including this file, 
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
 
-Device: &AxisDaqMux 
+AxisDaqMux: &AxiDaqMux
   name: AxisDaqMux
-  description: "Data acquisition control"
+  description: Data acquisition control
+  class: MMIODev
+  configPrio: 1
   size: 0x400
-  #########
-  IntField:
-  #########
+  children:
     #########################################################
-    - offset: 0x00
+    SoftwareTrigger:
+      at:
+        offset: 0x00
+      class: IntField
       name: SoftwareTrigger
-      sizeBits: 1    
-      lsBit: 0 
+      sizeBits: 1
+      lsBit: 0
       mode: RW
-      description: "Trigger data acquisition (bit0 - Auto clear register)"
+      description: Trigger data acquisition (bit0 - Auto clear register)
     #########################################################
-    - offset: 0x00
+    Mode:
+      at:
+        offset: 0x00
+      class: IntField
       name: Mode
-      sizeBits: 1    
+      sizeBits: 1
       lsBit: 1
       mode: RW
-      description: "Mode of DAQ - '0'  - until packet size and needs trigger - '1'  - sends the 4k frames continuously no trigger"
+      description: "Mode of DAQ - '0'  - until packet size and needs trigger - '1' - sends the 4k frames continuously no trigger"
       enums:
-        - name:  Triggered
+        Triggered:
+          class: Enum
           value: 0
-        - name:  Continuous
+        Continuous:
+          class: Enum
           value: 1
     #########################################################
-    - offset: 0x00
+    HwTriggerMask:
+      at:
+        offset: 0x00
+      class: IntField
       name: HwTriggerMask
-      sizeBits: 1    
+      sizeBits: 1
       lsBit: 2
       mode: RW
       description: "Hardware Trigger Mask '1' - Enabled, '0' - Disabled"
       enums:
-        - name:  Disabled
+        Disabled:
+          class: Enum
           value: 0
-        - name:  Enabled
+        Enabled:
+          class: Enum
           value: 1
     #########################################################
-    - offset: 0x00
+    DecimationMode:
+      at:
+        offset: 0x00
+      class: IntField
       name: DecimationMode
-      sizeBits: 1    
+      sizeBits: 1
       lsBit: 3
       mode: RW
       description: "Decimation mode '1' - 16-bit, '0' - 32-bit"
       enums:
-        - name:  32-bit
+        32-bit:
+          class: Enum
           value: 0
-        - name:  16-bit
+        16-bit:
+          class: Enum
           value: 1
     #########################################################
-    - offset: 0x08
+    SampleDecimation:
+      at:
+        offset: 0x08
+      class: IntField
       name: SampleDecimation
-      sizeBits: 16   
+      sizeBits: 16
       mode: RW
-      description: "Reduces the sample rate. 16bit DecimationMode: 0 - SR, 1 - SR/2, 2 - SR/4, 3 - SR/6 etc. 32bit DecimationMode: 0 - SR, 1 - SR, 2 - SR/2, 3 - SR/3 etc."
+      description: 'Reduces the sample rate. 16bit DecimationMode: 0 - SR, 1 - SR/2,
+        2 - SR/4, 3 - SR/6 etc. 32bit DecimationMode: 0 - SR, 1 - SR, 2 - SR/2, 3
+        - SR/3 etc.'
     #########################################################
-    - offset: 0x0C
+    DaqBufferSize:
+      at:
+        offset: 0x0C
+      class: IntField
       name: DaqBufferSize
-      sizeBits: 32   
+      sizeBits: 32
       mode: RW
-      description: "Size of a single continuous data buffer (number of 32-bit words)"
+      description: Size of a single continuous data buffer (number of 32-bit words)
     #########################################################
-    - offset: 0x40
+    S0ChannelSelect:
+      at:
+        offset: 0x40
+      class: IntField
       name: S0ChannelSelect
-      sizeBits: 4   
+      sizeBits: 4
       mode: RW
-      description: "Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)"
+      description: Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)
     #########################################################
-    - offset: 0x44
+    S1ChannelSelect:
+      at:
+        offset: 0x44
+      class: IntField
       name: S1ChannelSelect
-      sizeBits: 4   
+      sizeBits: 4
       mode: RW
-      description: "Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)"
+      description: Select channel for AXI stream 1 (0 - Disabled, 1 - Ch1, etc)
     #########################################################
-    - offset: 0x80
+    S0Pause:
+      at:
+        offset: 0x80
+      class: IntField
       name: S0Pause
       sizeBits: 1
-      lsBit: 0      
+      lsBit: 0
       mode: RO
-      description: "DAQ interface busy"
+      description: DAQ interface busy
     ######################################################### 
-    - offset: 0x80
+    S0Ready:
+      at:
+        offset: 0x80
+      class: IntField
       name: S0Ready
       sizeBits: 1
-      lsBit: 1      
+      lsBit: 1
       mode: RO
-      description: "Ready to take new data packet"
+      description: Ready to take new data packet
     #########################################################    
-    - offset: 0x80
+    S0Overflow:
+      at:
+        offset: 0x80
+      class: IntField
       name: S0Overflow
       sizeBits: 1
       lsBit: 2
       mode: RO
-      description: "Buffer overflow"
+      description: Buffer overflow
     #########################################################
-    - offset: 0x80
+    S0Error:
+      at:
+        offset: 0x80
+      class: IntField
       name: S0Error
       sizeBits: 1
       lsBit: 3
       mode: RO
-      description: "Error during last Acquisition - received buffer might be shorter then requested"
+      description: Error during last Acquisition - received buffer might be shorter
+        then requested
     #########################################################
-    - offset: 0x80
+    S0DataInValid:
+      at:
+        offset: 0x80
+      class: IntField
       name: S0DataInValid
       sizeBits: 1
       lsBit: 4
       mode: RO
-      description: "The incoming data is Valid (Usually connected to JESD valid signal)."
+      description: The incoming data is Valid (Usually connected to JESD valid signal).
     #########################################################
-    - offset: 0x80
+    S0Enabled:
+      at:
+        offset: 0x80
+      class: IntField
       name: S0Enabled
       sizeBits: 1
       lsBit: 5
       mode: RO
-      description: "Streamming is: 1-enabled, 0-Disabled"
+      description: 'Streamming is: 1-enabled, 0-Disabled'
     #########################################################
-    - offset: 0x80
+    S0FrameCnt:
+      at:
+        offset: 0x80
+      class: IntField
       name: S0FrameCnt
       sizeBits: 26
       lsBit: 6
       mode: RO
-      description: "Number of frames (4096 bytes) sent. In the last transfer."
+      description: Number of frames (4096 bytes) sent. In the last transfer.
     #########################################################
-    - offset: 0x84
+    S1Pause:
+      at:
+        offset: 0x84
+      class: IntField
       name: S1Pause
       sizeBits: 1
-      lsBit: 0      
+      lsBit: 0
       mode: RO
-      description: "DAQ interface busy"
+      description: DAQ interface busy
     ######################################################### 
-    - offset: 0x84
+    S1Ready:
+      at:
+        offset: 0x84
+      class: IntField
       name: S1Ready
       sizeBits: 1
-      lsBit: 1      
+      lsBit: 1
       mode: RO
-      description: "Ready to take new data packet"
+      description: Ready to take new data packet
     #########################################################    
-    - offset: 0x84
+    S1Overflow:
+      at:
+        offset: 0x84
+      class: IntField
       name: S1Overflow
       sizeBits: 1
       lsBit: 2
       mode: RO
-      description: "Buffer overflow"
+      description: Buffer overflow
     #########################################################
-    - offset: 0x84
+    S1Error:
+      at:
+        offset: 0x84
+      class: IntField
       name: S1Error
       sizeBits: 1
       lsBit: 3
       mode: RO
-      description: "Error during last Acquisition - received buffer might be shorter then requested"
+      description: Error during last Acquisition - received buffer might be shorter
+        then requested
     #########################################################
-    - offset: 0x84
+    S1DataInValid:
+      at:
+        offset: 0x84
+      class: IntField
       name: S1DataInValid
       sizeBits: 1
       lsBit: 4
       mode: RO
-      description: "The incoming data is Valid (Usually connected to JESD valid signal)."
+      description: The incoming data is Valid (Usually connected to JESD valid signal).
     #########################################################
-    - offset: 0x84
+    S1Enabled:
+      at:
+        offset: 0x84
+      class: IntField
       name: S1Enabled
       sizeBits: 1
       lsBit: 5
       mode: RO
-      description: "Streamming is: 1-enabled, 0-Disabled"
+      description: 'Streamming is: 1-enabled, 0-Disabled'
     #########################################################
-    - offset: 0x84
+    S1FrameCnt:
+      at:
+        offset: 0x84
+      class: IntField
       name: S1FrameCnt
       sizeBits: 26
       lsBit: 6
       mode: RO
-      description: "Number of frames (4096 bytes) sent. In the last transfer."
+      description: Number of frames (4096 bytes) sent. In the last transfer.
     #########################################################
-  #########
-  Commands:
-  #########
-    - name: TriggerDaq
-      description: "Trigger data aquisition from software."
+    TriggerDaq:
+      name: TriggerDaq
+      class: SequenceCommand
+      description: Trigger data aquisition from software.
       sequence:
-        - entry: SoftwareTrigger
-          value: 0x1
-        - entry: SoftwareTrigger
-          value: 0x0               
+      - entry: SoftwareTrigger
+        value: 0x1
+      - entry: SoftwareTrigger
+        value: 0x0
     ######################################################### 
-    

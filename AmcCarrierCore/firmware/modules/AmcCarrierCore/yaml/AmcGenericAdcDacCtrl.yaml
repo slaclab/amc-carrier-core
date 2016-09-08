@@ -1,137 +1,194 @@
 ##############################################################################
-## This file is part of 'LCLS2 Common Carrier Core'.
+## This file is part of 'SLAC Firmware Standard Library'.
 ## It is subject to the license terms in the LICENSE.txt file found in the 
 ## top-level directory of this distribution and at: 
 ##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
+## No part of 'SLAC Firmware Standard Library', including this file, 
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
 
-Device: &AmcGenericAdcDacCtrl 
+AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
   name: AmcGenericAdcDacCtrl
   description: Generic ADC/DAC AMC Control Module
-  size: 0x400
-  #########
-  IntField:
-  #########
+  class: MMIODev 
+  size: 0x400 
+  children:
     #########################################################
-    - offset: 0x00
+    AdcValidCnt:
+      at:
+        offset: 0x00
+        nelms: 4
+      class: IntField
       name: AdcValidCnt
-      nelms: 4
       mode: RO
       description: ADC Valid Transistion Counter[3:0]
     #########################################################
-    - offset: 0x0FC
+    AdcValid:
+      at:
+        offset: 0x0FC
+      class: IntField
       name: AdcValid
-      sizeBits: 4     
+      sizeBits: 4
       lsBit: 0
       mode: RO
       description: ADC Valid[3:0]
     #########################################################
-    - offset: 0x0FC
+    DebugTrig:
+      at:
+        offset: 0x0FC
+      class: IntField
       name: DebugTrig
-      sizeBits: 1    
+      sizeBits: 1
       lsBit: 4
       mode: RO
-      description: Debug Trigger     
+      description: Debug Trigger
     #########################################################
-    - offset: 0x100
+    AdcData:
+      at:
+        offset: 0x100
+        stride: 4
+        nelms: 4
+      class: IntField
       name: AdcData
       sizeBits: 16
-      stride: 4
-      nelms: 4
       mode: RO
-      description: ADC Data[3:0]     
+      description: ADC Data[3:0]
     #########################################################
-    - offset: 0x110
+    DacData:
+      at:
+        offset: 0x110
+        stride: 4
+        nelms: 2
+      class: IntField
       name: DacData
       sizeBits: 16
-      stride: 4
-      nelms: 2
       mode: RO
-      description: DAC Data[3:0]           
+      description: DAC Data[3:0]
     #########################################################
-    - offset: 0x1F8
+    VcoDac:
+      at:
+        offset: 0x1F8
+      class: IntField
       name: VcoDac
       sizeBits: 16
       mode: RO
-      description: VCO's DAC Value     
+      description: VCO's DAC Value
     #########################################################
-    - offset: 0x1FC
+    AmcClkFreq:
+      at:
+        offset: 0x1FC
+      class: IntField
       name: AmcClkFreq
       mode: RO
       description: AMC Clock frequency (in units of Hz)
     #########################################################
-    - offset: 0x200
+    LmkClkSel:
+      at:
+        offset: 0x200
+      class: IntField
       name: LmkClkSel
       sizeBits: 2
       mode: RW
-      description: LMK Clock Select  
+      description: LMK Clock Select
     #########################################################
-    - offset: 0x204
+    LmkRst:
+      at:
+        offset: 0x204
+      class: IntField
       name: LmkRst
       sizeBits: 1
       mode: RW
-      description: LMK Reset      
+      description: LMK Reset
     #########################################################
-    - offset: 0x208
+    LmkSync:
+      at:
+        offset: 0x208
+      class: IntField
       name: LmkSync
       sizeBits: 1
       mode: RW
-      description: LMK SYNC  
+      description: LMK SYNC
     #########################################################
-    - offset: 0x20C
+    LmkStatus:
+      at:
+        offset: 0x20C
+      class: IntField
       name: LmkStatus
       sizeBits: 2
       mode: RO
-      description: LMK Status        
+      description: LMK Status
     #########################################################
-    - offset: 0x210
+    Loopback:
+      at:
+        offset: 0x210
+      class: IntField
       name: Loopback
       sizeBits: 1
       mode: RW
       description: ADC-to-DAC Loopback Enable
     #########################################################
-    - offset: 0x214
+    LmkMuxSel:
+      at:
+        offset: 0x214
+      class: IntField
       name: LmkMuxSel
       sizeBits: 1
       mode: RW
       description: LMK MUX Select
     #########################################################
-    - offset: 0x218
+    SoftTrig:
+      at:
+        offset: 0x218
+      class: IntField
       name: SoftTrig
       sizeBits: 1
       mode: WO
-      description: Software Trigger   
+      description: Software Trigger
     #########################################################
-    - offset: 0x21C
+    SoftClear:
+      at:
+        offset: 0x21C
+      class: IntField
       name: SoftClear
       sizeBits: 1
       mode: WO
       description: Software Clear
     #########################################################
-    - offset: 0x220
+    VcoDacSckConfig:
+      at:
+        offset: 0x220
+      class: IntField
       name: VcoDacSckConfig
       sizeBits: 16
       mode: RW
-      description: VCO DAC SCK Rate Configuration        
+      description: VCO DAC SCK Rate Configuration
     #########################################################
-    - offset: 0x224
+    VcoDacEnable:
+      at:
+        offset: 0x224
+      class: IntField
       name: VcoDacEnable
       sizeBits: 1
       mode: RW
       description: VCO DAC Enable
     #########################################################
-    - offset: 0x3F8
+    RollOverEn:
+      at:
+        offset: 0x3F8
+      class: IntField
       name: RollOverEn
       sizeBits: 5
       mode: RW
       description: Enable Status counter roll over
     #########################################################
-    - offset: 0x3FC
+    CntRst:
+      at:
+        offset: 0x3FC
+      class: IntField
       name: CntRst
       sizeBits: 1
       mode: WO
       description: Status counter reset
-    #########################################################

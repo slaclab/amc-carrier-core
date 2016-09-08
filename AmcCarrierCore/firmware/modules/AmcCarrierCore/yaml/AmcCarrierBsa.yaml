@@ -7,23 +7,26 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
+#include BsaBufferControl.yaml
+#include BsaWaveformEngine.yaml
 
-include: BsaBufferControl.yaml
-include: BsaWaveformEngine.yaml
-
-Device: &AmcCarrierBsa 
+AmcCarrierBsa: &AmcCarrierBsa 
   name: AmcCarrierBsa
+  class: MMIODev
+  configPrio: 1
   description: AmcCarrier BSA Module
-  size: 0x30000 # Double check this
+  size: 0x30000
   #########
-  MMIODev:
-    ################################################## 
-    - <<: *BsaBufferControl
-      offset: 0x00000000
-    ##################################################     
-    - <<: *BsaWaveformEngine
-      offset: 0x00010000
-      nelms: 2
-      stride: 0x00010000
-      offset: 0x00010000
-    ##################################################
+  children:
+    BsaBufferControl:
+      <<: *BsaBufferControl
+      at:
+        offset: 0x00000000
+    BsaWaveformEngine:
+      <<: *BsaWaveformEngine
+      at:
+        offset: 0x00010000
+        nelms: 2
+        stride: 0x00010000

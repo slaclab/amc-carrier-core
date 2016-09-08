@@ -7,17 +7,21 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
+#include AmcCarrierMpsPhy.yaml
 
-include: AmcCarrierMpsPhy.yaml
-
-Device: &AmcCarrierMps 
+AmcCarrierMps: &AmcCarrierMps 
   name: AmcCarrierMps
   description: AmcCarrierMps
+  class: MMIODev
   size: 0x01000000 
   ########
-  MMIODev:
+  children:
   ########
     ##################################################
-    - <<: *AmcCarrierMpsPhy
-      offset: 0x00010000
+    AmcCarrierMpsPhy:
+      <<: *AmcCarrierMpsPhy
+      at:
+        offset: 0x00010000
     ##################################################
