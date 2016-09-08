@@ -23,6 +23,7 @@
 #include RssiCore.yaml
 #include AxiMemTester.yaml
 #include AmcCarrierMps.yaml
+#include AxiCdcm6208.yaml
 
 AmcCarrierCore: &AmcCarrierCore 
   name: AmcCarrierCore
