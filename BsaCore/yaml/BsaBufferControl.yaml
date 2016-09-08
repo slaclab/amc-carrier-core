@@ -7,31 +7,86 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+#schemaversion 3.0.0
+#once
+#include GenericMemory.yaml
+#include AxiStreamDmaRingWrite.yaml
 
-include: GenericMemory.yaml
-include: AxiStreamDmaRingWrite.yaml
-
-Device: &BsaBufferControl
-  name: BsaBufferControl
+BsaBufferControl: &BsaBufferControl
   description: Configuration and status of the BSA dignosic buffers
+  class: MMIODev
+  configPrio: 1
   size: 0x2000 # Double check this
   #########
-  MMIODev:
-    - offset: 0x00000000
-      name: Timestamps
+  children:
+    Timestamps:
+      at:
+        offset: 0x00000000
       size: 512 # 64 64-bit values
-      IntField:
-        - <<: *MemoryArray
-          nelms: 64
+      class: MMIODev
+      configPrio: 1
+      children:
+        MemoryArray:
+          <<: *MemoryArray
+          at:
+            offset: 0x0
+            nelms: 64
           bitSize: 64
           mode: RO
-
-    - offset: 0x00001000
-      name: BsaBuffers
-      metadata:
-       - numBuffers: 64
-       - destEnums:
-           - name: Default
-             value: 0
-       - destHidden: true
+    BsaBuffers:
+      at:
+        offset: 0x00001000
       <<: *AxiStreamDmaRingWrite
+      metadata:
+        numBuffers: &BsaBufferControlNelms 64
+        destEnums: &BsaBufferControlEnums
+          - name: default
+            value: 0
+        destHidden: &BsaBufferControlHidden true
+      children:
+        StartAddr:
+          at:
+            nelms: *BsaBufferControlNelms
+        EndAddr:
+          at:
+            nelms: *BsaBufferControlNelms
+        WrAddr:
+          at:
+            nelms: *BsaBufferControlNelms
+        TriggerAddr:
+          at:
+            nelms: *BsaBufferControlNelms
+        Enabled:
+          at:
+            nelms: *BsaBufferControlNelms
+        Mode:
+          at:
+            nelms: *BsaBufferControlNelms
+        SoftTrigger:
+          at:
+            nelms: *BsaBufferControlNelms
+        MsgDest:
+          at:
+            nelms: *BsaBufferControlNelms
+          enums: *BsaBufferControlEnums
+        FramesAfterTrigger:
+          at:
+            nelms: *BsaBufferControlNelms
+        Empty:
+          at:
+            nelms: *BsaBufferControlNelms
+        Full:
+          at:
+            nelms: *BsaBufferControlNelms
+        Done:
+          at:
+            nelms: *BsaBufferControlNelms
+        Triggered:
+          at:
+            nelms: *BsaBufferControlNelms
+        Error:
+          at:
+            nelms: *BsaBufferControlNelms
+        FramesSinceTrigger:
+          at:
+            nelms: *BsaBufferControlNelms
