@@ -37,56 +37,56 @@ BsaBufferControl: &BsaBufferControl
       at:
         offset: 0x00001000
       <<: *AxiStreamDmaRingWrite
-      metadata:
-        numBuffers: &BsaBufferControlNelms 64
-        destEnums: &BsaBufferControlEnums
-          - name: default
-            value: 0
-        destHidden: &BsaBufferControlHidden true
-      children:
-        StartAddr:
-          at:
-            nelms: *BsaBufferControlNelms
-        EndAddr:
-          at:
-            nelms: *BsaBufferControlNelms
-        WrAddr:
-          at:
-            nelms: *BsaBufferControlNelms
-        TriggerAddr:
-          at:
-            nelms: *BsaBufferControlNelms
-        Enabled:
-          at:
-            nelms: *BsaBufferControlNelms
-        Mode:
-          at:
-            nelms: *BsaBufferControlNelms
-        SoftTrigger:
-          at:
-            nelms: *BsaBufferControlNelms
-        MsgDest:
-          at:
-            nelms: *BsaBufferControlNelms
-          enums: *BsaBufferControlEnums
-        FramesAfterTrigger:
-          at:
-            nelms: *BsaBufferControlNelms
-        Empty:
-          at:
-            nelms: *BsaBufferControlNelms
-        Full:
-          at:
-            nelms: *BsaBufferControlNelms
-        Done:
-          at:
-            nelms: *BsaBufferControlNelms
-        Triggered:
-          at:
-            nelms: *BsaBufferControlNelms
-        Error:
-          at:
-            nelms: *BsaBufferControlNelms
-        FramesSinceTrigger:
-          at:
-            nelms: *BsaBufferControlNelms
+#      metadata:
+#        numBuffers: &BsaBufferControlNelms 64
+#        destEnums: &BsaBufferControlEnums
+#          - name: default
+#            value: 0
+#        destHidden: &BsaBufferControlHidden true
+#      children:
+#        StartAddr:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        EndAddr:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        WrAddr:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        TriggerAddr:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        Enabled:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        Mode:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        SoftTrigger:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        MsgDest:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#          enums: *BsaBufferControlEnums
+#        FramesAfterTrigger:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        Empty:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        Full:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        Done:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        Triggered:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        Error:
+#          at:
+#            nelms: *BsaBufferControlNelms
+#        FramesSinceTrigger:
+#          at:
+#            nelms: *BsaBufferControlNelms

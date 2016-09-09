@@ -31,50 +31,50 @@ Device: &BsaWaveformEngine
       <<: *AxiStreamDmaRingWrite
       at:
         offset: 0x00000000
-      children:
-        StartAddr:
-          at:
-            nelms: *BsaWaveformNelms
-        EndAddr:
-          at:
-            nelms: *BsaWaveformNelms
-        WrAddr:
-          at:
-            nelms: *BsaWaveformNelms
-        TriggerAddr:
-          at:
-            nelms: *BsaWaveformNelms
-        Enabled:
-          at:
-            nelms: *BsaWaveformNelms
-        Mode:
-          at:
-            nelms: *BsaWaveformNelms
-        SoftTrigger:
-          at:
-            nelms: *BsaWaveformNelms
-        MsgDest:
-          at:
-            nelms: *BsaWaveformNelms
-          enums: *BsaWaveformEnums
-        FramesAfterTrigger:
-          at:
-            nelms: *BsaWaveformNelms
-        Empty:
-          at:
-            nelms: *BsaWaveformNelms
-        Full:
-          at:
-            nelms: *BsaWaveformNelms
-        Done:
-          at:
-            nelms: *BsaWaveformNelms
-        Triggered:
-          at:
-            nelms: *BsaWaveformNelms
-        Error:
-          at:
-            nelms: *BsaWaveformNelms
-        FramesSinceTrigger:
-          at:
-            nelms: *BsaWaveformNelms
+#      children:
+#        StartAddr:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        EndAddr:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        WrAddr:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        TriggerAddr:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        Enabled:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        Mode:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        SoftTrigger:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        MsgDest:
+#          at:
+#            nelms: *BsaWaveformNelms
+#          enums: *BsaWaveformEnums
+#        FramesAfterTrigger:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        Empty:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        Full:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        Done:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        Triggered:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        Error:
+#          at:
+#            nelms: *BsaWaveformNelms
+#        FramesSinceTrigger:
+#          at:
+#            nelms: *BsaWaveformNelms
