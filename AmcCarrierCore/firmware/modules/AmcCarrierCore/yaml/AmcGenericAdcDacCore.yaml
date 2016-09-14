@@ -83,6 +83,8 @@ AmcGenericAdcDacCore: &AmcGenericAdcDacCore
     ##################################################
     InitAmcCard:
       description: Initialization for AMC card's JESD modules
+      at:
+        offset: 0x0
       class: SequenceCommand
       sequence:
         # Reset the RX's GTs
