@@ -29,7 +29,6 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
-use work.UdpEnginePkg.all;
 use work.IpV4EnginePkg.all;
 use work.AmcCarrierPkg.all;
 

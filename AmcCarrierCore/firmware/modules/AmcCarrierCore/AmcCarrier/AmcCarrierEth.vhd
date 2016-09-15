@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-08-17
+-- Last update: 2016-09-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -29,7 +29,6 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
-use work.UdpEnginePkg.all;
 use work.IpV4EnginePkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierRegPkg.all;
@@ -90,7 +89,6 @@ end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
-   constant MTU_C         : positive := 1500;
    constant SERVER_SIZE_C : positive := 5;
    constant CLIENT_SIZE_C : positive := 2;
 
@@ -256,28 +254,20 @@ begin
    U_UdpEngineWrapper : entity work.UdpEngineWrapper
       generic map (
          -- Simulation Generics
-         TPD_G              => TPD_G,
-         SIM_ERROR_HALT_G   => false,
-         -- UDP General Generic
-         RX_MTU_G           => MTU_C,
-         RX_FORWARD_EOFE_G  => false,
-         TX_FORWARD_EOFE_G  => false,
-         TX_CALC_CHECKSUM_G => true,
+         TPD_G            => TPD_G,
          -- UDP Server Generics
-         SERVER_EN_G        => true,
-         SERVER_SIZE_G      => SERVER_SIZE_C,
-         SERVER_PORTS_G     => ServerPorts,
-         SERVER_MTU_G       => MTU_C,
+         SERVER_EN_G      => true,
+         SERVER_SIZE_G    => SERVER_SIZE_C,
+         SERVER_PORTS_G   => ServerPorts,
          -- UDP Client Generics
-         CLIENT_EN_G        => true,
-         CLIENT_SIZE_G      => CLIENT_SIZE_C,
-         CLIENT_PORTS_G     => ClientPorts,
-         CLIENT_MTU_G       => MTU_C,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         CLIENT_EN_G      => true,
+         CLIENT_SIZE_G    => CLIENT_SIZE_C,
+         CLIENT_PORTS_G   => ClientPorts,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          -- IPv4/ARP Generics
-         CLK_FREQ_G         => AXI_CLK_FREQ_C,  -- In units of Hz
-         COMM_TIMEOUT_G     => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
-         VLAN_G             => false)   -- no VLAN       
+         CLK_FREQ_G       => AXI_CLK_FREQ_C,  -- In units of Hz
+         COMM_TIMEOUT_G   => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
+         VLAN_G           => false)     -- no VLAN       
       port map (
          -- Local Configurations
          localMac        => localMac,
