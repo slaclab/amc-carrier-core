@@ -29,7 +29,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
-use work.IpV4EnginePkg.all;
+use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 
 entity AmcCarrierEthRssi is
@@ -148,7 +148,7 @@ begin
          MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
          PIPE_STAGES_G       => 1,
          APP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
-         TSP_AXIS_CONFIG_G   => IP_ENGINE_CONFIG_C,
+         TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C,
          MAX_RETRANS_CNT_G   => MAX_RETRANS_CNT_C,
          MAX_CUM_ACK_CNT_G   => MAX_CUM_ACK_CNT_C)
       port map (
@@ -273,7 +273,7 @@ begin
          MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
          PIPE_STAGES_G       => 1,
          APP_AXIS_CONFIG_G   => TEMP_AXIS_CONFIG_C,
-         TSP_AXIS_CONFIG_G   => IP_ENGINE_CONFIG_C,
+         TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C,
          MAX_RETRANS_CNT_G   => MAX_RETRANS_CNT_C,
          MAX_CUM_ACK_CNT_G   => MAX_CUM_ACK_CNT_C)
       port map (

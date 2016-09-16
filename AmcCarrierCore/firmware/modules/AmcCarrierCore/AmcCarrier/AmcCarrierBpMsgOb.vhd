@@ -29,7 +29,7 @@ use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AmcCarrierPkg.all;
-use work.IpV4EnginePkg.all;
+use work.EthMacPkg.all;
 
 entity AmcCarrierBpMsgOb is
    generic (
@@ -129,7 +129,7 @@ begin
                v.bpMsgMaster.tData((AppType'length)+7 downto 8) := APP_TYPE_G;
                v.bpMsgMaster.tData(7 downto 0)                  := toSlv(BP_MSG_CHANNELS_C, 8);
                -- Set SOF
-               ssiSetUserSof(IP_ENGINE_CONFIG_C, v.bpMsgMaster, '1');
+               ssiSetUserSof(EMAC_AXIS_CONFIG_C, v.bpMsgMaster, '1');
                -- Check for EOF
                if BP_MSG_CHANNELS_C = 1 then
                   -- Set EOF

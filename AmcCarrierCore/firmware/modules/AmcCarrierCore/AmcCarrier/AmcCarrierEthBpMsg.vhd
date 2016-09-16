@@ -29,7 +29,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
-use work.IpV4EnginePkg.all;
+use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 
 entity AmcCarrierEthBpMsg is
@@ -76,7 +76,7 @@ architecture mapping of AmcCarrierEthBpMsg is
    constant ACK_TOUT_C         : positive := 50;      -- unit depends on TIMEOUT_UNIT_G  
    constant NULL_TOUT_C        : positive := 400;     -- unit depends on TIMEOUT_UNIT_G        
 
-   constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(0 downto 0) := (others => IP_ENGINE_CONFIG_C);
+   constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(0 downto 0) := (others => EMAC_AXIS_CONFIG_C);
 
    function AxiLiteConfig return AxiLiteCrossbarMasterConfigArray is
       variable retConf : AxiLiteCrossbarMasterConfigArray((2*BP_MSG_SIZE_C)-1 downto 0);
@@ -174,7 +174,7 @@ begin
                MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
                PIPE_STAGES_G       => 1,
                APP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
-               TSP_AXIS_CONFIG_G   => IP_ENGINE_CONFIG_C,
+               TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C,
                RETRANS_TOUT_G      => RETRANS_TOUT_C,
                ACK_TOUT_G          => ACK_TOUT_C,
                NULL_TOUT_G         => NULL_TOUT_C,
@@ -219,7 +219,7 @@ begin
                MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
                PIPE_STAGES_G       => 1,
                APP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
-               TSP_AXIS_CONFIG_G   => IP_ENGINE_CONFIG_C,
+               TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C,
                RETRANS_TOUT_G      => RETRANS_TOUT_C,
                ACK_TOUT_G          => ACK_TOUT_C,
                NULL_TOUT_G         => NULL_TOUT_C,

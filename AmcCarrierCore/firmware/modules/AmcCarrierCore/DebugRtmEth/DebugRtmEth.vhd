@@ -29,7 +29,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
-use work.IpV4EnginePkg.all;
+use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierRegPkg.all;
 
@@ -208,7 +208,7 @@ begin
             NUM_LANE_G        => 1,
             QPLL_REFCLK_SEL_G => "001",
             AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
-            AXIS_CONFIG_G     => (others => IP_ENGINE_CONFIG_C))
+            AXIS_CONFIG_G     => (others => EMAC_AXIS_CONFIG_C))
          port map (
             -- Local Configurations
             localMac(0)            => localMac,
@@ -261,7 +261,7 @@ begin
             CLKFBOUT_MULT_F_G  => 32.0,  -- 1 GHz = (32 x 31.25 MHz)
             CLKOUT0_DIVIDE_F_G => 8.0,   -- 125 MHz = (1.0 GHz/8)         
             -- AXI Streaming Configurations
-            AXIS_CONFIG_G      => (others => IP_ENGINE_CONFIG_C))  
+            AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))  
          port map (
             -- Local Configurations
             localMac(0)            => localMac,
@@ -359,7 +359,7 @@ begin
          EN_32BIT_ADDR_G     => true,
          BRAM_EN_G           => true,
          GEN_SYNC_FIFO_G     => true,
-         AXI_STREAM_CONFIG_G => IP_ENGINE_CONFIG_C)   
+         AXI_STREAM_CONFIG_G => EMAC_AXIS_CONFIG_C)   
       port map (
          -- Streaming Slave (Rx) Interface (sAxisClk domain) 
          sAxisClk            => axilClk,

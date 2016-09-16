@@ -29,7 +29,7 @@ use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AmcCarrierPkg.all;
-use work.IpV4EnginePkg.all;
+use work.EthMacPkg.all;
 
 entity AmcCarrierBpMsgIb is
    generic (
@@ -157,7 +157,7 @@ begin
          when IDLE_S =>
             -- Check for update
             if (obServerMaster.tValid = '1') then
-               if (ssiGetUserSof(IP_ENGINE_CONFIG_C, obServerMaster) = '1') then
+               if (ssiGetUserSof(EMAC_AXIS_CONFIG_C, obServerMaster) = '1') then
                   -- Next state
                   v.state := HEADER_S;
                else
@@ -228,7 +228,7 @@ begin
                   -- Next state
                   v.state := IDLE_S;
                -- Check for SOF
-               elsif (ssiGetUserSof(IP_ENGINE_CONFIG_C, obServerMaster) = '1') then
+               elsif (ssiGetUserSof(EMAC_AXIS_CONFIG_C, obServerMaster) = '1') then
                   -- Next state
                   v.state := IDLE_S;
                end if;
