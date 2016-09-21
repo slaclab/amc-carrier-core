@@ -19,13 +19,37 @@ package DaqMuxV2Pkg is
 --------------------------------------------------------------------------  
    -- Divide the slv
    function power2div(data : slv(63 downto 0); rateDiv : slv(15 downto 0)) return slv;
- 
+   -- Extend sign
+   function extSign(data : slv; position : natural) return slv;
+  
 end DaqMuxV2Pkg;
 
 package body DaqMuxV2Pkg is
 
 -- Functions
 --------------------------------------------------------------------------  
+   -- Extend sign   
+   function extSign(data : slv; position : natural) return slv is
+      variable vSign : sl;
+      variable vData : slv(data'range);
+   begin
+      -- 
+      for i in data'right to data'left loop
+         if (i = (data'right + position)) then 
+            vSign := data(i);
+            vData(i) := data(i);
+         elsif (i > (data'right + position)) then 
+            vData(i) := vSign;      
+         else 
+            vData(i) := data(i); 
+         end if;         
+      end loop;
+      
+      return vData;
+      --
+   end extSign;
+   
+   
    -- Divide the slv
    function power2div(data : slv(63 downto 0); rateDiv : slv(15 downto 0)) return slv is
    

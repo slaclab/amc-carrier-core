@@ -46,6 +46,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
+use work.DaqMuxV2Pkg.all;
 
 use work.Jesd204bPkg.all;
 
@@ -78,6 +79,10 @@ entity DaqLane is
       timeStamp_i  : in slv(63 downto 0); -- Connected from timing system
       headerEn_i   : in sl:='0';          
       header_i     : in slv(7 downto 0):=x"00";-- Additional/external header byte
+      
+      -- Sign extension
+      signWidth_i  : in slv(4 downto 0);
+      signed_i     : in sl;
       
       -- Mode of DAQ - '0'  - until packet size and needs trigger (used in new interface)
       --             - '1'  - sends the 4k frames continuously no trigger(used in new interface)
@@ -139,13 +144,31 @@ architecture rtl of DaqLane is
    signal s_rateClk        : sl;
    signal s_trigDecimator  : sl;
    signal s_decSampData    : slv((GT_WORD_SIZE_C*8)-1 downto 0);
-
+   signal s_sampDataExt    : slv((GT_WORD_SIZE_C*8)-1 downto 0);
+   
 begin
    -- Do not trigger decimator when busy
    -- because it will zero s_rateClk and data will be missed
    s_trigDecimator <= trig_i and not r.busy;
    
-   -- Rate divider module
+   -- Sign extension
+   signEx_comb : process (sampleData_i, signed_i, dec16or32_i, signWidth_i) is       
+   begin
+      if (signed_i = '0') then
+         s_sampDataExt <=  sampleData_i;
+      elsif (dec16or32_i = '0') then
+         s_sampDataExt <= extSign(sampleData_i, conv_integer(signWidth_i));     
+      else
+         s_sampDataExt(15 downto 0)  <= extSign(sampleData_i(15 downto 0), conv_integer(signWidth_i));         
+         s_sampDataExt(31 downto 16) <= extSign(sampleData_i(31 downto 16), conv_integer(signWidth_i)); 
+      end if;
+
+   end process signEx_comb;    
+
+   -- Rate divider module:
+   -- Decimates data,
+   -- Averages decimated data,
+   -- Applies test data,
    Decimator_INST : entity work.DaqDecimator
       generic map (
          TPD_G => TPD_G
@@ -154,15 +177,15 @@ begin
          clk           => devClk_i,
          rst           => devRst_i,
          test_i        => test_i,
-         sampleData_i  => sampleData_i,
+         sampleData_i  => s_sampDataExt,
          decSampData_o => s_decSampData,
          dec16or32_i   => dec16or32_i,
          rateDiv_i     => rateDiv_i,
+         signed_i      => signed_i,
          trig_i        => s_trigDecimator,
          averaging_i   => averaging_i,
          rateClk_o     => s_rateClk);
-
-
+   
    comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i, 
                    rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk, trig_i, headerEn_i, timeStamp_i, header_i) is
       variable v             : RegType;

@@ -53,7 +53,8 @@ entity DaqDecimator is
       test_i            : in  sl;
       dec16or32_i       : in  sl;
       averaging_i       : in  sl;
-
+      signed_i          : in  sl;
+      
       rateDiv_i : in  slv(15 downto 0);
       trig_i    : in  sl;
 
@@ -102,7 +103,7 @@ begin
    s_countPeriod <= rateDiv_i when dec16or32_i = '0' else '0'& rateDiv_i(rateDiv_i'left downto 1);
    
    
-   comb : process (r, rst, trig_i, rateDiv_i, s_countPeriod, sampleData_i, dec16or32_i, averaging_i, test_i) is
+   comb : process (r, rst, trig_i, rateDiv_i, s_countPeriod, sampleData_i, dec16or32_i, averaging_i, test_i, signed_i) is
       variable v        : RegType;
    begin
       v := r;
@@ -116,13 +117,20 @@ begin
          v.testDataCnt := r.testDataCnt + 2;
       end if;
       
-      -- Assign sample data according to different modes
-      if (test_i = '1' and dec16or32_i = '0') then
-        v.sampleData := r.testDataCnt;
-      elsif (test_i = '1' and dec16or32_i = '1') then
-        v.sampleData := r.testDataCnt(15 downto 0)+1 & r.testDataCnt(15 downto 0);
+      -- Assign sample data according to different modes (or cases)
+      if (test_i = '1' and dec16or32_i = '0') then -- Test mode 32 bit
+         v.sampleData := r.testDataCnt;
+      elsif (test_i = '1' and dec16or32_i = '1') then -- Test mode 16 bit
+         v.sampleData := r.testDataCnt(15 downto 0)+1 & r.testDataCnt(15 downto 0);
+      elsif (rateDiv_i <= 1) then    -- No data manipulation
+         v.sampleData := sampleData_i;
+      elsif (dec16or32_i = '0') then -- Signed mode 32 bit (if signed convert to unsigned)
+         v.sampleData := (sampleData_i(31) xor signed_i) & sampleData_i(30 downto 0);
+      elsif (dec16or32_i = '1') then -- Signed mode 16 bit (if signed convert to unsigned)
+         v.sampleData := (sampleData_i(31) xor signed_i) & sampleData_i(30 downto 16) &
+                         (sampleData_i(15) xor signed_i) & sampleData_i(14 downto  0);
       else
-        v.sampleData := sampleData_i;
+         v.sampleData := sampleData_i;
       end if;
 
       -- rateDiv clock generator 
@@ -178,10 +186,11 @@ begin
       -- Register decimated Sample data
       if (rateDiv_i <= 1) then
          v.decSampleData := r.sampleData;
-      elsif (dec16or32_i = '1') then
-         v.decSampleData := v.average(15 downto 0) & r.prevFrame;
-      else
-         v.decSampleData := v.average;
+      elsif (dec16or32_i = '1') then -- 16 bit: if signed convert back to signed
+         v.decSampleData := (v.average(15)   xor signed_i) & v.average(14 downto 0) &  
+                            (r.prevFrame(15) xor signed_i) & r.prevFrame(14 downto 0);
+      else -- 32 bit: if signed convert back to signed
+         v.decSampleData := (v.average(31)   xor signed_i) & v.average(30 downto 0);
       end if;
             
       -- Register rate clock (decimated data strobe)

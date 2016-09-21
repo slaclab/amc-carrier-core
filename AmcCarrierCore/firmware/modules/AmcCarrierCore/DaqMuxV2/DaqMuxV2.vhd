@@ -291,7 +291,11 @@ begin
             dec16or32_i    => s_data16or32(i),
             mode_i         => s_trigMode,
             averaging_i    => s_averaging(i),
-
+            
+            -- Sign extension
+            signWidth_i    => s_signWidth(i),
+            signed_i       => s_signed(i),            
+            
             -- Status 
             error_o        => s_errorVec(i),
             pctCnt_o       => s_pctCntVec(i),
