@@ -68,8 +68,9 @@ entity DaqMuxV2 is
       -- Freeze buffers
       freezeHw_i : in sl;
       
-      -- Time-stamp (if enabled it will be added to start of data)
-      timeStamp_i : in slv(63 downto 0);
+      -- Time-stamp and bsa (if enabled it will be added to start of data)
+      timeStamp_i : in slv(63 downto 0) :=(others => '1');
+      bsa_i       : in slv(127 downto 0):=(others => '1');
       
       -- AXI-Lite Register Interface
       axilReadMaster  : in  AxiLiteReadMasterType;
@@ -103,7 +104,8 @@ architecture rtl of DaqMuxV2 is
    signal s_muxSel            : Slv5Array(N_DATA_OUT_G-1 downto 0);
    signal s_rateDiv           : slv(15 downto 0);
    signal s_timeStampSync     : slv(63 downto 0);   
-  
+   signal s_bsaSync           : slv(127 downto 0);  
+   
    -- Trigger related signals
    signal s_trigCascMask      : sl;
    signal s_trigHwAutoRearm   : sl;
@@ -146,7 +148,7 @@ begin
    assert (1 <= N_DATA_OUT_G and N_DATA_OUT_G <= 16) report "N_DATA_OUT_G must be between 1 and 16"severity failure;
 
    -----------------------------------------------------------
-   -- Synchronize timestamp_i 
+   -- Synchronize timestamp_i and bsa
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
    -----------------------------------------------------------    
    U_SyncTimestamp: entity work.SynchronizerVector
@@ -158,6 +160,16 @@ begin
       rst     => devRst_i,
       dataIn  => timeStamp_i,
       dataOut => s_timeStampSync);
+      
+  U_SyncBsa: entity work.SynchronizerVector
+   generic map (
+      TPD_G          => TPD_G,
+      WIDTH_G        => 128)
+   port map (
+      clk     => devClk_i,
+      rst     => devRst_i,
+      dataIn  => bsa_i,      
+      dataOut => s_bsaSync);
 
    -----------------------------------------------------------
    -- AXI lite
@@ -183,6 +195,7 @@ begin
       -- Status
       daqStatus_i       => s_daqStatus,
       trigStatus_i      => s_trigStatus,
+      bsa_i             => s_bsaSync,
       timeStamp_i       => s_timeStampSync,
       -- Config
       trigSw_o          => s_trigSw,
@@ -281,6 +294,7 @@ begin
             enable_i       => s_enAxi(i),
             test_i         => s_enTest(i),
             timeStamp_i    => s_timeStampSync,
+            bsa_i          => s_bsaSync,
             headerEn_i     => s_headerEn,
             header_i       => s_header,
             axiNum_i       => i,

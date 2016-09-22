@@ -77,6 +77,7 @@ entity DaqLane is
       averaging_i  : in sl:='0';          -- Enable decination averaging
       dec16or32_i  : in sl:='0';          -- Data format
       timeStamp_i  : in slv(63 downto 0); -- Connected from timing system
+      bsa_i        : in slv(127 downto 0); -- Connected from timing system
       headerEn_i   : in sl:='0';          
       header_i     : in slv(7 downto 0):=x"00";-- Additional/external header byte
       
@@ -109,10 +110,7 @@ architecture rtl of DaqLane is
 
    type StateType is (
       IDLE_S,
-      HEADER_0_S,
-      HEADER_1_S,
-      HEADER_2_S,
-      HEADER_3_S,
+      HEADER_S,
       SOF_S,
       DATA_S
       );  
@@ -187,7 +185,7 @@ begin
          rateClk_o     => s_rateClk);
    
    comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i, 
-                   rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk, trig_i, headerEn_i, timeStamp_i, header_i) is
+                   rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk, trig_i, headerEn_i, timeStamp_i, header_i, bsa_i) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -216,7 +214,7 @@ begin
       
 
       -- State Machine
-      case (r.state) is
+      StateMachine : case (r.state) is
          ----------------------------------------------------------------------
          when IDLE_S =>
 
@@ -225,7 +223,6 @@ begin
             v.error   := r.error;
             v.busy    := '0';
             v.pctCnt  := r.pctCnt;
-              
 
             -- No data sent 
             v.txAxisMaster.tvalid := '0';
@@ -242,16 +239,20 @@ begin
 
                -- 
                if (mode_i = '0') then 
-                  v.state  := HEADER_0_S; -- Next State when in triggered mode
+                  v.state  := HEADER_S; -- Next State when in triggered mode
                else   
                   v.state  := SOF_S;      -- Next State when in continuous mode
                end if;              
             end if;
          ----------------------------------------------------------------------
-         when HEADER_0_S =>
+         when HEADER_S =>
              
             v.busy   := '1';          
-            v.pctCnt := (others => '0');
+            
+            -- Set the SOF bit if at first header word
+            if (r.dataCnt = 0) then
+               ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, '1');
+            end if;            
             
             -- Increment the counter
             -- and sample data on s_rateClk rate
@@ -270,147 +271,56 @@ begin
                v.error := r.error;
             end if;
 
-            -- Insert time-stamp MSW at the first header word
+            -- Insert header words depending on which it is
             if (headerEn_i = '1') then
-               v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(63 downto 32);            
+               Header : case (r.dataCnt) is
+                  when toSlv(0, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(63 downto 32);
+                  when toSlv(1, 32) =>  
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(31 downto 0);
+                  when toSlv(2, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(127 downto 96);
+                  when toSlv(3, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(95 downto 64);
+                  when toSlv(4, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(63 downto 32);
+                  when toSlv(5, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(31 downto 0);
+                  when toSlv(6, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := packetSize_i;
+                  when toSlv(7, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & dec16or32_i & averaging_i & test_i & '0' & toSlv(axiNum_i, 4) & rateDiv_i ;            
+                  when others =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := (others=>'0');                  
+               end case Header;    
             else
                v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
             end if;
             
             v.txAxisMaster.tLast := '0';
             v.txAxisMaster.tDest := toSlv(axiNum_i, 8);
-
-            -- Set the SOF bit
-            ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, '1');
-
-            -- Go further after next data
-            if s_rateClk = '1' then
-               v.state := HEADER_1_S;
-            end if;
-         ----------------------------------------------------------------------
-         when HEADER_1_S =>
              
-            v.busy   := '1';          
-            v.pctCnt := (others => '0');
-            
-            -- Increment the counter
-            -- and sample data on s_rateClk rate
-            if s_rateClk = '1' then
-               v.dataCnt             := r.dataCnt + 1;
-               v.txAxisMaster.tvalid := '1';
-            else
-               v.dataCnt             := r.dataCnt;
-               v.txAxisMaster.tvalid := '0';
-            end if;
-
-            -- Error if tReady or dataReady drops 
-            if (rxAxisSlave_i.tReady = '0' or dataReady_i = '0') then
-               v.error := '1';
-            else
-               v.error := r.error;
-            end if;
-
-            -- Insert time-stamp LSW at the second header word
-            if (headerEn_i = '1') then
-               v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(31 downto 0);            
-            else
-               v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
-            end if;
-            
-            v.txAxisMaster.tLast := '0';
-            v.txAxisMaster.tDest := toSlv(axiNum_i, 8);
-
-            -- Go further after next data
-            if s_rateClk = '1' then
-               v.state := HEADER_2_S;
-            end if;
-         ----------------------------------------------------------------------
-         when HEADER_2_S =>
-             
-            v.busy   := '1';          
-            v.pctCnt := (others => '0');
-            
-            -- Increment the counter
-            -- and sample data on s_rateClk rate
-            if s_rateClk = '1' then
-               v.dataCnt             := r.dataCnt + 1;
-               v.txAxisMaster.tvalid := '1';
-            else
-               v.dataCnt             := r.dataCnt;
-               v.txAxisMaster.tvalid := '0';
-            end if;
-
-            -- Error if tReady or dataReady drops 
-            if (rxAxisSlave_i.tReady = '0' or dataReady_i = '0') then
-               v.error := '1';
-            else
-               v.error := r.error;
-            end if;
-
-            -- Insert packet size at the third header word
-            if (headerEn_i = '1') then
-               v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := packetSize_i;            
-            else
-               v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
-            end if;
-            
-            v.txAxisMaster.tLast := '0';
-            v.txAxisMaster.tDest := toSlv(axiNum_i, 8);
-
-            -- Go further after next data
-            if s_rateClk = '1' then
-               v.state := HEADER_3_S;
-            end if;
-         ----------------------------------------------------------------------
-         when HEADER_3_S =>
-             
-            v.busy   := '1';          
-            v.pctCnt := (others => '0');
-            
-            -- Increment the counter
-            -- and sample data on s_rateClk rate
-            if s_rateClk = '1' then
-               v.dataCnt             := r.dataCnt + 1;
-               v.txAxisMaster.tvalid := '1';
-            else
-               v.dataCnt             := r.dataCnt;
-               v.txAxisMaster.tvalid := '0';
-            end if;
-
-            -- Error if tReady or dataReady drops 
-            if (rxAxisSlave_i.tReady = '0' or dataReady_i = '0') then
-               v.error := '1';
-            else
-               v.error := r.error;
-            end if;
-
-            -- Insert header at the fourth header word
-            if (headerEn_i = '1') then
-               v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & dec16or32_i & averaging_i & test_i & '0' & toSlv(axiNum_i, 4) & rateDiv_i ;            
-            else                                                      
-               v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
-            end if;
-            
-            v.txAxisMaster.tLast := '0';
-            v.txAxisMaster.tDest := toSlv(axiNum_i, 8);
-            
-            -- Insert tLast and EOFE if packetSize_i less or equal to 4 
-            if (packetSize_i <= 4) then
-                        -- Set the EOF(tlast) bit       
+            -- Insert tLast at the end of header and EOFE if packetSize_i less or equal to 8 
+            if ((r.dataCnt = 7) and (packetSize_i <= 8)) then
+               -- Set the EOF(tlast) bit       
                v.txAxisMaster.tLast := '1';
                -- Set the EOFE bit in tUser if error occurred during packet transmission
                ssiSetUserEofe(SSI_CONFIG_C, v.txAxisMaster, r.error);
-            end if;
-
+            end if; 
+             
+             
             -- Go further after next data
-            if (s_rateClk = '1') then
-               if (packetSize_i <= 4) then
+            if s_rateClk = '1' then
+               if (r.dataCnt = 7 and packetSize_i <= 8) then
                   v.pctCnt  := r.pctCnt+1;
                   v.state := IDLE_S;     -- End packet
+               elsif (r.dataCnt = 7) then
+                  v.state := DATA_S;
                else
-                  v.state := DATA_S;               
+                  v.state := HEADER_S;
                end if;
-            end if;            
+            end if;
+         ----------------------------------------------------------------------         
          when SOF_S =>
          
             -- Busy only if in trigger mode        
@@ -545,7 +455,7 @@ begin
          when others => null;
 
       ----------------------------------------------------------------------
-      end case;
+      end case StateMachine;
 
       -- Reset
       if (devRst_i = '1') then

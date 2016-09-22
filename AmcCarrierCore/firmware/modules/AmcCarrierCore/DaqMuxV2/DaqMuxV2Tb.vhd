@@ -37,7 +37,8 @@ architecture Bhv of DaqMuxV2Tb is
    signal   trigHw_i          : sl:= '0';
    signal   freezeHw_i        : sl:= '0';
    signal   trigCasc_i        : sl:= '0';
-   signal   timeStamp_i       : slv(63 downto 0):= x"DEADBEEF_BA5EBA11";
+   signal   timeStamp_i       : slv(63 downto 0) := x"DEADBEEF_BA5EBA11";
+   signal   bsa_i             : slv(127 downto 0):= x"B0B0B0B0_B1B1B1B1_B2B2B2B2_B3B3B3B3";
    signal   sampleDataArr_i   : slv32Array(N_DATA_IN_G-1 downto 0);
    signal   dataValidVec_i    : slv(N_DATA_IN_G-1 downto 0):= (others => '1');  
    
@@ -91,6 +92,7 @@ begin
       trigCasc_i        => trigCasc_i,
       trigCasc_o        => trigCasc_o,
       timeStamp_i       => timeStamp_i,
+      bsa_i             => bsa_i,
       axilReadMaster    => axilReadMaster,
       axilReadSlave     => axilReadSlave,
       axilWriteMaster   => axilWriteMaster,

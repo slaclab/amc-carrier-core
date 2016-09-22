@@ -57,8 +57,9 @@ entity DaqRegItf is
 
       -- Registers
       daqStatus_i      : in  Slv32Array(N_DATA_OUT_G-1 downto 0);
-      trigStatus_i     : in  slv(5 downto 0);
-      timeStamp_i      : in slv(64-1 downto 0);
+      trigStatus_i     : in  slv(5  downto 0);
+      timeStamp_i      : in slv(63  downto 0);
+      bsa_i            : in slv(127 downto 0);
       
       -- Control
       trigSw_o          : out sl;
@@ -114,8 +115,8 @@ architecture rtl of DaqRegItf is
    -- Note: Use with DaqMuxV2Tb.vhd
    -- constant REG_INIT_C : RegType := (
       -- control        => "101000110",
-      -- rateDiv        => x"0004",    
-      -- dataSize       => x"0000_0800",
+      -- rateDiv        => x"0001",    
+      -- dataSize       => x"0000_0008",
       -- muxSel         => (1 => '0'&x"1"  , 0 => '0'& x"3"),
       -- dataFormat     => (1 => "00000000", 0 => "111" & '0'& x"d"),
       
@@ -132,7 +133,8 @@ architecture rtl of DaqRegItf is
    
    signal s_trigStatus     : slv(trigStatus_i'range);
    signal s_daqStatus      : slv32Array(N_DATA_OUT_G-1 downto 0);
-   signal s_timeStamp      : slv(64-1 downto 0);
+   signal s_timeStamp      : slv(63 downto 0);
+   signal s_bsa            : slv(127 downto 0);
    
 begin
 
@@ -140,7 +142,7 @@ begin
    s_RdAddr <= conv_integer(axilReadMaster.araddr(9 downto 2));
    s_WrAddr <= conv_integer(axilWriteMaster.awaddr(9 downto 2));
 
-   comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr, s_WrAddr, s_daqStatus, s_trigStatus, s_timeStamp) is
+   comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr, s_WrAddr, s_daqStatus, s_trigStatus, s_timeStamp,s_bsa) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -185,19 +187,27 @@ begin
          axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
          v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
-            when 16#00# =>              -- ADDR (0)
+            when 16#00# =>              -- ADDR (0x0)
                v.axilReadSlave.rdata(r.control'range) := r.control;
-            when 16#01# =>              -- ADDR (4)
+            when 16#01# =>              -- ADDR (0x4)
                v.axilReadSlave.rdata(trigStatus_i'range) := s_trigStatus;               
-            when 16#02# =>              -- ADDR (8)
+            when 16#02# =>              -- ADDR (0x8)
                v.axilReadSlave.rdata(r.rateDiv'range) := r.rateDiv;
-            when 16#03# =>              -- ADDR (12)
+            when 16#03# =>              -- ADDR (0xc)
                v.axilReadSlave.rdata(r.dataSize'range) := r.dataSize;
-            when 16#04# =>              -- ADDR (12)
-               v.axilReadSlave.rdata(r.dataSize'range) := s_timeStamp(64-1 downto 32);
-            when 16#05# =>              -- ADDR (12)
-               v.axilReadSlave.rdata(r.dataSize'range) := s_timeStamp(32-1 downto 0);
-            when 16#10# to 16#1F# =>    -- ADDR (64)
+            when 16#04# =>              -- ADDR (0x10)
+               v.axilReadSlave.rdata(r.dataSize'range) := s_timeStamp(63 downto 32);
+            when 16#05# =>              -- ADDR (0x14)
+               v.axilReadSlave.rdata(r.dataSize'range) := s_timeStamp(31 downto 0);
+            when 16#06# =>              -- ADDR (0x18)
+               v.axilReadSlave.rdata(r.dataSize'range) := s_bsa(127 downto 96);
+            when 16#07# =>              -- ADDR (0x1c)
+               v.axilReadSlave.rdata(r.dataSize'range) := s_bsa(95 downto 64);
+            when 16#08# =>              -- ADDR (0x20)
+               v.axilReadSlave.rdata(r.dataSize'range) := s_bsa(63 downto 32);
+            when 16#09# =>              -- ADDR (0x24)
+               v.axilReadSlave.rdata(r.dataSize'range) := s_bsa(31 downto 0);                
+            when 16#10# to 16#1F# =>    -- ADDR (0x40)
                for I in (N_DATA_OUT_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = I) then
                      v.axilReadSlave.rdata(r.muxSel(I)'range) := r.muxSel(I);
@@ -281,6 +291,17 @@ begin
      dout   => s_timeStamp
    );
 
+   SyncFifo_IN2 : entity work.SynchronizerFifo
+   generic map (
+     TPD_G        => TPD_G,
+     DATA_WIDTH_G => 128
+   )
+   port map (
+     wr_clk => devClk_i,
+     din    => bsa_i,
+     rd_clk => axiClk_i,
+     dout   => s_bsa
+   );
 
    ------------------------------------------------
    -- Output assignment and synchronisation
