@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2016-03-02
+-- Last update: 2016-09-23
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -120,16 +120,6 @@ architecture mapping of AmcCarrierMpsSalt is
 
 begin
 
-   U_SaltDelayCtrl : entity work.SaltDelayCtrl
-      generic map (
-         TPD_G           => TPD_G,
-         SIM_DEVICE_G    => "ULTRASCALE",
-         IODELAY_GROUP_G => "MPS_IODELAY_GRP")
-      port map (
-         iDelayCtrlRdy => iDelayCtrlRdy,
-         refClk        => mps625MHzClk,
-         refRst        => mps625MHzRst);    
-
    APP_SLOT : if (MPS_SLOT_G = false) generate
       
       mpsRxLinkUp  <= (others => '0');
@@ -184,6 +174,16 @@ begin
 
    MPS_SLOT : if (MPS_SLOT_G = true) generate
       
+      U_SaltDelayCtrl : entity work.SaltDelayCtrl
+         generic map (
+            TPD_G           => TPD_G,
+            SIM_DEVICE_G    => "ULTRASCALE",
+            IODELAY_GROUP_G => "MPS_IODELAY_GRP")
+         port map (
+            iDelayCtrlRdy => iDelayCtrlRdy,
+            refClk        => mps625MHzClk,
+            refRst        => mps625MHzRst);     
+
       mpsTxLinkUp     <= '0';
       mpsObMasters(0) <= mpsIbMaster;
       mpsIbSlave      <= mpsObSlaves(0);
