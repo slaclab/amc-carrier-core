@@ -34,9 +34,8 @@ entity DaqRegItf is
    generic (
       -- General Configurations
       TPD_G : time := 1 ns;
-
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
-
+      AXI_ADDR_WIDTH_G    : positive         := 10;
       -- Number of Axi lanes (1 to 16)
       N_DATA_OUT_G : positive := 8
       );    
@@ -55,11 +54,13 @@ entity DaqRegItf is
       devClk_i : in sl;
       devRst_i : in sl;
 
-      -- Registers
+      -- Status Registers
       daqStatus_i      : in  Slv32Array(N_DATA_OUT_G-1 downto 0);
       trigStatus_i     : in  slv(5  downto 0);
       timeStamp_i      : in slv(63  downto 0);
       bsa_i            : in slv(127 downto 0);
+      -- Trigger pulse for the trigger counter
+      trig_i           : in sl; 
       
       -- Control
       trigSw_o          : out sl;
@@ -131,18 +132,38 @@ architecture rtl of DaqRegItf is
    signal s_RdAddr : natural := 0;
    signal s_WrAddr : natural := 0;
    
+   signal s_trigCnt        : SlVectorArray(0 downto 0, 31 downto 0);
    signal s_trigStatus     : slv(trigStatus_i'range);
    signal s_daqStatus      : slv32Array(N_DATA_OUT_G-1 downto 0);
    signal s_timeStamp      : slv(63 downto 0);
    signal s_bsa            : slv(127 downto 0);
    
 begin
+   -- Counts the number of trigger pulses
+   U_SyncStatusVector : entity work.SyncStatusVector
+   generic map (
+      TPD_G          => TPD_G,
+      OUT_POLARITY_G => '1',
+      CNT_RST_EDGE_G => true,
+      CNT_WIDTH_G    => 32,
+      WIDTH_G        => 1)     
+   port map (
+      -- Input Status bit Signals (wrClk domain)
+      statusIn(0)          => trig_i,
+      -- Output Status bit Signals (rdClk domain)  
+      statusOut            => open,
+      -- Status Bit Counters Signals (rdClk domain) 
+      cntRstIn             => r.control(4),
+      cntOut               => s_trigCnt,
+      -- Clocks and Reset Ports
+      wrClk                => devClk_i,
+      rdClk                => axiClk_i);
 
    -- Convert address to integer (lower two bits of address are always '0')
-   s_RdAddr <= conv_integer(axilReadMaster.araddr(9 downto 2));
-   s_WrAddr <= conv_integer(axilWriteMaster.awaddr(9 downto 2));
+   s_RdAddr <= conv_integer(axilReadMaster.araddr(AXI_ADDR_WIDTH_G-1 downto 2));
+   s_WrAddr <= conv_integer(axilWriteMaster.awaddr(AXI_ADDR_WIDTH_G-1 downto 2));
 
-   comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr, s_WrAddr, s_daqStatus, s_trigStatus, s_timeStamp,s_bsa) is
+   comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr, s_WrAddr, s_daqStatus, s_trigStatus, s_timeStamp,s_bsa, s_trigCnt) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -196,17 +217,21 @@ begin
             when 16#03# =>              -- ADDR (0xc)
                v.axilReadSlave.rdata(r.dataSize'range) := r.dataSize;
             when 16#04# =>              -- ADDR (0x10)
-               v.axilReadSlave.rdata(r.dataSize'range) := s_timeStamp(63 downto 32);
+               v.axilReadSlave.rdata := s_timeStamp(63 downto 32);
             when 16#05# =>              -- ADDR (0x14)
-               v.axilReadSlave.rdata(r.dataSize'range) := s_timeStamp(31 downto 0);
+               v.axilReadSlave.rdata := s_timeStamp(31 downto 0);
             when 16#06# =>              -- ADDR (0x18)
-               v.axilReadSlave.rdata(r.dataSize'range) := s_bsa(127 downto 96);
+               v.axilReadSlave.rdata := s_bsa(127 downto 96);
             when 16#07# =>              -- ADDR (0x1c)
-               v.axilReadSlave.rdata(r.dataSize'range) := s_bsa(95 downto 64);
+               v.axilReadSlave.rdata := s_bsa(95 downto 64);
             when 16#08# =>              -- ADDR (0x20)
-               v.axilReadSlave.rdata(r.dataSize'range) := s_bsa(63 downto 32);
+               v.axilReadSlave.rdata := s_bsa(63 downto 32);
             when 16#09# =>              -- ADDR (0x24)
-               v.axilReadSlave.rdata(r.dataSize'range) := s_bsa(31 downto 0);                
+               v.axilReadSlave.rdata := s_bsa(31 downto 0);
+             when 16#0a# =>             -- ADDR (0x28)
+               for j in 31 downto 0 loop
+                  v.axilReadSlave.rdata(j) := s_trigCnt(0,j);
+               end loop;            
             when 16#10# to 16#1F# =>    -- ADDR (0x40)
                for I in (N_DATA_OUT_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = I) then

@@ -197,6 +197,7 @@ begin
       trigStatus_i      => s_trigStatus,
       bsa_i             => s_bsaSync,
       timeStamp_i       => s_timeStampSync,
+      trig_i            => s_trig,
       -- Config
       trigSw_o          => s_trigSw,
       trigCascMask_o    => s_trigCascMask,
