@@ -243,6 +243,25 @@ DaqMuxV2: &DaqMuxV2
       mode: RO
       description: Timestamp 63:0
     #########################################################
+    Bsa:
+      at:
+        offset: 0x018
+        nelms: 4
+      class: IntField
+      name: Bsa
+      sizeBits: 32
+      mode: RO
+      description:  "bsa(0) - edefAvgDn, bsa(1) - edefMinor, bsa(2) - edefMajor, bsa(3) - edefInit"
+    #########################################################
+    TrigCount:
+      at:
+        offset: 0x028
+      class: IntField
+      name: TrigCount
+      sizeBits: 32
+      mode: RO
+      description:  "Counts valid data acquisition triggers."
+    #########################################################
     InputMuxSel:
       at:
         offset: 0x040
