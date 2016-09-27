@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2016-09-15
+-- Last update: 2016-09-27
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -68,20 +68,20 @@ entity DebugRtmEth is
       -- Top Level Interface
       ----------------------
       -- Backplane Messaging Interface (bpMsgClk domain)
-      bpMsgClk          : in  sl              := '0';
-      bpMsgRst          : in  sl              := '0';
+      bpMsgClk          : in  sl                  := '0';
+      bpMsgRst          : in  sl                  := '0';
       bpMsgBus          : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
-      -- Application Debug Interface
-      obAppDebugMaster  : in  AxiStreamMasterType;
+      -- Application Debug Interface (ref156MHzClk domain)
+      obAppDebugMaster  : in  AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
       obAppDebugSlave   : out AxiStreamSlaveType;
       ibAppDebugMaster  : out AxiStreamMasterType;
-      ibAppDebugSlave   : in  AxiStreamSlaveType;
+      ibAppDebugSlave   : in  AxiStreamSlaveType  := AXI_STREAM_SLAVE_FORCE_C;
       -- Transceiver Debug Interface
-      gtTxPreCursor     : in  slv(4 downto 0) := "00000";
-      gtTxPostCursor    : in  slv(4 downto 0) := "00000";
-      gtTxDiffCtrl      : in  slv(3 downto 0) := "1111";
-      gtRxPolarity      : in  sl              := '0';
-      gtTxPolarity      : in  sl              := '0';
+      gtTxPreCursor     : in  slv(4 downto 0)     := "00000";
+      gtTxPostCursor    : in  slv(4 downto 0)     := "00000";
+      gtTxDiffCtrl      : in  slv(3 downto 0)     := "1111";
+      gtRxPolarity      : in  sl                  := '0';
+      gtTxPolarity      : in  sl                  := '0';
       ----------------
       -- Core Ports --
       ----------------   
