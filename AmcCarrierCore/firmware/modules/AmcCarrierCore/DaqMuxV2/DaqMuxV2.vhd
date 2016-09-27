@@ -150,6 +150,7 @@ begin
    -----------------------------------------------------------
    -- Synchronize timestamp_i and bsa
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
+   -- Rationale: The timeStamp and the bsa are registered between the two timing strobes. So this signal is static for 1/360s.
    -----------------------------------------------------------    
    U_SyncTimestamp: entity work.SynchronizerVector
    generic map (
