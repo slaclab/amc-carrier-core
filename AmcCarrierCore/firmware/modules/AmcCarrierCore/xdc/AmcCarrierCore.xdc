@@ -283,14 +283,6 @@ set_property -dict { PACKAGE_PIN J15 IOSTANDARD LVCMOS15 } [get_ports {ddrPg}]
 ## Core Area/Placement Constraints ##
 #####################################
 
-# # MIG Area Constraint
-# create_pblock MIG_GRP; add_cells_to_pblock [get_pblocks MIG_GRP] [get_cells {U_Core/U_DdrMem/MigCore_Inst}]
-# resize_pblock [get_pblocks MIG_GRP] -add {CLOCKREGION_X2Y2:CLOCKREGION_X2Y4}
-
-# # XAUI Area Constraint
-# create_pblock XAUI_GRP; add_cells_to_pblock [get_pblocks XAUI_GRP] [get_cells {U_Core/U_Eth/U_Xaui/XauiGthUltraScale_Inst/GEN_10GIGE.GEN_156p25MHz.U_XauiGthUltraScaleCore}]
-# resize_pblock [get_pblocks XAUI_GRP] -add {CLOCKREGION_X3Y2:CLOCKREGION_X3Y2}
-
 # SALT MPS Backplane: CH1
 set_property LOC BITSLICE_RX_TX_X0Y94  [get_cells -hier -filter {name =~ U_Core/U_MpsAndBpMsg/U_Salt/MPS_SLOT.GEN_VEC[1].*/idelay_cal}]
 set_property LOC BITSLICE_RX_TX_X0Y91  [get_cells -hier -filter {name =~ U_Core/U_MpsAndBpMsg/U_Salt/MPS_SLOT.GEN_VEC[1].*/idelay_m}]
@@ -412,17 +404,6 @@ create_generated_clock -name xauiPhyClk   [get_pins -hier -filter {name =~ U_Cor
 create_generated_clock -name ddrIntClk0   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
 create_generated_clock -name ddrIntClk1   [get_pins {U_Core/U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT6}]
 create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/LOCREF_G.U_TimingGthCore/*/RXOUTCLK}]  
-
-# create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/RXOUTCLK}]  
-# create_generated_clock -name timingGenClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TimingGthCoreWrapper_1/U_TimingGthCore/*/TXOUTCLK}]
-# create_generated_clock -name timingGenUsrClk [get_pins -hier -filter {name =~ U_Core/U_Timing/TIMING_TXCLK_BUFG_GT/O}]
-# create_generated_clock -name recTimingClk [get_pins -hier -filter {name =~ U_Core/U_Timing/recTimingClk}]
-
-set_false_path -to [get_pins -hier -filter {name =~ */U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*/RST}]
-set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsAndBpMsg/*/SALT_IDELAY_CTRL_Inst*}]
-set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsAndBpMsg/*/serdes_1_to_10_ser8_i/idelay_cal}]
-set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsAndBpMsg/*/serdes_1_to_10_ser8_i/idelay_m}]
-set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_MpsAndBpMsg/*/serdes_1_to_10_ser8_i/idelay_s}]
 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {xauiPhyClk}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ddrClkIn}] 
