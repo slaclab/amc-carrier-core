@@ -35,11 +35,13 @@ entity Jesd16bTo32b is
       wrClk    : in  sl;
       wrRst    : in  sl;
       validIn  : in  sl;
+      overflow : out sl;
       dataIn   : in  slv(15 downto 0);
       -- 32-bit Read Interface
       rdClk    : in  sl;
       rdRst    : in  sl;
       validOut : out sl;
+      underflow: out sl;
       dataOut  : out slv(31 downto 0));    
 end Jesd16bTo32b;
 
@@ -104,7 +106,7 @@ begin
       ALTERA_SYN_G  => false,
       SYNC_STAGES_G => 3,
       DATA_WIDTH_G  => 32,
-      ADDR_WIDTH_G  => 4)
+      ADDR_WIDTH_G  => 5)
    port map (
       -- Asynchronous Reset
       rst    => wrRst,
@@ -112,10 +114,12 @@ begin
       wr_clk => wrClk,
       wr_en  => r.wrEn,
       din    => r.data,
+      overflow => overflow,
       -- Read Ports (rd_clk domain)
       rd_clk => rdClk,
       rd_en  => s_valid,
       dout   => dataOut,
+      underflow => underflow,
       valid  => s_valid);
 
    validOut <= s_valid;

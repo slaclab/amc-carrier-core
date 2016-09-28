@@ -35,11 +35,13 @@ entity Jesd32bTo16b is
       wrClk    : in  sl;
       wrRst    : in  sl;
       validIn  : in  sl;
+      overflow : out sl;
       dataIn   : in  slv(31 downto 0);
       -- 16-bit Read Interface
       rdClk    : in  sl;
       rdRst    : in  sl;
       validOut : out sl;
+      underflow: out sl;
       dataOut  : out slv(15 downto 0));     
 end Jesd32bTo16b;
 
@@ -78,7 +80,7 @@ begin
          ALTERA_SYN_G  => false,
          SYNC_STAGES_G => 3,
          DATA_WIDTH_G  => 32,
-         ADDR_WIDTH_G  => 4)
+         ADDR_WIDTH_G  => 5)
       port map (
          -- Asynchronous Reset
          rst    => wrRst,
@@ -86,10 +88,12 @@ begin
          wr_clk => wrClk,
          wr_en  => validIn,
          din    => dataIn,
+         overflow => overflow,
          -- Read Ports (rd_clk domain)
          rd_clk => rdClk,
          rd_en  => rdEn,
          dout   => data,
+         underflow => underflow,
          valid  => valid);
 
    comb : process (data, r, rdRst, valid) is
@@ -100,20 +104,18 @@ begin
 
       -- Reset the strobes
       v.rdEn  := '0';
-      v.valid := '0';
+      v.valid := valid;
 
       -- Check if FIFO has data
-      if valid = '1' then
+      if r.valid = '1' then
          -- Check the 16-bit word select flag
          if r.wordSel = '0' then
             -- Set the flags and data bus
             v.wordSel := '1';
-            v.valid   := '1';
             v.data    := data(15 downto 0);
          else
             -- Set the flags and data bus
             v.wordSel := '0';
-            v.valid   := '1';
             v.data    := data(31 downto 16);
             -- Acknowledge the FIFO read
             v.rdEn    := '1';
