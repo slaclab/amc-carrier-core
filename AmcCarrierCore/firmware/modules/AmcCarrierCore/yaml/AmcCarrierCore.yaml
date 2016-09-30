@@ -19,7 +19,8 @@
 #include AmcCarrierTiming.yaml
 #include AmcCarrierBsa.yaml
 #include EthMacPhy.yaml
-#include UdpEngineWrapper.yaml
+#include UdpEngineClient.yaml
+#include UdpEngineServer.yaml
 #include RssiCore.yaml
 #include AxiMemTester.yaml
 #include AmcCarrierMps.yaml
@@ -119,13 +120,21 @@ AmcCarrierCore: &AmcCarrierCore
         offset: 0x0A000000  
       instantiate: false
     ##################################################
-    UdpEngineWrapper:
-      <<: *UdpEngineWrapper
+    UdpEngineClient:
+      <<: *UdpEngineClient
       at:
         offset: 0x0A010000
         nelms: 2
         stride: 8
       description: "ClientConfig[1:0]"
+    ##################################################
+    UdpEngineServer:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x0A010800
+        nelms: 5
+        stride: 8
+      description: "ServerConfig[4:0]"      
     ##################################################
     RssiServerSw:
       <<: *RssiCore
