@@ -117,6 +117,7 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *EthMacPhy
       at:
         offset: 0x0A000000  
+      instantiate: false
     ##################################################
     UdpEngineWrapper:
       <<: *UdpEngineWrapper
@@ -161,3 +162,4 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *AmcCarrierMps
       at:
         offset: 0x0C000000   
+    ##################################################   
