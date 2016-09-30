@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-08-08
+-- Last update: 2016-09-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ entity AmcCarrierBsa is
       TPD_G            : time            := 1 ns;
       FSBL_G           : boolean         := false;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
+      DISABLE_BSA_G    : boolean         := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- AXI-Lite Interface (axilClk domain)
@@ -313,33 +314,52 @@ begin
       -- BSA buffers
       -------------------------------------------------------------------------------------------------
       ibBsaSlaves(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;
-      BsaBufferControl_1 : entity work.BsaBufferControl
-         generic map (
-            TPD_G                   => TPD_G,
-            AXIL_BASE_ADDR_G        => AXIL_CROSSBAR_CONFIG_C(BSA_BUFFER_AXIL_C).baseAddr,
-            BSA_BUFFERS_G           => BSA_BUFFERS_C,
-            BSA_STREAM_BYTE_WIDTH_G => BSA_STREAM_BYTE_WIDTH_C,
-            DIAGNOSTIC_OUTPUTS_G    => BSA_DIAGNOSTIC_OUTPUTS_C,
-            BSA_BURST_BYTES_G       => BSA_BURST_BYTES_C,  -- explore 4096
-            AXI_CONFIG_G            => BSA_AXI_CONFIG_C)
-         port map (
-            axilClk          => axilClk,
-            axilRst          => axilRst,
-            axilReadMaster   => locAxilReadMasters(BSA_BUFFER_AXIL_C),
-            axilReadSlave    => locAxilReadSlaves(BSA_BUFFER_AXIL_C),
-            axilWriteMaster  => locAxilWriteMasters(BSA_BUFFER_AXIL_C),
-            axilWriteSlave   => locAxilWriteSlaves(BSA_BUFFER_AXIL_C),
-            diagnosticClk    => diagnosticClk,
-            diagnosticRst    => diagnosticRst,
-            diagnosticBus    => diagnosticBus,
-            axisStatusClk    => axilClk,
-            axisStatusRst    => axilRst,
-            axisStatusMaster => obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C),
-            axisStatusSlave  => obBsaSlaves(BSA_BSA_STATUS_AXIS_INDEX_C),
-            axiClk           => axiClk,
-            axiRst           => axiRst,
-            axiWriteMaster   => bsaAxiWriteMaster,
-            axiWriteSlave    => bsaAxiWriteSlave);
+      BSA_EN_GEN : if (DISABLE_BSA_G = false) generate
+         BsaBufferControl_1 : entity work.BsaBufferControl
+            generic map (
+               TPD_G                   => TPD_G,
+               AXIL_BASE_ADDR_G        => AXIL_CROSSBAR_CONFIG_C(BSA_BUFFER_AXIL_C).baseAddr,
+               BSA_BUFFERS_G           => BSA_BUFFERS_C,
+               BSA_STREAM_BYTE_WIDTH_G => BSA_STREAM_BYTE_WIDTH_C,
+               DIAGNOSTIC_OUTPUTS_G    => BSA_DIAGNOSTIC_OUTPUTS_C,
+               BSA_BURST_BYTES_G       => BSA_BURST_BYTES_C,  -- explore 4096
+               AXI_CONFIG_G            => BSA_AXI_CONFIG_C)
+            port map (
+               axilClk          => axilClk,
+               axilRst          => axilRst,
+               axilReadMaster   => locAxilReadMasters(BSA_BUFFER_AXIL_C),
+               axilReadSlave    => locAxilReadSlaves(BSA_BUFFER_AXIL_C),
+               axilWriteMaster  => locAxilWriteMasters(BSA_BUFFER_AXIL_C),
+               axilWriteSlave   => locAxilWriteSlaves(BSA_BUFFER_AXIL_C),
+               diagnosticClk    => diagnosticClk,
+               diagnosticRst    => diagnosticRst,
+               diagnosticBus    => diagnosticBus,
+               axisStatusClk    => axilClk,
+               axisStatusRst    => axilRst,
+               axisStatusMaster => obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C),
+               axisStatusSlave  => obBsaSlaves(BSA_BSA_STATUS_AXIS_INDEX_C),
+               axiClk           => axiClk,
+               axiRst           => axiRst,
+               axiWriteMaster   => bsaAxiWriteMaster,
+               axiWriteSlave    => bsaAxiWriteSlave);
+      end generate BSA_EN_GEN;
+
+      BSA_DISABLE_GEN : if (DISABLE_BSA_G) generate
+         U_AxiLiteEmpty_2 : entity work.AxiLiteEmpty
+            generic map (
+               TPD_G            => TPD_G,
+               AXI_ERROR_RESP_G => AXI_RESP_OK_C)
+            port map (
+               axiClk         => axilClk,                                 -- [in]
+               axiClkRst      => axilRst,                                 -- [in]
+               axiReadMaster  => locAxilReadMasters(BSA_BUFFER_AXIL_C),   -- [in]
+               axiReadSlave   => locAxilReadSlaves(BSA_BUFFER_AXIL_C),    -- [out]
+               axiWriteMaster => locAxilWriteMasters(BSA_BUFFER_AXIL_C),  -- [in]
+               axiWriteSlave  => locAxilWriteSlaves(BSA_BUFFER_AXIL_C));  -- [out]
+
+         bsaAxiWriteMaster <= AXI_WRITE_MASTER_INIT_C;
+         obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
+      end generate BSA_DISABLE_GEN;
 
       -----------------------------------------------------------------------------------------------
       -- Mem Read engine

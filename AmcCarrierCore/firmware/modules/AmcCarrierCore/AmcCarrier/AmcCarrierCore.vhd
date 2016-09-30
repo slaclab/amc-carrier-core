@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-08-08
+-- Last update: 2016-09-29
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -41,6 +41,7 @@ entity AmcCarrierCore is
       MPS_SLOT_G    : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G        : boolean := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G    : AppType := APP_NULL_TYPE_C;
+      DISABLE_BSA_G : boolean := false;
       EN_BP_MSG_G   : boolean := false);
    port (
       ----------------------
@@ -497,6 +498,7 @@ begin
          TPD_G            => TPD_G,
          FSBL_G           => FSBL_G,
          APP_TYPE_G       => APP_TYPE_G,
+         DISABLE_BSA_G    => DISABLE_BSA_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
