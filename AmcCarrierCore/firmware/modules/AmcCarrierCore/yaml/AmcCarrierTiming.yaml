@@ -11,7 +11,7 @@
 #once
 #include TimingFrameRx.yaml
 #include TPGMiniCore.yaml
-#include GthRxAlign.yaml
+#include GthRxAlignCheck.yaml
 
 AmcCarrierTiming: &AmcCarrierTiming 
   name: AmcCarrierTiming
@@ -32,8 +32,8 @@ AmcCarrierTiming: &AmcCarrierTiming
       at:
         offset: 0x00030000
     ##################################################
-    GthRxAlign:
-      <<: *GthRxAlign
+    GthRxAlignCheck:
+      <<: *GthRxAlignCheck
       at:
         offset: 0x00800000
     ##################################################    
