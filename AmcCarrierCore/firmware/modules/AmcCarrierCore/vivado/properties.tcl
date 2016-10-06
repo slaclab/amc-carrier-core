@@ -36,3 +36,7 @@ add_files -quiet -fileset sources_1 ${TOP_DIR}/modules/BsaCore/$::env(BSA_TAG)/c
 
 ## Place and Route strategies 
 set_property strategy Performance_Explore [get_runs impl_1]
+set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE Explore [get_runs impl_1]
+
+## Skip the utilization check during placement
+set_param place.skipUtilizationCheck 1
