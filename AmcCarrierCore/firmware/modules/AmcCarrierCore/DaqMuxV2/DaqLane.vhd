@@ -78,6 +78,7 @@ entity DaqLane is
       dec16or32_i  : in sl:='0';          -- Data format
       timeStamp_i  : in slv(63 downto 0); -- Connected from timing system
       bsa_i        : in slv(127 downto 0); -- Connected from timing system
+      dmod_i       : in slv(191 downto 0); -- Connected from timing system
       headerEn_i   : in sl:='0';          
       header_i     : in slv(7 downto 0):=x"00";-- Additional/external header byte
       
@@ -107,7 +108,9 @@ architecture rtl of DaqLane is
    constant SSI_CONFIG_C      : AxiStreamConfigType := ssiAxiStreamConfig(GT_WORD_SIZE_C, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 4, 3);
    constant TSTRB_C           : slv(15 downto 0)    := (15 downto GT_WORD_SIZE_C => '0') & (GT_WORD_SIZE_C-1 downto 0 => '1');
    constant KEEP_C            : slv(15 downto 0)    := (15 downto GT_WORD_SIZE_C => '0') & (GT_WORD_SIZE_C-1 downto 0 => '1');
-
+   -- Header size constant (so the header size could be quickly adjusted)
+   constant HEADER_SIZE_C     : positive := 14;
+   
    type StateType is (
       IDLE_S,
       HEADER_S,
@@ -275,20 +278,32 @@ begin
             if (headerEn_i = '1') then
                Header : case (r.dataCnt) is
                   when toSlv(0, 32) =>
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(63 downto 32);
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(31 downto 0);
                   when toSlv(1, 32) =>  
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(31 downto 0);
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(63 downto 32);
                   when toSlv(2, 32) =>
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(127 downto 96);
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(95 downto 64);
                   when toSlv(3, 32) =>
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(95 downto 64);
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(127 downto 96);
                   when toSlv(4, 32) =>
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(63 downto 32);
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(159 downto 128);
                   when toSlv(5, 32) =>
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(31 downto 0);
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(191 downto 160);             
                   when toSlv(6, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(31 downto 0);
+                  when toSlv(7, 32) =>  
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(63 downto 32);
+                  when toSlv(8, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(127 downto 96);
+                  when toSlv(9, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(95 downto 64);
+                  when toSlv(10, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(63 downto 32);
+                  when toSlv(11, 32) =>
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(31 downto 0);
+                  when toSlv(12, 32) =>
                      v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := packetSize_i;
-                  when toSlv(7, 32) =>
+                  when toSlv(13, 32) =>
                      v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & dec16or32_i & averaging_i & test_i & '0' & toSlv(axiNum_i, 4) & rateDiv_i ;            
                   when others =>
                      v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := (others=>'0');                  
@@ -300,8 +315,8 @@ begin
             v.txAxisMaster.tLast := '0';
             v.txAxisMaster.tDest := toSlv(axiNum_i, 8);
              
-            -- Insert tLast at the end of header and EOFE if packetSize_i less or equal to 8 
-            if ((r.dataCnt = 7) and (packetSize_i <= 8)) then
+            -- Insert tLast at the end of header and EOFE if packetSize_i less or equal to HEADER_SIZE_C 
+            if ((r.dataCnt = (HEADER_SIZE_C-1)) and (packetSize_i <= HEADER_SIZE_C)) then
                -- Set the EOF(tlast) bit       
                v.txAxisMaster.tLast := '1';
                -- Set the EOFE bit in tUser if error occurred during packet transmission
@@ -311,10 +326,10 @@ begin
              
             -- Go further after next data
             if s_rateClk = '1' then
-               if (r.dataCnt = 7 and packetSize_i <= 8) then
+               if (r.dataCnt = (HEADER_SIZE_C-1) and packetSize_i <= HEADER_SIZE_C) then
                   v.pctCnt  := r.pctCnt+1;
                   v.state := IDLE_S;     -- End packet
-               elsif (r.dataCnt = 7) then
+               elsif (r.dataCnt = (HEADER_SIZE_C-1)) then
                   v.state := DATA_S;
                else
                   v.state := HEADER_S;
