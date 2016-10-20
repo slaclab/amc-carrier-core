@@ -80,6 +80,7 @@ AmcGenericAdcDacCore: &AmcGenericAdcDacCore
             offset: 0x0
             nelms: 0x4000        
           mode: RO 
+      instantiate: false          
     ##################################################
     InitAmcCard:
       description: Initialization for AMC card's JESD modules
