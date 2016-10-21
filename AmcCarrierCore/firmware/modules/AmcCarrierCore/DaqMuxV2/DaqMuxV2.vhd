@@ -62,9 +62,13 @@ entity DaqMuxV2 is
       trigHw_i : in sl;
       
       -- Cascaded Sw trigger for external connection between modules
-      trigCasc_i : in sl;
+      trigCasc_i : in  sl;
       trigCasc_o : out sl;
       
+      -- Cascaded Arm trigger for external connection between modules      
+      armCasc_i : in  sl:= '0';
+      armCasc_o : out sl;      
+            
       -- Freeze buffers
       freezeHw_i : in sl;
       
@@ -243,6 +247,7 @@ begin
       trigCascMask_i    => s_trigCascMask,
       trigHwAutoRearm_i => s_trigHwAutoRearm,
       trigHwArm_i       => s_trigHwArm,
+      armCasc_i         => armCasc_i,
       
       freezeSw_i        => s_freezeSw,
       freezeHw_i        => freezeHw_i,
@@ -259,7 +264,7 @@ begin
    
    -- Sw trigger goes directly out to Cascade so it is aligned with the next nodule as much as possible
    trigCasc_o <= s_trigSw;  
-      
+   armCasc_o  <= s_trigHwArm;
    -----------------------------------------------------------
    -- MULTIPLEXER logic
    -----------------------------------------------------------    

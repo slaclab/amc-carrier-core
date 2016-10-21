@@ -53,6 +53,7 @@ entity DaqTrigger is
       trigSw_i    : in  sl;
       trigHw_i    : in  sl;
       trigCasc_i  : in  sl;
+      armCasc_i   : in  sl;
       
       -- Raw freeze inputs
       freezeSw_i  : in  sl;
@@ -106,6 +107,7 @@ architecture rtl of DaqTrigger is
    signal s_freezeSwRe : sl;
    signal s_freezeHwRe : sl;
    signal s_armRe      : sl;
+   signal s_armCascRe  : sl;   
    signal s_clearRe    : sl;   
    
 begin
@@ -169,8 +171,19 @@ begin
       clk     => clk,
       rst     => rst,
       dataIn  => trigHwArm_i,
-      dataOut => s_armRe);      
-
+      dataOut => s_armRe);
+      
+   -- One shots 
+   U_SyncOneShotArmCasc: entity work.SynchronizerOneShot
+   generic map (
+      TPD_G           => TPD_G,
+      BYPASS_SYNC_G   => true) -- No need to sync
+   port map (
+      clk     => clk,
+      rst     => rst,
+      dataIn  => armCasc_i,
+      dataOut => s_armCascRe); 
+      
    U_SyncOneShotClear: entity work.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
@@ -182,7 +195,7 @@ begin
       dataOut => s_clearRe);
    
    
-   comb : process (r, rst, s_trigSwRe, s_trigCascRe, s_trigHwRe, s_freezeHwRe, s_freezeSwRe, s_armRe, s_clearRe, trigCascMask_i, freezeHwMask_i, daqBusy_i, trigHwAutoRearm_i, trigMode_i ) is
+   comb : process (r, rst, s_trigSwRe, s_trigCascRe, s_trigHwRe, s_freezeHwRe, s_freezeSwRe, s_armRe, s_armCascRe, s_clearRe, trigCascMask_i, freezeHwMask_i, daqBusy_i, trigHwAutoRearm_i, trigMode_i ) is
       variable v           : RegType;
       variable vTrigHeader : slv(trigHeader_o'range); 
    begin
@@ -218,7 +231,7 @@ begin
       end if;
       
       -- Trig status Register 3
-      if (s_armRe = '1') then
+      if (s_armRe = '1' or s_armCascRe='1') then
          v.trigStatusReg(3) := '1';
       elsif (s_trigHwRe = '1') then
          v.trigStatusReg(3) := '0';
