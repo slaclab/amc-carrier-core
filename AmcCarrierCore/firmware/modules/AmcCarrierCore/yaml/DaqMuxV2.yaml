@@ -8,7 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once DaqMuxV2.yaml
 
 DaqMuxV2: &DaqMuxV2
   name: DaqMuxV2

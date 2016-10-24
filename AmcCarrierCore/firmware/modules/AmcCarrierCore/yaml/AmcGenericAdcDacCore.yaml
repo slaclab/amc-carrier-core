@@ -8,7 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once AmcGenericAdcDacCore.yaml
 #include JesdRx.yaml
 #include JesdTx.yaml
 #include Lmk04828.yaml

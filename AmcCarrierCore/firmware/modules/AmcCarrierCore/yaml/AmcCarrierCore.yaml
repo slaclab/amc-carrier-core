@@ -8,7 +8,7 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once
+#once AmcCarrierCore.yaml
 #include AxiVersion.yaml
 #include AxiEmpty.yaml
 #include AxiSysMonUltraScale.yaml
