@@ -187,7 +187,7 @@ begin
          averaging_i   => averaging_i,
          rateClk_o     => s_rateClk);
    
-   comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i, 
+   comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i,dmod_i,
                    rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk, trig_i, headerEn_i, timeStamp_i, header_i, bsa_i) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;

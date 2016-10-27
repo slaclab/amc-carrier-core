@@ -41,6 +41,7 @@ entity DebugRtmEthAmcCarrierCore is
       ETH_10G_G     : boolean := false;  -- false = 1 GigE, true = 10 GigE
       MPS_SLOT_G    : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G        : boolean := false;  -- false = Normal Operation, true = First Stage Boot loader
+      DISABLE_BSA_G : boolean := false;
       APP_TYPE_G    : AppType := APP_NULL_TYPE_C;
       EN_BP_MSG_G   : boolean := false);
    port (
@@ -512,6 +513,7 @@ begin
          TPD_G            => TPD_G,
          FSBL_G           => FSBL_G,
          APP_TYPE_G       => APP_TYPE_G,
+         DISABLE_BSA_G    => DISABLE_BSA_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
