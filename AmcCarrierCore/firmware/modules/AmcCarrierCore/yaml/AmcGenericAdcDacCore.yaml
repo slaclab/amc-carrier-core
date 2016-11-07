@@ -121,5 +121,9 @@ AmcGenericAdcDacCore: &AmcGenericAdcDacCore
 
         # Clear the Alarms
         - entry: Lmk04828/InitLmk          
-          value: 0x1       
+          value: 0x1 
+          
+        # Reset status counters
+        - entry: AmcGenericAdcDacCtrl/CntRst          
+          value: 0x1           
     ##################################################
