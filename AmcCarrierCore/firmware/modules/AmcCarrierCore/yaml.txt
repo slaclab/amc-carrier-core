@@ -4,7 +4,3 @@ manual yaml/AmcCarrierCore.yaml
 manual yaml/AmcCarrierMps.yaml
 manual yaml/AmcCarrierMpsPhy.yaml
 manual yaml/AmcCarrierTiming.yaml
-manual yaml/AmcGenericAdcDacCore.yaml
-manual yaml/AmcGenericAdcDacCtrl.yaml
-manual yaml/AxisDaqMux.yaml
-manual yaml/DaqMuxV2.yaml

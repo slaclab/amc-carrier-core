@@ -1,5 +1,4 @@
 
-
 vhdl work AppTop/rtl/AppTop.vhd
 vhdl work AppTop/rtl/AppTopJesd.vhd
 vhdl work AppTop/rtl/AppTopJesd204b.vhd
@@ -8,9 +7,9 @@ vhdl work AppTop/rtl/AppTopTrig.vhd
 
 vhdl work AppTop/coregen/AppTopJesd204bCoregen.dcp
 
-vhdl work DaqMuxV2/DaqDecimator.vhd
-vhdl work DaqMuxV2/DaqRegItf.vhd
-vhdl work DaqMuxV2/DaqTrigger.vhd
-vhdl work DaqMuxV2/DaqLane.vhd
-vhdl work DaqMuxV2/DaqMuxV2.vhd
-vhdl work DaqMuxV2/DaqMuxV2Pkg.vhd
+vhdl work DaqMuxV2/rtl/DaqDecimator.vhd
+vhdl work DaqMuxV2/rtl/DaqRegItf.vhd
+vhdl work DaqMuxV2/rtl/DaqTrigger.vhd
+vhdl work DaqMuxV2/rtl/DaqLane.vhd
+vhdl work DaqMuxV2/rtl/DaqMuxV2.vhd
+vhdl work DaqMuxV2/rtl/DaqMuxV2Pkg.vhd
