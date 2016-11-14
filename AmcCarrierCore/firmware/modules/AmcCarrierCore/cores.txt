@@ -4,4 +4,3 @@
 # coregen/SysMonCore.xci
 # coregen/MigCore.xci
 # coregen/DebugRtmPgpGthCore.xci 
-# coregen/AmcGenericAdcDacJesd204bCoregen.xci 
