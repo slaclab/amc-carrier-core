@@ -1,1 +1,2 @@
-vhdl work rtl/asdf.vhd
+vhdl work rtl/AmcStriplineBpmDualCore.vhd
+vhdl work rtl/AmcStriplineBpmCore.vhd
