@@ -130,10 +130,10 @@ entity AppTop is
       sysRefP              : inout Slv4Array(1 downto 0);
       sysRefN              : inout Slv4Array(1 downto 0);
       -- AMC's Sync Ports
-      syncInP              : inout Slv10Array(1 downto 0);
-      syncInN              : inout Slv10Array(1 downto 0);
-      syncOutP             : inout Slv4Array(1 downto 0);
-      syncOutN             : inout Slv4Array(1 downto 0);
+      syncInP              : inout Slv4Array(1 downto 0);
+      syncInN              : inout Slv4Array(1 downto 0);
+      syncOutP             : inout Slv10Array(1 downto 0);
+      syncOutN             : inout Slv10Array(1 downto 0);
       -- AMC's Spare Ports
       spareP               : inout Slv16Array(1 downto 0);
       spareN               : inout Slv16Array(1 downto 0);
@@ -409,7 +409,7 @@ begin
          SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
          SIMULATION_G     => SIMULATION_G,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
-         AXIL_BASE_ADDR_G => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)           
       port map (
          -- Clocks and resets   

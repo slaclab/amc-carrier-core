@@ -1,1 +1,4 @@
-vhdl work rtl/asdf.vhd
+vhdl work rtl/AmcGenericAdcDacCore.vhd
+vhdl work rtl/AmcGenericAdcDacCtrl.vhd
+vhdl work rtl/AmcGenericAdcDacDualCore.vhd
+vhdl work rtl/AmcGenericAdcDacVcoSpi.vhd

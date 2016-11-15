@@ -8,87 +8,97 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 # JESD High Speed Ports
-set_property PACKAGE_PIN N4 [get_ports {jesdTxP[1][0]}]
-set_property PACKAGE_PIN N3 [get_ports {jesdTxN[1][0]}]
-set_property PACKAGE_PIN M2 [get_ports {jesdRxP[1][0]}]
-set_property PACKAGE_PIN M1 [get_ports {jesdRxN[1][0]}]
-set_property PACKAGE_PIN L4 [get_ports {jesdTxP[1][1]}]
-set_property PACKAGE_PIN L3 [get_ports {jesdTxN[1][1]}]
-set_property PACKAGE_PIN K2 [get_ports {jesdRxP[1][1]}]
-set_property PACKAGE_PIN K1 [get_ports {jesdRxN[1][1]}]
-set_property PACKAGE_PIN J4 [get_ports {jesdTxP[1][2]}]
-set_property PACKAGE_PIN J3 [get_ports {jesdTxN[1][2]}]
-set_property PACKAGE_PIN H2 [get_ports {jesdRxP[1][2]}]
-set_property PACKAGE_PIN H1 [get_ports {jesdRxN[1][2]}]
-set_property PACKAGE_PIN G4 [get_ports {jesdTxP[1][3]}]
-set_property PACKAGE_PIN G3 [get_ports {jesdTxN[1][3]}]
-set_property PACKAGE_PIN F2 [get_ports {jesdRxP[1][3]}]
-set_property PACKAGE_PIN F1 [get_ports {jesdRxN[1][3]}]
+set_property PACKAGE_PIN N4 [get_ports {jesdTxP[1][0]}] ; #P13 PIN47
+set_property PACKAGE_PIN N3 [get_ports {jesdTxN[1][0]}] ; #P13 PIN48
+set_property PACKAGE_PIN M2 [get_ports {jesdRxP[1][0]}] ; #P13 PIN44
+set_property PACKAGE_PIN M1 [get_ports {jesdRxN[1][0]}] ; #P13 PIN45
+set_property PACKAGE_PIN L4 [get_ports {jesdTxP[1][1]}] ; #P13 PIN53
+set_property PACKAGE_PIN L3 [get_ports {jesdTxN[1][1]}] ; #P13 PIN54
+set_property PACKAGE_PIN K2 [get_ports {jesdRxP[1][1]}] ; #P13 PIN50
+set_property PACKAGE_PIN K1 [get_ports {jesdRxN[1][1]}] ; #P13 PIN51
+set_property PACKAGE_PIN J4 [get_ports {jesdTxP[1][2]}] ; #P13 PIN62
+set_property PACKAGE_PIN J3 [get_ports {jesdTxN[1][2]}] ; #P13 PIN63
+set_property PACKAGE_PIN H2 [get_ports {jesdRxP[1][2]}] ; #P13 PIN59
+set_property PACKAGE_PIN H1 [get_ports {jesdRxN[1][2]}] ; #P13 PIN60
+set_property PACKAGE_PIN G4 [get_ports {jesdTxP[1][3]}] ; #P13 PIN68
+set_property PACKAGE_PIN G3 [get_ports {jesdTxN[1][3]}] ; #P13 PIN69
+set_property PACKAGE_PIN F2 [get_ports {jesdRxP[1][3]}] ; #P13 PIN65
+set_property PACKAGE_PIN F1 [get_ports {jesdRxN[1][3]}] ; #P13 PIN66
+set_property PACKAGE_PIN F6 [get_ports {jesdTxP[1][4]}] ; #P13 PIN32
+set_property PACKAGE_PIN F5 [get_ports {jesdTxN[1][4]}] ; #P13 PIN33
+set_property PACKAGE_PIN E4 [get_ports {jesdRxP[1][4]}] ; #P13 PIN29
+set_property PACKAGE_PIN E3 [get_ports {jesdRxN[1][4]}] ; #P13 PIN30
+set_property PACKAGE_PIN D6 [get_ports {jesdTxP[1][5]}] ; #P13 PIN38
+set_property PACKAGE_PIN D5 [get_ports {jesdTxN[1][5]}] ; #P13 PIN39
+set_property PACKAGE_PIN D2 [get_ports {jesdRxP[1][5]}] ; #P13 PIN35
+set_property PACKAGE_PIN D1 [get_ports {jesdRxN[1][5]}] ; #P13 PIN36
+set_property PACKAGE_PIN C4 [get_ports {jesdTxP[1][6]}] ; #P14 PIN53
+set_property PACKAGE_PIN C3 [get_ports {jesdTxN[1][6]}] ; #P14 PIN54
+set_property PACKAGE_PIN B2 [get_ports {jesdRxP[1][6]}] ; #P14 PIN50
+set_property PACKAGE_PIN B1 [get_ports {jesdRxN[1][6]}] ; #P14 PIN51
 
 # JESD Reference Ports
-set_property PACKAGE_PIN H6  [get_ports {jesdClkP[1]}]
-set_property PACKAGE_PIN H5  [get_ports {jesdClkN[1]}]
-set_property -dict { PACKAGE_PIN W25  IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {jesdSysRefP[1]}]
-set_property -dict { PACKAGE_PIN Y25  IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {jesdSysRefN[1]}]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareP[1][0]}] ; #jesdSysRefP[1]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareN[1][0]}] ; #jesdSysRefN[1]
 
 # JESD ADC Sync Ports
-set_property -dict { PACKAGE_PIN AF20 IOSTANDARD LVDS } [get_ports {jesdRxSyncP[1][0]}]
-set_property -dict { PACKAGE_PIN AG20 IOSTANDARD LVDS } [get_ports {jesdRxSyncN[1][0]}]
-set_property -dict { PACKAGE_PIN AD21 IOSTANDARD LVDS } [get_ports {jesdRxSyncP[1][1]}]
-set_property -dict { PACKAGE_PIN AE21 IOSTANDARD LVDS } [get_ports {jesdRxSyncN[1][1]}]
-set_property -dict { PACKAGE_PIN AN14 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {jesdTxSyncP[1]}]
-set_property -dict { PACKAGE_PIN AP14 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {jesdTxSyncN[1]}]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][0]}] ; #jesdRxSyncP[1][0]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[1][0]}] ; #jesdRxSyncN[1][0]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][1]}] ; #jesdRxSyncP[1][1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[1][1]}] ; #jesdRxSyncN[1][1]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutP[1][2]}] ; #jesdTxSyncP[1]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutN[1][2]}] ; #jesdTxSyncN[1]
 
 # LMK Ports
-set_property -dict { PACKAGE_PIN AA20 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkClkSel[1][0]}]
-set_property -dict { PACKAGE_PIN AC22 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkClkSel[1][1]}]
-set_property -dict { PACKAGE_PIN AB20 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkStatus[1][0]}]
-set_property -dict { PACKAGE_PIN AC23 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkStatus[1][1]}]
-set_property -dict { PACKAGE_PIN Y26  IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkCsL[1]}]
-set_property -dict { PACKAGE_PIN Y27  IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkSck[1]}]
-set_property -dict { PACKAGE_PIN AL25 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkDio[1]}]
-set_property -dict { PACKAGE_PIN AL24 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkRst[1]}]
-set_property -dict { PACKAGE_PIN AL22 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {lmkSync[1][0]}];# LMK SYNC: AMC Card Version C00
-set_property -dict { PACKAGE_PIN AL10 IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {lmkSync[1][1]}];# LMK SYNC: AMC Card Version C01 (or later)
-set_property -dict { PACKAGE_PIN AM10 IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {lmkMuxSel[1]}];# LMK MUX SEL: AMC Card Version C01 (or later)
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][4]}] ; #lmkClkSel[1][0]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][5]}] ; #lmkClkSel[1][1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][4]}] ; #lmkStatus[1][0]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][5]}] ; #lmkStatus[1][1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][15]}] ; #lmkCsL[1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][15]}] ; #lmkSck[1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {syncInN[1][2]}] ; #lmkDio[1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {syncInP[1][2]}] ; #lmkRst[1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {syncInP[1][3]}];# lmkSync[1][0]: AMC Card Version C00
+set_property -dict { IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {jtagPri[1][1]}];# lmkSync[1][1]: AMC Card Version C01 (or later)
+set_property -dict { IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {jtagPri[1][2]}];# lmkMuxSel[1]: AMC Card Version C01 (or later)
 
 # Fast ADC's SPI Ports
-set_property -dict { PACKAGE_PIN AB30 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcCsL[1][0]}]
-set_property -dict { PACKAGE_PIN AC31 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcCsL[1][1]}]
-set_property -dict { PACKAGE_PIN AB31 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcSck[1][0]}]
-set_property -dict { PACKAGE_PIN AC32 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcSck[1][1]}]
-set_property -dict { PACKAGE_PIN AB32 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcMiso[1][0]}]
-set_property -dict { PACKAGE_PIN AD31 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcMiso[1][1]}]
-set_property -dict { PACKAGE_PIN AA32 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcMosi[1][0]}]
-set_property -dict { PACKAGE_PIN AD30 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {adcMosi[1][1]}]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][6]}] ; #adcCsL[1][0]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][8]}] ; #adcCsL[1][1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][6]}] ; #adcSck[1][0]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][8]}] ; #adcSck[1][1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][7]}] ; #adcMiso[1][0]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][9]}] ; #adcMiso[1][1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][7]}] ; #adcMosi[1][0]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][9]}] ; #adcMosi[1][1]
 
 # Fast DAC's SPI Ports
-set_property -dict { PACKAGE_PIN AB26 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {dacCsL[1]}]
-set_property -dict { PACKAGE_PIN AB25 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {dacSck[1]}]
-set_property -dict { PACKAGE_PIN AA27 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {dacMiso[1]}]
-set_property -dict { PACKAGE_PIN AB27 IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {dacMosi[1]}]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][10]}] ; #dacCsL[1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][10]}] ; #dacSck[1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[1][11]}] ; #dacMiso[1]
+set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[1][11]}] ; #dacMosi[1]
 
 # Slow DAC's SPI Ports
-set_property -dict { PACKAGE_PIN AC26 IOSTANDARD LVDS } [get_ports {dacVcoCsP[1]}]
-set_property -dict { PACKAGE_PIN AC27 IOSTANDARD LVDS } [get_ports {dacVcoCsN[1]}]
-set_property -dict { PACKAGE_PIN AB24 IOSTANDARD LVDS } [get_ports {dacVcoSckP[1]}]
-set_property -dict { PACKAGE_PIN AC24 IOSTANDARD LVDS } [get_ports {dacVcoSckN[1]}]
-set_property -dict { PACKAGE_PIN AD25 IOSTANDARD LVDS } [get_ports {dacVcoDinP[1]}]
-set_property -dict { PACKAGE_PIN AD26 IOSTANDARD LVDS } [get_ports {dacVcoDinN[1]}]
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareP[1][12]}] ; #dacVcoCsP[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareN[1][12]}] ; #dacVcoCsN[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareP[1][13]}] ; #dacVcoSckP[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareN[1][13]}] ; #dacVcoSckN[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareP[1][14]}] ; #dacVcoDinP[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareN[1][14]}] ; #dacVcoDinN[1]
 
 # Pass through Interfaces
-set_property -dict { PACKAGE_PIN AE16 IOSTANDARD LVDS } [get_ports {fpgaClkP[1]}]
-set_property -dict { PACKAGE_PIN AE15 IOSTANDARD LVDS } [get_ports {fpgaClkN[1]}]
-set_property -dict { PACKAGE_PIN V31  IOSTANDARD LVDS } [get_ports {smaTrigP[1]}]
-set_property -dict { PACKAGE_PIN W31  IOSTANDARD LVDS } [get_ports {smaTrigN[1]}]
-set_property -dict { PACKAGE_PIN U34  IOSTANDARD LVDS } [get_ports {adcCalP[1]}]
-set_property -dict { PACKAGE_PIN V34  IOSTANDARD LVDS } [get_ports {adcCalN[1]}]
-set_property -dict { PACKAGE_PIN AM22 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {lemoDinP[1][0]}]
-set_property -dict { PACKAGE_PIN AN22 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {lemoDinN[1][0]}]
-set_property -dict { PACKAGE_PIN AM21 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {lemoDinP[1][1]}]
-set_property -dict { PACKAGE_PIN AN21 IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {lemoDinN[1][1]}]
-set_property -dict { PACKAGE_PIN Y31  IOSTANDARD LVDS } [get_ports {lemoDoutP[1][0]}]
-set_property -dict { PACKAGE_PIN Y32  IOSTANDARD LVDS } [get_ports {lemoDoutN[1][0]}]
-set_property -dict { PACKAGE_PIN V33  IOSTANDARD LVDS } [get_ports {lemoDoutP[1][1]}]
-set_property -dict { PACKAGE_PIN W34  IOSTANDARD LVDS } [get_ports {lemoDoutN[1][1]}]
-set_property -dict { PACKAGE_PIN AP9  IOSTANDARD LVCMOS25 } [get_ports {bcmL[1]}]
+set_property -dict { IOSTANDARD LVDS } [get_ports {fpgaClkP[1][0]}] ; #fpgaClkP[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {fpgaClkN[1][0]}] ; #fpgaClkN[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][3]}] ; #smaTrigP[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[1][3]}] ; #smaTrigN[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][4]}] ; #adcCalP[1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[1][4]}] ; #adcCalN[1]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncInP[1][0]}] ; #lemoDinP[1][0]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncInN[1][0]}] ; #lemoDinN[1][0]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncInP[1][1]}] ; #lemoDinP[1][1]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncInN[1][1]}] ; #lemoDinN[1][1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][5]}] ; #lemoDoutP[1][0]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[1][5]}] ; #lemoDoutN[1][0]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][6]}] ; #lemoDoutP[1][1]
+set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[1][6]}] ; #lemoDoutN[1][1]
+set_property -dict { IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][0]}] ; #bcmL[1]
