@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-08-05
+-- Last update: 2016-11-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,9 +38,10 @@ entity DebugRtmPgpAmcCarrierCore2 is
    generic (
       TPD_G         : time    := 1 ns;  -- Simulation only parameter
       SIM_SPEEDUP_G : boolean := false;  -- Simulation only parameter
-      SIMULATION_G             : boolean              := false;  -- Simulation only parameter
+      SIMULATION_G  : boolean := false;  -- Simulation only parameter
       MPS_SLOT_G    : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G        : boolean := false;  -- false = Normal Operation, true = First Stage Boot loader
+      DISABLE_BSA_G : boolean := false;
       APP_TYPE_G    : AppType := APP_NULL_TYPE_C;
       EN_BP_MSG_G   : boolean := false);
    port (
@@ -58,7 +59,7 @@ entity DebugRtmPgpAmcCarrierCore2 is
       -- Timing Interface (timingClk domain) 
       timingClk            : in  sl;
       timingRst            : in  sl;
-      timingBus            : out TimingBusType := TIMING_BUS_INIT_C;
+      timingBus            : out TimingBusType                    := TIMING_BUS_INIT_C;
       timingPhy            : in  TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
       timingPhyClk         : out sl;
       timingPhyRst         : out sl;
@@ -69,14 +70,19 @@ entity DebugRtmPgpAmcCarrierCore2 is
       --  Waveform interface (waveformClk domain)
       waveformClk          : out sl;
       waveformRst          : out sl;
-      obAppWaveformMasters : in  WaveformMasterArrayType := WAVEFORM_MASTER_ARRAY_INIT_C;
+      obAppWaveformMasters : in  WaveformMasterArrayType          := WAVEFORM_MASTER_ARRAY_INIT_C;
       obAppWaveformSlaves  : out WaveformSlaveArrayType;
       ibAppWaveformMasters : out WaveformMasterArrayType;
-      ibAppWaveformSlaves  : in  WaveformSlaveArrayType := WAVEFORM_SLAVE_ARRAY_INIT_C;
+      ibAppWaveformSlaves  : in  WaveformSlaveArrayType           := WAVEFORM_SLAVE_ARRAY_INIT_C;
       -- Backplane Messaging Interface (bpMsgClk domain)
       bpMsgClk             : in  sl                               := '0';
       bpMsgRst             : in  sl                               := '0';
       bpMsgBus             : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      -- Application Debug Interface (ref156MHzClk domain)
+      obAppDebugMaster     : in  AxiStreamMasterType              := AXI_STREAM_MASTER_INIT_C;
+      obAppDebugSlave      : out AxiStreamSlaveType;
+      ibAppDebugMaster     : out AxiStreamMasterType;
+      ibAppDebugSlave      : in  AxiStreamSlaveType               := AXI_STREAM_SLAVE_FORCE_C;
       -- BSI Interface (bsiClk domain) 
       bsiClk               : in  sl                               := '0';
       bsiRst               : in  sl                               := '0';
@@ -97,6 +103,7 @@ entity DebugRtmPgpAmcCarrierCore2 is
       ref625MHzRst         : out sl;
 
       gthFabClk        : out   sl;
+      ethPhyReady      : out   sl;
       ----------------
       --  Top Level Interface to IO
       ----------------
@@ -238,8 +245,11 @@ architecture mapping of DebugRtmPgpAmcCarrierCore2 is
    signal localIp    : slv(31 downto 0);
    signal localAppId : slv(15 downto 0);
 
-
 begin
+   
+   ethPhyReady      <= '0';
+   obAppDebugSlave  <= AXI_STREAM_SLAVE_FORCE_C;
+   ibAppDebugMaster <= AXI_STREAM_MASTER_INIT_C;
 
    localIp  <= bsiIp;
    localMac <= bsiMac;
@@ -296,7 +306,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- PGP interface (RTM)
    -------------------------------------------------------------------------------------------------
-   U_AmcCarrierPgp_1: entity work.AmcCarrierPgp
+   U_AmcCarrierPgp_1 : entity work.AmcCarrierPgp
       generic map (
          TPD_G            => TPD_G,
          SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
@@ -307,28 +317,28 @@ begin
          mAxilReadSlaves   => axilReadSlaves,    -- [in]
          mAxilWriteMasters => axilWriteMasters,  -- [out]
          mAxilWriteSlaves  => axilWriteSlaves,   -- [in]
-         axilClk           => axilClk,            -- [in]
-         axilRst           => axilRst,            -- [in]
+         axilClk           => axilClk,           -- [in]
+         axilRst           => axilRst,           -- [in]
          axilReadMaster    => pgpReadMaster,     -- [in]
          axilReadSlave     => pgpReadSlave,      -- [out]
          axilWriteMaster   => pgpWriteMaster,    -- [in]
          axilWriteSlave    => pgpWriteSlave,     -- [out]
-         obBsaMasters      => obBsaMasters,       -- [in]
-         obBsaSlaves       => obBsaSlaves,        -- [out]
-         ibBsaMasters      => ibBsaMasters,       -- [out]
-         ibBsaSlaves       => ibBsaSlaves,        -- [in]
-         bpMsgMasters      => bpMsgMasters,       -- [in]
-         bpMsgSlaves       => bpMsgSlaves,        -- [out]
-         bpMsgClk          => bpMsgClk,           -- [in]
-         bpMsgRst          => bpMsgRst,           -- [in]
-         bpMsgBus          => bpMsgBus,           -- [out]
-         rtmPgpRxP         => rtmPgpRxP,          -- [in]
-         rtmPgpRxN         => rtmPgpRxN,          -- [in]
-         rtmPgpTxP         => rtmPgpTxP,          -- [out]
-         rtmPgpTxN         => rtmPgpTxN,          -- [out]
-         rtmPgpClkP        => rtmPgpClkP,         -- [in]
-         rtmPgpClkN        => rtmPgpClkN);        -- [in]
-   
+         obBsaMasters      => obBsaMasters,      -- [in]
+         obBsaSlaves       => obBsaSlaves,       -- [out]
+         ibBsaMasters      => ibBsaMasters,      -- [out]
+         ibBsaSlaves       => ibBsaSlaves,       -- [in]
+         bpMsgMasters      => bpMsgMasters,      -- [in]
+         bpMsgSlaves       => bpMsgSlaves,       -- [out]
+         bpMsgClk          => bpMsgClk,          -- [in]
+         bpMsgRst          => bpMsgRst,          -- [in]
+         bpMsgBus          => bpMsgBus,          -- [out]
+         rtmPgpRxP         => rtmPgpRxP,         -- [in]
+         rtmPgpRxN         => rtmPgpRxN,         -- [in]
+         rtmPgpTxP         => rtmPgpTxP,         -- [out]
+         rtmPgpTxN         => rtmPgpTxN,         -- [out]
+         rtmPgpClkP        => rtmPgpClkP,        -- [in]
+         rtmPgpClkN        => rtmPgpClkN);       -- [in]
+
    ----------------------------------   
    -- Register Address Mapping Module
    ----------------------------------   
@@ -465,6 +475,7 @@ begin
          TPD_G            => TPD_G,
          FSBL_G           => FSBL_G,
          APP_TYPE_G       => APP_TYPE_G,
+         DISABLE_BSA_G    => DISABLE_BSA_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
@@ -493,7 +504,7 @@ begin
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
          diagnosticBus        => diagnosticBus,
-      -- Waveform interface
+         -- Waveform interface
          waveformClk          => axiClk,
          waveformRst          => axiRst,
          obAppWaveformMasters => obAppWaveformMasters,
