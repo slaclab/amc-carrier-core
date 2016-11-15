@@ -62,6 +62,29 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *AxiSy56040
       at:
         offset: 0x03000000      
+      description: |
+        Timing Crossbar:
+        -----------------------------------------------------------------
+        OutputConfig[0] = 0x0: Connects RTM_TIMING_OUT0 to RTM_TIMING_IN0
+        OutputConfig[0] = 0x1: Connects RTM_TIMING_OUT0 to FPGA_TIMING_IN
+        OutputConfig[0] = 0x2: Connects RTM_TIMING_OUT0 to BP_TIMING_IN
+        OutputConfig[0] = 0x3: Connects RTM_TIMING_OUT0 to RTM_TIMING_IN1
+        -----------------------------------------------------------------
+        OutputConfig[1] = 0x0: Connects FPGA_TIMING_OUT to RTM_TIMING_IN0
+        OutputConfig[1] = 0x1: Connects FPGA_TIMING_OUT to FPGA_TIMING_IN
+        OutputConfig[1] = 0x2: Connects FPGA_TIMING_OUT to BP_TIMING_IN
+        OutputConfig[1] = 0x3: Connects FPGA_TIMING_OUT to RTM_TIMING_IN1 
+        -----------------------------------------------------------------
+        OutputConfig[2] = 0x0: Connects Backplane DIST0 to RTM_TIMING_IN0
+        OutputConfig[2] = 0x1: Connects Backplane DIST0 to FPGA_TIMING_IN
+        OutputConfig[2] = 0x2: Connects Backplane DIST0 to BP_TIMING_IN
+        OutputConfig[2] = 0x3: Connects Backplane DIST0 to RTM_TIMING_IN1
+        -----------------------------------------------------------------
+        OutputConfig[3] = 0x0: Connects Backplane DIST1 to RTM_TIMING_IN0
+        OutputConfig[3] = 0x1: Connects Backplane DIST1 to FPGA_TIMING_IN
+        OutputConfig[3] = 0x2: Connects Backplane DIST1 to BP_TIMING_IN
+        OutputConfig[3] = 0x3: Connects Backplane DIST1 to RTM_TIMING_IN1         
+        -----------------------------------------------------------------
     ##################################################
     Axi24LC64FT:
       at:
