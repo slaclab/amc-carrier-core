@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-14
+-- Last update: 2016-11-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -39,6 +39,20 @@ package AppTopPkg is
       bsa       : slv(127 downto 0);
       dmod      : slv(191 downto 0);
    end record;
-   
+
+   type DacSigCtrlType is record
+      start : sl;
+   end record;
+   type DacSigCtrlArray is array (natural range <>) of DacSigCtrlType;
+   constant DAC_SIG_CTRL_INIT_C : DacSigCtrlType := (
+      start => '0');
+
+   type DacSigStatusType is record
+      running : sl;
+   end record;
+   type DacSigStatusArray is array (natural range <>) of DacSigStatusType;
+   constant DAC_SIG_STATUS_INIT_C : DacSigStatusType := (
+      running => '0');      
+
 end package AppTopPkg;
 

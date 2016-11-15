@@ -13,6 +13,7 @@
 #include AppTopTrig.yaml
 #include DaqMuxV2.yaml
 #include AppTopJesd.yaml
+#include DacSigGen.yaml
 
 AppTop: &AppTop 
   description: Common Application Top Level
@@ -46,4 +47,11 @@ AppTop: &AppTop
         offset: 0x40000000 
         nelms: 2
         stride: 0x10000000         
-    ##################################################     
+    ##################################################
+    DacSigGen:
+      <<: *DacSigGen
+      at:
+        offset: 0x60000000 
+        nelms: 2
+        stride: 0x10000000         
+    ##################################################    

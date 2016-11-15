@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-14
+-- Last update: 2016-11-15
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -47,6 +47,7 @@ entity AppTop is
       JESD_RX_POLARITY_G   : Slv7Array(1 downto 0)    := (others => "0000000");
       JESD_TX_POLARITY_G   : Slv7Array(1 downto 0)    := (others => "0000000");
       JESD_REF_SEL_G       : Slv2Array(1 downto 0)    := (others => DEV_CLK2_SEL_C);
+      NUM_SIG_GEN_G        : NaturalArray(1 downto 0) := (others => 0);
       NUM_OF_TRIG_PULSES_G : positive range 1 to 16   := 3;
       DELAY_WIDTH_G        : integer range 1 to 32    := 32;
       PULSE_WIDTH_G        : integer range 1 to 32    := 32;
@@ -151,7 +152,7 @@ end AppTop;
 
 architecture mapping of AppTop is
 
-   constant NUM_AXI_MASTERS_C : natural := 6;
+   constant NUM_AXI_MASTERS_C : natural := 8;
 
    constant CORE_INDEX_C     : natural := 0;
    constant TIMING_INDEX_C   : natural := 1;
@@ -159,6 +160,8 @@ architecture mapping of AppTop is
    constant DAQ_MUX1_INDEX_C : natural := 3;
    constant JESD0_INDEX_C    : natural := 4;
    constant JESD1_INDEX_C    : natural := 5;
+   constant SIG_GEN0_INDEX_C : natural := 6;
+   constant SIG_GEN1_INDEX_C : natural := 7;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, x"80000000", 31, 28);
 
@@ -196,6 +199,11 @@ architecture mapping of AppTop is
 
    signal dataValids : Slv18Array(1 downto 0);
 
+   signal dacSigCtrl   : DacSigCtrlArray(1 downto 0);
+   signal dacSigStatus : DacSigStatusArray(1 downto 0);
+   signal dacSigValids : Slv7Array(1 downto 0);
+   signal dacSigValues : sampleDataVectorArray(1 downto 0, 6 downto 0);
+   
 begin
 
    --------------------------
@@ -262,7 +270,7 @@ begin
    trigCascBay(2) <= trigCascBay(0);    -- to make cross and use generate
    armCascBay(2)  <= armCascBay(0);     -- to make cross and use generate
 
-   U_DaqMux : for i in 1 downto 0 generate
+   U_AmcBay : for i in 1 downto 0 generate
       
       trigHw(i) <= evrTrig.trigPulse(0) or userTrig(i);
 
@@ -335,12 +343,9 @@ begin
 
       dataValids(i) <= debugValids(i) & dacValids(i) & adcValids(i);
 
-   end generate U_DaqMux;
-
-   ------------
-   -- JESD Core
-   ------------
-   U_Jesd : for i in 1 downto 0 generate
+      ------------
+      -- JESD Core
+      ------------
       U_JesdCore : entity work.AppTopJesd
          generic map (
             TPD_G              => TPD_G,
@@ -398,7 +403,34 @@ begin
             jesdTxN         => jesdTxN(i),
             jesdClkP        => jesdClkP(i),
             jesdClkN        => jesdClkN(i));
-   end generate U_Jesd;
+
+      U_DacSigGen : entity work.DacSigGen
+         generic map (
+            TPD_G         => TPD_G,
+            NUM_SIG_GEN_G => NUM_SIG_GEN_G(i))
+         port map (
+            -- DAC Signal Generator Interface
+            jesdClk         => jesdClk(i),
+            jesdRst         => jesdRst(i),
+            dacSigCtrl      => dacSigCtrl(i),
+            dacSigStatus    => dacSigStatus(i),
+            dacSigValids    => dacSigValids(i),
+            dacSigValues(0) => dacSigValues(i, 0),
+            dacSigValues(1) => dacSigValues(i, 1),
+            dacSigValues(2) => dacSigValues(i, 2),
+            dacSigValues(3) => dacSigValues(i, 3),
+            dacSigValues(4) => dacSigValues(i, 4),
+            dacSigValues(5) => dacSigValues(i, 5),
+            dacSigValues(6) => dacSigValues(i, 6),
+            -- AXI-Lite Interface
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => axilReadMasters(SIG_GEN0_INDEX_C+i),
+            axilReadSlave   => axilReadSlaves(SIG_GEN0_INDEX_C+i),
+            axilWriteMaster => axilWriteMasters(SIG_GEN0_INDEX_C+i),
+            axilWriteSlave  => axilWriteSlaves(SIG_GEN0_INDEX_C+i));
+
+   end generate U_AmcBay;
 
    -------------------
    -- Application Core
@@ -417,22 +449,27 @@ begin
          jesdRst          => jesdRst,
          jesdClk2x        => jesdClk2x,
          jesdRst2x        => jesdRst2x,
-         -- DaqMux/Trig Interface,
+         -- DaqMux/Trig Interface (recTimingClk domain) 
          freezeHw         => freezeHw,
          evrTrig          => evrTrig,
          userTrig         => userTrig,
-         -- JESD SYNC Interface
+         -- JESD SYNC Interface (jesdClk[1:0] domain)
          jesdSysRef       => jesdSysRef,
          jesdRxSync       => jesdRxSync,
          jesdTxSync       => jesdTxSync,
-         -- ADC/DAC/Debug Interface
+         -- ADC/DAC/Debug Interface (jesdClk[1:0] domain)
          adcValids        => adcValids,
          adcValues        => adcValues,
          dacValids        => dacValids,
          dacValues        => dacValues,
          debugValids      => debugValids,
          debugValues      => debugValues,
-         -- AXI-Lite Interface
+         -- DAC Signal Generator Interface (jesdClk[1:0] domain)
+         dacSigCtrl       => dacSigCtrl,
+         dacSigStatus     => dacSigStatus,
+         dacSigValids     => dacSigValids,
+         dacSigValues     => dacSigValues,
+         -- AXI-Lite Interface (axilClk domain) 
          axilClk          => axilClk,
          axilRst          => axilRst,
          axilReadMaster   => axilReadMasters(CORE_INDEX_C),
