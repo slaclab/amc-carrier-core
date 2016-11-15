@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-30
--- Last update: 2016-04-28
+-- Last update: 2016-11-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,12 +37,13 @@ use unisim.vcomponents.all;
 
 entity DebugRtmPgpAmcCarrierCore is
    generic (
-      TPD_G                    : time                 := 1 ns;   -- Simulation only parameter
-      SIM_SPEEDUP_G            : boolean              := false;  -- Simulation only parameter
-      SIMULATION_G             : boolean              := false;  -- Simulation only parameter
-      MPS_SLOT_G               : boolean              := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
-      FSBL_G                   : boolean              := false;  -- false = Normal Operation, true = First Stage Boot loader
-      APP_TYPE_G               : AppType              := APP_NULL_TYPE_C;
+      TPD_G         : time    := 1 ns;  -- Simulation only parameter
+      SIM_SPEEDUP_G : boolean := false;  -- Simulation only parameter
+      SIMULATION_G  : boolean := false;  -- Simulation only parameter
+      MPS_SLOT_G    : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
+      FSBL_G        : boolean := false;  -- false = Normal Operation, true = First Stage Boot loader
+      DISABLE_BSA_G : boolean := false;
+      APP_TYPE_G    : AppType := APP_NULL_TYPE_C;
       EN_BP_MSG_G   : boolean := false);
    port (
       ----------------------
@@ -59,8 +60,8 @@ entity DebugRtmPgpAmcCarrierCore is
       -- Timing Interface (timingClk domain) 
       timingClk            : in  sl;
       timingRst            : in  sl;
-      timingBus            : out TimingBusType := TIMING_BUS_INIT_C;
-      timingPhy            : in  TimingPhyType := TIMING_PHY_INIT_C;  -- Input for timing generator only
+      timingBus            : out TimingBusType                    := TIMING_BUS_INIT_C;
+      timingPhy            : in  TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
       timingPhyClk         : out sl;
       timingPhyRst         : out sl;
       -- Diagnostic Interface (diagnosticClk domain)
@@ -70,34 +71,40 @@ entity DebugRtmPgpAmcCarrierCore is
       --  Waveform interface (waveformClk domain)
       waveformClk          : out sl;
       waveformRst          : out sl;
-      obAppWaveformMasters : in  WaveformMasterArrayType := WAVEFORM_MASTER_ARRAY_INIT_C;
+      obAppWaveformMasters : in  WaveformMasterArrayType          := WAVEFORM_MASTER_ARRAY_INIT_C;
       obAppWaveformSlaves  : out WaveformSlaveArrayType;
       ibAppWaveformMasters : out WaveformMasterArrayType;
-      ibAppWaveformSlaves  : in  WaveformSlaveArrayType := WAVEFORM_SLAVE_ARRAY_INIT_C;
+      ibAppWaveformSlaves  : in  WaveformSlaveArrayType           := WAVEFORM_SLAVE_ARRAY_INIT_C;
       -- Backplane Messaging Interface (bpMsgClk domain)
-      bpMsgClk         : in    sl                               := '0';
-      bpMsgRst         : in    sl                               := '0';
-      bpMsgBus         : out   BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      bpMsgClk             : in  sl                               := '0';
+      bpMsgRst             : in  sl                               := '0';
+      bpMsgBus             : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      -- Application Debug Interface (ref156MHzClk domain)
+      obAppDebugMaster     : in  AxiStreamMasterType              := AXI_STREAM_MASTER_INIT_C;
+      obAppDebugSlave      : out AxiStreamSlaveType;
+      ibAppDebugMaster     : out AxiStreamMasterType;
+      ibAppDebugSlave      : in  AxiStreamSlaveType               := AXI_STREAM_SLAVE_FORCE_C;
       -- BSI Interface (bsiClk domain) 
-      bsiClk           : in    sl                               := '0';
-      bsiRst           : in    sl                               := '0';
-      bsiBus           : out   BsiBusType;
+      bsiClk               : in  sl                               := '0';
+      bsiRst               : in  sl                               := '0';
+      bsiBus               : out BsiBusType;
       -- MPS Concentrator Interface (ref156MHzClk domain)
-      mpsObMasters     : out   AxiStreamMasterArray(14 downto 0);
-      mpsObSlaves      : in    AxiStreamSlaveArray(14 downto 0) := (others => AXI_STREAM_SLAVE_FORCE_C);
+      mpsObMasters         : out AxiStreamMasterArray(14 downto 0);
+      mpsObSlaves          : in  AxiStreamSlaveArray(14 downto 0) := (others => AXI_STREAM_SLAVE_FORCE_C);
       -- Reference Clocks and Resets
-      recTimingClk     : out   sl;
-      recTimingRst     : out   sl;
-      ref125MHzClk     : out   sl;
-      ref125MHzRst     : out   sl;
-      ref156MHzClk     : out   sl;
-      ref156MHzRst     : out   sl;
-      ref312MHzClk     : out   sl;
-      ref312MHzRst     : out   sl;
-      ref625MHzClk     : out   sl;
-      ref625MHzRst     : out   sl;
+      recTimingClk         : out sl;
+      recTimingRst         : out sl;
+      ref125MHzClk         : out sl;
+      ref125MHzRst         : out sl;
+      ref156MHzClk         : out sl;
+      ref156MHzRst         : out sl;
+      ref312MHzClk         : out sl;
+      ref312MHzRst         : out sl;
+      ref625MHzClk         : out sl;
+      ref625MHzRst         : out sl;
 
       gthFabClk        : out   sl;
+      ethPhyReady      : out   sl;
       ----------------
       --  Top Level Interface to IO
       ----------------
@@ -233,25 +240,29 @@ architecture mapping of DebugRtmPgpAmcCarrierCore is
 
    signal bufDiagnosticMaster : AxiStreamMasterType;
    signal bufDiagnosticSlave  : AxiStreamSlaveType;
-   signal bpMsgMasters : AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
-   signal bpMsgSlaves  : AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal bpMsgMasters        : AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal bpMsgSlaves         : AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
    signal localMac   : slv(47 downto 0);
    signal localIp    : slv(31 downto 0);
    signal localAppId : slv(15 downto 0);
 
-   signal masterResetPgp      : sl;
-   signal masterResetAxi      : sl;
-   signal rstDly              : sl;
-   signal resetDDR            : sl;
-   signal pgpClk              : sl;
-   signal pgpRst              : sl;
+   signal masterResetPgp : sl;
+   signal masterResetAxi : sl;
+   signal rstDly         : sl;
+   signal resetDDR       : sl;
+   signal pgpClk         : sl;
+   signal pgpRst         : sl;
 
 begin
+   
+   ethPhyReady      <= '0';
+   obAppDebugSlave  <= AXI_STREAM_SLAVE_FORCE_C;
+   ibAppDebugMaster <= AXI_STREAM_MASTER_INIT_C;
 
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
    -- Note: Install R1063 if you want the FPGA to control AUX power
-   enAuxPwrL <= '0';
+   enAuxPwrL   <= '0';
    -- Send axiClk to application as ddrClk
    waveformClk <= axiClk;
    waveformRst <= axiRst;
@@ -480,29 +491,29 @@ begin
    ------------------
    U_DebugRawDiagnostic_1 : entity work.DebugRtmPgpRawDiagnostic
       generic map (
-         TPD_G                    => TPD_G,
-         AXIL_BASE_ADDR_G         => BSA_ADDR_C,
-         AXI_CONFIG_G             => AXI_CONFIG_C)
+         TPD_G            => TPD_G,
+         AXIL_BASE_ADDR_G => BSA_ADDR_C,
+         AXI_CONFIG_G     => AXI_CONFIG_C)
       port map (
          -- Waveform interface (axiClk domain)
          ibWaveformMasters => obAppWaveformMasters(0),
          ibWaveformSlaves  => obAppWaveformSlaves(0),
-         axilClk              => axilClk,               -- [in]
-         axilRst              => axilRst,               -- [in]
-         axilReadMaster       => bsaReadMaster,         -- [in]
-         axilReadSlave        => bsaReadSlave,          -- [out]
-         axilWriteMaster      => bsaWriteMaster,        -- [in]
-         axilWriteSlave       => bsaWriteSlave,         -- [out]
-         dataClk              => pgpClk,                -- [in]
-         dataRst              => pgpRst,                -- [in]
-         dataMaster           => bufDiagnosticMaster,   -- [out]
-         dataSlave            => bufDiagnosticSlave,    -- [in]
-         axiClk               => axiClk,                -- [in]
-         axiRst               => axiRst,                -- [in]
-         axiWriteMaster       => axiWriteMaster,        -- [out]
-         axiWriteSlave        => axiWriteSlave,         -- [in]
-         axiReadMaster        => axiReadMaster,         -- [out]
-         axiReadSlave         => axiReadSlave);         -- [in]
+         axilClk           => axilClk,              -- [in]
+         axilRst           => axilRst,              -- [in]
+         axilReadMaster    => bsaReadMaster,        -- [in]
+         axilReadSlave     => bsaReadSlave,         -- [out]
+         axilWriteMaster   => bsaWriteMaster,       -- [in]
+         axilWriteSlave    => bsaWriteSlave,        -- [out]
+         dataClk           => pgpClk,               -- [in]
+         dataRst           => pgpRst,               -- [in]
+         dataMaster        => bufDiagnosticMaster,  -- [out]
+         dataSlave         => bufDiagnosticSlave,   -- [in]
+         axiClk            => axiClk,               -- [in]
+         axiRst            => axiRst,               -- [in]
+         axiWriteMaster    => axiWriteMaster,       -- [out]
+         axiWriteSlave     => axiWriteSlave,        -- [in]
+         axiReadMaster     => axiReadMaster,        -- [out]
+         axiReadSlave      => axiReadSlave);        -- [in]
 
    -- Note: This is a work around. Not to be used in final version nor production! TODO Remove FIX ME ! 
    -- Reset DDR FIFO before requesting next transaction.
