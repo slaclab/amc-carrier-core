@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-14
+-- Last update: 2016-11-16
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -161,6 +161,7 @@ architecture mapping of AppTopJesd204b is
    signal s_gtRxReset     : sl              := '0';
    signal s_gtTxUserReset : slv(6 downto 0) := (others => '0');
    signal s_gtTxReset     : sl              := '0';
+   signal s_gtResetAll    : sl              := '0';
 
    signal s_sysRef        : sl                          := '0';
    signal s_sysRefDbg     : sl                          := '0';
@@ -339,6 +340,8 @@ begin
       s_allignEnVec(i)         <= not(s_dataValidVec(i));
    end generate RX_LANES_GEN;
 
+   s_gtResetAll <= s_gtTxReset or s_gtRxReset;
+
    U_Coregen : AppTopJesd204bCoregen
       port map (
          -- Clocks
@@ -349,7 +352,7 @@ begin
          gtwiz_buffbypass_tx_done_out          => open,
          gtwiz_buffbypass_tx_error_out         => open,
          gtwiz_reset_clk_freerun_in(0)         => stableClk,
-         gtwiz_reset_all_in(0)                 => '0',
+         gtwiz_reset_all_in(0)                 => s_gtResetAll,
          gtwiz_reset_tx_pll_and_datapath_in(0) => s_gtTxReset,
          gtwiz_reset_tx_datapath_in(0)         => s_gtTxReset,
          gtwiz_reset_rx_pll_and_datapath_in(0) => s_gtRxReset,
