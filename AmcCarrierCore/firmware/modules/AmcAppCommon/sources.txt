@@ -15,3 +15,5 @@ vhdl work DaqMuxV2/rtl/DaqMuxV2.vhd
 vhdl work DaqMuxV2/rtl/DaqMuxV2Pkg.vhd
 
 vhdl work DacSigGen/rtl/DacSigGen.vhd
+vhdl work DacSigGen/rtl/DacSigGenReg.vhd
+vhdl work DacSigGen/rtl/DacSigGenLane.vhd

@@ -41,18 +41,18 @@ package AppTopPkg is
    end record;
 
    type DacSigCtrlType is record
-      start : sl;
+      start : slv(6 downto 0);
    end record;
    type DacSigCtrlArray is array (natural range <>) of DacSigCtrlType;
    constant DAC_SIG_CTRL_INIT_C : DacSigCtrlType := (
-      start => '0');
+      start => (others => '0'));
 
    type DacSigStatusType is record
-      running : sl;
+      running : slv(6 downto 0);
    end record;
    type DacSigStatusArray is array (natural range <>) of DacSigStatusType;
    constant DAC_SIG_STATUS_INIT_C : DacSigStatusType := (
-      running => '0');      
+      running => (others => '0'));      
 
 end package AppTopPkg;
 
