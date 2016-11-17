@@ -25,6 +25,10 @@
 --               When disabled is outputs signal ZERO data according to sign format (sign_i)
 --                      Sign: '0' - Signed 2's complement, '1' - Offset binary
 --               INTERFACE_G defines the JESD DAC 32-bit interface vs. LVDS DAC 16-bit interface
+--
+--               Data After trigger latency:
+--               - 16bit Interface: 7x  jesdClk2x c-c
+--               - 32bit Interface: 12x jesdClk c-c
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 LLRF Development'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -90,15 +94,17 @@ architecture rtl of DacSigGenLane is
    
    -- Register
    type RegType is record
-      cnt     : slv(ADDR_WIDTH_G-1 downto 0);
-      running : sl;
-      state   : StateType;
+      cnt       : slv(ADDR_WIDTH_G-1 downto 0);
+      running   : sl;
+      runningD1 : sl;
+      state     : StateType;
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      cnt     => (others => '0'),
-      running => '0',
-      state   => IDLE_S
+      cnt      => (others => '0'),
+      running  => '0',
+      runningD1=> '0',      
+      state    => IDLE_S
    );
 
    signal r   : RegType := REG_INIT_C;
@@ -135,7 +141,7 @@ begin
       MODE_G       => "write-first",
       ADDR_WIDTH_G => ADDR_WIDTH_G,
       DATA_WIDTH_G => 16,
-      INIT_G       => "0")
+      INIT_G       => x"FFFF")
    port map (
       -- Axi clk domain
       axiClk         => axilClk,
@@ -158,9 +164,11 @@ begin
       variable v : RegType;
    begin
       -- Latch the current value
-      v := r;   
-   
-         -- State Machine
+      v := r; 
+      -- Delay to align with ram data
+      v.runningD1 := r.running;
+      
+      -- State Machine
       StateMachine : case (r.state) is
          ----------------------------------------------------------------------
          when IDLE_S =>
@@ -215,7 +223,7 @@ begin
    s_zeroData <= x"0000" when sign_i = '0' else
                  x"8000";
    -- Zero data if disabled
-   s_16bitData <= s_ramData when r.running = '1' else 
+   s_16bitData <= s_ramData when r.runningD1 = '1' else 
                   s_zeroData;
 
    -- jesdClk domain
@@ -242,7 +250,7 @@ begin
          port map (
             clk     => jesdClk,
             rst     => jesdRst,
-            dataIn  => r.running,
+            dataIn  => r.runningD1,
             dataOut => running_o);
    end generate GEN_32bit;
 
@@ -251,7 +259,7 @@ begin
       -- Output assignment
       overflow_o   <= '0';
       underflow_o  <= '0';
-      running_o    <= r.running;
+      running_o    <= r.runningD1;
       valid_o      <= enable_i;
       dacSigValues_o(15 downto 0)  <= s_16bitData;
       dacSigValues_o(31 downto 16) <= (15 downto 0 => '0');

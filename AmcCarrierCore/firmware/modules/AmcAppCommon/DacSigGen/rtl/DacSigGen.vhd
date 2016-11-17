@@ -137,14 +137,14 @@ begin
          axilReadSlave   => axilReadSlaves(0),
          axilWriteMaster => axilWriteMasters(0),
          axilWriteSlave  => axilWriteSlaves(0),
-         enable_o        => s_enable,
-         mode_o          => s_mode,
-         sign_o          => s_sign,
-         trigSw_o        => s_trigSw,
+         enable_o        => s_enable(NUM_SIG_GEN_G-1 downto 0),
+         mode_o          => s_mode(NUM_SIG_GEN_G-1 downto 0),
+         sign_o          => s_sign(NUM_SIG_GEN_G-1 downto 0),
+         trigSw_o        => s_trigSw(NUM_SIG_GEN_G-1 downto 0),
          period_o        => s_period(NUM_SIG_GEN_G-1 downto 0),
-         running_i       => s_running,         
-         overflow_i      => s_overflow, 
-         underflow_i     => s_underflow);
+         running_i       => s_running(NUM_SIG_GEN_G-1 downto 0),         
+         overflow_i      => s_overflow(NUM_SIG_GEN_G-1 downto 0), 
+         underflow_i     => s_underflow(NUM_SIG_GEN_G-1 downto 0));
   
       -----------------------------------------------------------
       -- Signal generator lanes
@@ -172,7 +172,7 @@ begin
                enable_i        => s_enable(i),
                mode_i          => s_mode(i),
                sign_i          => s_sign(i),
-               period_i        => s_period(ADDR_WIDTH_G-1 downto 0)(i),
+               period_i        => s_period(i)(ADDR_WIDTH_G-1 downto 0),
                start_i         => s_trig(i),
                overflow_o      => s_overflow(i),
                underflow_o     => s_underflow(i),
