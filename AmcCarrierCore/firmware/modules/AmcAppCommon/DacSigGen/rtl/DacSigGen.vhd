@@ -5,18 +5,18 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-15
+-- Last update: 2016-11-18
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 BAM Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the
--- top-level directory of this distribution and at:
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
--- No part of 'LCLS2 BAM Firmware', including this file,
--- may be copied, modified, propagated, or distributed except according to
+-- This file is part of 'LCLS2 AMC Carrier Firmware'.
+-- It is subject to the license terms in the LICENSE.txt file found in the 
+-- top-level directory of this distribution and at: 
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+-- No part of 'LCLS2 AMC Carrier Firmware', including this file, 
+-- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -30,13 +30,12 @@ use work.AppTopPkg.all;
 
 entity DacSigGen is
    generic (
-      TPD_G             : time                        := 1 ns;
-      AXI_ERROR_RESP_G  : slv(1 downto 0)             := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G   : slv(31 downto 0)            := (others => '0');
-      NUM_SIG_GEN_G     : natural range 0 to 7        := 0; -- 0 - Disabled
-      ADDR_WIDTH_G      : integer range 1 to 24       := 9;
-      INTERFACE_G       : sl := '0' -- '0': 32 bit, '1': 16 bit
-   );      
+      TPD_G                : time                   := 1 ns;
+      AXI_BASE_ADDR_G      : slv(31 downto 0)       := (others => '0');
+      AXI_ERROR_RESP_G     : slv(1 downto 0)        := AXI_RESP_DECERR_C;
+      SIG_GEN_SIZE_G       : natural range 0 to 7   := 0;                 -- 0 = Disabled
+      SIG_GEN_ADDR_WIDTH_G : positive range 1 to 24 := 9;
+      SIG_GEN_LANE_MODE_G  : slv(6 downto 0)        := (others => '0'));  -- '0': 32 bit, '1': 16 bit
    port (
       -- DAC Signal Generator Interface
       jesdClk         : in  sl;
@@ -58,7 +57,7 @@ end DacSigGen;
 
 architecture mapping of DacSigGen is
 
-   constant NUM_AXI_MASTERS_C : natural := NUM_SIG_GEN_G+1;
+   constant NUM_AXI_MASTERS_C : natural := SIG_GEN_SIZE_G+1;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 28, 24);
 
@@ -66,21 +65,21 @@ architecture mapping of DacSigGen is
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   
+
    -- Internal signals
    signal s_enable    : slv(6 downto 0);
    signal s_mode      : slv(6 downto 0);
    signal s_sign      : slv(6 downto 0);
    signal s_trigSw    : slv(6 downto 0);
-   signal s_trig      : slv(6 downto 0);   
+   signal s_trig      : slv(6 downto 0);
    signal s_overflow  : slv(6 downto 0);
    signal s_underflow : slv(6 downto 0);
-   signal s_running   : slv(6 downto 0);   
+   signal s_running   : slv(6 downto 0);
    signal s_period    : slv32Array(6 downto 0);
    
 begin
    
-   GEN_EMPTY : if NUM_SIG_GEN_G = 0 generate
+   GEN_EMPTY : if SIG_GEN_SIZE_G = 0 generate
       dacSigStatus <= DAC_SIG_STATUS_INIT_C;
       dacSigValids <= (others => '0');
       dacSigValues <= (others => x"0000_0000");
@@ -97,8 +96,8 @@ begin
             axiWriteMaster => axilWriteMaster,
             axiWriteSlave  => axilWriteSlave);
    end generate GEN_EMPTY;
-   
-   GEN_SIGGEN : if NUM_SIG_GEN_G /= 0 generate
+
+   GEN_SIGGEN : if SIG_GEN_SIZE_G /= 0 generate
       ---------------------
       -- AXI-Lite Crossbar
       ---------------------
@@ -120,44 +119,44 @@ begin
             mAxiWriteSlaves     => axilWriteSlaves,
             mAxiReadMasters     => axilReadMasters,
             mAxiReadSlaves      => axilReadSlaves); 
-            
+
       -- DAQ control register interface
-      U_DacSigGenReg: entity work.DacSigGenReg
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         ADDR_WIDTH_G     => ADDR_WIDTH_G,
-         NUM_SIG_GEN_G    => NUM_SIG_GEN_G)
-      port map (
-         axiClk_i        => axilClk,
-         axiRst_i        => axilRst,   
-         devClk_i        => jesdClk2x,
-         devRst_i        => jesdRst2x,
-         axilReadMaster  => axilReadMasters(0),
-         axilReadSlave   => axilReadSlaves(0),
-         axilWriteMaster => axilWriteMasters(0),
-         axilWriteSlave  => axilWriteSlaves(0),
-         enable_o        => s_enable(NUM_SIG_GEN_G-1 downto 0),
-         mode_o          => s_mode(NUM_SIG_GEN_G-1 downto 0),
-         sign_o          => s_sign(NUM_SIG_GEN_G-1 downto 0),
-         trigSw_o        => s_trigSw(NUM_SIG_GEN_G-1 downto 0),
-         period_o        => s_period(NUM_SIG_GEN_G-1 downto 0),
-         running_i       => s_running(NUM_SIG_GEN_G-1 downto 0),         
-         overflow_i      => s_overflow(NUM_SIG_GEN_G-1 downto 0), 
-         underflow_i     => s_underflow(NUM_SIG_GEN_G-1 downto 0));
-  
+      U_DacSigGenReg : entity work.DacSigGenReg
+         generic map (
+            TPD_G            => TPD_G,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            ADDR_WIDTH_G     => SIG_GEN_ADDR_WIDTH_G,
+            NUM_SIG_GEN_G    => SIG_GEN_SIZE_G)
+         port map (
+            axiClk_i        => axilClk,
+            axiRst_i        => axilRst,
+            devClk_i        => jesdClk2x,
+            devRst_i        => jesdRst2x,
+            axilReadMaster  => axilReadMasters(0),
+            axilReadSlave   => axilReadSlaves(0),
+            axilWriteMaster => axilWriteMasters(0),
+            axilWriteSlave  => axilWriteSlaves(0),
+            enable_o        => s_enable(SIG_GEN_SIZE_G-1 downto 0),
+            mode_o          => s_mode(SIG_GEN_SIZE_G-1 downto 0),
+            sign_o          => s_sign(SIG_GEN_SIZE_G-1 downto 0),
+            trigSw_o        => s_trigSw(SIG_GEN_SIZE_G-1 downto 0),
+            period_o        => s_period(SIG_GEN_SIZE_G-1 downto 0),
+            running_i       => s_running(SIG_GEN_SIZE_G-1 downto 0),
+            overflow_i      => s_overflow(SIG_GEN_SIZE_G-1 downto 0),
+            underflow_i     => s_underflow(SIG_GEN_SIZE_G-1 downto 0));
+
       -----------------------------------------------------------
       -- Signal generator lanes
       ----------------------------------------------------------- 
-      GEN_CHS : for i in NUM_SIG_GEN_G-1 downto 0 generate
+      GEN_CHS : for i in SIG_GEN_SIZE_G-1 downto 0 generate
          -- Triggers
          s_trig(i) <= dacSigCtrl.start(i) or s_trigSw(i);
-         
-         U_DacSigGenLane: entity work.DacSigGenLane
+
+         U_DacSigGenLane : entity work.DacSigGenLane
             generic map (
                TPD_G        => TPD_G,
-               ADDR_WIDTH_G => ADDR_WIDTH_G,
-               INTERFACE_G  => INTERFACE_G)
+               ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G,
+               INTERFACE_G  => SIG_GEN_LANE_MODE_G(i))
             port map (
                jesdClk         => jesdClk,
                jesdRst         => jesdRst,
@@ -172,7 +171,7 @@ begin
                enable_i        => s_enable(i),
                mode_i          => s_mode(i),
                sign_i          => s_sign(i),
-               period_i        => s_period(i)(ADDR_WIDTH_G-1 downto 0),
+               period_i        => s_period(i)(SIG_GEN_ADDR_WIDTH_G-1 downto 0),
                start_i         => s_trig(i),
                overflow_o      => s_overflow(i),
                underflow_o     => s_underflow(i),
@@ -180,10 +179,10 @@ begin
                valid_o         => dacSigValids(i),
                dacSigValues_o  => dacSigValues(i));
       end generate GEN_CHS;
-      
+
       -- Assign out
       dacSigStatus.running <= s_running;
-      ------
+   ------
    end generate GEN_SIGGEN;
-   -----------------------------------
+-----------------------------------
 end mapping;

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-15
+-- Last update: 2016-11-18
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,21 +38,27 @@ use work.AppTopPkg.all;
 
 entity AppTop is
    generic (
-      TPD_G                : time                     := 1 ns;
-      SIM_SPEEDUP_G        : boolean                  := false;
-      SIMULATION_G         : boolean                  := false;
-      JESD_DRP_EN_G        : boolean                  := false;
-      JESD_RX_LANE_G       : NaturalArray(1 downto 0) := (others => 0);
-      JESD_TX_LANE_G       : NaturalArray(1 downto 0) := (others => 0);
-      JESD_RX_POLARITY_G   : Slv7Array(1 downto 0)    := (others => "0000000");
-      JESD_TX_POLARITY_G   : Slv7Array(1 downto 0)    := (others => "0000000");
-      JESD_REF_SEL_G       : Slv2Array(1 downto 0)    := (others => DEV_CLK2_SEL_C);
-      NUM_SIG_GEN_G        : NaturalArray(1 downto 0) := (others => 0);
-      NUM_OF_TRIG_PULSES_G : positive range 1 to 16   := 3;
-      DELAY_WIDTH_G        : integer range 1 to 32    := 32;
-      PULSE_WIDTH_G        : integer range 1 to 32    := 32;
-      AXI_CLK_FREQ_G       : real                     := 156.25E+6;
-      AXI_ERROR_RESP_G     : slv(1 downto 0)          := AXI_RESP_DECERR_C);
+      -- General Generics
+      TPD_G                : time                      := 1 ns;
+      SIM_SPEEDUP_G        : boolean                   := false;
+      SIMULATION_G         : boolean                   := false;
+      AXI_CLK_FREQ_G       : real                      := 156.25E+6;
+      AXI_ERROR_RESP_G     : slv(1 downto 0)           := AXI_RESP_DECERR_C;
+      -- JESD Generics
+      JESD_DRP_EN_G        : boolean                   := false;
+      JESD_RX_LANE_G       : NaturalArray(1 downto 0)  := (others => 0);
+      JESD_TX_LANE_G       : NaturalArray(1 downto 0)  := (others => 0);
+      JESD_RX_POLARITY_G   : Slv7Array(1 downto 0)     := (others => "0000000");
+      JESD_TX_POLARITY_G   : Slv7Array(1 downto 0)     := (others => "0000000");
+      JESD_REF_SEL_G       : Slv2Array(1 downto 0)     := (others => DEV_CLK2_SEL_C);
+      -- Signal Generator Generics
+      SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 0);
+      SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0) := (others => 9);
+      SIG_GEN_LANE_MODE_G  : Slv7Array(1 downto 0)     := (others => "0000000");
+      -- Triggering Generics
+      TRIG_SIZE_G          : positive range 1 to 16    := 3;
+      TRIG_DELAY_WIDTH_G   : integer range 1 to 32     := 32;
+      TRIG_PULSE_WIDTH_G   : integer range 1 to 32     := 32);
    port (
       ----------------------
       -- Top Level Interface
@@ -243,12 +249,12 @@ begin
    ---------------
    U_Trig : entity work.AppTopTrig
       generic map (
-         TPD_G                => TPD_G,
-         AXIL_BASE_ADDR_G     => AXI_CONFIG_C(TIMING_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G     => AXI_ERROR_RESP_G,
-         NUM_OF_TRIG_PULSES_G => NUM_OF_TRIG_PULSES_G,
-         DELAY_WIDTH_G        => DELAY_WIDTH_G,
-         PULSE_WIDTH_G        => PULSE_WIDTH_G)         
+         TPD_G              => TPD_G,
+         AXIL_BASE_ADDR_G   => AXI_CONFIG_C(TIMING_INDEX_C).baseAddr,
+         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         TRIG_SIZE_G        => TRIG_SIZE_G,
+         TRIG_DELAY_WIDTH_G => TRIG_DELAY_WIDTH_G,
+         TRIG_PULSE_WIDTH_G => TRIG_PULSE_WIDTH_G)         
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,
@@ -406,12 +412,18 @@ begin
 
       U_DacSigGen : entity work.DacSigGen
          generic map (
-            TPD_G         => TPD_G,
-            NUM_SIG_GEN_G => NUM_SIG_GEN_G(i))
+            TPD_G                => TPD_G,
+            AXI_BASE_ADDR_G      => AXI_CONFIG_C(SIG_GEN0_INDEX_C+i).baseAddr,
+            AXI_ERROR_RESP_G     => AXI_ERROR_RESP_G,
+            SIG_GEN_SIZE_G       => SIG_GEN_SIZE_G(i),
+            SIG_GEN_ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G(i),
+            SIG_GEN_LANE_MODE_G  => SIG_GEN_LANE_MODE_G(i))
          port map (
             -- DAC Signal Generator Interface
             jesdClk         => jesdClk(i),
             jesdRst         => jesdRst(i),
+            jesdClk2x       => jesdClk2x(i),
+            jesdRst2x       => jesdRst2x(i),
             dacSigCtrl      => dacSigCtrl(i),
             dacSigStatus    => dacSigStatus(i),
             dacSigValids    => dacSigValids(i),
@@ -464,7 +476,9 @@ begin
          dacValues        => dacValues,
          debugValids      => debugValids,
          debugValues      => debugValues,
-         -- DAC Signal Generator Interface (jesdClk[1:0] domain)
+         -- DAC Signal Generator Interface
+         -- If SIG_GEN_LANE_MODE_G = '0', (jesdClk[1:0] domain)
+         -- If SIG_GEN_LANE_MODE_G = '1', (jesdClk2x[1:0] domain)
          dacSigCtrl       => dacSigCtrl,
          dacSigStatus     => dacSigStatus,
          dacSigValids     => dacSigValids,
