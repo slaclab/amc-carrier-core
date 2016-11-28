@@ -36,16 +36,6 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       mode: RO
       description: ADC Valid[3:0]
     #########################################################
-    DebugTrig:
-      at:
-        offset: 0x0FC
-      class: IntField
-      name: DebugTrig
-      sizeBits: 1
-      lsBit: 4
-      mode: RO
-      description: Debug Trigger
-    #########################################################
     AdcData:
       at:
         offset: 0x100
@@ -121,15 +111,6 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       mode: RO
       description: LMK Status
     #########################################################
-    Loopback:
-      at:
-        offset: 0x210
-      class: IntField
-      name: Loopback
-      sizeBits: 1
-      mode: RW
-      description: ADC-to-DAC Loopback Enable
-    #########################################################
     LmkMuxSel:
       at:
         offset: 0x214
@@ -138,24 +119,6 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       sizeBits: 1
       mode: RW
       description: LMK MUX Select
-    #########################################################
-    SoftTrig:
-      at:
-        offset: 0x218
-      class: IntField
-      name: SoftTrig
-      sizeBits: 1
-      mode: WO
-      description: Software Trigger
-    #########################################################
-    SoftClear:
-      at:
-        offset: 0x21C
-      class: IntField
-      name: SoftClear
-      sizeBits: 1
-      mode: WO
-      description: Software Clear
     #########################################################
     VcoDacSckConfig:
       at:
@@ -180,7 +143,7 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
         offset: 0x3F8
       class: IntField
       name: RollOverEn
-      sizeBits: 5
+      sizeBits: 4
       mode: RW
       description: Enable Status counter roll over
     #########################################################
@@ -192,3 +155,4 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       sizeBits: 1
       mode: WO
       description: Status counter reset
+    #########################################################

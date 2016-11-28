@@ -25,9 +25,11 @@ AppTopJesd: &AppTopJesd
       <<: *JesdRx
       at:
         offset: 0x00000000  
+      instantiate: false 
     ##################################################     
     JesdTx:
       <<: *JesdTx
       at:
         offset: 0x01000000   
+      instantiate: false 
     ##################################################

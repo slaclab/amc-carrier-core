@@ -9,78 +9,41 @@
 ##############################################################################
 #schemaversion 3.0.0
 #once AmcGenericAdcDacCore.yaml
-#include JesdRx.yaml
-#include JesdTx.yaml
 #include Lmk04828.yaml
 #include Adc16Dx370.yaml
 #include Dac38J84.yaml
 #include AmcGenericAdcDacCtrl.yaml
-#include GenericMemory.yaml
-#include Gthe3Channel.yaml
 
 AmcGenericAdcDacCore: &AmcGenericAdcDacCore 
   description: Generic ADC/DAC AMC Core
   class: MMIODev
   configPrio: 1
-  size: 0x00800000
+  size: 0x00008000
   ########
   children:
   ########
-    JesdRx:
-      <<: *JesdRx
-      at:
-        offset: 0x00000000  
-    ##################################################     
-    JesdTx:
-      <<: *JesdTx
-      at:
-        offset: 0x00100000 
     ##################################################     
     Lmk04828:
       <<: *Lmk04828
       at:
-        offset: 0x00200000 
+        offset: 0x00000000 
     ##################################################     
     Adc16Dx370:
       <<: *Adc16Dx370
       at:
-        offset: 0x00300000 
+        offset: 0x00001000 
+        stride: 0x00001000              
         nelms: 2
-        stride: 0x00100000              
     ##################################################     
     Dac38J84:
       <<: *Dac38J84
       at:
-        offset: 0x00500000 
+        offset: 0x00003000 
     ##################################################     
     AmcGenericAdcDacCtrl:
       <<: *AmcGenericAdcDacCtrl
       at:
-        offset: 0x00600000       
-    ##################################################
-    Gthe3Channel:
-      <<: *Gthe3Channel
-      at:
-        offset: 0x00700000   
-        nelms: 4
-        stride: 0x10000         
-    ##################################################
-    AxiLiteRingBuffer:
-      at:
-        offset: 0x00610000       
-        nelms: 6
-        stride: 0x10000      
-      size: 0x10000   
-      class: MMIODev
-      configPrio: 1  
-      children:
-        MemoryArray:
-          <<: *MemoryArray
-          at:
-            offset: 0x0
-            nelms: 0x4000        
-          mode: RO 
-      instantiate: false          
+        offset: 0x00004000              
     ##################################################
     InitAmcCard:
       description: Initialization for AMC card's JESD modules
@@ -88,14 +51,7 @@ AmcGenericAdcDacCore: &AmcGenericAdcDacCore
         offset: 0x0
       class: SequenceCommand
       sequence:
-        # Reset the RX's GTs
-        - entry: JesdRx/ResetRxGTs
-          value: 0x1  
-          
-        # Reset the TX's GTs
-        - entry: JesdTx/ResetTxGTs
-          value: 0x1            
-          
+                    
         # Calibrate the JESD ADCs
         - entry: Adc16Dx370/CalibrateAdc
           value: 0x1       

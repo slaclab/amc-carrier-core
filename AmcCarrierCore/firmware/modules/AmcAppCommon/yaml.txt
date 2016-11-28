@@ -1,2 +1,8 @@
 manual AppTop/yaml/AppTop.yaml
+manual AppTop/yaml/AppTopJesd.yaml
+manual AppTop/yaml/AppTopTrig.yaml
+manual DacSigGen/yaml/DacSigGen.yaml
 manual DaqMuxV2/yaml/DaqMuxV2.yaml
+
+manual Hardware/AmcGenericAdcDac/yaml/AmcGenericAdcDacCore.yaml
+manual Hardware/AmcGenericAdcDac/yaml/AmcGenericAdcDacCtrl.yaml
