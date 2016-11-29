@@ -501,7 +501,7 @@ begin
             axilReadMaster  => axilReadMasters(DEBUG_ADC0_INDEX_C+i),
             axilReadSlave   => axilReadSlaves(DEBUG_ADC0_INDEX_C+i),
             axilWriteMaster => axilWriteMasters(DEBUG_ADC0_INDEX_C+i),
-            axilWriteSlave  => axilWriteSlaves(DEBUG_ADC0_INDEX_C+i);          
+            axilWriteSlave  => axilWriteSlaves(DEBUG_ADC0_INDEX_C+i));          
    end generate GEN_ADC_DEBUG;
    
 end mapping;

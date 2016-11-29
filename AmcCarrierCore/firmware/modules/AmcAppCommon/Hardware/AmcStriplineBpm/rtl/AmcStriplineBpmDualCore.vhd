@@ -85,7 +85,7 @@ entity AmcStriplineBpmDualCore is
       syncOutN         : inout Slv4Array(1 downto 0);
       -- AMC's Spare Ports
       spareP           : inout Slv16Array(1 downto 0);
-      spareN           : inout Slv16Array(1 downto 0);
+      spareN           : inout Slv16Array(1 downto 0)
    );
 end AmcStriplineBpmDualCore;
 
