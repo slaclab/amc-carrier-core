@@ -44,18 +44,16 @@ entity AmcStriplineBpmCore is
       AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G          : slv(31 downto 0)       := (others => '0'));
    port (
-      extTrig         : out   sl;
-      -- ADC Clock and Reset
-      adcClk          : out   sl;
-      adcRst          : out   sl;
-      -- AXI Streaming Interface (adcClk domain)
-      adcMasters      : out   AxiStreamMasterArray(3 downto 0);
-      adcCtrls        : in    AxiStreamCtrlArray(3 downto 0) := (others => AXI_STREAM_CTRL_UNUSED_C);
-      -- Sample data output (adcClk domain: Use if external data acquisition core is attached)
-      adcValids       : out   slv(3 downto 0);
-      adcValues       : out   sampleDataArray(3 downto 0);
-      -- DAC Interface (adcClk domain)
-      dacVcoCtrl      : in    slv(15 downto 0);
+      -- JESD SYNC Interface
+      jesdClk         : in    sl;
+      jesdRst         : in    sl;
+      jesdSysRef      : out   sl;
+      jesdRxSync      : in    sl;
+
+      -- ADC/DAC Interface
+      adcValids       : in   slv(3 downto 0);
+      adcValues       : in   sampleDataArray(3 downto 0);
+      dacVcoCtrl      : in   slv(15 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -63,204 +61,95 @@ entity AmcStriplineBpmCore is
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- Pass through Interfaces
+      extTrig         : out   sl;
+      evrTrig         : in    sl;
+      
       -----------------------
       -- Application Ports --
       -----------------------
-      -- JESD High Speed Ports
-      jesdRxP         : in    slv(3 downto 0);
-      jesdRxN         : in    slv(3 downto 0);
-      jesdTxP         : out   slv(3 downto 0);
-      jesdTxN         : out   slv(3 downto 0);
-      -- JESD Reference Ports
-      jesdClkP        : in    sl;
-      jesdClkN        : in    sl;
-      jesdSysRefP     : in    sl;
-      jesdSysRefN     : in    sl;
-      -- JESD ADC Sync Ports
-      jesdSyncP       : out   slv(1 downto 0);
-      jesdSyncN       : out   slv(1 downto 0);
-      -- LMK Ports
-      lmkClkSel       : out   slv(1 downto 0);
-      lmkSck          : out   sl;
-      lmkDio          : inout sl;
-      lmkSync         : out   sl;
-      lmkCsL          : out   sl;
-      lmkRst          : out   sl;
-      -- Fast ADC's SPI Ports
-      adcCsL          : out   slv(1 downto 0);
-      adcSck          : out   sl;
-      adcMiso         : in    sl;
-      adcMosi         : out   sl;
-      -- Slow DAC's SPI Ports
-      dacCsL          : out   sl;
-      dacSck          : out   sl;
-      dacMosi         : out   sl;
-      -- VMON I2C Ports
-      vmonScl         : inout sl;
-      vmonSda         : inout sl;
-      -- External Trigger Ports
-      extTrigP        : in    sl;
-      extTrigN        : in    sl;
-      -- Analog Control Ports 
-      attn1A          : out   slv(4 downto 0);
-      attn1B          : out   slv(4 downto 0);
-      attn2A          : out   slv(4 downto 0);
-      attn2B          : out   slv(4 downto 0);
-      attn3A          : out   slv(4 downto 0);
-      attn3B          : out   slv(4 downto 0);
-      attn4A          : out   slv(4 downto 0);
-      attn4B          : out   slv(4 downto 0);
-      attn5A          : out   slv(4 downto 0);
-      clSw            : out   slv(5 downto 0);
-      clClkOe         : out   sl;
-      rfAmpOn         : out   sl);
+      -- AMC's JTAG Ports
+      jtagPri         : inout slv(4 downto 0);
+      jtagSec         : inout slv(4 downto 0);
+      -- AMC's FPGA Clock Ports
+      fpgaClkP        : inout slv(1 downto 0);
+      fpgaClkN        : inout slv(1 downto 0);
+      -- AMC's System Reference Ports
+      sysRefP         : inout slv(3 downto 0);
+      sysRefN         : inout slv(3 downto 0);
+      -- AMC's Sync Ports
+      syncInP         : inout slv(3 downto 0);
+      syncInN         : inout slv(3 downto 0);
+      syncOutP        : inout slv(9 downto 0);
+      syncOutN        : inout slv(9 downto 0);
+      -- AMC's Spare Ports
+      spareP          : inout slv(15 downto 0);
+      spareN          : inout slv(15 downto 0)
+   );
 end AmcStriplineBpmCore;
 
 architecture mapping of AmcStriplineBpmCore is
 
-   constant NUM_AXI_MASTERS_C : natural := 8;
+   constant NUM_AXI_MASTERS_C : natural := 9;
 
-   constant JESD_INDEX_C : natural := 0;
-   constant LMK_INDEX_C  : natural := 1;
-   constant ADC0_INDEX_C : natural := 2;
-   constant ADC1_INDEX_C : natural := 3;
-   constant DAC_INDEX_C  : natural := 4;
-   constant VMON_INDEX_C : natural := 5;
-   constant CTRL_INDEX_C : natural := 6;
-   constant GTH_INDEX_C  : natural := 7;
-
-   constant JESD_BASE_ADDR_C       : slv(31 downto 0) := X"00000000" + AXI_BASE_ADDR_G;
-   constant LMK_BASE_ADDR_C        : slv(31 downto 0) := X"00100000" + AXI_BASE_ADDR_G;
-   constant ADC0_BASE_ADDR_C       : slv(31 downto 0) := X"00200000" + AXI_BASE_ADDR_G;
-   constant ADC1_BASE_ADDR_C       : slv(31 downto 0) := X"00300000" + AXI_BASE_ADDR_G;
-   constant DAC_BASE_ADDR_C        : slv(31 downto 0) := X"00400000" + AXI_BASE_ADDR_G;
-   constant VMON_BASE_ADDR_C       : slv(31 downto 0) := X"00500000" + AXI_BASE_ADDR_G;
-   constant CTRL_BASE_ADDR_C       : slv(31 downto 0) := X"00600000" + AXI_BASE_ADDR_G;
-   constant DEBUG_ADC0_BASE_ADDR_C : slv(31 downto 0) := X"00610000" + AXI_BASE_ADDR_G;
-   constant DEBUG_ADC1_BASE_ADDR_C : slv(31 downto 0) := X"00620000" + AXI_BASE_ADDR_G;
-   constant DEBUG_ADC2_BASE_ADDR_C : slv(31 downto 0) := X"00630000" + AXI_BASE_ADDR_G;
-   constant DEBUG_ADC3_BASE_ADDR_C : slv(31 downto 0) := X"00640000" + AXI_BASE_ADDR_G;
-   constant GTH0_BASE_ADDR_C       : slv(31 downto 0) := X"00700000" + AXI_BASE_ADDR_G;
-   constant GTH1_BASE_ADDR_C       : slv(31 downto 0) := X"00710000" + AXI_BASE_ADDR_G;
-   constant GTH2_BASE_ADDR_C       : slv(31 downto 0) := X"00720000" + AXI_BASE_ADDR_G;
-   constant GTH3_BASE_ADDR_C       : slv(31 downto 0) := X"00730000" + AXI_BASE_ADDR_G;
+   constant LMK_INDEX_C          : natural := 0;
+   constant ADC0_INDEX_C         : natural := 1;
+   constant ADC1_INDEX_C         : natural := 2;
+   constant DAC_INDEX_C          : natural := 3;
+   constant CTRL_INDEX_C         : natural := 4;
+   constant DEBUG_ADC0_INDEX_C   : natural := 5;  
    
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      JESD_INDEX_C    => (
-         baseAddr     => JESD_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      LMK_INDEX_C     => (
-         baseAddr     => LMK_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      ADC0_INDEX_C    => (
-         baseAddr     => ADC0_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      ADC1_INDEX_C    => (
-         baseAddr     => ADC1_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      DAC_INDEX_C     => (
-         baseAddr     => DAC_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      VMON_INDEX_C    => (
-         baseAddr     => VMON_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      CTRL_INDEX_C    => (
-         baseAddr     => CTRL_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"),
-      GTH_INDEX_C     => (
-         baseAddr     => GTH0_BASE_ADDR_C,
-         addrBits     => 20,
-         connectivity => X"0001"));  
-
-   constant CTRL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(4 downto 0) := (
-      0               => (
-         baseAddr     => CTRL_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"),
-      1               => (
-         baseAddr     => DEBUG_ADC0_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"),
-      2               => (
-         baseAddr     => DEBUG_ADC1_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"),
-      3               => (
-         baseAddr     => DEBUG_ADC2_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"),
-      4               => (
-         baseAddr     => DEBUG_ADC3_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"));            
-
-   constant GTH_CONFIG_C : AxiLiteCrossbarMasterConfigArray(3 downto 0) := (
-      0               => (
-         baseAddr     => GTH0_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"),
-      1               => (
-         baseAddr     => GTH1_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"),
-      2               => (
-         baseAddr     => GTH2_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"),
-      3               => (
-         baseAddr     => GTH3_BASE_ADDR_C,
-         addrBits     => 16,
-         connectivity => X"0001"));           
-
-   constant VMON_I2C_CONFIG_C : I2cAxiLiteDevArray(0 to 0) := (
-      0             => MakeI2cAxiLiteDevType(
-         i2cAddress => "1001001",
-         dataSize   => 8,               -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '1'));           -- Big endian          
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);  
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-
-   signal ctrlWriteMasters : AxiLiteWriteMasterArray(4 downto 0);
-   signal ctrlWriteSlaves  : AxiLiteWriteSlaveArray(4 downto 0);
-   signal ctrlReadMasters  : AxiLiteReadMasterArray(4 downto 0);
-   signal ctrlReadSlaves   : AxiLiteReadSlaveArray(4 downto 0);
-
-   signal gthWriteMasters : AxiLiteWriteMasterArray(3 downto 0);
-   signal gthWriteSlaves  : AxiLiteWriteSlaveArray(3 downto 0);
-   signal gthReadMasters  : AxiLiteReadMasterArray(3 downto 0);
-   signal gthReadSlaves   : AxiLiteReadSlaveArray(3 downto 0);
-
-   signal refClkDiv2 : sl;
-   signal refClk     : sl;
-   signal amcClk     : sl;
-   signal amcRst     : sl;
-
-   signal jesdClk185     : sl;
-   signal jesdRst185     : sl;
-   signal jesdMmcmLocked : sl;
-   signal jesdSysRef     : sl;
-   signal jesdSync       : sl;
-
+   
+   -- Stripline App IO signals (Will be mapped to App Top)
+   -----------------------------------------------------------------
+   -- LMK Ports
+   signal lmkClkSel       : slv(1 downto 0);
+   signal lmkSck          : sl;
+   signal lmkDio          : sl;
+   signal lmkSync         : sl;
+   signal lmkCsL          : sl;
+   signal lmkRst          : sl;
+   -- Fast ADC's SPI Ports
+   signal adcCsL          : slv(1 downto 0);
+   signal adcSck          : sl;
+   signal adcMiso         : sl;
+   signal adcMosi         : sl;
+   -- Slow DAC's SPI Ports
+   signal dacCsL          : sl;
+   signal dacSck          : sl;
+   signal dacMosi         : sl;
+   -- Analog Control Ports 
+   signal attn1A          : slv(4 downto 0);
+   signal attn1B          : slv(4 downto 0);
+   signal attn2A          : slv(4 downto 0);
+   signal attn2B          : slv(4 downto 0);
+   signal attn3A          : slv(4 downto 0);
+   signal attn3B          : slv(4 downto 0);
+   signal attn4A          : slv(4 downto 0);
+   signal attn4B          : slv(4 downto 0);
+   signal attn5A          : slv(4 downto 0);
+   signal clSw            : slv(5 downto 0);
+   signal clClkOe         : sl;
+   signal rfAmpOn         : sl;
+   
+   -- Internal signals
+   ----------------------------------------------------------------
    signal lmkDin        : sl;
    signal lmkDeglitched : sl;
    signal lmkCnt        : slv(3 downto 0);
    signal lmkDout       : sl;
-
-   signal extTrigL : sl;
-   signal valids   : slv(3 downto 0);
-   signal samples  : sampleDataArray(3 downto 0);
-
+  
+   signal extTrigInt  : sl;
+   signal debugTrig   : sl;
+   signal debugLogEn  : sl;
+   signal debugLogClr : sl;
+   
    signal coreSclk  : slv(1 downto 0);
    signal coreSDout : slv(1 downto 0);
    signal coreCsb   : slv(1 downto 0);
@@ -271,30 +160,122 @@ architecture mapping of AmcStriplineBpmCore is
    signal dacVcoEnable    : sl;
    signal dacVcoSckConfig : slv(15 downto 0);
 
-   signal debugTrig   : sl;
-   signal debugLogEn  : sl;
-   signal debugLogClr : sl;
-
-   signal drpClk  : slv(3 downto 0);
-   signal drpRdy  : slv(3 downto 0);
-   signal drpEn   : slv(3 downto 0);
-   signal drpWe   : slv(3 downto 0);
-   signal drpAddr : slv(35 downto 0);
-   signal drpDi   : slv(63 downto 0);
-   signal drpDo   : slv(63 downto 0);
-   
 begin
+   
+   -- AppCore Signal remapping
+   --------------------------------------------------------------------------
+   
+   -- LMK Ports
+   spareN(5)  <= lmkClkSel(0);
+   spareP(5)  <= lmkClkSel(1);
+   spareN(10) <= lmkSck;   
+   spareP(15) <= lmkDio; 
+   spareN(15) <= lmkSync;
+   spareP(10) <= lmkCsL;   
+   spareP(14) <= lmkRst;
+   -- Fast ADC's SPI Ports
+   jtagPri(4) <= adcCsL(0);
+   spareP(3)  <= adcCsL(1);
+   jtagPri(1) <= adcSck; 
+   adcMiso    <= jtagPri(3);
+   jtagPri(2) <= adcMosi;
+   -- Slow DAC's SPI Ports
+   spareP(12) <= dacCsL;
+   spareN(13) <= dacSck;
+   spareN(12) <= dacMosi;   
+   -- Analog Control Ports 
+   sysRefN(0)  <= attn1A(0);
+   sysRefP(0)  <= attn1A(1);   
+   syncInN(0)  <= attn1A(2);   
+   syncInP(0)  <= attn1A(3);   
+   sysRefN(1)  <= attn1A(4);   
+   sysRefP(1)  <= attn1B(0); 
+   syncInN(1)  <= attn1B(1); 
+   syncInP(1)  <= attn1B(2); 
+   sysRefN(2)  <= attn1B(3); 
+   sysRefP(2)  <= attn1B(4); 
+   syncInN(2)  <= attn2A(0);
+   syncInP(2)  <= attn2A(1);
+   sysRefN(3)  <= attn2A(2);
+   sysRefP(3)  <= attn2A(3);
+   syncInN(3)  <= attn2A(4);
+   syncInP(3)  <= attn2B(0);
+   syncOutN(0) <= attn2B(1);
+   syncOutP(0) <= attn2B(2);
+   syncOutN(1) <= attn2B(3);
+   syncOutP(1) <= attn2B(4);
+   syncOutN(2) <= attn3A(0);
+   syncOutP(2) <= attn3A(1);
+   syncOutN(3) <= attn3A(2);
+   syncOutP(3) <= attn3A(3);
+   syncOutN(4) <= attn3A(4);
+   syncOutP(4) <= attn3B(0);
+   syncOutN(5) <= attn3B(1);
+   syncOutP(5) <= attn3B(2);
+   syncOutN(8) <= attn3B(3);
+   syncOutP(8) <= attn3B(4);
+   syncOutN(9) <= attn4A(0);
+   syncOutP(9) <= attn4A(1);
+   spareN(0)   <= attn4A(2);
+   spareP(0)   <= attn4A(3);
+   spareP(1)   <= attn4A(4);
+   spareN(2)   <= attn4B(0);
+   spareP(2)   <= attn4B(1);
+   spareN(3)   <= attn4B(2);
+   spareN(4)   <= attn4B(3);
+   spareP(4)   <= attn4B(4);
+   spareN(6)   <= attn5A(0);
+   spareP(6)   <= attn5A(1);   
+   spareN(7)   <= attn5A(2);  
+   spareP(7)   <= attn5A(3);   
+   spareN(8)   <= attn5A(4);   
+   spareN(11)  <= clSw(0);
+   spareP(11)  <= clSw(1);
+   fpgaClkP(1) <= clSw(2);
+   fpgaClkN(1) <= clSw(3);
+   syncOutN(7) <= clSw(4);
+   syncOutP(7) <= clSw(5);
+   spareN(9)   <= clClkOe;
+   spareP(9)   <= rfAmpOn;
+   -- JESD
+   IBUFDS_SysRef : IBUFDS
+      port map (
+         I  => fpgaClkP(0),
+         IB => fpgaClkN(0),
+         O  => jesdSysRef);             
+
+   OBUFDS_RxSync0 : OBUFDS
+      port map (
+         I  => jesdRxSync,
+         O  => jtagSec(0),
+         OB => jtagSec(1));
+         
+   OBUFDS_RxSync1 : OBUFDS
+      port map (
+         I  => jesdRxSync,
+         O  => jtagSec(2),
+         OB => jtagSec(3));      
+      
+   -- Triggers
+   IBUFDS_ExtTrig : IBUFDS
+      port map (
+         I  => syncOutP(6),
+         IB => syncOutN(6),
+         O  => extTrigInt); 
 
    IBUFDS_ExtTrig : IBUFDS
       port map (
          I  => extTrigP,
          IB => extTrigN,
-         O  => debugTrig); 
-
-   extTrig <= debugTrig;
+         O  => extTrigInt);
+         
+   -- Assign external trigger to output
+   extTrig  <= extTrigInt;
+   -- Drive internal debug trigger with EVR or EXT
+   debugTrig <= extTrigInt or evrTrig;
 
    ---------------------
-   -- AXI-Lite Crossbars
+   -- AXI-Lite Crossbar
    ---------------------
    U_XBAR0 : entity work.AxiLiteCrossbar
       generic map (
@@ -313,172 +294,7 @@ begin
          mAxiWriteMasters    => axilWriteMasters,
          mAxiWriteSlaves     => axilWriteSlaves,
          mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);
-
-   U_XBAR1 : entity work.AxiLiteCrossbar
-      generic map (
-         TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 5,
-         MASTERS_CONFIG_G   => CTRL_CONFIG_C)
-      port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => axilWriteMasters(CTRL_INDEX_C),
-         sAxiWriteSlaves(0)  => axilWriteSlaves(CTRL_INDEX_C),
-         sAxiReadMasters(0)  => axilReadMasters(CTRL_INDEX_C),
-         sAxiReadSlaves(0)   => axilReadSlaves(CTRL_INDEX_C),
-         mAxiWriteMasters    => ctrlWriteMasters,
-         mAxiWriteSlaves     => ctrlWriteSlaves,
-         mAxiReadMasters     => ctrlReadMasters,
-         mAxiReadSlaves      => ctrlReadSlaves);   
-
-   U_XBAR2 : entity work.AxiLiteCrossbar
-      generic map (
-         TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 4,
-         MASTERS_CONFIG_G   => GTH_CONFIG_C)
-      port map (
-         axiClk              => axilClk,
-         axiClkRst           => axilRst,
-         sAxiWriteMasters(0) => axilWriteMasters(GTH_INDEX_C),
-         sAxiWriteSlaves(0)  => axilWriteSlaves(GTH_INDEX_C),
-         sAxiReadMasters(0)  => axilReadMasters(GTH_INDEX_C),
-         sAxiReadSlaves(0)   => axilReadSlaves(GTH_INDEX_C),
-         mAxiWriteMasters    => gthWriteMasters,
-         mAxiWriteSlaves     => gthWriteSlaves,
-         mAxiReadMasters     => gthReadMasters,
-         mAxiReadSlaves      => gthReadSlaves);     
-
-   ----------------
-   -- JESD Clocking
-   ----------------
-   U_IBUFDS_GTE3 : IBUFDS_GTE3
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")   
-      port map (
-         I     => jesdClkP,
-         IB    => jesdClkN,
-         CEB   => '0',
-         ODIV2 => refClkDiv2,           -- 185 MHz, Frequency the same as jesdRefClk
-         O     => refClk);              -- 185 MHz     
-
-   U_BUFG_GT : BUFG_GT
-      port map (
-         I       => refClkDiv2,         -- 185 MHz
-         CE      => '1',
-         CLR     => '0',
-         CEMASK  => '1',
-         CLRMASK => '1',
-         DIV     => "000",              -- Divide by 1
-         O       => amcClk);            -- 185 MHz
-
-   U_PwrUpRst : entity work.PwrUpRst
-      generic map (
-         TPD_G          => TPD_G,
-         SIM_SPEEDUP_G  => SIMULATION_G,
-         IN_POLARITY_G  => '1',
-         OUT_POLARITY_G => '1')
-      port map (
-         clk    => amcClk,
-         rstOut => amcRst);      
-
-   U_ClockManager : entity work.ClockManagerUltraScale
-      generic map (
-         TPD_G              => TPD_G,
-         TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => false,
-         FB_BUFG_G          => true,
-         NUM_CLOCKS_G       => 1,
-         BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 5.405,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 5.375,  --12.75,--6.375,--6.375,
-         CLKOUT0_DIVIDE_F_G => 5.375,  --12.75,--6.375,
-         CLKOUT0_RST_HOLD_G => 16)
-      port map (
-         clkIn     => amcClk,
-         rstIn     => amcRst,
-         clkOut(0) => jesdClk185,
-         rstOut(0) => jesdRst185,
-         locked    => jesdMmcmLocked);
-
-   adcClk <= jesdClk185;
-   adcRst <= jesdRst185;
-
-   -------------
-   -- JESD block
-   -------------
-   U_Jesd : entity work.AmcBpmJesd204b
-      generic map (
-         TPD_G            => TPD_G,
-         TEST_G           => false,
-         SYSREF_GEN_G     => false,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)    
-      port map (
-         -- DRP Interface
-         drpClk          => drpClk,
-         drpRdy          => drpRdy,
-         drpEn           => drpEn,
-         drpWe           => drpWe,
-         drpAddr         => drpAddr,
-         drpDi           => drpDi,
-         drpDo           => drpDo,
-         -- AXI interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(JESD_INDEX_C),
-         axilReadSlave   => axilReadSlaves(JESD_INDEX_C),
-         axilWriteMaster => axilWriteMasters(JESD_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(JESD_INDEX_C),
-         -- AXI Streaming Interface
-         rxAxisMasterArr => adcMasters,
-         rxCtrlArr       => adcCtrls,
-         -- Sample data output (Use if external data acquisition core is attached)
-         sampleDataArr_o => samples,
-         dataValidVec_o  => valids,
-         -------
-         -- JESD
-         -------
-         -- Clocks
-         stableClk       => axilClk,
-         refClk          => refClk,
-         devClk_i        => jesdClk185,
-         devClk2_i       => jesdClk185,
-         devRst_i        => jesdRst185,
-         devClkActive_i  => jesdMmcmLocked,
-         -- GTH Ports
-         gtTxP           => jesdTxP,
-         gtTxN           => jesdTxN,
-         gtRxP           => jesdRxP,
-         gtRxN           => jesdRxN,
-         -- SYSREF for subclass 1 fixed latency
-         sysRef_i        => jesdSysRef,
-         -- Synchronisation output combined from all receivers to be connected to ADC chips
-         nSync_o         => jesdSync);
-
-   adcValues <= samples;
-   adcValids <= valids;
-
-   IBUFDS_SysRef : IBUFDS
-      port map (
-         I  => jesdSysRefP,
-         IB => jesdSysRefN,
-         O  => jesdSysRef);        
-
-   GEN_VEC :
-   for i in 1 downto 0 generate
-      U_OBUFDS : OBUFDS
-         port map (
-            I  => jesdSync,
-            O  => jesdSyncP(i),
-            OB => jesdSyncN(i));  
-   end generate GEN_VEC;
+         mAxiReadSlaves      => axilReadSlaves);   
 
    -----------------
    -- LMK SPI Module
@@ -556,13 +372,13 @@ begin
 
    with coreCsb select
       adcSck <= coreSclk(0) when "10",
-      coreSclk(1)           when "01",
-      '0'                   when others;
+                coreSclk(1) when "01",
+                        '0' when others;
    
    with coreCsb select
       adcMosi <= coreSDout(0) when "10",
-      coreSDout(1)            when "01",
-      '0'                     when others;
+                 coreSDout(1) when "01",
+                          '0' when others;
 
    -----------------
    -- DAC SPI Module
@@ -591,8 +407,8 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
-         clk             => jesdClk185,
-         rst             => jesdRst185,
+         clk             => jesdClk,
+         rst             => jesdRst,
          dacVcoEnable    => dacVcoEnable,
          dacVcoCtrl      => dacVcoCtrl,
          dacVcoSckConfig => dacVcoSckConfig,
@@ -603,29 +419,7 @@ begin
 
    dacCsL  <= dacCsLVec(0)  when(dacVcoEnable = '0') else dacCsLVec(1);
    dacSck  <= dacSckVec(0)  when(dacVcoEnable = '0') else dacSckVec(1);
-   dacMosi <= dacMosiVec(0) when(dacVcoEnable = '0') else dacMosiVec(1);
-
-   ------------------
-   -- VMON I2C Module
-   ------------------
-   I2C_VMON : entity work.AxiI2cRegMaster
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         DEVICE_MAP_G     => VMON_I2C_CONFIG_C,
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G)
-      port map (
-         -- I2C Ports
-         scl            => vmonScl,
-         sda            => vmonSda,
-         -- AXI-Lite Register Interface
-         axiReadMaster  => axilReadMasters(VMON_INDEX_C),
-         axiReadSlave   => axilReadSlaves(VMON_INDEX_C),
-         axiWriteMaster => axilWriteMasters(VMON_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(VMON_INDEX_C),
-         -- Clocks and Resets
-         axiClk         => axilClk,
-         axiRst         => axilRst);      
+   dacMosi <= dacMosiVec(0) when(dacVcoEnable = '0') else dacMosiVec(1); 
 
    ---------------------
    -- BPM Control Module
@@ -639,10 +433,10 @@ begin
       port map (
          -- Debug Signals
          amcClk          => amcClk,
-         clk             => jesdClk185,
-         rst             => jesdRst185,
-         adcValids       => valids,
-         adcValues       => samples,
+         clk             => jesdClk,
+         rst             => jesdRst,
+         adcValids       => adcValids,
+         adcValues       => adcValues,
          dacVcoCtrl      => dacVcoCtrl,
          dacVcoEnable    => dacVcoEnable,
          dacVcoSckConfig => dacVcoSckConfig,
@@ -652,10 +446,10 @@ begin
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => ctrlReadMasters(0),
-         axilReadSlave   => ctrlReadSlaves(0),
-         axilWriteMaster => ctrlWriteMasters(0),
-         axilWriteSlave  => ctrlWriteSlaves(0),
+         axilReadMaster  => axilReadMasters(CTRL_INDEX_C),
+         axilReadSlave   => axilReadSlaves(CTRL_INDEX_C),
+         axilWriteMaster => axilWriteMasters(CTRL_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(CTRL_INDEX_C),
          -----------------------
          -- Application Ports --
          -----------------------      
@@ -692,52 +486,19 @@ begin
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
          port map (
             -- Data to store in ring buffer
-            dataClk         => jesdClk185,
-            dataRst         => jesdRst185,
-            dataValid       => valids(i),
-            dataValue       => samples(i),
+            dataClk         => jesdClk,
+            dataRst         => jesdRst,
+            dataValid       => adcValids(i),
+            dataValue       => adcValues(i),
             bufferEnable    => debugLogEn,
             bufferClear     => debugLogClr,
             -- AXI-Lite interface for readout
             axilClk         => axilClk,
             axilRst         => axilRst,
-            axilReadMaster  => ctrlReadMasters(1+i),
-            axilReadSlave   => ctrlReadSlaves(1+i),
-            axilWriteMaster => ctrlWriteMasters(1+i),
-            axilWriteSlave  => ctrlWriteSlaves(1+i));             
+            axilReadMaster  => axilReadMasters(DEBUG_ADC0_INDEX_C+i),
+            axilReadSlave   => axilReadSlaves(DEBUG_ADC0_INDEX_C+i),
+            axilWriteMaster => axilWriteMasters(DEBUG_ADC0_INDEX_C+i),
+            axilWriteSlave  => axilWriteSlaves(DEBUG_ADC0_INDEX_C+i);          
    end generate GEN_ADC_DEBUG;
-
-   -----------------------
-   -- GTH's DRP Interfaces
-   -----------------------
-   GEN_GTH_DRP : for i in 3 downto 0 generate
-      U_AxiLiteToDrp : entity work.AxiLiteToDrp
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_RESP_DECERR_C,
-            COMMON_CLK_G     => true,
-            EN_ARBITRATION_G => false,
-            TIMEOUT_G        => 4096,
-            ADDR_WIDTH_G     => 9,
-            DATA_WIDTH_G     => 16)      
-         port map (
-            -- AXI-Lite Port
-            axilClk         => axilClk,
-            axilRst         => axilRst,
-            axilReadMaster  => gthReadMasters(i),
-            axilReadSlave   => gthReadSlaves(i),
-            axilWriteMaster => gthWriteMasters(i),
-            axilWriteSlave  => gthWriteSlaves(i),
-            -- DRP Interface
-            drpClk          => axilClk,
-            drpRst          => axilRst,
-            drpRdy          => drpRdy(i),
-            drpEn           => drpEn(i),
-            drpWe           => drpWe(i),
-            drpAddr         => drpAddr((i*9)+8 downto (i*9)),
-            drpDi           => drpDi((i*16)+15 downto (i*16)),
-            drpDo           => drpDo((i*16)+15 downto (i*16)));
-      drpClk(i) <= axilClk;
-   end generate GEN_GTH_DRP;
    
 end mapping;

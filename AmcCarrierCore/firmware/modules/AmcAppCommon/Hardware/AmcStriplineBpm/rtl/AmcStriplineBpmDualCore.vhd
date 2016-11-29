@@ -49,12 +49,7 @@ entity AmcStriplineBpmDualCore is
       jesdClk         : in    slv(1 downto 0);
       jesdRst         : in    slv(1 downto 0);
       jesdSysRef      : out   slv(1 downto 0);
-      jesdRxSync      : in    slv(1 downto 0);
-      jesdTxSync      : out   slv(1 downto 0);
-           
-      -- AXI Streaming Interface (adcClk domain)
-      adcMasters      : out   AxiStreamMasterVectorArray(1 downto 0, 3 downto 0);
-      adcCtrls        : in    AxiStreamCtrlVectorArray(1 downto 0, 3 downto 0) := (others => (others => AXI_STREAM_CTRL_UNUSED_C));
+      jesdRxSync      : in    slv(1 downto 0);          
       -- ADC/DAC Interface (jesdClk domain)
       adcValids       : out   Slv4Array(1 downto 0);
       adcValues       : out   sampleDataVectorArray(1 downto 0, 3 downto 0);
@@ -69,6 +64,7 @@ entity AmcStriplineBpmDualCore is
 
       -- Pass through Interfaces
       extTrig         : out   slv(1 downto 0);     
+      evrTrig         : in    slv(1 downto 0);
       
       -----------------------
       -- Application Ports --
@@ -97,7 +93,7 @@ architecture mapping of AmcStriplineBpmDualCore is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 16, 15);
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 28, 24);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -148,16 +144,7 @@ begin
             jesdRst         => jesdRst(i),
             jesdSysRef      => jesdSysRef(i),
             jesdRxSync      => jesdRxSync(i),
-            jesdTxSync      => jesdTxSync(i),
-            -- AXI Streaming Interface (jesdClk)
-            adcMasters(0)   => adcMasters(i, 0),
-            adcMasters(1)   => adcMasters(i, 1),
-            adcMasters(2)   => adcMasters(i, 2),
-            adcMasters(3)   => adcMasters(i, 3),
-            adcCtrls(0)     => adcCtrls(i, 0),
-            adcCtrls(1)     => adcCtrls(i, 1),
-            adcCtrls(2)     => adcCtrls(i, 2),
-            adcCtrls(3)     => adcCtrls(i, 3),
+
             -- ADC/DAC Interface
             adcValids       => adcValids(i),
             adcValues(0)    => adcValues(i, 0),
@@ -174,10 +161,9 @@ begin
             axilWriteMaster => writeMasters(i),
             axilWriteSlave  => writeSlaves(i),
             -- Pass through Interfaces
-            extTrig         => extTrig(i),            
-            -----------------------
-            -- Application Ports --
-            -----------------------
+            extTrig         => extTrig(i),
+            evrTrig         => evrTrig(i),
+
             -----------------------
             -- Application Ports --
             -----------------------
