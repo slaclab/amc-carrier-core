@@ -188,47 +188,56 @@ begin
    sysRefP(0)  <= attn1A(1);   
    syncInN(0)  <= attn1A(2);   
    syncInP(0)  <= attn1A(3);   
-   sysRefN(1)  <= attn1A(4);   
+   sysRefN(1)  <= attn1A(4);
+   
    sysRefP(1)  <= attn1B(0); 
    syncInN(1)  <= attn1B(1); 
    syncInP(1)  <= attn1B(2); 
    sysRefN(2)  <= attn1B(3); 
    sysRefP(2)  <= attn1B(4); 
+   
    syncInN(2)  <= attn2A(0);
    syncInP(2)  <= attn2A(1);
    sysRefN(3)  <= attn2A(2);
    sysRefP(3)  <= attn2A(3);
    syncInN(3)  <= attn2A(4);
+   
    syncInP(3)  <= attn2B(0);
    syncOutN(0) <= attn2B(1);
    syncOutP(0) <= attn2B(2);
    syncOutN(1) <= attn2B(3);
    syncOutP(1) <= attn2B(4);
+   
    syncOutN(2) <= attn3A(0);
    syncOutP(2) <= attn3A(1);
    syncOutN(3) <= attn3A(2);
    syncOutP(3) <= attn3A(3);
    syncOutN(4) <= attn3A(4);
+   
    syncOutP(4) <= attn3B(0);
    syncOutN(5) <= attn3B(1);
    syncOutP(5) <= attn3B(2);
    syncOutN(8) <= attn3B(3);
    syncOutP(8) <= attn3B(4);
+   
    syncOutN(9) <= attn4A(0);
    syncOutP(9) <= attn4A(1);
    spareN(0)   <= attn4A(2);
    spareP(0)   <= attn4A(3);
    spareP(1)   <= attn4A(4);
+   
    spareN(2)   <= attn4B(0);
    spareP(2)   <= attn4B(1);
    spareN(3)   <= attn4B(2);
    spareN(4)   <= attn4B(3);
    spareP(4)   <= attn4B(4);
+   
    spareN(6)   <= attn5A(0);
    spareP(6)   <= attn5A(1);   
    spareN(7)   <= attn5A(2);  
    spareP(7)   <= attn5A(3);   
-   spareN(8)   <= attn5A(4);   
+   spareN(8)   <= attn5A(4);
+   
    spareN(11)  <= clSw(0);
    spareP(11)  <= clSw(1);
    fpgaClkP(1) <= clSw(2);
@@ -262,12 +271,6 @@ begin
          I  => syncOutP(6),
          IB => syncOutN(6),
          O  => extTrigInt); 
-
-   IBUFDS_ExtTrig : IBUFDS
-      port map (
-         I  => extTrigP,
-         IB => extTrigN,
-         O  => extTrigInt);
          
    -- Assign external trigger to output
    extTrig  <= extTrigInt;
