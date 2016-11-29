@@ -435,7 +435,7 @@ begin
          AXI_ERROR_RESP_G         => AXI_ERROR_RESP_G)
       port map (
          -- Debug Signals
-         amcClk          => amcClk,
+         amcClk          => jesdClk,
          clk             => jesdClk,
          rst             => jesdRst,
          adcValids       => adcValids,
