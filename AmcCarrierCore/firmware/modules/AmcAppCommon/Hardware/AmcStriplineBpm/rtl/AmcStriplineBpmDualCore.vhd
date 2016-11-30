@@ -79,10 +79,10 @@ entity AmcStriplineBpmDualCore is
       sysRefP          : inout Slv4Array(1 downto 0);
       sysRefN          : inout Slv4Array(1 downto 0);
       -- AMC's Sync Ports
-      syncInP          : inout Slv10Array(1 downto 0);
-      syncInN          : inout Slv10Array(1 downto 0);
-      syncOutP         : inout Slv4Array(1 downto 0);
-      syncOutN         : inout Slv4Array(1 downto 0);
+      syncInP          : inout Slv4Array(1 downto 0);
+      syncInN          : inout Slv4Array(1 downto 0);
+      syncOutP         : inout Slv10Array(1 downto 0);
+      syncOutN         : inout Slv10Array(1 downto 0);
       -- AMC's Spare Ports
       spareP           : inout Slv16Array(1 downto 0);
       spareN           : inout Slv16Array(1 downto 0)
