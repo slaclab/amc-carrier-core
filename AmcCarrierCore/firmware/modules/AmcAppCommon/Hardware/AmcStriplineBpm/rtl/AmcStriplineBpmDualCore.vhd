@@ -119,10 +119,10 @@ begin
          sAxiWriteSlaves(0)  => axilWriteSlave,
          sAxiReadMasters(0)  => axilReadMaster,
          sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => writeMasters,
-         mAxiWriteSlaves     => writeSlaves,
-         mAxiReadMasters     => readMasters,
-         mAxiReadSlaves      => readSlaves);
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves   );
 
    -----------
    -- AMC Core
@@ -156,10 +156,10 @@ begin
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
-            axilReadMaster  => readMasters(i),
-            axilReadSlave   => readSlaves(i),
-            axilWriteMaster => writeMasters(i),
-            axilWriteSlave  => writeSlaves(i),
+            axilReadMaster  => axilReadMasters(i),
+            axilReadSlave   => axilReadSlaves(i),
+            axilWriteMaster => axilWriteMasters(i),
+            axilWriteSlave  => axilWriteSlaves(i),
             -- Pass through Interfaces
             extTrig         => extTrig(i),
             evrTrig         => evrTrig(i),
