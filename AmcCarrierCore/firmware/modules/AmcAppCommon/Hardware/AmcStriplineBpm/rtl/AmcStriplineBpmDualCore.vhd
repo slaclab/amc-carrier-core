@@ -51,9 +51,9 @@ entity AmcStriplineBpmDualCore is
       jesdSysRef      : out   slv(1 downto 0);
       jesdRxSync      : in    slv(1 downto 0);          
       -- ADC/DAC Interface (jesdClk domain)
-      adcValids       : out   Slv4Array(1 downto 0);
-      adcValues       : out   sampleDataVectorArray(1 downto 0, 3 downto 0);
-      dacVcoCtrl      : in    Slv16Array(1 downto 0);
+      adcValids       : in   Slv4Array(1 downto 0);
+      adcValues       : in   sampleDataVectorArray(1 downto 0, 3 downto 0);
+      dacVcoCtrl      : in   Slv16Array(1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
