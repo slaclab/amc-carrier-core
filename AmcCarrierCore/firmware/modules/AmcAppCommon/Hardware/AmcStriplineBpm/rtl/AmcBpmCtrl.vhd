@@ -259,7 +259,7 @@ begin
          dataIn  => r.softClear,
          dataOut => softClear);     
 
-   Synchronizer_DebugTrig : entity work.AmcGenericAdcDacSyncTrig
+   Synchronizer_DebugTrig : entity work.RingBufferCtrl
       generic map (
          TPD_G                    => TPD_G,
          RING_BUFFER_ADDR_WIDTH_G => RING_BUFFER_ADDR_WIDTH_G)

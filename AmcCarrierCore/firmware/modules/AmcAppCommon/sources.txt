@@ -4,6 +4,7 @@ vhdl work AppTop/rtl/AppTopJesd.vhd
 vhdl work AppTop/rtl/AppTopJesd204b.vhd
 vhdl work AppTop/rtl/AppTopPkg.vhd
 vhdl work AppTop/rtl/AppTopTrig.vhd
+vhdl work AppTop/rtl/RingBufferCtrl.vhd
 
 vhdl work AppTop/coregen/AppTopJesd204bCoregen.dcp
 
