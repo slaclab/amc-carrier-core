@@ -1,1 +1,2 @@
-manual yaml/asdf.yaml
+manual yaml/AmcBpmCore.yaml
+manual yaml/AmcBpmCtrl.yaml

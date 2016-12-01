@@ -1,0 +1,344 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once
+
+AmcBpmCtrl: &AmcBpmCtrl
+  name: AmcBpmCtrl
+  description: BPM Control Module
+  class: MMIODev 
+  size: 0x400 
+  children:
+    #########################################################
+    AdcValidCnt:
+      at:
+        offset: 0x000
+        nelms: 4
+      class: IntField
+      name: AdcValidCnt
+      mode: RO
+      description: ADC Valid Transistion Counter[3:0]
+    #########################################################
+    DebugTrigCnt:
+      at:
+        offset: 0x010
+      class: IntField
+      name: DebugTrigCnt
+      mode: RO
+      description: Debug Trigger counter
+    #########################################################
+    AdcValid:
+      at:
+        offset: 0x0FC
+      class: IntField
+      name: AdcValid
+      sizeBits: 4
+      lsBit: 0
+      mode: RO
+      description: ADC Valid[3:0]
+    #########################################################
+    DebugTrig:
+      at:
+        offset: 0x0FC
+      class: IntField
+      name: DebugTrig
+      sizeBits: 1
+      lsBit: 4
+      mode: RO
+      description: Debug Trigger
+    #########################################################
+    AdcData:
+      at:
+        offset: 0x100
+        stride: 4
+        nelms: 4
+      class: IntField
+      name: AdcData
+      sizeBits: 16
+      mode: RO
+      description: ADC Data[3:0]
+    #########################################################
+    VcoDac:
+      at:
+        offset: 0x1F8
+      class: IntField
+      name: VcoDac
+      sizeBits: 16
+      mode: RO
+      description: VCO's DAC Value
+    #########################################################
+    AmcClkFreq:
+      at:
+        offset: 0x1FC
+      class: IntField
+      name: AmcClkFreq
+      mode: RO
+      description: AMC Clock frequency (in units of Hz)
+    #########################################################
+    LmkClkSel:
+      at:
+        offset: 0x200
+      class: IntField
+      name: LmkClkSel
+      sizeBits: 2
+      mode: RW
+      description: LMK Clock Select
+    #########################################################
+    LmkRst:
+      at:
+        offset: 0x204
+      class: IntField
+      name: LmkRst
+      sizeBits: 1
+      mode: RW
+      description: LMK Reset
+    #########################################################
+    LmkSync:
+      at:
+        offset: 0x208
+      class: IntField
+      name: LmkSync
+      sizeBits: 1
+      mode: RW
+      description: LMK SYNC
+    #########################################################
+    Attn1A:
+      at:
+        offset: 0x210
+      class: IntField
+      name: Attn1A
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"
+    #########################################################
+    Attn1B:
+      at:
+        offset: 0x214
+      class: IntField
+      name: Attn1B
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"
+    #########################################################
+    Attn2A:
+      at:
+        offset: 0x218
+      class: IntField
+      name: Attn2A
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"
+    #########################################################
+    Attn2B:
+      at:
+        offset: 0x21c
+      class: IntField
+      name: Attn2B
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"
+    #########################################################
+    Attn3A:
+      at:
+        offset: 0x220
+      class: IntField
+      name: Attn3A
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"
+    #########################################################
+    Attn3B:
+      at:
+        offset: 0x224
+      class: IntField
+      name: Attn3B
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"
+    #########################################################
+    Attn4A:
+      at:
+        offset: 0x228
+      class: IntField
+      name: Attn4A
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"
+    #########################################################
+    Attn4B:
+      at:
+        offset: 0x22c
+      class: IntField
+      name: Attn4B
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"     
+    #########################################################
+    Attn5A:
+      at:
+        offset: 0x230
+      class: IntField
+      name: Attn5A
+      sizeBits: 5
+      mode: RW
+      description: "Attenuation value. b0: 1dB, b1: 2dB, b2: 4dB, b3: 8dB, b4: 16dB (Active low)"      
+    #########################################################
+    Delay_TRIG2AMP:
+      at:
+        offset: 0x234
+      class: IntField
+      name: Delay_TRIG2AMP
+      sizeBits: 20
+      mode: RW
+      description: Delay      
+    #########################################################      
+    Delay_AMP2RF1:
+      at:
+        offset: 0x238
+      class: IntField
+      name: Delay_AMP2RF1
+      sizeBits: 20
+      mode: RW
+      description: Delay      
+    #########################################################      
+    Delay_RF12RF2:
+      at:
+        offset: 0x23C
+      class: IntField
+      name: Delay_RF12RF2
+      sizeBits: 20
+      mode: RW
+      description: Delay      
+    #########################################################      
+    Delay_RFWIDTH:
+      at:
+        offset: 0x240
+      class: IntField
+      name: Delay_RFWIDTH
+      sizeBits: 20
+      mode: RW
+      description: Delay      
+    #########################################################
+    Delay_OFFTIME:
+      at:
+        offset: 0x244
+      class: IntField
+      name: Delay_OFFTIME
+      sizeBits: 20
+      mode: RW
+      description: Delay      
+    #########################################################    
+    Delay_Trig2Beam:
+      at:
+        offset: 0x248
+      class: IntField
+      name: Delay_Trig2Beam
+      sizeBits: 20
+      mode: RW
+      description: Delay      
+    #########################################################      
+    Delay_RF2Red:
+      at:
+        offset: 0x24C
+      class: IntField
+      name: Delay_RF2Red
+      sizeBits: 20
+      mode: RW
+      description: Delay      
+    #########################################################      
+    Delay_RF2Green:
+      at:
+        offset: 0x250
+      class: IntField
+      name: Delay_RF2Green
+      sizeBits: 20
+      mode: RW
+      description: Delay      
+    #########################################################      
+    Cal_OSCMode:
+      at:
+        offset: 0x254
+      class: IntField
+      name: Cal_OSCMode
+      sizeBits: 4
+      mode: RW
+      description: Cal_OSCMode   
+    #########################################################
+    Cal_CALMode:
+      at:
+        offset: 0x258
+      class: IntField
+      name: Cal_CALMode
+      sizeBits: 4
+      mode: RW
+      description: Cal_CALMode   
+    #########################################################
+    Cal_EnaTrig:
+      at:
+        offset: 0x25C
+      class: IntField
+      name: Cal_EnaTrig
+      sizeBits: 1
+      mode: RW
+      description: Cal_EnaTrig   
+    #########################################################
+    SoftTrig:
+      at:
+        offset: 0x300
+      class: IntField
+      name: SoftTrig
+      sizeBits: 1
+      mode: WO
+      description: Software Trigger
+    #########################################################
+    SoftClear:
+      at:
+        offset: 0x304
+      class: IntField
+      name: SoftClear
+      sizeBits: 1
+      mode: WO
+      description: Software Clear
+    #########################################################
+    VcoDacSckConfig:
+      at:
+        offset: 0x308
+      class: IntField
+      name: VcoDacSckConfig
+      sizeBits: 16
+      mode: RW
+      description: VCO DAC SCK Rate Configuration
+    #########################################################
+    VcoDacEnable:
+      at:
+        offset: 0x30C
+      class: IntField
+      name: VcoDacEnable
+      sizeBits: 1
+      mode: RW
+      description: VCO DAC Enable
+    #########################################################
+    RollOverEn:
+      at:
+        offset: 0x3F8
+      class: IntField
+      name: RollOverEn
+      sizeBits: 5
+      mode: RW
+      description: Enable Status counter roll over
+    #########################################################
+    CntRst:
+      at:
+        offset: 0x3FC
+      class: IntField
+      name: CntRst
+      sizeBits: 1
+      mode: WO
+      description: Status counter reset

@@ -121,14 +121,14 @@ set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[1][7]}]; #attn5A[0
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[1][7]}]; #attn5A[0][3] P12 PIN121
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[1][8]}]; #attn5A[0][4] P12 PIN123
 
-set_property -dict { PACKAGE_PIN Y28  IOSTANDARD LVCMOS18 } [get_ports {spareN[1][11]}]; #clSw[0][0] P12 PIN132
-set_property -dict { PACKAGE_PIN W28  IOSTANDARD LVCMOS18 } [get_ports {spareP[1][11]}]; #clSw[0][1] P12 PIN133
-set_property -dict { PACKAGE_PIN AE17 IOSTANDARD LVCMOS18 } [get_ports {fpgaClkP[1][1]}]; #clSw[0][2] P12 PIN74
-set_property -dict { PACKAGE_PIN AF17 IOSTANDARD LVCMOS18 } [get_ports {fpgaClkN[1][1]}]; #clSw[0][3] P12 PIN75
-set_property -dict { PACKAGE_PIN AE23 IOSTANDARD LVCMOS18 } [get_ports {syncOutN[1][7]}]; #clSw[0][4] P11 PIN138
-set_property -dict { PACKAGE_PIN AE22 IOSTANDARD LVCMOS18 } [get_ports {syncOutP[1][7]}]; #clSw[0][5] P11 PIN139
-set_property -dict { PACKAGE_PIN AK18 IOSTANDARD LVCMOS18 } [get_ports {spareN[1][9]}]; #clClkOe P12 PIN126
-set_property -dict { PACKAGE_PIN AJ18 IOSTANDARD LVCMOS18 } [get_ports {spareP[1][9]}]; #rfAmpOn P12 PIN127
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[1][11]}]; #clSw[0][0] P12 PIN132
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[1][11]}]; #clSw[0][1] P12 PIN133
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {fpgaClkP[1][1]}]; #clSw[0][2] P12 PIN74
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {fpgaClkN[1][1]}]; #clSw[0][3] P12 PIN75
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[1][7]}]; #clSw[0][4] P11 PIN138
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[1][7]}]; #clSw[0][5] P11 PIN139
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[1][9]}]; #clClkOe P12 PIN126
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[1][9]}]; #rfAmpOn P12 PIN127
 
 # Triggers
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutP[1][6]}]; #extTrigP P11 PIN136
