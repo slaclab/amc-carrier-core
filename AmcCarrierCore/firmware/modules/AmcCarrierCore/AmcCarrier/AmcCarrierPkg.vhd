@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-09-01
+-- Last update: 2016-12-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -45,7 +45,8 @@ package AmcCarrierPkg is
    -- 04/21/2016 (0x00000007): Added Ethernet Uptime counter in the BSI interface
    -- 07/08/2016 (0x00000008): Updated the I2C device configurations
    -- 09/01/2016 (0x00000009): Backing up to 1.2 TAG
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"00000009";
+   -- 12/05/2016 (0x0000000A): Adding more application types
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"0000000A";
 
    constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
@@ -59,12 +60,14 @@ package AmcCarrierPkg is
    subtype AppType is slv(6 downto 0);  -- Max. Size is 7-bits
 
    constant APP_NULL_TYPE_C           : AppType := toSlv(0, AppType'length);
-   constant APP_TIME_GEN_TYPE_C       : AppType := toSlv(1, AppType'length);  --Timing Generator with local reference
-   constant APP_BCM_TYPE_C            : AppType := toSlv(2, AppType'length);
-   constant APP_BLEN_TYPE_C           : AppType := toSlv(3, AppType'length);
-   constant APP_BPM_TYPE_C            : AppType := toSlv(4, AppType'length);
-   constant APP_LLRF_TYPE_C           : AppType := toSlv(5, AppType'length);
-   constant APP_EXTREF_GEN_TYPE_C     : AppType := toSlv(6, AppType'length);  --Timing Generator with external reference
+   constant APP_DEBUG_TYPE_C          : AppType := toSlv(1, AppType'length);
+   constant APP_TIME_GEN_TYPE_C       : AppType := toSlv(10, AppType'length);  --Timing Generator with local reference
+   constant APP_BCM_TYPE_C            : AppType := toSlv(11, AppType'length);
+   constant APP_BLEN_TYPE_C           : AppType := toSlv(12, AppType'length);
+   constant APP_LLRF_TYPE_C           : AppType := toSlv(13, AppType'length);
+   constant APP_EXTREF_GEN_TYPE_C     : AppType := toSlv(14, AppType'length);  --Timing Generator with external reference
+   constant APP_BPM_STRIPLINE_TYPE_C  : AppType := toSlv(100, AppType'length);
+   constant APP_BPM_CAVITY_TYPE_C     : AppType := toSlv(101, AppType'length);
    constant APP_MPS_APP_TYPE_C        : AppType := toSlv(123, AppType'length);  -- MPS Application Node
    constant APP_MPS_DIGITAL_TYPE_C    : AppType := toSlv(124, AppType'length);  -- MPS Link Node, RTM and AMC digital inputs
    constant APP_MPS_LINK_AIN_TYPE_C   : AppType := toSlv(125, AppType'length);  -- MPS Link Node, Dual Analog AMC cards
@@ -234,8 +237,10 @@ package body AmcCarrierPkg is
          retVar := 0;                   -- TBD value
       elsif (app = APP_BLEN_TYPE_C) then
          retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_TYPE_C) then
+      elsif (app = APP_BPM_STRIPLINE_TYPE_C) then
          retVar := 0;                   -- TBD value
+      elsif (app = APP_BPM_CAVITY_TYPE_C) then
+         retVar := 0;                   -- TBD value         
       elsif (app = APP_LLRF_TYPE_C) then
          retVar := 0;                   -- TBD value
       elsif (app = APP_MPS_APP_TYPE_C) then
@@ -261,8 +266,10 @@ package body AmcCarrierPkg is
          retVar := 0;                   -- TBD value
       elsif (app = APP_BLEN_TYPE_C) then
          retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_TYPE_C) then
+      elsif (app = APP_BPM_STRIPLINE_TYPE_C) then
          retVar := 0;                   -- TBD value
+      elsif (app = APP_BPM_CAVITY_TYPE_C) then
+         retVar := 0;                   -- TBD value         
       elsif (app = APP_LLRF_TYPE_C) then
          retVar := 0;                   -- TBD value
       elsif (app = APP_MPS_APP_TYPE_C) then
@@ -284,22 +291,14 @@ package body AmcCarrierPkg is
    function getBpMsgChCnt (app : AppType) return natural is
       variable retVar : natural range 0 to 32;
    begin
-      if (app = APP_BCM_TYPE_C) then
+      if (app = APP_BLEN_TYPE_C) then
          retVar := 0;                   -- TBD value
-      elsif (app = APP_BLEN_TYPE_C) then
+      elsif (app = APP_BPM_STRIPLINE_TYPE_C) then
+         retVar := 6;
+      elsif (app = APP_BPM_CAVITY_TYPE_C) then
          retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_LLRF_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_MPS_DIGITAL_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         retVar := 0;                   -- TBD value
+      elsif (app = APP_DEBUG_TYPE_C) then
+         retVar := 32;                  -- Send all 32-bit words
       else
          retVar := 0;
       end if;
