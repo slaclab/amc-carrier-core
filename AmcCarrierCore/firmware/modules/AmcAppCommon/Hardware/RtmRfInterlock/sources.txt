@@ -1,1 +1,6 @@
-vhdl work rtl/RtmRfInterlock.vhd
+vhdl work rtl/RtmRfInterlockCore.vhd
+vhdl work rtl/RtmRfInterlockReg.vhd
+vhdl work rtl/Ad9229Core.vhd
+vhdl work rtl/Ad9229Deserializer.vhd
+vhdl work rtl/AxiSpiAd7682.vhd
+vhdl work rtl/AxiSpiAd7682Reg.vhd
