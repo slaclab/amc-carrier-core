@@ -1,0 +1,383 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once RtmRfInterlock.yaml
+#include GenericMemory.yaml
+
+RtmRfInterlock: &RtmRfInterlock 
+  class: MMIODev
+  configPrio: 1
+  description: "LLRF RTM interlock core"
+  size: 0x4000
+  #########
+  children:
+  #########
+    #########################################################
+    #    CPLD
+    #########################################################
+    Status:
+      class: IntField
+      at:
+        offset: 0x0
+      sizeBits: 16
+      mode: RO
+      description: "CPLD Status Todo make seperate objets within the 16-bit status"
+    #########################################################
+    FirmwareVersion:
+      class: IntField
+      at:
+        offset: 0x04
+      sizeBits: 16
+      mode: RO
+      description: "0x0100 (Version 1.00)"
+    #########################################################
+    SystemId:
+      class: IntField
+      at:
+        offset: 0x08
+        stride: 4
+        nelms: 4
+      sizeBits: 16
+      mode: RO
+      description: "8 Bytes, ASCII "
+    #########################################################
+    SubType:
+      class: IntField
+      at:
+        offset: 0x18
+        stride: 4
+        nelms: 4
+      sizeBits: 16
+      mode: RO
+      description: "8 Bytes, ASCII "
+    #########################################################
+    FirmwareDate:
+      class: IntField
+      at:
+        offset: 0x28
+        stride: 4
+        nelms: 4
+      sizeBits: 16
+      mode: RO
+      description: "8 Bytes, ASCII "
+    #########################################################
+    #    KLY THRESHOLD TPL0202
+    #########################################################
+    KlyWiperRegA:
+      class: IntField
+      at:
+        offset: 0x404
+      sizeBits: 8
+      mode: RW
+      description: "Write Wiper Register A"
+    #########################################################
+    KlyWiperRegB:
+      class: IntField
+      at:
+        offset: 0x408
+      sizeBits: 8
+      mode: RW
+      description: "Write Wiper Register B"
+    #########################################################
+    # KlyWiperRegAB:
+      # class: IntField
+      # at:
+        # offset: 0x40C
+      # sizeBits: 8
+      # mode: RW
+      # description: "Write Wiper Register A and B"
+    #########################################################
+    KlyNVRegA:
+      class: IntField
+      at:
+        offset: 0x444
+      sizeBits: 8
+      mode: RW
+      description: "Write NV Register A"
+    #########################################################
+    KlyNVRegB:
+      class: IntField
+      at:
+        offset: 0x448
+      sizeBits: 8
+      mode: RW
+      description: "Write NV Register B"
+    #########################################################
+    # KlyNVRegAB:
+      # class: IntField
+      # at:
+        # offset: 0x44C
+      # sizeBits: 8
+      # mode: RW
+      # description: "Write NV Register A and B"
+    #########################################################
+    #    MOD THRESHOLD TPL0202
+    #########################################################
+    ModWiperRegA:
+      class: IntField
+      at:
+        offset: 0x804
+      sizeBits: 8
+      mode: RW
+      description: "Write Wiper Register A"
+    #########################################################
+    ModWiperRegB:
+      class: IntField
+      at:
+        offset: 0x808
+      sizeBits: 8
+      mode: RW
+      description: "Write Wiper Register B"
+    #########################################################
+    # ModWiperRegAB:
+      # class: IntField
+      # at:
+        # offset: 0x80C
+      # sizeBits: 8
+      # mode: RW
+      # description: "Write Wiper Register A and B"
+    #########################################################
+    ModNVRegA:
+      class: IntField
+      at:
+        offset: 0x844
+      sizeBits: 8
+      mode: RW
+      description: "Write NV Register A"
+    #########################################################
+    ModNVRegB:
+      class: IntField
+      at:
+        offset: 0x848
+      sizeBits: 8
+      mode: RW
+      description: "Write NV Register B"
+    #########################################################
+    # ModNVRegAB:
+      # class: IntField
+      # at:
+        # offset: 0x84C
+      # sizeBits: 8
+      # mode: RW
+      # description: "Write NV Register A and B"
+    #########################################################
+    #    ADC THRESHOLD readout chip. AD7682
+    #########################################################
+    CfgRegister:
+      class: IntField
+      at:
+        offset: 0xC00
+      sizeBits: 16
+      mode: RW
+      description: "Default 0xFFFC: bit15-CFG,bit14-INCC,bit13-INCC,bit12-INCC,bit11-INx,bit10-INx,bit09-INx,bit08-BW,bit07-REF,bit06-REF,bit05-REF,bit03-SEQ,bit02-RB,bit01-XX,bit00-XX"
+    #########################################################
+    AdcIn:
+      class: IntField
+      at:
+        offset: 0xC40
+        stride: 4
+        nelms: 4
+      sizeBits: 16
+      mode: RO
+      description: "ADC values [3-0]"
+    #########################################################
+    #    RTM FPGA registers
+    #########################################################
+    Mode:
+      class: IntField
+      at:
+        offset: 0x1000
+      sizeBits: 1
+      mode: RW
+      description: "Interlock mode"
+    #########################################################
+    TuneSled:
+      class: IntField
+      at:
+        offset: 0x1004
+      sizeBits: 1
+      mode: RW
+      description: "TuneSled"
+    #########################################################
+    DetuneSled:
+      class: IntField
+      at:
+        offset: 0x1008
+      sizeBits: 1
+      mode: RW
+      description: "DetuneSled"
+    #########################################################
+    SoftBufferTrigger:
+      class: IntField
+      at:
+        offset: 0x100C
+      lsBit: 0
+      sizeBits: 1
+      mode: RW
+      description: "Trigger ring buffer from software"
+    #########################################################
+    SoftBufferClear:
+      class: IntField
+      at:
+        offset: 0x100C
+      lsBit: 1
+      sizeBits: 1
+      mode: RW
+      description: "Clear ring buffer. Arm next acquisition"
+    #########################################################
+    AdcIDelayLoad:
+      class: IntField
+      at:
+        offset: 0x100C
+      lsBit: 2
+      sizeBits: 1
+      mode: RW
+      description: "Load the delays of 4 Fast ADC lanes and frame clock('1' loads the delays)."
+    #########################################################
+    FaultClear:
+      class: IntField
+      at:
+        offset: 0x100C
+      lsBit: 3
+      sizeBits: 1
+      mode: RW
+      description: "Clear the Fault Latch in CPLD. 1 us pulse."
+    #########################################################
+    ModeBypass:
+      class: IntField
+      at:
+        offset: 0x100C
+      lsBit: 4
+      sizeBits: 1
+      mode: RW
+      description: "Bypass mode."
+    #########################################################
+    FaultOut:
+      class: IntField
+      at:
+        offset: 0x1040
+      lsBit: 0
+      sizeBits: 1
+      mode: RO
+      description: "Fault from RTM status"        
+    #########################################################
+    AdcLocked:
+      class: IntField
+      at:
+        offset: 0x1040
+      lsBit: 1
+      sizeBits: 1
+      mode: RO
+      description: "Fast ADC data locked/aligned to frame clock."
+    #########################################################
+    RfOff:
+      class: IntField
+      at:
+        offset: 0x1040
+      lsBit: 2
+      sizeBits: 1
+      mode: RO
+      description: "Rf Off RTM status"
+    #########################################################
+    AdcSetDelay:
+      class: IntField
+      at:
+        offset: 0x1080
+        stride: 4
+        nelms: 4
+      sizeBits: 9
+      mode: RW
+      description: "Set value of the ADC[3:0] iDelay(On AdcIDelayLoad)."
+    #########################################################
+    AdcFrameSetDelay:
+      class: IntField
+      at:
+        offset: 0x1090
+      sizeBits: 9
+      mode: RW
+      description: "Set value of the Frame clock iDelay(On AdcIDelayLoad)."
+    #########################################################
+    AdcGetDelay:
+      class: IntField
+      at:
+        offset: 0x10c0
+        stride: 4
+        nelms: 4
+      sizeBits: 9
+      mode: RO
+      description: "Get value of the ADC[3:0] iDelay(On AdcIDelayLoad)."
+    #########################################################
+    AdcFrameGetDelay:
+      class: IntField
+      at:
+        offset: 0x10d0
+      sizeBits: 9
+      mode: RO
+      description: "Get value of the Frame clock iDelay(On AdcIDelayLoad)."
+    #########################################################
+    #    BUFFER 0 (32bit word) x"0" & Beam_I_Data  x"0" & Beam_V_Data
+    #    BUFFER 1 (32bit word) x"0" & FWD_PWR_Data x"0" & REFL_PWR_Data    
+    #########################################################
+    RtmAdcBuffer:
+      class: MMIODev
+      at:
+        offset: 0x2000
+        stride: 0x1000
+        nelms: 2
+      size: 0x1000       
+      description: "BUFFER 0 (32 bit word) 0x0 & Beam_I_Data 0x0 & Beam_V_Data BUFFER 1 (32 bit word) 0x0 & FWD_PWR_Data 0x0 & REFL_PWR_Data"     
+      children:
+        MemoryArray:
+          <<: *MemoryArray
+          sizeBits: 32
+          mode: RO
+          at:
+            offset: 0x0
+            nelms: 0x200   
+    #########################################################
+    #    Commands
+    #########################################################
+    RearmTrigger:
+      name: RearmTrigger
+      class: SequenceCommand
+      at:
+        offset: 0x0
+      description: Send Soft buffer clear to reinitialize soft buffers. 
+      sequence:
+      - entry: SoftBufferClear
+        value: 0x1
+      - entry: SoftBufferClear
+        value: 0x0
+    #########################################################
+    SwTrigger:
+      name: SwTrigger
+      class: SequenceCommand
+      at:
+        offset: 0x0
+      description: Trigger the buffer readout from software. 
+      sequence:
+      - entry: SoftBufferTrigger
+        value: 0x1
+      - entry: SoftBufferTrigger
+        value: 0x0
+    #########################################################
+    #########################################################
+    ClearFault:
+      name: ClearFault
+      class: SequenceCommand
+      at:
+        offset: 0x0
+      description: "Clear the Fault Latch in CPLD. Will generate a single 1 us pulse."
+      sequence:
+      - entry: FaultClear
+        value: 0x1
+      - entry: FaultClear
+        value: 0x0
+    #########################################################
