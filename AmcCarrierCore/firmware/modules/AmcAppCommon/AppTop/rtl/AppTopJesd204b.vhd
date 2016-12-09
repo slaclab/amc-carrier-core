@@ -185,6 +185,7 @@ architecture mapping of AppTopJesd204b is
 
    signal s_rxpd : slv(13 downto 0) := (others => '1');
    signal s_txpd : slv(13 downto 0) := (others => '1');
+   signal s_cdrStable : sl;
    
 begin
 
@@ -333,6 +334,7 @@ begin
       r_jesdGtRxArr(i).dispErr <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
       r_jesdGtRxArr(i).decErr  <= s_rxctrl3(i*8+GT_WORD_SIZE_C-1 downto i*8);
       r_jesdGtRxArr(i).rstDone <= s_rxDone;
+      r_jesdGtRxArr(i).cdrStable <= s_cdrStable;
       s_devClkVec(i)           <= devClk_i;
       s_devClk2Vec(i)          <= devClk2_i;
       s_stableClkVec(i)        <= stableClk;
@@ -357,7 +359,7 @@ begin
          gtwiz_reset_tx_datapath_in(0)         => s_gtTxReset,
          gtwiz_reset_rx_pll_and_datapath_in(0) => s_gtRxReset,
          gtwiz_reset_rx_datapath_in(0)         => s_gtRxReset,
-         gtwiz_reset_rx_cdr_stable_out         => open,
+         gtwiz_reset_rx_cdr_stable_out(0)      => s_cdrStable,
          gtwiz_reset_tx_done_out(0)            => s_txDone,
          gtwiz_reset_rx_done_out(0)            => s_rxDone,
          gtwiz_userdata_tx_in                  => s_txData,
