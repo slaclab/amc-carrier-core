@@ -1,0 +1,74 @@
+## LLR - 09JAN2017
+## After generating each of the .DCP files from their corresponding .XCI files, 
+## performed the following TCL commands in the DCP to generate a modified DCP file:
+
+# Remove the IO Lock Constraints
+set_property is_loc_fixed false [get_ports [list  gthtxp_out[0]]]
+set_property is_loc_fixed false [get_ports [list  gthtxp_out[1]]]
+set_property is_loc_fixed false [get_ports [list  gthtxp_out[2]]]
+set_property is_loc_fixed false [get_ports [list  gthtxp_out[3]]]
+set_property is_loc_fixed false [get_ports [list  gthtxp_out[4]]]
+set_property is_loc_fixed false [get_ports [list  gthtxp_out[5]]]
+set_property is_loc_fixed false [get_ports [list  gthtxp_out[6]]]
+
+set_property is_loc_fixed false [get_ports [list  gthtxn_out[0]]]
+set_property is_loc_fixed false [get_ports [list  gthtxn_out[1]]]
+set_property is_loc_fixed false [get_ports [list  gthtxn_out[2]]]
+set_property is_loc_fixed false [get_ports [list  gthtxn_out[3]]]
+set_property is_loc_fixed false [get_ports [list  gthtxn_out[4]]]
+set_property is_loc_fixed false [get_ports [list  gthtxn_out[5]]]
+set_property is_loc_fixed false [get_ports [list  gthtxn_out[6]]]
+
+set_property is_loc_fixed false [get_ports [list  gthrxp_in[0]]]
+set_property is_loc_fixed false [get_ports [list  gthrxp_in[1]]]
+set_property is_loc_fixed false [get_ports [list  gthrxp_in[2]]]
+set_property is_loc_fixed false [get_ports [list  gthrxp_in[3]]]
+set_property is_loc_fixed false [get_ports [list  gthrxp_in[4]]]
+set_property is_loc_fixed false [get_ports [list  gthrxp_in[5]]]
+set_property is_loc_fixed false [get_ports [list  gthrxp_in[6]]]
+
+set_property is_loc_fixed false [get_ports [list  gthrxn_in[0]]]
+set_property is_loc_fixed false [get_ports [list  gthrxn_in[1]]]
+set_property is_loc_fixed false [get_ports [list  gthrxn_in[2]]]
+set_property is_loc_fixed false [get_ports [list  gthrxn_in[3]]]
+set_property is_loc_fixed false [get_ports [list  gthrxn_in[4]]]
+set_property is_loc_fixed false [get_ports [list  gthrxn_in[5]]]
+set_property is_loc_fixed false [get_ports [list  gthrxn_in[6]]]
+
+# Removed the IO location Constraints
+set_property package_pin "" [get_ports [list  gthtxp_out[0]]]
+set_property package_pin "" [get_ports [list  gthtxp_out[1]]]
+set_property package_pin "" [get_ports [list  gthtxp_out[2]]]
+set_property package_pin "" [get_ports [list  gthtxp_out[3]]]
+set_property package_pin "" [get_ports [list  gthtxp_out[4]]]
+set_property package_pin "" [get_ports [list  gthtxp_out[5]]]
+set_property package_pin "" [get_ports [list  gthtxp_out[6]]]
+
+set_property package_pin "" [get_ports [list  gthtxn_out[0]]]
+set_property package_pin "" [get_ports [list  gthtxn_out[1]]]
+set_property package_pin "" [get_ports [list  gthtxn_out[2]]]
+set_property package_pin "" [get_ports [list  gthtxn_out[3]]]
+set_property package_pin "" [get_ports [list  gthtxn_out[4]]]
+set_property package_pin "" [get_ports [list  gthtxn_out[5]]]
+set_property package_pin "" [get_ports [list  gthtxn_out[6]]]
+
+set_property package_pin "" [get_ports [list  gthrxp_in[0]]]
+set_property package_pin "" [get_ports [list  gthrxp_in[1]]]
+set_property package_pin "" [get_ports [list  gthrxp_in[2]]]
+set_property package_pin "" [get_ports [list  gthrxp_in[3]]]
+set_property package_pin "" [get_ports [list  gthrxp_in[4]]]
+set_property package_pin "" [get_ports [list  gthrxp_in[5]]]
+set_property package_pin "" [get_ports [list  gthrxp_in[6]]]
+
+set_property package_pin "" [get_ports [list  gthrxn_in[0]]]
+set_property package_pin "" [get_ports [list  gthrxn_in[1]]]
+set_property package_pin "" [get_ports [list  gthrxn_in[2]]]
+set_property package_pin "" [get_ports [list  gthrxn_in[3]]]
+set_property package_pin "" [get_ports [list  gthrxn_in[4]]]
+set_property package_pin "" [get_ports [list  gthrxn_in[5]]]
+set_property package_pin "" [get_ports [list  gthrxn_in[6]]]
+
+# Removed the Placement Constraints
+set_property is_bel_fixed false [get_cells -hierarchical *GTHE3_CHANNEL_PRIM_INST*]
+set_property is_loc_fixed false [get_cells -hierarchical *GTHE3_CHANNEL_PRIM_INST*]
+unplace_cell [get_cells -hierarchical *GTHE3_CHANNEL_PRIM_INST*]
