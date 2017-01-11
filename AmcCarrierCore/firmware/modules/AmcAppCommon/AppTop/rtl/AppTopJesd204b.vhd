@@ -183,8 +183,6 @@ architecture mapping of AppTopJesd204b is
    signal s_dataValidVec  : slv(6 downto 0)             := (others => '0');
    signal s_sampleDataArr : sampleDataArray(6 downto 0) := (others => (others => '0'));
 
-   signal s_rxpd : slv(13 downto 0) := (others => '1');
-   signal s_txpd : slv(13 downto 0) := (others => '1');
    signal s_cdrStable : sl;
    
 begin
@@ -225,7 +223,6 @@ begin
             pulse_o           => open,
             leds_o            => open);
       s_gtRxReset                           <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
-      s_rxpd((2*JESD_RX_LANE_G)-1 downto 0) <= (others => '0');
    end generate;
 
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
@@ -274,7 +271,6 @@ begin
             pulse_o              => open,
             leds_o               => open);
       s_gtTxReset                           <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
-      s_txpd((2*JESD_TX_LANE_G)-1 downto 0) <= (others => '0');
    end generate;
 
    BYP_TX_CORE : if (JESD_TX_LANE_G = 0) generate
@@ -376,7 +372,7 @@ begin
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec,
          rxpcommaalignen_in                    => s_allignEnVec,
-         rxpd_in                               => s_rxpd,
+         rxpd_in                               => (others => '0'),
          rxpolarity_in                         => JESD_RX_POLARITY_G,
          rxusrclk_in                           => s_devClkVec,
          rxusrclk2_in                          => s_devClk2Vec,
@@ -385,7 +381,7 @@ begin
          txctrl1_in                            => (others => '0'),
          txctrl2_in                            => s_txDataK,
          txdiffctrl_in                         => (others => '1'),
-         txpd_in                               => s_txpd,
+         txpd_in                               => (others => '0'),
          txpolarity_in                         => JESD_TX_POLARITY_G,
          txusrclk_in                           => s_devClkVec,
          txusrclk2_in                          => s_devClk2Vec,
