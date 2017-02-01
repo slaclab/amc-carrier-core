@@ -124,7 +124,7 @@ package AmcCarrierPkg is
    -- MPS: Configurations, Constants and Records Types
    ---------------------------------------------------   
    constant MPS_CONFIG_C          : AxiStreamConfigType := ssiAxiStreamConfig(2);
-   constant MPS_MITIGATION_BITS_C : integer             := 114;
+   constant MPS_MITIGATION_BITS_C : integer             := 98;
    constant MPS_MESSAGE_BITS_C    : integer             := 298;
 
    function getMpsChCnt(app        : AppType) return natural;
@@ -132,18 +132,18 @@ package AmcCarrierPkg is
 
    type MpsMitigationMsgType is record
       strobe    : sl;                      -- valid
+      timeStamp : slv(15 downto 0);
       latchDiag : sl;                      -- latch the beam diagnostics with 'tag'
       tag       : slv(15 downto 0);
       class     : Slv4Array(15 downto 0);  -- power class limits for each of 16 destinations
-      permit    : Slv2Array(15 downto 0);  -- Permit level for each of 16 destinations
    end record;
 
    constant MPS_MITIGATION_MSG_INIT_C : MpsMitigationMsgType := (
       strobe    => '0',
+      timeStamp => (others => '0'),
       latchDiag => '0',
       tag       => (others => '0'),
-      class     => (others => (others => '0')),
-      permit    => (others => (others => '0')));
+      class     => (others => (others => '0')));
 
    function toSlv (m                : MpsMitigationMsgType) return slv;
    function toMpsMitigationMsg (vec : slv) return MpsMitigationMsgType;
@@ -336,15 +336,12 @@ package body AmcCarrierPkg is
       variable i      : integer                               := 0;
    begin
       assignSlv(i, vector, m.strobe);
+      assignSlv(i, vector, m.timeStamp);
       assignSlv(i, vector, m.latchDiag);
       assignSlv(i, vector, m.tag);
 
       for j in 0 to 15 loop
          assignslv(i, vector, m.class(j));
-      end loop;
-
-      for j in 0 to 15 loop
-         assignslv(i, vector, m.permit(j));
       end loop;
 
       return vector;
@@ -355,15 +352,12 @@ package body AmcCarrierPkg is
       variable i : integer := 0;
    begin
       assignrecord(i, vec, m.strobe);
+      assignRecord(i, vec, m.timeStamp);
       assignrecord(i, vec, m.latchDiag);
       assignrecord(i, vec, m.tag);
 
       for j in 0 to 15 loop
          assignrecord(i, vec, m.class(j));
-      end loop;
-
-      for j in 0 to 15 loop
-         assignrecord(i, vec, m.permit(j));
       end loop;
 
       return m;

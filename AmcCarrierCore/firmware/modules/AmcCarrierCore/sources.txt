@@ -21,6 +21,7 @@ vhdl work AmcCarrier/AmcCarrierMpsAndBpMsg.vhd
 vhdl work AmcCarrier/AmcCarrierMpsSalt.vhd
 vhdl work AmcCarrier/AmcCarrierMpsMsg.vhd
 vhdl work AmcCarrier/AmcCarrierMpsMsgCore.vhd
+vhdl work AmcCarrier/AmcCarrierMitMsgRx.vhd
 vhdl work AmcCarrier/AmcCarrierMpsEncoder.vhd
 vhdl work AmcCarrier/AmcCarrierMpsComparator.vhd
 vhdl work AmcCarrier/AmcCarrierBpMsgIb.vhd
