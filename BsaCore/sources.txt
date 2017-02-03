@@ -1,6 +1,0 @@
-vhdl work rtl/BsaBufferControl.vhd
-vhdl work rtl/BsaAccumulator.vhd
-vhdl work rtl/BsaAxiInterconnectWrapper.vhd
-vhdl work rtl/BsaWaveformEngine.vhd
-vhdl work rtl/SsiAxiMaster.vhd
-

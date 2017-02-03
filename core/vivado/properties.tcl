@@ -8,10 +8,9 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-## Get variables and Custom Procedures
-set VIVADO_BUILD_DIR $::env(VIVADO_BUILD_DIR)
-source -quiet ${VIVADO_BUILD_DIR}/vivado_env_var_v1.tcl
-source -quiet ${VIVADO_BUILD_DIR}/vivado_proc_v1.tcl
+# Load RUCKUS environment and library
+source -quiet $::env(RUCKUS_DIR)/vivado_env_var.tcl
+source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 ## Check for version 2016.2 of Vivado
 if { [VersionCheck 2016.2] < 0 } {
@@ -22,17 +21,14 @@ if { [VersionCheck 2016.2] < 0 } {
 # Check for Application Microblaze build
 if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {
    ## Add the Microblaze Calibration Code
-   add_files ${TOP_DIR}/modules/AmcCarrierCore/$::env(AMC_TAG)/coregen/MigCoreMicroblazeCalibration.elf
+   add_files ${TOP_DIR}/submodules/amc-carrier-core/core/coregen/MigCoreMicroblazeCalibration.elf
    set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.elf]
    set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/microblaze_I} [get_files MigCoreMicroblazeCalibration.elf]
 
-   add_files ${TOP_DIR}/modules/AmcCarrierCore/$::env(AMC_TAG)/coregen/MigCoreMicroblazeCalibration.bmm
+   add_files ${TOP_DIR}/submodules/amc-carrier-core/core/coregen/MigCoreMicroblazeCalibration.bmm
    set_property SCOPED_TO_REF   {MigCore} [get_files MigCoreMicroblazeCalibration.bmm]
    set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0} [get_files MigCoreMicroblazeCalibration.bmm]
 }
-
-## BSA's .DCP files
-add_files -quiet -fileset sources_1 ${TOP_DIR}/modules/BsaCore/$::env(BSA_TAG)/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp
 
 ## Place and Route strategies 
 set_property strategy Performance_Explore [get_runs impl_1]

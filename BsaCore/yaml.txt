@@ -1,2 +1,0 @@
-manual yaml/BsaBufferControl.yaml
-manual yaml/BsaWaveformEngine.yaml

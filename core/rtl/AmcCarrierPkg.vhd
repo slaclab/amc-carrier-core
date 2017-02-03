@@ -52,7 +52,7 @@ package AmcCarrierPkg is
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
 
    constant AXI_CLK_FREQ_C   : real := 156.25E+6;                        -- In units of Hz
-   constant AXI_CLK_PERIOD_C : real := getRealDiv(1.0, AXI_CLK_FREQ_C);  -- In units of seconds   
+   constant AXI_CLK_PERIOD_C : real := (1.0/AXI_CLK_FREQ_C);  -- In units of seconds   
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
