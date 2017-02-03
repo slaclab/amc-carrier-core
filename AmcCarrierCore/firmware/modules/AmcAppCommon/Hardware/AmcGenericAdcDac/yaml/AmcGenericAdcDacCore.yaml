@@ -18,32 +18,32 @@ AmcGenericAdcDacCore: &AmcGenericAdcDacCore
   description: Generic ADC/DAC AMC Core
   class: MMIODev
   configPrio: 1
-  size: 0x00008000
+  size: 0x00080000
   ########
   children:
   ########
     ##################################################     
-    Lmk04828:
-      <<: *Lmk04828
+    AmcGenericAdcDacCtrl:
+      <<: *AmcGenericAdcDacCtrl
       at:
-        offset: 0x00000000 
-    ##################################################     
-    Adc16Dx370:
-      <<: *Adc16Dx370
-      at:
-        offset: 0x00001000 
-        stride: 0x00001000              
-        nelms: 2
+        offset: 0x00000000              
     ##################################################     
     Dac38J84:
       <<: *Dac38J84
       at:
-        offset: 0x00003000 
+        offset: 0x00002000 
     ##################################################     
-    AmcGenericAdcDacCtrl:
-      <<: *AmcGenericAdcDacCtrl
+    Lmk04828:
+      <<: *Lmk04828
       at:
-        offset: 0x00004000              
+        offset: 0x00020000 
+    ##################################################     
+    Adc16Dx370:
+      <<: *Adc16Dx370
+      at:
+        offset: 0x00040000 
+        stride: 0x00020000              
+        nelms: 2
     ##################################################
     InitAmcCard:
       description: Initialization for AMC card's JESD modules

@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-11-14
+-- Last update: 2017-02-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ entity AmcGenericAdcDacCore is
       jesdRxSync      : in    sl;
       jesdTxSync      : out   sl;
       -- ADC/DAC Interface
-      adcValids       : in   slv(3 downto 0);
-      adcValues       : in   sampleDataArray(3 downto 0);
+      adcValids       : in    slv(3 downto 0);
+      adcValues       : in    sampleDataArray(3 downto 0);
       dacValues       : in    sampleDataArray(1 downto 0);
       dacVcoCtrl      : in    slv(15 downto 0);
       -- AXI-Lite Interface
@@ -71,7 +71,7 @@ entity AmcGenericAdcDacCore is
       bcm             : in    sl;
       -----------------------
       -- Application Ports --
-      -----------------------
+      -----------------------      
       -- AMC's JTAG Ports
       jtagPri         : inout slv(4 downto 0);
       jtagSec         : inout slv(4 downto 0);
@@ -88,20 +88,40 @@ entity AmcGenericAdcDacCore is
       syncOutN        : inout slv(9 downto 0);
       -- AMC's Spare Ports
       spareP          : inout slv(15 downto 0);
-      spareN          : inout slv(15 downto 0));    
+      spareN          : inout slv(15 downto 0));
 end AmcGenericAdcDacCore;
 
 architecture mapping of AmcGenericAdcDacCore is
 
    constant NUM_AXI_MASTERS_C : natural := 5;
 
-   constant LMK_INDEX_C   : natural := 0;
-   constant ADC_A_INDEX_C : natural := 1;
-   constant ADC_B_INDEX_C : natural := 2;
-   constant DAC_INDEX_C   : natural := 3;
-   constant CTRL_INDEX_C  : natural := 4;
+   constant CTRL_INDEX_C  : natural := 0;
+   constant DAC_INDEX_C   : natural := 1;
+   constant LMK_INDEX_C   : natural := 2;
+   constant ADC_A_INDEX_C : natural := 3;
+   constant ADC_B_INDEX_C : natural := 4;
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 15, 12);
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
+      CTRL_INDEX_C    => (
+         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0000"),
+         addrBits     => 12,
+         connectivity => X"0001"),
+      DAC_INDEX_C     => (
+         baseAddr     => (AXI_BASE_ADDR_G + x"0000_2000"),
+         addrBits     => 12,
+         connectivity => X"0001"),
+      LMK_INDEX_C     => (
+         baseAddr     => (AXI_BASE_ADDR_G + x"0002_0000"),
+         addrBits     => 17,
+         connectivity => X"0001"),
+      ADC_A_INDEX_C   => (
+         baseAddr     => (AXI_BASE_ADDR_G + x"0004_0000"),
+         addrBits     => 17,
+         connectivity => X"0001"),
+      ADC_B_INDEX_C   => (
+         baseAddr     => (AXI_BASE_ADDR_G + x"0006_0000"),
+         addrBits     => 17,
+         connectivity => X"0001"));
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -113,9 +133,133 @@ architecture mapping of AmcGenericAdcDacCore is
 
    signal dacVcoEnable    : sl;
    signal dacVcoSckConfig : slv(15 downto 0);
-   
+
+   -----------------------
+   -- Application Ports --
+   -----------------------
+   -- JESD Reference Ports
+   signal jesdSysRefP : sl;
+   signal jesdSysRefN : sl;
+   -- JESD Sync Ports
+   signal jesdRxSyncP : slv(1 downto 0);
+   signal jesdRxSyncN : slv(1 downto 0);
+   signal jesdTxSyncP : sl;
+   signal jesdTxSyncN : sl;
+   -- LMK Ports
+   signal lmkMuxSel   : sl;
+   signal lmkClkSel   : slv(1 downto 0);
+   signal lmkStatus   : slv(1 downto 0);
+   signal lmkSck      : sl;
+   signal lmkDio      : sl;
+   signal lmkSync     : slv(1 downto 0);
+   signal lmkCsL      : sl;
+   signal lmkRst      : sl;
+   -- Fast ADC's SPI Ports
+   signal adcCsL      : slv(1 downto 0);
+   signal adcSck      : slv(1 downto 0);
+   signal adcMiso     : slv(1 downto 0);
+   signal adcMosi     : slv(1 downto 0);
+   -- Fast DAC's SPI Ports
+   signal dacCsL      : sl;
+   signal dacSck      : sl;
+   signal dacMiso     : sl;
+   signal dacMosi     : sl;
+   -- Slow DAC's SPI Ports
+   signal dacVcoCsP   : sl;
+   signal dacVcoCsN   : sl;
+   signal dacVcoSckP  : sl;
+   signal dacVcoSckN  : sl;
+   signal dacVcoDinP  : sl;
+   signal dacVcoDinN  : sl;
+   -- Pass through Interfaces      
+   signal fpgaClockP  : sl;
+   signal fpgaClockN  : sl;
+   signal smaTrigP    : sl;
+   signal smaTrigN    : sl;
+   signal adcCalP     : sl;
+   signal adcCalN     : sl;
+   signal lemoDinP    : slv(1 downto 0);
+   signal lemoDinN    : slv(1 downto 0);
+   signal lemoDoutP   : slv(1 downto 0);
+   signal lemoDoutN   : slv(1 downto 0);
+   signal bcmL        : sl;
+
 begin
 
+   -----------------------
+   -- Generalized Mapping 
+   -----------------------
+
+   -- JESD Reference Ports
+   jesdSysRefP <= spareP(0);
+   jesdSysRefN <= spareN(0);
+
+   -- JESD Sync Ports
+   syncOutP(0) <= jesdRxSyncP(0);
+   syncOutN(0) <= jesdRxSyncN(0);
+   syncOutP(1) <= jesdRxSyncP(1);
+   syncOutN(1) <= jesdRxSyncN(1);
+   jesdTxSyncP <= syncOutP(2);
+   jesdTxSyncN <= syncOutN(2);
+
+   -- LMK Ports
+   jtagPri(2)   <= lmkMuxSel;
+   spareP(4)    <= lmkClkSel(0);
+   spareP(5)    <= lmkClkSel(1);
+   lmkStatus(0) <= spareN(4);
+   lmkStatus(1) <= spareN(5);
+   spareN(15)   <= lmkSck;
+   syncInN(2)   <= lmkDio;
+   syncInP(3)   <= lmkSync(0);
+   jtagPri(1)   <= lmkSync(1);
+   spareP(15)   <= lmkCsL;
+   syncInP(2)   <= lmkRst;
+
+   -- Fast ADC's SPI Ports
+   spareP(6)  <= adcCsL(0);
+   spareN(6)  <= adcSck(0);
+   adcMiso(0) <= spareN(7);
+   spareP(7)  <= adcMosi(0);
+
+   spareP(8)  <= adcCsL(1);
+   spareN(8)  <= adcSck(1);
+   adcMiso(1) <= spareN(9);
+   spareP(9)  <= adcMosi(1);
+
+   -- Fast DAC's SPI Ports
+   spareN(10) <= dacCsL;
+   spareP(10) <= dacSck;
+   dacMiso    <= spareP(11);
+   spareN(11) <= dacMosi;
+
+   -- Slow DAC's SPI Ports
+   spareP(12) <= dacVcoCsP;
+   spareN(12) <= dacVcoCsN;
+   spareP(13) <= dacVcoSckP;
+   spareN(13) <= dacVcoSckN;
+   spareP(14) <= dacVcoDinP;
+   spareN(14) <= dacVcoDinN;
+
+   -- Pass through Interfaces      
+   fpgaClkP(0) <= fpgaClockP;
+   fpgaClkN(0) <= fpgaClockN;
+   syncOutP(3) <= smaTrigP;
+   syncOutN(3) <= smaTrigN;
+   syncOutP(4) <= adcCalP;
+   syncOutN(4) <= adcCalN;
+   lemoDinP(0) <= syncInP(0);
+   lemoDinN(0) <= syncInN(0);
+   lemoDinP(1) <= syncInP(1);
+   lemoDinN(1) <= syncInN(1);
+   syncOutP(5) <= lemoDoutP(0);
+   syncOutN(5) <= lemoDoutN(0);
+   syncOutP(6) <= lemoDoutP(1);
+   syncOutN(6) <= lemoDoutN(1);
+   jtagPri(0)  <= bcmL;
+
+   --------------------
+   -- Application Ports
+   --------------------
    ClkBuf_0 : entity work.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
@@ -130,7 +274,7 @@ begin
          port map (
             I  => smaTrig,
             O  => syncOutP(3),
-            OB => syncOutN(3));         
+            OB => syncOutN(3));
    end generate;
 
    TRIG_CLK : if (TRIG_CLK_G = true) generate
@@ -141,7 +285,7 @@ begin
          port map (
             clkIn   => smaTrig,
             clkOutP => syncOutP(3),
-            clkOutN => syncOutN(3));      
+            clkOutN => syncOutN(3));
    end generate;
 
    CAL_SIGNAL : if (CAL_CLK_G = false) generate
@@ -149,7 +293,7 @@ begin
          port map (
             I  => adcCal,
             O  => syncOutP(4),
-            OB => syncOutN(4));         
+            OB => syncOutN(4));
    end generate;
 
    CAL_CLK : if (CAL_CLK_G = true) generate
@@ -160,48 +304,48 @@ begin
          port map (
             clkIn   => adcCal,
             clkOutP => syncOutP(4),
-            clkOutN => syncOutN(4));      
+            clkOutN => syncOutN(4));
    end generate;
 
    GEN_LEMO :
    for i in 1 downto 0 generate
-      
+
       OBUFDS_LemoDout : OBUFDS
          port map (
             I  => lemoDout(i),
             O  => syncOutP(5+i),
-            OB => syncOutN(5+i));  
+            OB => syncOutN(5+i));
 
       IBUFDS_LemoDin : IBUFDS
          port map (
             I  => syncInP(i),
             IB => syncInN(i),
-            O  => lemoDin(i));              
+            O  => lemoDin(i));
 
    end generate GEN_LEMO;
 
-   jtagPri(0) <= not(bcm);
+   bcmL <= not(bcm);
 
    IBUFDS_SysRef : IBUFDS
       port map (
-         I  => spareP(0),
-         IB => spareN(0),
-         O  => jesdSysRef);   
+         I  => jesdSysRefP,
+         IB => jesdSysRefN,
+         O  => jesdSysRef);
 
    IBUFDS_TxSync : IBUFDS
       port map (
-         I  => syncOutP(2),
-         IB => syncOutN(2),
-         O  => jesdTxSync);            
+         I  => jesdTxSyncP,
+         IB => jesdTxSyncN,
+         O  => jesdTxSync);
 
-   GEN_VEC :
+   GEN_RX_SYNC :
    for i in 1 downto 0 generate
       OBUFDS_RxSync : OBUFDS
          port map (
             I  => jesdRxSync,
-            O  => syncOutP(i),
-            OB => syncOutN(i));  
-   end generate GEN_VEC;
+            O  => jesdRxSyncP(i),
+            OB => jesdRxSyncN(i));
+   end generate GEN_RX_SYNC;
 
    ---------------------
    -- AXI-Lite Crossbars
@@ -223,7 +367,7 @@ begin
          mAxiWriteMasters    => axilWriteMasters,
          mAxiWriteSlaves     => axilWriteSlaves,
          mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);   
+         mAxiReadSlaves      => axilReadSlaves);
 
    -----------------
    -- LMK SPI Module
@@ -243,17 +387,17 @@ begin
          axiReadSlave   => axilReadSlaves(LMK_INDEX_C),
          axiWriteMaster => axilWriteMasters(LMK_INDEX_C),
          axiWriteSlave  => axilWriteSlaves(LMK_INDEX_C),
-         coreSclk       => spareN(15),
+         coreSclk       => lmkSck,
          coreSDin       => lmkDataIn,
          coreSDout      => lmkDataOut,
-         coreCsb        => spareP(15));  
+         coreCsb        => lmkCsL);
 
    IOBUF_Lmk : IOBUF
       port map (
          I  => '0',
          O  => lmkDataIn,
-         IO => syncInN(2),
-         T  => lmkDataOut);   
+         IO => lmkDio,
+         T  => lmkDataOut);
 
    ----------------------
    -- Fast ADC SPI Module
@@ -274,10 +418,10 @@ begin
             axiReadSlave   => axilReadSlaves(ADC_A_INDEX_C+i),
             axiWriteMaster => axilWriteMasters(ADC_A_INDEX_C+i),
             axiWriteSlave  => axilWriteSlaves(ADC_A_INDEX_C+i),
-            coreSclk       => spareN(6+(2*i)),
-            coreSDin       => spareN(7+(2*i)),
-            coreSDout      => spareP(7+(2*i)),
-            coreCsb        => spareP(6+(2*i)));
+            coreSclk       => adcSck(i),
+            coreSDin       => adcMiso(i),
+            coreSDout      => adcMosi(i),
+            coreCsb        => adcCsL(i));
    end generate GEN_ADC_SPI;
 
    ----------------------
@@ -298,10 +442,10 @@ begin
          axiReadSlave   => axilReadSlaves(DAC_INDEX_C),
          axiWriteMaster => axilWriteMasters(DAC_INDEX_C),
          axiWriteSlave  => axilWriteSlaves(DAC_INDEX_C),
-         coreSclk       => spareP(10),
-         coreSDin       => spareP(11),
-         coreSDout      => spareN(11),
-         coreCsb        => spareN(10));   
+         coreSclk       => dacSck,
+         coreSDin       => dacMiso,
+         coreSDout      => dacMosi,
+         coreCsb        => dacCsL);
 
    ----------------------   
    -- SLOW DAC SPI Module
@@ -316,12 +460,12 @@ begin
          dacVcoCtrl      => dacVcoCtrl,
          dacVcoSckConfig => dacVcoSckConfig,
          -- Slow DAC's SPI Ports
-         dacVcoCsP       => spareP(12),
-         dacVcoCsN       => spareN(12),
-         dacVcoSckP      => spareP(13),
-         dacVcoSckN      => spareN(13),
-         dacVcoDinP      => spareP(14),
-         dacVcoDinN      => spareN(14));
+         dacVcoCsP       => dacVcoCsP,
+         dacVcoCsN       => dacVcoCsN,
+         dacVcoSckP      => dacVcoSckP,
+         dacVcoSckN      => dacVcoSckN,
+         dacVcoDinP      => dacVcoDinP,
+         dacVcoDinN      => dacVcoDinN);
 
    -----------------------   
    -- Misc. Control Module
@@ -352,13 +496,10 @@ begin
          -- Application Ports --
          -----------------------      
          -- LMK Ports
-         lmkMuxSel       => jtagPri(2),
-         lmkClkSel(0)    => spareP(4),
-         lmkClkSel(1)    => spareP(5),
-         lmkStatus(0)    => spareN(4),
-         lmkStatus(1)    => spareN(5),
-         lmkRst          => syncInP(2),
-         lmkSync(0)      => syncInP(3),
-         lmkSync(1)      => jtagPri(1));
+         lmkMuxSel       => lmkMuxSel,
+         lmkClkSel       => lmkClkSel,
+         lmkStatus       => lmkStatus,
+         lmkRst          => lmkRst,
+         lmkSync         => lmkSync);
 
 end mapping;

@@ -50,33 +50,33 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOu
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutN[0][2]}] ; #jesdTxSyncN[0]
 
 # LMK Ports
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][4]}] ; #lmkClkSel[0][0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][5]}] ; #lmkClkSel[0][1]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][4]}] ; #lmkStatus[0][0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][5]}] ; #lmkStatus[0][1]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][15]}] ; #lmkCsL[0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][15]}] ; #lmkSck[0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {syncInN[0][2]}] ; #lmkDio[0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {syncInP[0][2]}] ; #lmkRst[0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {syncInP[0][3]}];# lmkSync[0][0]: AMC Card Version C00
-set_property -dict { IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {jtagPri[0][1]}];# lmkSync[0][1]: AMC Card Version C01 (or later)
-set_property -dict { IOSTANDARD LVCMOS25 SLEW FAST DRIVE 12 } [get_ports {jtagPri[0][2]}];# lmkMuxSel[0]: AMC Card Version C01 (or later)
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareP[0][4]}] ; #lmkClkSel[0][0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareP[0][5]}] ; #lmkClkSel[0][1]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareN[0][4]}] ; #lmkStatus[0][0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareN[0][5]}] ; #lmkStatus[0][1]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareP[0][15]}] ; #lmkCsL[0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareN[0][15]}] ; #lmkSck[0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {syncInN[0][2]}] ; #lmkDio[0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {syncInP[0][2]}] ; #lmkRst[0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {syncInP[0][3]}];# lmkSync[0][0]: AMC Card Version C00
+set_property -dict { IOSTANDARD LVCMOS25 PULLTYPE PULLUP } [get_ports {jtagPri[0][1]}];# lmkSync[0][1]: AMC Card Version C01 (or later)
+set_property -dict { IOSTANDARD LVCMOS25 PULLTYPE PULLUP } [get_ports {jtagPri[0][2]}];# lmkMuxSel[0]: AMC Card Version C01 (or later)
 
 # Fast ADC's SPI Ports
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][6]}] ; #adcCsL[0][0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][8]}] ; #adcCsL[0][1]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][6]}] ; #adcSck[0][0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][8]}] ; #adcSck[0][1]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][7]}] ; #adcMiso[0][0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][9]}] ; #adcMiso[0][1]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][7]}] ; #adcMosi[0][0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][9]}] ; #adcMosi[0][1]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareP[0][6]}] ; #adcCsL[0][0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareP[0][8]}] ; #adcCsL[0][1]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareN[0][6]}] ; #adcSck[0][0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareN[0][8]}] ; #adcSck[0][1]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE NONE   } [get_ports {spareN[0][7]}] ; #adcMiso[0][0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE NONE   } [get_ports {spareN[0][9]}] ; #adcMiso[0][1]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareP[0][7]}] ; #adcMosi[0][0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareP[0][9]}] ; #adcMosi[0][1]
 
 # Fast DAC's SPI Ports
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][10]}] ; #dacCsL[0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][10]}] ; #dacSck[0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareP[0][11]}] ; #dacMiso[0]
-set_property -dict { IOSTANDARD LVCMOS18 SLEW FAST DRIVE 12 } [get_ports {spareN[0][11]}] ; #dacMosi[0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareN[0][10]}] ; #dacCsL[0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareP[0][10]}] ; #dacSck[0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE NONE   } [get_ports {spareP[0][11]}] ; #dacMiso[0]
+set_property -dict { IOSTANDARD LVCMOS18 PULLTYPE PULLUP } [get_ports {spareN[0][11]}] ; #dacMosi[0]
 
 # Slow DAC's SPI Ports
 set_property -dict { IOSTANDARD LVDS } [get_ports {spareP[0][12]}] ; #dacVcoCsP[0]

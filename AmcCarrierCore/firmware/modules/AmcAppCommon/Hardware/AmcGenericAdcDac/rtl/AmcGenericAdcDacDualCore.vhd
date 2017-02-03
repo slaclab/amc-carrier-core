@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-11-14
+-- Last update: 2017-02-02
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ entity AmcGenericAdcDacDualCore is
       CAL_CLK_G        : boolean          := false;
       AXI_CLK_FREQ_G   : real             := 156.25E+6;
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));      
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD SYNC Interface
       jesdClk         : in    slv(1 downto 0);
@@ -81,14 +81,14 @@ entity AmcGenericAdcDacDualCore is
       syncOutN        : inout Slv10Array(1 downto 0);
       -- AMC's Spare Ports
       spareP          : inout Slv16Array(1 downto 0);
-      spareN          : inout Slv16Array(1 downto 0));     
+      spareN          : inout Slv16Array(1 downto 0));
 end AmcGenericAdcDacDualCore;
 
 architecture mapping of AmcGenericAdcDacDualCore is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 16, 15);
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 20, 19);
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -117,7 +117,7 @@ begin
          mAxiWriteMasters    => axilWriteMasters,
          mAxiWriteSlaves     => axilWriteSlaves,
          mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);   
+         mAxiReadSlaves      => axilReadSlaves);
 
    -----------
    -- AMC Core
@@ -183,7 +183,7 @@ begin
             syncOutN        => syncOutN(i),
             -- AMC's Spare Ports
             spareP          => spareP(i),
-            spareN          => spareN(i));       
+            spareN          => spareN(i));
    end generate GEN_AMC;
 
 end mapping;
