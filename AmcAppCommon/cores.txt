@@ -1,4 +1,0 @@
-##########################################################################
-## By default, using the .DCP file during systhesis to reduce compile time
-##########################################################################
-#AppTop/coregen/AppTopJesd204bCoregen.xci 
