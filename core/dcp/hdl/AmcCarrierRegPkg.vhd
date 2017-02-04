@@ -73,30 +73,3 @@ package AmcCarrierRegPkg is
    function xbarDefault(app : AppType; sel : boolean) return Slv2Array;
 
 end package AmcCarrierRegPkg;
-
-package body AmcCarrierRegPkg is
-
-   function xbarDefault (app : AppType; sel : boolean) return Slv2Array is
-      variable retVar : Slv2Array(3 downto 0);
-   begin
-      -- Check for Timing Generator Node
-      if (app = APP_TIME_GEN_TYPE_C) then
-         retVar := XBAR_TIME_GEN_C;
-      -- Check for MPS Link Node
-      elsif (app = APP_MPS_LINK_AIN_TYPE_C) or (app = APP_MPS_LINK_DIN_TYPE_C) or (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         retVar := XBAR_TIME_GEN_C;
-         -- -- Check for LCLS-I timing
-         -- if (sel = TIMING_MODE_119MHZ_C) then
-            -- retVar := XBAR_MPS_I_LINK_C;
-         -- -- Check for LCLS-II timing
-         -- else
-            -- retVar := XBAR_MPS_II_LINK_C;
-         -- end if;
-      else
-         -- Else Application Node
-         retVar := XBAR_APP_NODE_C;
-      end if;
-      return retVar;
-   end function;
-
-end package body AmcCarrierRegPkg;

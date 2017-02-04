@@ -36,7 +36,6 @@ entity AmcCarrierBsa is
    generic (
       TPD_G            : time            := 1 ns;
       FSBL_G           : boolean         := false;
-      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
       DISABLE_BSA_G    : boolean         := false;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (

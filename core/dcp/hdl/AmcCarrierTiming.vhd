@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-08-30
+-- Last update: 2017-02-03
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -39,10 +39,11 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierTiming is
    generic (
-      TPD_G            : time            := 1 ns;
-      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      RX_CLK_MMCM_G    : boolean         := false);
+      TPD_G             : time            := 1 ns;
+      TIME_GEN_APP_G    : boolean         := false;
+      TIME_GEN_EXTREF_G : boolean         := false;
+      AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      RX_CLK_MMCM_G     : boolean         := false);
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk          : in  sl;
@@ -60,7 +61,7 @@ entity AmcCarrierTiming is
       appTimingClk     : in  sl;
       appTimingRst     : in  sl;
       appTimingBus     : out TimingBusType;
-      appTimingPhy     : in  TimingPhyType;          -- Input for timing generator only
+      appTimingPhy     : in  TimingPhyType;  -- Input for timing generator only
       appTimingPhyClk  : out sl;
       appTimingPhyRst  : out sl;
       ----------------
@@ -88,9 +89,7 @@ architecture mapping of AmcCarrierTiming is
       1               => (
          baseAddr     => (TIMING_ADDR_C+x"00800000"),
          addrBits     => 23,
-         connectivity => x"FFFF"));  
-
-   constant TIME_GEN_APP : boolean := (APP_TYPE_G = APP_TIME_GEN_TYPE_C or APP_TYPE_G = APP_EXTREF_GEN_TYPE_C);
+         connectivity => x"FFFF"));
 
    signal timingRefClk   : sl;
    signal timingRecClkGt : sl;
@@ -149,11 +148,11 @@ begin
    recTimingClk <= timingRecClk;
    recTimingRst <= not(rxStatus.resetDone);
 
-   TIMING_GEN_CLK : if TIME_GEN_APP generate
+   TIMING_GEN_CLK : if (TIME_GEN_APP_G = true) generate
       timingPhy <= appTimingPhy;
    end generate TIMING_GEN_CLK;
 
-   NOT_TIMING_GEN_CLK : if not TIME_GEN_APP generate
+   NOT_TIMING_GEN_CLK : if (TIME_GEN_APP_G = false) generate
       timingPhy <= coreTimingPhy;
    end generate NOT_TIMING_GEN_CLK;
 
@@ -171,7 +170,7 @@ begin
    TIMING_REFCLK_IBUFDS_GTE3 : IBUFDS_GTE3
       generic map (
          REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "01",    -- 2'b01: ODIV2 = Divide-by-2 version of O
+         REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
          REFCLK_ICNTL_RX    => "00")
       port map (
          I     => timingRefClkInP,
@@ -186,7 +185,7 @@ begin
    TimingGthCoreWrapper_1 : entity work.TimingGthCoreWrapper
       generic map (
          TPD_G    => TPD_G,
-         EXTREF_G => ite(APP_TYPE_G = APP_EXTREF_GEN_TYPE_C, true, false))
+         EXTREF_G => TIME_GEN_EXTREF_G)
       port map (
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -269,7 +268,7 @@ begin
    TimingCore_1 : entity work.TimingCore
       generic map (
          TPD_G             => TPD_G,
-         TPGEN_G           => TIME_GEN_APP,
+         TPGEN_G           => TIME_GEN_APP_G,
          AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
          AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
       port map (

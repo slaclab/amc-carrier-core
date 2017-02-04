@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2016-04-21
+-- Last update: 2017-02-03
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -51,8 +51,6 @@ entity AmcCarrierBsi is
       bootAddr        : out   slv(31 downto 0);
       upTimeCnt       : in    slv(31 downto 0);
       -- Application Interface
-      bsiClk          : in    sl;
-      bsiRst          : in    sl;
       bsiBus          : out   BsiBusType;
       -- I2C Ports
       scl             : inout sl;
@@ -64,7 +62,7 @@ entity AmcCarrierBsi is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -- Clocks and Resets
       axilClk         : in    sl;
-      axilRst         : in    sl);  
+      axilRst         : in    sl);
 end AmcCarrierBsi;
 
 architecture rtl of AmcCarrierBsi is
@@ -200,7 +198,7 @@ begin
          rdEn   => open,
          rdData => i2cBramDout(0),
          i2ci   => slaveIn(0),
-         i2co   => slaveOut(0)); 
+         i2co   => slaveOut(0));
 
    -------------------
    -- I2c Slave @ 0x51
@@ -225,7 +223,7 @@ begin
          rdEn   => open,
          rdData => i2cBramDout(1),
          i2ci   => slaveIn(1),
-         i2co   => slaveOut(1));          
+         i2co   => slaveOut(1));
 
    ----------------
    -- Dual port RAM
@@ -248,7 +246,7 @@ begin
          web   => r.we,
          addrb => r.addr,
          dinb  => r.ramData,
-         doutb => ramData);   
+         doutb => ramData);
 
    ------------------
    -- Single port ROM
@@ -453,7 +451,14 @@ begin
 
       localMac <= ConvertEndianness(r.macAddress(0));
       localIp  <= r.localIp;
-      
+
+
+      bsiBus.slotNumber <= r.slotNumber;
+      bsiBus.crateId    <= r.crateId;
+      for i in BSI_MAC_SIZE_C-1 downto 1 loop
+         bsiBus.macAddress(i) <= ConvertEndianness(r.macAddress(i));
+      end loop;
+
    end process comb;
 
    seq : process (axilClk) is
@@ -463,45 +468,4 @@ begin
       end if;
    end process seq;
 
-   Sync_slotNumber : entity work.SynchronizerFifo
-      generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => 8)
-      port map (
-         -- Write Ports (wr_clk domain)
-         wr_clk => axilClk,
-         din    => r.slotNumber,
-         -- Read Ports (rd_clk domain)
-         rd_clk => bsiClk,
-         dout   => bsiBus.slotNumber); 
-
-   Sync_crateId : entity work.SynchronizerFifo
-      generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => 16)
-      port map (
-         -- Write Ports (wr_clk domain)
-         wr_clk => axilClk,
-         din    => r.crateId,
-         -- Read Ports (rd_clk domain)
-         rd_clk => bsiClk,
-         dout   => bsiBus.crateId);  
-
-   GEN_VEC :
-   for i in BSI_MAC_SIZE_C-1 downto 1 generate
-      
-      Sync_macAddress : entity work.SynchronizerFifo
-         generic map (
-            TPD_G        => TPD_G,
-            DATA_WIDTH_G => 48)
-         port map (
-            -- Write Ports (wr_clk domain)
-            wr_clk => axilClk,
-            din    => ConvertEndianness(r.macAddress(i)),
-            -- Read Ports (rd_clk domain)
-            rd_clk => bsiClk,
-            dout   => bsiBus.macAddress(i));     
-
-   end generate GEN_VEC;
-   
 end rtl;

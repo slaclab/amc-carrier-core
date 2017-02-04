@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierEthRssi.vhd
+-- File       : AmcCarrierRssi.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
@@ -32,7 +32,7 @@ use work.SsiPkg.all;
 use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 
-entity AmcCarrierEthRssi is
+entity AmcCarrierRssi is
    generic (
       TPD_G            : time             := 1 ns;
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
@@ -65,9 +65,9 @@ entity AmcCarrierEthRssi is
       obServerSlaves   : out AxiStreamSlaveArray(1 downto 0);
       ibServerMasters  : out AxiStreamMasterArray(1 downto 0);
       ibServerSlaves   : in  AxiStreamSlaveArray(1 downto 0));
-end AmcCarrierEthRssi;
+end AmcCarrierRssi;
 
-architecture mapping of AmcCarrierEthRssi is
+architecture mapping of AmcCarrierRssi is
 
    constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
    constant WINDOW_ADDR_SIZE_C : positive := 3;

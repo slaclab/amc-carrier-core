@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-09-29
+-- Last update: 2017-02-03
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -36,157 +36,139 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierCore is
    generic (
-      TPD_G         : time    := 1 ns;  -- Simulation only parameter
-      SIM_SPEEDUP_G : boolean := false;  -- Simulation only parameter
-      MPS_SLOT_G    : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
-      FSBL_G        : boolean := false;  -- false = Normal Operation, true = First Stage Boot loader
-      APP_TYPE_G    : AppType := APP_NULL_TYPE_C;
-      DISABLE_BSA_G : boolean := false;
-      EN_BP_MSG_G   : boolean := false);
+      TPD_G             : time    := 1 ns;
+      SIM_SPEEDUP_G     : boolean := false;  -- false = Normal Operation, true = simulation
+      DISABLE_BSA_G     : boolean := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
+      TIME_GEN_APP_G    : boolean := false;  -- false = normal application, true = timing generator application
+      TIME_GEN_EXTREF_G : boolean := false;  -- false = normal application, true = timing generator using external reference
+      FSBL_G            : boolean := false);  -- false = Normal Operation, true = First Stage Boot loader
    port (
       ----------------------
       -- Core Ports to Application
       ----------------------
-      -- AXI-Lite Interface (regClk domain)
+      -- AXI-Lite Interface (ref156MHzClk domain)
       -- Address Range = [0x80000000:0xFFFFFFFF]
-      regClk               : in  sl;
-      regRst               : in  sl;
-      regReadMaster        : out AxiLiteReadMasterType;
-      regReadSlave         : in  AxiLiteReadSlaveType;
-      regWriteMaster       : out AxiLiteWriteMasterType;
-      regWriteSlave        : in  AxiLiteWriteSlaveType;
+      regReadMaster        : out   AxiLiteReadMasterType;
+      regReadSlave         : in    AxiLiteReadSlaveType;
+      regWriteMaster       : out   AxiLiteWriteMasterType;
+      regWriteSlave        : in    AxiLiteWriteSlaveType;
       -- Timing Interface (timingClk domain) 
-      timingClk            : in  sl;
-      timingRst            : in  sl;
-      timingBus            : out TimingBusType;
-      timingPhy            : in  TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
-      timingPhyClk         : out sl;
-      timingPhyRst         : out sl;
+      timingClk            : in    sl;
+      timingRst            : in    sl;
+      timingBus            : out   TimingBusType;
+      timingPhy            : in    TimingPhyType           := TIMING_PHY_INIT_C;  -- Input for timing generator only
+      timingPhyClk         : out   sl;
+      timingPhyRst         : out   sl;
       -- Diagnostic Interface (diagnosticClk domain)
-      diagnosticClk        : in  sl;
-      diagnosticRst        : in  sl;
-      diagnosticBus        : in  DiagnosticBusType;
+      diagnosticClk        : in    sl;
+      diagnosticRst        : in    sl;
+      diagnosticBus        : in    DiagnosticBusType;
       --  Waveform interface (waveformClk domain)
-      waveformClk          : out sl;
-      waveformRst          : out sl;
-      obAppWaveformMasters : in  WaveformMasterArrayType          := WAVEFORM_MASTER_ARRAY_INIT_C;
-      obAppWaveformSlaves  : out WaveformSlaveArrayType;
-      ibAppWaveformMasters : out WaveformMasterArrayType;
-      ibAppWaveformSlaves  : in  WaveformSlaveArrayType           := WAVEFORM_SLAVE_ARRAY_INIT_C;
-      -- Backplane Messaging Interface (bpMsgClk domain)
-      bpMsgClk             : in  sl                               := '0';
-      bpMsgRst             : in  sl                               := '0';
-      bpMsgBus             : out BpMsgBusArray(BP_MSG_SIZE_C-1 downto 0);
+      waveformClk          : out   sl;
+      waveformRst          : out   sl;
+      obAppWaveformMasters : in    WaveformMasterArrayType := WAVEFORM_MASTER_ARRAY_INIT_C;
+      obAppWaveformSlaves  : out   WaveformSlaveArrayType;
+      ibAppWaveformMasters : out   WaveformMasterArrayType;
+      ibAppWaveformSlaves  : in    WaveformSlaveArrayType  := WAVEFORM_SLAVE_ARRAY_INIT_C;
+      -- Backplane Messaging Interface  (ref156MHzClk domain)
+      obBpMsgClientMaster  : in    AxiStreamMasterType     := AXI_STREAM_MASTER_INIT_C;
+      obBpMsgClientSlave   : out   AxiStreamSlaveType;
+      ibBpMsgClientMaster  : out   AxiStreamMasterType;
+      ibBpMsgClientSlave   : in    AxiStreamSlaveType      := AXI_STREAM_SLAVE_FORCE_C;
+      obBpMsgServerMaster  : in    AxiStreamMasterType     := AXI_STREAM_MASTER_INIT_C;
+      obBpMsgServerSlave   : out   AxiStreamSlaveType;
+      ibBpMsgServerMaster  : out   AxiStreamMasterType;
+      ibBpMsgServerSlave   : in    AxiStreamSlaveType      := AXI_STREAM_SLAVE_FORCE_C;
       -- Application Debug Interface (ref156MHzClk domain)
-      obAppDebugMaster     : in  AxiStreamMasterType              := AXI_STREAM_MASTER_INIT_C;
-      obAppDebugSlave      : out AxiStreamSlaveType;
-      ibAppDebugMaster     : out AxiStreamMasterType;
-      ibAppDebugSlave      : in  AxiStreamSlaveType               := AXI_STREAM_SLAVE_FORCE_C;
-      -- BSI Interface (bsiClk domain) 
-      bsiClk               : in  sl                               := '0';
-      bsiRst               : in  sl                               := '0';
-      bsiBus               : out BsiBusType;
-      -- MPS Concentrator Interface (ref156MHzClk domain)
-      mpsObMasters         : out AxiStreamMasterArray(14 downto 0);
-      mpsObSlaves          : in  AxiStreamSlaveArray(14 downto 0) := (others => AXI_STREAM_SLAVE_FORCE_C);
+      obAppDebugMaster     : in    AxiStreamMasterType     := AXI_STREAM_MASTER_INIT_C;
+      obAppDebugSlave      : out   AxiStreamSlaveType;
+      ibAppDebugMaster     : out   AxiStreamMasterType;
+      ibAppDebugSlave      : in    AxiStreamSlaveType      := AXI_STREAM_SLAVE_FORCE_C;
+      -- BSI Interface  (ref156MHzClk domain)
+      bsiBus               : out   BsiBusType;
+      ethPhyReady          : out   sl;
       -- Reference Clocks and Resets
-      recTimingClk         : out sl;
-      recTimingRst         : out sl;
-      ref125MHzClk         : out sl;
-      ref125MHzRst         : out sl;
-      ref156MHzClk         : out sl;
-      ref156MHzRst         : out sl;
-      ref312MHzClk         : out sl;
-      ref312MHzRst         : out sl;
-      ref625MHzClk         : out sl;
-      ref625MHzRst         : out sl;
-
-      gthFabClk        : out   sl;
-      ethPhyReady      : out   sl;
-      ----------------
-      --  Top Level Interface to IO
-      ----------------
+      recTimingClk         : out   sl;
+      recTimingRst         : out   sl;
+      ref156MHzClk         : out   sl;
+      ref156MHzRst         : out   sl;
+      gthFabClk            : out   sl;
+      -----------------
+      --  MPS Interface
+      -----------------
+      mpsReadMaster        : out   AxiLiteReadMasterType;
+      mpsReadSlave         : in    AxiLiteReadSlaveType;
+      mpsWriteMaster       : out   AxiLiteWriteMasterType;
+      mpsWriteSlave        : in    AxiLiteWriteSlaveType;
+      -----------------------
+      --  Top Level Interface
+      -----------------------
       -- Common Fabricate Clock
-      fabClkP          : in    sl;
-      fabClkN          : in    sl;
+      fabClkP              : in    sl;
+      fabClkN              : in    sl;
       -- Backplane Ethernet Ports
-      xauiRxP          : in    slv(3 downto 0);
-      xauiRxN          : in    slv(3 downto 0);
-      xauiTxP          : out   slv(3 downto 0);
-      xauiTxN          : out   slv(3 downto 0);
-      xauiClkP         : in    sl;
-      xauiClkN         : in    sl;
-      -- Backplane MPS Ports
-      mpsClkIn         : in    sl;
-      mpsClkOut        : out   sl;
-      mpsBusRxP        : in    slv(14 downto 1);
-      mpsBusRxN        : in    slv(14 downto 1);
-      mpsTxP           : out   sl;
-      mpsTxN           : out   sl;
+      xauiRxP              : in    slv(3 downto 0);
+      xauiRxN              : in    slv(3 downto 0);
+      xauiTxP              : out   slv(3 downto 0);
+      xauiTxN              : out   slv(3 downto 0);
+      xauiClkP             : in    sl;
+      xauiClkN             : in    sl;
       -- LCLS Timing Ports
-      timingRxP        : in    sl;
-      timingRxN        : in    sl;
-      timingTxP        : out   sl;
-      timingTxN        : out   sl;
-      timingRefClkInP  : in    sl;
-      timingRefClkInN  : in    sl;
-      timingRecClkOutP : out   sl;
-      timingRecClkOutN : out   sl;
-      timingClkSel     : out   sl;
-      timingClkScl     : inout sl;
-      timingClkSda     : inout sl;
+      timingRxP            : in    sl;
+      timingRxN            : in    sl;
+      timingTxP            : out   sl;
+      timingTxN            : out   sl;
+      timingRefClkInP      : in    sl;
+      timingRefClkInN      : in    sl;
+      timingRecClkOutP     : out   sl;
+      timingRecClkOutN     : out   sl;
+      timingClkSel         : out   sl;
+      timingClkScl         : inout sl;
+      timingClkSda         : inout sl;
       -- Crossbar Ports
-      xBarSin          : out   slv(1 downto 0);
-      xBarSout         : out   slv(1 downto 0);
-      xBarConfig       : out   sl;
-      xBarLoad         : out   sl;
+      xBarSin              : out   slv(1 downto 0);
+      xBarSout             : out   slv(1 downto 0);
+      xBarConfig           : out   sl;
+      xBarLoad             : out   sl;
       -- Secondary AMC Auxiliary Power Enable Port
-      enAuxPwrL        : out   sl;
+      enAuxPwrL            : out   sl;
       -- IPMC Ports
-      ipmcScl          : inout sl;
-      ipmcSda          : inout sl;
+      ipmcScl              : inout sl;
+      ipmcSda              : inout sl;
       -- Configuration PROM Ports
-      calScl           : inout sl;
-      calSda           : inout sl;
+      calScl               : inout sl;
+      calSda               : inout sl;
       -- DDR3L SO-DIMM Ports
-      ddrClkP          : in    sl;
-      ddrClkN          : in    sl;
-      ddrDm            : out   slv(7 downto 0);
-      ddrDqsP          : inout slv(7 downto 0);
-      ddrDqsN          : inout slv(7 downto 0);
-      ddrDq            : inout slv(63 downto 0);
-      ddrA             : out   slv(15 downto 0);
-      ddrBa            : out   slv(2 downto 0);
-      ddrCsL           : out   slv(1 downto 0);
-      ddrOdt           : out   slv(1 downto 0);
-      ddrCke           : out   slv(1 downto 0);
-      ddrCkP           : out   slv(1 downto 0);
-      ddrCkN           : out   slv(1 downto 0);
-      ddrWeL           : out   sl;
-      ddrRasL          : out   sl;
-      ddrCasL          : out   sl;
-      ddrRstL          : out   sl;
-      ddrAlertL        : in    sl;
-      ddrPg            : in    sl;
-      ddrPwrEnL        : out   sl;
-      ddrScl           : inout sl;
-      ddrSda           : inout sl;
+      ddrClkP              : in    sl;
+      ddrClkN              : in    sl;
+      ddrDm                : out   slv(7 downto 0);
+      ddrDqsP              : inout slv(7 downto 0);
+      ddrDqsN              : inout slv(7 downto 0);
+      ddrDq                : inout slv(63 downto 0);
+      ddrA                 : out   slv(15 downto 0);
+      ddrBa                : out   slv(2 downto 0);
+      ddrCsL               : out   slv(1 downto 0);
+      ddrOdt               : out   slv(1 downto 0);
+      ddrCke               : out   slv(1 downto 0);
+      ddrCkP               : out   slv(1 downto 0);
+      ddrCkN               : out   slv(1 downto 0);
+      ddrWeL               : out   sl;
+      ddrRasL              : out   sl;
+      ddrCasL              : out   sl;
+      ddrRstL              : out   sl;
+      ddrAlertL            : in    sl;
+      ddrPg                : in    sl;
+      ddrPwrEnL            : out   sl;
+      ddrScl               : inout sl;
+      ddrSda               : inout sl;
       -- SYSMON Ports
-      vPIn             : in    sl;
-      vNIn             : in    sl);
+      vPIn                 : in    sl;
+      vNIn                 : in    sl);
 end AmcCarrierCore;
 
 architecture mapping of AmcCarrierCore is
 
    constant AXI_ERROR_RESP_C : slv(1 downto 0) := AXI_RESP_DECERR_C;
-
-   signal mps125MHzClk : sl;
-   signal mps125MHzRst : sl;
-   signal mps312MHzClk : sl;
-   signal mps312MHzRst : sl;
-   signal mps625MHzClk : sl;
-   signal mps625MHzRst : sl;
-   signal mpsPllLocked : sl;
 
    signal axilClk          : sl;
    signal axilRst          : sl;
@@ -224,151 +206,150 @@ architecture mapping of AmcCarrierCore is
    signal ddrMemReady    : sl;
    signal ddrMemError    : sl;
 
-   signal mpsReadMaster  : AxiLiteReadMasterType;
-   signal mpsReadSlave   : AxiLiteReadSlaveType;
-   signal mpsWriteMaster : AxiLiteWriteMasterType;
-   signal mpsWriteSlave  : AxiLiteWriteSlaveType;
-
    signal obBsaMasters : AxiStreamMasterArray(3 downto 0);
    signal obBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
    signal ibBsaMasters : AxiStreamMasterArray(3 downto 0);
    signal ibBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
 
-   signal bpMsgMasters : AxiStreamMasterArray(BP_MSG_SIZE_C-1 downto 0);
-   signal bpMsgSlaves  : AxiStreamSlaveArray(BP_MSG_SIZE_C-1 downto 0);
-
-   signal bsiMac : slv(47 downto 0);
-   signal bsiIp  : slv(31 downto 0);
-
-   signal localMac   : slv(47 downto 0);
-   signal localIp    : slv(31 downto 0);
-   signal localAppId : slv(15 downto 0);
-   signal ethLinkUp  : sl;
-
-   signal waveformClkInt : sl;
-   signal waveformRstInt : sl;
+   signal localMac  : slv(47 downto 0);
+   signal localIp   : slv(31 downto 0);
+   signal ethLinkUp : sl;
+   signal gtClk     : sl;
+   signal fabClk    : sl;
+   signal fabRst    : sl;
 
 begin
-
-   localIp  <= bsiIp;
-   localMac <= bsiMac;
 
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
    -- Note: Install R1063 if you want the FPGA to control AUX power
    enAuxPwrL <= '0' when(FSBL_G = false) else '1';
 
-   -- Send axiClk to application as ddrClk
-   waveformClkInt <= axiClk;
-   waveformRstInt <= axiRst;
-   waveformClk    <= waveformClkInt;
-   waveformRst    <= waveformRstInt;
+   ref156MHzRst <= axilRst;
+   ref156MHzClk <= axilClk;
+   waveformClk  <= axiClk;
+   waveformRst  <= axiRst;
+   ethPhyReady  <= ethLinkUp;
 
    --------------------------------
    -- Common Clock and Reset Module
    -------------------------------- 
-   U_ClkAndRst : entity work.AmcCarrierClkAndRst
+   U_IBUFDS : IBUFDS_GTE3
       generic map (
-         TPD_G         => TPD_G,
-         MPS_SLOT_G    => MPS_SLOT_G,
-         SIM_SPEEDUP_G => SIM_SPEEDUP_G)
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
       port map (
-         -- Reference Clocks and Resets
-         ref125MHzClk => ref125MHzClk,
-         ref125MHzRst => ref125MHzRst,
-         ref156MHzClk => ref156MHzClk,
-         ref156MHzRst => ref156MHzRst,
-         ref312MHzClk => ref312MHzClk,
-         ref312MHzRst => ref312MHzRst,
-         ref625MHzClk => ref625MHzClk,
-         ref625MHzRst => ref625MHzRst,
-         gthFabClk    => gthFabClk,
-         -- AXI-Lite Clocks and Resets
-         axilClk      => axilClk,
-         axilRst      => axilRst,
-         -- MPS Clocks and Resets
-         mps125MHzClk => mps125MHzClk,
-         mps125MHzRst => mps125MHzRst,
-         mps312MHzClk => mps312MHzClk,
-         mps312MHzRst => mps312MHzRst,
-         mps625MHzClk => mps625MHzClk,
-         mps625MHzRst => mps625MHzRst,
-         mpsPllLocked => mpsPllLocked,
-         ----------------
-         -- Core Ports --
-         ----------------   
-         -- Common Fabric Clock
-         fabClkP      => fabClkP,
-         fabClkN      => fabClkN,
-         -- Backplane MPS Ports
-         mpsClkIn     => mpsClkIn,
-         mpsClkOut    => mpsClkOut);
+         I     => fabClkP,
+         IB    => fabClkN,
+         CEB   => '0',
+         ODIV2 => gtClk,
+         O     => gthFabClk);
 
-   ------------------------------------
-   -- Ethernet Module (ATCA ZONE 2)
-   ------------------------------------
+   U_BUFG_GT : BUFG_GT
+      port map (
+         I       => gtClk,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",              -- Divide by 1
+         O       => fabClk);
+
+   U_PwrUpRst : entity work.PwrUpRst
+      generic map(
+         TPD_G         => TPD_G,
+         SIM_SPEEDUP_G => SIM_SPEEDUP_G)
+      port map(
+         clk    => fabClk,
+         rstOut => fabRst);
+
+   U_Pll : entity work.ClockManagerUltraScale
+      generic map(
+         TPD_G             => TPD_G,
+         TYPE_G            => "PLL",
+         INPUT_BUFG_G      => true,
+         FB_BUFG_G         => true,
+         RST_IN_POLARITY_G => '1',
+         NUM_CLOCKS_G      => 1,
+         -- MMCM attributes
+         BANDWIDTH_G       => "OPTIMIZED",
+         CLKIN_PERIOD_G    => 6.4,
+         DIVCLK_DIVIDE_G   => 1,
+         CLKFBOUT_MULT_G   => 4,
+         CLKOUT0_DIVIDE_G  => 4)
+      port map(
+         -- Clock Input
+         clkIn     => fabClk,
+         rstIn     => fabRst,
+         -- Clock Outputs
+         clkOut(0) => axilClk,
+         -- Reset Outputs
+         rstOut(0) => axilRst);
+
+   ------------------
+   -- Ethernet Module
+   ------------------
    U_Eth : entity work.AmcCarrierEth
       generic map (
          TPD_G            => TPD_G,
-         EN_BP_MSG_G      => EN_BP_MSG_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
          -- Local Configuration
-         localMac          => localMac,
-         localIp           => localIp,
-         ethPhyReady       => ethLinkUp,
+         localMac            => localMac,
+         localIp             => localIp,
+         ethPhyReady         => ethLinkUp,
          -- Master AXI-Lite Interface
-         mAxilReadMasters  => axilReadMasters,
-         mAxilReadSlaves   => axilReadSlaves,
-         mAxilWriteMasters => axilWriteMasters,
-         mAxilWriteSlaves  => axilWriteSlaves,
+         mAxilReadMasters    => axilReadMasters,
+         mAxilReadSlaves     => axilReadSlaves,
+         mAxilWriteMasters   => axilWriteMasters,
+         mAxilWriteSlaves    => axilWriteSlaves,
          -- AXI-Lite Interface
-         axilClk           => axilClk,
-         axilRst           => axilRst,
-         axilReadMaster    => xauiReadMaster,
-         axilReadSlave     => xauiReadSlave,
-         axilWriteMaster   => xauiWriteMaster,
-         axilWriteSlave    => xauiWriteSlave,
+         axilClk             => axilClk,
+         axilRst             => axilRst,
+         axilReadMaster      => xauiReadMaster,
+         axilReadSlave       => xauiReadSlave,
+         axilWriteMaster     => xauiWriteMaster,
+         axilWriteSlave      => xauiWriteSlave,
          -- BSA Ethernet Interface
-         obBsaMasters      => obBsaMasters,
-         obBsaSlaves       => obBsaSlaves,
-         ibBsaMasters      => ibBsaMasters,
-         ibBsaSlaves       => ibBsaSlaves,
-         -- Backplane Messaging Interface
-         bpMsgMasters      => bpMsgMasters,
-         bpMsgSlaves       => bpMsgSlaves,
+         obBsaMasters        => obBsaMasters,
+         obBsaSlaves         => obBsaSlaves,
+         ibBsaMasters        => ibBsaMasters,
+         ibBsaSlaves         => ibBsaSlaves,
          ----------------------
          -- Top Level Interface
          ----------------------
-         -- Backplane Messaging Interface (bpMsgClk domain)
-         bpMsgClk          => bpMsgClk,
-         bpMsgRst          => bpMsgRst,
-         bpMsgBus          => bpMsgBus,
          -- Application Debug Interface
-         obAppDebugMaster  => obAppDebugMaster,
-         obAppDebugSlave   => obAppDebugSlave,
-         ibAppDebugMaster  => ibAppDebugMaster,
-         ibAppDebugSlave   => ibAppDebugSlave,
+         obAppDebugMaster    => obAppDebugMaster,
+         obAppDebugSlave     => obAppDebugSlave,
+         ibAppDebugMaster    => ibAppDebugMaster,
+         ibAppDebugSlave     => ibAppDebugSlave,
+         -- Backplane Messaging Interface
+         obBpMsgClientMaster => obBpMsgClientMaster,
+         obBpMsgClientSlave  => obBpMsgClientSlave,
+         ibBpMsgClientMaster => ibBpMsgClientMaster,
+         ibBpMsgClientSlave  => ibBpMsgClientSlave,
+         obBpMsgServerMaster => obBpMsgServerMaster,
+         obBpMsgServerSlave  => obBpMsgServerSlave,
+         ibBpMsgServerMaster => ibBpMsgServerMaster,
+         ibBpMsgServerSlave  => ibBpMsgServerSlave,
          ----------------
          -- Core Ports --
          ----------------   
          -- XAUI Ports
-         xauiRxP           => xauiRxP,
-         xauiRxN           => xauiRxN,
-         xauiTxP           => xauiTxP,
-         xauiTxN           => xauiTxN,
-         xauiClkP          => xauiClkP,
-         xauiClkN          => xauiClkN);
-
-   ethPhyReady <= ethLinkUp;
+         xauiRxP             => xauiRxP,
+         xauiRxN             => xauiRxN,
+         xauiTxP             => xauiTxP,
+         xauiTxN             => xauiTxN,
+         xauiClkP            => xauiClkP,
+         xauiClkN            => xauiClkN);
 
    ----------------------------------   
-   -- Register Address Mapping Module
+   -- System Register Address Mapping
    ----------------------------------   
-   U_RegMap : entity work.AmcCarrierRegMapping
+   U_SysReg : entity work.AmcCarrierSysReg
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         APP_TYPE_G       => APP_TYPE_G,
          FSBL_G           => FSBL_G)
       port map (
          -- Primary AXI-Lite Interface
@@ -406,23 +387,18 @@ begin
          mpsWriteMaster    => mpsWriteMaster,
          mpsWriteSlave     => mpsWriteSlave,
          -- Local Configuration
-         localMac          => bsiMac,
-         localIp           => bsiIp,
-         localAppId        => localAppId,
+         localMac          => localMac,
+         localIp           => localIp,
          ethLinkUp         => ethLinkUp,
          ----------------------
          -- Top Level Interface
          ----------------------              
          -- Application AXI-Lite Interface
-         regClk            => regClk,
-         regRst            => regRst,
          regReadMaster     => regReadMaster,
          regReadSlave      => regReadSlave,
          regWriteMaster    => regWriteMaster,
          regWriteSlave     => regWriteSlave,
          -- BSI Interface
-         bsiClk            => bsiClk,
-         bsiRst            => bsiRst,
          bsiBus            => bsiBus,
          ----------------
          -- Core Ports --
@@ -453,9 +429,10 @@ begin
    --------------
    U_Timing : entity work.AmcCarrierTiming
       generic map (
-         TPD_G            => TPD_G,
-         APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
+         TPD_G             => TPD_G,
+         TIME_GEN_APP_G    => TIME_GEN_APP_G,
+         TIME_GEN_EXTREF_G => TIME_GEN_EXTREF_G,
+         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk          => axilClk,
@@ -497,7 +474,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          FSBL_G           => FSBL_G,
-         APP_TYPE_G       => APP_TYPE_G,
          DISABLE_BSA_G    => DISABLE_BSA_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
       port map (
@@ -528,8 +504,8 @@ begin
          diagnosticRst        => diagnosticRst,
          diagnosticBus        => diagnosticBus,
          -- Waveform interface (axiClk domain)
-         waveformClk          => waveformClkInt,
-         waveformRst          => waveformRstInt,
+         waveformClk          => axiClk,
+         waveformRst          => axiClk,
          obAppWaveformMasters => obAppWaveformMasters,
          obAppWaveformSlaves  => obAppWaveformSlaves);
 
@@ -583,54 +559,5 @@ begin
          ddrPwrEnL       => ddrPwrEnL,
          ddrPg           => ddrPg,
          ddrAlertL       => ddrAlertL);
-
-   ----------------------
-   -- MPS and BP_MSG Core
-   ----------------------
-   U_MpsAndBpMsg : entity work.AmcCarrierMpsAndBpMsg
-      generic map (
-         TPD_G            => TPD_G,
-         APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         MPS_SLOT_G       => MPS_SLOT_G)
-      port map (
-         -- Local Configuration
-         localAppId      => localAppId,
-         -- MPS Clocks and Resets
-         mps125MHzClk    => mps125MHzClk,
-         mps125MHzRst    => mps125MHzRst,
-         mps312MHzClk    => mps312MHzClk,
-         mps312MHzRst    => mps312MHzRst,
-         mps625MHzClk    => mps625MHzClk,
-         mps625MHzRst    => mps625MHzRst,
-         mpsPllLocked    => mpsPllLocked,
-         -- AXI-Lite Interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => mpsReadMaster,
-         axilReadSlave   => mpsReadSlave,
-         axilWriteMaster => mpsWriteMaster,
-         axilWriteSlave  => mpsWriteSlave,
-         -- Backplane Messaging Interface
-         bpMsgMasters    => bpMsgMasters,
-         bpMsgSlaves     => bpMsgSlaves,
-         ----------------------
-         -- Top Level Interface
-         ----------------------
-         -- Diagnostic Interface (diagnosticClk domain)
-         diagnosticClk   => diagnosticClk,
-         diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBus,
-         -- MPS Interface
-         mpsObMasters    => mpsObMasters,
-         mpsObSlaves     => mpsObSlaves,
-         ----------------
-         -- Core Ports --
-         ----------------
-         -- Backplane MPS Ports
-         mpsBusRxP       => mpsBusRxP,
-         mpsBusRxN       => mpsBusRxN,
-         mpsTxP          => mpsTxP,
-         mpsTxN          => mpsTxN);
 
 end mapping;

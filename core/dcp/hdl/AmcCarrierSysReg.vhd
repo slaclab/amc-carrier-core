@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      :
 -------------------------------------------------------------------------------
--- File       : AmcCarrierRegMapping.vhd
+-- File       : AmcCarrierSysReg.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
@@ -36,12 +36,10 @@ use work.AmcCarrierRegPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcCarrierRegMapping is
+entity AmcCarrierSysReg is
    generic (
       TPD_G            : time            := 1 ns;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
-      TIMING_MODE_G    : boolean         := false;  -- false = Normal Operation, = LCLS-I timing only
       FSBL_G           : boolean         := false);
    port (
       -- Primary AXI-Lite Interface
@@ -83,21 +81,15 @@ entity AmcCarrierRegMapping is
       localIp           : out   slv(31 downto 0);
       localAppId        : out   slv(15 downto 0);
       ethLinkUp         : in    sl := '0';
-      -- Misc.
-      debugReset        : out   sl;
       ----------------------
       -- Top Level Interface
       ----------------------
       -- AXI-Lite Interface
-      regClk            : in    sl;
-      regRst            : in    sl;
       regReadMaster     : out   AxiLiteReadMasterType;
       regReadSlave      : in    AxiLiteReadSlaveType;
       regWriteMaster    : out   AxiLiteWriteMasterType;
       regWriteSlave     : in    AxiLiteWriteSlaveType;
       -- BSI Interface
-      bsiClk            : in    sl;
-      bsiRst            : in    sl;
       bsiBus            : out   bsiBusType;
       ----------------
       -- Core Ports --
@@ -122,9 +114,9 @@ entity AmcCarrierRegMapping is
       -- SYSMON Ports
       vPIn              : in    sl;
       vNIn              : in    sl);
-end AmcCarrierRegMapping;
+end AmcCarrierSysReg;
 
-architecture mapping of AmcCarrierRegMapping is
+architecture mapping of AmcCarrierSysReg is
 
    -- FSBL Timeout Duration
    constant TIMEOUT_C : integer := integer(10.0 / AXI_CLK_PERIOD_C);
@@ -279,7 +271,6 @@ begin
          -- AXI-Lite Interface
          axiClk         => axilClk,
          axiRst         => axilRst,
-         masterReset    => debugReset,
          upTimeCnt      => upTimeCnt,
          userValues     => (others => AMC_CARRIER_CORE_VERSION_C),
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
@@ -402,7 +393,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, TIMING_MODE_G),
+         XBAR_DEFAULT_G   => XBAR_APP_NODE_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
          -- XBAR Ports
@@ -507,8 +498,6 @@ begin
          bootAddr        => bootAddr,
          upTimeCnt       => upTimeCnt,
          -- Application Interface
-         bsiClk          => bsiClk,
-         bsiRst          => bsiRst,
          bsiBus          => bsiBus,
          -- I2C Ports
          scl             => ipmcScl,
@@ -565,23 +554,9 @@ begin
    -------------------------------------------
    -- Map the AXI-Lite to Application Firmware
    -------------------------------------------
-   U_AxiLiteAsync : entity work.AxiLiteAsync
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         -- Slave Port
-         sAxiClk         => axilClk,
-         sAxiClkRst      => axilRst,
-         sAxiReadMaster  => mAxilReadMasters(APP_INDEX_C),
-         sAxiReadSlave   => mAxilReadSlaves(APP_INDEX_C),
-         sAxiWriteMaster => mAxilWriteMasters(APP_INDEX_C),
-         sAxiWriteSlave  => mAxilWriteSlaves(APP_INDEX_C),
-         -- Master Port
-         mAxiClk         => regClk,
-         mAxiClkRst      => regRst,
-         mAxiReadMaster  => regReadMaster,
-         mAxiReadSlave   => regReadSlave,
-         mAxiWriteMaster => regWriteMaster,
-         mAxiWriteSlave  => regWriteSlave);
+   regReadMaster                 <= mAxilReadMasters(APP_INDEX_C);
+   mAxilReadSlaves(APP_INDEX_C)  <= regReadSlave;
+   regWriteMaster                <= mAxilWriteMasters(APP_INDEX_C);
+   mAxilWriteSlaves(APP_INDEX_C) <= regWriteSlave;
 
 end mapping;
