@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierClkAndRst.vhd
+-- File       : AppMpsClk.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
@@ -10,6 +10,13 @@
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: 
+--
+-- Note: Do not forget to configure the ATCA crate to drive the clock from the slot#2 MPS link node
+-- For the 7-slot crate:
+--    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
+-- For the 16-slot crate:
+--    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
+-- 
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -28,25 +35,15 @@ use work.StdRtlPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcCarrierClkAndRst is
+entity AppMpsClk is
    generic (
       TPD_G         : time    := 1 ns;
       MPS_SLOT_G    : boolean := false;
       SIM_SPEEDUP_G : boolean := false);
    port (
-      -- Reference Clocks and Resets
-      ref125MHzClk : out sl;
-      ref125MHzRst : out sl;
-      ref156MHzClk : out sl;
-      ref156MHzRst : out sl;
-      ref312MHzClk : out sl;
-      ref312MHzRst : out sl;
-      ref625MHzClk : out sl;
-      ref625MHzRst : out sl;
-      gthFabClk    : out sl;
-      -- AXI-Lite Clocks and Resets
-      axilClk      : out sl;
-      axilRst      : out sl;
+      -- Stable Clock and Reset 
+      axilClk : in sl;
+      axilRst : in sl;
       -- MPS Clocks and Resets
       mps125MHzClk : out sl;
       mps125MHzRst : out sl;
@@ -58,21 +55,12 @@ entity AmcCarrierClkAndRst is
       ----------------
       -- Core Ports --
       ----------------   
-      -- Common Fabricate Clock
-      fabClkP      : in  sl;
-      fabClkN      : in  sl;
       -- Backplane MPS Ports
       mpsClkIn     : in  sl;
       mpsClkOut    : out sl);
-end AmcCarrierClkAndRst;
+end AppMpsClk;
 
-architecture mapping of AmcCarrierClkAndRst is
-
-   signal gtClk         : sl;
-   signal fabClk        : sl;
-   signal fabRst        : sl;
-   signal fabMmcmClkOut : sl;
-   signal fabMmcmRstOut : sl;
+architecture mapping of AppMpsClk is
 
    signal mpsRefClk     : sl;
    signal mpsClk        : sl;
@@ -84,72 +72,13 @@ architecture mapping of AmcCarrierClkAndRst is
 
 begin
 
-   IBUFDS_GTE3_Inst : IBUFDS_GTE3
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => fabClkP,
-         IB    => fabClkN,
-         CEB   => '0',
-         ODIV2 => gtClk,
-         O     => gthFabClk);
-
-   BUFG_GT_Inst : BUFG_GT
-      port map (
-         I       => gtClk,
-         CE      => '1',
-         CEMASK  => '1',
-         CLR     => '0',
-         CLRMASK => '1',
-         DIV     => "000",              -- Divide by 1
-         O       => fabClk);
-
-   PwrUpRst_Inst : entity work.PwrUpRst
-      generic map(
-         TPD_G         => TPD_G,
-         SIM_SPEEDUP_G => SIM_SPEEDUP_G)
-      port map(
-         clk    => fabClk,
-         rstOut => fabRst);
-
-   U_ClkManagerAxiLite : entity work.ClockManagerUltraScale
-      generic map(
-         TPD_G             => TPD_G,
-         TYPE_G            => "PLL",
-         INPUT_BUFG_G      => true,
-         FB_BUFG_G         => true,
-         RST_IN_POLARITY_G => '1',
-         NUM_CLOCKS_G      => 1,
-         -- MMCM attributes
-         BANDWIDTH_G       => "OPTIMIZED",
-         CLKIN_PERIOD_G    => 6.4,
-         DIVCLK_DIVIDE_G   => 1,
-         CLKFBOUT_MULT_G   => 4,
-         CLKOUT0_DIVIDE_G  => 4)
-      port map(
-         -- Clock Input
-         clkIn     => fabClk,
-         rstIn     => fabRst,
-         -- Clock Outputs
-         clkOut(0) => fabMmcmClkOut,
-         -- Reset Outputs
-         rstOut(0) => fabMmcmRstOut);
-
-   axilClk <= fabMmcmClkOut;
-   axilRst <= fabMmcmRstOut;
-
-   ref156MHzClk <= fabMmcmClkOut;
-   ref156MHzRst <= fabMmcmRstOut;
-
    U_IBUF : IBUF
       port map (
          I => mpsClkIn,
          O => mpsRefClk);
 
-   mpsClk <= fabClk when(MPS_SLOT_G) else mpsRefClk;
-   mpsRst <= fabRst when(MPS_SLOT_G) else '0';
+   mpsClk <= axilClk when(MPS_SLOT_G) else mpsRefClk;
+   mpsRst <= axilRst when(MPS_SLOT_G) else '0';
 
    U_ClkManagerMps : entity work.ClockManagerUltraScale
       generic map(
@@ -183,18 +112,9 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
-         clk     => fabMmcmClkOut,
+         clk     => axilClk,
          dataIn  => locked,
          dataOut => mpsPllLocked);            
-
-   ref125MHzClk <= mpsMmcmClkOut(2);
-   ref125MHzRst <= mpsMmcmRstOut(2);
-
-   ref312MHzClk <= mpsMmcmClkOut(1);
-   ref312MHzRst <= mpsMmcmRstOut(1);
-
-   ref625MHzClk <= mpsMmcmClkOut(0);
-   ref625MHzRst <= mpsMmcmRstOut(0);
 
    mps125MHzClk <= mpsMmcmClkOut(2);
    mps125MHzRst <= mpsMmcmRstOut(2);

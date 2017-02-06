@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2017-02-03
+-- Last update: 2017-02-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -45,7 +45,6 @@ entity AmcCarrierBsi is
       -- Local Configuration
       localMac        : out   slv(47 downto 0);
       localIp         : out   slv(31 downto 0);
-      localAppId      : out   slv(15 downto 0);
       ethLinkUp       : in    sl;
       bootReq         : out   sl;
       bootAddr        : out   slv(31 downto 0);
@@ -446,12 +445,8 @@ begin
       bootReq        <= r.bootReq;
       bootAddr       <= r.bootAddr;
 
-      localAppId(3 downto 0)  <= r.slotNumber(3 downto 0);
-      localAppId(15 downto 4) <= r.crateId(15 downto 4);
-
       localMac <= ConvertEndianness(r.macAddress(0));
       localIp  <= r.localIp;
-
 
       bsiBus.slotNumber <= r.slotNumber;
       bsiBus.crateId    <= r.crateId;

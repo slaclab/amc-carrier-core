@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-07-13
+-- Last update: 2017-02-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ entity AmcCarrierDdrMem is
       ddrRstL         : out   sl;
       ddrAlertL       : in    sl                     := '1';
       ddrPg           : in    sl                     := '1';
-      ddrPwrEnL       : out   sl);      
+      ddrPwrEnL       : out   sl);
 end AmcCarrierDdrMem;
 
 architecture mapping of AmcCarrierDdrMem is
@@ -195,23 +195,42 @@ architecture mapping of AmcCarrierDdrMem is
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
-   
+
+   signal pg     : sl;
+   signal alertL : sl;
+   signal pwrEnL : sl;
+
 begin
 
-   axiClk    <= ddrClk;
-   axiRst    <= ddrRst;
-   ddrPwrEnL <= not(r.ddrPwrEn);
+   axiClk <= ddrClk;
+   axiRst <= ddrRst;
+
+   U_ddrPg : IBUF
+      port map (
+         I => ddrPg,
+         O => pg);
+
+   U_ddrAlertL : IBUF
+      port map (
+         I => ddrAlertL,
+         O => alertL);
+
+   pwrEnL <= not(r.ddrPwrEn);
+   U_ddrPwrEnL : OBUF
+      port map (
+         I => pwrEnL,
+         O => ddrPwrEnL);
 
    IBUFDS_Inst : IBUFDS
       port map (
          I  => ddrClkP,
          IB => ddrClkN,
-         O  => refClock);                 
+         O  => refClock);
 
    BUFG_Inst : BUFG
       port map (
          I => refClock,
-         O => refClkBufg);     
+         O => refClkBufg);
 
    reset   <= axilRst or r.ddrReset;
    axiRstL <= not(sysRst);
@@ -222,7 +241,7 @@ begin
       port map (
          clk      => refClkBufg,
          asyncRst => reset,
-         syncRst  => sysRst);   
+         syncRst  => sysRst);
 
    MigCore_Inst : MigCore
       port map (
@@ -283,7 +302,7 @@ begin
          c0_ddr3_s_axi_rresp     => ddrReadSlave.rresp(1 downto 0),
          c0_ddr3_s_axi_rid       => ddrReadSlave.rid(3 downto 0),
          c0_ddr3_s_axi_rdata     => ddrReadSlave.rdata(511 downto 0),
-         sys_rst                 => sysRst); 
+         sys_rst                 => sysRst);
 
    process(ddrClk)
    begin
@@ -294,7 +313,7 @@ begin
    end process;
 
    FSBL_GEN : if (FSBL_G = true) generate
-      
+
       U_AxiMemTester : entity work.AxiMemTester
          generic map (
             TPD_G        => TPD_G,
@@ -323,7 +342,7 @@ begin
       -- Terminate the buses
       axiWriteSlave <= AXI_WRITE_SLAVE_INIT_C;
       axiReadSlave  <= AXI_READ_SLAVE_INIT_C;
-      
+
    end generate;
 
    NORMAL_GEN : if (FSBL_G = false) generate
@@ -340,9 +359,10 @@ begin
          port map (
             clk     => axilClk,
             dataIn  => ddrCalDone,
-            dataOut => done);      
+            dataOut => done);
 
-      comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrAlertL, ddrPg, done, r) is
+      comb : process (alertL, axilReadMaster, axilRst, axilWriteMaster, done,
+                      pg, r) is
          variable v      : RegType;
          variable regCon : AxiLiteEndPointType;
       begin
@@ -367,8 +387,8 @@ begin
          axiSlaveRegisterR(regCon, x"120", 0, toSlv(AXI_CONFIG_C.ADDR_WIDTH_C, 32));
          axiSlaveRegisterR(regCon, x"124", 0, toSlv(AXI_CONFIG_C.DATA_BYTES_C, 32));
          axiSlaveRegisterR(regCon, x"128", 0, toSlv(AXI_CONFIG_C.ID_BITS_C, 32));
-         axiSlaveRegisterR(regCon, x"130", 0, ddrAlertL);
-         axiSlaveRegisterR(regCon, x"134", 0, ddrPg);
+         axiSlaveRegisterR(regCon, x"130", 0, alertL);
+         axiSlaveRegisterR(regCon, x"134", 0, pg);
 
          -- Map the write registers
          axiSlaveRegister(regCon, x"3F8", 0, v.ddrPwrEn);
@@ -393,7 +413,7 @@ begin
          axilReadSlave  <= r.axilReadSlave;
          memReady       <= r.memReady;
          memError       <= r.memError;
-         
+
       end process comb;
 
       seq : process (axilClk) is
@@ -404,5 +424,5 @@ begin
       end process seq;
 
    end generate;
-   
+
 end mapping;

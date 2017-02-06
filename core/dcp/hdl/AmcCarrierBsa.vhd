@@ -30,7 +30,7 @@ use work.AxiPkg.all;
 use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
-use work.AmcCarrierRegPkg.all;
+use work.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierBsa is
    generic (

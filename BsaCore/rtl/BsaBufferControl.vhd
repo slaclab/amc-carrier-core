@@ -35,7 +35,7 @@ use work.AxiDmaPkg.all;
 use work.TextUtilPkg.all;
 
 use work.AmcCarrierPkg.all;
-use work.AmcCarrierRegPkg.all;
+use work.AmcCarrierSysRegPkg.all;
 use work.TimingPkg.all;
 
 entity BsaBufferControl is

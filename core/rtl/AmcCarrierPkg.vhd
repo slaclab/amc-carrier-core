@@ -175,6 +175,7 @@ package AmcCarrierPkg is
    ---------------------------------------------------------------------------      
    -- Backplane Messaging Network: Configurations, Constants and Records Types
    ---------------------------------------------------------------------------    
+   constant BP_MSG_SIZE_C     : natural := 2;
    function getBpMsgChCnt(app : AppType) return natural;
 
    type BpMsgBusType is record

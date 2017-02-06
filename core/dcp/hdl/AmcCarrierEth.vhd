@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2017-02-03
+-- Last update: 2017-02-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
-use work.AmcCarrierRegPkg.all;
+use work.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierEth is
    generic (

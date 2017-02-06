@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------------
 -- Title      : 
 -------------------------------------------------------------------------------
--- File       : AmcCarrierMpsSalt.vhd
+-- File       : AppMpsSalt.vhd
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2016-09-23
+-- Last update: 2017-02-04
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ use work.AmcCarrierPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcCarrierMpsSalt is
+entity AppMpsSalt is
    generic (
       TPD_G            : time            := 1 ns;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
@@ -40,59 +40,51 @@ entity AmcCarrierMpsSalt is
       MPS_SLOT_G       : boolean         := false);
    port (
       -- SALT Reference clocks
-      mps125MHzClk      : in  sl;
-      mps125MHzRst      : in  sl;
-      mps312MHzClk      : in  sl;
-      mps312MHzRst      : in  sl;
-      mps625MHzClk      : in  sl;
-      mps625MHzRst      : in  sl;
-      mpsPllLocked      : in  sl;
+      mps125MHzClk    : in  sl;
+      mps125MHzRst    : in  sl;
+      mps312MHzClk    : in  sl;
+      mps312MHzRst    : in  sl;
+      mps625MHzClk    : in  sl;
+      mps625MHzRst    : in  sl;
+      mpsPllLocked    : in  sl;
       -- AXI-Lite Interface
-      axilClk           : in  sl;
-      axilRst           : in  sl;
-      axilReadMaster    : in  AxiLiteReadMasterType;
-      axilReadSlave     : out AxiLiteReadSlaveType;
-      axilWriteMaster   : in  AxiLiteWriteMasterType;
-      axilWriteSlave    : out AxiLiteWriteSlaveType;
+      axilClk         : in  sl;
+      axilRst         : in  sl;
+      axilReadMaster  : in  AxiLiteReadMasterType;
+      axilReadSlave   : out AxiLiteReadSlaveType;
+      axilWriteMaster : in  AxiLiteWriteMasterType;
+      axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- MPS Interface
-      mpsIbMaster       : in  AxiStreamMasterType;
-      mpsIbSlave        : out AxiStreamSlaveType;
-      -- MPS/BP_MSG configuration/status signals
-      appId             : in  slv(15 downto 0);
-      mpsEnable         : out sl;
-      mpsTestMode       : out sl;
-      bpMsgEnable       : out sl;
-      bpMsgTestMode     : out sl;
-      timeStrbRate      : in  slv(31 downto 0);
-      diagnosticClkFreq : in  slv(31 downto 0);
+      mpsIbMaster     : in  AxiStreamMasterType;
+      mpsIbSlave      : out AxiStreamSlaveType;
+      -- MPS configuration/status signals
+      mpsEnable       : out sl;
+      mpsTestMode     : out sl;
       ----------------------
       -- Top Level Interface
       ----------------------
       -- MPS Interface
-      mpsObMasters      : out AxiStreamMasterArray(14 downto 0);
-      mpsObSlaves       : in  AxiStreamSlaveArray(14 downto 0);
+      mpsObMasters    : out AxiStreamMasterArray(14 downto 0);
+      mpsObSlaves     : in  AxiStreamSlaveArray(14 downto 0);
       ----------------
       -- Core Ports --
       ----------------
       -- Backplane MPS Ports
-      mpsBusRxP         : in  slv(14 downto 1);
-      mpsBusRxN         : in  slv(14 downto 1);
-      mpsTxP            : out sl;
-      mpsTxN            : out sl);
-end AmcCarrierMpsSalt;
+      mpsBusRxP       : in  slv(14 downto 1);
+      mpsBusRxN       : in  slv(14 downto 1);
+      mpsTxP          : out sl;
+      mpsTxN          : out sl);
+end AppMpsSalt;
 
-architecture mapping of AmcCarrierMpsSalt is
+architecture mapping of AppMpsSalt is
 
-   constant STATUS_SIZE_C     : natural                := 15;
-   constant MPS_CHANNELS_C    : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
-   constant MPS_THRESHOLD_C   : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
-   constant BP_MSG_CHANNELS_C : natural range 0 to 32  := getBpMsgChCnt(APP_TYPE_G);
+   constant STATUS_SIZE_C   : natural                := 15;
+   constant MPS_CHANNELS_C  : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
+   constant MPS_THRESHOLD_C : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
 
    type RegType is record
       mpsEnable      : sl;
       mpsTestMode    : sl;
-      bpMsgEnable    : sl;
-      bpMsgTestMode  : sl;
       cntRst         : sl;
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -102,8 +94,6 @@ architecture mapping of AmcCarrierMpsSalt is
    constant REG_INIT_C : RegType := (
       mpsEnable      => '0',
       mpsTestMode    => '0',
-      bpMsgEnable    => '0',
-      bpMsgTestMode  => '0',
       cntRst         => '1',
       rollOverEn     => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
@@ -121,7 +111,7 @@ architecture mapping of AmcCarrierMpsSalt is
 begin
 
    APP_SLOT : if (MPS_SLOT_G = false) generate
-      
+
       mpsRxLinkUp  <= (others => '0');
       mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
 
@@ -157,23 +147,23 @@ begin
             mAxisClk      => axilClk,
             mAxisRst      => axilRst,
             mAxisMaster   => open,
-            mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);            
+            mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);
 
       GEN_VEC :
       for i in 14 downto 2 generate
          U_IBUFDS : IBUFDS
             generic map (
-               DIFF_TERM => true) 
+               DIFF_TERM => true)
             port map(
                I  => mpsBusRxP(i),
                IB => mpsBusRxN(i),
                O  => open);
       end generate GEN_VEC;
-      
+
    end generate;
 
    MPS_SLOT : if (MPS_SLOT_G = true) generate
-      
+
       U_SaltDelayCtrl : entity work.SaltDelayCtrl
          generic map (
             TPD_G           => TPD_G,
@@ -182,7 +172,7 @@ begin
          port map (
             iDelayCtrlRdy => iDelayCtrlRdy,
             refClk        => mps625MHzClk,
-            refRst        => mps625MHzRst);     
+            refRst        => mps625MHzRst);
 
       mpsTxLinkUp     <= '0';
       mpsObMasters(0) <= mpsIbMaster;
@@ -192,7 +182,7 @@ begin
          port map (
             I  => '0',
             O  => mpsTxP,
-            OB => mpsTxN);      
+            OB => mpsTxN);
 
       GEN_VEC :
       for i in 14 downto 1 generate
@@ -228,15 +218,16 @@ begin
                mAxisClk      => axilClk,
                mAxisRst      => axilRst,
                mAxisMaster   => mpsObMasters(i),
-               mAxisSlave    => mpsObSlaves(i));             
+               mAxisSlave    => mpsObSlaves(i));
       end generate GEN_VEC;
-      
+
    end generate;
 
-   comb : process (appId, axilReadMaster, axilRst, axilWriteMaster, cntOut, diagnosticClkFreq,
-                   mpsPllLocked, r, statusOut, timeStrbRate) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, cntOut,
+                   mpsPllLocked, r, statusOut) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
+      variable i      : natural;
    begin
       -- Latch the current value
       v := r;
@@ -248,39 +239,21 @@ begin
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read registers
-      axiSlaveRegisterR(regCon, x"000", 0, muxSlVectorArray(cntOut, 0));
-      axiSlaveRegisterR(regCon, x"004", 0, muxSlVectorArray(cntOut, 1));
-      axiSlaveRegisterR(regCon, x"008", 0, muxSlVectorArray(cntOut, 2));
-      axiSlaveRegisterR(regCon, x"00C", 0, muxSlVectorArray(cntOut, 3));
-      axiSlaveRegisterR(regCon, x"010", 0, muxSlVectorArray(cntOut, 4));
-      axiSlaveRegisterR(regCon, x"014", 0, muxSlVectorArray(cntOut, 5));
-      axiSlaveRegisterR(regCon, x"018", 0, muxSlVectorArray(cntOut, 6));
-      axiSlaveRegisterR(regCon, x"01C", 0, muxSlVectorArray(cntOut, 7));
-      axiSlaveRegisterR(regCon, x"020", 0, muxSlVectorArray(cntOut, 8));
-      axiSlaveRegisterR(regCon, x"024", 0, muxSlVectorArray(cntOut, 9));
-      axiSlaveRegisterR(regCon, x"028", 0, muxSlVectorArray(cntOut, 10));
-      axiSlaveRegisterR(regCon, x"02C", 0, muxSlVectorArray(cntOut, 11));
-      axiSlaveRegisterR(regCon, x"030", 0, muxSlVectorArray(cntOut, 12));
-      axiSlaveRegisterR(regCon, x"034", 0, muxSlVectorArray(cntOut, 13));
-      axiSlaveRegisterR(regCon, x"038", 0, muxSlVectorArray(cntOut, 14));
-      axiSlaveRegisterR(regCon, x"100", 0, statusOut);
-      axiSlaveRegisterR(regCon, x"104", 0, ite(MPS_SLOT_G, x"00000001", x"00000000"));
-      axiSlaveRegisterR(regCon, x"108", 0, timeStrbRate);
-      axiSlaveRegisterR(regCon, x"10C", 0, diagnosticClkFreq);
-      axiSlaveRegisterR(regCon, x"110", 0, APP_TYPE_G);
-      axiSlaveRegisterR(regCon, x"114", 0, toSlv(MPS_CHANNELS_C, 32));
-      axiSlaveRegisterR(regCon, x"118", 0, toSlv(MPS_THRESHOLD_C, 32));
-      axiSlaveRegisterR(regCon, x"11C", 0, toSlv(BP_MSG_CHANNELS_C, 32));
-      axiSlaveRegisterR(regCon, x"120", 0, appId);
-      axiSlaveRegisterR(regCon, x"124", 0, mpsPllLocked);
+      for i in STATUS_SIZE_C-1 downto 0 loop
+         axiSlaveRegisterR(regCon, toSlv(4*i, 12), 0, muxSlVectorArray(cntOut, i));
+      end loop;
+      axiSlaveRegisterR(regCon, x"700", 0, statusOut);
+      axiSlaveRegisterR(regCon, x"704", 0, ite(MPS_SLOT_G, x"00000001", x"00000000"));
+      axiSlaveRegisterR(regCon, x"708", 0, APP_TYPE_G);
+      axiSlaveRegisterR(regCon, x"70C", 0, toSlv(MPS_CHANNELS_C, 32));
+      axiSlaveRegisterR(regCon, x"710", 0, toSlv(MPS_THRESHOLD_C, 32));
+      axiSlaveRegisterR(regCon, x"714", 0, mpsPllLocked);
 
       -- Map the write registers
-      axiSlaveRegister(regCon, x"200", 0, v.mpsEnable);
-      axiSlaveRegister(regCon, x"204", 0, v.mpsTestMode);
-      axiSlaveRegister(regCon, x"208", 0, v.bpMsgEnable);
-      axiSlaveRegister(regCon, x"20C", 0, v.bpMsgTestMode);
-      axiSlaveRegister(regCon, x"3F0", 0, v.rollOverEn);
-      axiSlaveRegister(regCon, x"3FC", 0, v.cntRst);
+      axiSlaveRegister(regCon, x"800", 0, v.mpsEnable);
+      axiSlaveRegister(regCon, x"804", 0, v.mpsTestMode);
+      axiSlaveRegister(regCon, x"FF0", 0, v.rollOverEn);
+      axiSlaveRegister(regCon, x"FF4", 0, v.cntRst);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -298,9 +271,7 @@ begin
       axilReadSlave  <= r.axilReadSlave;
       mpsEnable      <= r.mpsEnable;
       mpsTestMode    <= r.mpsTestMode;
-      bpMsgEnable    <= r.bpMsgEnable;
-      bpMsgTestMode  <= r.bpMsgTestMode;
-      
+
    end process comb;
 
    seq : process (axilClk) is
@@ -316,7 +287,7 @@ begin
          OUT_POLARITY_G => '1',
          CNT_RST_EDGE_G => true,
          CNT_WIDTH_G    => 32,
-         WIDTH_G        => STATUS_SIZE_C)     
+         WIDTH_G        => STATUS_SIZE_C)
       port map (
          -- Input Status bit Signals (wrClk domain)                  
          statusIn(14 downto 1) => mpsRxLinkUp,
@@ -329,6 +300,6 @@ begin
          cntOut                => cntOut,
          -- Clocks and Reset Ports
          wrClk                 => mps125MHzClk,
-         rdClk                 => axilClk);   
+         rdClk                 => axilClk);
 
 end mapping;

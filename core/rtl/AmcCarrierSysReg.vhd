@@ -31,7 +31,7 @@ use work.SsiPkg.all;
 use work.AxiLitePkg.all;
 use work.I2cPkg.all;
 use work.AmcCarrierPkg.all;
-use work.AmcCarrierRegPkg.all;
+use work.AmcCarrierSysRegPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -40,6 +40,8 @@ entity AmcCarrierSysReg is
    generic (
       TPD_G            : time            := 1 ns;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
+      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
+      TIMING_MODE_G    : boolean         := false;  -- false = Normal Operation, = LCLS-I timing only
       FSBL_G           : boolean         := false);
    port (
       -- Primary AXI-Lite Interface
@@ -59,11 +61,11 @@ entity AmcCarrierSysReg is
       bsaReadSlave      : in    AxiLiteReadSlaveType;
       bsaWriteMaster    : out   AxiLiteWriteMasterType;
       bsaWriteSlave     : in    AxiLiteWriteSlaveType;
-      -- XAUI PHY AXI-Lite Interface
-      xauiReadMaster    : out   AxiLiteReadMasterType;
-      xauiReadSlave     : in    AxiLiteReadSlaveType;
-      xauiWriteMaster   : out   AxiLiteWriteMasterType;
-      xauiWriteSlave    : in    AxiLiteWriteSlaveType;
+      -- ETH AXI-Lite Interface
+      ethReadMaster    : out   AxiLiteReadMasterType;
+      ethReadSlave     : in    AxiLiteReadSlaveType;
+      ethWriteMaster   : out   AxiLiteWriteMasterType;
+      ethWriteSlave    : in    AxiLiteWriteSlaveType;
       -- DDR PHY AXI-Lite Interface
       ddrReadMaster     : out   AxiLiteReadMasterType;
       ddrReadSlave      : in    AxiLiteReadSlaveType;
@@ -79,16 +81,15 @@ entity AmcCarrierSysReg is
       -- Local Configuration
       localMac          : out   slv(47 downto 0);
       localIp           : out   slv(31 downto 0);
-      localAppId        : out   slv(15 downto 0);
       ethLinkUp         : in    sl := '0';
       ----------------------
       -- Top Level Interface
       ----------------------
       -- AXI-Lite Interface
-      regReadMaster     : out   AxiLiteReadMasterType;
-      regReadSlave      : in    AxiLiteReadSlaveType;
-      regWriteMaster    : out   AxiLiteWriteMasterType;
-      regWriteSlave     : in    AxiLiteWriteSlaveType;
+      appReadMaster     : out   AxiLiteReadMasterType;
+      appReadSlave      : in    AxiLiteReadSlaveType;
+      appWriteMaster    : out   AxiLiteWriteMasterType;
+      appWriteSlave     : in    AxiLiteWriteSlaveType;
       -- BSI Interface
       bsiBus            : out   bsiBusType;
       ----------------
@@ -393,7 +394,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         XBAR_DEFAULT_G   => XBAR_APP_NODE_C,
+         XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, TIMING_MODE_G),
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
          -- XBAR Ports
@@ -492,7 +493,6 @@ begin
          -- Local Configurations
          localMac        => localMac,
          localIp         => localIp,
-         localAppId      => localAppId,
          ethLinkUp       => ethLinkUp,
          bootReq         => bootReq,
          bootAddr        => bootAddr,
@@ -528,12 +528,12 @@ begin
    mAxilWriteSlaves(BSA_INDEX_C) <= bsaWriteSlave;
 
    ----------------------------------------
-   -- Map the AXI-Lite to XAUI PHY Firmware
+   -- Map the AXI-Lite to ETH Firmware
    ----------------------------------------
-   xauiReadMaster                 <= mAxilReadMasters(XAUI_INDEX_C);
-   mAxilReadSlaves(XAUI_INDEX_C)  <= xauiReadSlave;
-   xauiWriteMaster                <= mAxilWriteMasters(XAUI_INDEX_C);
-   mAxilWriteSlaves(XAUI_INDEX_C) <= xauiWriteSlave;
+   ethReadMaster                 <= mAxilReadMasters(XAUI_INDEX_C);
+   mAxilReadSlaves(XAUI_INDEX_C)  <= ethReadSlave;
+   ethWriteMaster                <= mAxilWriteMasters(XAUI_INDEX_C);
+   mAxilWriteSlaves(XAUI_INDEX_C) <= ethWriteSlave;
 
    ---------------------------------------
    -- Map the AXI-Lite to DDR PHY Firmware
@@ -554,9 +554,9 @@ begin
    -------------------------------------------
    -- Map the AXI-Lite to Application Firmware
    -------------------------------------------
-   regReadMaster                 <= mAxilReadMasters(APP_INDEX_C);
-   mAxilReadSlaves(APP_INDEX_C)  <= regReadSlave;
-   regWriteMaster                <= mAxilWriteMasters(APP_INDEX_C);
-   mAxilWriteSlaves(APP_INDEX_C) <= regWriteSlave;
+   appReadMaster                 <= mAxilReadMasters(APP_INDEX_C);
+   mAxilReadSlaves(APP_INDEX_C)  <= appReadSlave;
+   appWriteMaster                <= mAxilWriteMasters(APP_INDEX_C);
+   mAxilWriteSlaves(APP_INDEX_C) <= appWriteSlave;
 
 end mapping;

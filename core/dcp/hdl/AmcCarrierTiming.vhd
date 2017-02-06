@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-03
+-- Last update: 2017-02-05
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ use work.AxiPkg.all;
 use work.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
-use work.AmcCarrierRegPkg.all;
+use work.AmcCarrierSysRegPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -94,6 +94,7 @@ architecture mapping of AmcCarrierTiming is
    signal timingRefClk   : sl;
    signal timingRecClkGt : sl;
    signal timingRecClk   : sl;
+   signal timingClockSel : sl;
 
    -- Rx ports
    signal rxReset        : sl;
@@ -286,7 +287,7 @@ begin
          appTimingRst    => appTimingRst,
          appTimingBus    => appBus,
          timingPhy       => coreTimingPhy,
-         timingClkSel    => timingClkSel,
+         timingClkSel    => timingClockSel,
          axilClk         => axilClk,
          axilRst         => axilRst,
          axilReadMaster  => axilReadMasters(0),
@@ -305,5 +306,11 @@ begin
    appTimingBus.stream  <= appBus.stream;
    appTimingBus.v1      <= appBus.v1;
    appTimingBus.v2      <= appBus.v2;
+
+   U_timingClkSel : OBUF
+      port map (
+         I => timingClockSel,
+         O => timingClkSel);
+
 
 end mapping;
