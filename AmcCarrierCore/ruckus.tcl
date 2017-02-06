@@ -7,6 +7,7 @@ loadSource      -path "$::DIR_PATH/core/AmcCarrierPkg.vhd"
 loadSource      -path "$::DIR_PATH/core/AmcCarrierSysMon.vhd"
 loadSource      -path "$::DIR_PATH/core/AmcCarrierSysReg.vhd"
 loadSource      -path "$::DIR_PATH/core/AmcCarrierSysRegPkg.vhd"
+loadConstraints -dir  "$::DIR_PATH/xdc/"
 
 loadSource      -path "$::DIR_PATH/ip/SysMonCore.dcp"
 # loadIpCore    -path "$::DIR_PATH/ip/SysMonCore.xci"
