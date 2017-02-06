@@ -1,8 +1,0 @@
-vhdl work rtl/AmcStriplineBpmDualCore.vhd
-vhdl work rtl/AmcStriplineBpmCore.vhd
-vhdl work rtl/AmcBpmCtrl.vhd 
-vhdl work rtl/AmcBpmDacVcoSpi.vhd
-
-vhdl work rtl/BpmPkg.vhd
-vhdl work rtl/cal_seq.vhd
-vhdl work rtl/pulse_delay20.vhd
