@@ -1,6 +1,7 @@
-# Load RUCKUS environment and library
-source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
-
-# Load local Source Code and constraints
-loadSource      -dir "$::DIR_PATH/rtl/"
-loadConstraints -dir "$::DIR_PATH/xdc/"
+puts "\n\n\n\n"
+puts "ERROR: $::DIR_PATH not supported yet."
+puts "       If this is a priority: please make JIRA ticket with"
+puts "       your support request and include a due data and charge#"
+puts "       https://jira.slac.stanford.edu/projects/ESLCOMMON/"
+puts "\n\n\n\n"
+exit -1

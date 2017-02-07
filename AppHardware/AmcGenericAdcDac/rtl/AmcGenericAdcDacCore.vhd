@@ -378,7 +378,7 @@ begin
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          ADDRESS_SIZE_G    => 15,
          DATA_SIZE_G       => 8,
-         CLK_PERIOD_G      => getRealDiv(1, AXI_CLK_FREQ_G),
+         CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
          SPI_SCLK_PERIOD_G => 1.0E-6)
       port map (
          axiClk         => axilClk,
@@ -409,7 +409,7 @@ begin
             AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
             ADDRESS_SIZE_G    => 15,
             DATA_SIZE_G       => 8,
-            CLK_PERIOD_G      => getRealDiv(1, AXI_CLK_FREQ_G),
+            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
             SPI_SCLK_PERIOD_G => 1.0E-6)
          port map (
             axiClk         => axilClk,
@@ -433,7 +433,7 @@ begin
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          ADDRESS_SIZE_G    => 7,
          DATA_SIZE_G       => 16,
-         CLK_PERIOD_G      => getRealDiv(1, AXI_CLK_FREQ_G),
+         CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
          SPI_SCLK_PERIOD_G => 1.0E-6)
       port map (
          axiClk         => axilClk,

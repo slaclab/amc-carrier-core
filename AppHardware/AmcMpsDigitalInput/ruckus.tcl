@@ -7,10 +7,10 @@ loadSource -dir "$::DIR_PATH/rtl/"
 # Load AMC BAY[0] constraints files
 set rootName [file rootname [file tail $::DIR_PATH]]
 if { $::AMC_TYPE_BAY0 == ${rootName} } {
-   loadConstraints -path "$::DIR_PATH/xdc/AmcEmptyBay0Pinout.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/AmcMpsDigitalInputBay0Pinout.xdc"
 }
 
 # Load AMC BAY[1] constraints files
 if { $::AMC_TYPE_BAY1 == ${rootName} } {
-   loadConstraints -path "$::DIR_PATH/xdc/AmcEmptyBay1Pinout.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/AmcMpsDigitalInputBay1Pinout.xdc"
 }

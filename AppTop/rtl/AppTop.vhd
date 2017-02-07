@@ -146,6 +146,7 @@ entity AppTop is
       rtmHsRxN             : in    sl;
       rtmHsTxP             : out   sl;
       rtmHsTxN             : out   sl;
+      -- RTM's Clock Reference 
       genClkP              : in    sl;
       genClkN              : in    sl);
 end AppTop;
@@ -539,6 +540,7 @@ begin
          rtmHsRxN            => rtmHsRxN,
          rtmHsTxP            => rtmHsTxP,
          rtmHsTxN            => rtmHsTxN,
+         -- RTM's Clock Reference 
          genClkP             => genClkP,
          genClkN             => genClkN);
 
