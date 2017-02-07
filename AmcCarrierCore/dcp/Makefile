@@ -6,8 +6,7 @@ target: dcp
 export PRJ_PART = XCKU040-FFVA1156-2-E
 
 # Override the defaults
-export TOP_DIR = $(abspath $(PROJ_DIR)/../../..)
-export MODULES = $(TOP_DIR)
+export TOP_DIR = $(abspath $(PROJ_DIR)/../../../..)
 export PROJECT = AmcCarrierCore
 
 # Use top level makefile
