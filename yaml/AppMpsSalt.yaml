@@ -1,22 +1,23 @@
 ##############################################################################
-## This file is part of 'SLAC Firmware Standard Library'.
+## This file is part of 'LCLS2 Common Carrier Core'.
 ## It is subject to the license terms in the LICENSE.txt file found in the 
 ## top-level directory of this distribution and at: 
 ##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'SLAC Firmware Standard Library', including this file, 
+## No part of 'LCLS2 Common Carrier Core', including this file, 
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once AmcCarrierMpsPhy.yaml
+#once AppMpsSalt.yaml
 
-AmcCarrierMpsPhy: &AmcCarrierMpsPhy
-  name: AmcCarrierMpsPhy
+AppMpsSalt: &AppMpsSalt
+  name: AppMpsSalt
   description: AmcCarrier MPS PHY Module
   class: MMIODev
   configPrio: 1
-  size: 0x400
+  size: 0x1000
   children:
+    #########################################################
     MpsTxLinkUpCnt:
       at:
         offset: 0x000
@@ -25,8 +26,8 @@ AmcCarrierMpsPhy: &AmcCarrierMpsPhy
       mode: RO
       sizeBits: 32
       description: MPS TX LinkUp Counter
-    MpsRxLinkUpCnt:
     #########################################################
+    MpsRxLinkUpCnt:
       at:
         offset: 0x004
         stride: 4
@@ -36,68 +37,50 @@ AmcCarrierMpsPhy: &AmcCarrierMpsPhy
       mode: RO
       sizeBits: 32
       description: MPS RX LinkUp Counter[13:0]
-    MpsTxLinkUP:
     #########################################################
+    MpsTxLinkUP:
       at:
-        offset: 0x100
+        offset: 0x700
       class: IntField
       name: MpsTxLinkUP
       mode: RO
       lsBit: 0
       sizeBits: 1
       description: MPS TX LinkUp
-    MpsRxLinkUP:
     #########################################################
+    MpsRxLinkUP:
       at:
-        offset: 0x100
+        offset: 0x700
       class: IntField
       name: MpsRxLinkUP
       mode: RO
       lsBit: 1
       sizeBits: 14
       description: MPS TX LinkUp[13:0]
-    MPS_SLOT_G:
     #########################################################
+    MPS_SLOT_G:
       at:
-        offset: 0x104
+        offset: 0x704
       class: IntField
       name: MPS_SLOT_G
       mode: RO
       lsBit: 0
       sizeBits: 1
       description: MPS_SLOT_G
-    TimeStrbRate:
     #########################################################
-      at:
-        offset: 0x108
-      class: IntField
-      name: TimeStrbRate
-      mode: RO
-      sizeBits: 32
-      description: Time Strobe Rate (units of Hz)
-    DiagnosticClkFreq:
-    #########################################################
-      at:
-        offset: 0x10C
-      class: IntField
-      name: DiagnosticClkFreq
-      mode: RO
-      sizeBits: 32
-      description: Diagnostic Clock Frequency (units of Hz)
     APP_TYPE_G:
-    #########################################################
       at:
-        offset: 0x110
+        offset: 0x708
       class: IntField
       name: APP_TYPE_G
       mode: RO
       lsBit: 0
       sizeBits: 7
       description: See AmcCarrierPkg.vhd for defination
-    MPS_CHANNELS_C:
     #########################################################
+    MPS_CHANNELS_C:
       at:
-        offset: 0x114
+        offset: 0x70C
       class: IntField
       name: MPS_CHANNELS_C
       mode: RO
@@ -106,97 +89,60 @@ AmcCarrierMpsPhy: &AmcCarrierMpsPhy
     MPS_THRESHOLD_C:
     #########################################################
       at:
-        offset: 0x118
+        offset: 0x710
       class: IntField
       name: MPS_THRESHOLD_C
       mode: RO
       sizeBits: 32
       description: Number of MPS Thresholds
-    BP_MSG_CHANNELS_C:
     #########################################################
-      at:
-        offset: 0x11C
-      class: IntField
-      name: BP_MSG_CHANNELS_C
-      mode: RO
-      sizeBits: 32
-      description: Number of backplane messaging Thresholds
-    AppId:
-    #########################################################
-      at:
-        offset: 0x120
-      class: IntField
-      name: AppId
-      mode: RO
-      sizeBits: 16
-      description: Application ID
     MpsPllLocked:
-    #########################################################
       at:
-        offset: 0x124
+        offset: 0x714
       class: IntField
       name: MpsPllLocked
       mode: RO
       lsBit: 0
       sizeBits: 1
       description: MPS PLL Lock Status
-    MpsEnable:
     #########################################################
+    MpsEnable:
       at:
-        offset: 0x200
+        offset: 0x800
       class: IntField
       name: MpsEnable
       mode: RW
       lsBit: 0
       sizeBits: 1
       description: MPS Enable Flag
-    MpsTestMode:
     #########################################################
+    MpsTestMode:
       at:
-        offset: 0x204
+        offset: 0x804
       class: IntField
       name: MpsTestMode
       mode: RW
       lsBit: 0
       sizeBits: 1
       description: MPS Test Mode Flag
-    BpMsgEnable:
     #########################################################
-      at:
-        offset: 0x208
-      class: IntField
-      name: BpMsgEnable
-      mode: RW
-      lsBit: 0
-      sizeBits: 1
-      description: BP_MSG Enable Flag
-    BpMsgTestMode:
-    #########################################################
-      at:
-        offset: 0x20C
-      class: IntField
-      name: BpMsgTestMode
-      mode: RW
-      lsBit: 0
-      sizeBits: 1
-      description: BP_MSG Test Mode Flag
     RollOverEn:
-    #########################################################
       at:
-        offset: 0x3F0
+        offset: 0xFF0
       class: IntField
       name: RollOverEn
       mode: RW
       lsBit: 0
       sizeBits: 15
       description: Status Counter Roll Over Enable
-    CntRst:
     #########################################################
+    CntRst:
       at:
-        offset: 0x3FC
+        offset: 0xFF4
       class: IntField
       name: CntRst
       mode: WO
       lsBit: 0
       sizeBits: 1
       description: Status Counter Reset
+    #########################################################

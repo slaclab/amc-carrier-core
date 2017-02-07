@@ -8,20 +8,20 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once AmcCarrierMps.yaml
-#include AmcCarrierMpsPhy.yaml
+#once AppMps.yaml
+#include AppMpsSalt.yaml
 
-AmcCarrierMps: &AmcCarrierMps 
-  name: AmcCarrierMps
-  description: AmcCarrierMps
+AppMps: &AppMps 
+  name: AppMps
+  description: AppMps
   class: MMIODev
   size: 0x01000000 
   ########
   children:
   ########
     ##################################################
-    AmcCarrierMpsPhy:
-      <<: *AmcCarrierMpsPhy
+    AppMpsSalt:
+      <<: *AppMpsSalt
       at:
-        offset: 0x00010000
+        offset: 0x00000000
     ##################################################

@@ -13,7 +13,7 @@ loadSource      -path "$::DIR_PATH/ip/SysMonCore.dcp"
 # loadIpCore    -path "$::DIR_PATH/ip/SysMonCore.xci"
 
 # Check for advance build, which bypasses the pre-built .DCP file
-if { $::AMC_ADV_BUILD  == 1 } {
+if {  $::env(AMC_ADV_BUILD)  == 1 } {
    loadSource -path "$::DIR_PATH/core/AmcCarrierCoreAdv.vhd"
    loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierCore.vhd"
    loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierEth.vhd"
@@ -28,7 +28,7 @@ if { $::AMC_ADV_BUILD  == 1 } {
 }
 
 # Check if using zone2 or zone3 ETH interface
-if { $::RTM_ETH  == 1 } {
+if {  $::env(RTM_ETH)  == 1 } {
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone3Eth.xdc" 
 } else {
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone2Eth.xdc" 

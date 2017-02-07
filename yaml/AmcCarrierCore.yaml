@@ -23,7 +23,7 @@
 #include UdpEngineServer.yaml
 #include RssiCore.yaml
 #include AxiMemTester.yaml
-#include AmcCarrierMps.yaml
+#include AppMps.yaml
 #include AxiCdcm6208.yaml
 
 AmcCarrierCore: &AmcCarrierCore 
@@ -138,61 +138,37 @@ AmcCarrierCore: &AmcCarrierCore
       at:
         offset: 0x09000000    
     ##################################################
-    EthMacPhy:
-      <<: *EthMacPhy
-      at:
-        offset: 0x0A000000  
-      instantiate: false
-    ##################################################
     UdpEngineClient:
       <<: *UdpEngineClient
       at:
-        offset: 0x0A010000
-        nelms: 2
+        offset: 0x0A000000
+        nelms: 1
         stride: 8
       description: "ClientConfig[1:0]"
     ##################################################
     UdpEngineServer:
       <<: *UdpEngineServer
       at:
-        offset: 0x0A010800
-        nelms: 5
+        offset: 0x0A000800
+        nelms: 4
         stride: 8
       description: "ServerConfig[4:0]"      
     ##################################################
     RssiServerSw:
       <<: *RssiCore
       at:
-        offset: 0x0A020000 
+        offset: 0x0A010000 
         nelms: 2
         stride: 0x1000   
       description: Server RSSI Software
-    ##################################################
-    RssiServerBp:
-      <<: *RssiCore
-      at:
-        offset: 0x0A030000     
-        nelms: 2
-        stride: 0x2000
-      description: "Server RSSI BP_MSG[1:0]"
-      instantiate: false
-    ##################################################
-    RssiClientBp:
-      <<: *RssiCore
-      at:
-        offset: 0x0A031000    
-        nelms: 2
-        stride: 0x2000
-      description: "Client RSSI BP_MSG[1:0]"
-      instantiate: false
     ##################################################
     AxiMemTester:
       <<: *AxiMemTester
       at:
         offset: 0x0B000000  
     ##################################################   
-    AmcCarrierMps:
-      <<: *AmcCarrierMps
+    AppMps:
+      <<: *AppMps
       at:
         offset: 0x0C000000   
     ##################################################   
