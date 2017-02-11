@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-16
+-- Last update: 2017-02-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ entity AppTopJesd204b is
       stableClk       : in  sl;  -- GT needs a stable clock to "boot up"(buffered refClkDiv2) 
       refClk          : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer   
       devClk_i        : in  sl;         -- Device clock also rxUsrClkIn for MGT
-      devClk2_i       : in  sl;         -- Device clock divided by 2 also rxUsrClk2In for MGT       
+      devClk2_i       : in  sl;  -- Device clock divided by 2 also rxUsrClk2In for MGT       
       devRst_i        : in  sl;         -- 
       devClkActive_i  : in  sl := '1';  -- devClk_i MCMM locked      
       -- GTH Ports
@@ -183,8 +183,9 @@ architecture mapping of AppTopJesd204b is
    signal s_dataValidVec  : slv(6 downto 0)             := (others => '0');
    signal s_sampleDataArr : sampleDataArray(6 downto 0) := (others => (others => '0'));
 
-   signal s_cdrStable : sl;
-   
+   signal s_cdrStable  : sl;
+   signal dummyZeroBit : sl;
+
 begin
 
    dataValidVec_o  <= s_dataValidVec;
@@ -222,8 +223,13 @@ begin
             nSync_o           => nSync_o,
             pulse_o           => open,
             leds_o            => open);
-      s_gtRxReset                           <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
+      s_gtRxReset <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
    end generate;
+   
+   TERM_UNUSED : if (JESD_RX_LANE_G /= 7) generate
+      s_dataValidVec(6 downto JESD_RX_LANE_G)  <= (others => dummyZeroBit);
+      s_sampleDataArr(6 downto JESD_RX_LANE_G) <= (others => (others => dummyZeroBit));
+   end generate;   
 
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
@@ -236,8 +242,8 @@ begin
             axiReadMaster  => rxReadMaster,
             axiReadSlave   => rxReadSlave,
             axiWriteMaster => rxWriteMaster,
-            axiWriteSlave  => rxWriteSlave);   
-      s_gtRxReset <= devRst_i;
+            axiWriteSlave  => rxWriteSlave);
+      s_gtRxReset     <= devRst_i;
    end generate;
 
    ---------------
@@ -270,7 +276,7 @@ begin
             r_jesdGtTxArr        => r_jesdGtTxArr(JESD_TX_LANE_G-1 downto 0),
             pulse_o              => open,
             leds_o               => open);
-      s_gtTxReset                           <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
+      s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
    end generate;
 
    BYP_TX_CORE : if (JESD_TX_LANE_G = 0) generate
@@ -284,7 +290,7 @@ begin
             axiReadMaster  => txReadMaster,
             axiReadSlave   => txReadSlave,
             axiWriteMaster => txWriteMaster,
-            axiWriteSlave  => txWriteSlave);  
+            axiWriteSlave  => txWriteSlave);
       s_gtTxReset <= devRst_i;
    end generate;
 
@@ -325,20 +331,21 @@ begin
    -- GTH RX signals
    -----------------
    RX_LANES_GEN : for i in 6 downto 0 generate
-      r_jesdGtRxArr(i).data    <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
-      r_jesdGtRxArr(i).dataK   <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
-      r_jesdGtRxArr(i).dispErr <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
-      r_jesdGtRxArr(i).decErr  <= s_rxctrl3(i*8+GT_WORD_SIZE_C-1 downto i*8);
-      r_jesdGtRxArr(i).rstDone <= s_rxDone;
+      r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
+      r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
+      r_jesdGtRxArr(i).dispErr   <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
+      r_jesdGtRxArr(i).decErr    <= s_rxctrl3(i*8+GT_WORD_SIZE_C-1 downto i*8);
+      r_jesdGtRxArr(i).rstDone   <= s_rxDone;
       r_jesdGtRxArr(i).cdrStable <= s_cdrStable;
-      s_devClkVec(i)           <= devClk_i;
-      s_devClk2Vec(i)          <= devClk2_i;
-      s_stableClkVec(i)        <= stableClk;
-      s_gtRefClkVec(i)         <= refClk;
-      s_allignEnVec(i)         <= not(s_dataValidVec(i));
+      s_devClkVec(i)             <= devClk_i;
+      s_devClk2Vec(i)            <= devClk2_i;
+      s_stableClkVec(i)          <= stableClk;
+      s_gtRefClkVec(i)           <= refClk;
+      s_allignEnVec(i)           <= not(s_dataValidVec(i));
    end generate RX_LANES_GEN;
 
    s_gtResetAll <= s_gtTxReset or s_gtRxReset;
+   dummyZeroBit <= devRst_i and s_txDone and s_rxDone;
 
    U_Coregen : AppTopJesd204bCoregen
       port map (

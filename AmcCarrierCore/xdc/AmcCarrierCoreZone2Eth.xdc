@@ -30,9 +30,9 @@ set_property PACKAGE_PIN R3  [get_ports {ethTxN[3]}]
 set_property PACKAGE_PIN P2  [get_ports {ethRxP[3]}]
 set_property PACKAGE_PIN P1  [get_ports {ethRxN[3]}]
 
-#############################
-## Core Timing Constraints ##
-#############################
+# #############################
+# ## Core Timing Constraints ##
+# #############################
 
 create_generated_clock -name ethPhyClk    [get_pins -hier -filter {name =~ U_Core/U_Core/U_Eth/ETH_ZONE2.U_Xaui/XauiGthUltraScale_Inst/*/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
 

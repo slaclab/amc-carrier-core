@@ -1,6 +1,12 @@
 # Load RUCKUS environment and library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
+## Check for version 2016.4 of Vivado
+if { [VersionCheck 2016.4] < 0 } {
+   close_project
+   exit -1
+}
+
 # Check if required variables exist
 if { [info exists ::env(AMC_ADV_BUILD)] != 1 } {
    puts "\n\nERROR: AMC_ADV_BUILD is not defined in $::env(PROJ_DIR)/Makefile\n\n"; exit -1

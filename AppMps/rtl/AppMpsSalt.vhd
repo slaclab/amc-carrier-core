@@ -118,8 +118,8 @@ begin
       U_SaltUltraScale : entity work.SaltUltraScale
          generic map (
             TPD_G               => TPD_G,
-            TX_ENABLE_G         => true,
-            RX_ENABLE_G         => false,
+            TX_ENABLE_G         => true,-- TX only
+            RX_ENABLE_G         => false,-- Not using RX path
             COMMON_TX_CLK_G     => false,
             COMMON_RX_CLK_G     => false,
             SLAVE_AXI_CONFIG_G  => MPS_CONFIG_C,
@@ -129,14 +129,14 @@ begin
             txP           => mpsTxP,
             txN           => mpsTxN,
             -- RX Serial Stream
-            rxP           => mpsBusRxP(1),
-            rxN           => mpsBusRxN(1),
+            rxP           => '0',-- Not using RX path
+            rxN           => '1',-- Not using RX path
             -- Reference Signals
             clk125MHz     => mps125MHzClk,
             rst125MHz     => mps125MHzRst,
             clk312MHz     => mps312MHzClk,
             clk625MHz     => mps625MHzClk,
-            iDelayCtrlRdy => iDelayCtrlRdy,
+            iDelayCtrlRdy => '1',-- Not using RX path
             linkUp        => mpsTxLinkUp,
             -- Slave Port
             sAxisClk      => axilClk,
@@ -150,7 +150,7 @@ begin
             mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);
 
       GEN_VEC :
-      for i in 14 downto 2 generate
+      for i in 14 downto 1 generate
          U_IBUFDS : IBUFDS
             generic map (
                DIFF_TERM => true)

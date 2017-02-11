@@ -17,22 +17,6 @@ set_property PACKAGE_PIN T6 [get_ports {fabClkP}]
 set_property PACKAGE_PIN T5 [get_ports {fabClkN}]
 
 # ETH Ports
-set_property PACKAGE_PIN AA4 [get_ports {ethTxP[0]}]
-set_property PACKAGE_PIN AA3 [get_ports {ethTxN[0]}]
-set_property PACKAGE_PIN Y2  [get_ports {ethRxP[0]}]
-set_property PACKAGE_PIN Y1  [get_ports {ethRxN[0]}]
-set_property PACKAGE_PIN W4  [get_ports {ethTxP[1]}]
-set_property PACKAGE_PIN W3  [get_ports {ethTxN[1]}]
-set_property PACKAGE_PIN V2  [get_ports {ethRxP[1]}]
-set_property PACKAGE_PIN V1  [get_ports {ethRxN[1]}]
-set_property PACKAGE_PIN U4  [get_ports {ethTxP[2]}]
-set_property PACKAGE_PIN U3  [get_ports {ethTxN[2]}]
-set_property PACKAGE_PIN T2  [get_ports {ethRxP[2]}]
-set_property PACKAGE_PIN T1  [get_ports {ethRxN[2]}]
-set_property PACKAGE_PIN R4  [get_ports {ethTxP[3]}]
-set_property PACKAGE_PIN R3  [get_ports {ethTxN[3]}]
-set_property PACKAGE_PIN P2  [get_ports {ethRxP[3]}]
-set_property PACKAGE_PIN P1  [get_ports {ethRxN[3]}]
 set_property PACKAGE_PIN V6  [get_ports {ethClkP}]
 set_property PACKAGE_PIN V5  [get_ports {ethClkN}]
 
@@ -222,76 +206,3 @@ set_property -dict { PACKAGE_PIN C16 IOSTANDARD SSTL15     OUTPUT_IMPEDANCE RDRV
 set_property -dict { PACKAGE_PIN K17 IOSTANDARD LVCMOS15 } [get_ports {ddrPwrEnL}] 
 set_property -dict { PACKAGE_PIN K18 IOSTANDARD LVCMOS15 } [get_ports {ddrAlertL}] 
 set_property -dict { PACKAGE_PIN J15 IOSTANDARD LVCMOS15 } [get_ports {ddrPg}] 
-
-#####################################
-## Core Area/Placement Constraints ##
-#####################################
-
-#############################
-## Core Timing Constraints ##
-#############################
- 
-set_property CLOCK_DEDICATED_ROUTE FALSE    [get_nets -hier -filter {NAME =~ *U_DdrMem/refClock}]
-set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets -hier -filter {NAME =~ *U_DdrMem/refClkBufg}]
-
-create_clock -name ddrClkIn   -period  5.000  [get_pins -hier -filter {NAME =~ *U_DdrMem/BUFG_Inst/O}]
-create_clock -name fabClk     -period  6.400  [get_ports {fabClkP}]
-create_clock -name ethRef     -period  6.400  [get_ports {ethClkP}]
-create_clock -name timingRef  -period  2.691  [get_ports {timingRefClkInP}]
-
-create_generated_clock -name axilClk      [get_pins -hier -filter {NAME =~ *U_AmcCorePll/PllGen.U_Pll/CLKOUT0}] 
-create_generated_clock -name ethPhyClk    [get_pins -hier -filter {NAME =~ *U_Eth/ETH_ZONE2.U_Xaui/XauiGthUltraScale_Inst/*/gthe3_channel_gen.gen_gthe3_channel_inst[0].GTHE3_CHANNEL_PRIM_INST/TXOUTCLK}]
-create_generated_clock -name ddrIntClk0   [get_pins -hier -filter {NAME =~ *U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
-create_generated_clock -name ddrIntClk1   [get_pins -hier -filter {NAME =~ *U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT6}]
-create_generated_clock -name recTimingClk [get_pins -hier -filter {NAME =~ *U_Timing/TimingGthCoreWrapper_1/LOCREF_G.U_TimingGthCore/*/RXOUTCLK}]  
-
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethPhyClk}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ddrClkIn}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ddrIntClk1}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks -include_generated_clocks {timingRef}]
-set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {axilClk}] 
-set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks {ddrIntClk0}]
-set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks {ddrIntClk1}]
-
-################################
-## Wrapper Timing Constraints ##
-################################
-
-create_generated_clock -name jesd0_185MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
-create_generated_clock -name jesd0_370MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
-create_generated_clock -name jesd1_185MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
-create_generated_clock -name jesd1_370MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
-
-create_generated_clock -name mpsClk625MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT0}] 
-create_generated_clock -name mpsClk312MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT1}] 
-create_generated_clock -name mpsClk125MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT2}] 
-
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk00}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk01}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk02}] 
-
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk10}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk11}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk12}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_185MHz}] -group [get_clocks {jesd1_370MHz}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {recTimingClk}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {axilClk}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {recTimingClk}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {axilClk}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {recTimingClk}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {axilClk}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd1_370MHz}] -group [get_clocks {recTimingClk}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd1_370MHz}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd1_370MHz}] -group [get_clocks {axilClk}] 
-
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {mpsClk125MHz}] 

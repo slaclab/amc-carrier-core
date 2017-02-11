@@ -338,44 +338,18 @@ create_clock -name jesdClk02 -period 5.405 [get_ports {jesdClkP[0][2]}]
 create_clock -name jesdClk10 -period 5.405 [get_ports {jesdClkP[1][0]}]
 create_clock -name jesdClk11 -period 5.405 [get_ports {jesdClkP[1][1]}]
 create_clock -name jesdClk12 -period 5.405 [get_ports {jesdClkP[1][2]}]
+create_clock -name mpsClkP   -period 8.000 [get_ports {mpsClkIn}]
+
+create_generated_clock -name mpsClk625MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT0}] 
+create_generated_clock -name mpsClk312MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT1}] 
+create_generated_clock -name mpsClk125MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT2}] 
 
 create_generated_clock -name jesd0_185MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 create_generated_clock -name jesd0_370MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
 create_generated_clock -name jesd1_185MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 create_generated_clock -name jesd1_370MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk00}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk01}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk02}] 
-
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk10}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk11}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk12}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd1_185MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd1_370MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd0_370MHz}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_185MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_370MHz}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {jesd1_370MHz}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {recTimingClk}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {axilClk}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {recTimingClk}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {axilClk}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {recTimingClk}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {axilClk}] 
-
-set_clock_groups -asynchronous -group [get_clocks {jesd1_370MHz}] -group [get_clocks {recTimingClk}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd1_370MHz}] -group [get_clocks {ddrIntClk0}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd1_370MHz}] -group [get_clocks {axilClk}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_185MHz}] -group [get_clocks {jesd1_370MHz}] 
 
 ##########################
 ## Misc. Configurations ##

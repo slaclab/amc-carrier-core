@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-06
+-- Last update: 2017-02-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -185,6 +185,7 @@ architecture mapping of AmcCarrierCore is
    signal fabRst  : sl;
    signal axiClk  : sl;
    signal axiRst  : sl;
+   signal reset   : sl;
    signal axilClk : sl;
    signal axilRst : sl;
    signal auxPwrL : sl;
@@ -239,7 +240,7 @@ begin
          clk    => fabClk,
          rstOut => fabRst);
 
-   U_Pll : entity work.ClockManagerUltraScale
+   U_AmcCorePll : entity work.ClockManagerUltraScale
       generic map(
          TPD_G             => TPD_G,
          TYPE_G            => "PLL",
@@ -260,7 +261,13 @@ begin
          -- Clock Outputs
          clkOut(0) => axilClk,
          -- Reset Outputs
-         rstOut(0) => axilRst);
+         rstOut(0) => reset);
+
+   -- Forcing BUFG for reset that's used everywhere      
+   U_BUFG : BUFG
+      port map (
+         I => reset,
+         O => axilRst);
 
    ------------------
    -- Ethernet Module

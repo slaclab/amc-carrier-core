@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-06
+-- Last update: 2017-02-10
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -265,11 +265,13 @@ begin
          CLK_PERIOD_G     => 6.4E-9,
          XIL_DEVICE_G     => "ULTRASCALE",
          EN_DEVICE_DNA_G  => true,
+         USE_SLOWCLK_G    => true,
          EN_DS2411_G      => false,
          EN_ICAP_G        => false,
          AUTO_RELOAD_EN_G => false)
       port map (
          -- AXI-Lite Interface
+         slowClk        => axilClk,
          axiClk         => axilClk,
          axiRst         => axilRst,
          upTimeCnt      => upTimeCnt,
@@ -307,9 +309,11 @@ begin
 
    U_Iprog : entity work.Iprog
       generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => "ULTRASCALE")
+         TPD_G         => TPD_G,
+         USE_SLOWCLK_G => true,
+         XIL_DEVICE_G  => "ULTRASCALE")
       port map (
+         slowClk     => axilClk,
          clk         => axilClk,
          rst         => axilRst,
          start       => bootstart,

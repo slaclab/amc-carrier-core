@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-05
+-- Last update: 2017-02-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -92,64 +92,66 @@ architecture mapping of AmcCarrierDdrMem is
 
    component MigCore
       port (
-         c0_init_calib_complete  : out   std_logic;
+         sys_rst                 : in    std_logic;
          c0_sys_clk_i            : in    std_logic;
-         c0_ddr3_addr            : out   std_logic_vector(15 downto 0);
-         c0_ddr3_ba              : out   std_logic_vector(2 downto 0);
-         c0_ddr3_cas_n           : out   std_logic;
-         c0_ddr3_cke             : out   std_logic_vector(1 downto 0);
-         c0_ddr3_ck_n            : out   std_logic_vector(1 downto 0);
-         c0_ddr3_ck_p            : out   std_logic_vector(1 downto 0);
-         c0_ddr3_cs_n            : out   std_logic_vector(1 downto 0);
-         c0_ddr3_dm              : out   std_logic_vector(7 downto 0);
-         c0_ddr3_dq              : inout std_logic_vector(63 downto 0);
-         c0_ddr3_dqs_n           : inout std_logic_vector(7 downto 0);
-         c0_ddr3_dqs_p           : inout std_logic_vector(7 downto 0);
-         c0_ddr3_odt             : out   std_logic_vector(1 downto 0);
+         c0_ddr3_addr            : out   std_logic_vector (15 downto 0);
+         c0_ddr3_ba              : out   std_logic_vector (2 downto 0);
          c0_ddr3_ras_n           : out   std_logic;
-         c0_ddr3_reset_n         : out   std_logic;
+         c0_ddr3_cas_n           : out   std_logic;
          c0_ddr3_we_n            : out   std_logic;
+         c0_ddr3_cke             : out   std_logic_vector (1 downto 0);
+         c0_ddr3_odt             : out   std_logic_vector (1 downto 0);
+         c0_ddr3_cs_n            : out   std_logic_vector (1 downto 0);
+         c0_ddr3_ck_p            : out   std_logic_vector (1 downto 0);
+         c0_ddr3_ck_n            : out   std_logic_vector (1 downto 0);
+         c0_ddr3_reset_n         : out   std_logic;
+         c0_ddr3_dm              : out   std_logic_vector (7 downto 0);
+         c0_ddr3_dq              : inout std_logic_vector (63 downto 0);
+         c0_ddr3_dqs_p           : inout std_logic_vector (7 downto 0);
+         c0_ddr3_dqs_n           : inout std_logic_vector (7 downto 0);
+         c0_init_calib_complete  : out   std_logic;
          c0_ddr3_ui_clk          : out   std_logic;
          c0_ddr3_ui_clk_sync_rst : out   std_logic;
+         dbg_clk                 : out   std_logic;
          c0_ddr3_aresetn         : in    std_logic;
-         c0_ddr3_s_axi_awid      : in    std_logic_vector(3 downto 0);
-         c0_ddr3_s_axi_awaddr    : in    std_logic_vector(32 downto 0);
-         c0_ddr3_s_axi_awlen     : in    std_logic_vector(7 downto 0);
-         c0_ddr3_s_axi_awsize    : in    std_logic_vector(2 downto 0);
-         c0_ddr3_s_axi_awburst   : in    std_logic_vector(1 downto 0);
-         c0_ddr3_s_axi_awlock    : in    std_logic_vector(0 downto 0);
-         c0_ddr3_s_axi_awcache   : in    std_logic_vector(3 downto 0);
-         c0_ddr3_s_axi_awprot    : in    std_logic_vector(2 downto 0);
-         c0_ddr3_s_axi_awqos     : in    std_logic_vector(3 downto 0);
+         c0_ddr3_s_axi_awid      : in    std_logic_vector (3 downto 0);
+         c0_ddr3_s_axi_awaddr    : in    std_logic_vector (32 downto 0);
+         c0_ddr3_s_axi_awlen     : in    std_logic_vector (7 downto 0);
+         c0_ddr3_s_axi_awsize    : in    std_logic_vector (2 downto 0);
+         c0_ddr3_s_axi_awburst   : in    std_logic_vector (1 downto 0);
+         c0_ddr3_s_axi_awlock    : in    std_logic_vector (0 to 0);
+         c0_ddr3_s_axi_awcache   : in    std_logic_vector (3 downto 0);
+         c0_ddr3_s_axi_awprot    : in    std_logic_vector (2 downto 0);
+         c0_ddr3_s_axi_awqos     : in    std_logic_vector (3 downto 0);
          c0_ddr3_s_axi_awvalid   : in    std_logic;
          c0_ddr3_s_axi_awready   : out   std_logic;
-         c0_ddr3_s_axi_wdata     : in    std_logic_vector(511 downto 0);
-         c0_ddr3_s_axi_wstrb     : in    std_logic_vector(63 downto 0);
+         c0_ddr3_s_axi_wdata     : in    std_logic_vector (511 downto 0);
+         c0_ddr3_s_axi_wstrb     : in    std_logic_vector (63 downto 0);
          c0_ddr3_s_axi_wlast     : in    std_logic;
          c0_ddr3_s_axi_wvalid    : in    std_logic;
          c0_ddr3_s_axi_wready    : out   std_logic;
          c0_ddr3_s_axi_bready    : in    std_logic;
-         c0_ddr3_s_axi_bid       : out   std_logic_vector(3 downto 0);
-         c0_ddr3_s_axi_bresp     : out   std_logic_vector(1 downto 0);
+         c0_ddr3_s_axi_bid       : out   std_logic_vector (3 downto 0);
+         c0_ddr3_s_axi_bresp     : out   std_logic_vector (1 downto 0);
          c0_ddr3_s_axi_bvalid    : out   std_logic;
-         c0_ddr3_s_axi_arid      : in    std_logic_vector(3 downto 0);
-         c0_ddr3_s_axi_araddr    : in    std_logic_vector(32 downto 0);
-         c0_ddr3_s_axi_arlen     : in    std_logic_vector(7 downto 0);
-         c0_ddr3_s_axi_arsize    : in    std_logic_vector(2 downto 0);
-         c0_ddr3_s_axi_arburst   : in    std_logic_vector(1 downto 0);
-         c0_ddr3_s_axi_arlock    : in    std_logic_vector(0 downto 0);
-         c0_ddr3_s_axi_arcache   : in    std_logic_vector(3 downto 0);
-         c0_ddr3_s_axi_arprot    : in    std_logic_vector(2 downto 0);
-         c0_ddr3_s_axi_arqos     : in    std_logic_vector(3 downto 0);
+         c0_ddr3_s_axi_arid      : in    std_logic_vector (3 downto 0);
+         c0_ddr3_s_axi_araddr    : in    std_logic_vector (32 downto 0);
+         c0_ddr3_s_axi_arlen     : in    std_logic_vector (7 downto 0);
+         c0_ddr3_s_axi_arsize    : in    std_logic_vector (2 downto 0);
+         c0_ddr3_s_axi_arburst   : in    std_logic_vector (1 downto 0);
+         c0_ddr3_s_axi_arlock    : in    std_logic_vector (0 to 0);
+         c0_ddr3_s_axi_arcache   : in    std_logic_vector (3 downto 0);
+         c0_ddr3_s_axi_arprot    : in    std_logic_vector (2 downto 0);
+         c0_ddr3_s_axi_arqos     : in    std_logic_vector (3 downto 0);
          c0_ddr3_s_axi_arvalid   : in    std_logic;
          c0_ddr3_s_axi_arready   : out   std_logic;
          c0_ddr3_s_axi_rready    : in    std_logic;
+         c0_ddr3_s_axi_rid       : out   std_logic_vector (3 downto 0);
+         c0_ddr3_s_axi_rdata     : out   std_logic_vector (511 downto 0);
+         c0_ddr3_s_axi_rresp     : out   std_logic_vector (1 downto 0);
          c0_ddr3_s_axi_rlast     : out   std_logic;
          c0_ddr3_s_axi_rvalid    : out   std_logic;
-         c0_ddr3_s_axi_rresp     : out   std_logic_vector(1 downto 0);
-         c0_ddr3_s_axi_rid       : out   std_logic_vector(3 downto 0);
-         c0_ddr3_s_axi_rdata     : out   std_logic_vector(511 downto 0);
-         sys_rst                 : in    std_logic);
+         dbg_bus                 : out   std_logic_vector (511 downto 0));
    end component;
 
    signal ddrWriteMaster : AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
@@ -245,6 +247,8 @@ begin
 
    MigCore_Inst : MigCore
       port map (
+         dbg_clk                 => open,
+         dbg_bus                 => open,
          c0_init_calib_complete  => ddrCalDone,
          c0_sys_clk_i            => refClkBufg,
          c0_ddr3_addr            => ddrA,
