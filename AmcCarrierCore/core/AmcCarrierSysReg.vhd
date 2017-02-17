@@ -38,7 +38,8 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierSysReg is
    generic (
-      TPD_G            : time            := 1 ns;
+      TPD_G            : time    := 1 ns;
+      BUILD_INFO_G     : BuildInfoType;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
       TIMING_MODE_G    : boolean         := false;  -- false = Normal Operation, = LCLS-I timing only
@@ -261,6 +262,7 @@ begin
    U_Version : entity work.AxiVersion
       generic map (
          TPD_G            => TPD_G,
+         BUILD_INFO_G     => BUILD_INFO_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          CLK_PERIOD_G     => 6.4E-9,
          XIL_DEVICE_G     => "ULTRASCALE",

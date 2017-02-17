@@ -37,6 +37,7 @@ use unisim.vcomponents.all;
 entity AmcCarrierCoreBase is
    generic (
       TPD_G         : time    := 1 ns;
+      BUILD_INFO_G  : BuildInfoType;
       SIM_SPEEDUP_G : boolean := false;  -- false = Normal Operation, true = simulation
       APP_TYPE_G    : AppType;
       MPS_SLOT_G    : boolean := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
@@ -814,6 +815,7 @@ begin
    U_SysReg : entity work.AmcCarrierSysReg
       generic map (
          TPD_G            => TPD_G,
+         BUILD_INFO_G     => BUILD_INFO_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          APP_TYPE_G       => APP_TYPE_G,
          FSBL_G           => false)

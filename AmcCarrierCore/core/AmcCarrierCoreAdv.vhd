@@ -37,6 +37,7 @@ use unisim.vcomponents.all;
 entity AmcCarrierCoreAdv is
    generic (
       TPD_G             : time    := 1 ns;
+      BUILD_INFO_G      : BuildInfoType;
       SIM_SPEEDUP_G     : boolean := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G     : boolean := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
       RTM_ETH_G         : boolean := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
@@ -229,6 +230,7 @@ begin
    U_SysReg : entity work.AmcCarrierSysReg
       generic map (
          TPD_G            => TPD_G,
+         BUILD_INFO_G     => BUILD_INFO_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          APP_TYPE_G       => APP_TYPE_G,
          FSBL_G           => false)
