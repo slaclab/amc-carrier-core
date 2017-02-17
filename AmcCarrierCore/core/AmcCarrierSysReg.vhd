@@ -491,6 +491,7 @@ begin
    U_Bsi : entity work.AmcCarrierBsi
       generic map (
          TPD_G            => TPD_G,
+         BUILD_INFO_G     => BUILD_INFO_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
          -- DDR Memory Status

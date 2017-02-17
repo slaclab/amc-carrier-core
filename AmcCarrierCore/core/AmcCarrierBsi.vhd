@@ -29,7 +29,6 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.i2cPkg.all;
 use work.AmcCarrierPkg.all;
-use work.Version.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -37,6 +36,7 @@ use unisim.vcomponents.all;
 entity AmcCarrierBsi is
    generic (
       TPD_G            : time            := 1 ns;
+      BUILD_INFO_G     : BuildInfoType;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- DDR Memory Status
@@ -66,6 +66,8 @@ end AmcCarrierBsi;
 
 architecture rtl of AmcCarrierBsi is
 
+   constant BUILD_INFO_C       : BuildInfoRetType := toBuildInfo(BUILD_INFO_G);
+
    constant BSI_MAJOR_VERSION_C : slv(7 downto 0) := x"01";
    constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"02";
 
@@ -75,11 +77,9 @@ architecture rtl of AmcCarrierBsi is
 
    function makeStringRom return RomType is
       variable ret : RomType := (others => (others => '0'));
-      variable c   : character;
    begin
-      for i in BUILD_STAMP_C'range loop
-         c      := BUILD_STAMP_C(i);
-         ret(i) := toSlv(character'pos(c), 8);
+      for i in 0 to 255 loop
+         ret(i) := BUILD_INFO_C.buildString(i/4)(8*(i mod 4)+7 downto 8*(i mod 4)); 
       end loop;
       return ret;
    end function makeStringRom;
@@ -323,20 +323,20 @@ begin
             when x"F7" => v.bootAddr(15 downto 8)  := ramData;
             when x"F6" => v.bootAddr(7 downto 0)   := ramData;
             ---------------------------------------
-            -- Check for FPGA_VERSION_C
+            -- Check for BUILD_INFO_C.fwVersion
             ---------------------------------------            
             when x"F5" =>
                v.we      := '1';
-               v.ramData := FPGA_VERSION_C(31 downto 24);
+               v.ramData := BUILD_INFO_C.fwVersion(31 downto 24);
             when x"F4" =>
                v.we      := '1';
-               v.ramData := FPGA_VERSION_C(23 downto 16);
+               v.ramData := BUILD_INFO_C.fwVersion(23 downto 16);
             when x"F3" =>
                v.we      := '1';
-               v.ramData := FPGA_VERSION_C(15 downto 8);
+               v.ramData := BUILD_INFO_C.fwVersion(15 downto 8);
             when x"F2" =>
                v.we      := '1';
-               v.ramData := FPGA_VERSION_C(7 downto 0);
+               v.ramData := BUILD_INFO_C.fwVersion(7 downto 0);
             ---------------------------------------
             -- Check for DDR Memory Status
             ---------------------------------------               
