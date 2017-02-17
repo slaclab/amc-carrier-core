@@ -9,7 +9,6 @@ loadRuckusTcl $::env(PROJ_DIR)/../../BsaCore
 # Load target's source code and constraints
 loadSource      -dir  "$::DIR_PATH/hdl/"
 loadConstraints -dir  "$::DIR_PATH/hdl/"
-loadSource      -path "$::DIR_PATH/Version.vhd"
 loadSource      -path "$::DIR_PATH/../core/AmcCarrierPkg.vhd"
 loadSource      -path "$::DIR_PATH/../core/AmcCarrierSysRegPkg.vhd"
 
