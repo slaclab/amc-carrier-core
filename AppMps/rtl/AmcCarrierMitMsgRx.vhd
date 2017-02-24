@@ -98,10 +98,18 @@ begin
             v := REG_INIT_C;
 
             -- Get message Latch Diag
-            v.mitMessage.latchDiag  := mpsMaster.tData(0);
+            v.mitMessage.latchDiag  := mpsMaster.tData(14);
 
-            -- Detect error
-            v.intError := not ssiGetUserSof(MPS_CONFIG_C,mpsMaster);
+            -- Detect error:
+            -- Check mitigation flag
+            -- Check message size
+            -- Check SOF
+            if (mpsMaster.tData(15) /= '1'                            or 
+                mpsMaster.tData(7 downto 0) /= x"0E"                  or 
+                ssiGetUserSof(MPS_CONFIG_C,mpsMaster) /= '1'       
+            ) then
+               v.intError := '1';
+            end if;
 
             if mpsMaster.tValid = '1' then
                if mpsMaster.tLast = '1' then

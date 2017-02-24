@@ -132,17 +132,17 @@ package AmcCarrierPkg is
 
    type MpsMitigationMsgType is record
       strobe    : sl;                      -- valid
+      latchDiag : sl;                      -- latch the beam diagnostics with 'tag' 
+      tag       : slv(15 downto 0);      
       timeStamp : slv(15 downto 0);
-      latchDiag : sl;                      -- latch the beam diagnostics with 'tag'
-      tag       : slv(15 downto 0);
       class     : Slv4Array(15 downto 0);  -- power class limits for each of 16 destinations
    end record;
 
    constant MPS_MITIGATION_MSG_INIT_C : MpsMitigationMsgType := (
       strobe    => '0',
-      timeStamp => (others => '0'),
       latchDiag => '0',
-      tag       => (others => '0'),
+      tag       => (others => '0'),      
+      timeStamp => (others => '0'),
       class     => (others => (others => '0')));
 
    function toSlv (m                : MpsMitigationMsgType) return slv;
@@ -150,10 +150,10 @@ package AmcCarrierPkg is
 
    type MpsMessageType is record
       valid     : sl;
+      lcls      : sl; -- '0' LCLS-II, '1' LCLS-I
+      inputType : sl; -- '0' Digital, '1' Analog      
       timeStamp : slv(15 downto 0);
-      testMode  : sl;
       appId     : slv(15 downto 0);
-      appType   : AppType;
       message   : Slv8Array(31 downto 0);
       msgSize   : slv(7 downto 0);      -- In units of Bytes
    end record;
@@ -162,10 +162,10 @@ package AmcCarrierPkg is
 
    constant MPS_MESSAGE_INIT_C : MpsMessageType := (
       valid     => '0',
+      lcls      => '0',    
+      inputType => '0',      
       timeStamp => (others => '0'),
-      testMode  => '0',
       appId     => (others => '0'),
-      appType   => (others => '0'),
       message   => (others => (others => '0')),
       msgSize   => (others => '0'));
 
@@ -336,9 +336,9 @@ package body AmcCarrierPkg is
       variable i      : integer                               := 0;
    begin
       assignSlv(i, vector, m.strobe);
+      assignSlv(i, vector, m.latchDiag);      
+      assignSlv(i, vector, m.tag);      
       assignSlv(i, vector, m.timeStamp);
-      assignSlv(i, vector, m.latchDiag);
-      assignSlv(i, vector, m.tag);
 
       for j in 0 to 15 loop
          assignslv(i, vector, m.class(j));
@@ -352,9 +352,9 @@ package body AmcCarrierPkg is
       variable i : integer := 0;
    begin
       assignrecord(i, vec, m.strobe);
-      assignRecord(i, vec, m.timeStamp);
       assignrecord(i, vec, m.latchDiag);
-      assignrecord(i, vec, m.tag);
+      assignrecord(i, vec, m.tag);      
+      assignRecord(i, vec, m.timeStamp);
 
       for j in 0 to 15 loop
          assignrecord(i, vec, m.class(j));
@@ -368,15 +368,16 @@ package body AmcCarrierPkg is
       variable i      : integer                            := 0;
    begin
       assignSlv(i, vector, m.valid);
-      assignSlv(i, vector, m.timeStamp);
-      assignSlv(i, vector, m.testMode);
+      assignSlv(i, vector, m.lcls);
+      assignSlv(i, vector, m.inputType);      
+      assignSlv(i, vector, m.msgSize);      
       assignSlv(i, vector, m.appId);
-
+      assignSlv(i, vector, m.timeStamp);
+      
       for j in 0 to 31 loop
          assignSlv(i, vector, m.message(j));
       end loop;
 
-      assignSlv(i, vector, m.msgSize);
       return vector;
    end function;
 
@@ -385,15 +386,16 @@ package body AmcCarrierPkg is
       variable i : integer := 0;
    begin
       assignRecord(i, vec, m.valid);
+      assignRecord(i, vec, m.lcls);
+      assignRecord(i, vec, m.inputType);
+      assignRecord(i, vec, m.msgSize);
+      assignRecord(i, vec, m.appId);      
       assignRecord(i, vec, m.timeStamp);
-      assignRecord(i, vec, m.testMode);
-      assignRecord(i, vec, m.appId);
 
       for j in 0 to 31 loop
          assignRecord(i, vec, m.message(j));
       end loop;
 
-      assignRecord(i, vec, m.msgSize);
       return m;
    end function;
 
