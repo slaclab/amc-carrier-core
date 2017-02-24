@@ -175,7 +175,6 @@ architecture mapping of AppTop is
    signal trigCascBay : slv(2 downto 0);
    signal armCascBay  : slv(2 downto 0);
    signal trigHw      : slv(1 downto 0);
-   signal userTrig    : slv(1 downto 0);
    signal freezeHw    : slv(1 downto 0);
 
    signal jesdClk    : slv(1 downto 0);
@@ -265,8 +264,6 @@ begin
    armCascBay(2)  <= armCascBay(0);     -- to make cross and use generate
 
    U_AmcBay : for i in 1 downto 0 generate
-
-      trigHw(i) <= evrTrig.trigPulse(0) or userTrig(i);
 
       ------------------
       -- DAQ MUXV2 Module
@@ -451,7 +448,7 @@ begin
          -- DaqMux/Trig Interface (timingClk domain) 
          freezeHw            => freezeHw,
          evrTrig             => evrTrig,
-         userTrig            => userTrig,
+         trigHw              => trigHw,
          -- JESD SYNC Interface (jesdClk[1:0] domain)
          jesdSysRef          => jesdSysRef,
          jesdRxSync          => jesdRxSync,

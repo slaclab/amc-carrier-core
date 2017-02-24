@@ -85,7 +85,7 @@ set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {sysRefN[0][3]}]; #attn2A[
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {sysRefP[0][3]}]; #attn2A[0][3] P11 PIN112
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncInN[0][3]}]; #attn2A[0][4] P11 PIN114
                                                                    
-set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncInP [0][3]}]; #attn2B[0][0] P11 PIN115
+set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncInP[0][3]}]; #attn2B[0][0] P11 PIN115
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][0]}]; #attn2B[0][1] P11 PIN117
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][0]}]; #attn2B[0][2] P11 PIN118
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][1]}]; #attn2B[0][3] P11 PIN120

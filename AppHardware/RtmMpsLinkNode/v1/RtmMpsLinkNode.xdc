@@ -83,47 +83,47 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[24]}] ; #din[24]
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[24]}] ; #din[24]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[25]}] ; #din[25]
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[25]}] ; #din[25]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[25]}] ; #din[25]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[25]}] ; #din[25]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[26]}] ; #din[26]
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[26]}] ; #din[26]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[26]}] ; #din[26]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[26]}] ; #din[26]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[27]}] ; #din[27]
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[27]}] ; #din[27]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[27]}] ; #din[27]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[27]}] ; #din[27]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[28]}] ; #din[28]
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[28]}] ; #din[28]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[28]}] ; #din[28]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[28]}] ; #din[28]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[29]}] ; #din[29]
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[29]}] ; #din[29]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[29]}] ; #din[29]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[29]}] ; #din[29]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[30]}] ; #din[30]
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[30]}] ; #din[30]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[30]}] ; #din[30]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[30]}] ; #din[30]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[31]}] ; #din[31]
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[31]}] ; #din[31]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsP[31]}] ; #din[31]
+set_property -dict { IOSTANDARD LVDS_25 DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN[31]}] ; #din[31]
 
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[32]}] ; #dout[0]
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[32]}] ; #dout[0]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[32]}] ; #dout[0]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[32]}] ; #dout[0]
 
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[33]}] ; #dout[1]
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[33]}] ; #dout[1]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[33]}] ; #dout[1]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[33]}] ; #dout[1]
 
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[34]}] ; #dout[2]
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[34]}] ; #dout[2]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[34]}] ; #dout[2]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[34]}] ; #dout[2]
 
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[35]}] ; #dout[3]
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[35]}] ; #dout[3]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[35]}] ; #dout[3]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[35]}] ; #dout[3]
 
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[36]}] ; #dout[4]
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[36]}] ; #dout[4]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[36]}] ; #dout[4]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[36]}] ; #dout[4]
 
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[37]}] ; #dout[5]
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[37]}] ; #dout[5]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[37]}] ; #dout[5]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[37]}] ; #dout[5]
 
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[38]}] ; #dout[6]
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[38]}] ; #dout[6]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[38]}] ; #dout[6]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[38]}] ; #dout[6]
 
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[39]}] ; #dout[7]
-set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[39]}] ; #dout[7]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[39]}] ; #dout[7]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[39]}] ; #dout[7]

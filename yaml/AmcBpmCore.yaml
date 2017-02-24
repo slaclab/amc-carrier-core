@@ -18,64 +18,54 @@ AmcBpmCore: &AmcBpmCore
   description: Generic ADC/DAC AMC Core
   class: MMIODev
   configPrio: 1
-  size: 0x01000000
+  size: 0x00080000
   ########
   children:
   ########
-    Lmk04828:
-      <<: *Lmk04828
-      at:
-        offset: 0x00000000 
-    ##################################################     
-    Adc16Dx370:
-      <<: *Adc16Dx370
-      at:
-        offset: 0x00100000 
-        nelms: 2
-        stride: 0x00100000              
     ##################################################     
     AmcBpmCtrl:
       <<: *AmcBpmCtrl
       at:
-        offset: 0x00400000       
-    ##################################################
-    AxiLiteRingBuffer:
+        offset: 0x00000000              
+    ##################################################     
+    Lmk04828:
+      <<: *Lmk04828
       at:
-        offset: 0x00500000       
-        nelms: 4
-        stride: 0x00100000      
-      size: 0x00100000   
-      class: MMIODev
-      configPrio: 1  
-      children:
-        MemoryArray:
-          <<: *MemoryArray
-          at:
-            offset: 0x0
-            nelms: 0x200        
-          mode: RO
-      instantiate: false
-    ##################################################
-    # InitAmcCard:
-      # description: Initialization for AMC card's JESD modules
-      # at:
-        # offset: 0x0
-      # class: SequenceCommand
-      # sequence:
-        # # Put the RX's GTs into RESET
-        # - entry: JesdRx/ResetGTs
-          # value: 0x1        
-        # # Calibrate the JESD ADCs
-        # - entry: Adc16Dx370/CalibrateAdc
-          # value: 0x1       
-        # # 1000 ms sleep
-        # - entry: usleep
-          # value: 1000000  
+        offset: 0x00020000 
+    ##################################################     
+    Adc16Dx370:
+      <<: *Adc16Dx370
+      at:
+        offset: 0x00040000 
+        stride: 0x00020000              
+        nelms: 2
+    ##################################################  
+    InitAmcCard:
+      description: Initialization for AMC card's JESD modules
+      at:
+        offset: 0x0
+      class: SequenceCommand
+      sequence:
+                    
+        # Calibrate the JESD ADCs
+        - entry: Adc16Dx370/CalibrateAdc
+          value: 0x1       
+        # 100 ms sleep
+        - entry: usleep
+          value: 100000       
 
-        # # Release the RX's GTs RESET
-        # - entry: JesdRx/ResetGTs
-          # value: 0x0
-        # # Clear errors to have a fresh start
-        # - entry: JesdRx/ClearRxErrors
-          # value: 0x1       
+        # Power up the LMK's SYSREF
+        - entry: Lmk04828/PwrUpSysRef
+          value: 0x1       
+        # 1000 ms sleep
+        - entry: usleep
+          value: 1000000          
+
+        # Clear the Alarms
+        - entry: Lmk04828/InitLmk          
+          value: 0x1 
+                    
+        # Reset status counters
+        - entry: AmcBpmCtrl/CntRst          
+          value: 0x1           
     ##################################################
