@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
--- File       : AmcMpsDigitalInputCore.vhd
+-- File       : RtmMpsLinkNode.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-06
--- Last update: 2017-02-06
+-- Created    : 2017-02-23
+-- Last update: 2017-02-23
 -------------------------------------------------------------------------------
--- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_06_CXX
+-- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_07_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -21,13 +21,17 @@ use ieee.std_logic_1164.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 
-entity AmcMpsDigitalInputCore is
+library unisim;
+use unisim.vcomponents.all;
+
+entity RtmMpsLinkNode is
    generic (
       TPD_G            : time            := 1 ns;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
-      -- MPS Digital Inputs
-      amcMpsDin       : out   slv(31 downto 0);
+      -- Digital I/O Interface
+      dout            : in    slv(7 downto 0);
+      din             : out   slv(31 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -38,34 +42,53 @@ entity AmcMpsDigitalInputCore is
       -----------------------
       -- Application Ports --
       -----------------------      
-      -- AMC's JTAG Ports
-      jtagPri         : inout slv(4 downto 0);
-      jtagSec         : inout slv(4 downto 0);
-      -- AMC's FPGA Clock Ports
-      fpgaClkP        : inout slv(1 downto 0);
-      fpgaClkN        : inout slv(1 downto 0);
-      -- AMC's System Reference Ports
-      sysRefP         : inout slv(3 downto 0);
-      sysRefN         : inout slv(3 downto 0);
-      -- AMC's Sync Ports
-      syncInP         : inout slv(3 downto 0);
-      syncInN         : inout slv(3 downto 0);
-      syncOutP        : inout slv(9 downto 0);
-      syncOutN        : inout slv(9 downto 0);
-      -- AMC's Spare Ports
-      spareP          : inout slv(15 downto 0);
-      spareN          : inout slv(15 downto 0));
-end AmcMpsDigitalInputCore;
+      -- RTM's Low Speed Ports
+      rtmLsP          : inout slv(53 downto 0);
+      rtmLsN          : inout slv(53 downto 0);
+      --  RTM's Clock Reference
+      genClkP         : in    sl;
+      genClkN         : in    sl);
+end RtmMpsLinkNode;
 
-architecture mapping of AmcMpsDigitalInputCore is
+architecture mapping of RtmMpsLinkNode is
+
+   signal doutL : slv(7 downto 0);
+   signal dinL  : slv(31 downto 0);
 
 begin
 
-   GEN_VEC :
+   din   <= not(dinL);
+   doutL <= not(dout);
+
+   GEN_DIN :
    for i in 15 downto 0 generate
-      amcMpsDin(i+0)  <= spareP(i);
-      amcMpsDin(i+16) <= spareN(i);
+
+      U_IBUF_P : IBUF
+         port map (
+            I => rtmLsP(i+0),
+            O => dinL(i+0));
+
+      U_IBUF_N : IBUF
+         port map (
+            I => rtmLsN(i+0),
+            O => dinL(i+16));
+
    end generate GEN_VEC;
+
+   GEN_VEC :
+   for i in 3 downto 0 generate
+
+      U_OBUF_P : OBUF
+         port map (
+            I => doutL((2*i)+0),
+            O => rtmLsP(i+16));
+
+      U_OBUF_N : OBUF
+         port map (
+            I => doutL((2*i)+1),
+            O => rtmLsN(i+16));
+
+   end generate GEN_DOUT;
 
    U_AxiLiteEmpty : entity work.AxiLiteEmpty
       generic map (
