@@ -2,7 +2,7 @@
 -- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-12-05
+-- Last update: 2017-02-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ package AmcCarrierPkg is
    -- BSA configuration
    -------------------------------------------------------------------------------------------------
    constant BSA_BUFFERS_C            : integer := 64;
-   constant BSA_DIAGNOSTIC_OUTPUTS_C : integer := 28;
+   constant BSA_DIAGNOSTIC_OUTPUTS_C : integer := 31;
    constant BSA_STREAM_BYTE_WIDTH_C  : integer := 8;
    constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data
 
@@ -136,15 +136,19 @@ package AmcCarrierPkg is
    type DiagnosticBusType is record
       strobe        : sl;
       data          : Slv32Array(31 downto 0);
+      sevr          : Slv2Array (31 downto 0); -- (0=NONE, 1=MINOR, 2=MAJOR, 3=INVALID)
+      fixed         : slv       (31 downto 0); -- do not add/average (static)
       timingMessage : TimingMessageType;
    end record;
    type DiagnosticBusArray is array (natural range <>) of DiagnosticBusType;
    constant DIAGNOSTIC_BUS_INIT_C : DiagnosticBusType := (
       strobe        => '0',
       data          => (others => (others => '0')),
+      sevr          => (others => (others => '0')),
+      fixed         => (others => '0'),
       timingMessage => TIMING_MESSAGE_INIT_C);
 
-   constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*32 + TIMING_MESSAGE_BITS_C;
+   constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*35 + TIMING_MESSAGE_BITS_C;
 
    function toSlv (b             : DiagnosticBusType) return slv;
    function toDiagnosticBus (vec : slv) return DiagnosticBusType;
@@ -160,7 +164,9 @@ package body AmcCarrierPkg is
       vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
       i                                        := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
-         assignSlv(i, vector, b.data(j));
+         assignSlv(i, vector, b.data (j));
+         assignSlv(i, vector, b.sevr (j));
+         assignSlv(i, vector, b.fixed(j));
       end loop;
       assignSlv(i, vector, b.strobe);
       return vector;
@@ -173,7 +179,9 @@ package body AmcCarrierPkg is
       b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
       i               := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
-         assignRecord(i, vec, b.data(j));
+         assignRecord(i, vec, b.data (j));
+         assignRecord(i, vec, b.sevr (j));
+         assignRecord(i, vec, b.fixed(j));
       end loop;
       assignRecord(i, vec, b.strobe);
       return b;
