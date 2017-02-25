@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
 -- File       : AmcCarrierEth.vhd
--- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2017-02-06
--- Platform   : 
--- Standard   : VHDL'93/02
+-- Last update: 2017-02-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -35,9 +30,10 @@ use work.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierEth is
    generic (
-      TPD_G            : time            := 1 ns;
-      RTM_ETH_G        : boolean         := false;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G                 : time            := 1 ns;
+      RTM_ETH_G             : boolean         := false;
+      ETH_USR_FRAME_LIMIT_G : positive        := 4096;  -- 4kB
+      AXI_ERROR_RESP_G      : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration and status
       localMac            : in  slv(47 downto 0);  --  big-Endian configuration
@@ -357,9 +353,10 @@ begin
    -----------------------------------------------
    U_RssiServer : entity work.AmcCarrierRssi
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr)
+         TPD_G                 => TPD_G,
+         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
+         AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G       => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr)
       port map (
          -- Slave AXI-Lite Interface
          axilClk          => axilClk,
@@ -400,7 +397,7 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => 1.0E-3,
-         FRAME_LIMIT_G       => (1024/16),  -- 1kB limit
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
@@ -429,7 +426,7 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => 1.0E-3,
-         FRAME_LIMIT_G       => (1024/16),  -- 1kB limit
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,

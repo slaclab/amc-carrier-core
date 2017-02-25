@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
 -- File       : AmcCarrierRssi.vhd
--- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2016-09-02
--- Platform   : 
--- Standard   : VHDL'93/02
+-- Last update: 2017-02-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -34,9 +29,10 @@ use work.AmcCarrierPkg.all;
 
 entity AmcCarrierRssi is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G                 : time             := 1 ns;
+      ETH_USR_FRAME_LIMIT_G : positive         := 4096;  -- 4kB
+      AXI_ERROR_RESP_G      : slv(1 downto 0)  := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G       : slv(31 downto 0) := (others => '0'));
    port (
       -- Slave AXI-Lite Interface
       axilClk          : in  sl;
@@ -237,12 +233,12 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (4096/16),  -- 4kB limit
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
          SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)      
+         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
@@ -253,7 +249,7 @@ begin
          mAxisClk    => axilClk,
          mAxisRst    => axilRst,
          mAxisMaster => rssiIbMasters(4),
-         mAxisSlave  => rssiIbSlaves(4));   
+         mAxisSlave  => rssiIbSlaves(4));
 
    ------------------------------
    -- Software's RSSI Server@8194

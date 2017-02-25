@@ -7,9 +7,15 @@ if { $::env(RTM_INTF)  == "Version1" } {
    loadSource      -dir "$::DIR_PATH/v1/"
    loadConstraints -dir "$::DIR_PATH/v1/"
 } elseif { $::env(RTM_INTF)  == "Version2" } {
-
-   puts "\n\n RTM_INTF = Version2 not supported yet.\n\n"
-   exit -1
+   
+   puts "\n\n\n\n"
+   puts "ERROR: RTM_INTF = Version2 not supported yet."
+   puts "       If this is a priority: please make JIRA ticket with"
+   puts "       your support request and include a due data and charge#"
+   puts "       https://jira.slac.stanford.edu/projects/ESLCOMMON/"
+   puts "\n\n\n\n"
+   exit -1   
+   
 
    loadSource      -dir "$::DIR_PATH/v2/"
    loadConstraints -dir "$::DIR_PATH/v2/"

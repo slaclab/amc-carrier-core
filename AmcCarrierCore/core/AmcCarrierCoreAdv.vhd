@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
 -- File       : AmcCarrierCoreAdv.vhd
--- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-02-06
--- Platform   : 
--- Standard   : VHDL'93/02
+-- Last update: 2017-02-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -36,16 +31,17 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierCoreAdv is
    generic (
-      TPD_G             : time    := 1 ns;
-      BUILD_INFO_G      : BuildInfoType;
-      SIM_SPEEDUP_G     : boolean := false;  -- false = Normal Operation, true = simulation
-      DISABLE_BSA_G     : boolean := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
-      RTM_ETH_G         : boolean := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
-      TIME_GEN_APP_G    : boolean := false;  -- false = normal application, true = timing generator application
-      TIME_GEN_EXTREF_G : boolean := false;  -- false = normal application, true = timing generator using external reference
-      FSBL_G            : boolean := false;  -- false = Normal Operation, true = First Stage Boot loader
-      APP_TYPE_G        : AppType;
-      MPS_SLOT_G        : boolean := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      TPD_G                 : time     := 1 ns;
+      BUILD_INFO_G          : BuildInfoType;
+      SIM_SPEEDUP_G         : boolean  := false;  -- false = Normal Operation, true = simulation
+      DISABLE_BSA_G         : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
+      RTM_ETH_G             : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
+      TIME_GEN_APP_G        : boolean  := false;  -- false = normal application, true = timing generator application
+      TIME_GEN_EXTREF_G     : boolean  := false;  -- false = normal application, true = timing generator using external reference
+      FSBL_G                : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
+      APP_TYPE_G            : AppType;
+      ETH_USR_FRAME_LIMIT_G : positive := 4096;   -- 4kB  
+      MPS_SLOT_G            : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -352,13 +348,14 @@ begin
    -------------------
    U_Core : entity work.AmcCarrierCore
       generic map (
-         TPD_G             => TPD_G,
-         SIM_SPEEDUP_G     => SIM_SPEEDUP_G,
-         DISABLE_BSA_G     => DISABLE_BSA_G,
-         RTM_ETH_G         => RTM_ETH_G,
-         TIME_GEN_APP_G    => TIME_GEN_APP_G,
-         TIME_GEN_EXTREF_G => TIME_GEN_EXTREF_G,
-         FSBL_G            => FSBL_G)
+         TPD_G                 => TPD_G,
+         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
+         SIM_SPEEDUP_G         => SIM_SPEEDUP_G,
+         DISABLE_BSA_G         => DISABLE_BSA_G,
+         RTM_ETH_G             => RTM_ETH_G,
+         TIME_GEN_APP_G        => TIME_GEN_APP_G,
+         TIME_GEN_EXTREF_G     => TIME_GEN_EXTREF_G,
+         FSBL_G                => FSBL_G)
       port map (
          -----------------------
          -- Core Ports to AppTop

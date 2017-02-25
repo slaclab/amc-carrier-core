@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
 -- File       : AmcCarrierCore.vhd
--- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-10
--- Platform   : 
--- Standard   : VHDL'93/02
+-- Last update: 2017-02-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -36,13 +31,14 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierCore is
    generic (
-      TPD_G             : time    := 1 ns;
-      SIM_SPEEDUP_G     : boolean := false;  -- false = Normal Operation, true = simulation
-      DISABLE_BSA_G     : boolean := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
-      RTM_ETH_G         : boolean := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
-      TIME_GEN_APP_G    : boolean := false;  -- false = normal application, true = timing generator application
-      TIME_GEN_EXTREF_G : boolean := false;  -- false = normal application, true = timing generator using external reference
-      FSBL_G            : boolean := false);  -- false = Normal Operation, true = First Stage Boot loader
+      TPD_G                 : time     := 1 ns;
+      ETH_USR_FRAME_LIMIT_G : positive := 4096;   -- 4kB      
+      SIM_SPEEDUP_G         : boolean  := false;  -- false = Normal Operation, true = simulation
+      DISABLE_BSA_G         : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
+      RTM_ETH_G             : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
+      TIME_GEN_APP_G        : boolean  := false;  -- false = normal application, true = timing generator application
+      TIME_GEN_EXTREF_G     : boolean  := false;  -- false = normal application, true = timing generator using external reference
+      FSBL_G                : boolean  := false);  -- false = Normal Operation, true = First Stage Boot loader
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -274,9 +270,10 @@ begin
    ------------------
    U_Eth : entity work.AmcCarrierEth
       generic map (
-         TPD_G            => TPD_G,
-         RTM_ETH_G        => RTM_ETH_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
+         TPD_G                 => TPD_G,
+         RTM_ETH_G             => RTM_ETH_G,
+         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
+         AXI_ERROR_RESP_G      => AXI_ERROR_RESP_C)
       port map (
          -- Local Configuration
          localMac            => localMac,
