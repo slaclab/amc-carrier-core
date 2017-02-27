@@ -2,9 +2,9 @@
 -- File       : RtmRfInterlock.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-17
--- Last update: 2017-02-24
+-- Last update: 2017-02-27
 -------------------------------------------------------------------------------
--- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_CXX         
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C00
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 LLRF Development'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -74,16 +74,17 @@ architecture mapping of RtmRfInterlock is
    signal hsAdcDataClkN  : sl;
    signal hsAdcClkP      : sl;
    signal hsAdcClkN      : sl;
+   signal hsAdcTest      : sl;
    -- Thresholds SPI
    signal klyThrCs       : sl;
    signal modThrCs       : sl;
-   signal potSclk        : sl;
+   signal potSck         : sl;
    signal potSdi         : sl;
    signal potSdiL        : sl;
    -- Low Speed ADC SPI
    signal adcCnv         : sl;
    signal adcCnvL        : sl;
-   signal adcSclk        : sl;
+   signal adcSck         : sl;
    signal adcSdi         : sl;
    signal adcSdo         : sl;
    -- CPLD SPI
@@ -121,15 +122,21 @@ begin
    rtmLsP(8)      <= hsAdcClkP;
    rtmLsN(8)      <= hsAdcClkN;
 
+   U_fastTest : OBUFDS
+      port map (
+         I  => hsAdcTest,
+         O  => rtmLsP(34),
+         OB => rtmLsN(34));
+
    U_potSdiL : OBUFDS
       port map (
          I  => potSdiL,
          O  => rtmLsP(35),
          OB => rtmLsN(35));
 
-   U_potSclk : OBUFDS
+   U_potSck : OBUFDS
       port map (
-         I  => potSclk,
+         I  => potSck,
          O  => rtmLsP(36),
          OB => rtmLsN(36));
 
@@ -151,9 +158,9 @@ begin
          O  => rtmLsP(40),
          OB => rtmLsN(40));
 
-   U_adcSclk : OBUFDS
+   U_adcSck : OBUFDS
       port map (
-         I  => adcSclk,
+         I  => adcSck,
          O  => rtmLsP(41),
          OB => rtmLsN(41));
 
@@ -241,13 +248,13 @@ begin
          IB => rtmLsN(48),
          O  => fault);
 
-   U_fault : IBUFDS
+   U_rfOff : IBUFDS
       generic map (
          DIFF_TERM => true)
       port map (
          I  => rtmLsP(5),               -- 47 -> 5 (changed due to DRC)
          IB => rtmLsN(5),               -- 47 -> 5 (changed due to DRC)
-         O  => fault);
+         O  => rfOff);
 
    U_faultClear : OBUFDS
       port map (
@@ -300,14 +307,15 @@ begin
          hsAdcDataClkN   => hsAdcDataClkN,
          hsAdcClkP       => hsAdcClkP,
          hsAdcClkN       => hsAdcClkN,
+         hsAdcTest       => hsAdcTest,
          -- Thresholds SPI
          klyThrCs        => klyThrCs,
          modThrCs        => modThrCs,
-         potSclk         => potSclk,
+         potSck          => potSck,
          potSdi          => potSdi,
          -- Low Speed ADC SPI
          adcCnv          => adcCnv,
-         adcSclk         => adcSclk,
+         adcSck          => adcSck,
          adcSdi          => adcSdi,
          adcSdo          => adcSdo,
          -- CPLD SPI

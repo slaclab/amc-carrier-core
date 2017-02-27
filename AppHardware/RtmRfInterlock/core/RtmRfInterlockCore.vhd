@@ -2,7 +2,7 @@
 -- File       : RtmRfInterlockCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-17
--- Last update: 2017-02-24
+-- Last update: 2017-02-27
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_CXX
 ------------------------------------------------------------------------------
@@ -60,14 +60,15 @@ entity RtmRfInterlockCore is
       hsAdcDataClkN   : in  sl;
       hsAdcClkP       : out sl;
       hsAdcClkN       : out sl;
+      hsAdcTest       : out sl;
       -- Thresholds SPI
       klyThrCs        : out sl;
       modThrCs        : out sl;
-      potSclk         : out sl;
+      potSck          : out sl;
       potSdi          : out sl;
       -- Low Speed ADC SPI
       adcCnv          : out sl;
-      adcSclk         : out sl;
+      adcSck          : out sl;
       adcSdi          : out sl;
       adcSdo          : in  sl;
       -- CPLD SPI
@@ -75,9 +76,6 @@ entity RtmRfInterlockCore is
       cpldSck         : out sl;
       cpldSdi         : out sl;
       cpldSdo         : in  sl;
-      -- Timing triggers
-      stndbyTrig      : out sl;
-      accelTrig       : out sl;
       -- SLED and MODE
       detuneSled      : out sl;
       tuneSled        : out sl;
@@ -173,6 +171,8 @@ architecture mapping of RtmRfInterlockCore is
 
 
 begin
+
+   hsAdcTest <= '0';
 
    --------------------
    -- AXI-Lite Crossbar
@@ -314,9 +314,9 @@ begin
 
    -- Output mux
    with s_csbVec select
-      potSclk <= s_sclkVec(0) when "10",
-      s_sclkVec(1)            when "01",
-      '0'                     when others;
+      potSck <= s_sclkVec(0) when "10",
+      s_sclkVec(1)           when "01",
+      '0'                    when others;
 
    with s_csbVec select
       potSdi <= s_doutVec(0) when "10",
@@ -345,7 +345,7 @@ begin
          axiReadSlave   => readSlaves(THR_ADC_INDEX_C),
          axiWriteMaster => writeMasters(THR_ADC_INDEX_C),
          axiWriteSlave  => writeSlaves(THR_ADC_INDEX_C),
-         coreSclk       => adcSclk,
+         coreSclk       => adcSck,
          coreSDin       => adcSdo,
          coreSDout      => adcSdi,
          coreCnv        => adcCnv);

@@ -1,7 +1,16 @@
-puts "\n\n\n\n"
-puts "ERROR: $::DIR_PATH not supported yet."
-puts "       If this is a priority: please make JIRA ticket with"
-puts "       your support request and include a due data and charge#"
-puts "       https://jira.slac.stanford.edu/projects/ESLCOMMON/"
-puts "\n\n\n\n"
-exit -1
+# Load RUCKUS environment and library
+source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
+
+# Load local Source Code
+loadSource -dir "$::DIR_PATH/rtl/"
+
+# Load AMC BAY[0] constraints files
+set rootName [file rootname [file tail $::DIR_PATH]]
+if { $::env(AMC_TYPE_BAY0) == ${rootName} } {
+   loadConstraints -path "$::DIR_PATH/xdc/AmcMrLlrfUpConvertBay0Pinout.xdc"
+}
+
+# Load AMC BAY[1] constraints files
+if { $::env(AMC_TYPE_BAY1) == ${rootName} } {
+   loadConstraints -path "$::DIR_PATH/xdc/AmcMrLlrfUpConvertBay1Pinout.xdc"
+}
