@@ -95,8 +95,7 @@ begin
 
          -- Wait for first part of frame
          when HEADER0_S =>
-            v := REG_INIT_C;
-
+            v.intError := '0';
             -- Get message Latch Diag
             v.mitMessage.latchDiag  := mpsMaster.tData(14);
 
