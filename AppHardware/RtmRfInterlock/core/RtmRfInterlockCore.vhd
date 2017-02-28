@@ -89,7 +89,6 @@ end RtmRfInterlockCore;
 architecture mapping of RtmRfInterlockCore is
 
    constant BUFFER_WIDTH_C : natural := 32;
-
    constant BUFFER_ADDR_SIZE_C : natural := 9;  -- 512 samples after trigger 
    constant NUM_AXI_MASTERS_C  : natural := 7;
 
@@ -294,7 +293,7 @@ begin
       U_thrSpi : entity work.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
-            WO_SPI_G          => true,
+            MODE_G            => "WO",
             ADDRESS_SIZE_G    => 7,
             DATA_SIZE_G       => 8,
             CLK_PERIOD_G      => 6.4E-9,
@@ -366,7 +365,7 @@ begin
          axilWriteSlave  => writeSlaves(RTM_REG_INDEX_C),
          devClk_i        => recClk,
          devRst_i        => recRst,
-         mode_o          => s_mode,
+         mode_o          => mode,
          bypassMode_o    => bypassMode,
          tuneSled_o      => tuneSled,
          detuneSled_o    => detuneSled,
@@ -390,7 +389,7 @@ begin
    --   - FWD_PWR_Data  
    --   - REFL_PWR_Data 
    ----------------------------------------------------------------          
-   U_AmcGenericAdcDacSyncTrig : entity work.AmcGenericAdcDacSyncTrig
+   U_RingBufferCtrl : entity work.RingBufferCtrl
       generic map (
          TPD_G                    => TPD_G,
          RING_BUFFER_ADDR_WIDTH_G => BUFFER_ADDR_SIZE_C)

@@ -177,11 +177,10 @@ architecture mapping of AmcMrLlrfDownConvertCore is
    signal dacMuxSClk  : sl;
    signal dacMuxSDout : sl;
 
-   signal spiSclk_o  : sl;
-   signal spiSdi_o   : sl;
-   signal spiSdo_i   : sl;
-   signal spiSdio_io : sl;
-   signal spiCsL_o   : Slv(3 downto 0);
+   signal spiSclk_o : sl;
+   signal spiSdi_o  : sl;
+   signal spiSdo_i  : sl;
+   signal spiCsL_o  : Slv(3 downto 0);
 
    signal attSclk_o    : sl;
    signal attSdi_o     : sl;
@@ -189,7 +188,7 @@ architecture mapping of AmcMrLlrfDownConvertCore is
 
    signal dacSclk_o : sl;
    signal dacSdi_o  : sl;
-   signal dacCsL_o  : slv(2 downto 0)
+   signal dacCsL_o  : slv(2 downto 0);
 
 begin
 
@@ -204,21 +203,21 @@ begin
          IB => sysRefN(2),
          O  => jesdSysRef);
 
-   U_jesdSync0 : OBUFDS
+   U_jesdRxSync0 : OBUFDS
       port map (
-         I  => jesdSync,
+         I  => jesdRxSync,
          O  => syncOutP(5),
          OB => syncOutN(5));
 
-   U_jesdSync1 : OBUFDS
+   U_jesdRxSync1 : OBUFDS
       port map (
-         I  => jesdSync,
+         I  => jesdRxSync,
          O  => syncOutP(0),
          OB => syncOutN(0));
 
-   U_jesdSync2 : OBUFDS
+   U_jesdRxSync2 : OBUFDS
       port map (
-         I  => jesdSync,
+         I  => jesdRxSync,
          O  => syncInP(1),
          OB => syncInN(1));
 
@@ -290,10 +289,10 @@ begin
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
-            axiReadMaster  => readMasters(ADC_0_INDEX_C+i),
-            axiReadSlave   => readSlaves(ADC_0_INDEX_C+i),
-            axiWriteMaster => writeMasters(ADC_0_INDEX_C+i),
-            axiWriteSlave  => writeSlaves(ADC_0_INDEX_C+i),
+            axiReadMaster  => axilReadMasters(ADC_0_INDEX_C+i),
+            axiReadSlave   => axilReadSlaves(ADC_0_INDEX_C+i),
+            axiWriteMaster => axilWriteMasters(ADC_0_INDEX_C+i),
+            axiWriteSlave  => axilWriteSlaves(ADC_0_INDEX_C+i),
             coreSclk       => sclkVec(i),
             coreSDin       => muxSDin,
             coreSDout      => doutVec(i),
@@ -338,10 +337,10 @@ begin
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
-            axiReadMaster  => readMasters(ATT_0_INDEX_C+i),
-            axiReadSlave   => readSlaves(ATT_0_INDEX_C+i),
-            axiWriteMaster => writeMasters(ATT_0_INDEX_C+i),
-            axiWriteSlave  => writeSlaves(ATT_0_INDEX_C+i),
+            axiReadMaster  => axilReadMasters(ATT_0_INDEX_C+i),
+            axiReadSlave   => axilReadSlaves(ATT_0_INDEX_C+i),
+            axiWriteMaster => axilWriteMasters(ATT_0_INDEX_C+i),
+            axiWriteSlave  => axilWriteSlaves(ATT_0_INDEX_C+i),
             coreSclk       => attSclkVec(i),
             coreSDin       => '0',
             coreSDout      => attDoutVec(i),
@@ -387,10 +386,10 @@ begin
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
-            axiReadMaster  => readMasters(DAC_0_INDEX_C+i),
-            axiReadSlave   => readSlaves(DAC_0_INDEX_C+i),
-            axiWriteMaster => writeMasters(DAC_0_INDEX_C+i),
-            axiWriteSlave  => writeSlaves(DAC_0_INDEX_C+i),
+            axiReadMaster  => axilReadMasters(DAC_0_INDEX_C+i),
+            axiReadSlave   => axilReadSlaves(DAC_0_INDEX_C+i),
+            axiWriteMaster => axilWriteMasters(DAC_0_INDEX_C+i),
+            axiWriteSlave  => axilWriteSlaves(DAC_0_INDEX_C+i),
             coreSclk       => dacSclkVec(i),
             coreSDin       => '0',
             coreSDout      => dacDoutVec(i),
@@ -411,7 +410,7 @@ begin
       dacDoutVec(2)                when "011",
       '0'                          when others;
 
-   U_Dac : entity work.AmcBay0DacMux
+   U_Dac : entity work.AmcMrLlrfDownConvertDacMux
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
@@ -419,10 +418,10 @@ begin
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => readMasters(DAC_MUX_INDEX_C),
-         axilReadSlave   => readSlaves(DAC_MUX_INDEX_C),
-         axilWriteMaster => writeMasters(DAC_MUX_INDEX_C),
-         axilWriteSlave  => writeSlaves(DAC_MUX_INDEX_C),
+         axilReadMaster  => axilReadMasters(DAC_MUX_INDEX_C),
+         axilReadSlave   => axilReadSlaves(DAC_MUX_INDEX_C),
+         axilWriteMaster => axilWriteMasters(DAC_MUX_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(DAC_MUX_INDEX_C),
          -- External AXI-Module interface
          clk             => jesdClk,
          rst             => jesdRst,

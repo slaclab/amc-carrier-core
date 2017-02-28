@@ -130,7 +130,7 @@ begin
       we_o            => s_we);
 
    
-   comb : process (axiRst, r, s_rdEn, s_rdData, s_we) is
+   comb : process (axiRst, r, s_rdEn, s_rdData, s_cfgReg, s_we) is
       variable v  : RegType;
    begin
       v := r;

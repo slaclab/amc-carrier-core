@@ -29,6 +29,9 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN
 set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[8]}]
 set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[8]}]
 
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[34]}]
+set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[34]}]
+
 set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsP[35]}]
 set_property -dict { IOSTANDARD LVDS_25 } [get_ports {rtmLsN[35]}]
 
@@ -91,3 +94,17 @@ set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {rtmLsN
 
 set_property -dict { IOSTANDARD LVDS  } [get_ports {rtmLsP[4]}]
 set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[4]}]
+
+# Delay groups
+set_property IODELAY_GROUP RTM_IDELAY_GRP [get_cells {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/U_IDELAYCTRL}]
+
+# Clocks
+create_clock -period 2.801 -name rtmAdcDataClk [get_ports {rtmLsP[3]}]
+create_generated_clock -name rtmAdcDataClkDiv2 [get_pins {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/U_BUFGCE_DIV/O}]
+create_generated_clock -name recTimingClkDiv2  [get_pins {U_AppTop/U_AppCore/U_RTM/U_CORE/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
+
+set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {rtmAdcDataClk}] 
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {rtmAdcDataClk}]
+set_clock_groups -asynchronous -group [get_clocks {recTimingClkDiv2}] -group [get_clocks {rtmAdcDataClk}]
+set_clock_groups -asynchronous -group [get_clocks {recTimingClkDiv2}] -group [get_clocks {rtmAdcDataClkDiv2}]
+set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {rtmAdcDataClkDiv2}]

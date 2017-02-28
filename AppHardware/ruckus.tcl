@@ -11,4 +11,4 @@ loadRuckusTcl "$::DIR_PATH/$::env(AMC_TYPE_BAY1)"
 loadRuckusTcl "$::DIR_PATH/$::env(RTM_TYPE)"
 
 # Load local Source Code
-loadSource -dir "$::DIR_PATH/common/"
+loadSource -dir "$::DIR_PATH/common/rtl"

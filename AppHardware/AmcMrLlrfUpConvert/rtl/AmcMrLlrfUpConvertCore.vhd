@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfUpConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-07
--- Last update: 2016-02-11
+-- Last update: 2017-02-27
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -42,14 +42,17 @@ entity AmcMrLlrfUpConvertCore is
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
       -- DAC Interface (jesdClk domain)
-      dacValues       : in slv(31 downto 0);  
+      dacValues       : in    slv(31 downto 0);
+      -- Interlock and trigger
+      timingTrig      : in    sl;
+      fpgaInterlock   : in    sl;
       -- AXI-Lite Interface
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType;
+      axilClk         : in    sl;
+      axilRst         : in    sl;
+      axilReadMaster  : in    AxiLiteReadMasterType;
+      axilReadSlave   : out   AxiLiteReadSlaveType;
+      axilWriteMaster : in    AxiLiteWriteMasterType;
+      axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
       -----------------------      
@@ -74,19 +77,19 @@ end AmcMrLlrfUpConvertCore;
 
 architecture mapping of AmcMrLlrfUpConvertCore is
 
-   constant NUM_AXI_MASTERS_C : natural := 10;
-   constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 5;   
-   constant NUM_ATTN_CHIPS_C : positive range 1 to 8 := 4;   
+   constant NUM_AXI_MASTERS_C      : natural               := 10;
+   constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 5;
+   constant NUM_ATTN_CHIPS_C       : positive range 1 to 8 := 4;
 
-   constant ADC_0_INDEX_C   : natural := 0;
-   constant ADC_1_INDEX_C   : natural := 1;
-   constant ADC_2_INDEX_C   : natural := 2;
-   constant LMK_INDEX_C     : natural := 3;
-   constant DAC_INDEX_C     : natural := 4;
-   constant ATT_0_INDEX_C   : natural := 5;
-   constant ATT_1_INDEX_C   : natural := 6;
-   constant ATT_2_INDEX_C   : natural := 7;
-   constant ATT_3_INDEX_C   : natural := 8;
+   constant ATT_0_INDEX_C   : natural := 0;
+   constant ATT_1_INDEX_C   : natural := 1;
+   constant ATT_2_INDEX_C   : natural := 2;
+   constant ATT_3_INDEX_C   : natural := 3;
+   constant ADC_0_INDEX_C   : natural := 4;
+   constant ADC_1_INDEX_C   : natural := 5;
+   constant ADC_2_INDEX_C   : natural := 6;
+   constant LMK_INDEX_C     : natural := 7;
+   constant DAC_INDEX_C     : natural := 8;
    constant SIG_GEN_INDEX_C : natural := 9;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
@@ -118,14 +121,14 @@ architecture mapping of AmcMrLlrfUpConvertCore is
          baseAddr     => (AXI_BASE_ADDR_G + x"0006_0000"),
          addrBits     => 17,
          connectivity => X"0001"),
-      DAC_INDEX_C   => (
+      LMK_INDEX_C     => (
          baseAddr     => (AXI_BASE_ADDR_G + x"0008_0000"),
          addrBits     => 17,
-         connectivity => X"0001"),  
-      LMK_INDEX_C   => (
+         connectivity => X"0001"),
+      DAC_INDEX_C     => (
          baseAddr     => (AXI_BASE_ADDR_G + x"000A_0000"),
          addrBits     => 17,
-         connectivity => X"0001"),                    
+         connectivity => X"0001"),
       SIG_GEN_INDEX_C => (
          baseAddr     => (AXI_BASE_ADDR_G + x"000C_0000"),
          addrBits     => 17,
@@ -136,19 +139,19 @@ architecture mapping of AmcMrLlrfUpConvertCore is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal sclkVec                  : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
-   signal doutVec                  : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
-   signal csbVec                   : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
+   signal sclkVec : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
+   signal doutVec : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
+   signal csbVec  : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
 
    signal muxSDin  : sl;
    signal muxSClk  : sl;
    signal muxSDout : sl;
    signal lmkSDin  : sl;
 
-   signal attSclkVec         : slv(NUM_ATTN_CHIPS_C-1 downto 0);
-   signal attDoutVec         : slv(NUM_ATTN_CHIPS_C-1 downto 0);
-   signal attCsbVec          : slv(NUM_ATTN_CHIPS_C-1 downto 0);
-   signal attLEnVec          : slv(NUM_ATTN_CHIPS_C-1 downto 0);
+   signal attSclkVec : slv(NUM_ATTN_CHIPS_C-1 downto 0);
+   signal attDoutVec : slv(NUM_ATTN_CHIPS_C-1 downto 0);
+   signal attCsbVec  : slv(NUM_ATTN_CHIPS_C-1 downto 0);
+   signal attLEnVec  : slv(NUM_ATTN_CHIPS_C-1 downto 0);
 
    signal attMuxSClk  : sl;
    signal attMuxSDout : sl;
@@ -160,59 +163,88 @@ architecture mapping of AmcMrLlrfUpConvertCore is
    signal s_tapDelaySet  : Slv9Array(15 downto 0);
    signal s_tapDelayStat : Slv9Array(15 downto 0);
 
-   signal   spiSclk_o  : sl;
-   signal   spiSdi_o   : sl;
-   signal   spiSdo_i   : sl;
-   signal   spiCsL_o   : Slv(4 downto 0);
+   signal spiSclk_o : sl;
+   signal spiSdi_o  : sl;
+   signal spiSdo_i  : sl;
+   signal spiCsL_o  : Slv(4 downto 0);
 
-   signal   attSclk_o    : sl;
-   signal   attSdi_o     : sl;
-   signal   attLatchEn_o : slv(3 downto 0);
-   
+   signal attSclk_o    : sl;
+   signal attSdi_o     : sl;
+   signal attLatchEn_o : slv(3 downto 0);
+
 begin
 
    -----------------------
    -- Generalized Mapping 
    -----------------------
+   U_jesdSysRef : IBUFDS
+      generic map (
+         DIFF_TERM => true)
+      port map (
+         I  => syncOutP(7),
+         IB => syncOutN(7),
+         O  => jesdSysRef);
 
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
+   U_jesdRxSync0 : OBUFDS
+      port map (
+         I  => jesdRxSync,
+         O  => syncOutP(4),
+         OB => syncOutN(4));
+
+   U_jesdRxSync1 : OBUFDS
+      port map (
+         I  => jesdRxSync,
+         O  => syncOutP(2),
+         OB => syncOutN(2));
+
+   U_jesdRxSync2 : OBUFDS
+      port map (
+         I  => jesdRxSync,
+         O  => syncOutP(1),
+         OB => syncOutN(1));
 
    ADC_SDIO_IOBUFT : IOBUF
       port map (
          I  => '0',
          O  => lmkSDin,
-         IO => spiSdio_io,
-         T  => muxSDout);   
-   
-   GEN_LVDS_OUT :
-   for i in 15 downto 0 generate
-      U_OBUFDS : OBUFDS
-         port map (
-            I  => s_dacDataDly(i),
-            O  => dacDataP(i),
-            OB => dacDataN(i));
-   end generate GEN_LVDS_OUT;
+         IO => jtagPri(0),
+         T  => muxSDout);
+
+
+   jtagPri(1) <= spiSclk_o;
+   jtagPri(2) <= spiSdi_o;
+   spiSdo_i   <= jtagPri(3);
+
+   spareN(2)  <= spiCsL_o(0);
+   spareP(3)  <= spiCsL_o(1);
+   spareN(3)  <= spiCsL_o(2);
+   spareP(2)  <= spiCsL_o(3);
+   jtagPri(4) <= spiCsL_o(4);
+
+   spareN(6) <= attSclk_o;
+   spareP(6) <= attSdi_o;
+
+   spareN(8) <= attLatchEn_o(0);
+   spareP(8) <= attLatchEn_o(1);
+   spareN(7) <= attLatchEn_o(2);
+   spareP(7) <= attLatchEn_o(3);
+
+   U_DOUT0  : OBUFDS port map (I => s_dacDataDly(0), O => spareP(9), OB => spareN(9));
+   U_DOUT1  : OBUFDS port map (I => s_dacDataDly(1), O => spareP(10), OB => spareN(10));
+   U_DOUT2  : OBUFDS port map (I => s_dacDataDly(2), O => spareP(11), OB => spareN(11));
+   U_DOUT3  : OBUFDS port map (I => s_dacDataDly(3), O => spareP(12), OB => spareN(12));
+   U_DOUT4  : OBUFDS port map (I => s_dacDataDly(4), O => spareP(13), OB => spareN(13));
+   U_DOUT5  : OBUFDS port map (I => s_dacDataDly(5), O => spareP(14), OB => spareN(14));
+   U_DOUT6  : OBUFDS port map (I => s_dacDataDly(6), O => spareP(15), OB => spareN(15));
+   U_DOUT7  : OBUFDS port map (I => s_dacDataDly(7), O => sysRefP(0), OB => sysRefN(0));
+   U_DOUT8  : OBUFDS port map (I => s_dacDataDly(8), O => sysRefP(1), OB => sysRefN(1));
+   U_DOUT9  : OBUFDS port map (I => s_dacDataDly(9), O => syncInP(1), OB => syncInN(1));
+   U_DOUT10 : OBUFDS port map (I => s_dacDataDly(10), O => sysRefP(2), OB => sysRefN(2));
+   U_DOUT11 : OBUFDS port map (I => s_dacDataDly(11), O => syncInP(2), OB => syncInN(2));
+   U_DOUT12 : OBUFDS port map (I => s_dacDataDly(12), O => sysRefP(3), OB => sysRefN(3));
+   U_DOUT13 : OBUFDS port map (I => s_dacDataDly(13), O => syncInP(3), OB => syncInN(3));
+   U_DOUT14 : OBUFDS port map (I => s_dacDataDly(14), O => syncOutP(0), OB => syncOutN(0));
+   U_DOUT15 : OBUFDS port map (I => s_dacDataDly(15), O => syncOutP(3), OB => syncOutN(3));
 
    -- Samples on both edges of jesdClk (~185MHz). Sample rate = jesdClk2x (~370MHz)
    U_CLK_DIFF_BUF : entity work.ClkOutBufDiff
@@ -222,9 +254,12 @@ begin
       port map (
          rstIn   => jesdRst,
          clkIn   => jesdClk,
-         clkOutP => dacDckP,
-         clkOutN => dacDckN);   
-   
+         clkOutP => syncInP(0),
+         clkOutN => syncInN(0));
+
+   jtagSec(0) <= timingTrig;
+   jtagSec(4) <= fpgaInterlock;
+
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
@@ -372,7 +407,7 @@ begin
    U_DAC_SIG_GEN : entity work.LvdsDacSigGen
       generic map (
          TPD_G            => TPD_G,
-         AXI_BASE_ADDR_G  => SIG_GEN_BASE_ADDR_C,
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(SIG_GEN_INDEX_C).baseAddr,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          DATA_WIDTH_G     => 16)
       port map (
@@ -394,11 +429,11 @@ begin
          load_o          => s_load,
          tapDelaySet_o   => s_tapDelaySet,
          tapDelayStat_i  => s_tapDelayStat,
-         sampleData_o => s_dacData);
-   
+         sampleData_o    => s_dacData);
+
    GEN_DLY_OUT :
-      for i in 15 downto 0 generate
-         OutputTapDelay_INST: entity work.OutputTapDelay
+   for i in 15 downto 0 generate
+      OutputTapDelay_INST : entity work.OutputTapDelay
          generic map (
             TPD_G              => TPD_G,
             REFCLK_FREQUENCY_G => 370.0)
@@ -411,5 +446,5 @@ begin
             data_i   => s_dacData(i),
             data_o   => s_dacDataDly(i));
    end generate GEN_DLY_OUT;
-   
+
 end mapping;

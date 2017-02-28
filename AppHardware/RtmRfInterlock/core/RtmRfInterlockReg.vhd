@@ -128,7 +128,7 @@ begin
    s_RdAddr <= conv_integer( axilReadMaster.araddr(AXIL_ADDR_WIDTH_G-1 downto 2));
    s_WrAddr <= conv_integer( axilWriteMaster.awaddr(AXIL_ADDR_WIDTH_G-1 downto 2)); 
    
-   comb : process (axilReadMaster, axilWriteMaster, r, axiRst_i, s_RdAddr, s_WrAddr, s_status) is
+   comb : process (axilReadMaster, axilWriteMaster, r, axiRst_i, s_curDelay, s_RdAddr, s_WrAddr, s_status) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);

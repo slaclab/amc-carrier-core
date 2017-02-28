@@ -257,7 +257,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- ADC Bit Clocked Logic
    -------------------------------------------------------------------------------------------------      
-   comb : process (r, s_parFrame, s_parData) is
+   comb : process (r, s_parFrame, s_parData, sampleRst) is
       variable v : RegType;
    begin
       v := r;

@@ -323,9 +323,6 @@ begin
          cpldSck         => cpldSck,
          cpldSdi         => cpldSdi,
          cpldSdo         => cpldSdo,
-         -- Timing triggers
-         stndbyTrig      => stndbyTrig,
-         accelTrig       => accelTrig,
          -- SLED and MODE
          detuneSled      => detuneSled,
          tuneSled        => tuneSled,
