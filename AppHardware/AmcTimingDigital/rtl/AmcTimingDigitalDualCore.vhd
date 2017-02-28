@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
--- File       : AmcEmptyDualCore.vhd
+-- File       : AmcTimingDigitalDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-06
--- Last update: 2017-02-06
+-- Created    : 2017-02-28
+-- Last update: 2017-02-28
 -------------------------------------------------------------------------------
--- Description: Module to terminate a dual empty AMC bay
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -20,12 +20,18 @@ use ieee.std_logic_1164.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.AxiStreamPkg.all;
 
-entity AmcEmptyDualCore is
+entity AmcTimingDigitalDualCore is
    generic (
       TPD_G            : time            := 1 ns;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
+      -- Digital I/O Interface
+      smaDin          : out   slv(1 downto 0);
+      smaDout         : in    Slv2Array(1 downto 0);
+      lemoDin         : out   Slv4Array(1 downto 0);
+      lemoDout        : in    Slv4Array(1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -53,9 +59,9 @@ entity AmcEmptyDualCore is
       -- AMC's Spare Ports
       spareP          : inout Slv16Array(1 downto 0);
       spareN          : inout Slv16Array(1 downto 0));
-end AmcEmptyDualCore;
+end AmcTimingDigitalDualCore;
 
-architecture mapping of AmcEmptyDualCore is
+architecture mapping of AmcTimingDigitalDualCore is
 
 begin
 
@@ -75,12 +81,16 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcEmptyCore
+      U_AMC : entity work.AmcTimingDigitalCore
          generic map (
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
          port map(
-
+            -- Digital I/O Interface
+            smaDin          => smaDin(i),
+            smaDout         => smaDout(i),
+            lemoDin         => lemoDin(i),
+            lemoDout        => lemoDout(i),
             -- AXI-Lite Interface
             axilClk         => '0',
             axilRst         => '0',

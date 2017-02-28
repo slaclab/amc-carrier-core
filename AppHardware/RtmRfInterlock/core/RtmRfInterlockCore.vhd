@@ -30,6 +30,7 @@ use unisim.vcomponents.all;
 entity RtmRfInterlockCore is
    generic (
       TPD_G            : time             := 1 ns;
+      IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";
       AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C);
    port (
@@ -223,7 +224,7 @@ begin
    U_Ad9229Core : entity work.Ad9229Core
       generic map (
          TPD_G           => TPD_G,
-         IODELAY_GROUP_G => "RTM_IDELAY_GRP",
+         IODELAY_GROUP_G => IODELAY_GROUP_G,
          N_CHANNELS_G    => 4)
       port map (
          sampleClk       => s_recClkDiv2,

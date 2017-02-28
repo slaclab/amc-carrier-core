@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
--- File       : AmcEmptyDualCore.vhd
+-- File       : AmcMpsSfpDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-06
--- Last update: 2017-02-06
+-- Created    : 2017-02-28
+-- Last update: 2017-02-28
 -------------------------------------------------------------------------------
--- Description: Module to terminate a dual empty AMC bay
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_09_C00
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -21,10 +21,12 @@ use ieee.std_logic_1164.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 
-entity AmcEmptyDualCore is
+entity AmcMpsSfpDualCore is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G            : time             := 1 ns;
+      AXI_CLK_FREQ_G   : real             := 156.25E+6;
+      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- AXI-Lite Interface
       axilClk         : in    sl;
@@ -53,41 +55,61 @@ entity AmcEmptyDualCore is
       -- AMC's Spare Ports
       spareP          : inout Slv16Array(1 downto 0);
       spareN          : inout Slv16Array(1 downto 0));
-end AmcEmptyDualCore;
+end AmcMpsSfpDualCore;
 
-architecture mapping of AmcEmptyDualCore is
+architecture mapping of AmcMpsSfpDualCore is
+
+   constant NUM_AXI_MASTERS_C : natural := 2;
+
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 20, 19);
+
+   signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
 begin
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+   ---------------------
+   -- AXI-Lite Crossbar
+   ---------------------
+   U_XBAR : entity work.AxiLiteCrossbar
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
+         MASTERS_CONFIG_G   => AXI_CONFIG_C)
       port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
 
    -----------
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcEmptyCore
+      U_AMC : entity work.AmcMpsSfpCore
          generic map (
             TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
          port map(
-
             -- AXI-Lite Interface
-            axilClk         => '0',
-            axilRst         => '0',
-            axilReadMaster  => AXI_LITE_READ_MASTER_INIT_C,
-            axilReadSlave   => open,
-            axilWriteMaster => AXI_LITE_WRITE_MASTER_INIT_C,
-            axilWriteSlave  => open,
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => axilReadMasters(i),
+            axilReadSlave   => axilReadSlaves(i),
+            axilWriteMaster => axilWriteMasters(i),
+            axilWriteSlave  => axilWriteSlaves(i),
             -----------------------
             -- Application Ports --
             -----------------------

@@ -8,6 +8,6 @@ if { $::env(RTM_INTF)  == "Version1" } {
 } elseif { $::env(RTM_INTF)  == "Version2" } {
    loadSource -dir "$::DIR_PATH/v2/"
 } else {
-   puts "\n\n $::env(RTM_INTF) is an invalid RTM_INTF name.  Please fixed your target/makefile''s RTM_INTF variable.\n\n"
+   puts "\n\n $::env(RTM_INTF) is an invalid RTM_INTF name. RTM_INTF can be [Version1,Version2]. Please fixed your target/makefile''s.\n\n"   
    exit -1
 }

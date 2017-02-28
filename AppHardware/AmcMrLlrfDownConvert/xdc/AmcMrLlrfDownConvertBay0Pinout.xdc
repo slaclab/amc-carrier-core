@@ -79,3 +79,5 @@ set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareP[0][11]}] ; # dacSdi
 set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareN[0][12]}] ; # dacCsL_o[0][0]
 set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareP[0][12]}] ; # dacCsL_o[0][1]
 set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareN[0][13]}] ; # dacCsL_o[0][2]
+
+set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd0_370MHz}]

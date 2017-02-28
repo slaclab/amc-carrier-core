@@ -39,7 +39,7 @@ use unisim.vcomponents.all;
 entity OutputTapDelay is
    generic (
       TPD_G              : time := 1 ns;
-      -- refClk input frequency range in MHz (200.0-2400.0)
+      IODELAY_GROUP_G    : string:= "DEFAULT_GROUP";
       REFCLK_FREQUENCY_G : real := 200.0);
    port (
       -- When load_i = '1' the tapSet_i is applied
@@ -56,6 +56,9 @@ end OutputTapDelay;
 architecture rtl of OutputTapDelay is
 
    signal dataReg : sl;
+   
+   attribute IODELAY_GROUP : string;
+   attribute IODELAY_GROUP of U_ODELAYE3 : label is IODELAY_GROUP_G;   
 
 begin
 

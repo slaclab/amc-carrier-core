@@ -31,6 +31,7 @@ use unisim.vcomponents.all;
 entity AmcMrLlrfUpConvertCore is
    generic (
       TPD_G            : time             := 1 ns;
+      IODELAY_GROUP_G  : string           := "AMC_DELAY_GROUP";
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
@@ -171,6 +172,12 @@ architecture mapping of AmcMrLlrfUpConvertCore is
    signal attSclk_o    : sl;
    signal attSdi_o     : sl;
    signal attLatchEn_o : slv(3 downto 0);
+
+   attribute IODELAY_GROUP                 : string;
+   attribute IODELAY_GROUP of U_IDELAYCTRL : label is IODELAY_GROUP_G;
+
+   -- attribute KEEP_HIERARCHY                 : string;
+   -- attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
 
 begin
 
@@ -436,15 +443,24 @@ begin
       OutputTapDelay_INST : entity work.OutputTapDelay
          generic map (
             TPD_G              => TPD_G,
-            REFCLK_FREQUENCY_G => 370.0)
-         port map (
-            clk_i    => jesdClk2x,
-            rst_i    => jesdRst2x,
+            IODELAY_GROUP_G    => IODELAY_GROUP_G,
+            REFCLK_FREQUENCY_G => 370.0)-- IDELAYCTRL uses jesdClk2x
+         port map (      
+            clk_i    => jesdClk,-- DDR clock (using both edges)
+            rst_i    => jesdRst,
             load_i   => s_load(i),
             tapSet_i => s_tapDelaySet(i),
             tapGet_o => s_tapDelayStat(i),
             data_i   => s_dacData(i),
             data_o   => s_dacDataDly(i));
    end generate GEN_DLY_OUT;
+
+   U_IDELAYCTRL : IDELAYCTRL
+      generic map (
+         SIM_DEVICE => "ULTRASCALE")
+      port map (
+         RDY    => open,           -- 1-bit output: Ready output
+         REFCLK => jesdClk2x,        -- 1-bit input: Reference clock input
+         RST    => jesdRst2x);       -- 1-bit input: Active high reset input
 
 end mapping;

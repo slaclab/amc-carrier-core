@@ -153,8 +153,8 @@ begin
    port map (
       axiClk_i        => axiClk,
       axiRst_i        => axiRst,   
-      devClk_i        => devClk2x_i,
-      devRst_i        => devRst2x_i,
+      devClk_i        => devClk_i,
+      devRst_i        => devRst_i,
       axilReadMaster  => locAxilReadMasters(DAC_AXIL_INDEX_C),
       axilReadSlave   => locAxilReadSlaves(DAC_AXIL_INDEX_C),
       axilWriteMaster => locAxilWriteMasters(DAC_AXIL_INDEX_C),
