@@ -2,7 +2,7 @@
 -- File       : AmcMpsSfpPll.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-11-14
+-- Last update: 2017-02-28
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -28,81 +28,80 @@ use unisim.vcomponents.all;
 
 entity AmcMpsSfpPll is
    generic (
-      TPD_G                    : time                   := 1 ns;
-      AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C);
+      TPD_G            : time            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- PLL Parallel Interface
-      pllRst        : out  sl;
-      pllInc        : out  sl;
-      pllDec        : out  sl;
-      pllDbly2By    : out  sl;
-      pllFrqTbl     : inout  sl;
-      pllRate       : inout  slv(1 downto 0);  
-      pllSFout      : inout  slv(1 downto 0);   
-      pllBwSel      : inout  slv(1 downto 0);   
-      pllFrqSel     : inout  slv(3 downto 0);
+      pllRst          : out   sl;
+      pllInc          : out   sl;
+      pllDec          : out   sl;
+      pllDbly2By      : out   sl;
+      pllFrqTbl       : inout sl;
+      pllRate         : inout slv(1 downto 0);
+      pllSFout        : inout slv(1 downto 0);
+      pllBwSel        : inout slv(1 downto 0);
+      pllFrqSel       : inout slv(3 downto 0);
       -- AXI-Lite Interface
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType);
+      axilClk         : in    sl;
+      axilRst         : in    sl;
+      axilReadMaster  : in    AxiLiteReadMasterType;
+      axilReadSlave   : out   AxiLiteReadSlaveType;
+      axilWriteMaster : in    AxiLiteWriteMasterType;
+      axilWriteSlave  : out   AxiLiteWriteSlaveType);
 end AmcMpsSfpPll;
 
 architecture rtl of AmcMpsSfpPll is
 
    type RegType is record
-      pllRst        : sl;
-      pllInc        : sl;
-      pllDec        : sl;
-      pllDbly2By    : sl;
-      pllFrqTbl     : sl;
-      pllFrqTblTri  : sl;
-      pllRate       : slv(1 downto 0);  
-      pllRateTri    : slv(1 downto 0);  
-      pllSFout      : slv(1 downto 0);   
-      pllSFoutTri   : slv(1 downto 0);   
-      pllBwSel      : slv(1 downto 0);   
-      pllBwSelTri   : slv(1 downto 0);   
-      pllFrqSel     : slv(3 downto 0);   
-      pllFrqSelTri  : slv(3 downto 0);   
-      axilReadSlave   : AxiLiteReadSlaveType;
-      axilWriteSlave  : AxiLiteWriteSlaveType;
+      pllRst         : sl;
+      pllInc         : sl;
+      pllDec         : sl;
+      pllDbly2By     : sl;
+      pllFrqTbl      : sl;
+      pllFrqTblTri   : sl;
+      pllRate        : slv(1 downto 0);
+      pllRateTri     : slv(1 downto 0);
+      pllSFout       : slv(1 downto 0);
+      pllSFoutTri    : slv(1 downto 0);
+      pllBwSel       : slv(1 downto 0);
+      pllBwSelTri    : slv(1 downto 0);
+      pllFrqSel      : slv(3 downto 0);
+      pllFrqSelTri   : slv(3 downto 0);
+      axilReadSlave  : AxiLiteReadSlaveType;
+      axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      pllRst        => '0',
-      pllInc        => '0',
-      pllDec        => '0',
+      pllRst         => '0',
+      pllInc         => '0',
+      pllDec         => '0',
       -- Default: DBLY_BY  : L       
-      pllDbly2By    => '0',
+      pllDbly2By     => '0',
       -- Default: FrqTbl   : M
-      pllFrqTbl     => '1',
-      pllFrqTblTri  => '1',
+      pllFrqTbl      => '1',
+      pllFrqTblTri   => '1',
       -- Default: RateSel  : MM
-      pllRate       => "11", 
-      pllRateTri    => "11",   
+      pllRate        => "11",
+      pllRateTri     => "11",
       -- Default: SFout    : HM
-      pllSFout      => "11",   
-      pllSFoutTri   => "01",    
+      pllSFout       => "11",
+      pllSFoutTri    => "01",
       -- Default: BwSel    : LL
-      pllBwSel      => "00",   
-      pllBwSelTri   => "00",   
+      pllBwSel       => "00",
+      pllBwSelTri    => "00",
       -- Default: FrqSel   : HMMH
-      pllFrqSel     => "1111",   
-      pllFrqSelTri  => "0110",      
+      pllFrqSel      => "1111",
+      pllFrqSelTri   => "0110",
       -- AXI-Lite
-      axilReadSlave   => AXI_LITE_READ_SLAVE_INIT_C,
-      axilWriteSlave  => AXI_LITE_WRITE_SLAVE_INIT_C);
+      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
-   
-   signal configOeL        : slv(31 downto 0);
+
    -- attribute dont_touch               : string;
    -- attribute dont_touch of r          : signal is "TRUE";
-   
+
 begin
 
    U_pllFrqTbl : IOBUF
@@ -111,55 +110,51 @@ begin
          O  => open,
          IO => pllFrqTbl,
          T  => r.pllFrqTblTri);
-   
+
    GEN_2B :
    for i in 1 downto 0 generate
 
       U_pllRate : IOBUF
          port map (
-            I  => r.pllRate,
+            I  => r.pllRate(i),
             O  => open,
             IO => pllRate(i),
-            T  => r.pllRateTri);   
-            
+            T  => r.pllRateTri(i));
+
       U_pllSFout : IOBUF
          port map (
-            I  => r.pllSFout,
+            I  => r.pllSFout(i),
             O  => open,
             IO => pllSFout(i),
-            T  => r.pllSFoutTri);   
+            T  => r.pllSFoutTri(i));
 
       U_pllBwSel : IOBUF
          port map (
-            I  => r.pllBwSel,
+            I  => r.pllBwSel(i),
             O  => open,
             IO => pllBwSel(i),
-            T  => r.pllBwSelTri);               
-   
-   end generate GEN_2B;   
-   
+            T  => r.pllBwSelTri(i));
+
+   end generate GEN_2B;
+
    GEN_4B :
    for i in 3 downto 0 generate
 
       U_pllFrqSel : IOBUF
          port map (
-            I  => r.pllFrqSel,
+            I  => r.pllFrqSel(i),
             O  => open,
             IO => pllFrqSel(i),
-            T  => r.pllFrqSelTri);              
-   
-   end generate GEN_4B;      
-   
-   comb : process (adcDataSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dacDataSync,
-                   dacVcoCtrlSync, lmkStatus, r, statusCnt, statusOut) is
+            T  => r.pllFrqSelTri(i));
+
+   end generate GEN_4B;
+
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
       -- Latch the current value
       v := r;
-
-      -- Reset the strobes
-      v.cntRst := '0';
 
       -- Determine the transaction type
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
@@ -170,7 +165,7 @@ begin
       axiSlaveRegister(regCon, x"0", 2, v.pllDec);
       axiSlaveRegister(regCon, x"0", 3, v.pllDbly2By);
       axiSlaveRegister(regCon, x"0", 4, v.pllFrqTbl);
-      axiSlaveRegister(regCon, x"0", 5, v.pllFrqTblTri);      
+      axiSlaveRegister(regCon, x"0", 5, v.pllFrqTblTri);
       axiSlaveRegister(regCon, x"0", 12, v.pllRate);
       axiSlaveRegister(regCon, x"0", 14, v.pllRateTri);
       axiSlaveRegister(regCon, x"0", 16, v.pllSFout);
@@ -198,7 +193,7 @@ begin
       pllInc         <= r.pllInc;
       pllDec         <= r.pllDec;
       pllDbly2By     <= r.pllDbly2By;
-      
+
    end process comb;
 
    seq : process (axilClk) is
@@ -207,5 +202,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 end rtl;

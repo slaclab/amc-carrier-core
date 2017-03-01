@@ -33,7 +33,7 @@ entity AmcMpsSfpCore is
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- PLL Interface
-      pllClk          : in    sl := 0;;
+      pllClk          : in    sl := '0';
       pllLos          : out   sl;
       pllLol          : out   sl;
       -- AXI-Lite Interface
@@ -192,10 +192,10 @@ begin
          port map (
             axiClk         => axilClk,
             axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(PLL_INDEX_C),
-            axiReadSlave   => axilReadSlaves(PLL_INDEX_C),
-            axiWriteMaster => axilWriteMasters(PLL_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(PLL_INDEX_C));
+            axiReadMaster  => axilReadMasters(HS_REPEATER_INDEX_C),
+            axiReadSlave   => axilReadSlaves(HS_REPEATER_INDEX_C),
+            axiWriteMaster => axilWriteMasters(HS_REPEATER_INDEX_C),
+            axiWriteSlave  => axilWriteSlaves(HS_REPEATER_INDEX_C));
 
    end generate;
 

@@ -126,7 +126,7 @@ begin
    s_RdAddr <= slvToInt( axilReadMaster.araddr(AXI_ADDR_WIDTH_G-1 downto 2));
    s_WrAddr <= slvToInt( axilWriteMaster.awaddr(AXI_ADDR_WIDTH_G-1 downto 2)); 
    
-   comb : process (axilReadMaster, axilWriteMaster, r, axiRst_i, s_RdAddr, s_WrAddr) is
+   comb : process (axilReadMaster, axilWriteMaster, r, axiRst_i, s_RdAddr, s_WrAddr, s_runningSync, s_underflowSync, s_overflowSync) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -168,21 +168,21 @@ begin
          v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>  -- ADDR (0x0)
-               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0)   := r.enable;
+               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := r.enable;
             when 16#01# =>  -- ADDR (0x4)
-               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0)   := r.mode;               
+               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := r.mode;               
             when 16#02# =>  -- ADDR (0x8)
-               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0)    := r.sign;
+               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := r.sign;
             when 16#03# =>  -- ADDR (0xC)
-               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0)    := r.trigSw;
+               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := r.trigSw;
             when 16#08# =>  -- ADDR (0x20)
-               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0)   := s_runningSync;
+               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := s_runningSync;
             when 16#09# =>  -- ADDR (0x24)
-               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0)   := s_underflowSync;               
+               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := s_underflowSync;               
             when 16#0A# =>  -- ADDR (0x28)
-               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0)    := s_overflowSync;
+               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := s_overflowSync;
             when 16#0B# =>  -- ADDR (0x2C)
-               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0)    := toSlv(2**ADDR_WIDTH_G, 32);               
+               v.axilReadSlave.rdata                           := toSlv(2**ADDR_WIDTH_G, 32);               
             when 16#10# to 16#1F# => -- ADDR (0x40-0x7C) 
                for i in (NUM_SIG_GEN_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = i) then

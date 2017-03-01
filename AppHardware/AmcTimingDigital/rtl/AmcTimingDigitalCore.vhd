@@ -17,9 +17,14 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
+use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+
+library unisim;
+use unisim.vcomponents.all;
 
 entity AmcTimingDigitalCore is
    generic (
@@ -78,7 +83,7 @@ begin
          O  => spareP(1),
          OB => spareN(1));
 
-   U_smaDout0 : OBUFDS
+   U_smaDout1 : OBUFDS
       port map (
          I  => smaDout(1),
          O  => spareP(2),
