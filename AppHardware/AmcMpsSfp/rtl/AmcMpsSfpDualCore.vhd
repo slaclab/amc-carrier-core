@@ -24,10 +24,16 @@ use work.AxiLitePkg.all;
 entity AmcMpsSfpDualCore is
    generic (
       TPD_G            : time             := 1 ns;
+      EN_PLL_G         : boolean          := false;
+      EN_HS_REPEATER_G : boolean          := false;
       AXI_CLK_FREQ_G   : real             := 156.25E+6;
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
+      -- PLL Interface
+      pllClk          : in    slv(1 downto 0) := "00";
+      pllLos          : out   slv(1 downto 0);
+      pllLol          : out   slv(1 downto 0);   
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -99,10 +105,16 @@ begin
       U_AMC : entity work.AmcMpsSfpCore
          generic map (
             TPD_G            => TPD_G,
+            EN_PLL_G         => EN_PLL_G,
+            EN_HS_REPEATER_G => EN_HS_REPEATER_G,
             AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
          port map(
+            -- PLL Interface
+            pllClk          => pllClk(i),
+            pllLos          => pllLos(i),
+            pllLol          => pllLol(i),
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,

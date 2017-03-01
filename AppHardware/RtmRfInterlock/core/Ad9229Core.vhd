@@ -69,9 +69,8 @@ entity Ad9229Core is
    );
 end Ad9229Core;
 
-architecture Behavioral of Ad9229Core is
+architecture rtl of Ad9229Core is
 
-   -- Alignment mechanism
    type RegType is record
       slip       : sl;
       count      : slv(8 downto 0);
@@ -83,36 +82,25 @@ architecture Behavioral of Ad9229Core is
       slip       => '0',
       count      => (others => '0'),
       locked     => '0',
-      parData => (others => (others => '0'))
-   );
+      parData => (others => (others => '0')));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
    
-   signal x_serClk  : sl;
-   signal x_serClkB : sl;   
-   signal s_serClk  : sl;
-   signal s_serClkB : sl;
-   signal s_serClkG : sl;
-   signal s_serRstG : sl;
+   signal fadcDataClk  : sl;
+   signal s_serClk     : sl;
    signal s_serDiv2Clk : sl;   
    signal s_serDiv2Rst : sl; 
    
    signal s_serData : slv(N_CHANNELS_G-1 downto 0);
    signal s_parData : Slv12Array(N_CHANNELS_G-1 downto 0);
    
-   -- Alignment mechanism
    signal s_frameClk : sl;   
    signal s_parFrame : Slv(11 downto 0);   
    
-   
-   attribute keep : string;
-
    attribute IODELAY_GROUP                          : string;
    attribute IODELAY_GROUP of U_IDELAYCTRL : label is IODELAY_GROUP_G;
 
-   -- attribute KEEP_HIERARCHY                          : string;
-   -- attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
    
 begin
    
@@ -132,30 +120,23 @@ begin
    ----------------------------------------------------
    -- Fast Serial Clock
    ----------------------------------------------------   
-   -- Fast Serial Clock Differential input buffer
-   U_IBUFDS_DIFF : IBUFDS_DIFF_OUT
-   port map (
-      I  => fadcDataClkP_i, -- 1-bit input: Diff_p buffer input (connect directly to top-level port)
-      IB => fadcDataClkN_i,
-      O  => x_serClk,      -- 1-bit output: Buffer diff_p output
-      OB => x_serClkB);    -- 1-bit output: Buffer diff_n output
+   U_IBUFDS : IBUFDS
+      port map (
+         I  => fadcDataClkP_i,
+         IB => fadcDataClkN_i,
+         O  => fadcDataClk); 
    
    U_serClk : BUFG
       port map (
-         I => x_serClk,
+         I => fadcDataClk,
          O => s_serClk);  
 
-   U_serClkB : BUFG
-      port map (
-         I => x_serClkB,
-         O => s_serClkB);           
-   
    -- Divide by 2
    U_BUFGCE_DIV : BUFGCE_DIV
       generic map (
          BUFGCE_DIVIDE => 2)
       port map (
-         I  => x_serClk, -- 1-bit output: Buffer
+         I  => fadcDataClk, -- 1-bit output: Buffer
          CE => '1', -- 1-bit input: Buffer enable
          CLR=> '0', -- 1-bit input: Asynchronous clear
          O  => s_serDiv2Clk);
@@ -170,31 +151,13 @@ begin
          asyncRst => sampleRst,
          syncRst  => s_serDiv2Rst);
    
-   ----------------------------------------------------   
-   -- Delay controller group
-   ----------------------------------------------------
-   -- U_BUFG : BUFG
-   -- port map (
-      -- I  => s_serClk, -- 1-bit output: Buffer
-      -- O  => s_serClkG);
-      
-   -- -- Fast Serial Clock reset sync
-   -- U_rstSync1 : entity work.RstSync
-      -- generic map (
-         -- TPD_G           => TPD_G,
-         -- RELEASE_DELAY_G => 5)
-      -- port map (
-         -- clk      => s_serClkG,
-         -- asyncRst => sampleRst,
-         -- syncRst  => s_serRstG);
-   
    U_IDELAYCTRL : IDELAYCTRL
       generic map (
          SIM_DEVICE => "ULTRASCALE")
       port map (
-         RDY => open, -- 1-bit output: Ready output
+         RDY    => open, -- 1-bit output: Ready output
          REFCLK => s_serDiv2Clk, -- 1-bit input: Reference clock input
-         RST => s_serDiv2Rst); -- 1-bit input: Active high reset input
+         RST    => s_serDiv2Rst); -- 1-bit input: Active high reset input
       
    ----------------------------------------------------   
    -- Data Deserializers
@@ -215,8 +178,7 @@ begin
             IODELAY_GROUP_G   => IODELAY_GROUP_G,
             IDELAYCTRL_FREQ_G => 367.0)
          port map (
-            clkSerP    => s_serClk,
-            clkSerN    => s_serClkB,
+            clkSer     => s_serClk,
             idelayClk  => s_serDiv2Clk,
             idelayRst  => s_serDiv2Rst,         
             clkSerDiv2 => s_serDiv2Clk,
@@ -249,8 +211,7 @@ begin
          IODELAY_GROUP_G   => IODELAY_GROUP_G,
          IDELAYCTRL_FREQ_G => 357.0)
       port map (
-         clkSerP    => s_serClk,
-         clkSerN    => s_serClkB,
+         clkSer     => s_serClk,
          idelayClk  => s_serDiv2Clk,
          idelayRst  => s_serDiv2Rst,
          clkSerDiv2 => s_serDiv2Clk,
@@ -325,5 +286,4 @@ begin
    parData_o <= r.parData;
    locked_o  <= r.locked;
    
-end Behavioral;
-
+end rtl;

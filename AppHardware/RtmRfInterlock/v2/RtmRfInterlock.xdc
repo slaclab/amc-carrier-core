@@ -42,5 +42,3 @@ set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks 
 set_clock_groups -asynchronous -group [get_clocks {recTimingClkDiv2}] -group [get_clocks {rtmAdcDataClk}]
 set_clock_groups -asynchronous -group [get_clocks {recTimingClkDiv2}] -group [get_clocks {rtmAdcDataClkDiv2}]
 set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {rtmAdcDataClkDiv2}]
-
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/U_IBUFDS_DIFF/OB]

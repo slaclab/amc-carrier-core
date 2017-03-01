@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcMpsSfpHsRepeater.vhd
+-- File       : AmcMpsSfpMon.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-28
 -- Last update: 2017-02-28
@@ -17,6 +17,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
+use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
@@ -24,14 +26,18 @@ use work.AxiLitePkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcMpsSfpHsRepeater is
+entity AmcMpsSfpMon is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G            : time             := 1 ns;
+      AXI_CLK_FREQ_G   : real             := 156.25E+6;
+      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- I2C Interface
-      i2cScl  : inout slv(2 downto 0);
-      i2cSda  : inout slv(2 downto 0);
+      i2cScl  : inout sl;
+      i2cSda  : inout sl;
+      i2cRstL : out   sl;
+      i2cIntL : in    sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -39,31 +45,28 @@ entity AmcMpsSfpHsRepeater is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType);
-end AmcMpsSfpHsRepeater;
+end AmcMpsSfpMon;
 
-architecture mapping of AmcMpsSfpHsRepeater is
+architecture mapping of AmcMpsSfpMon is
 
 begin
 
-   GEN_VEC :
-   for i in 2 downto 0 generate
+   i2cRstL <= not(axilRst);
 
-      U_i2cScl : IOBUF
-         port map (
-            I  => '0',
-            O  => open,
-            IO => i2cScl(i),
-            T  => '1');
-            
-      U_i2cSda : IOBUF
-         port map (
-            I  => '0',
-            O  => open,
-            IO => i2cSda(i),
-            T  => '1');         
-
-   end generate GEN_VEC;         
+   U_i2cScl : IOBUF
+      port map (
+         I  => '0',
+         O  => open,
+         IO => i2cScl,
+         T  => '1');
          
+   U_i2cSda : IOBUF
+      port map (
+         I  => '0',
+         O  => open,
+         IO => i2cSda,
+         T  => '1');         
+
    --------------------------------
    -- Placeholder for future module
    --------------------------------

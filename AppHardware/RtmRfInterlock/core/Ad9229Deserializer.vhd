@@ -28,8 +28,7 @@ entity Ad9229Deserializer is
       IODELAY_GROUP_G : string:= "DEFAULT_GROUP";
       IDELAYCTRL_FREQ_G : real := 200.0);
    port (
-      clkSerN : in sl;
-      clkSerP : in sl;
+      clkSer : in sl;
       idelayClk  : in sl;
       idelayRst  : in sl;      
       clkSerDiv2 : in sl;
@@ -81,11 +80,15 @@ architecture rtl of Ad9229Deserializer is
    signal s_slipSyncRe  : sl;
    signal s_serdesData  : slv(7 downto 0);   
    signal s_parData     : slv(11 downto 0);
+   
+   signal clkSerL : sl;
 
    attribute IODELAY_GROUP : string;
    attribute IODELAY_GROUP of U_DELAY : label is IODELAY_GROUP_G;
    
 begin
+
+   clkSerL <= not(clkSer);
 
    -- Slip sync and one shot
    U_SyncOneShot: entity work.SynchronizerOneShot
@@ -140,8 +143,8 @@ begin
    port map (
       FIFO_EMPTY => open, -- 1-bit output: FIFO empty flag
       INTERNAL_DIVCLK => open, 
-      CLK    => clkSerP, -- 1-bit input: High-speed clock
-      CLK_B  => clkSerN, -- 1-bit input: Inversion of High-speed clock CLK
+      CLK    => clkSer, -- 1-bit input: High-speed clock
+      CLK_B  => clkSerL, -- 1-bit input: Inversion of High-speed clock CLK
       CLKDIV => clkSerDiv2, -- 1-bit input: Divided Clock
       D => s_iDataDly, -- 1-bit input: Serial Data Input
       Q => s_serdesData, -- 8-bit registered output
