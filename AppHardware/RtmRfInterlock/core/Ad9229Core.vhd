@@ -98,10 +98,6 @@ architecture rtl of Ad9229Core is
    signal s_frameClk : sl;   
    signal s_parFrame : Slv(11 downto 0);   
    
-   attribute IODELAY_GROUP                          : string;
-   attribute IODELAY_GROUP of U_IDELAYCTRL : label is IODELAY_GROUP_G;
-
-   
 begin
    
    ----------------------------------------------------
@@ -150,14 +146,6 @@ begin
          clk      => s_serDiv2Clk,
          asyncRst => sampleRst,
          syncRst  => s_serDiv2Rst);
-   
-   U_IDELAYCTRL : IDELAYCTRL
-      generic map (
-         SIM_DEVICE => "ULTRASCALE")
-      port map (
-         RDY    => open, -- 1-bit output: Ready output
-         REFCLK => s_serDiv2Clk, -- 1-bit input: Reference clock input
-         RST    => s_serDiv2Rst); -- 1-bit input: Active high reset input
       
    ----------------------------------------------------   
    -- Data Deserializers
@@ -176,7 +164,7 @@ begin
          generic map (
             TPD_G             => TPD_G,
             IODELAY_GROUP_G   => IODELAY_GROUP_G,
-            IDELAYCTRL_FREQ_G => 367.0)
+            IDELAYCTRL_FREQ_G => 370.0)
          port map (
             clkSer     => s_serClk,
             idelayClk  => s_serDiv2Clk,
@@ -209,7 +197,7 @@ begin
       generic map (
          TPD_G             => TPD_G,
          IODELAY_GROUP_G   => IODELAY_GROUP_G,
-         IDELAYCTRL_FREQ_G => 357.0)
+         IDELAYCTRL_FREQ_G => 370.0)
       port map (
          clkSer     => s_serClk,
          idelayClk  => s_serDiv2Clk,

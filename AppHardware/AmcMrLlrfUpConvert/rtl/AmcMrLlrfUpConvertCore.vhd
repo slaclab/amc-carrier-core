@@ -173,12 +173,6 @@ architecture mapping of AmcMrLlrfUpConvertCore is
    signal attSdi_o     : sl;
    signal attLatchEn_o : slv(3 downto 0);
 
-   attribute IODELAY_GROUP                 : string;
-   attribute IODELAY_GROUP of U_IDELAYCTRL : label is IODELAY_GROUP_G;
-
-   -- attribute KEEP_HIERARCHY                 : string;
-   -- attribute KEEP_HIERARCHY of U_IDELAYCTRL : label is "TRUE";
-
 begin
 
    -----------------------
@@ -454,13 +448,5 @@ begin
             data_i   => s_dacData(i),
             data_o   => s_dacDataDly(i));
    end generate GEN_DLY_OUT;
-
-   U_IDELAYCTRL : IDELAYCTRL
-      generic map (
-         SIM_DEVICE => "ULTRASCALE")
-      port map (
-         RDY    => open,           -- 1-bit output: Ready output
-         REFCLK => jesdClk2x,        -- 1-bit input: Reference clock input
-         RST    => jesdRst2x);       -- 1-bit input: Active high reset input
 
 end mapping;
