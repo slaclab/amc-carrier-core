@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Single lane signal generator
--------------------------------------------------------------------------------
 -- File       : LvdsDacLane.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-29
 -- Last update: 2015-01-29
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
 --               The module contains a AXI-Lite accessible block RAM where the 
@@ -17,11 +12,11 @@
 --               The signal period is defined in user register.
 --               Signal has to be disabled while the periodSize_i or RAM contents is being changed.
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

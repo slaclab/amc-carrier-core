@@ -1,14 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Axi Lite register access for simple SPI chips (write only data no address)
--------------------------------------------------------------------------------
 -- File       : AxiSerAttnMaster.vhd
--- Author     : Benjamin Reese  <bareese@slac.stanford.edu>
---            : Uros Legat Modified <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-12
 -- Last update: 2015-11-04
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:   This module handles SPI chips with only one setting (non addressable or readable over SPI)
 --                Write only access to SPI
@@ -24,11 +18,11 @@
 --                Outputs a latch enable signal (For Attenuator chips) after the data is written
 --                the latch enable stays high for one SPI_CLK_PERIOD_CYCLES_C.
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

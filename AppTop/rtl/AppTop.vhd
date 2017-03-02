@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-02-04
+-- Last update: 2017-03-01
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -63,8 +63,8 @@ entity AppTop is
       -- Top Level Interface
       ----------------------
       -- AXI-Lite Interface (axilClk domain)
-      axilClk              : in   sl;
-      axilRst              : in   sl;
+      axilClk              : in    sl;
+      axilRst              : in    sl;
       axilReadMaster       : in    AxiLiteReadMasterType;
       axilReadSlave        : out   AxiLiteReadSlaveType;
       axilWriteMaster      : in    AxiLiteWriteMasterType;
@@ -201,6 +201,9 @@ architecture mapping of AppTop is
    signal dacSigValids : Slv7Array(1 downto 0);
    signal dacSigValues : sampleDataVectorArray(1 downto 0, 6 downto 0);
 
+   signal obAppDbgMaster : AxiStreamMasterType;
+   signal obAppDbgSlave  : AxiStreamSlaveType;
+
 begin
 
    --------------------------
@@ -250,6 +253,11 @@ begin
          axilReadSlave   => axilReadSlaves(TIMING_INDEX_C),
          axilWriteMaster => axilWriteMasters(TIMING_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(TIMING_INDEX_C),
+         -- Application Debug Interface (axilClk domain)
+         sAxisMaster     => obAppDbgMaster,
+         sAxisSlave      => obAppDbgSlave,
+         mAxisMaster     => obAppDebugMaster,
+         mAxisSlave      => obAppDebugSlave,
          -- Timing Interface
          recClk          => recTimingClk,
          recRst          => recTimingRst,
@@ -498,8 +506,8 @@ begin
          ibBpMsgServerMaster => ibBpMsgServerMaster,
          ibBpMsgServerSlave  => ibBpMsgServerSlave,
          -- Application Debug Interface (axilClk domain)
-         obAppDebugMaster    => obAppDebugMaster,
-         obAppDebugSlave     => obAppDebugSlave,
+         obAppDebugMaster    => obAppDbgMaster,
+         obAppDebugSlave     => obAppDbgSlave,
          ibAppDebugMaster    => ibAppDebugMaster,
          ibAppDebugSlave     => ibAppDebugSlave,
          -- MPS Concentrator Interface (axilClk domain)

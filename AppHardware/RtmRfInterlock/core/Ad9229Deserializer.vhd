@@ -1,23 +1,24 @@
 -------------------------------------------------------------------------------
--- Title      : DDR deserializer
--------------------------------------------------------------------------------
 -- File       : Ad9229Deserializer.vhd
--- Author     : Benjamin Reese  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-08-09
 -- Last update: 2016-08-09
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: 12 bit DDR deserializer using Ultrascale IDELAYE3 and ISERDESE3.
 -------------------------------------------------------------------------------
--- Copyright (c) 2013 SLAC National Accelerator Laboratory
+-- This file is part of 'LCLS2 Common Carrier Core'.
+-- It is subject to the license terms in the LICENSE.txt file found in the 
+-- top-level directory of this distribution and at: 
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
+-- may be copied, modified, propagated, or distributed except according to 
+-- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
-
 
 library ieee;
 use ieee.std_logic_1164.all;
 use work.StdRtlPkg.all;
+
 library UNISIM;
 use UNISIM.vcomponents.all;
 

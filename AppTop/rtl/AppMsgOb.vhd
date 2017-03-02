@@ -27,9 +27,13 @@ use work.EthMacPkg.all;
 
 entity AppMsgOb is
    generic (
-      TPD_G       : time     := 1 ns;
-      HDR_SIZE_G  : positive := 1;
-      DATA_SIZE_G : positive := 1);
+      TPD_G             : time            := 1 ns;
+      HDR_SIZE_G        : positive        := 1;
+      DATA_SIZE_G       : positive        := 1;
+      EN_CRC_G          : boolean         := true;
+      BRAM_EN_G         : boolean         := true;
+      FIFO_ADDR_WIDTH_G : positive        := 9;
+      TDEST_G           : slv(7 downto 0) := x"00");
    port (
       -- Application Messaging Interface (clk domain)      
       clk         : in  sl;
@@ -114,9 +118,10 @@ architecture rtl of AppMsgOb is
    signal txSlave  : AxiStreamSlaveType;
 
    signal valid     : sl;
+   signal fifoRd    : sl;
    signal fifoDin   : slv(DATA_WIDTH_G-1 downto 0);
    signal fifoDout  : slv(DATA_WIDTH_G-1 downto 0);
-   signal crcResult : slv(31 downto 0);
+   signal crcResult : slv(31 downto 0) := (others => '0');
 
    -- attribute dont_touch             : string;
    -- attribute dont_touch of r        : signal is "TRUE";   
@@ -137,7 +142,7 @@ begin
          din    => fifoDin,
          -- Read Ports
          rd_clk => axilClk,
-         rd_en  => r.fifoRd,
+         rd_en  => fifoRd,
          valid  => valid,
          dout   => fifoDout);
 
@@ -189,8 +194,16 @@ begin
                   v.cnt    := 0;
                   -- Accept the data from the FIFO
                   v.fifoRd := '1';
-                  -- Next state
-                  v.state  := CRC_S;
+                  -- Check if CRC is enabled
+                  if (EN_CRC_G = true) then
+                     -- Next state
+                     v.state := CRC_S;
+                  else
+                     -- Set the EOF flag
+                     v.txMaster.tLast := '1';
+                     -- Next state
+                     v.state          := IDLE_S;
+                  end if;
                end if;
             end if;
          ----------------------------------------------------------------------
@@ -215,6 +228,9 @@ begin
       ----------------------------------------------------------------------
       end case;
 
+      -- Update the TDEST routing
+      v.txMaster.tDest := TDEST_G;
+
       -- Reset
       if (axilRst = '1') then
          v := REG_INIT_C;
@@ -224,6 +240,7 @@ begin
       rin <= v;
 
       -- Outputs        
+      fifoRd   <= v.fifoRd;
       txMaster <= r.txMaster;
 
    end process comb;
@@ -235,17 +252,19 @@ begin
       end if;
    end process seq;
 
-   U_Crc32 : entity work.Crc32Parallel
-      generic map (
-         TPD_G        => TPD_G,
-         BYTE_WIDTH_G => 4)
-      port map (
-         crcClk       => axilClk,
-         crcReset     => r.crcRst,
-         crcDataWidth => "011",         -- 4 bytes 
-         crcDataValid => r.crcValid,
-         crcIn        => r.crcData,
-         crcOut       => crcResult);
+   GEN_CRC : if (EN_CRC_G = true) generate
+      U_Crc32 : entity work.Crc32Parallel
+         generic map (
+            TPD_G        => TPD_G,
+            BYTE_WIDTH_G => 4)
+         port map (
+            crcClk       => axilClk,
+            crcReset     => r.crcRst,
+            crcDataWidth => "011",      -- 4 bytes 
+            crcDataValid => r.crcValid,
+            crcIn        => r.crcData,
+            crcOut       => crcResult);
+   end generate;
 
    TX_FIFO : entity work.AxiStreamFifoV2
       generic map (
@@ -254,9 +273,9 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
+         BRAM_EN_G           => BRAM_EN_G,
          GEN_SYNC_FIFO_G     => true,
-         FIFO_ADDR_WIDTH_G   => 9,
+         FIFO_ADDR_WIDTH_G   => FIFO_ADDR_WIDTH_G,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)

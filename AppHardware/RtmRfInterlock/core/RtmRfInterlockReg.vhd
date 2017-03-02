@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Axi-lite interface for RTM registers
--------------------------------------------------------------------------------
 -- File       : RtmRfInterlockReg.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-06-21
 -- Last update: 2016-06-21
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:  Register decoding
 --               0x00 (RW)- bit0 = mode
@@ -25,11 +20,11 @@
 --               0x30-0x34
 --                    (R)- bit0-9 = Get value of the ADC iDelay                                       
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

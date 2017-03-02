@@ -27,9 +27,12 @@ use work.EthMacPkg.all;
 
 entity AppMsgIb is
    generic (
-      TPD_G       : time     := 1 ns;
-      HDR_SIZE_G  : positive := 1;
-      DATA_SIZE_G : positive := 1);
+      TPD_G             : time     := 1 ns;
+      HDR_SIZE_G        : positive := 1;
+      DATA_SIZE_G       : positive := 1;
+      EN_CRC_G          : boolean  := true;
+      BRAM_EN_G         : boolean  := true;
+      FIFO_ADDR_WIDTH_G : positive := 9);
    port (
       -- Application Messaging Interface (clk domain)      
       clk         : in  sl;
@@ -124,7 +127,7 @@ architecture rtl of AppMsgIb is
    signal tx       : TxType;
 
    signal fifoData  : slv(DATA_WIDTH_G-1 downto 0);
-   signal crcResult : slv(31 downto 0);
+   signal crcResult : slv(31 downto 0) := (others => '0');
 
    -- attribute dont_touch             : string;
    -- attribute dont_touch of r        : signal is "TRUE";   
@@ -138,9 +141,9 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => true,
+         BRAM_EN_G           => BRAM_EN_G,
          GEN_SYNC_FIFO_G     => true,
-         FIFO_ADDR_WIDTH_G   => 9,
+         FIFO_ADDR_WIDTH_G   => FIFO_ADDR_WIDTH_G,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
@@ -196,19 +199,34 @@ begin
                v.crcData                                   := rxMaster.tData(31 downto 0);
                -- Increment the counter
                v.cnt                                       := r.cnt + 1;
-               -- Check for last FIFO word
-               if (r.cnt = (SIZE_C-1)) then
-                  -- Reset the counter
-                  v.cnt   := 0;
-                  -- Next state
-                  v.state := CRC_S;
-               end if;
-               -- Check for framing error
-               if (rxMaster.tLast = '1') then
-                  -- Reset the CRC engine
-                  v.crcRst := '1';
-                  -- Next state
-                  v.state  := IDLE_S;
+               -- Check if CRC is enabled
+               if (EN_CRC_G = true) then
+                  -- Check for last FIFO word
+                  if (r.cnt = (SIZE_C-1)) then
+                     -- Reset the counter
+                     v.cnt   := 0;
+                     -- Next state
+                     v.state := CRC_S;
+                  end if;
+                  -- Check for framing error
+                  if (rxMaster.tLast = '1') then
+                     -- Reset the CRC engine
+                     v.crcRst := '1';
+                     -- Next state
+                     v.state  := IDLE_S;
+                  end if;
+               else
+                  -- Check for EOF or aligned
+                  if (rxMaster.tLast = '1') or (r.cnt = (SIZE_C-1)) then
+                     -- Check for no EOFE and aligned and EOF
+                     if (ssiGetUserEofe(AXIS_CONFIG_C, rxMaster) = '0')
+                        and (r.cnt = (SIZE_C-1))
+                        and (rxMaster.tLast = '1') then
+                        v.fifoWr := '1';
+                     end if;
+                     -- Next state
+                     v.state := IDLE_S;
+                  end if;
                end if;
             end if;
          ----------------------------------------------------------------------
@@ -255,17 +273,19 @@ begin
       end if;
    end process seq;
 
-   U_Crc32 : entity work.Crc32Parallel
-      generic map (
-         TPD_G        => TPD_G,
-         BYTE_WIDTH_G => 4)
-      port map (
-         crcClk       => axilClk,
-         crcReset     => r.crcRst,
-         crcDataWidth => "011",         -- 4 bytes 
-         crcDataValid => r.crcValid,
-         crcIn        => r.crcData,
-         crcOut       => crcResult);
+   GEN_CRC : if (EN_CRC_G = true) generate
+      U_Crc32 : entity work.Crc32Parallel
+         generic map (
+            TPD_G        => TPD_G,
+            BYTE_WIDTH_G => 4)
+         port map (
+            crcClk       => axilClk,
+            crcReset     => r.crcRst,
+            crcDataWidth => "011",      -- 4 bytes 
+            crcDataValid => r.crcValid,
+            crcIn        => r.crcData,
+            crcOut       => crcResult);
+   end generate;
 
    TX_FIFO : entity work.SynchronizerFifo
       generic map (

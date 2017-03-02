@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Sample rate decimation circuit
--------------------------------------------------------------------------------
 -- File       : DaqDecimator.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
 -- Last update: 2016-05-24
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: Reduces the sample rate:
 --                   test_i = '1' : Output counter test data
@@ -18,9 +13,7 @@
 --                         Averages the samples with the window size of rateDiv_i
 --                   averaging_i = '0':
 --                         rateDiv_i
---                         0 - SR, 1 - SR, 2 - SR/2, 3 - SR/3, 4 - SR/4 etc. up to 2^16-1
--- 
---              
+--                         0 - SR, 1 - SR, 2 - SR/2, 3 - SR/3, 4 - SR/4 etc. up to 2^16-1             
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 

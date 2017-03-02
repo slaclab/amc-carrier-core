@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Signal Generator for LVDS DAC
--------------------------------------------------------------------------------
 -- File       : LvdsDacSigGen.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-14
 -- Last update: 2015-04-14
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: Signal generator top module.
 --     Arbitrary signal generator
@@ -16,11 +11,11 @@
 --     Adjustable period s_periodSize,
 --     Polarity can be bitwise reversed s_polarityMask. 
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

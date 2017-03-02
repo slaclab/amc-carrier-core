@@ -1,27 +1,18 @@
 -------------------------------------------------------------------------------
--- Title      : Register Slave Block
--- Project    : General Purpose Core
--------------------------------------------------------------------------------
 -- File       : SsiAxiMaster.vhd
--- Author     : Ryan Herbst, rherbst@slac.stanford.edu
 -- Created    : 2014-04-09
 -- Last update: 2016-02-09
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:
 -- Block for Register protocol.
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 Timing BSA Core'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Timing BSA Core', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
--------------------------------------------------------------------------------
--- Modification history:
--- 04/09/2014: created.
 -------------------------------------------------------------------------------
 
 library ieee;

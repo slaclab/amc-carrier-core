@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Single lane DAC signal generator
--------------------------------------------------------------------------------
 -- File       : DacSigGenLane.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-16
 -- Last update: 2016-11-16
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
 --               The module contains a AXI-Lite accessible block RAM where the 
@@ -30,11 +25,11 @@
 --               - 16bit Interface: 7x  jesdClk2x c-c
 --               - 32bit Interface: 12x jesdClk c-c
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

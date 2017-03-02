@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Axi-lite interface for Signal generator control  
--------------------------------------------------------------------------------
 -- File       : LvdsDacRegItf.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
 -- Last update: 2015-04-15
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for Signal generator
 --               0x00 (RW)- Control Register
@@ -22,11 +17,11 @@
 --               0x2X (R) - Current tap delay values
 --
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

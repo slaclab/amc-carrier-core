@@ -1,14 +1,9 @@
 -------------------------------------------------------------------------------
--- Title      : Axi Lite register access for AD7682/AD7689
--------------------------------------------------------------------------------
 -- File       : AxiSpiAd7682.vhd
 -- Author     : Uros Legat <ulegat@slac.stanford.edu>
---            : 
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-12
 -- Last update: 2015-11-04
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:   
 --    The acquisition is continuous. Conversion time is defined by N_SPI_CYCLES_G. 
@@ -18,11 +13,11 @@
 --    Default configuration is s_cfgReg[15:0] = 0xFFFC
 --    
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

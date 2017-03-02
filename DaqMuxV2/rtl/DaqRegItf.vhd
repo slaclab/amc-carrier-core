@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Axi-lite interface for DAQ register access  V2
--------------------------------------------------------------------------------
 -- File       : DaqRegItf.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
 -- Last update: 2015-11-02
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for DAQ
 --

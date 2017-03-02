@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Axi-lite interface for Signal generator control  
--------------------------------------------------------------------------------
 -- File       : AxiLiteGenRegItf.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
 -- Last update: 2015-04-15
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for Signal generator
 --               0x00      (RW)- Enable channels. Example: 0x7F enables all 7 channels (also used to align the lane) (NUM_SIG_GEN_G-1 downto 0)
@@ -21,13 +16,12 @@
 --               0x10-0x1x (RW)- WaveformSize: In Periodic mode: Period size (Zero inclusive).
 --                                        In Triggered mode: Waveform size (Zero inclusive).
 --                                        Separate values for separate channels.
-
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

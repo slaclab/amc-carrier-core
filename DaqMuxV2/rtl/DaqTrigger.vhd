@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Handles DAQ triggers
--------------------------------------------------------------------------------
 -- File       : DaqTrigger.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
 -- Last update: 2016-05-24
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: 
 --          Trigger Status
@@ -16,13 +11,7 @@
 --              bit2: Hardware Trigger Status (Registered on first trigger until cleared by TriggerControl(4))
 --              bit3: Hardware Trigger Armed Status (Registered on rising edge TriggerControl(3) and cleared when Hw trigger occurs)
 --              bit4: Combined Trigger Status (Registered when trigger condition is met until cleared by TriggerControl(4))
---              bit5: Freeze buffer occurred (Registered on first freeze until cleared by Control(4))
---              
---              
---              
---              
---              
---              
+--              bit5: Freeze buffer occurred (Registered on first freeze until cleared by Control(4))      
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 

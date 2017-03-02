@@ -1,6 +1,4 @@
 -------------------------------------------------------------------------------
--- Title      : Generic DAC waveform generator
--------------------------------------------------------------------------------
 -- File       : DacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
@@ -8,11 +6,11 @@
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 AMC Carrier Firmware'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 AMC Carrier Firmware', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------

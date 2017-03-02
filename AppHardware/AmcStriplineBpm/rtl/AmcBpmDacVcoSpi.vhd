@@ -3,8 +3,6 @@
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-07-12
 -- Last update: 2016-07-12
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------

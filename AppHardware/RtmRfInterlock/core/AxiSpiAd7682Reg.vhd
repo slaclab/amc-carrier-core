@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Axi-lite interface for AD7682
--------------------------------------------------------------------------------
 -- File       : AxiSpiAd7682Reg.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
 -- Last update: 2016-09-02
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:  Registers 
 --               0x00(RW)- CFG register - Default 0xFFFC(AD7682/AD7689 Data-sheet, Table 11)
@@ -31,11 +26,11 @@
 --               0x10-1X(RO)- ADC values (0-3)
 --                   
 -------------------------------------------------------------------------------
--- This file is part of 'LCLS2 LLRF Development'.
+-- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
 -- top-level directory of this distribution and at: 
 --    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
+-- No part of 'LCLS2 Common Carrier Core', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
