@@ -23,7 +23,7 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 
 use work.TimingPkg.all;
-use work.AppMpsPkg.all;
+use work.AmcCarrierPkg.all;
 
 package AppMpsPkg is
 
