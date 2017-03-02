@@ -41,13 +41,8 @@ package AmcCarrierPkg is
    -- 07/08/2016 (0x00000008): Updated the I2C device configurations
    -- 09/01/2016 (0x00000009): Backing up to 1.2 TAG
    -- 12/05/2016 (0x0000000A): Adding more application types
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"0000000A";
-
-   constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
-   constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
-
-   constant AXI_CLK_FREQ_C   : real := 156.25E+6;                        -- In units of Hz
-   constant AXI_CLK_PERIOD_C : real := (1.0/AXI_CLK_FREQ_C);  -- In units of seconds   
+   -- 03/02/2017 (0x0000000B): Migration to GIT
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"0000000B";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
@@ -69,6 +64,16 @@ package AmcCarrierPkg is
    constant APP_MPS_LINK_DIN_TYPE_C   : AppType := toSlv(126, AppType'length);  -- MPS Link Node, Dual Digital AMC cards
    constant APP_MPS_LINK_MIXED_TYPE_C : AppType := toSlv(127, AppType'length);  -- MPS Link Node, Mixed Signal (1x Analog and 1x Digital AMC cards)
 
+   -------------------------------------
+   -- Common Platform: General Constants
+   -------------------------------------
+
+   constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
+   constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
+
+   constant AXI_CLK_FREQ_C   : real := 156.25E+6;                        -- In units of Hz
+   constant AXI_CLK_PERIOD_C : real := (1.0/AXI_CLK_FREQ_C);  -- In units of seconds      
+   
    constant APP_REG_BASE_ADDR_C : slv(31 downto 0) := x"80000000";
 
    -------------------------------------------------------------------------------------------------
@@ -89,7 +94,6 @@ package AmcCarrierPkg is
    constant BSA_DIAGNOSTIC_OUTPUTS_C : integer := 28;
    constant BSA_STREAM_BYTE_WIDTH_C  : integer := 8;
    constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data
-
 
    constant WAVEFORM_STREAMS_C     : integer := 8;
    constant WAVEFORM_AXIS_CONFIG_C : AxiStreamConfigType :=
@@ -113,82 +117,6 @@ package AmcCarrierPkg is
       slave => AXI_STREAM_SLAVE_INIT_C,
       ctrl  => AXI_STREAM_CTRL_INIT_C);
    constant WAVEFORM_SLAVE_ARRAY_INIT_C : WaveformSlaveArrayType := (others => (others => WAVEFORM_SLAVE_REC_INIT_C));
-
-
-   ---------------------------------------------------
-   -- MPS: Configurations, Constants and Records Types
-   ---------------------------------------------------   
-   constant MPS_CONFIG_C          : AxiStreamConfigType := ssiAxiStreamConfig(2);
-   constant MPS_MITIGATION_BITS_C : integer             := 98;
-   constant MPS_MESSAGE_BITS_C    : integer             := 298;
-
-   function getMpsChCnt(app        : AppType) return natural;
-   function getMpsThresholdCnt(app : AppType) return natural;
-
-   type MpsMitigationMsgType is record
-      strobe    : sl;                      -- valid
-      latchDiag : sl;                      -- latch the beam diagnostics with 'tag' 
-      tag       : slv(15 downto 0);      
-      timeStamp : slv(15 downto 0);
-      class     : Slv4Array(15 downto 0);  -- power class limits for each of 16 destinations
-   end record;
-
-   constant MPS_MITIGATION_MSG_INIT_C : MpsMitigationMsgType := (
-      strobe    => '0',
-      latchDiag => '0',
-      tag       => (others => '0'),      
-      timeStamp => (others => '0'),
-      class     => (others => (others => '0')));
-
-   function toSlv (m                : MpsMitigationMsgType) return slv;
-   function toMpsMitigationMsg (vec : slv) return MpsMitigationMsgType;
-
-   type MpsMessageType is record
-      valid     : sl;
-      lcls      : sl; -- '0' LCLS-II, '1' LCLS-I
-      inputType : sl; -- '0' Digital, '1' Analog      
-      timeStamp : slv(15 downto 0);
-      appId     : slv(15 downto 0);
-      message   : Slv8Array(31 downto 0);
-      msgSize   : slv(7 downto 0);      -- In units of Bytes
-   end record;
-
-   type MpsMessageArray is array (natural range <>) of MpsMessageType;
-
-   constant MPS_MESSAGE_INIT_C : MpsMessageType := (
-      valid     => '0',
-      lcls      => '0',    
-      inputType => '0',      
-      timeStamp => (others => '0'),
-      appId     => (others => '0'),
-      message   => (others => (others => '0')),
-      msgSize   => (others => '0'));
-
-   function toSlv (m          : MpsMessageType) return slv;
-   function toMpsMessage (vec : slv) return MpsMessageType;
-
-   ---------------------------------------------------------------------------      
-   -- Backplane Messaging Network: Configurations, Constants and Records Types
-   ---------------------------------------------------------------------------    
-   constant BP_MSG_SIZE_C     : natural := 2;
-   function getBpMsgChCnt(app : AppType) return natural;
-
-   type BpMsgBusType is record
-      valid     : sl;
-      testMode  : sl;
-      app       : AppType;
-      appId     : slv(15 downto 0);
-      timeStamp : slv(63 downto 0);
-      message   : Slv32Array(31 downto 0);
-   end record;
-   type BpMsgBusArray is array (natural range <>) of BpMsgBusType;
-   constant BP_MSG_BUS_INIT_C : BpMsgBusType := (
-      valid     => '0',
-      testMode  => '0',
-      app       => (others => '0'),
-      appId     => (others => '0'),
-      timeStamp => (others => '0'),
-      message   => (others => (others => '0')));
 
    ---------------------------------------------------
    -- BSI: Configurations, Constants and Records Types
@@ -225,81 +153,6 @@ end package AmcCarrierPkg;
 
 package body AmcCarrierPkg is
 
-   function getMpsChCnt (app : AppType) return natural is
-      variable retVar : natural range 0 to 32;
-   begin
-      if (app = APP_BCM_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BLEN_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_STRIPLINE_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_CAVITY_TYPE_C) then
-         retVar := 0;                   -- TBD value         
-      elsif (app = APP_LLRF_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_MPS_APP_TYPE_C) then
-         retVar := 24;                  -- 6 channels * 4 integrations, RTH 01/27/2016
-      elsif (app = APP_MPS_DIGITAL_TYPE_C) then
-         retVar := 12;                  -- 96 bits., RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
-         retVar := 24;                  -- 6 channels * 4 integrations, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
-         retVar := 0;                   -- 0 channels, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         retVar := 12;                  -- 3 channels * 4 integrations, RTH 01/27/2016
-      else
-         retVar := 0;
-      end if;
-      return retVar;
-   end function;
-
-   function getMpsThresholdCnt (app : AppType) return natural is
-      variable retVar : natural range 0 to 256;
-   begin
-      if (app = APP_BCM_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BLEN_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_STRIPLINE_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_CAVITY_TYPE_C) then
-         retVar := 0;                   -- TBD value         
-      elsif (app = APP_LLRF_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_MPS_APP_TYPE_C) then
-         retVar := 16;                  -- 16, RTH 01/27/2016
-      elsif (app = APP_MPS_DIGITAL_TYPE_C) then
-         retVar := 0;                   -- None, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
-         retVar := 16;                  -- 16, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
-         retVar := 0;                   -- None, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         retVar := 16;                  -- 16, RTH 01/27/2016
-      else
-         retVar := 0;
-      end if;
-      return retVar;
-   end function;
-
-   function getBpMsgChCnt (app : AppType) return natural is
-      variable retVar : natural range 0 to 32;
-   begin
-      if (app = APP_BLEN_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_STRIPLINE_TYPE_C) then
-         retVar := 6;
-      elsif (app = APP_BPM_CAVITY_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_DEBUG_TYPE_C) then
-         retVar := 32;                  -- Send all 32-bit words
-      else
-         retVar := 0;
-      end if;
-      return retVar;
-   end function;
-
    function toSlv (b : DiagnosticBusType) return slv is
       variable vector : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0) := (others => '0');
       variable i      : integer                               := 0;
@@ -325,73 +178,5 @@ package body AmcCarrierPkg is
       assignRecord(i, vec, b.strobe);
       return b;
    end function;
-
-   function toSlv (m : MpsMitigationMsgType) return slv is
-      variable vector : slv(MPS_MITIGATION_BITS_C-1 downto 0) := (others => '0');
-      variable i      : integer                               := 0;
-   begin
-      assignSlv(i, vector, m.strobe);
-      assignSlv(i, vector, m.latchDiag);      
-      assignSlv(i, vector, m.tag);      
-      assignSlv(i, vector, m.timeStamp);
-
-      for j in 0 to 15 loop
-         assignslv(i, vector, m.class(j));
-      end loop;
-
-      return vector;
-   end function;
-
-   function toMpsMitigationMsg (vec : slv) return MpsMitigationMsgType is
-      variable m : MpsMitigationMsgType;
-      variable i : integer := 0;
-   begin
-      assignrecord(i, vec, m.strobe);
-      assignrecord(i, vec, m.latchDiag);
-      assignrecord(i, vec, m.tag);      
-      assignRecord(i, vec, m.timeStamp);
-
-      for j in 0 to 15 loop
-         assignrecord(i, vec, m.class(j));
-      end loop;
-
-      return m;
-   end function;
-
-   function toSlv (m : MpsMessageType) return slv is
-      variable vector : slv(MPS_MESSAGE_BITS_C-1 downto 0) := (others => '0');
-      variable i      : integer                            := 0;
-   begin
-      assignSlv(i, vector, m.valid);
-      assignSlv(i, vector, m.lcls);
-      assignSlv(i, vector, m.inputType);      
-      assignSlv(i, vector, m.msgSize);      
-      assignSlv(i, vector, m.appId);
-      assignSlv(i, vector, m.timeStamp);
-      
-      for j in 0 to 31 loop
-         assignSlv(i, vector, m.message(j));
-      end loop;
-
-      return vector;
-   end function;
-
-   function toMpsMessage (vec : slv) return MpsMessageType is
-      variable m : MpsMessageType;
-      variable i : integer := 0;
-   begin
-      assignRecord(i, vec, m.valid);
-      assignRecord(i, vec, m.lcls);
-      assignRecord(i, vec, m.inputType);
-      assignRecord(i, vec, m.msgSize);
-      assignRecord(i, vec, m.appId);      
-      assignRecord(i, vec, m.timeStamp);
-
-      for j in 0 to 31 loop
-         assignRecord(i, vec, m.message(j));
-      end loop;
-
-      return m;
-   end function;
-
+   
 end package body AmcCarrierPkg;
