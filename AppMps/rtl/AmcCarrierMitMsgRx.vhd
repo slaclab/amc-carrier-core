@@ -43,6 +43,7 @@ entity AmcCarrierMitMsgRx is
       -- Incoming data
       mpsMaster     : in  AxiStreamMasterType;
       mpsSlave      : out AxiStreamSlaveType:= AXI_STREAM_SLAVE_FORCE_C;
+      mpsCtrl       : out AxiStreamCtrlType := AXI_STREAM_CTRL_UNUSED_C;
       -- Message Out
       mitMessage      : out MpsMitigationMsgType;
       msgError        : out sl
