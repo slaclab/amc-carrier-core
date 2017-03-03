@@ -30,7 +30,7 @@ use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.MpsCentralNodePkg.all;
-use work.AmcCarrierPkg.all;
+use work.AppMpsPkg.all;
 
 
 entity AmcCarrierMitMsgRx is
