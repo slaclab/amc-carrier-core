@@ -32,8 +32,7 @@ entity AppMsgOb is
       DATA_SIZE_G       : positive        := 1;
       EN_CRC_G          : boolean         := true;
       BRAM_EN_G         : boolean         := true;
-      FIFO_ADDR_WIDTH_G : positive        := 9;
-      TDEST_G           : slv(7 downto 0) := x"00");
+      FIFO_ADDR_WIDTH_G : positive        := 9);
    port (
       -- Application Messaging Interface (clk domain)      
       clk         : in  sl;
@@ -42,6 +41,7 @@ entity AppMsgOb is
       header      : in  Slv32Array(HDR_SIZE_G-1 downto 0);
       timeStamp   : in  slv(63 downto 0);
       data        : in  Slv32Array(DATA_SIZE_G-1 downto 0);
+      tdest       : in  slv(7 downto 0) := x"00";
       -- Backplane Messaging Interface  (axilClk domain)
       axilClk     : in  sl;
       axilRst     : in  sl;
@@ -52,13 +52,14 @@ end AppMsgOb;
 architecture rtl of AppMsgOb is
 
    constant SIZE_C        : positive            := (2+HDR_SIZE_G+DATA_SIZE_G);  -- 64-bit timestamp + header + data
-   constant DATA_WIDTH_G  : positive            := (32*SIZE_C);  -- 32-bit words
+   constant DATA_WIDTH_G  : positive            := (32*SIZE_C)+8;  -- 32-bit words + 8-bit tdest
    constant AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(4);
 
    function toSlv (
-      hdr : Slv32Array(HDR_SIZE_G-1 downto 0);
-      ts  : slv(63 downto 0);
-      msg : Slv32Array(DATA_SIZE_G-1 downto 0)) return slv is
+      hdr   : Slv32Array(HDR_SIZE_G-1 downto 0);
+      ts    : slv(63 downto 0);
+      msg   : Slv32Array(DATA_SIZE_G-1 downto 0);
+      tdest : slv(7 downto 0)) return slv is
       variable retVar : slv(DATA_WIDTH_G-1 downto 0);
       variable i      : natural;
       variable idx    : natural;
@@ -84,7 +85,11 @@ architecture rtl of AppMsgOb is
          retVar((idx*32)+31 downto (idx*32)) := msg(i);
          idx                                 := idx + 1;
       end loop;
-
+      
+      -- Load the tDest 
+      retVar((idx*32)+7 downto (idx*32)) := tdest;
+      idx                                := idx + 1;      
+      
       return retVar;
    end function;
 
@@ -128,7 +133,7 @@ architecture rtl of AppMsgOb is
 
 begin
 
-   fifoDin <= toSlv(header, timeStamp, data);
+   fifoDin <= toSlv(header, timeStamp, data, tdest);
 
    RX_FIFO : entity work.SynchronizerFifo
       generic map (
@@ -166,8 +171,10 @@ begin
       case r.state is
          ----------------------------------------------------------------------
          when IDLE_S =>
-            -- Check for new data
-            if (valid = '1') then
+            -- Check for new data and ready to send
+            if (valid = '1') and (v.txMaster.tValid = '0') then
+               -- Update the tDest
+               v.txMaster.tDest  := fifoDout((32*SIZE_C)+7 downto (32*SIZE_C));
                -- Next state
                v.state := DATA_S;
             end if;
@@ -227,9 +234,6 @@ begin
             end if;
       ----------------------------------------------------------------------
       end case;
-
-      -- Update the TDEST routing
-      v.txMaster.tDest := TDEST_G;
 
       -- Reset
       if (axilRst = '1') then

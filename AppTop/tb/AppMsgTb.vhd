@@ -31,7 +31,7 @@ architecture testbed of AppMsgTb is
    constant TPD_C        : time := CLK_PERIOD_C/4;
 
    constant HDR_SIZE_C  : positive := 1;
-   constant DATA_SIZE_C : positive := 1;
+   constant DATA_SIZE_C : positive := 8;
    constant EN_CRC_C    : boolean  := true;
 
    type RegType is record
@@ -89,6 +89,7 @@ begin
          header      => r.header,
          timeStamp   => r.timeStamp,
          data        => r.data,
+         tDest       => r.timeStamp(7 downto 0),         
          -- Backplane Messaging Interface  (axilClk domain)
          axilClk     => clk,
          axilRst     => rst,

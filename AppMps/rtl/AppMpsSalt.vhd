@@ -29,6 +29,7 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AmcCarrierPkg.all;
+use work.AppMpsPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
