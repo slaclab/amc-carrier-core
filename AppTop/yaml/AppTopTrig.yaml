@@ -11,7 +11,7 @@
 #once AppTopTrig.yaml
 #include LclsMrTimingTriggerPulse.yaml
 #include EvrV1Reg.yaml
-#include AxiEmpty.yaml
+#include EvrV1Irq.yaml
 
 AppTopTrig: &AppTopTrig 
   description: Common Application Top Level Trigger Module
@@ -35,7 +35,7 @@ AppTopTrig: &AppTopTrig
         offset: 0x01000000  
     ##################################################
     EvrV1Irq:
-      <<: *AxiEmpty
+      <<: *EvrV1Irq
       at:
         offset: 0x02000000
     ##################################################     

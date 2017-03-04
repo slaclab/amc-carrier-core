@@ -37,6 +37,7 @@ entity AppTop is
       TPD_G                : time                      := 1 ns;
       SIM_SPEEDUP_G        : boolean                   := false;
       SIMULATION_G         : boolean                   := false;
+      MR_LCLS_APP_G        : boolean                   := true;
       AXI_ERROR_RESP_G     : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
       JESD_DRP_EN_G        : boolean                   := false;
@@ -235,6 +236,7 @@ begin
    U_Trig : entity work.AppTopTrig
       generic map (
          TPD_G              => TPD_G,
+         MR_LCLS_APP_G      => MR_LCLS_APP_G,
          AXIL_BASE_ADDR_G   => AXI_CONFIG_C(TIMING_INDEX_C).baseAddr,
          AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          TRIG_SIZE_G        => TRIG_SIZE_G,

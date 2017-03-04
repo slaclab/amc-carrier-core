@@ -2,7 +2,7 @@
 -- File       : AppTopTrig.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-03-02
+-- Last update: 2017-03-03
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -29,6 +29,7 @@ use work.EthMacPkg.all;
 entity AppTopTrig is
    generic (
       TPD_G              : time                   := 1 ns;
+      MR_LCLS_APP_G      : boolean                := true;
       AXIL_BASE_ADDR_G   : slv(31 downto 0)       := (others => '0');
       AXI_ERROR_RESP_G   : slv(1 downto 0)        := AXI_RESP_SLVERR_C;
       TRIG_SIZE_G        : positive range 1 to 16 := 3;    -- Unused
@@ -59,9 +60,13 @@ architecture mapping of AppTopTrig is
 
    constant APP_STREAM_ROUTES_C : Slv8Array(1 downto 0) := (
       0 => "--------",  -- AppCore Message: TDEST = ANY
-      1 => x"FF");                      -- EVR IRQ Message: TDEST = 0xFF
+      1 => "--------");  -- EVR IRQ Message: TDEST = forced to [0xFF:0xF0] at EvrV1CoreIrqCtrl
 
-   constant NUM_AXI_MASTERS_C : natural := 3;
+   constant NUM_AXI_MASTERS_C : natural := ite(MR_LCLS_APP_G, 3, 1);
+
+   constant TRIG_CORE_INDEX_C : natural := 0;
+   constant EVR_CORE_INDEX_C  : natural := 1;
+   constant EVR_IRQ_INDEX_C   : natural := 2;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXIL_BASE_ADDR_G, 28, 24);
 
@@ -70,10 +75,10 @@ architecture mapping of AppTopTrig is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal mAxilReadMaster  : AxiLiteReadMasterType;
-   signal mAxilReadSlave   : AxiLiteReadSlaveType;
-   signal mAxilWriteMaster : AxiLiteWriteMasterType;
-   signal mAxilWriteSlave  : AxiLiteWriteSlaveType;
+   signal mAxilReadMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+   signal mAxilReadSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
+   signal mAxilWriteMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+   signal mAxilWriteSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;
 
    signal evrIrqMaster : AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
    signal evrIrqSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_FORCE_C;
@@ -94,7 +99,7 @@ begin
    process (trig) is
    begin
       for i in 15 downto 0 loop
-         evrTrig.trigPulse(i) <= trig(0)(i) or trig(1)(i);
+         evrTrig.trigPulse(i) <= trig(TRIG_CORE_INDEX_C)(i) or trig(EVR_CORE_INDEX_C)(i);
       end loop;
    end process;
 
@@ -123,14 +128,14 @@ begin
          mAxiWriteSlaves     => axilWriteSlaves,
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
-
+         
    -----------------------------
    -- LCLS Timing/Trigger Module
    -----------------------------
    U_Trigging : entity work.LclsMrTimingCore
       generic map (
          TPD_G                => TPD_G,
-         AXIL_BASE_ADDR_G     => AXIL_BASE_ADDR_G,
+         AXIL_BASE_ADDR_G     => AXI_CONFIG_C(TRIG_CORE_INDEX_C).baseAddr,
          AXI_ERROR_RESP_G     => AXI_ERROR_RESP_G,
          NUM_OF_TRIG_PULSES_G => TRIG_SIZE_G,
          DELAY_WIDTH_G        => TRIG_DELAY_WIDTH_G,
@@ -139,94 +144,106 @@ begin
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(0),
-         axilReadSlave   => axilReadSlaves(0),
-         axilWriteMaster => axilWriteMasters(0),
-         axilWriteSlave  => axilWriteSlaves(0),
+         axilReadMaster  => axilReadMasters(TRIG_CORE_INDEX_C),
+         axilReadSlave   => axilReadSlaves(TRIG_CORE_INDEX_C),
+         axilWriteMaster => axilWriteMasters(TRIG_CORE_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(TRIG_CORE_INDEX_C),
          -- Timing Interface
          recClk          => recClk,
          recRst          => recRst,
          timingBus_i     => timingBus_i,
          -- Trigger pulse outputs 
-         trigPulse_o     => trig(0)(TRIG_SIZE_G-1 downto 0),
+         trigPulse_o     => trig(TRIG_CORE_INDEX_C)(TRIG_SIZE_G-1 downto 0),
          timeStamp_o     => evrTrig.timeStamp,
          pulseId_o       => evrTrig.pulseId,
          bsa_o           => evrTrig.bsa,
          dmod_o          => evrTrig.dmod);
 
-   -----------------------------
-   -- LCLS Timing/Trigger Module
-   -----------------------------         
-   U_EvrV1Core : entity work.EvrV1Core
-      generic map (
-         TPD_G           => TPD_G,
-         BUILD_INFO_G    => (others => '0'),
-         SYNC_POLARITY_G => '1',
-         USE_WSTRB_G     => false,
-         ENDIAN_G        => false)
-      port map (
-         -- AXI-Lite and IRQ Interface
-         axiClk         => axilClk,
-         axiRst         => axilRst,
-         axiReadMaster  => axilReadMasters(1),
-         axiReadSlave   => axilReadSlaves(1),
-         axiWriteMaster => axilWriteMasters(1),
-         axiWriteSlave  => axilWriteSlaves(1),
-         irqActive      => irqActive,
-         irqEnable      => irqEnable,
-         irqReq         => irqReq,
-         -- Trigger and Sync Port
-         sync           => '0',
-         trigOut        => trig(1)(11 downto 0),
-         -- EVR Interface
-         evrClk         => recClk,
-         evrRst         => recRst,
-         rxLinkUp       => rxLinkUp,
-         rxError        => rxError,
-         rxData         => rxData,
-         rxDataK        => rxDataK);
+   GEN_EVR : if (MR_LCLS_APP_G = true) generate
 
-   -----------------------------
-   -- LCLS Timing/Trigger Module
-   -----------------------------         
-   U_EvrV1Irq : entity work.EvrV1CoreIrqCtrl
-      generic map (
-         TPD_G             => TPD_G,
-         TIMEOUT_EN_G      => false,
-         BRAM_EN_G         => true,
-         FIFO_ADDR_WIDTH_G => 9,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
-         AXIS_CONFIG_G     => EMAC_AXIS_CONFIG_C)
-      port map (
-         -- AXI-Lite and AXIS Interfaces
-         axilClk          => axilClk,
-         axilRst          => axilRst,
-         axilReadMaster   => axilReadMasters(2),
-         axilReadSlave    => axilReadSlaves(2),
-         axilWriteMaster  => axilWriteMasters(2),
-         axilWriteSlave   => axilWriteSlaves(2),
-         mAxilReadMaster  => mAxilReadMaster,
-         mAxilReadSlave   => mAxilReadSlave,
-         mAxilWriteMaster => mAxilWriteMaster,
-         mAxilWriteSlave  => mAxilWriteSlave,
-         mAxisMaster      => evrIrqMaster,
-         mAxisSlave       => evrIrqSlave,
-         -- IRQ Interface
-         irqActive        => irqActive,
-         irqEnable        => irqEnable,
-         irqReq           => irqReq,
-         -- EVR Interface
-         evrClk           => recClk,
-         evrRst           => recRst,
-         gtLinkUp         => timingBus_i.v1.linkUp,
-         gtRxData         => timingBus_i.v1.gtRxData,
-         gtRxDataK        => timingBus_i.v1.gtRxDataK,
-         gtRxDispErr      => timingBus_i.v1.gtRxDispErr,
-         gtRxDecErr       => timingBus_i.v1.gtRxDecErr,
-         rxLinkUp         => rxLinkUp,
-         rxError          => rxError,
-         rxData           => rxData,
-         rxDataK          => rxDataK);
+      -----------------------------
+      -- LCLS Timing/Trigger Module
+      -----------------------------         
+      U_EvrV1Core : entity work.EvrV1Core
+         generic map (
+            TPD_G           => TPD_G,
+            BUILD_INFO_G    => (others => '0'),
+            SYNC_POLARITY_G => '1',
+            USE_WSTRB_G     => false,
+            ENDIAN_G        => false)
+         port map (
+            -- AXI-Lite and IRQ Interface
+            axiClk         => axilClk,
+            axiRst         => axilRst,
+            axiReadMaster  => axilReadMasters(EVR_CORE_INDEX_C),
+            axiReadSlave   => axilReadSlaves(EVR_CORE_INDEX_C),
+            axiWriteMaster => axilWriteMasters(EVR_CORE_INDEX_C),
+            axiWriteSlave  => axilWriteSlaves(EVR_CORE_INDEX_C),
+            irqActive      => irqActive,
+            irqEnable      => irqEnable,
+            irqReq         => irqReq,
+            -- Trigger and Sync Port
+            sync           => '0',
+            trigOut        => trig(EVR_CORE_INDEX_C)(11 downto 0),
+            -- EVR Interface
+            evrClk         => recClk,
+            evrRst         => recRst,
+            rxLinkUp       => rxLinkUp,
+            rxError        => rxError,
+            rxData         => rxData,
+            rxDataK        => rxDataK);
+
+      -----------------------------
+      -- LCLS Timing/Trigger Module
+      -----------------------------         
+      U_EvrV1Irq : entity work.EvrV1CoreIrqCtrl
+         generic map (
+            TPD_G                 => TPD_G,
+            DEFAULT_ISR_SEL_G     => '1',  -- '1' = SW, '0' = FW
+            TDEST_IRQ_MSG_G       => x"FF",
+            TDEST_DATABUF_MSG_G   => x"F5",
+            TDEST_PULSE_MSG_G     => x"F4",
+            TDEST_EVENT_MSG_G     => x"F3",
+            TDEST_HEARTBEAT_MSG_G => x"F2",
+            TDEST_FIFOFULL_MSG_G  => x"F1",
+            TDEST_VIOLATION_MSG_G => x"F0",
+            BRAM_EN_G             => true,
+            FIFO_ADDR_WIDTH_G     => 9,
+            REM_BASE_ADDR_G       => AXI_CONFIG_C(EVR_CORE_INDEX_C).baseAddr,  -- remote base address offset
+            AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
+            AXIS_CONFIG_G         => EMAC_AXIS_CONFIG_C)
+         port map (
+            -- AXI-Lite and AXIS Interfaces
+            axilClk          => axilClk,
+            axilRst          => axilRst,
+            axilReadMaster   => axilReadMasters(EVR_IRQ_INDEX_C),
+            axilReadSlave    => axilReadSlaves(EVR_IRQ_INDEX_C),
+            axilWriteMaster  => axilWriteMasters(EVR_IRQ_INDEX_C),
+            axilWriteSlave   => axilWriteSlaves(EVR_IRQ_INDEX_C),
+            mAxilReadMaster  => mAxilReadMaster,
+            mAxilReadSlave   => mAxilReadSlave,
+            mAxilWriteMaster => mAxilWriteMaster,
+            mAxilWriteSlave  => mAxilWriteSlave,
+            mAxisMaster      => evrIrqMaster,
+            mAxisSlave       => evrIrqSlave,
+            -- IRQ Interface
+            irqActive        => irqActive,
+            irqEnable        => irqEnable,
+            irqReq           => irqReq,
+            -- EVR Interface
+            evrClk           => recClk,
+            evrRst           => recRst,
+            gtLinkUp         => timingBus_i.v1.linkUp,
+            gtRxData         => timingBus_i.v1.gtRxData,
+            gtRxDataK        => timingBus_i.v1.gtRxDataK,
+            gtRxDispErr      => timingBus_i.v1.gtRxDispErr,
+            gtRxDecErr       => timingBus_i.v1.gtRxDecErr,
+            rxLinkUp         => rxLinkUp,
+            rxError          => rxError,
+            rxData           => rxData,
+            rxDataK          => rxDataK);
+
+   end generate;
 
    -----------
    -- AXIS MUX
