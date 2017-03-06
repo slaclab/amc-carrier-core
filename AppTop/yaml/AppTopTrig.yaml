@@ -9,33 +9,36 @@
 ##############################################################################
 #schemaversion 3.0.0
 #once AppTopTrig.yaml
-#include LclsMrTimingTriggerPulse.yaml
+#include LclsTriggerPulse.yaml
 #include EvrV1Reg.yaml
-#include EvrV1Irq.yaml
+#include EvrV1Isr.yaml
 
 AppTopTrig: &AppTopTrig 
   description: Common Application Top Level Trigger Module
   class: MMIODev
   configPrio: 1
   size: 0x10000000
+  metadata:
+    numTrigPulse: &numTrigPulse 1  
   ########
   children:
   ########
     ##################################################
-    LclsMrTimingTriggerPulse:
-      <<: *LclsMrTimingTriggerPulse
+    LclsTriggerPulse:
+      <<: *LclsTriggerPulse
       at:
         offset: 0x00000000  
         stride: 0x00001000
-        nelms: 1     
+        nelms: *numTrigPulse     
     ##################################################
     EvrV1Reg:
       <<: *EvrV1Reg
       at:
         offset: 0x01000000  
     ##################################################
-    EvrV1Irq:
-      <<: *EvrV1Irq
+    EvrV1Isr:
+      <<: *EvrV1Isr
       at:
         offset: 0x02000000
     ##################################################     
+    

@@ -2,7 +2,7 @@
 -- File       : AppTopTrig.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-03-03
+-- Last update: 2017-03-06
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ architecture mapping of AppTopTrig is
 
    constant TRIG_CORE_INDEX_C : natural := 0;
    constant EVR_CORE_INDEX_C  : natural := 1;
-   constant EVR_IRQ_INDEX_C   : natural := 2;
+   constant EVR_ISR_INDEX_C   : natural := 2;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXIL_BASE_ADDR_G, 28, 24);
 
@@ -128,11 +128,11 @@ begin
          mAxiWriteSlaves     => axilWriteSlaves,
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
-         
+
    -----------------------------
    -- LCLS Timing/Trigger Module
    -----------------------------
-   U_Trigging : entity work.LclsMrTimingCore
+   U_Trigging : entity work.LclsTriggerCore
       generic map (
          TPD_G                => TPD_G,
          AXIL_BASE_ADDR_G     => AXI_CONFIG_C(TRIG_CORE_INDEX_C).baseAddr,
@@ -193,20 +193,20 @@ begin
             rxData         => rxData,
             rxDataK        => rxDataK);
 
-      -----------------------------
-      -- LCLS Timing/Trigger Module
-      -----------------------------         
-      U_EvrV1Irq : entity work.EvrV1CoreIrqCtrl
+      ------------------------------------
+      -- EvrV1Core's ISR Controller Module
+      ------------------------------------         
+      U_EvrV1Isr : entity work.EvrV1CoreIsrCtrl
          generic map (
             TPD_G                 => TPD_G,
-            DEFAULT_ISR_SEL_G     => '1',  -- '1' = SW, '0' = FW
-            TDEST_IRQ_MSG_G       => x"FF",
-            TDEST_DATABUF_MSG_G   => x"F5",
-            TDEST_PULSE_MSG_G     => x"F4",
-            TDEST_EVENT_MSG_G     => x"F3",
-            TDEST_HEARTBEAT_MSG_G => x"F2",
-            TDEST_FIFOFULL_MSG_G  => x"F1",
-            TDEST_VIOLATION_MSG_G => x"F0",
+            DEFAULT_ISR_SEL_G     => '0',    -- '1' = SW, '0' = FW
+            TDEST_IRQ_MSG_G       => x"FF",  -- SW ISR only
+            TDEST_DATABUF_MSG_G   => x"F5",  -- FW ISR only
+            TDEST_PULSE_MSG_G     => x"F4",  -- FW ISR only
+            TDEST_EVENT_MSG_G     => x"F3",  -- FW ISR only
+            TDEST_HEARTBEAT_MSG_G => x"F2",  -- FW ISR only
+            TDEST_FIFOFULL_MSG_G  => x"F1",  -- FW ISR only
+            TDEST_VIOLATION_MSG_G => x"F0",  -- FW ISR only
             BRAM_EN_G             => true,
             FIFO_ADDR_WIDTH_G     => 9,
             REM_BASE_ADDR_G       => AXI_CONFIG_C(EVR_CORE_INDEX_C).baseAddr,  -- remote base address offset
@@ -216,10 +216,10 @@ begin
             -- AXI-Lite and AXIS Interfaces
             axilClk          => axilClk,
             axilRst          => axilRst,
-            axilReadMaster   => axilReadMasters(EVR_IRQ_INDEX_C),
-            axilReadSlave    => axilReadSlaves(EVR_IRQ_INDEX_C),
-            axilWriteMaster  => axilWriteMasters(EVR_IRQ_INDEX_C),
-            axilWriteSlave   => axilWriteSlaves(EVR_IRQ_INDEX_C),
+            axilReadMaster   => axilReadMasters(EVR_ISR_INDEX_C),
+            axilReadSlave    => axilReadSlaves(EVR_ISR_INDEX_C),
+            axilWriteMaster  => axilWriteMasters(EVR_ISR_INDEX_C),
+            axilWriteSlave   => axilWriteSlaves(EVR_ISR_INDEX_C),
             mAxilReadMaster  => mAxilReadMaster,
             mAxilReadSlave   => mAxilReadSlave,
             mAxilWriteMaster => mAxilWriteMaster,
