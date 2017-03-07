@@ -43,6 +43,8 @@ package AppMpsPkg is
       class     : Slv4Array(15 downto 0);  -- power class limits for each of 16 destinations
    end record;
 
+   type MpsMitigationMsgArray is array (natural range <>) of MpsMitigationMsgType;   
+   
    constant MPS_MITIGATION_MSG_INIT_C : MpsMitigationMsgType := (
       strobe    => '0',
       latchDiag => '0',
