@@ -2,7 +2,7 @@
 -- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-02-04
+-- Last update: 2017-03-09
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -112,7 +112,33 @@ architecture mapping of AppMpsSalt is
 
 begin
 
-   APP_SLOT : if (MPS_SLOT_G = false) generate
+   APP_UNDEFINED : if (APP_TYPE_G = APP_NULL_TYPE_C) generate
+
+      mpsTxLinkUp  <= '0';
+      mpsRxLinkUp  <= (others => '0');
+      mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
+      mpsIbSlave   <= AXI_STREAM_SLAVE_FORCE_C;
+
+      U_OBUFDS : OBUFDS
+         port map (
+            I  => '0',
+            O  => mpsTxP,
+            OB => mpsTxN);
+
+      GEN_VEC :
+      for i in 14 downto 1 generate
+         U_IBUFDS : IBUFDS
+            generic map (
+               DIFF_TERM => true)
+            port map(
+               I  => mpsBusRxP(i),
+               IB => mpsBusRxN(i),
+               O  => open);
+      end generate GEN_VEC;
+
+   end generate;
+
+   APP_SLOT : if (MPS_SLOT_G = false) and (APP_TYPE_G /= APP_NULL_TYPE_C) generate
 
       mpsRxLinkUp  <= (others => '0');
       mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
@@ -120,8 +146,8 @@ begin
       U_SaltUltraScale : entity work.SaltUltraScale
          generic map (
             TPD_G               => TPD_G,
-            TX_ENABLE_G         => true,-- TX only
-            RX_ENABLE_G         => false,-- Not using RX path
+            TX_ENABLE_G         => true,   -- TX only
+            RX_ENABLE_G         => false,  -- Not using RX path
             COMMON_TX_CLK_G     => false,
             COMMON_RX_CLK_G     => false,
             SLAVE_AXI_CONFIG_G  => MPS_CONFIG_C,
@@ -131,14 +157,14 @@ begin
             txP           => mpsTxP,
             txN           => mpsTxN,
             -- RX Serial Stream
-            rxP           => '0',-- Not using RX path
-            rxN           => '1',-- Not using RX path
+            rxP           => '0',          -- Not using RX path
+            rxN           => '1',          -- Not using RX path
             -- Reference Signals
             clk125MHz     => mps125MHzClk,
             rst125MHz     => mps125MHzRst,
             clk312MHz     => mps312MHzClk,
             clk625MHz     => mps625MHzClk,
-            iDelayCtrlRdy => '1',-- Not using RX path
+            iDelayCtrlRdy => '1',          -- Not using RX path
             linkUp        => mpsTxLinkUp,
             -- Slave Port
             sAxisClk      => axilClk,
@@ -164,7 +190,7 @@ begin
 
    end generate;
 
-   MPS_SLOT : if (MPS_SLOT_G = true) generate
+   MPS_SLOT : if (MPS_SLOT_G = true) and (APP_TYPE_G /= APP_NULL_TYPE_C) generate
 
       U_SaltDelayCtrl : entity work.SaltDelayCtrl
          generic map (

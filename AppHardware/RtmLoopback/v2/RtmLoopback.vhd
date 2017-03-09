@@ -2,7 +2,7 @@
 -- File       : RtmLoopback.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-02-23
+-- Last update: 2017-03-09
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_22_CXX
 -------------------------------------------------------------------------------
@@ -30,8 +30,8 @@ entity RtmLoopback is
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Loopback Interface
-      loopIn          : in    slv(9 downto 0);
-      loopOut         : out   slv(9 downto 0);
+      loopbackIn      : in    slv(9 downto 0);
+      loopbackOut     : out   slv(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -59,7 +59,7 @@ begin
 
       U_OBUFDS : OBUFDS
          port map (
-            I  => loopIn(i),
+            I  => loopbackIn(i),
             O  => rtmLsP((2*i)+0),
             OB => rtmLsN((2*i)+0));
 
@@ -67,7 +67,7 @@ begin
          port map (
             I  => rtmLsP((2*i)+1),
             IB => rtmLsN((2*i)+1),
-            O  => loopOut(i));
+            O  => loopbackOut(i));
 
    end generate GEN_VEC;
 
