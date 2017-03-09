@@ -179,7 +179,6 @@ begin
          TPD_G          => TPD_G,
          NUM_SLAVES_G   => STREAMS_C,
          PIPE_STAGES_G  => 1,
-         TDEST_HIGH_G   => 7,
          TDEST_LOW_G    => 0,
          TDEST_ROUTES_G => TDEST_ROUTES_C,
          MODE_G         => "INDEXED")

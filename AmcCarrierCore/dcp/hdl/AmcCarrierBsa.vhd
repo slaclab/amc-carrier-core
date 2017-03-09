@@ -280,7 +280,6 @@ begin
                0           => ROUTE0_C,
                1           => ROUTE1_C),
             PIPE_STAGES_G  => 1,
-            TDEST_HIGH_G   => 7,
             TDEST_LOW_G    => 0)
          port map (
             sAxisMasters => waveformStatusMasters,                           -- [in]
@@ -299,7 +298,6 @@ begin
                0           => ROUTE0_C,
                1           => ROUTE1_C),
             PIPE_STAGES_G  => 1,
-            TDEST_HIGH_G   => 7,
             TDEST_LOW_G    => 0)
          port map (
             sAxisMasters => waveformDataMasters,                           -- [in]
