@@ -2,7 +2,7 @@
 -- File       : AmcEmptyDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-06
--- Last update: 2017-02-06
+-- Last update: 2017-03-09
 -------------------------------------------------------------------------------
 -- Description: Module to terminate a dual empty AMC bay
 -------------------------------------------------------------------------------
@@ -27,11 +27,11 @@ entity AmcEmptyDualCore is
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- AXI-Lite Interface
-      axilClk         : in    sl;
-      axilRst         : in    sl;
-      axilReadMaster  : in    AxiLiteReadMasterType;
+      axilClk         : in    sl                     := '0';
+      axilRst         : in    sl                     := '0';
+      axilReadMaster  : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
       axilReadSlave   : out   AxiLiteReadSlaveType;
-      axilWriteMaster : in    AxiLiteWriteMasterType;
+      axilWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
