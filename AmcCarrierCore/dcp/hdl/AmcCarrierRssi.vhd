@@ -131,7 +131,7 @@ begin
          TPD_G               => TPD_G,
          APP_STREAMS_G       => 5,
          APP_STREAM_ROUTES_G => (
-            0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv0)
+            0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
             1                => X"01",  -- TDEST 1 routed to stream 1 (loopback)
             2                => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
             3                => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
