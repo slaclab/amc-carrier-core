@@ -2,7 +2,7 @@
 -- File       : AppTopPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-15
+-- Last update: 2017-03-10
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -27,6 +27,24 @@ package AppTopPkg is
    constant DEV_CLK2_SEL_C : slv(1 downto 0) := toSLv(2, 2);
    constant DEV_CLK3_SEL_C : slv(1 downto 0) := toSLv(3, 2);  -- KU060 only
 
+   constant JESD_ROUTES_INIT_C : NaturalArray(6 downto 0) := (
+      0 => 0,
+      1 => 1,
+      2 => 2,
+      3 => 3,
+      4 => 4,
+      5 => 5,
+      6 => 6);
+
+   constant JESD_CH0_CH1_SWAP_C : NaturalArray(6 downto 0) := (
+      0 => 1,  -- Swap CH0 and CH1 to match the front panel labels
+      1 => 0,  -- Swap CH0 and CH1 to match the front panel labels
+      2 => 2,
+      3 => 3,
+      4 => 4,
+      5 => 5,
+      6 => 6);
+
    type AppTopTrigType is record
       trigPulse : slv(15 downto 0);
       timeStamp : slv(63 downto 0);
@@ -47,7 +65,7 @@ package AppTopPkg is
    end record;
    type DacSigStatusArray is array (natural range <>) of DacSigStatusType;
    constant DAC_SIG_STATUS_INIT_C : DacSigStatusType := (
-      running => (others => '0'));      
+      running => (others => '0'));
 
 end package AppTopPkg;
 

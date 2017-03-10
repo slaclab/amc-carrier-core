@@ -2,7 +2,7 @@
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-14
+-- Last update: 2017-03-10
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,17 +31,19 @@ use unisim.vcomponents.all;
 
 entity AppTopJesd is
    generic (
-      TPD_G              : time                 := 1 ns;
-      SIM_SPEEDUP_G      : boolean              := false;
-      SIMULATION_G       : boolean              := false;
-      AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
-      JESD_DRP_EN_G      : boolean              := true;
-      JESD_RX_LANE_G     : natural range 0 to 7 := 7;
-      JESD_TX_LANE_G     : natural range 0 to 7 := 7;
-      JESD_RX_POLARITY_G : slv(6 downto 0)      := "0000000";
-      JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000";
-      JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C);        
+      TPD_G              : time                     := 1 ns;
+      SIM_SPEEDUP_G      : boolean                  := false;
+      SIMULATION_G       : boolean                  := false;
+      AXI_ERROR_RESP_G   : slv(1 downto 0)          := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G    : slv(31 downto 0)         := (others => '0');
+      JESD_DRP_EN_G      : boolean                  := true;
+      JESD_RX_LANE_G     : natural range 0 to 7     := 7;
+      JESD_TX_LANE_G     : natural range 0 to 7     := 7;
+      JESD_RX_POLARITY_G : slv(6 downto 0)          := "0000000";
+      JESD_TX_POLARITY_G : slv(6 downto 0)          := "0000000";
+      JESD_RX_ROUTES_G   : NaturalArray(6 downto 0) := JESD_ROUTES_INIT_C;
+      JESD_TX_ROUTES_G   : NaturalArray(6 downto 0) := JESD_ROUTES_INIT_C;
+      JESD_REF_SEL_G     : slv(1 downto 0)          := DEV_CLK2_SEL_C);
    port (
       -- Clock/reset/SYNC
       jesdClk         : out sl;
@@ -118,8 +120,21 @@ architecture mapping of AppTopJesd is
    signal drpAddr : slv(62 downto 0)  := (others => '0');
    signal drpDi   : slv(111 downto 0) := (others => '0');
    signal drpDo   : slv(111 downto 0) := (others => '0');
-   
+
+   signal adcEn : slv(6 downto 0)             := (others => '0');
+   signal adc   : sampleDataArray(6 downto 0) := (others => (others => '0'));
+   signal dac   : sampleDataArray(6 downto 0) := (others => (others => '0'));
+
 begin
+
+   GEN_ROUTE : for i in 6 downto 0 generate
+
+      adcValids(i) <= adcEn(JESD_RX_ROUTES_G(i));
+      adcValues(i) <= adc(JESD_RX_ROUTES_G(i));
+
+      dac(JESD_TX_ROUTES_G(i)) <= dacValues(i);
+
+   end generate GEN_ROUTE;
 
    ---------------------
    -- AXI-Lite Crossbars
@@ -147,18 +162,18 @@ begin
    -- JESD Clocking
    ----------------
    GEN_GTH_CLK : for i in 2 downto 0 generate
-      
+
       U_IBUFDS_GTE3 : IBUFDS_GTE3
          generic map (
             REFCLK_EN_TX_PATH  => '0',
             REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
-            REFCLK_ICNTL_RX    => "00")   
+            REFCLK_ICNTL_RX    => "00")
          port map (
             I     => jesdClkP(i),
             IB    => jesdClkN(i),
             CEB   => '0',
-            ODIV2 => refClkDiv2Vec(i),   -- 185 MHz, Frequency the same as jesdRefClk
-            O     => refClkVec(i));      -- 185 MHz     
+            ODIV2 => refClkDiv2Vec(i),  -- 185 MHz, Frequency the same as jesdRefClk
+            O     => refClkVec(i));     -- 185 MHz     
 
       U_BUFG_GT : BUFG_GT
          port map (
@@ -183,7 +198,7 @@ begin
          OUT_POLARITY_G => '1')
       port map (
          clk    => amcClk,
-         rstOut => amcRst);      
+         rstOut => amcRst);
 
    U_ClockManager : entity work.ClockManagerUltraScale
       generic map (
@@ -214,7 +229,7 @@ begin
          axilReadMaster  => axilReadMasters(MMCM_INDEX_C),
          axilReadSlave   => axilReadSlaves(MMCM_INDEX_C),
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));      
+         axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
    jesdClk <= jesdClk185;
    jesdRst <= jesdRst185;
@@ -231,7 +246,7 @@ begin
          JESD_TX_LANE_G     => JESD_TX_LANE_G,
          JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
          JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)    
+         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)
       port map (
          -- DRP Interface
          drpClk          => drpClk,
@@ -253,9 +268,9 @@ begin
          txWriteMaster   => axilWriteMasters(JESD_TX_INDEX_C),
          txWriteSlave    => axilWriteSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         dataValidVec_o  => adcValids,
-         sampleDataArr_o => adcValues,
-         sampleDataArr_i => dacValues,
+         dataValidVec_o  => adcEn,
+         sampleDataArr_o => adc,
+         sampleDataArr_i => dac,
          -------
          -- JESD
          -------
@@ -282,7 +297,7 @@ begin
    -----------------------
    drpClk <= (others => axilClk);
    GTH_DRP : if (JESD_DRP_EN_G = true) generate
-      
+
       U_XBAR : entity work.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
@@ -300,7 +315,7 @@ begin
             mAxiWriteMasters    => gthWriteMasters,
             mAxiWriteSlaves     => gthWriteSlaves,
             mAxiReadMasters     => gthReadMasters,
-            mAxiReadSlaves      => gthReadSlaves);    
+            mAxiReadSlaves      => gthReadSlaves);
 
       GEN_GTH_DRP : for i in (JESD_LANE_C-1) downto 0 generate
          U_AxiLiteToDrp : entity work.AxiLiteToDrp
@@ -311,7 +326,7 @@ begin
                EN_ARBITRATION_G => false,
                TIMEOUT_G        => 4096,
                ADDR_WIDTH_G     => 9,
-               DATA_WIDTH_G     => 16)      
+               DATA_WIDTH_G     => 16)
             port map (
                -- AXI-Lite Port
                axilClk         => axilClk,
@@ -332,5 +347,5 @@ begin
 
       end generate GEN_GTH_DRP;
    end generate;
-   
+
 end mapping;
