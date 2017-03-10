@@ -63,6 +63,9 @@ BsaBufferControl: &BsaBufferControl
         Mode:
           at:
             nelms: *BsaBufferControlNelms
+        Init:
+          at:
+            nelms: *BsaBufferControlNelms
         SoftTrigger:
           at:
             nelms: *BsaBufferControlNelms
@@ -71,6 +74,9 @@ BsaBufferControl: &BsaBufferControl
             nelms: *BsaBufferControlNelms
           enums: *BsaBufferControlEnums
         FramesAfterTrigger:
+          at:
+            nelms: *BsaBufferControlNelms
+        Status:
           at:
             nelms: *BsaBufferControlNelms
         Empty:
