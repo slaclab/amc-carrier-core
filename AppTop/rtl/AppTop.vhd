@@ -34,28 +34,28 @@ use work.AppTopPkg.all;
 entity AppTop is
    generic (
       -- General Generics
-      TPD_G                : time                           := 1 ns;
-      SIM_SPEEDUP_G        : boolean                        := false;
-      SIMULATION_G         : boolean                        := false;
-      MR_LCLS_APP_G        : boolean                        := true;
-      AXI_ERROR_RESP_G     : slv(1 downto 0)                := AXI_RESP_DECERR_C;
+      TPD_G                : time                      := 1 ns;
+      SIM_SPEEDUP_G        : boolean                   := false;
+      SIMULATION_G         : boolean                   := false;
+      MR_LCLS_APP_G        : boolean                   := true;
+      AXI_ERROR_RESP_G     : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
-      JESD_DRP_EN_G        : boolean                        := false;
-      JESD_RX_LANE_G       : NaturalArray(1 downto 0)       := (others => 0);
-      JESD_TX_LANE_G       : NaturalArray(1 downto 0)       := (others => 0);
-      JESD_RX_POLARITY_G   : Slv7Array(1 downto 0)          := (others => "0000000");
-      JESD_TX_POLARITY_G   : Slv7Array(1 downto 0)          := (others => "0000000");
-      JESD_RX_ROUTES_G     : NaturalVectorArray(6 downto 0) := (others => JESD_ROUTES_INIT_C);
-      JESD_TX_ROUTES_G     : NaturalVectorArray(6 downto 0) := (others => JESD_ROUTES_INIT_C);
-      JESD_REF_SEL_G       : Slv2Array(1 downto 0)          := (others => DEV_CLK2_SEL_C);
+      JESD_DRP_EN_G        : boolean                   := false;
+      JESD_RX_LANE_G       : NaturalArray(1 downto 0)  := (others => 0);
+      JESD_TX_LANE_G       : NaturalArray(1 downto 0)  := (others => 0);
+      JESD_RX_POLARITY_G   : Slv7Array(1 downto 0)     := (others => "0000000");
+      JESD_TX_POLARITY_G   : Slv7Array(1 downto 0)     := (others => "0000000");
+      JESD_RX_ROUTES_G     : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
+      JESD_TX_ROUTES_G     : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
+      JESD_REF_SEL_G       : Slv2Array(1 downto 0)     := (others => DEV_CLK2_SEL_C);
       -- Signal Generator Generics
-      SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)       := (others => 0);
-      SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0)      := (others => 9);
-      SIG_GEN_LANE_MODE_G  : Slv7Array(1 downto 0)          := (others => "0000000");
+      SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 0);
+      SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0) := (others => 9);
+      SIG_GEN_LANE_MODE_G  : Slv7Array(1 downto 0)     := (others => "0000000");
       -- Triggering Generics
-      TRIG_SIZE_G          : positive range 1 to 16         := 3;
-      TRIG_DELAY_WIDTH_G   : integer range 1 to 32          := 32;
-      TRIG_PULSE_WIDTH_G   : integer range 1 to 32          := 32);
+      TRIG_SIZE_G          : positive range 1 to 16    := 3;
+      TRIG_DELAY_WIDTH_G   : integer range 1 to 32     := 32;
+      TRIG_PULSE_WIDTH_G   : integer range 1 to 32     := 32);
    port (
       ----------------------
       -- Top Level Interface

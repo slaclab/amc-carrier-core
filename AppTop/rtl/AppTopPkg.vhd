@@ -22,12 +22,15 @@ use work.StdRtlPkg.all;
 
 package AppTopPkg is
 
+   type AppTopJesdRouteType  is array (6 downto 0) of natural;
+   type AppTopJesdRouteArray  is array (1 downto 0) of AppTopJesdRouteType;
+
    constant DEV_CLK0_SEL_C : slv(1 downto 0) := toSLv(0, 2);
    constant DEV_CLK1_SEL_C : slv(1 downto 0) := toSLv(1, 2);
    constant DEV_CLK2_SEL_C : slv(1 downto 0) := toSLv(2, 2);
    constant DEV_CLK3_SEL_C : slv(1 downto 0) := toSLv(3, 2);  -- KU060 only
 
-   constant JESD_ROUTES_INIT_C : NaturalArray(6 downto 0) := (
+   constant JESD_ROUTES_INIT_C : AppTopJesdRouteType := (
       0 => 0,
       1 => 1,
       2 => 2,
@@ -36,14 +39,14 @@ package AppTopPkg is
       5 => 5,
       6 => 6);
 
-   constant JESD_CH0_CH1_SWAP_C : NaturalArray(6 downto 0) := (
+   constant JESD_CH0_CH1_SWAP_C : AppTopJesdRouteType := (
       0 => 1,  -- Swap CH0 and CH1 to match the front panel labels
       1 => 0,  -- Swap CH0 and CH1 to match the front panel labels
       2 => 2,
       3 => 3,
       4 => 4,
       5 => 5,
-      6 => 6);
+      6 => 6);   
 
    type AppTopTrigType is record
       trigPulse : slv(15 downto 0);

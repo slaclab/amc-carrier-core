@@ -31,19 +31,19 @@ use unisim.vcomponents.all;
 
 entity AppTopJesd is
    generic (
-      TPD_G              : time                     := 1 ns;
-      SIM_SPEEDUP_G      : boolean                  := false;
-      SIMULATION_G       : boolean                  := false;
-      AXI_ERROR_RESP_G   : slv(1 downto 0)          := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G    : slv(31 downto 0)         := (others => '0');
-      JESD_DRP_EN_G      : boolean                  := true;
-      JESD_RX_LANE_G     : natural range 0 to 7     := 7;
-      JESD_TX_LANE_G     : natural range 0 to 7     := 7;
-      JESD_RX_POLARITY_G : slv(6 downto 0)          := "0000000";
-      JESD_TX_POLARITY_G : slv(6 downto 0)          := "0000000";
-      JESD_RX_ROUTES_G   : NaturalArray(6 downto 0) := JESD_ROUTES_INIT_C;
-      JESD_TX_ROUTES_G   : NaturalArray(6 downto 0) := JESD_ROUTES_INIT_C;
-      JESD_REF_SEL_G     : slv(1 downto 0)          := DEV_CLK2_SEL_C);
+      TPD_G              : time                 := 1 ns;
+      SIM_SPEEDUP_G      : boolean              := false;
+      SIMULATION_G       : boolean              := false;
+      AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
+      JESD_DRP_EN_G      : boolean              := true;
+      JESD_RX_LANE_G     : natural range 0 to 7 := 7;
+      JESD_TX_LANE_G     : natural range 0 to 7 := 7;
+      JESD_RX_POLARITY_G : slv(6 downto 0)      := "0000000";
+      JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000";
+      JESD_RX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;
+      JESD_TX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;
+      JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C);
    port (
       -- Clock/reset/SYNC
       jesdClk         : out sl;
