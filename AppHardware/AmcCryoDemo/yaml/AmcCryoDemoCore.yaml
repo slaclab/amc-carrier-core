@@ -64,7 +64,7 @@ AmcBpmCore: &AmcBpmCore
         #  value: 0x1 
 
         # Init the DACs
-        - entry: Dac38J84/InitDac     
+        - entry: Dac38J84/InitDac
           value: 0x1       
         # 100 ms sleep
         - entry: usleep
