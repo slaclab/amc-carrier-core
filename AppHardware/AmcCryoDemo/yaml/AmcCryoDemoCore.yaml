@@ -12,8 +12,8 @@
 #include Lmk04828.yaml
 #include Adc16Dx370.yaml
 #include Dac38J84.yaml
-AmcBpmCore: &AmcBpmCore 
-  description: Generic ADC/DAC AMC Core
+AmcCryoDemoCore: &AmcCryoDemoCore 
+  description: Cryo Amc Rf Demo Board Core
   class: MMIODev
   configPrio: 1
   size: 0x00080000
