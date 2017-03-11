@@ -2,13 +2,9 @@
 -- File       : BsaBufferControl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
-<<<<<<< HEAD
--- Last update: 2016-06-30
-=======
--- Last update: 2017-02-22
+-- Last update: 2017-03-10
 -- Platform   : 
 -- Standard   : VHDL'93/02
->>>>>>> Add BSA variance calc
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
