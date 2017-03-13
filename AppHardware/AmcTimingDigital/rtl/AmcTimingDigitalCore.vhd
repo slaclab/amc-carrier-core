@@ -2,7 +2,7 @@
 -- File       : AmcTimingDigitalCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-06
--- Last update: 2017-02-28
+-- Last update: 2017-03-10
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_06_CXX
 -------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ entity AmcTimingDigitalCore is
       -- Digital I/O Interface
       smaDin          : out   sl;
       smaDout         : in    slv(1 downto 0);
-      lemoDin         : out   slv(3 downto 0);
+      lemoDinN        : out   slv(3 downto 0);
       lemoDout        : in    slv(3 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
@@ -66,8 +66,6 @@ entity AmcTimingDigitalCore is
 end AmcTimingDigitalCore;
 
 architecture mapping of AmcTimingDigitalCore is
-
-   signal lemoDinL : slv(3 downto 0);
 
 begin
 
@@ -102,9 +100,7 @@ begin
          port map (
             I  => syncOutP(i),
             IB => syncOutN(i),
-            O  => lemoDinL(i));
-
-      lemoDin(i) <= not(lemoDinL(i));   -- polarity correction in firmware
+            O  => lemoDinN(i));
 
    end generate GEN_VEC;
 
