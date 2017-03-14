@@ -287,7 +287,7 @@ begin
    end generate gen_dcSpiChips;
 
    -- Input mux from "IO" port if LMK and from "I" port for ADCs 
-   muxSDin <= lmkSDin when coreCsb = "0111" else spiSdo_i;
+   muxSDin <= lmkSDin when coreCsb = "0111" else spiSdo;
 
    -- Output mux
    with coreCsb select
