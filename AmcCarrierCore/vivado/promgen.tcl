@@ -35,7 +35,7 @@ set TEMP_GZ_KU060    "0x07701DEC"
 set BIT_PATH   "$::env(IMPL_DIR)/$::env(PROJECT).bit"
 
 # Check for ruck v1.2.0 (or later)
-if { [file exists ${PROJ_DIR}/build.info] == 1 } {
+if { [file exists $::env(IMAGES_DIR)/$::env(IMAGENAME).cpsw.tar.gz] == 1 } {
    set DATA_PATH  "$::env(IMAGES_DIR)/$::env(IMAGENAME).cpsw.tar.gz"
 } else {
    set DATA_PATH  "$::env(IMAGES_DIR)/$::env(IMAGENAME).tar.gz"
