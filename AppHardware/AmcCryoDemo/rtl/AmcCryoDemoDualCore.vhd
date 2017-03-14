@@ -40,8 +40,8 @@ entity AmcCryoDemoDualCore is
       jesdTxSync      : out   slv(1 downto 0);
       
       -- AXI-Lite Interface
-      axilClk         : in    slv(1 downto 0);
-      axilRst         : in    slv(1 downto 0);
+      axilClk         : in    sl;
+      axilRst         : in    sl;
       axilReadMaster  : in    AxiLiteReadMasterType;
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
