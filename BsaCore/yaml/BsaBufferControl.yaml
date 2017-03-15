@@ -41,7 +41,7 @@ BsaBufferControl: &BsaBufferControl
       metadata:
         numBuffers: &BsaBufferControlNelms 64
         destEnums: &BsaBufferControlEnums
-          - name: default
+          - name: Software
             value: 0
         destHidden: &BsaBufferControlHidden true
       children:
