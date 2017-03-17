@@ -8,14 +8,12 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once AmcBpmCore.yaml
+#once AmcCryoDemoCore.yaml
 #include Lmk04828.yaml
 #include Adc16Dx370.yaml
-#include AmcBpmCtrl.yaml
-#include GenericMemory.yaml
-
-AmcBpmCore: &AmcBpmCore 
-  description: Generic ADC/DAC AMC Core
+#include Dac38J84.yaml
+AmcCryoDemoCore: &AmcCryoDemoCore 
+  description: Cryo Amc Rf Demo Board Core
   class: MMIODev
   configPrio: 1
   size: 0x00080000
@@ -23,22 +21,22 @@ AmcBpmCore: &AmcBpmCore
   children:
   ########
     ##################################################     
-    AmcBpmCtrl:
-      <<: *AmcBpmCtrl
+    Adc16Dx370:
+      <<: *Adc16Dx370
       at:
-        offset: 0x00000000              
+        offset: 0x00010000 
+        stride: 0x00010000              
+        nelms: 3
     ##################################################     
     Lmk04828:
       <<: *Lmk04828
       at:
-        offset: 0x00020000 
-    ##################################################     
-    Adc16Dx370:
-      <<: *Adc16Dx370
-      at:
         offset: 0x00040000 
-        stride: 0x00020000              
-        nelms: 2
+    ##################################################     
+    Dac38J84:
+      <<: *Dac38J84
+      at:
+        offset: 0x00050000 
     ##################################################  
     InitAmcCard:
       description: Initialization for AMC card's JESD modules
@@ -62,10 +60,20 @@ AmcBpmCore: &AmcBpmCore
           value: 1000000          
 
         # Clear the Alarms
-        - entry: Lmk04828/InitLmk          
-          value: 0x1 
-                    
-        # Reset status counters
-        - entry: AmcBpmCtrl/CntRst          
-          value: 0x1           
+        #- entry: Lmk04828/InitLmk          
+        #  value: 0x1 
+
+        # Init the DACs
+        - entry: Dac38J84/InitDac
+          value: 0x1       
+        # 100 ms sleep
+        - entry: usleep
+          value: 100000
+        # Clear the Alarms
+        
+        - entry: Dac38J84/ClearAlarms  
+          value: 0x1       
+        # 100 ms sleep
+        - entry: usleep
+          value: 100000            
     ##################################################
