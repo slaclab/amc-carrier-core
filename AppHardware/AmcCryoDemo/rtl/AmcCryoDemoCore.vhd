@@ -99,32 +99,32 @@ architecture top_level_app of AmcCryoDemoCore is
    constant LMK_INDEX_C          : natural := 3;
    constant DAC_INDEX_C          : natural := 4;
 
-   constant ADC_0_BASE_ADDR_C        : slv(31 downto 0) := X"0001_0000" + AXI_BASE_ADDR_G;
-   constant ADC_1_BASE_ADDR_C        : slv(31 downto 0) := X"0002_0000" + AXI_BASE_ADDR_G;
-   constant ADC_2_BASE_ADDR_C        : slv(31 downto 0) := X"0003_0000" + AXI_BASE_ADDR_G;
-   constant LMK_BASE_ADDR_C          : slv(31 downto 0) := X"0004_0000" + AXI_BASE_ADDR_G;
-   constant DAC_BASE_ADDR_C          : slv(31 downto 0) := X"0005_0000" + AXI_BASE_ADDR_G;
+   constant ADC_0_BASE_ADDR_C        : slv(31 downto 0) := X"0002_0000" + AXI_BASE_ADDR_G;
+   constant ADC_1_BASE_ADDR_C        : slv(31 downto 0) := X"0004_0000" + AXI_BASE_ADDR_G;
+   constant ADC_2_BASE_ADDR_C        : slv(31 downto 0) := X"0006_0000" + AXI_BASE_ADDR_G;
+   constant LMK_BASE_ADDR_C          : slv(31 downto 0) := X"0008_0000" + AXI_BASE_ADDR_G;
+   constant DAC_BASE_ADDR_C          : slv(31 downto 0) := X"000A_0000" + AXI_BASE_ADDR_G;
    
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       ADC_0_INDEX_C        => (
          baseAddr          => ADC_0_BASE_ADDR_C,
-         addrBits          => 16,
+         addrBits          => 17,
          connectivity      => X"FFFF"),
       ADC_1_INDEX_C        => (
          baseAddr          => ADC_1_BASE_ADDR_C,
-         addrBits          => 16,
+         addrBits          => 17,
          connectivity      => X"FFFF"),
       ADC_2_INDEX_C        => (
          baseAddr          => ADC_2_BASE_ADDR_C,
-         addrBits          => 16,
+         addrBits          => 17,
          connectivity      => X"FFFF"),
       LMK_INDEX_C          => (
          baseAddr          => LMK_BASE_ADDR_C,
-         addrBits          => 16,
+         addrBits          => 17,
          connectivity      => X"FFFF"),
       DAC_INDEX_C          => (
          baseAddr          => DAC_BASE_ADDR_C,
-         addrBits          => 16,
+         addrBits          => 17,
          connectivity      => X"FFFF"));
 
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
