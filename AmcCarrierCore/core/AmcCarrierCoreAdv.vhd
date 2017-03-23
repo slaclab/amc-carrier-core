@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-02-24
+-- Last update: 2017-03-23
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -209,9 +209,10 @@ architecture mapping of AmcCarrierCoreAdv is
    signal mpsWriteMaster    : AxiLiteWriteMasterType;
    signal mpsWriteSlave     : AxiLiteWriteSlaveType;
 
-   signal ref156MHzClk : sl;
-   signal ref156MHzRst : sl;
-   signal bsiBus       : BsiBusType;
+   signal ref156MHzClk  : sl;
+   signal ref156MHzRst  : sl;
+   signal bsiBus        : BsiBusType;
+   signal timingBusIntf : TimingBusType;
 
 begin
 
@@ -219,6 +220,7 @@ begin
    axilRst     <= ref156MHzRst;
    ipmiBsi     <= bsiBus;
    ethPhyReady <= ethLinkUp;
+   timingBus   <= timingBusIntf;
 
    ----------------------------------   
    -- Register Address Mapping Module
@@ -320,8 +322,12 @@ begin
          axilReadSlave   => mpsReadSlave,
          axilWriteMaster => mpsWriteMaster,
          axilWriteSlave  => mpsWriteSlave,
-         -- IPMI Status and Configurations
+         -- System Status
          bsiBus          => bsiBus,
+         ethLinkUp       => ethLinkUp,
+         timingClk       => timingClk,
+         timingRst       => timingRst,
+         timingBus       => timingBusIntf,
          ----------------------
          -- Top Level Interface
          ----------------------
@@ -363,7 +369,7 @@ begin
          -- Timing Interface (timingClk domain) 
          timingClk            => timingClk,
          timingRst            => timingRst,
-         timingBus            => timingBus,
+         timingBus            => timingBusIntf,
          timingPhy            => timingPhy,
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,

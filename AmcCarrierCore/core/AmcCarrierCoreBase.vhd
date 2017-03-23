@@ -795,7 +795,8 @@ architecture mapping of AmcCarrierCoreBase is
 
    signal ref156MHzClk : sl;
    signal ref156MHzRst : sl;
-   signal bsiBus       : BsiBusType;
+   signal bsiBus        : BsiBusType;
+   signal timingBusIntf : TimingBusType;
 
 begin
 
@@ -803,6 +804,7 @@ begin
    axilRst     <= ref156MHzRst;
    ipmiBsi     <= bsiBus;
    ethPhyReady <= ethLinkUp;
+   timingBus   <= timingBusIntf;
 
    ----------------------------------   
    -- Register Address Mapping Module
@@ -904,8 +906,12 @@ begin
          axilReadSlave   => mpsReadSlave,
          axilWriteMaster => mpsWriteMaster,
          axilWriteSlave  => mpsWriteSlave,
-         -- IPMI Status and Configurations
+         -- System Status
          bsiBus          => bsiBus,
+         ethLinkUp       => ethLinkUp,
+         timingClk       => timingClk,
+         timingRst       => timingRst,
+         timingBus       => timingBusIntf,
          ----------------------
          -- Top Level Interface
          ----------------------
