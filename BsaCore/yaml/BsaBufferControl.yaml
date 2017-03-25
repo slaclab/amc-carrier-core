@@ -32,7 +32,7 @@ BsaBufferControl: &BsaBufferControl
             offset: 0x0
             stride: 8
             nelms: 64
-          bitSize: 64
+          sizeBits: 64
           mode: RO
     BsaBuffers:
       at:
