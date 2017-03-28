@@ -2,7 +2,7 @@
 -- File       : AmcCarrierSysRegPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2017-02-06
+-- Last update: 2017-03-28
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -60,10 +60,10 @@ package AmcCarrierSysRegPkg is
       0 => "00");  -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)      
 
    constant XBAR_APP_NODE_C : Slv2Array(3 downto 0) := (
-      3 => "01",   -- OUT[3] = IN[1], DIST1 = FPGA
-      2 => "01",   -- OUT[2] = IN[1], DIST0 = FPGA
-      1 => "10",   -- OUT[1] = IN[2], FPGA  = Backplane timing
-      0 => "00");  -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)      
+      3 => "00",   -- OUT[3] = IN[1], DIST1 = RTM0 
+      2 => "00",   -- OUT[2] = IN[1], DIST0 = RTM0 
+      1 => "01",   -- OUT[1] = IN[2], FPGA  = FPGA (loopback)
+      0 => "00");  -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)
 
    function xbarDefault(app : AppType; sel : boolean) return Slv2Array;
 
