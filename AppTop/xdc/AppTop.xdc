@@ -352,6 +352,15 @@ create_generated_clock -name jesd1_370MHz [get_pins {U_AppTop/U_AmcBay[1].U_Jesd
 set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd1_185MHz}]
 set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_370MHz}]
 
+set_clock_groups -asynchronous \
+    -group [get_clocks -include_generated_clocks {recTimingClk}] \
+    -group [get_clocks -include_generated_clocks {ddrClkIn}] \
+    -group [get_clocks -include_generated_clocks {fabClk}] \
+    -group [get_clocks -include_generated_clocks {ethRef}] \
+    -group [get_clocks -include_generated_clocks {mpsClkP}] \
+    -group [get_clocks -include_generated_clocks {jesd0_185MHz}] \
+    -group [get_clocks -include_generated_clocks {jesd1_185MHz}]
+
 ##########################
 ## Misc. Configurations ##
 ##########################
