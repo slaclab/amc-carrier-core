@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- File       : AmcMrLlrfUpConvertMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-12-07
+-- Created    : 2017-03-30
 -- Last update: 2017-03-30
 -------------------------------------------------------------------------------
 -- Description: 
@@ -129,6 +129,9 @@ begin
    spareN(7) <= attLatchEn_o(2);
    spareP(7) <= attLatchEn_o(3);
 
+   jtagSec(0) <= timingTrig;
+   jtagSec(4) <= fpgaInterlock;
+
    U_DOUT0  : OBUFDS port map (I => s_dacDataDly(0), O => spareP(9), OB => spareN(9));
    U_DOUT1  : OBUFDS port map (I => s_dacDataDly(1), O => spareP(10), OB => spareN(10));
    U_DOUT2  : OBUFDS port map (I => s_dacDataDly(2), O => spareP(11), OB => spareN(11));
@@ -136,6 +139,11 @@ begin
    U_DOUT4  : OBUFDS port map (I => s_dacDataDly(4), O => spareP(13), OB => spareN(13));
    U_DOUT5  : OBUFDS port map (I => s_dacDataDly(5), O => spareP(14), OB => spareN(14));
    U_DOUT6  : OBUFDS port map (I => s_dacDataDly(6), O => spareP(15), OB => spareN(15));
+   
+   ----------------------------
+   -- Version2 Specific Mapping 
+   ----------------------------    
+   
    U_DOUT7  : OBUFDS port map (I => s_dacDataDly(7), O => sysRefP(0), OB => sysRefN(0));
    U_DOUT8  : OBUFDS port map (I => s_dacDataDly(8), O => sysRefP(1), OB => sysRefN(1));
    U_DOUT9  : OBUFDS port map (I => s_dacDataDly(9), O => syncInP(1), OB => syncInN(1));
@@ -146,18 +154,14 @@ begin
    U_DOUT14 : OBUFDS port map (I => s_dacDataDly(14), O => syncOutP(0), OB => syncOutN(0));
    U_DOUT15 : OBUFDS port map (I => s_dacDataDly(15), O => syncOutP(3), OB => syncOutN(3));
 
-   -- Samples on both edges of jesdClk (~185MHz). Sample rate = jesdClk2x (~370MHz)
    U_CLK_DIFF_BUF : entity work.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
       port map (
          rstIn   => jesdRst,
-         clkIn   => jesdClk,
+         clkIn   => jesdClk,-- Samples on both edges of jesdClk (~185MHz). Sample rate = jesdClk2x (~370MHz)
          clkOutP => syncInP(0),
          clkOutN => syncInN(0));
-
-   jtagSec(0) <= timingTrig;
-   jtagSec(4) <= fpgaInterlock;
 
 end mapping;

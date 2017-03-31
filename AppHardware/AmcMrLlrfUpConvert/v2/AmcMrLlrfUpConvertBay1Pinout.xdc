@@ -94,35 +94,35 @@ set_property -dict { IOSTANDARD LVDS} [get_ports {spareN[1][14]}] ; # dacDataN[1
 set_property -dict { IOSTANDARD LVDS} [get_ports {spareP[1][15]}] ; # dacDataP[1][6]
 set_property -dict { IOSTANDARD LVDS} [get_ports {spareN[1][15]}] ; # dacDataN[1][6]
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][0]}] ; # dacDataP[1][7]
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][0]}] ; # dacDataN[1][7]
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][0]}] ; # dacDataP[1][7] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][0]}] ; # dacDataN[1][7] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][1]}] ; # dacDataP[1][8]
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][1]}] ; # dacDataN[1][8]
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][1]}] ; # dacDataP[1][8] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][1]}] ; # dacDataN[1][8] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][1]}] ; # dacDataP[1][9]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][1]}] ; # dacDataN[1][9]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][1]}] ; # dacDataP[1][9] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][1]}] ; # dacDataN[1][9] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][2]}] ; # dacDataP[1][10]
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][2]}] ; # dacDataN[1][10]
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][2]}] ; # dacDataP[1][10] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][2]}] ; # dacDataN[1][10] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][2]}] ; # dacDataP[1][11]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][2]}] ; # dacDataN[1][11]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][2]}] ; # dacDataP[1][11] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][2]}] ; # dacDataN[1][11] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][3]}] ; # dacDataP[1][12]
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][3]}] ; # dacDataN[1][12]
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][3]}] ; # dacDataP[1][12] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][3]}] ; # dacDataN[1][12] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][3]}] ; # dacDataP[1][13]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][3]}] ; # dacDataN[1][13]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][3]}] ; # dacDataP[1][13] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][3]}] ; # dacDataN[1][13] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutP[1][0]}] ; # dacDataP[1][14]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutN[1][0]}] ; # dacDataN[1][14]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutP[1][0]}] ; # dacDataP[1][14] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutN[1][0]}] ; # dacDataN[1][14] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutP[1][3]}] ; # dacDataP[1][15]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutN[1][3]}] ; # dacDataN[1][15]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutP[1][3]}] ; # dacDataP[1][15] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutN[1][3]}] ; # dacDataN[1][15] - Version2 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][0]}] ; # dacDckP[1]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][0]}] ; # dacDckN[1]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][0]}] ; # dacDckP[1] - Version2 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][0]}] ; # dacDckN[1] - Version2 Specific Mapping 
 
 # Interlock and trigger
 set_property -dict { IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][0]}] ; # timingTrig[1]

@@ -20,13 +20,6 @@ if { $::env(AMC_TYPE_BAY0) == ${rootName} } {
 
 # Load AMC BAY[1] constraints files
 if { $::env(AMC_TYPE_BAY1) == ${rootName} } {
-   # Check the AMC card version
-   if { $::env(AMC_INTF_BAY1) == "Version1" } {
-      loadConstraints -path "$::DIR_PATH/v1/AmcMrLlrfDownConvertBay1Pinout.xdc"
-   } elseif { $::env(AMC_INTF_BAY1)  == "Version2" } {
-      loadConstraints -path "$::DIR_PATH/v2/AmcMrLlrfDownConvertBay1Pinout.xdc"
-   } else {
-      puts "\n\n $::env(AMC_INTF_BAY1) is an invalid AMC_INTF_BAY1 name. AMC_INTF_BAY1 can be \[Version1,Version2\]. Please fixed your target/makefile's.\n\n"   
-      exit -1
-   } 
+   puts "\n\n AmcMrLlrfDownConvert is not supported in AMC BAY\[1\].\n\n"   
+   exit -1
 }
