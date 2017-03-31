@@ -175,91 +175,46 @@ architecture mapping of AmcMrLlrfUpConvertCore is
 
 begin
 
-   -----------------------
-   -- Generalized Mapping 
-   -----------------------
-   U_jesdSysRef : IBUFDS
+   U_AmcMapping : entity work.AmcMrLlrfUpConvertMapping
       generic map (
-         DIFF_TERM => true)
+         TPD_G        => TPD_G)
       port map (
-         I  => syncOutP(7),
-         IB => syncOutN(7),
-         O  => jesdSysRef);
-
-   U_jesdRxSync0 : OBUFDS
-      port map (
-         I  => jesdRxSync,
-         O  => syncOutP(4),
-         OB => syncOutN(4));
-
-   U_jesdRxSync1 : OBUFDS
-      port map (
-         I  => jesdRxSync,
-         O  => syncOutP(2),
-         OB => syncOutN(2));
-
-   U_jesdRxSync2 : OBUFDS
-      port map (
-         I  => jesdRxSync,
-         O  => syncOutP(1),
-         OB => syncOutN(1));
-
-   ADC_SDIO_IOBUFT : IOBUF
-      port map (
-         I  => '0',
-         O  => lmkSDin,
-         IO => jtagPri(0),
-         T  => muxSDout);
-
-
-   jtagPri(1) <= spiSclk_o;
-   jtagPri(2) <= spiSdi_o;
-   spiSdo_i   <= jtagPri(3);
-
-   spareN(2)  <= spiCsL_o(0);
-   spareP(3)  <= spiCsL_o(1);
-   spareN(3)  <= spiCsL_o(2);
-   spareP(2)  <= spiCsL_o(3);
-   jtagPri(4) <= spiCsL_o(4);
-
-   spareN(6) <= attSclk_o;
-   spareP(6) <= attSdi_o;
-
-   spareN(8) <= attLatchEn_o(0);
-   spareP(8) <= attLatchEn_o(1);
-   spareN(7) <= attLatchEn_o(2);
-   spareP(7) <= attLatchEn_o(3);
-
-   U_DOUT0  : OBUFDS port map (I => s_dacDataDly(0), O => spareP(9), OB => spareN(9));
-   U_DOUT1  : OBUFDS port map (I => s_dacDataDly(1), O => spareP(10), OB => spareN(10));
-   U_DOUT2  : OBUFDS port map (I => s_dacDataDly(2), O => spareP(11), OB => spareN(11));
-   U_DOUT3  : OBUFDS port map (I => s_dacDataDly(3), O => spareP(12), OB => spareN(12));
-   U_DOUT4  : OBUFDS port map (I => s_dacDataDly(4), O => spareP(13), OB => spareN(13));
-   U_DOUT5  : OBUFDS port map (I => s_dacDataDly(5), O => spareP(14), OB => spareN(14));
-   U_DOUT6  : OBUFDS port map (I => s_dacDataDly(6), O => spareP(15), OB => spareN(15));
-   U_DOUT7  : OBUFDS port map (I => s_dacDataDly(7), O => sysRefP(0), OB => sysRefN(0));
-   U_DOUT8  : OBUFDS port map (I => s_dacDataDly(8), O => sysRefP(1), OB => sysRefN(1));
-   U_DOUT9  : OBUFDS port map (I => s_dacDataDly(9), O => syncInP(1), OB => syncInN(1));
-   U_DOUT10 : OBUFDS port map (I => s_dacDataDly(10), O => sysRefP(2), OB => sysRefN(2));
-   U_DOUT11 : OBUFDS port map (I => s_dacDataDly(11), O => syncInP(2), OB => syncInN(2));
-   U_DOUT12 : OBUFDS port map (I => s_dacDataDly(12), O => sysRefP(3), OB => sysRefN(3));
-   U_DOUT13 : OBUFDS port map (I => s_dacDataDly(13), O => syncInP(3), OB => syncInN(3));
-   U_DOUT14 : OBUFDS port map (I => s_dacDataDly(14), O => syncOutP(0), OB => syncOutN(0));
-   U_DOUT15 : OBUFDS port map (I => s_dacDataDly(15), O => syncOutP(3), OB => syncOutN(3));
-
-   -- Samples on both edges of jesdClk (~185MHz). Sample rate = jesdClk2x (~370MHz)
-   U_CLK_DIFF_BUF : entity work.ClkOutBufDiff
-      generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => "ULTRASCALE")
-      port map (
-         rstIn   => jesdRst,
-         clkIn   => jesdClk,
-         clkOutP => syncInP(0),
-         clkOutN => syncInN(0));
-
-   jtagSec(0) <= timingTrig;
-   jtagSec(4) <= fpgaInterlock;
+         jesdSysRef    => jesdSysRef,
+         jesdRxSync    => jesdRxSync,
+         lmkSDin       => lmkSDin,
+         muxSDout      => muxSDout,
+         spiSclk_o     => spiSclk_o,
+         spiSdi_o      => spiSdi_o,
+         spiSdo_i      => spiSdo_i,
+         spiCsL_o      => spiCsL_o,
+         attSclk_o     => attSclk_o,
+         attSdi_o      => attSdi_o,
+         attLatchEn_o  => attLatchEn_o,
+         s_dacDataDly  => s_dacDataDly,
+         jesdClk       => jesdClk,
+         jesdRst       => jesdRst,
+         timingTrig    => timingTrig,
+         fpgaInterlock => fpgaInterlock,
+         -----------------------
+         -- Application Ports --
+         -----------------------      
+         -- AMC's JTAG Ports
+         jtagPri       => jtagPri,
+         jtagSec       => jtagSec,
+         -- AMC's FPGA Clock Ports
+         fpgaClkP      => fpgaClkP,
+         fpgaClkN      => fpgaClkN,
+         -- AMC's System Reference Ports
+         sysRefP       => sysRefP,
+         sysRefN       => sysRefN,
+         -- AMC's Sync Ports
+         syncInP       => syncInP,
+         syncInN       => syncInN,
+         syncOutP      => syncOutP,
+         syncOutN      => syncOutN,
+         -- AMC's Spare Ports
+         spareP        => spareP,
+         spareN        => spareN);
 
    ---------------------
    -- AXI-Lite Crossbars
