@@ -136,12 +136,13 @@ set_property LOC BITSLICE_RX_TX_X0Y162 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN
 set_property LOC BITSLICE_RX_TX_X0Y160 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[4].OutputTapDelay_INST/U_ODELAYE3}]
 set_property LOC BITSLICE_RX_TX_X0Y158 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[5].OutputTapDelay_INST/U_ODELAYE3}]
 set_property LOC BITSLICE_RX_TX_X0Y156 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[6].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y221 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[7].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y218 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[8].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y39  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[9].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y238 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[10].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y36  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[11].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y227 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[12].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y34  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[13].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y2   [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[14].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y257 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[15].OutputTapDelay_INST/U_ODELAYE3}]
+
+set_property LOC BITSLICE_RX_TX_X0Y221 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[7].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y218 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[8].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y39  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[9].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y238 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[10].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y36  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[11].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y227 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[12].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y34  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[13].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y2   [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[14].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y257 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[15].OutputTapDelay_INST/U_ODELAYE3}] ; # Version2 Specific Mapping 
