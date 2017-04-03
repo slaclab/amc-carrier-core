@@ -117,6 +117,11 @@ package AmcCarrierPkg is
       slave => AXI_STREAM_SLAVE_INIT_C,
       ctrl  => AXI_STREAM_CTRL_INIT_C);
    constant WAVEFORM_SLAVE_ARRAY_INIT_C : WaveformSlaveArrayType := (others => (others => WAVEFORM_SLAVE_REC_INIT_C));
+   
+   constant WAVEFORM_SLAVE_REC_FORCE_C : WaveformSlaveRecType := (
+      slave => AXI_STREAM_SLAVE_FORCE_C,
+      ctrl  => AXI_STREAM_CTRL_UNUSED_C);
+   constant WAVEFORM_SLAVE_ARRAY_FORCE_C : WaveformSlaveArrayType := (others => (others => WAVEFORM_SLAVE_REC_FORCE_C));   
 
    ---------------------------------------------------
    -- BSI: Configurations, Constants and Records Types
