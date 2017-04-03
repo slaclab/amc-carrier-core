@@ -62,6 +62,7 @@ entity AmcCarrierTiming is
       appTimingRst     : in  sl;
       appTimingBus     : out TimingBusType;
       appTimingPhy     : in  TimingPhyType;  -- Input for timing generator only
+      appTimingRefClk  : out sl;
       appTimingPhyClk  : out sl;
       appTimingPhyRst  : out sl;
       ----------------
@@ -180,6 +181,8 @@ begin
          ODIV2 => open,
          O     => timingRefClk);
 
+   appTimingRefClk <= timingRefClk;
+         
    -------------------------------------------------------------------------------------------------
    -- GTH Timing Receiver
    -------------------------------------------------------------------------------------------------
