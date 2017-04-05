@@ -72,17 +72,15 @@ begin
       REG_OUT : if (REG_DOUT_EN_G(i) = '1') generate
 
          REG_DATA : if (REG_DOUT_MODE_G(i) = '0') generate
-            U_ODDR : ODDR
+            U_ODDR : ODDRE1
                generic map(
                   DDR_CLK_EDGE => "SAME_EDGE")
                port map (
                   C  => doutClk(i),
                   Q  => doutReg(i),
-                  CE => '1',
                   D1 => dout(i),
                   D2 => dout(i),
-                  R  => '0',
-                  S  => '0');
+                  SR => '0');
             U_OBUF : OBUF
                port map (
                   I => doutReg(i),

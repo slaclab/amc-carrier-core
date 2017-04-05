@@ -208,17 +208,13 @@ begin
          O  => rtmLsP(52),
          OB => rtmLsN(52));
 
-   U_stndbyTrigReg : ODDR
-      generic map(
-         DDR_CLK_EDGE => "SAME_EDGE")
+   U_stndbyTrigReg : ODDRE1
       port map (
          C  => recClk,
          Q  => stndbyTrigLReg,
-         CE => '1',
          D1 => stndbyTrigL,
          D2 => stndbyTrigL,
-         R  => '0',
-         S  => '0');
+         SR  => '0');
 
    U_stndbyTrigL : OBUFDS
       port map (
@@ -226,17 +222,13 @@ begin
          O  => rtmLsP(45),
          OB => rtmLsN(45));
 
-   U_accelTrigReg : ODDR
-      generic map(
-         DDR_CLK_EDGE => "SAME_EDGE")
+   U_accelTrigReg : ODDRE1
       port map (
          C  => recClk,
          Q  => accelTrigReg,
-         CE => '1',
          D1 => accelTrig,
          D2 => accelTrig,
-         R  => '0',
-         S  => '0');
+         SR => '0');
 
    U_accelTrig : OBUFDS
       port map (

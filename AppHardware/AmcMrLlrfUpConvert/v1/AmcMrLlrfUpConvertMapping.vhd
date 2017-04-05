@@ -138,17 +138,15 @@ begin
    jtagSec(4) <= fpgaInterlock;
 
    DATA_OUT : if (TIMING_TRIG_MODE_G = false) generate
-      U_ODDR : ODDR
+      U_ODDR : ODDRE1
          generic map(
             DDR_CLK_EDGE => "SAME_EDGE")
          port map (
             C  => recClk,
             Q  => timingTrigReg,
-            CE => '1',
             D1 => timingTrig,
             D2 => timingTrig,
-            R  => '0',
-            S  => '0');
+            SR => '0');
       U_OBUF : OBUF
          port map (
             I => timingTrigReg,
