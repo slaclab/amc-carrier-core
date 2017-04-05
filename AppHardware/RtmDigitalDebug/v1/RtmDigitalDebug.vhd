@@ -74,8 +74,6 @@ begin
 
          REG_DATA : if (REG_DOUT_MODE_G(i) = '0') generate
             U_ODDR : ODDRE1
-               generic map(
-                  DDR_CLK_EDGE => "SAME_EDGE")
                port map (
                   C  => doutClk(i),
                   Q  => doutReg(i),

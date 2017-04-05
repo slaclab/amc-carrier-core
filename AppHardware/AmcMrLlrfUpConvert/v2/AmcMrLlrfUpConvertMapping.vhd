@@ -139,8 +139,6 @@ begin
 
    DATA_OUT : if (TIMING_TRIG_MODE_G = false) generate
       U_ODDR : ODDRE1
-         generic map(
-            DDR_CLK_EDGE => "SAME_EDGE")
          port map (
             C  => recClk,
             Q  => timingTrigReg,
