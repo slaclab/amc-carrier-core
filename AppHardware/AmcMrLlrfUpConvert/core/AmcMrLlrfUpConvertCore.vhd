@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfUpConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-07
--- Last update: 2017-02-27
+-- Last update: 2017-04-04
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -30,10 +30,11 @@ use unisim.vcomponents.all;
 
 entity AmcMrLlrfUpConvertCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      IODELAY_GROUP_G  : string           := "AMC_DELAY_GROUP";
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G              : time             := 1 ns;
+      TIMING_TRIG_MODE_G : boolean          := false;  -- false = data output, true = clock output
+      IODELAY_GROUP_G    : string           := "AMC_DELAY_GROUP";
+      AXI_ERROR_RESP_G   : slv(1 downto 0)  := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G    : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD SYNC Interface
       jesdClk         : in    sl;
@@ -54,6 +55,9 @@ entity AmcMrLlrfUpConvertCore is
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- Recovered EVR clock
+      recClk          : in    sl;
+      recRst          : in    sl;
       -----------------------
       -- Application Ports --
       -----------------------      
@@ -177,7 +181,8 @@ begin
 
    U_AmcMapping : entity work.AmcMrLlrfUpConvertMapping
       generic map (
-         TPD_G        => TPD_G)
+         TPD_G              => TPD_G,
+         TIMING_TRIG_MODE_G => TIMING_TRIG_MODE_G)
       port map (
          jesdSysRef    => jesdSysRef,
          jesdRxSync    => jesdRxSync,
@@ -195,6 +200,9 @@ begin
          jesdRst       => jesdRst,
          timingTrig    => timingTrig,
          fpgaInterlock => fpgaInterlock,
+         -- Recovered EVR clock
+         recClk        => recClk,
+         recRst        => recRst,
          -----------------------
          -- Application Ports --
          -----------------------      
@@ -393,9 +401,9 @@ begin
          generic map (
             TPD_G              => TPD_G,
             IODELAY_GROUP_G    => IODELAY_GROUP_G,
-            REFCLK_FREQUENCY_G => 370.0)-- IDELAYCTRL uses jesdClk2x
-         port map (      
-            clk_i    => jesdClk,-- DDR clock (using both edges)
+            REFCLK_FREQUENCY_G => 370.0)  -- IDELAYCTRL uses jesdClk2x
+         port map (
+            clk_i    => jesdClk,          -- DDR clock (using both edges)
             rst_i    => jesdRst,
             load_i   => s_load(i),
             tapSet_i => s_tapDelaySet(i),

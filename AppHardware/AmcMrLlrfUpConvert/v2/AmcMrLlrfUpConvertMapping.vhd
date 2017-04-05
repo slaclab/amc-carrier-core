@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfUpConvertMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-03-30
--- Last update: 2017-03-30
+-- Last update: 2017-04-04
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -30,7 +30,8 @@ use unisim.vcomponents.all;
 
 entity AmcMrLlrfUpConvertMapping is
    generic (
-      TPD_G : time := 1 ns);
+      TPD_G              : time    := 1 ns;
+      TIMING_TRIG_MODE_G : boolean := false);  -- false = data output, true = clock output
    port (
       jesdSysRef    : out   sl;
       jesdRxSync    : in    sl;
@@ -48,6 +49,9 @@ entity AmcMrLlrfUpConvertMapping is
       jesdRst       : in    sl;
       timingTrig    : in    sl;
       fpgaInterlock : in    sl;
+      -- Recovered EVR clock
+      recClk        : in    sl;
+      recRst        : in    sl;
       -----------------------
       -- Application Ports --
       -----------------------      
@@ -71,6 +75,8 @@ entity AmcMrLlrfUpConvertMapping is
 end AmcMrLlrfUpConvertMapping;
 
 architecture mapping of AmcMrLlrfUpConvertMapping is
+
+   signal timingTrigReg : sl;
 
 begin
 
@@ -129,21 +135,48 @@ begin
    spareN(7) <= attLatchEn_o(2);
    spareP(7) <= attLatchEn_o(3);
 
-   jtagSec(0) <= timingTrig;
    jtagSec(4) <= fpgaInterlock;
 
-   U_DOUT0  : OBUFDS port map (I => s_dacDataDly(0), O => spareP(9), OB => spareN(9));
-   U_DOUT1  : OBUFDS port map (I => s_dacDataDly(1), O => spareP(10), OB => spareN(10));
-   U_DOUT2  : OBUFDS port map (I => s_dacDataDly(2), O => spareP(11), OB => spareN(11));
-   U_DOUT3  : OBUFDS port map (I => s_dacDataDly(3), O => spareP(12), OB => spareN(12));
-   U_DOUT4  : OBUFDS port map (I => s_dacDataDly(4), O => spareP(13), OB => spareN(13));
-   U_DOUT5  : OBUFDS port map (I => s_dacDataDly(5), O => spareP(14), OB => spareN(14));
-   U_DOUT6  : OBUFDS port map (I => s_dacDataDly(6), O => spareP(15), OB => spareN(15));
-   
+   DATA_OUT : if (TIMING_TRIG_MODE_G = false) generate
+      U_ODDR : ODDR
+         generic map(
+            DDR_CLK_EDGE => "SAME_EDGE")
+         port map (
+            C  => recClk,
+            Q  => timingTrigReg,
+            CE => '1',
+            D1 => timingTrig,
+            D2 => timingTrig,
+            R  => '0',
+            S  => '0');
+      U_OBUF : OBUF
+         port map (
+            I => timingTrigReg,
+            O => jtagSec(0));
+   end generate;
+
+   CLK_OUT : if (TIMING_TRIG_MODE_G = true) generate
+      U_CLK : entity work.ClkOutBufSingle
+         generic map (
+            TPD_G        => TPD_G,
+            XIL_DEVICE_G => "ULTRASCALE")
+         port map (
+            clkIn  => timingTrig,
+            clkOut => jtagSec(0));
+   end generate;
+
+   U_DOUT0 : OBUFDS port map (I => s_dacDataDly(0), O => spareP(9), OB => spareN(9));
+   U_DOUT1 : OBUFDS port map (I => s_dacDataDly(1), O => spareP(10), OB => spareN(10));
+   U_DOUT2 : OBUFDS port map (I => s_dacDataDly(2), O => spareP(11), OB => spareN(11));
+   U_DOUT3 : OBUFDS port map (I => s_dacDataDly(3), O => spareP(12), OB => spareN(12));
+   U_DOUT4 : OBUFDS port map (I => s_dacDataDly(4), O => spareP(13), OB => spareN(13));
+   U_DOUT5 : OBUFDS port map (I => s_dacDataDly(5), O => spareP(14), OB => spareN(14));
+   U_DOUT6 : OBUFDS port map (I => s_dacDataDly(6), O => spareP(15), OB => spareN(15));
+
    ----------------------------
    -- Version2 Specific Mapping 
    ----------------------------    
-   
+
    U_DOUT7  : OBUFDS port map (I => s_dacDataDly(7), O => sysRefP(0), OB => sysRefN(0));
    U_DOUT8  : OBUFDS port map (I => s_dacDataDly(8), O => sysRefP(1), OB => sysRefN(1));
    U_DOUT9  : OBUFDS port map (I => s_dacDataDly(9), O => syncInP(1), OB => syncInN(1));
@@ -160,7 +193,7 @@ begin
          XIL_DEVICE_G => "ULTRASCALE")
       port map (
          rstIn   => jesdRst,
-         clkIn   => jesdClk,-- Samples on both edges of jesdClk (~185MHz). Sample rate = jesdClk2x (~370MHz)
+         clkIn   => jesdClk,  -- Samples on both edges of jesdClk (~185MHz). Sample rate = jesdClk2x (~370MHz)
          clkOutP => syncInP(0),
          clkOutN => syncInN(0));
 
