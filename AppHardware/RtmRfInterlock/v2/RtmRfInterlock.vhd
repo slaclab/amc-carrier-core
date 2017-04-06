@@ -2,7 +2,7 @@
 -- File       : RtmRfInterlock.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-17
--- Last update: 2017-03-21
+-- Last update: 2017-04-04
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C01    
 ------------------------------------------------------------------------------
@@ -100,6 +100,9 @@ architecture mapping of RtmRfInterlock is
    signal fault          : sl;
    signal faultClear     : sl;
 
+   signal stndbyTrigReg : sl;
+   signal accelTrigReg  : sl;
+
 begin
 
    hsAdcBeamIP    <= rtmLsP(9);
@@ -136,15 +139,31 @@ begin
    rtmLsN(12) <= cpldSck;
    rtmLsN(11) <= cpldCsb;
 
+   U_stndbyTrigReg : ODDRE1
+      port map (
+         C  => recClk,
+         Q  => stndbyTrigReg,
+         D1 => stndbyTrig,
+         D2 => stndbyTrig,
+         SR => '0');
+
    U_stndbyTrig : OBUFDS
       port map (
-         I  => stndbyTrig,  -- C00's stndbyTrig = C01's MOD_TRIGGER (CPLD.M2)
+         I  => stndbyTrigReg,  -- C00's stndbyTrig = C01's MOD_TRIGGER (CPLD.M2)
          O  => rtmLsP(6),
          OB => rtmLsN(6));
 
+   U_accelTrigReg : ODDRE1
+      port map (
+         C  => recClk,
+         Q  => accelTrigReg,
+         D1 => accelTrig,
+         D2 => accelTrig,
+         SR => '0');
+
    U_accelTrig : OBUFDS
       port map (
-         I  => accelTrig,  -- C00's accelTrig  = C01's SSSB_TRIGGER (CPLD.L4)
+         I  => accelTrigReg,  -- C00's accelTrig  = C01's SSSB_TRIGGER (CPLD.L4)
          O  => rtmLsP(7),
          OB => rtmLsN(7));
 

@@ -94,35 +94,35 @@ set_property -dict { IOSTANDARD LVDS} [get_ports {spareN[1][14]}] ; # dacDataN[1
 set_property -dict { IOSTANDARD LVDS} [get_ports {spareP[1][15]}] ; # dacDataP[1][6]
 set_property -dict { IOSTANDARD LVDS} [get_ports {spareN[1][15]}] ; # dacDataN[1][6]
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][0]}] ; # dacDataP[1][7]
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][0]}] ; # dacDataN[1][7]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutP[1][8]}] ; # dacDataP[1][7] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutN[1][8]}] ; # dacDataN[1][7] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][1]}] ; # dacDataP[1][8]
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][1]}] ; # dacDataN[1][8]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][0]}] ; # dacDataP[1][8] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][0]}] ; # dacDataN[1][8] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][1]}] ; # dacDataP[1][9]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][1]}] ; # dacDataN[1][9]
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][1]}] ; # dacDataP[1][9] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][1]}] ; # dacDataN[1][9] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][2]}] ; # dacDataP[1][10]
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][2]}] ; # dacDataN[1][10]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][1]}] ; # dacDataP[1][10] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][1]}] ; # dacDataN[1][10] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][2]}] ; # dacDataP[1][11]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][2]}] ; # dacDataN[1][11]
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][2]}] ; # dacDataP[1][11] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][2]}] ; # dacDataN[1][11] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][3]}] ; # dacDataP[1][12]
-set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][3]}] ; # dacDataN[1][12]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][2]}] ; # dacDataP[1][12] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][2]}] ; # dacDataN[1][12] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][3]}] ; # dacDataP[1][13]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][3]}] ; # dacDataN[1][13]
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][3]}] ; # dacDataP[1][13] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][3]}] ; # dacDataN[1][13] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutP[1][0]}] ; # dacDataP[1][14]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutN[1][0]}] ; # dacDataN[1][14]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][3]}] ; # dacDataP[1][14] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][3]}] ; # dacDataN[1][14] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutP[1][3]}] ; # dacDataP[1][15]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutN[1][3]}] ; # dacDataN[1][15]
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutP[1][0]}] ; # dacDataP[1][15] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {syncOutN[1][0]}] ; # dacDataN[1][15] - Version1 Specific Mapping 
 
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInP[1][0]}] ; # dacDckP[1]
-set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][0]}] ; # dacDckN[1]
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefP[1][0]}] ; # dacDckP[1] - Version1 Specific Mapping 
+set_property -dict { IOSTANDARD LVDS} [get_ports {sysRefN[1][0]}] ; # dacDckN[1] - Version1 Specific Mapping 
 
 # Interlock and trigger
 set_property -dict { IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][0]}] ; # timingTrig[1]
@@ -136,12 +136,13 @@ set_property LOC BITSLICE_RX_TX_X0Y162 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN
 set_property LOC BITSLICE_RX_TX_X0Y160 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[4].OutputTapDelay_INST/U_ODELAYE3}]
 set_property LOC BITSLICE_RX_TX_X0Y158 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[5].OutputTapDelay_INST/U_ODELAYE3}]
 set_property LOC BITSLICE_RX_TX_X0Y156 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[6].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y221 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[7].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y218 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[8].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y39  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[9].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y238 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[10].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y36  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[11].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y227 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[12].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y34  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[13].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y2   [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[14].OutputTapDelay_INST/U_ODELAYE3}]
-set_property LOC BITSLICE_RX_TX_X0Y257 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[15].OutputTapDelay_INST/U_ODELAYE3}]
+
+set_property LOC BITSLICE_RX_TX_X0Y247 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[7].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y41  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[8].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y218 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[9].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y39  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[10].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y238 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[11].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y36  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[12].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y227 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[13].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y34  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[14].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+set_property LOC BITSLICE_RX_TX_X0Y2   [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[15].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 

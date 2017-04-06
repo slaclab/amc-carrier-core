@@ -188,8 +188,9 @@ begin
    -------------------------------------------------------------------------------------------------
    TimingGthCoreWrapper_1 : entity work.TimingGthCoreWrapper
       generic map (
-         TPD_G    => TPD_G,
-         EXTREF_G => TIME_GEN_EXTREF_G)
+         TPD_G             => TPD_G,
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(1).baseAddr,
+         EXTREF_G          => TIME_GEN_EXTREF_G)
       port map (
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -273,7 +274,7 @@ begin
       generic map (
          TPD_G             => TPD_G,
          TPGEN_G           => TIME_GEN_APP_G,
-         AXIL_BASE_ADDR_G  => TIMING_ADDR_C,
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(0).baseAddr,
          AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
       port map (
          gtTxUsrClk      => txUsrClk,

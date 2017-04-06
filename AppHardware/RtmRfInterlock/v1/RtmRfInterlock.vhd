@@ -2,7 +2,7 @@
 -- File       : RtmRfInterlock.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-17
--- Last update: 2017-02-27
+-- Last update: 2017-04-04
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C00
 ------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ use unisim.vcomponents.all;
 entity RtmRfInterlock is
    generic (
       TPD_G            : time             := 1 ns;
-      IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";      
+      IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";
       AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C);
    port (
@@ -105,6 +105,9 @@ architecture mapping of RtmRfInterlock is
    signal rfOff          : sl;
    signal fault          : sl;
    signal faultClear     : sl;
+
+   signal stndbyTrigLReg : sl;
+   signal accelTrigReg   : sl;
 
 begin
 
@@ -205,15 +208,31 @@ begin
          O  => rtmLsP(52),
          OB => rtmLsN(52));
 
+   U_stndbyTrigReg : ODDRE1
+      port map (
+         C  => recClk,
+         Q  => stndbyTrigLReg,
+         D1 => stndbyTrigL,
+         D2 => stndbyTrigL,
+         SR  => '0');
+
    U_stndbyTrigL : OBUFDS
       port map (
-         I  => stndbyTrigL,
+         I  => stndbyTrigLReg,
          O  => rtmLsP(45),
          OB => rtmLsN(45));
 
+   U_accelTrigReg : ODDRE1
+      port map (
+         C  => recClk,
+         Q  => accelTrigReg,
+         D1 => accelTrig,
+         D2 => accelTrig,
+         SR => '0');
+
    U_accelTrig : OBUFDS
       port map (
-         I  => accelTrig,
+         I  => accelTrigReg,
          O  => rtmLsP(46),
          OB => rtmLsN(46));
 

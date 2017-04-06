@@ -2,7 +2,7 @@
 -- File       : RtmRfInterlockCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-17
--- Last update: 2017-02-27
+-- Last update: 2017-03-30
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_CXX
 ------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ end RtmRfInterlockCore;
 
 architecture mapping of RtmRfInterlockCore is
 
-   constant BUFFER_WIDTH_C : natural := 32;
+   constant BUFFER_WIDTH_C     : natural := 32;
    constant BUFFER_ADDR_SIZE_C : natural := 9;  -- 512 samples after trigger 
    constant NUM_AXI_MASTERS_C  : natural := 7;
 
@@ -269,6 +269,8 @@ begin
    U_cpldSpi : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
+         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
+         MODE_G            => "RW",
          ADDRESS_SIZE_G    => 7,
          DATA_SIZE_G       => 16,
          CLK_PERIOD_G      => 6.4E-9,
@@ -295,10 +297,11 @@ begin
          generic map (
             TPD_G             => TPD_G,
             MODE_G            => "WO",
+            AXI_ERROR_RESP_G  => AXI_RESP_OK_C,  -- always return OK response for WO operations
             ADDRESS_SIZE_G    => 7,
             DATA_SIZE_G       => 8,
             CLK_PERIOD_G      => 6.4E-9,
-            SPI_SCLK_PERIOD_G => 3.0E-6)  -- 1 MHz
+            SPI_SCLK_PERIOD_G => 3.0E-6)         -- 1 MHz
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,

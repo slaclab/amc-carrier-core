@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-03-10
+-- Last update: 2017-04-03
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -458,6 +458,7 @@ begin
          freezeHw            => freezeHw,
          evrTrig             => evrTrig,
          trigHw              => trigHw,
+         trigCascBay         => trigCascBay(1 downto 0),
          -- JESD SYNC Interface (jesdClk[1:0] domain)
          jesdSysRef          => jesdSysRef,
          jesdRxSync          => jesdRxSync,
