@@ -46,54 +46,71 @@ BsaBufferControl: &BsaBufferControl
         destHidden: &BsaBufferControlHidden true
       children:
         StartAddr:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         EndAddr:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         WrAddr:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         TriggerAddr:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Enabled:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Mode:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Init:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         SoftTrigger:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         MsgDest:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
           enums: *BsaBufferControlEnums
         FramesAfterTrigger:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Status:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Empty:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Full:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Done:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Triggered:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         Error:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
         FramesSinceTrigger:
+          class: IntField
           at:
             nelms: *BsaBufferControlNelms
