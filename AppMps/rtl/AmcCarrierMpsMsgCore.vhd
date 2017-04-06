@@ -34,8 +34,7 @@ use work.AmcCarrierPkg.all;
 entity AmcCarrierMpsMsgCore is
    generic (
       TPD_G            : time    := 1 ns;
-      SIM_ERROR_HALT_G : boolean := false;
-      APP_TYPE_G       : AppType := APP_NULL_TYPE_C);      
+      SIM_ERROR_HALT_G : boolean := false
    port (
       clk       : in  sl;
       rst       : in  sl;
@@ -48,8 +47,6 @@ end AmcCarrierMpsMsgCore;
 
 architecture rtl of AmcCarrierMpsMsgCore is
 
-   constant MPS_CHANNELS_C : natural range 0 to 32 := getMpsChCnt(APP_TYPE_G);
-   
    type StateType is (
       IDLE_S,
       HEADER_S,
@@ -97,11 +94,7 @@ begin
          ----------------------------------------------------------------------
          when IDLE_S =>
             -- Check for update
-            if (mpsMessage.valid = '1')
-               and (APP_TYPE_G /= APP_NULL_TYPE_C)
-               and (MPS_CHANNELS_C /= 0)
-               and (mpsMessage.msgSize /= 0)
-               and (mpsMessage.msgSize <= MPS_CHANNELS_C) then
+            if mpsMessage.valid = '1' then
                -- Reset tData
                v.mpsMaster.tData := (others => '0');
                -- Latch the information
@@ -121,7 +114,7 @@ begin
                v.mpsMaster.tData(12 downto 8) := (others => '0');               
                v.mpsMaster.tData(7 downto 0)  := r.mpsMessage.msgSize+5;  -- Length in units of bytes
                -- Set SOF               
-               ssiSetUserSof(MPS_CONFIG_C, v.mpsMaster, '1');
+               ssiSetUserSof(MPS_AXIS_CONFIG_C, v.mpsMaster, '1');
                -- Next state
                v.state                                         := APP_ID_S;
             end if;
@@ -188,8 +181,7 @@ begin
          -- Check the simulation error printing
          if SIM_ERROR_HALT_G then
             report "AmcCarrierMpsMsg: Simulation Overflow Detected ...";
-            report "APP_TYPE_G = " & integer'image(conv_integer(APP_TYPE_G));
-            report "APP ID     = " & integer'image(conv_integer(mpsMessage.appId)) severity failure;
+            report "APP ID = " & integer'image(conv_integer(mpsMessage.appId)) severity failure;
          end if;
       end if;
 

@@ -59,9 +59,6 @@ entity AppMpsSalt is
       -- MPS Interface
       mpsIbMaster     : in  AxiStreamMasterType;
       mpsIbSlave      : out AxiStreamSlaveType;
-      -- MPS configuration/status signals
-      mpsEnable       : out sl;
-      mpsTestMode     : out sl;
       ----------------------
       -- Top Level Interface
       ----------------------
@@ -81,12 +78,8 @@ end AppMpsSalt;
 architecture mapping of AppMpsSalt is
 
    constant STATUS_SIZE_C   : natural                := 15;
-   constant MPS_CHANNELS_C  : natural range 0 to 32  := getMpsChCnt(APP_TYPE_G);
-   constant MPS_THRESHOLD_C : natural range 0 to 256 := getMpsThresholdCnt(APP_TYPE_G);
 
    type RegType is record
-      mpsEnable      : sl;
-      mpsTestMode    : sl;
       cntRst         : sl;
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -94,8 +87,6 @@ architecture mapping of AppMpsSalt is
    end record;
 
    constant REG_INIT_C : RegType := (
-      mpsEnable      => '0',
-      mpsTestMode    => '0',
       cntRst         => '1',
       rollOverEn     => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
@@ -150,8 +141,8 @@ begin
             RX_ENABLE_G         => false,  -- Not using RX path
             COMMON_TX_CLK_G     => false,
             COMMON_RX_CLK_G     => false,
-            SLAVE_AXI_CONFIG_G  => MPS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => MPS_CONFIG_C)
+            SLAVE_AXI_CONFIG_G  => MPS_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C)
          port map (
             -- TX Serial Stream
             txP           => mpsTxP,
@@ -221,8 +212,8 @@ begin
                RX_ENABLE_G         => true,
                COMMON_TX_CLK_G     => false,
                COMMON_RX_CLK_G     => false,
-               SLAVE_AXI_CONFIG_G  => MPS_CONFIG_C,
-               MASTER_AXI_CONFIG_G => MPS_CONFIG_C)
+               SLAVE_AXI_CONFIG_G  => MPS_AXIS_CONFIG_C,
+               MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C)
             port map (
                -- TX Serial Stream
                txP           => open,
@@ -273,13 +264,9 @@ begin
       axiSlaveRegisterR(regCon, x"700", 0, statusOut);
       axiSlaveRegisterR(regCon, x"704", 0, ite(MPS_SLOT_G, x"00000001", x"00000000"));
       axiSlaveRegisterR(regCon, x"708", 0, APP_TYPE_G);
-      axiSlaveRegisterR(regCon, x"70C", 0, toSlv(MPS_CHANNELS_C, 32));
-      axiSlaveRegisterR(regCon, x"710", 0, toSlv(MPS_THRESHOLD_C, 32));
       axiSlaveRegisterR(regCon, x"714", 0, mpsPllLocked);
 
       -- Map the write registers
-      axiSlaveRegister(regCon, x"800", 0, v.mpsEnable);
-      axiSlaveRegister(regCon, x"804", 0, v.mpsTestMode);
       axiSlaveRegister(regCon, x"FF0", 0, v.rollOverEn);
       axiSlaveRegister(regCon, x"FF4", 0, v.cntRst);
 
@@ -297,8 +284,6 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
-      mpsEnable      <= r.mpsEnable;
-      mpsTestMode    <= r.mpsTestMode;
 
    end process comb;
 

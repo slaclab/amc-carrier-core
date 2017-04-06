@@ -107,7 +107,7 @@ begin
             -- Check SOF
             if (mpsMaster.tData(15) /= '1'                            or 
                 mpsMaster.tData(7 downto 0) /= x"0E"                  or 
-                ssiGetUserSof(MPS_CONFIG_C,mpsMaster) /= '1'       
+                ssiGetUserSof(MPS_AXIS_CONFIG_C,mpsMaster) /= '1'       
             ) then
                v.intError := '1';
             end if;
@@ -175,7 +175,7 @@ begin
 
                -- Message is done
                elsif mpsMaster.tLast = '1' then
-                  v.msgError  := r.intError or ssiGetUserEofe(MPS_CONFIG_C,mpsMaster);
+                  v.msgError  := r.intError or ssiGetUserEofe(MPS_AXIS_CONFIG_C,mpsMaster);
                   v.mitMessage.strobe := not v.msgError;
                   v.state     := HEADER0_S;
                end if;

@@ -28,12 +28,9 @@ package AppMpsPkg is
    ---------------------------------------------------
    -- MPS: Configurations, Constants and Records Types
    ---------------------------------------------------   
-   constant MPS_CONFIG_C          : AxiStreamConfigType := ssiAxiStreamConfig(2);
+   constant MPS_AXIS_CONFIG_C     : AxiStreamConfigType := ssiAxiStreamConfig(2);
    constant MPS_MITIGATION_BITS_C : integer             := 98;
    constant MPS_MESSAGE_BITS_C    : integer             := 298;
-
-   function getMpsChCnt(app        : AppType) return natural;
-   function getMpsThresholdCnt(app : AppType) return natural;
 
    type MpsMitigationMsgType is record
       strobe    : sl;                      -- valid
@@ -82,64 +79,6 @@ package AppMpsPkg is
 end package AppMpsPkg;
 
 package body AppMpsPkg is
-
-   function getMpsChCnt (app : AppType) return natural is
-      variable retVar : natural range 0 to 32;
-   begin
-      if (app = APP_BCM_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BLEN_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_STRIPLINE_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_CAVITY_TYPE_C) then
-         retVar := 0;                   -- TBD value         
-      elsif (app = APP_LLRF_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_MPS_APP_TYPE_C) then
-         retVar := 24;                  -- 6 channels * 4 integrations, RTH 01/27/2016
-      elsif (app = APP_MPS_DIGITAL_TYPE_C) then
-         retVar := 12;                  -- 96 bits., RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
-         retVar := 24;                  -- 6 channels * 4 integrations, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
-         retVar := 0;                   -- 0 channels, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         retVar := 12;                  -- 3 channels * 4 integrations, RTH 01/27/2016
-      else
-         retVar := 0;
-      end if;
-      return retVar;
-   end function;
-
-   function getMpsThresholdCnt (app : AppType) return natural is
-      variable retVar : natural range 0 to 256;
-   begin
-      if (app = APP_BCM_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BLEN_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_STRIPLINE_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_BPM_CAVITY_TYPE_C) then
-         retVar := 0;                   -- TBD value         
-      elsif (app = APP_LLRF_TYPE_C) then
-         retVar := 0;                   -- TBD value
-      elsif (app = APP_MPS_APP_TYPE_C) then
-         retVar := 16;                  -- 16, RTH 01/27/2016
-      elsif (app = APP_MPS_DIGITAL_TYPE_C) then
-         retVar := 0;                   -- None, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_AIN_TYPE_C) then
-         retVar := 16;                  -- 16, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_DIN_TYPE_C) then
-         retVar := 0;                   -- None, RTH 01/27/2016
-      elsif (app = APP_MPS_LINK_MIXED_TYPE_C) then
-         retVar := 16;                  -- 16, RTH 01/27/2016
-      else
-         retVar := 0;
-      end if;
-      return retVar;
-   end function;
 
    function toSlv (m : MpsMitigationMsgType) return slv is
       variable vector : slv(MPS_MITIGATION_BITS_C-1 downto 0) := (others => '0');

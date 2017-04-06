@@ -107,9 +107,6 @@ architecture mapping of AppMps is
    signal mps625MHzRst : sl;
    signal mpsPllLocked : sl;
 
-   signal mpsTestMode : sl;
-   signal mpsEnable   : sl;
-
    signal mpsMaster : AxiStreamMasterType;
    signal mpsSlave  : AxiStreamSlaveType;
 
@@ -186,9 +183,7 @@ begin
          axilReadSlave   => axilReadSlaves(ENCODER_INDEX_C),
          axilWriteMaster => axilWriteMasters(ENCODER_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(ENCODER_INDEX_C),
-         -- Inbound Message Value
-         enable          => mpsEnable,
-         testMode        => mpsTestMode,
+         -- Config
          bsiBus          => bsiBus,
          -- MPS Interface
          mpsMaster       => mpsMaster,
@@ -219,9 +214,6 @@ begin
          axilReadSlave   => axilReadSlaves(SALT_INDEX_C),
          axilWriteMaster => axilWriteMasters(SALT_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(SALT_INDEX_C),
-         -- MPS/BP_MSG configuration/status signals
-         mpsEnable       => mpsEnable,
-         mpsTestMode     => mpsTestMode,
          -- MPS Interface
          mpsIbMaster     => mpsMaster,
          mpsIbSlave      => mpsSlave,
