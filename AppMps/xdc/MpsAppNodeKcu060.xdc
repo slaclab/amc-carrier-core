@@ -8,9 +8,12 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-# Load RUCKUS environment and library
-source -quiet $::env(RUCKUS_DIR)/vivado_env_var.tcl
-source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
+################################
+## Area/Placement Constraints ##
+################################
 
-set topName [get_property top [current_fileset]]
-exec mv -f "${IMAGES_DIR}/${topName}_${PRJ_VERSION}.dcp" "${IMAGES_DIR}/${topName}.dcp"
+
+##########################
+## Misc. Configurations ##
+##########################
+

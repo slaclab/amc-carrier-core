@@ -19,6 +19,7 @@ if {  $::env(AMC_ADV_BUILD)  == 1 } {
    loadSource      -path "$::DIR_PATH/dcp/hdl/AmcCarrierBsa.vhd"
    loadSource      -path "$::DIR_PATH/dcp/hdl/AmcCarrierDdrMem.vhd"
    loadSource      -path "$::DIR_PATH/ip/MigCore.dcp"
+   # loadIpCore      -path "$::DIR_PATH/ip/MigCore.xci"
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePorts.xdc" 
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreTiming.xdc" 
    
