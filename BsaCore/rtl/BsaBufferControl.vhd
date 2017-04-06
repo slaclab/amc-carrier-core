@@ -2,7 +2,9 @@
 -- File       : BsaBufferControl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2016-06-30
+-- Last update: 2017-03-10
+-- Platform   : 
+-- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -18,7 +20,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
@@ -30,7 +32,7 @@ use work.AxiDmaPkg.all;
 use work.TextUtilPkg.all;
 
 use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+--use work.AmcCarrierSysRegPkg.all;
 use work.TimingPkg.all;
 
 entity BsaBufferControl is
@@ -97,7 +99,7 @@ architecture rtl of BsaBufferControl is
       TDEST_BITS_C  => BSA_ADDR_BITS_C,
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,  --ite(BSA_STREAM_BYTE_WIDTH_G = 4, TKEEP_FIXED_C, TKEEP_COMP_C),
-      TUSER_BITS_C  => 1,
+      TUSER_BITS_C  => 2,    -- (OVFL, BSADONE)
       TUSER_MODE_C  => TUSER_LAST_C);
 
    constant INT_STREAM_CONFIG_C : AxiStreamConfigType := (
@@ -106,7 +108,7 @@ architecture rtl of BsaBufferControl is
       TDEST_BITS_C  => BSA_ADDR_BITS_C,
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,  --ite(AXI_CONFIG_G.DATA_BYTES_C = 4, TKEEP_FIXED_C, TKEEP_COMP_C),
-      TUSER_BITS_C  => 1,
+      TUSER_BITS_C  => 2,
       TUSER_MODE_C  => TUSER_LAST_C);
 
    constant LAST_STREAM_CONFIG_C : AxiStreamConfigType := (
@@ -115,7 +117,7 @@ architecture rtl of BsaBufferControl is
       TDEST_BITS_C  => BSA_ADDR_BITS_C,
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,  --ite(AXI_CONFIG_G.DATA_BYTES_C = 4, TKEEP_FIXED_C, TKEEP_COMP_C),
-      TUSER_BITS_C  => 1,
+      TUSER_BITS_C  => 2,  -- (EOFE, TRIGGER)
       TUSER_MODE_C  => TUSER_LAST_C);
 
 --    constant AXI_CONFIG_C : AxiConfigType := (
@@ -140,29 +142,38 @@ architecture rtl of BsaBufferControl is
    signal dmaAxisMaster      : AxiStreamMasterType;
    signal dmaAxisSlave       : AxiStreamSlaveType;
 
-   -- Each accumulator maintains 4 header words + diagnostic output accumulations
-   constant NUM_ACCUMULATIONS_C      : integer := DIAGNOSTIC_OUTPUTS_G + 4;
-   constant BSA_BUFFER_ENTRY_BYTES_C : integer := NUM_ACCUMULATIONS_C * 4;
+   -- Each accumulator maintains 128b header word + diagnostic output accumulations
+--   constant NUM_ACCUMULATIONS_C      : integer := DIAGNOSTIC_OUTPUTS_G;
+   constant NUM_ACCUMULATIONS_C      : integer := 31;
 
    type RegType is record
-      diagnosticData : Slv32Array(NUM_ACCUMULATIONS_C - 1 downto 0);
+      diagnosticData : Slv32Array(NUM_ACCUMULATIONS_C downto 0);
+      diagnosticSevr : Slv2Array (NUM_ACCUMULATIONS_C downto 0);
+      diagnosticFixd : slv       (NUM_ACCUMULATIONS_C downto 0);
+      dataSquare     : slv       (47 downto 0);
+      excSquare      : sl;
       syncRdEn       : sl;
       timestampEn    : sl;
+      headerEn       : sl;
       accumulateEn   : sl;
-      setEn          : sl;
       lastEn         : sl;
       adderCount     : slv(5 downto 0);
-
+      adderPhase     : slv(2 downto 0);
    end record RegType;
 
    constant REG_INIT_C : RegType := (
       diagnosticData => (others => (others => '0')),
+      diagnosticSevr => (others => (others => '0')),
+      diagnosticFixd => (others => '0'),
+      dataSquare     => (others => '0'),
+      excSquare      => '0',
       syncRdEn       => '0',
       timestampEn    => '0',
-      setEn          => '0',
-      lastEn         => '0',
+      headerEn       => '0',
       accumulateEn   => '0',
-      adderCount     => (others => '0'));
+      lastEn         => '0',
+      adderCount     => (others => '0'),
+      adderPhase     => (others => '0'));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -176,7 +187,8 @@ architecture rtl of BsaBufferControl is
    -- axilClk signals
    signal bufferClearEn : sl;
    signal bufferClear   : slv(BSA_ADDR_BITS_C-1 downto 0);
-
+   signal bufferEnabled : slv(BSA_BUFFERS_G-1 downto 0);
+   
 begin
 
    U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
@@ -253,19 +265,23 @@ begin
          generic map (
             TPD_G               => TPD_G,
             BSA_NUMBER_G        => i,
-            NUM_ACCUMULATIONS_G => NUM_ACCUMULATIONS_C,
+            NUM_ACCUMULATIONS_G => NUM_ACCUMULATIONS_C+1,
             FRAME_SIZE_BYTES_G  => BSA_BURST_BYTES_G,
             AXIS_CONFIG_G       => BSA_STREAM_CONFIG_C)
          port map (
             clk            => axiClk,                                         -- [in]
             rst            => axiRst,                                         -- [in]
+            enable         => bufferEnabled(i),                               -- [in]
             bsaInit        => diagnosticBusSync.timingMessage.bsaInit(i),     -- [in]
             bsaActive      => diagnosticBusSync.timingMessage.bsaActive(i),   -- [in]
             bsaAvgDone     => diagnosticBusSync.timingMessage.bsaAvgDone(i),  -- [in]
             bsaDone        => diagnosticBusSync.timingMessage.bsaDone(i),     -- [in]
-            diagnosticData => r.diagnosticData(0),                            -- [in]
+            diagnosticData => r.diagnosticData(NUM_ACCUMULATIONS_C),          -- [in]
+            diagnosticSqr  => r.dataSquare,                                   -- [in]
+            diagnosticFixd => r.diagnosticFixd(NUM_ACCUMULATIONS_C),          -- [in]
+            diagnosticSevr => r.diagnosticSevr(NUM_ACCUMULATIONS_C),          -- [in]
+            diagnosticExc  => r.excSquare,                                    -- [in]
             accumulateEn   => r.accumulateEn,                                 -- [in]
-            setEn          => r.setEn,                                        -- [in]
             lastEn         => r.lastEn,                                       -- [in]
             axisMaster     => bsaAxisMasters(i),                              -- [out]
             axisSlave      => bsaAxisSlaves(i));                              -- [in]
@@ -374,13 +390,15 @@ begin
          mAxisMaster => lastFifoAxisMaster,  -- [out]
          mAxisSlave  => lastFifoAxisSlave);  -- [in]
 
+   axisStatusMaster <= AXI_STREAM_MASTER_INIT_C;
 
    U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
       generic map (
          TPD_G                => TPD_G,
          BUFFERS_G            => BSA_BUFFERS_G,
          BURST_SIZE_BYTES_G   => BSA_BURST_BYTES_G,
-         TRIGGER_USER_BIT_G   => 0,
+         ENABLE_UNALIGN_G     => true,
+         TRIGGER_USER_BIT_G   => 1,  -- EOFE is bit 0
          AXIL_BASE_ADDR_G     => DMA_RING_BASE_ADDR_C,
          DATA_AXIS_CONFIG_G   => LAST_STREAM_CONFIG_C,
          STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1),
@@ -394,12 +412,13 @@ begin
          axilWriteSlave   => locAxilWriteSlaves(DMA_RING_AXIL_C),   -- [out]
          axisStatusClk    => axisStatusClk,                         -- [in]
          axisStatusRst    => axisStatusRst,                         -- [in]
-         axisStatusMaster => axisStatusMaster,                      -- [out]
-         axisStatusSlave  => axisStatusSlave,                       -- [in]
+         axisStatusMaster => open,                                  -- [out]
+         axisStatusSlave  => AXI_STREAM_SLAVE_FORCE_C,              -- [in]
          axiClk           => axiClk,                                -- [in]
          axiRst           => axiRst,                                -- [in]
          bufferClearEn    => timeStampRamWe,                        -- [in]
          bufferClear      => r.adderCount,                          -- [in]
+         bufferEnabled    => bufferEnabled,                         -- [out]
          axisDataMaster   => lastFifoAxisMaster,                    -- [in]
          axisDataSlave    => lastFifoAxisSlave,                     -- [out]
          axiWriteMaster   => axiWriteMaster,                        -- [out]
@@ -415,63 +434,80 @@ begin
    begin
       v := r;
 
-      ----------------------------------------------------------------------------------------------
-      -- Counter is freerunning. Reset at start of new message
-      ----------------------------------------------------------------------------------------------
-      v.adderCount := r.adderCount + 1;
-      v.lastEn     := '0';
-      v.syncRdEn   := '0';
+      v.syncRdEn     := '0';
+      v.accumulateEn := '0';
+      v.headerEn     := '0';
 
+      v.adderPhase := r.adderPhase+1;
+      
+      ----------------------------------------------------------------------------------------------
+      -- Accumulation stage - shift new diagnostic data through the accumulators
+      ----------------------------------------------------------------------------------------------
+      if r.adderPhase="100" and r.timestampEn='1' then
+
+        v.adderPhase := "000";
+        v.adderCount := r.adderCount + 1;
+
+        v.diagnosticData := r.diagnosticData(0) & r.diagnosticData(r.diagnosticData'left downto 1);
+        v.diagnosticSevr := r.diagnosticSevr(0) & r.diagnosticSevr(r.diagnosticSevr'left downto 1);
+        v.diagnosticFixd := r.diagnosticFixd(0) & r.diagnosticFixd(r.diagnosticFixd'left downto 1);
+
+        v.dataSquare := x"000" &
+                        slv(signed(r.diagnosticData(0)(17 downto 0))*
+                            signed(r.diagnosticData(0)(17 downto 0)));
+        if (allBits(r.diagnosticData(0)(31 downto 17),'0') or
+            allBits(r.diagnosticData(0)(31 downto 17),'1')) then
+          v.excSquare := '0';
+        else
+          v.excSquare := '1';
+        end if;
+
+        v.lastEn  := '0';
+        if (r.adderCount = NUM_ACCUMULATIONS_C-1) then
+          v.lastEn   := '1';
+        end if;
+        if (r.adderCount < NUM_ACCUMULATIONS_C) then
+          v.accumulateEn := '1';
+        end if;
+
+        ----------------------------------------------------------------------------------------------
+        -- Disable timestamps after iterating through all bsa indicies
+        ----------------------------------------------------------------------------------------------
+        if (r.adderCount = NUM_ACCUMULATIONS_C+1) then
+          v.timestampEn := '0';
+          v.syncRdEn    := '1';            
+        end if;
+
+      end if;
+      
       ----------------------------------------------------------------------------------------------
       -- Synchronization
       -- Wait for synchronized strobe signal, then latch the timing message onto the local clock      
       ----------------------------------------------------------------------------------------------
       if (diagnosticBusSyncValid = '1' and r.accumulateEn = '0' and r.timeStampEn = '0' and r.syncRdEn = '0') then
-         v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 4) := diagnosticBusSync.data(DIAGNOSTIC_OUTPUTS_G-1 downto 0);
-         v.diagnosticData(3)                              := X"00000001";  -- 1.0 (for number of accumulations)
-         v.diagnosticData(2)                              := toSlv(DIAGNOSTIC_OUTPUTS_G, 32);  --Make this based on app constants
-         v.diagnosticData(1)                              := diagnosticBusSync.timingMessage.pulseId(63 downto 32);
-         v.diagnosticData(0)                              := diagnosticBusSync.timingMessage.pulseId(31 downto 0);
+         --  Header data
+         v.dataSquare := diagnosticBusSync.timingMessage.pulseId(63 downto 16);
+         v.diagnosticData(NUM_ACCUMULATIONS_C) :=
+           diagnosticBusSync.timingMessage.pulseId(15 downto 0) &
+           toSlv(NUM_ACCUMULATIONS_C,16);
+         v.diagnosticSevr(NUM_ACCUMULATIONS_C) := "00";
+         v.diagnosticFixd(NUM_ACCUMULATIONS_C) := '1';
+         --  Channel data
+         v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 0) :=
+           diagnosticBusSync.data (NUM_ACCUMULATIONS_C-1 downto 0);
+         v.diagnosticSevr(NUM_ACCUMULATIONS_C-1 downto 0) := 
+           diagnosticBusSync.sevr (NUM_ACCUMULATIONS_C-1 downto 0);
+         v.diagnosticFixd(NUM_ACCUMULATIONS_C-1 downto 0) :=
+           diagnosticBusSync.fixed(NUM_ACCUMULATIONS_C-1 downto 0);
 
-         v.timestampEn  := '1';
-         v.accumulateEn := '1';
-         v.setEn        := '1';
-         v.adderCount   := (others => '0');
+         v.excSquare      := '0';
+         v.accumulateEn   := '1';
+         v.timestampEn    := '1';
+         v.adderCount     := (others => '0');
+         v.adderPhase     := (others => '0');
       end if;
 
-
-      ----------------------------------------------------------------------------------------------
-      -- Accumulation stage - shift new diagnostic data through the accumulators
-      ----------------------------------------------------------------------------------------------
-      if (r.accumulateEn = '1') then
-         v.diagnosticData(NUM_ACCUMULATIONS_C-1)          := X"00000000";
-         v.diagnosticData(NUM_ACCUMULATIONS_C-2 downto 0) := r.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 1);
-
-         -- Stop when done with all buffers
-         v.adderCount := r.adderCount + 1;
-         if (r.adderCount = 2) then
-            v.setEn := '0';
-         end if;
-         if (r.adderCount = NUM_ACCUMULATIONS_C-2) then
-            v.lastEn := '1';
-         end if;
-         if (r.adderCount = NUM_ACCUMULATIONS_C-1) then
-            v.accumulateEn := '0';
-         end if;
-      end if;
-
-      ----------------------------------------------------------------------------------------------
-      -- Disable timestamps after iterating through all bsa indicies
-      ----------------------------------------------------------------------------------------------
-      if (r.adderCount = 63) then
-         v.timestampEn := '0';
-         if (r.timestampEn = '1') then
-            v.syncRdEn    := '1';            
-         end if;
-      end if;
-
-
-      ----------------------------------------------------------------------------------------------
+      ----------------------------------------------------------------------------------------------        
       -- Reset and output assignment
       ----------------------------------------------------------------------------------------------
       if (axiRst = '1') then
