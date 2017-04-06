@@ -12,6 +12,7 @@
 #include TimingFrameRx.yaml
 #include TPGMiniCore.yaml
 #include GthRxAlignCheck.yaml
+#include Gthe3Channel.yaml
 
 AmcCarrierTiming: &AmcCarrierTiming 
   name: AmcCarrierTiming
@@ -36,4 +37,9 @@ AmcCarrierTiming: &AmcCarrierTiming
       <<: *GthRxAlignCheck
       at:
         offset: 0x00800000
-    ##################################################    
+    ##################################################  
+    Gthe3Channel:
+      <<: *Gthe3Channel
+      at:
+        offset: 0x00C00000
+    ##################################################      
