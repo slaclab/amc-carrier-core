@@ -2,7 +2,7 @@
 -- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2017-02-24
+-- Last update: 2017-04-04
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ package AmcCarrierPkg is
    constant DIAGNOSTIC_BUS_INIT_C : DiagnosticBusType := (
       strobe        => '0',
       data          => (others => (others => '0')),
-      sevr          => (others => (others => '0')),
+      sevr          => (others => (others => '1')),
       fixed         => (others => '0'),
       timingMessage => TIMING_MESSAGE_INIT_C);
 
