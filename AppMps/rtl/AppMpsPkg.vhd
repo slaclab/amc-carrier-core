@@ -2,7 +2,6 @@
 -- File       : AppMpsPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-12-05
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -21,17 +20,20 @@ use ieee.std_logic_1164.all;
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
-use work.AmcCarrierPkg.all;
 
 package AppMpsPkg is
 
    ---------------------------------------------------
-   -- MPS: Configurations, Constants and Records Types
+   -- MPS: Configurations and Constants
    ---------------------------------------------------   
    constant MPS_AXIS_CONFIG_C     : AxiStreamConfigType := ssiAxiStreamConfig(2);
    constant MPS_MITIGATION_BITS_C : integer             := 98;
    constant MPS_MESSAGE_BITS_C    : integer             := 298;
+   constant MPS_CHAN_COUNT_C      : integer             := 24;
 
+   ---------------------------------------------------
+   -- Mitigation message record
+   ---------------------------------------------------   
    type MpsMitigationMsgType is record
       strobe    : sl;                      -- valid
       latchDiag : sl;                      -- latch the beam diagnostics with 'tag' 
@@ -52,6 +54,9 @@ package AppMpsPkg is
    function toSlv (m                : MpsMitigationMsgType) return slv;
    function toMpsMitigationMsg (vec : slv) return MpsMitigationMsgType;
 
+   ---------------------------------------------------
+   -- Update message
+   ---------------------------------------------------   
    type MpsMessageType is record
       valid     : sl;
       lcls      : sl; -- '0' LCLS-II, '1' LCLS-I
@@ -75,6 +80,103 @@ package AppMpsPkg is
 
    function toSlv (m          : MpsMessageType) return slv;
    function toMpsMessage (vec : slv) return MpsMessageType;
+
+   ---------------------------------------------------
+   -- MPS Channel Configuration
+   ---------------------------------------------------   
+   type MpsChanConfigType is record
+      THOLD_COUNT_C  : integer range 0 to 8;
+      LCLS1_EN_C     : boolean;
+      IDLE_EN_C      : boolean;
+      ALT_EN_C       : boolean;
+      BYTE_MAP_C     : integer range 0 to MPS_CHAN_COUNT-1;
+   end record;
+
+   type MpsChanConfigArray is array (natural range <>) of MpsChanConfigType;
+
+   constant MPS_CHAN_CONFIG_INIT_C : MpsChanConfigType := (
+      THOLD_COUNT_C  => 0,
+      LCLS1_EN_C     => false,
+      IDLE_EN_C      => false,
+      ALT_EN_C       => false,
+      BYTE_MAP_C     => 0);
+
+   ---------------------------------------------------
+   -- MPS App Configuration
+   ---------------------------------------------------   
+   type MpsAppConfigType is record
+      DIGITAL_EN_C   : boolean; -- APP is digital
+      BYTE_COUNT_C   : integer range 0 to MPS_CHAN_COUNT-1; -- MPS message bytes
+      CHAN_CONFIG_C  : MpsChanConfigArray(MPS_CHAN_COUNT-1 downto 0);
+   end record;
+
+   constant MPS_APP_CONFIG_INIT_C : MpsAppConfigType := (
+      DIGITAL_EN_C   => false,
+      BYTE_COUNT_C   => 0,
+      CHAN_CONFIG_C  => (others=>MPS_CHAN_CONFIG_INIT_C));
+
+   ---------------------------------------------------
+   -- MPS Channel Thold Registers
+   ---------------------------------------------------   
+   type MpsChanTholdType is record
+      minTholdEn : sl;
+      maxTholdEn : sl;
+      minThold   : slv(31 downto 0);
+      maxThold   : slv(31 downto 0);
+   end record;
+
+   type MpsChanTholdArray is array (natural range <>) of MpsChanTholdType;
+
+   constant MPS_CHAN_THOLD_INIT_C : MpsChanTholdType := (
+      minTholdEn => 0,
+      maxTholdEn => 0,
+      minThold   => (others=>'0'),
+      maxThold   => (others=>'0'));
+
+   ---------------------------------------------------
+   -- MPS Channel Registers
+   ---------------------------------------------------   
+   type MpsChanRegType is record
+      stdTholds    : MpsChanTholdArray(7 downto 0);
+      lcls1Thold   : MpsChanTholdType;
+      idlehold     : MpsChanTholdType;
+      altTholds    : MpsChanTholdArray(7 downto 0);
+   end record;
+
+   type MpsChanRegArray is array (natural range <>) of MpsChanRegType;
+
+   constant MPS_CHAN_REG_INIT_C : MpsChanRegType := (
+      stdTholds    => (others=>MPS_CHAN_THOLD_INIT_C),
+      lcls1Thold   => MPS_CHAN_THOLD_INIT_C;
+      idleThold    => MPS_CHAN_THOLD_INIT_C;
+      altTholds    => (others=>MPS_CHAN_THOLD_INIT_C));
+
+   ---------------------------------------------------
+   -- MPS Application Registers
+   ---------------------------------------------------   
+
+   -- Kick detect modes
+   constant MPS_KICK_DISABLE : slv(1 downto 0) := "00";
+   constant MPS_KICK_SOFT    : slv(1 downto 0) := "01";
+   constant MPS_KICK_HARD    : slv(1 downto 0) := "10";
+   constant MPS_KICK_OTHER   : slv(1 downto 0) := "11";
+
+   type MpsAppRegType is record
+      mpsEnable   : sl;
+      mpsAddId    : slv(9 downto 0);
+      lcls1Mode   : sl;
+      kickDetMode : slv(1 downto 0);
+      mpsChanReg  : MpsChanRegArray(MPS_CHAN_COUNT_C downto 0);
+   end record;
+
+   type MpsAppRegArray is array (natural range <>) of MpsAppRegType;
+
+   constant MPS_APP_REG_INIT_C : MpsAppRegType := (
+      mpsEnable    => 0,
+      mpsAddId     => (others=>'0'),
+      lcls1Mode    => '0',
+      kickDetMode  => (others=>'0'),
+      mpsChanReg   => (others=>MPS_CHAN_REG_INIT_C));
 
 end package AppMpsPkg;
 
