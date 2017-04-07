@@ -269,7 +269,7 @@ begin
 
    end generate;
 
-   NO_GEN_EVR : if (MR_LCLS_APP_G = true) generate
+   NO_GEN_EVR : if (MR_LCLS_APP_G = false) generate
 
       mAxisMaster <= sAxisMaster;
       sAxisSlave  <= mAxisSlave;
