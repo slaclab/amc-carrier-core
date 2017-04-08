@@ -33,11 +33,11 @@ entity RtmMpsLinkNode is
       dout            : in    slv(7 downto 0);
       din             : out   slv(31 downto 0);
       -- AXI-Lite Interface
-      axilClk         : in    sl;
-      axilRst         : in    sl;
-      axilReadMaster  : in    AxiLiteReadMasterType;
+      axilClk         : in    sl                     := '0';
+      axilRst         : in    sl                     := '0';
+      axilReadMaster  : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
       axilReadSlave   : out   AxiLiteReadSlaveType;
-      axilWriteMaster : in    AxiLiteWriteMasterType;
+      axilWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --

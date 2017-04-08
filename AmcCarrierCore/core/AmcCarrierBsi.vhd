@@ -73,8 +73,9 @@ architecture rtl of AmcCarrierBsi is
    function makeStringRom return RomType is
       variable ret : RomType := (others => (others => '0'));
    begin
-      for i in 0 to 255 loop
-         ret(i) := BUILD_INFO_C.buildString(i/4)(8*(i mod 4)+7 downto 8*(i mod 4)); 
+      ret(0) := x"00";
+      for i in 0 to 254 loop
+         ret(i+1) := BUILD_INFO_C.buildString(i/4)(8*(i mod 4)+7 downto 8*(i mod 4)); 
       end loop;
       return ret;
    end function makeStringRom;

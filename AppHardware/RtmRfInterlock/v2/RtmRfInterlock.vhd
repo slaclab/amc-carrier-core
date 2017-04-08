@@ -2,7 +2,7 @@
 -- File       : RtmRfInterlock.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-17
--- Last update: 2017-02-27
+-- Last update: 2017-03-21
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C01    
 ------------------------------------------------------------------------------
@@ -106,8 +106,8 @@ begin
    hsAdcBeamIN    <= rtmLsN(9);
    hsAdcBeamVP    <= rtmLsP(14);
    hsAdcBeamVN    <= rtmLsN(14);
-   hsAdcFwdPwrP   <= '0';               -- Removed in revision C01 
-   hsAdcFwdPwrN   <= '1';               -- Removed in revision C01   
+   hsAdcFwdPwrP   <= rtmLsP(13);
+   hsAdcFwdPwrN   <= rtmLsN(13);
    hsAdcReflPwrP  <= rtmLsP(19);
    hsAdcReflPwrN  <= rtmLsN(19);
    hsAdcFrameClkP <= rtmLsP(18);

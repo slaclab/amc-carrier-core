@@ -3,4 +3,11 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 # Load Source Code
 loadSource -dir "$::DIR_PATH/rtl/"
-loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeSaltSerdes.xdc"
+
+
+if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
+   loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu040.xdc"
+} else {
+   loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu060.xdc"
+}
+

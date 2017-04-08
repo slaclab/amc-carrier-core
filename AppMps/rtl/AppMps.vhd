@@ -2,7 +2,7 @@
 -- File       : AppMps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-02-04
+-- Last update: 2017-03-23
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -49,8 +49,12 @@ entity AppMps is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
-      -- IPMI Status and Configurations
-      bsiBus          : in  BsiBusType;
+      -- System Status
+      bsiBus          : in  BsiBusType;     -- axilClk domain
+      ethLinkUp       : in  sl;             -- axilClk domain
+      timingClk       : in  sl;
+      timingRst       : in  sl;
+      timingBus       : in  TimingBusType;  -- timingClk domain  
       ----------------------
       -- Top Level Interface
       ----------------------
