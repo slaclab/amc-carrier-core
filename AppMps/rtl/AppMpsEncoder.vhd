@@ -36,8 +36,8 @@ use work.TimingPkg.all;
 entity AppMpsEncoder is
    generic (
       TPD_G            : time             := 1 ns;
-      MPS_SLOT_G       : boolean         := false;
-      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
+      MPS_SLOT_G       : boolean          := false;
+      APP_TYPE_G       : AppType          := APP_NULL_TYPE_C;
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));      
    port (
@@ -53,10 +53,8 @@ entity AppMpsEncoder is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- Configurations 
-      enable          : in  sl;
-      testMode        : in  sl;
       bsiBus          : in  BsiBusType;
-      -- MPS Interface
+      -- MPS Interface, sync to axilClk
       mpsMaster       : out AxiStreamMasterType;
       mpsSlave        : in  AxiStreamSlaveType);   
 end AppMpsEncoder;
@@ -110,6 +108,22 @@ begin
             dout   => message(i));
 
    end generate GEN_VEC;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
    -- Placeholder for future code
    mpsMaster <= AXI_STREAM_MASTER_INIT_C;

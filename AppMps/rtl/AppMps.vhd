@@ -185,7 +185,7 @@ begin
          axilWriteSlave  => axilWriteSlaves(ENCODER_INDEX_C),
          -- Config
          bsiBus          => bsiBus,
-         -- MPS Interface
+         -- MPS Interface, axilClk
          mpsMaster       => mpsMaster,
          mpsSlave        => mpsSlave);
 
