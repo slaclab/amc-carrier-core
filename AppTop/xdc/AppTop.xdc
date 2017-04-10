@@ -366,6 +366,8 @@ set_clock_groups -asynchronous \
     -group [get_clocks -include_generated_clocks {jesd0_370MHz}] \
     -group [get_clocks -include_generated_clocks {jesd1_370MHz}]  
 
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {ddrClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]
+
 ##########################
 ## Misc. Configurations ##
 ##########################
