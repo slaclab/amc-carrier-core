@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierMpsMsgCore.vhd
+-- File       : MpsMsgCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
 -- Last update: 2016-05-06
@@ -31,7 +31,7 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AmcCarrierPkg.all;
 
-entity AmcCarrierMpsMsgCore is
+entity MpsMsgCore is
    generic (
       TPD_G            : time    := 1 ns;
       SIM_ERROR_HALT_G : boolean := false
@@ -43,9 +43,9 @@ entity AmcCarrierMpsMsgCore is
       -- Outbound MPS Interface
       mpsMaster : out AxiStreamMasterType;
       mpsSlave  : in  AxiStreamSlaveType);   
-end AmcCarrierMpsMsgCore;
+end MpsMsgCore;
 
-architecture rtl of AmcCarrierMpsMsgCore is
+architecture rtl of MpsMsgCore is
 
    type StateType is (
       IDLE_S,

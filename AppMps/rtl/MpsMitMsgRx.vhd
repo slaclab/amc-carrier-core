@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierMitMsgRx.vhd
+-- File       : MpsMitMsgRx.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-01-26
 -- Last update: 2017-01-26
@@ -33,7 +33,7 @@ use work.MpsCentralNodePkg.all;
 use work.AppMpsPkg.all;
 
 
-entity AmcCarrierMitMsgRx is
+entity MpsMitMsgRx is
    generic (
       TPD_G  : time  := 1 ns);
    port (
@@ -48,9 +48,9 @@ entity AmcCarrierMitMsgRx is
       mitMessage      : out MpsMitigationMsgType;
       msgError        : out sl
    );
-end AmcCarrierMitMsgRx;
+end MpsMitMsgRx;
 
-architecture rtl of AmcCarrierMitMsgRx is
+architecture rtl of MpsMitMsgRx is
 
    type StateType is (      
       HEADER0_S,
