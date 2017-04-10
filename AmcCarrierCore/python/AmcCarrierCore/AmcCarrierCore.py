@@ -1,15 +1,17 @@
 import pyrogue as pr
 
 # Modules from surf
-from surf.AxiVersion import *
-from surf.AxiSysMonUltraScale import *
-from surf.AxiMicronN25Q import *
-from surf.AxiSy56040 import *
-from surf.AxiCdcm6208 import *
-from surf.UdpEngineClient import *
-from surf.UdpEngineServer import *
-from surf.RssiCore import *
-from surf.AxiMemTester import *
+from surf._AxiVersion import *
+from surf._AxiSysMonUltraScale import *
+from surf._AxiMicronN25Q import *
+from surf._AxiSy56040 import *
+from surf._AxiCdcm6208 import *
+from surf._UdpEngineClient import *
+from surf._UdpEngineServer import *
+from surf._RssiCore import *
+from surf._AxiMemTester import *
+from surf._Axi24LC64FT import *
+from surf._DdrSpd import *
 
 # Modules from AmcCarrierCore
 from AmcCarrierCore.AmcCarrierBsi import *
@@ -18,10 +20,6 @@ from AmcCarrierCore.AmcCarrierBsa import *
 
 # Modules from AppMps
 from AppMps.AppMps import *
-
-# Other modules
-from others.Axi24LC64FT import *
-from others.DdrSpd import *
 
 class AmcCarrierCore(pr.Device):
     def __init__(self, name="AmcCarrierCore", memBase=None, offset=0x0, hidden=False):

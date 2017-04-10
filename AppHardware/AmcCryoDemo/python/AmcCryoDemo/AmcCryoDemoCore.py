@@ -19,9 +19,9 @@
 
 import pyrogue as pr
 
-from surf.Adc16Dx370 import *
-from surf.Lmk04828 import *
-from surf.Dac38J84 import *
+from surf._Adc16Dx370 import *
+from surf._Lmk04828 import *
+from surf._Dac38J84 import *
 
 class AmcCryoDemoCore(pr.Device):
     def __init__(self, name="AmcCryoDemoCore", description="Cryo Amc Rf Demo Board Core", memBase=None, offset=0x0, hidden=False):

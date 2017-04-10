@@ -19,7 +19,7 @@
 
 import pyrogue as pr
 
-from surf.GenericMemory import *
+from surf._GenericMemory import *
 
 class Waveform(pr.Device):
     def __init__(	self, 
