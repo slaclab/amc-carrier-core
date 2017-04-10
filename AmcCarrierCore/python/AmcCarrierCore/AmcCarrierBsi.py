@@ -77,8 +77,16 @@ class AmcCarrierBsi(pr.Device):
                                 description  = "BSI's Major Version Number",
                                 offset       =  0x90,
                                 bitSize      =  8,
-                                bitOffset    =  0x00,
+                                bitOffset    =  0x08,
                                 base         = "hex",
                                 mode         = "RO",
                             ))
 
+        self.add(pr.Variable(   name         = "EthUpTime",
+                                description  = "ETH Uptime (units of sec)",
+                                offset       =  0x94,
+                                bitSize      =  32,
+                                bitOffset    =  0x00,
+                                base         = "hex",
+                                mode         = "RO",
+                            ))
