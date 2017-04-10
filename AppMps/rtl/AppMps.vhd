@@ -80,9 +80,8 @@ end AppMps;
 architecture mapping of AppMps is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
-
-   constant SALT_INDEX_C    : natural := 0;
-   constant ENCODER_INDEX_C : natural := 1;
+   constant SALT_INDEX_C      : natural := 0;
+   constant ENCODER_INDEX_C   : natural := 1;
 
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       SALT_INDEX_C    => (
@@ -107,8 +106,15 @@ architecture mapping of AppMps is
    signal mps625MHzRst : sl;
    signal mpsPllLocked : sl;
 
-   signal mpsMaster : AxiStreamMasterType;
-   signal mpsSlave  : AxiStreamSlaveType;
+   signal diagnosticBusApp : DiagnosticBusType;
+   signal mpsAppRegisters  : MpsAppRegType;
+
+   signal digitalBus  : slv(63 downto 0);
+   signal selectIdle  : sl;
+   signal selectAlt   : sl;
+
+   signal mpsMaster  : AxiStreamMasterType;
+   signal mpsSlave   : AxiStreamSlaveType;
 
 begin
 
@@ -161,33 +167,70 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   ----------------------
-   -- MPS Message Encoder
-   ----------------------
-   U_AppMpsEncoder : entity work.AppMpsEncoder
+   ----------------------------
+   -- Configuration Registers
+   ----------------------------
+   U_AppMpsReg: entity work.AppMpsReg 
       generic map (
          TPD_G            => TPD_G,
-         MPS_SLOT_G       => MPS_SLOT_G,
          APP_TYPE_G       => APP_TYPE_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(ENCODER_INDEX_C).baseAddr)
+         APP_CONFIG_G     => xxxx )
       port map (
-         -- Diagnostic Interface (diagnosticClk domain)
-         diagnosticClk   => diagnosticClk,
-         diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBus,
-         -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
          axilReadMaster  => axilReadMasters(ENCODER_INDEX_C),
          axilReadSlave   => axilReadSlaves(ENCODER_INDEX_C),
          axilWriteMaster => axilWriteMasters(ENCODER_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(ENCODER_INDEX_C),
-         -- Config
-         bsiBus          => bsiBus,
-         -- MPS Interface, axilClk
+         mpsAppRegisters => mpsAppRegisters);
+
+   ----------------------------
+   -- Sync Kick Detect Mode
+   ----------------------------
+   U_SyncKickDet: entity work.SynchronizerVector 
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2 )
+      port map (
+         clk     => diagnosticClk,
+         rst     => diagnosticRst,
+         dataIn  => mpsAppRegister.kickDetMode,
+         dataOut => kickDetMode);
+
+   ----------------------------
+   -- Application specific logic
+   ----------------------------
+
+         diagnosticClk    => diagnosticClk,
+         diagnosticRst    => diagnosticRst,
+         diagnosticBusIn  => diagnosticBus,
+         diagnosticBusOut => diagnosticBusApp,
+         kickDetMode
+         digitalBus       : in  slv(63 downto 0);
+         selectIdle       : in  sl;
+         selectAlt        : in  sl);
+
+
+   ----------------------------
+   -- Threshold Logic
+   ----------------------------
+   U_AppMpsThold: entity work.AppMpsThold
+      generic map (
+         TPD_G        => TPD_G,
+         APP_CONFIG_G => xxxx )
+      port map (
+         axilClk         => axiClk,
+         axilRst         => axiRst,
+         mpsAppRegisters => mpsAppRegisters,
          mpsMaster       => mpsMaster,
-         mpsSlave        => mpsSlave);
+         mpsSlave        => mpsSlave,
+         diagnosticClk   => diagnosticClk,
+         diagnosticRst   => diagnosticRst,
+         diagnosticBus   => diagnosticBusApp,
+         digitalBus      => digitalBus,
+         selectIdle      => selectIdle,
+         selectAlt       => selectAlt);
 
    ---------------------------------         
    -- MPS Backplane SALT Transceiver
@@ -233,3 +276,4 @@ begin
          mpsTxN          => mpsTxN);
 
 end mapping;
+
