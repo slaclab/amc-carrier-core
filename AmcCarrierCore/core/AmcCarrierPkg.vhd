@@ -56,13 +56,14 @@ package AmcCarrierPkg is
    constant APP_BLEN_TYPE_C           : AppType := toSlv(12, AppType'length);
    constant APP_LLRF_TYPE_C           : AppType := toSlv(13, AppType'length);
    constant APP_EXTREF_GEN_TYPE_C     : AppType := toSlv(14, AppType'length);  --Timing Generator with external reference
+
    constant APP_BPM_STRIPLINE_TYPE_C  : AppType := toSlv(100, AppType'length);
    constant APP_BPM_CAVITY_TYPE_C     : AppType := toSlv(101, AppType'length);
-   constant APP_MPS_APP_TYPE_C        : AppType := toSlv(123, AppType'length);  -- MPS Application Node
-   constant APP_MPS_DIGITAL_TYPE_C    : AppType := toSlv(124, AppType'length);  -- MPS Link Node, RTM and AMC digital inputs
-   constant APP_MPS_LINK_AIN_TYPE_C   : AppType := toSlv(125, AppType'length);  -- MPS Link Node, Dual Analog AMC cards
-   constant APP_MPS_LINK_DIN_TYPE_C   : AppType := toSlv(126, AppType'length);  -- MPS Link Node, Dual Digital AMC cards
-   constant APP_MPS_LINK_MIXED_TYPE_C : AppType := toSlv(127, AppType'length);  -- MPS Link Node, Mixed Signal (1x Analog and 1x Digital AMC cards)
+
+   constant APP_MPS_BLM_TYPE_C        : AppType := toSlv(120, AppType'length);
+   constant APP_MPS_GAP_TYPE_C        : AppType := toSlv(121, AppType'length);
+   constant APP_MPS_BEND_TYPE_C       : AppType := toSlv(122, AppType'length);
+   constant APP_MPS_KICK_TYPE_C       : AppType := toSlv(123, AppType'length);
 
    -------------------------------------
    -- Common Platform: General Constants

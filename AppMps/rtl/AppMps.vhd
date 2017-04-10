@@ -106,13 +106,6 @@ architecture mapping of AppMps is
    signal mps625MHzRst : sl;
    signal mpsPllLocked : sl;
 
-   signal diagnosticBusApp : DiagnosticBusType;
-   signal mpsAppRegisters  : MpsAppRegType;
-
-   signal digitalBus  : slv(63 downto 0);
-   signal selectIdle  : sl;
-   signal selectAlt   : sl;
-
    signal mpsMaster  : AxiStreamMasterType;
    signal mpsSlave   : AxiStreamSlaveType;
 
@@ -170,21 +163,6 @@ begin
    ----------------------------
    -- Configuration Registers
    ----------------------------
-   U_AppMpsReg: entity work.AppMpsReg 
-      generic map (
-         TPD_G            => TPD_G,
-         APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         APP_CONFIG_G     => xxxx )
-      port map (
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(ENCODER_INDEX_C),
-         axilReadSlave   => axilReadSlaves(ENCODER_INDEX_C),
-         axilWriteMaster => axilWriteMasters(ENCODER_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(ENCODER_INDEX_C),
-         mpsAppRegisters => mpsAppRegisters);
-
    ----------------------------
    -- Sync Kick Detect Mode
    ----------------------------
@@ -199,38 +177,24 @@ begin
          dataOut => kickDetMode);
 
    ----------------------------
-   -- Application specific logic
+   -- Encoder Logic
    ----------------------------
-
-         diagnosticClk    => diagnosticClk,
-         diagnosticRst    => diagnosticRst,
-         diagnosticBusIn  => diagnosticBus,
-         diagnosticBusOut => diagnosticBusApp,
-         kickDetMode
-         digitalBus       : in  slv(63 downto 0);
-         selectIdle       : in  sl;
-         selectAlt        : in  sl);
-
-
-   ----------------------------
-   -- Threshold Logic
-   ----------------------------
-   U_AppMpsThold: entity work.AppMpsThold
+   U_AppMpsEncoder: entity work.AppMpsEncoder
       generic map (
          TPD_G        => TPD_G,
-         APP_CONFIG_G => xxxx )
+         APP_TYPE_G   => APP_TYPE_G)
       port map (
          axilClk         => axiClk,
          axilRst         => axiRst,
-         mpsAppRegisters => mpsAppRegisters,
+         axilReadMaster  => axilReadMasters(ENCODER_INDEX_C),
+         axilReadSlave   => axilReadSlaves(ENCODER_INDEX_C),
+         axilWriteMaster => axilWriteMasters(ENCODER_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(ENCODER_INDEX_C),
          mpsMaster       => mpsMaster,
          mpsSlave        => mpsSlave,
          diagnosticClk   => diagnosticClk,
          diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBusApp,
-         digitalBus      => digitalBus,
-         selectIdle      => selectIdle,
-         selectAlt       => selectAlt);
+         diagnosticBus   => diagnosticBusApp);
 
    ---------------------------------         
    -- MPS Backplane SALT Transceiver

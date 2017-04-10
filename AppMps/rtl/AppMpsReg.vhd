@@ -75,12 +75,16 @@ begin
       axiSlaveWaitTxn(regEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Top level registers
-      axiSlaveRegister(regEp, x"000",  0, v.mpsReg.mpsAppId);
-      axiSlaveRegister(regEp, x"000", 16, v.mpsReg.mpsEnable);
-      axiSlaveRegister(regEp, x"000", 17, v.mpsReg.lcls1Mode);
-      axiSlaveRegister(regEp, x"000", 24, v.mpsReg.kickDetMode);
-      axiSlaveRegisterR(regEp, x"004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C,8);
-      axiSlaveRegisterR(regEp, x"004", 8, toSlv(APP_CONFIG_G.DIGITAL_EN_C,1);
+      axiSlaveRegister(regEp, x"0000",  0, v.mpsReg.mpsAppId);
+      axiSlaveRegister(regEp, x"0000", 16, v.mpsReg.mpsEnable);
+      axiSlaveRegister(regEp, x"0000", 17, v.mpsReg.lcls1Mode);
+      axiSlaveRegister(regEp, x"0000", 24, v.mpsReg.kickDetMode);
+
+      axiSlaveRegisterR(regEp, x"0004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C,8);
+      axiSlaveRegisterR(regEp, x"0004", 8, toSlv(APP_CONFIG_G.DIGITAL_EN_C,1);
+
+      axiSlaveRegister(regEp, x"0008",  0, v.mpsReg.beamDestMask);
+      axiSlaveRegister(regEp, x"0008", 16, v.mpsReg.altDestMask);
 
       -- Chan 0 = 0x8000, Chan 1 = 0x8200, Chan 3 = 0x8400 ... Chan 23 = 0xAE00
       for chan in 0 to (MPS_CHAN_COUNT_C-1) loop

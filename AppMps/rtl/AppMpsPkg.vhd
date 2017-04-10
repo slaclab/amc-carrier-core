@@ -162,11 +162,12 @@ package AppMpsPkg is
    constant MPS_KICK_OTHER   : slv(1 downto 0) := "11";
 
    type MpsAppRegType is record
-      mpsEnable   : sl;
-      mpsAddId    : slv(9 downto 0);
-      lcls1Mode   : sl;
-      kickDetMode : slv(1 downto 0);
-      mpsChanReg  : MpsChanRegArray(MPS_CHAN_COUNT_C downto 0);
+      mpsEnable    : sl;
+      mpsAddId     : slv(9 downto 0);
+      lcls1Mode    : sl;
+      beamDestMask : slv(15 downto 0);
+      altDestMask  : slv(15 downto 0);
+      mpsChanReg   : MpsChanRegArray(MPS_CHAN_COUNT_C downto 0);
    end record;
 
    type MpsAppRegArray is array (natural range <>) of MpsAppRegType;
@@ -175,8 +176,15 @@ package AppMpsPkg is
       mpsEnable    => 0,
       mpsAddId     => (others=>'0'),
       lcls1Mode    => '0',
-      kickDetMode  => (others=>'0'),
+      beamDestMask => (others=>'0'),
+      altDestMask  => (others=>'0'),
       mpsChanReg   => (others=>MPS_CHAN_REG_INIT_C));
+
+   ---------------------------------------------------
+   -- MPS Configuration Function
+   ---------------------------------------------------   
+
+   function getMpsAppConfig (type : AppType) return MpsAppConfigType;
 
 end package AppMpsPkg;
 
@@ -248,6 +256,97 @@ package body AppMpsPkg is
       end loop;
 
       return m;
+   end function;
+
+   function getMpsAppConfig (app : AppType) return MpsAppConfigType is
+      variable ret : MpsAppConfigType;
+   begin
+      ret = MPS_APP_CONFIG_INIT_C;
+
+      case app is
+         when APP_BPM_STRIPLINE_TYPE_C | APP_BPM_CAVITY_TYPE_C =>
+            ret.BYTE_COUNT_C := 6;
+
+            for i in 0 to 2 loop
+
+               -- Inputs 0, 1, 2
+               ret.CHAN_CONFIG_C(i).
+               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i).IDLE_EN_C     := ite(i=2,true,false); -- Charge
+               ret.CHAN_CONFIG_C(i).ALT_EN_C      := ite(i=0,true,false); -- x position
+               ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i; -- 0, 1, 2
+
+               -- Inputs 16, 17, 18
+               ret.CHAN_CONFIG_C(i+16).
+               ret.CHAN_CONFIG_C(i+16).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i+16).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i+16).IDLE_EN_C     := ite(i=2,true,false); -- Charge
+               ret.CHAN_CONFIG_C(i+16).ALT_EN_C      := ite(i=0,true,false); -- x position
+               ret.CHAN_CONFIG_C(i+16).BYTE_MAP_C    := i+3; -- 3, 4, 5
+            end loop;
+
+         when APP_BLEN_TYPE_C =>
+            ret.BYTE_COUNT_C := 2;
+
+            -- Input 0
+            ret.CHAN_CONFIG_C(0).
+            ret.CHAN_CONFIG_C(0).THOLD_COUNT_C := 4;
+            ret.CHAN_CONFIG_C(0).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(0).BYTE_MAP_C    := 0;
+
+            -- Input 16
+            ret.CHAN_CONFIG_C(1).
+            ret.CHAN_CONFIG_C(1).THOLD_COUNT_C := 4;
+            ret.CHAN_CONFIG_C(1).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(1).BYTE_MAP_C    := 1;
+
+         when APP_LLRF_TYPE_C =>
+            ret.DIGITAL_EN_C := true;
+            ret.BYTE_COUNT_C := 1;
+
+         when APP_MPS_BLM_TYPE_C =>
+            ret.BYTE_COUNT_C := 24;
+
+            for i in 0 to 23 loop
+               ret.CHAN_CONFIG_C(i).
+               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;
+            end loop;
+
+         when APP_MPS_GAP_TYPE_C =>
+            ret.BYTE_COUNT_C := 6;
+
+            for i in 0 to 5 loop
+               ret.CHAN_CONFIG_C(i*4).
+               ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
+               ret.CHAN_CONFIG_C(i*4).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
+            end loop;
+
+         when APP_MPS_BEND_TYPE_C =>
+            ret.BYTE_COUNT_C := 6;
+
+            for i in 0 to 5 loop
+               ret.CHAN_CONFIG_C(i*4).
+               ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
+               ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
+            end loop;
+
+         when APP_MPS_KICK_TYPE_C =>
+            ret.BYTE_COUNT_C := 6;
+
+            for i in 0 to 5 loop
+               ret.CHAN_CONFIG_C(i*4).
+               ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
+               ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
+               ret.CHAN_CONFIG_C(i*4).IDLE_EN_C     := true;
+            end loop;
+
+      end case;
+
+      return ret;
    end function;
 
 end package body AppMpsPkg;
