@@ -161,22 +161,6 @@ begin
          mAxiReadSlaves      => axilReadSlaves);
 
    ----------------------------
-   -- Configuration Registers
-   ----------------------------
-   ----------------------------
-   -- Sync Kick Detect Mode
-   ----------------------------
-   U_SyncKickDet: entity work.SynchronizerVector 
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => 2 )
-      port map (
-         clk     => diagnosticClk,
-         rst     => diagnosticRst,
-         dataIn  => mpsAppRegister.kickDetMode,
-         dataOut => kickDetMode);
-
-   ----------------------------
    -- Encoder Logic
    ----------------------------
    U_AppMpsEncoder: entity work.AppMpsEncoder

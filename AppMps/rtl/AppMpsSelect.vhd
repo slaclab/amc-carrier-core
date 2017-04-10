@@ -94,7 +94,7 @@ begin
       variable thold    : integer;
       variable beamEn   : boolean;
       variable altEn    : boolean;
-      variable beamDest : slv(3 downto 0);
+      variable beamDest : slv(15 downto 0);
    begin
       -- Latch the current value
       v := r;
