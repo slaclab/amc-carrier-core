@@ -66,9 +66,20 @@ AmcCarrierBsi: &AmcCarrierBsi
     #########################################################
     VersionMajor:
       at:
-        offset: 0x90
+        offset: 0x91
       class: IntField
       name: VersionMajor
       mode: RO
       sizeBits: 8
       description: BSI's Major Version Number
+    #########################################################
+    EthUpTime:
+      at:
+        offset: 0x94
+      class: IntField
+      name: EthUpTime
+      mode: RO
+      sizeBits: 32
+      description: ETH Uptime (units of sec)     
+    #########################################################
+    
