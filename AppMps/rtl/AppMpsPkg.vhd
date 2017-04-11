@@ -30,6 +30,7 @@ package AppMpsPkg is
    constant MPS_MITIGATION_BITS_C : integer             := 98;
    constant MPS_MESSAGE_BITS_C    : integer             := 298;
    constant MPS_CHAN_COUNT_C      : integer             := 24;
+   constant MPS_SELECT_BITS_C     : integer             := 82 + (MPS_CHAN_COUNT*34);
 
    ---------------------------------------------------
    -- Mitigation message record
@@ -167,7 +168,7 @@ package AppMpsPkg is
       lcls1Mode    : sl;
       beamDestMask : slv(15 downto 0);
       altDestMask  : slv(15 downto 0);
-      mpsChanReg   : MpsChanRegArray(MPS_CHAN_COUNT_C downto 0);
+      mpsChanReg   : MpsChanRegArray(MPS_CHAN_COUNT_C-1 downto 0);
    end record;
 
    type MpsAppRegArray is array (natural range <>) of MpsAppRegType;
@@ -179,6 +180,33 @@ package AppMpsPkg is
       beamDestMask => (others=>'0'),
       altDestMask  => (others=>'0'),
       mpsChanReg   => (others=>MPS_CHAN_REG_INIT_C));
+
+   ---------------------------------------------------
+   -- MPS Select Data
+   ---------------------------------------------------   
+   type MpsSelectType is record
+      valid        : sl;
+      timeStamp    : slv(15 downto 0);
+      selectIdle   : sl;
+      selectAlt    : sl;
+      digitalBus   : slv(63 downto 0);
+      mpsError     : slv(MPS_CHAN_COUNT_C-1 downto 0);
+      mpsIgnore    : slv(MPS_CHAN_COUNT_C-1 downto 0);
+      chanData     : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
+   end record;
+
+   constant MPS_SELECT_INIT_C : MpsSelectType := (
+      valid        => '0',
+      timeStamp    => (others=>'0'),
+      selectIdle   => '0',
+      selectAlt    => '0',
+      digitalBus   => (others=>'0'),
+      mpsError     => (others=>'0'),
+      mpsIgnore    => (others=>'0'),
+      chanData     => (others=>(others=>'0')));
+
+   function toSlv (m : MpsSelectType) return slv;
+   function toMpsSelect (vec : slv, valid : sl) return MpsSelectType;
 
    ---------------------------------------------------
    -- MPS Configuration Function
@@ -254,6 +282,46 @@ package body AppMpsPkg is
       for j in 0 to 31 loop
          assignRecord(i, vec, m.message(j));
       end loop;
+
+      return m;
+   end function;
+
+   function toSlv (m : MpsSelectType) return slv is
+      variable vector : slv(MPS_SELECT_BITS_C-1 downto 0) := (others => '0');
+      variable i      : integer                           := 0;
+   begin
+
+      assignSlv(i, vector, m.timeStamp);
+      assignSlv(i, vector, m.selectIdle);
+      assignSlv(i, vector, m.selectAlt);
+      assignSlv(i, vector, m.digitalBus);
+      assignSlv(i, vector, m.mpsError);
+      assignSlv(i, vector, m.mpsIgnore);
+
+      for j in 0 to MPS_CHAN_COUNT_C-1 loop
+         assignSlv(i, vector, m.chanData(j));
+      end loop;
+
+      return vector;
+   end function;
+
+   function toMpsSelect (vec : slv, valid : sl) return MpsSelectType is
+      variable m : MpsSelectType;
+      variable i : integer := 0;
+   begin
+
+      assignRecord(i, vec, m.timeStamp);
+      assignRecord(i, vec, m.selectIdle);
+      assignRecord(i, vec, m.selectAlt);
+      assignRecord(i, vec, m.digitalBus);
+      assignRecord(i, vec, m.mpsError);
+      assignRecord(i, vec, m.mpsIgnore);
+
+      for j in 0 to MPS_CHAN_COUNT_C-1 loop
+         assignRecord(i, vector, m.chanData(j));
+      end loop;
+
+      m.valid := valid;
 
       return m;
    end function;

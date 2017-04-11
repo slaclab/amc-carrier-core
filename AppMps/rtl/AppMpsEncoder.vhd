@@ -59,17 +59,7 @@ architecture mapping of AppMpsEncoder is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal timeStrb   : sl;
-   signal timeStamp  : slv(15 downto 0);
-   signal message    : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0) := (others=>(others=>'0'));
-   signal syncIdle   : sl;
-   signal syncAlt    : sl;
-   signal digitalBus : slv(APP_CONFIG_C.BYTE_COUNT_C*8-1 downto 0);
-   signal digSync    : slv(APP_CONFIG_C.BYTE_COUNT_C*8-1 downto 0);
-   signal mpsReg     : MpsAppRegType;
-   signal intDiagBus : DiagnosticBusType;   
-   signal selectIdle : sl;
-   signal selectAlt  : sl;
+   signal mpsSelect  : MpsSelectType;
 
    procedure compareTholds (thold   : in MpsChanTholdType, 
                             config  : in MpsChanConfigType,
@@ -126,83 +116,15 @@ begin
          diagnosticClk     => diagnosticClk,
          diagnosticRst     => diagnosticRst,
          diagnosticBusIn   => diagnosticBus,
-         diagnosticBusOut  => diagnosticBusInt,
-         selectIdle        => selectIdle,
-         selectAlt         => selectAlt,
-         digitalBus        => digitalBus,
-         mpsReg            => mpsReg);
-
-   ------------------------------------ 
-   -- Time Stamp Synchronization Module
-   ------------------------------------ 
-   U_SyncFifo : entity work.SynchronizerFifo
-      generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => 18)
-      port map (
-         -- Asynchronous Reset
-         rst    => diagnosticRst,
-         -- Write Ports (wr_clk domain)
-         wr_clk => diagnosticClk,
-         wr_en  => diagnosticBusInt.strobe,
-         din(15 downto 0) => diagnosticBusInt.timingMessage.timeStamp(15 downto 0),
-         din(16)          => selectIdle,
-         din(17)          => selectAlt,
-         -- Read Ports (rd_clk domain)
-         rd_clk            => axilClk,
-         valid             => timeStrb,
-         dout(15 downto 0) => timeStamp,
-         dout(16)          => syncIdle,
-         dout(17)          => syncAlt);
-
-   --------------------------------- 
-   -- Message Synchronization Module
-   --------------------------------- 
-   GEN_ANA_EN : if APP_CONFIG_C.DIGITAL_EN_C = false generate
-      GEN_VEC : for i in 0 to (MPS_CHAN_COUNT_C-1) generate
-         U_SyncFifo : entity work.SynchronizerFifo
-            generic map (
-               TPD_G        => TPD_G,
-               DATA_WIDTH_G => 32)
-            port map (
-               -- Asynchronous Reset
-               rst    => diagnosticRst,
-               -- Write Ports (wr_clk domain)
-               wr_clk => diagnosticClk,
-               wr_en  => diagnosticBusInt.strobe,
-               din    => diagnosticBusInt.data(i),
-               -- Read Ports (rd_clk domain)
-               rd_clk => axilClk,
-               dout   => message(i));
-      end generate GEN_VEC;
-      digSync <= (others=>'0'); 
-   end generate GEN_ANA_EN;
-
-   GEN_DIG_EN : if APP_CONFIG_C.DIGITAL_EN_C = true generate
-      U_SyncFifo : entity work.SynchronizerFifo
-         generic map (
-            TPD_G        => TPD_G,
-            DATA_WIDTH_G => APP_CONFIG_C.BYTE_COUNT_C*8)
-         )
-         port map (
-            -- Asynchronous Reset
-            rst    => diagnosticRst,
-            -- Write Ports (wr_clk domain)
-            wr_clk => diagnosticClk,
-            wr_en  => diagnosticBusInt.strobe,
-            din    => digitalBus,
-            -- Read Ports (rd_clk domain)
-            rd_clk => axilClk,
-            dout   => digSync);
-
-      message <= (others=>(others=>'0'));
-
-   end generate GEN_DIG_EN;
+         axilClk           => axilClk,
+         axilRst           => axilRst,
+         mpsReg            => mpsReg,
+         mpsSelect         => mpsSelect);
 
    --------------------------------- 
    -- Thresholds
    --------------------------------- 
-   comb : process (timeStrb, timeStamp, message, syncIdle, syncAlt, digSync, r) is
+   comb : process (axilRst, mpsSelect, r) is
       variable v      : RegType;
       variable chan   : integer;
       variable thold  : integer;
@@ -213,7 +135,7 @@ begin
       -- Init and setup MPS message
       v.mpsMessage                   := MPS_MESSAGE_INIT_C;
       v.mpsMessage.lcls              := mpsAppRegisters.lcls1Mode;
-      v.mpsMessage.timeStamp         := timeStamp;
+      v.mpsMessage.timeStamp         := mpsSelect.timeStamp;
       v.mpsMessage.appId(9 downto 0) := mpsAppRegisters.mpsAppId;
       v.mpsMessage.msgSize           := toSlv(APP_CONFIG_C.BYTE_COUNT_C,8);
 
@@ -222,7 +144,7 @@ begin
          v.mpsMessage.inputType  := '0';
 
          for i in 0 to APP_CONFIG_C.BYTE_COUNT_C-1 loop
-            v.mpsMessage.message(i) := digSync(i*8+7  downto  i*8);
+            v.mpsMessage.message(i) := mpsSelect.digitalBus(i*8+7  downto  i*8);
          end loop;
 
       -- Analog Process each enabled channel
@@ -230,35 +152,41 @@ begin
          v.mpsMessage.inputType := '1';
 
          for chan in 0 to (MPS_CHAN_COUNT_C-1) loop
-            if APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C > 0 then
-      
+
+            -- Threshold is enabled and mps channel is not ignored
+            if APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C > 0 and mpsSelect.mpsIgnore(chan) = '0' then
+
+               -- Channel is marked in error, set all bits
+               if mpsSelect.mpsError(chan) = '1' then
+                  v.mpsMessage(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C) := x"FF";
+
                -- LCLS1 Mode
-               if APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsAppRegisters.lcls1Mode = '1' then
+               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsAppRegisters.lcls1Mode = '1' then
                   compareTholds (mpsAppRegister.lcls1Thold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 message(chan), 0, v.mpsMessage);
+                                 mpsSelect.chanData(chan), 0, v.mpsMessage);
                   
                -- LCLS2 idle table
-               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and syncIdle = '1' then
+               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsAppRegister.idleThold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 message(chan), 7, v.mpsMessage);
+                                 mpsSelect.chanData(chan), 7, v.mpsMessage);
 
                -- Multiple thresholds
                else
                   for thold in 0 to (APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C-1) loop
 
                      -- Alternate table
-                     if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and syncAlt = '1' then
+                     if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
                         compareTholds (mpsAppRegister.altThold, 
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       message(chan), thold, v.mpsMessage);
+                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
 
                      -- Standard table
                      else
                         compareTholds (mpsAppRegister.stdThold, 
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       message(chan), thold, v.mpsMessage);
+                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
                      end if;
                   end loop;
                end if;
@@ -266,9 +194,6 @@ begin
          end loop;
       end if;
 
-      -- Generate message
-      v.mpsMessage.valid := timeStrb;
-      
       -- Synchronous Reset
       if (axilRst = '1') then
          v := REG_INIT_C;

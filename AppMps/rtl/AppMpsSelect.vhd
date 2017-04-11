@@ -30,18 +30,16 @@ entity AppMpsSelect is
       APP_TYPE_G      : AppType          := APP_NULL_TYPE_C;
       APP_CONFIG_G    : MpsAppConfigType := MPS_APP_CONFIG_INIT);
    port (
-      -- Clock
+      -- Inputs, diagnosticClk
       diagnosticClk    : in  sl;
       diagnosticRst    : in  sl;
-      -- Inputs
-      diagnosticBusIn  : in  DiagnosticBusType;
-      -- Outputs
-      diagnosticBusOut : out DiagnosticBusType;
-      selectIdle       : out sl;
-      selectAlt        : out sl;
-      digitalBus       : out slv(APP_CONFIG_C.BYTE_COUNT_C*8-1 downto 0);
-      --Config
-      mpsReg           : in MpsAppRegType);
+      diagnosticBus    : in  DiagnosticBusType;
+      --Config, axilClk
+      axilClk          : in  sl;
+      axilRst          : in  sl;
+      mpsReg           : in  MpsAppRegType;
+      -- Outputs, axilClk
+      mpsSelect        : out MpsSelectType);
 
 end AppMpsSelect;
 
@@ -49,24 +47,21 @@ architecture mapping of AppMpsSelect is
 
    type RegType is record
       mpsMessage : MpsMessageType;
-      diagOut    : DiagnosticBusType;
-      selectIdle : sl;
-      selectAlt  : sl;
-      digitalBus : slv(APP_CONFIG_C.BYTE_COUNT_C*8-1 downto 0);
+      mpsSelect  : MpsSelectType;
    end record;
 
    constant REG_INIT_C : RegType := (
       mpsMessage => MPS_MESSAGE_INIT_C,
-      diagOut    => DIAGNOSTIC_BUS_INIT_C,
-      selectIdle => '0',
-      selectAlt  => '0',
-      digitalBus => (others=>'0'));
+      mpsSelect  => MPS_SELECT_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal beamDestInt : slv(15 downto 0);
-   signal altDestInt  : slv(15 downto 0);
+   signal beamDestInt    : slv(15 downto 0);
+   signal altDestInt     : slv(15 downto 0);
+   signal mpsSelectDin   : slv(MPS_SELECT_BITS_C-1 downto 0);
+   signal mpsSelectDout  : slv(MPS_SELECT_BITS_C-1 downto 0);
+   signal mpsSelectValid : sl;
 
 begin
 
@@ -76,7 +71,7 @@ begin
    U_SyncKickDet: entity work.SynchronizerVector 
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 2 )
+         WIDTH_G => 32 )
       port map (
          clk                   => diagnosticClk,
          rst                   => diagnosticRst,
@@ -88,7 +83,7 @@ begin
    --------------------------------- 
    -- Thresholds
    --------------------------------- 
-   comb : process (timeStrb, timeStamp, message, syncIdle, syncAlt, digSync, r) is
+   comb : process (diagnosticRst, diagnosticBus, beamDestInt, altDestInt, r) is
       variable v        : RegType;
       variable chan     : integer;
       variable thold    : integer;
@@ -99,14 +94,22 @@ begin
       -- Latch the current value
       v := r;
 
-      -- Pass diag bus through
-      v.diagOut    := diagnosticBus;
-      v.selectIdle := '0';
-      v.selectAlt  := '0';
+      -- Init
+      v.mpsSelect  : MPS_SELECT_INIT_C;
+
+      -- Data
+      v.mpsSelect.valid     := diagnosticBus.timeStrb;
+      v.mpsSelect.timeStamp := diagnosticBus.timeStamp;
+      v.mpsSelect.chanData  := diagnosticBus.data(MPS_CHAN_COUNT_C-1 downto 0);
+      --v.mpsSelect.mpsIgnore := diagnosticBus.mpsIgnore(MPS_CHAN_COUNT_C-1 downto 0);
+
+      for i in 0 to MPS_CHAN_COUNT_C-1 loop
+         v.mpsSelect.mpsError := ite(diagnosticBus.sevr(i) = 0, '0', '1');
+      end loop;
 
       -- Set beam dest
       beamDest := (others=>'0');
-      beamDest(conv_integer(diagnosticBusIn.timingMessage.beamRequest(7 downto 4))) := '1';
+      beamDest(conv_integer(diagnosticBus.timingMessage.beamRequest(7 downto 4))) := '1';
 
       -- Beam enable decode
       beamEn = ((beamDest and beamDestInt) /= 0);
@@ -116,42 +119,58 @@ begin
 
       -- BPM mode, alt = kick, idle = no beam
       if APP_TYPE_G = APP_BPM_STRIPLINE_TYPE_C or APP_TYPE_G = APP_BPM_CAVITY_TYPE_C then
-         v.selectIdle := not beamEn;
-         v.selectAlt  := altEn;
+         v.mpsSelect.selectIdle := not beamEn;
+         v.mpsSelect.selectAlt  := altEn;
 
       -- Kicker mode, idle = no kick
       elsif APP_TYPE_G = APP_MPS_KICK_C then
-         v.selectIdle := not beamEn;
+         v.mpsSelect.selectIdle := not beamEn;
       end if;
 
       -- LLRF is the only digital app right now
       if APP_TYPE_G = APP_CONFIG_G.DIGITAL_EN_C then
-         digitalBus(3 downto 0) := diagnosticBus.data(30)(3 downto 0);
-         digitalBus(7 downto 4) := diagnosticBus.data(31)(3 downto 0);
+         v.mpsSelect.digitalBus(3 downto 0) := diagnosticBus.data(30)(3 downto 0);
+         v.mpsSelect.digitalBus(7 downto 4) := diagnosticBus.data(31)(3 downto 0);
       end if;
 
       -- Synchronous Reset
-      if (axilRst = '1') then
+      if (diagnosticRst = '1') then
          v := REG_INIT_C;
       end if;
-
-      -- Outputs
-      diagnosticBusOut <= r.diagOut;
-      selectIdle       <= r.selectIdle;
-      selectAlt        <= r.selectAlt;
-      digitalBus       <= r.digitalBus;
 
       -- Register the variable for next clock cycle
       rin <= v;
 
    end process comb;
 
-   seq : process (axilClk) is
+   seq : process (diagnosticClk) is
    begin
-      if (rising_edge(axilClk)) then
+      if (rising_edge(diagnosticClk)) then
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   ------------------------------------ 
+   -- Output Synchronization Module
+   ------------------------------------ 
+   U_SyncFifo : entity work.SynchronizerFifo
+      generic map (
+         TPD_G        => TPD_G,
+         DATA_WIDTH_G => MPS_SELECT_BITS_C)
+      port map (
+         -- Asynchronous Reset
+         rst    => diagnosticRst,
+         -- Write Ports (wr_clk domain)
+         wr_clk => diagnosticClk,
+         wr_en  => r.mpsSelect.valid,
+         din    => mpsSelectDin,
+         rd_clk => axilClk,
+         rd_en  => axilRst,
+         valid  => mpsSelectValid,
+         dout   => mpsSelectDout);
+
+   mpsSelectDin <= toSlv (r.mpsSelect);
+   mpsSelect    <= toMpsSelect (mpsSelectDout, mpsSelectValid);
 
 end mapping;
 
