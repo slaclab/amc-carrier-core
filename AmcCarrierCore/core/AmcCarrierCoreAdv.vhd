@@ -61,6 +61,8 @@ entity AmcCarrierCoreAdv is
       timingPhy            : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
+      timingRefClk         : out   sl;
+      timingRefClkDiv2     : out   sl;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -373,6 +375,8 @@ begin
          timingPhy            => timingPhy,
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,
+         timingRefClk         => timingRefClk,
+         timingRefClkDiv2     => timingRefClkDiv2,     
          -- Diagnostic Interface (diagnosticClk domain)
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
