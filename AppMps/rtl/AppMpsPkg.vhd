@@ -170,7 +170,6 @@ package AppMpsPkg is
       mpsEnable    : sl;
       mpsAppId     : slv(9 downto 0);
       lcls1Mode    : sl;
-      kickDetMode  : sl;
       beamDestMask : slv(15 downto 0);
       altDestMask  : slv(15 downto 0);
       mpsChanReg   : MpsChanRegArray(MPS_CHAN_COUNT_C-1 downto 0);
@@ -182,7 +181,6 @@ package AppMpsPkg is
       mpsEnable    => '0',
       mpsAppId     => (others => '0'),
       lcls1Mode    => '0',
-      kickDetMode  => '0',
       beamDestMask => (others => '0'),
       altDestMask  => (others => '0'),
       mpsChanReg   => (others => MPS_CHAN_REG_INIT_C));
@@ -345,19 +343,19 @@ package body AppMpsPkg is
 
             for i in 0 to 2 loop
 
-               -- Inputs 0, 1, 2
-               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i).IDLE_EN_C     := ite(i = 2, true, false);  -- Charge
-               ret.CHAN_CONFIG_C(i).ALT_EN_C      := ite(i = 0, true, false);  -- x position
-               ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;  -- 0, 1, 2
+               -- Inputs 1, 2, 3
+               ret.CHAN_CONFIG_C(i+1).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i+1).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i+1).IDLE_EN_C     := ite(i=0,true,false); -- Charge
+               ret.CHAN_CONFIG_C(i+1).ALT_EN_C      := ite(i=1,true,false); -- x position
+               ret.CHAN_CONFIG_C(i+1).BYTE_MAP_C    := i; -- 0, 1, 2
 
-               -- Inputs 16, 17, 18
-               ret.CHAN_CONFIG_C(i+16).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i+16).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i+16).IDLE_EN_C     := ite(i = 2, true, false);  -- Charge
-               ret.CHAN_CONFIG_C(i+16).ALT_EN_C      := ite(i = 0, true, false);  -- x position
-               ret.CHAN_CONFIG_C(i+16).BYTE_MAP_C    := i+3;  -- 3, 4, 5
+               -- Inputs 5, 6, 7
+               ret.CHAN_CONFIG_C(i+5).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i+5).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i+5).IDLE_EN_C     := ite(i=0,true,false); -- Charge
+               ret.CHAN_CONFIG_C(i+5).ALT_EN_C      := ite(i=1,true,false); -- x position
+               ret.CHAN_CONFIG_C(i+5).BYTE_MAP_C    := i+3; -- 3, 4, 5
             end loop;
 
          when APP_BLEN_TYPE_C =>
