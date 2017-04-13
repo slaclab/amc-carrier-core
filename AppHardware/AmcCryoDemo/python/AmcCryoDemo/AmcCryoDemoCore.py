@@ -24,7 +24,13 @@ from surf._Lmk04828 import *
 from surf._Dac38J84 import *
 
 class AmcCryoDemoCore(pr.Device):
-    def __init__(self, name="AmcCryoDemoCore", description="Cryo Amc Rf Demo Board Core", memBase=None, offset=0x0, hidden=False):
+    def __init__(   self, 
+                    name        = "AmcCryoDemoCore", 
+                    description = "Cryo Amc Rf Demo Board Core", 
+                    memBase     =  None, 
+                    offset      =  0x0, 
+                    hidden      =  False
+                ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
         ##############################
@@ -49,17 +55,17 @@ class AmcCryoDemoCore(pr.Device):
         # Commands
         ##############################
 
-        self.add(pr.Command (   name         = "InitAmcCard",
-                                description  = "Initialization for AMC card's JESD modules",
-                                function     = """\
-                                               self.Adc16Dx370.CalibrateAdc.set(1)
-                                               self.usleep(1000000)
-                                               self.Lmk04828.PwrUpSysRef.set(1)
-                                               self.usleep(1000000)
-                                               self.Dac38J84.itDac.set(1)
-                                               self.usleep(100000)
-                                               self.Dac38J84.ClearAlarms.set(1)
-                                               self.usleep(100000)
-                                               self.ClearErrors.set(0)
-                                               """
-                            ))
+        self.addCommand(    name         = "InitAmcCard",
+                            description  = "Initialization for AMC card's JESD modules",
+                            function     = """\
+                                           self.Adc16Dx370.CalibrateAdc.set(1)
+                                           self.usleep(1000000)
+                                           self.Lmk04828.PwrUpSysRef.set(1)
+                                           self.usleep(1000000)
+                                           self.Dac38J84.itDac.set(1)
+                                           self.usleep(100000)
+                                           self.Dac38J84.ClearAlarms.set(1)
+                                           self.usleep(100000)
+                                           self.ClearErrors.set(0)
+                                           """
+                        )
