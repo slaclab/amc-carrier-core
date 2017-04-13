@@ -17,6 +17,8 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
+import pyrogue as pr
+
 class DaqMuxV2(pr.Device):
     def __init__(   self,       
                     name        = "DaqMuxV2",
@@ -245,16 +247,16 @@ class DaqMuxV2(pr.Device):
                             number       =  4,
                             stride       =  4,
                             enum         = {
-                                              00 : "Disabled",
-                                              01 : "Test",
-                                              02 : "Ch0",
-                                              03 : "Ch1",
-                                              04 : "Ch2",
-                                              05 : "Ch3",
-                                              06 : "Ch4",
-                                              07 : "Ch5",
-                                              08 : "Ch6",
-                                              09 : "Ch7",
+                                               0 : "Disabled",
+                                               1 : "Test",
+                                               2 : "Ch0",
+                                               3 : "Ch1",
+                                               4 : "Ch2",
+                                               5 : "Ch3",
+                                               6 : "Ch4",
+                                               7 : "Ch5",
+                                               8 : "Ch6",
+                                               9 : "Ch7",
                                               10 : "Ch8",
                                               11 : "Ch9",
                                               12 : "Ch10",
