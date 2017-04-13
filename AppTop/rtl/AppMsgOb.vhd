@@ -69,19 +69,19 @@ architecture rtl of AppMsgOb is
       idx    := 0;
 
       -- Load the header array
-      for i in (HDR_SIZE_G-1) downto 0 loop
+      for i in 0 to (HDR_SIZE_G-1) loop
          retVar((idx*32)+31 downto (idx*32)) := hdr(i);
          idx                                 := idx + 1;
       end loop;
 
       -- Load the 64-bit time stamp
-      for i in 1 downto 0 loop
+      for i in 0 to 1 loop
          retVar((idx*32)+31 downto (idx*32)) := ts((i*32)+31 downto (i*32));
          idx                                 := idx + 1;
       end loop;
 
       -- Load the message array
-      for i in (DATA_SIZE_G-1) downto 0 loop
+      for i in 0 to (DATA_SIZE_G-1) loop
          retVar((idx*32)+31 downto (idx*32)) := msg(i);
          idx                                 := idx + 1;
       end loop;
