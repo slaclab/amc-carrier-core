@@ -2,7 +2,7 @@
 -- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2017-04-04
+-- Last update: 2017-04-07
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -144,6 +144,7 @@ package AmcCarrierPkg is
       data          : Slv32Array(31 downto 0);
       sevr          : Slv2Array (31 downto 0); -- (0=NONE, 1=MINOR, 2=MAJOR, 3=INVALID)
       fixed         : slv       (31 downto 0); -- do not add/average (static)
+      mpsIgnore     : sl;                      -- invalid for MPS
       timingMessage : TimingMessageType;
    end record;
    type DiagnosticBusArray is array (natural range <>) of DiagnosticBusType;
@@ -152,6 +153,7 @@ package AmcCarrierPkg is
       data          => (others => (others => '0')),
       sevr          => (others => (others => '1')),
       fixed         => (others => '0'),
+      mpsIgnore     => '0',
       timingMessage => TIMING_MESSAGE_INIT_C);
 
    constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*35 + TIMING_MESSAGE_BITS_C;

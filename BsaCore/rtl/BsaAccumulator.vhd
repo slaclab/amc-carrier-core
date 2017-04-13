@@ -2,7 +2,7 @@
 -- File       : BsaAccumulator.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2017-03-10
+-- Last update: 2017-04-11
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -407,16 +407,17 @@ begin
       else
         fifoDin                <= resVar(47 downto 16);
       end if;
-      
+
       if diagnosticFixd = '1' then
-        incDiag     <= "11";  -- adding the new data
         notFixd     <= "00";  -- not keeping a sum (replacing)
-      elsif bsaActive = '1' and diagnosticSevr <= r.sevr then
-        incDiag     <= "11";  -- adding the new data
+      else
         notFixd     <= "11";  -- keeping a sum
+      end if;
+      
+      if bsaActive = '1' and diagnosticSevr <= r.sevr then
+        incDiag     <= "11";  -- adding the new data
       else
         incDiag     <= "00";  -- not adding the new data
-        notFixd     <= "11";  -- keeping a sum
       end if;
       
       case r.state is
