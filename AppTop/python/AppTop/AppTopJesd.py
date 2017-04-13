@@ -23,7 +23,15 @@ from surf._JesdRx import *
 from surf._JesdTx import *
 
 class AppTopJesd(pr.Device):
-    def __init__(self, name="AppTopJesd", description="Common Application Top Level JESD Module", memBase=None, offset=0x0, hidden=False, numRxLanes=6, numTxLanes=2):
+    def __init__(   self, 
+                    name        = "AppTopJesd", 
+                    description = "Common Application Top Level JESD Module", 
+                    memBase     =  None, 
+                    offset      =  0x0, 
+                    hidden      =  False, 
+                    numRxLanes  =  6, 
+                    numTxLanes  =  2
+                ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
         ##############################

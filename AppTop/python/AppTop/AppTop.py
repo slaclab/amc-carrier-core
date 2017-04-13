@@ -26,7 +26,15 @@ from DaqMuxV2.DaqMuxV2 import *
 from common.AppCore import *
 
 class AppTop(pr.Device):
-    def __init__(self, name="AppTop", description="Common Application Top Level", memBase=None, offset=0x0, hidden=False, numRxLanes=6, numTxLanes=2):
+    def __init__(   self, 
+                    name        = "AppTop", 
+                    description = "Common Application Top Level", 
+                    memBase     =  None, 
+                    offset      =  0x0, 
+                    hidden      =  False, 
+                    numRxLanes  =  6, 
+                    numTxLanes  =  2
+                ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
         ##############################

@@ -22,7 +22,13 @@ import pyrogue as pr
 from AppMps.AppMpsSalt import *
 
 class AppMps(pr.Device):
-    def __init__(self, name="AppMps", description="MPS Application", memBase=None, offset=0x0, hidden=False):
+    def __init__(   self, 
+                    name        = "AppMps", 
+                    description = "MPS Application", 
+                    memBase     =  None, 
+                    offset      =  0x0, 
+                    hidden      =  False
+                ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
         ##############################

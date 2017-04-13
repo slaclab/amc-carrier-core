@@ -32,7 +32,8 @@ class Waveform(pr.Device):
                     bitOffset   =  0, 
                     base        = "hex", 
                     mode        = "RW",                                      
-    				buffSize    = 0x200):
+    				buffSize    =  0x200
+                ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
         ##############################
