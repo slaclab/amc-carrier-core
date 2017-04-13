@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-24
+-- Last update: 2017-04-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -50,6 +50,8 @@ entity AmcCarrierCore is
       timingPhy            : in    TimingPhyType;
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
+      timingRefClk         : out   sl;
+      timingRefClkDiv2     : out   sl;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -335,37 +337,39 @@ begin
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
-         axilClk          => axilClk,
-         axilRst          => axilRst,
-         axilReadMaster   => timingReadMaster,
-         axilReadSlave    => timingReadSlave,
-         axilWriteMaster  => timingWriteMaster,
-         axilWriteSlave   => timingWriteSlave,
+         axilClk             => axilClk,
+         axilRst             => axilRst,
+         axilReadMaster      => timingReadMaster,
+         axilReadSlave       => timingReadSlave,
+         axilWriteMaster     => timingWriteMaster,
+         axilWriteSlave      => timingWriteSlave,
          ----------------------
          -- Top Level Interface
          ----------------------         
          -- Timing Interface 
-         recTimingClk     => recTimingClk,
-         recTimingRst     => recTimingRst,
-         appTimingClk     => timingClk,
-         appTimingRst     => timingRst,
-         appTimingBus     => timingBus,
-         appTimingPhy     => timingPhy,
-         appTimingPhyClk  => timingPhyClk,
-         appTimingPhyRst  => timingPhyRst,
+         recTimingClk        => recTimingClk,
+         recTimingRst        => recTimingRst,
+         appTimingClk        => timingClk,
+         appTimingRst        => timingRst,
+         appTimingBus        => timingBus,
+         appTimingPhy        => timingPhy,
+         appTimingPhyClk     => timingPhyClk,
+         appTimingPhyRst     => timingPhyRst,
+         appTimingRefClk     => timingRefClk,
+         appTimingRefClkDiv2 => timingRefClkDiv2,
          ----------------
          -- Core Ports --
          ----------------   
          -- LCLS Timing Ports
-         timingRxP        => timingRxP,
-         timingRxN        => timingRxN,
-         timingTxP        => timingTxP,
-         timingTxN        => timingTxN,
-         timingRefClkInP  => timingRefClkInP,
-         timingRefClkInN  => timingRefClkInN,
-         timingRecClkOutP => timingRecClkOutP,
-         timingRecClkOutN => timingRecClkOutN,
-         timingClkSel     => timingClkSel);
+         timingRxP           => timingRxP,
+         timingRxN           => timingRxN,
+         timingTxP           => timingTxP,
+         timingTxN           => timingTxN,
+         timingRefClkInP     => timingRefClkInP,
+         timingRefClkInN     => timingRefClkInN,
+         timingRecClkOutP    => timingRecClkOutP,
+         timingRecClkOutN    => timingRecClkOutN,
+         timingClkSel        => timingClkSel);
 
    --------------
    -- BSA Core
