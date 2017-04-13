@@ -168,8 +168,8 @@ begin
          TPD_G        => TPD_G,
          APP_TYPE_G   => APP_TYPE_G)
       port map (
-         axilClk         => axiClk,
-         axilRst         => axiRst,
+         axilClk         => axilClk,
+         axilRst         => axilRst,
          axilReadMaster  => axilReadMasters(ENCODER_INDEX_C),
          axilReadSlave   => axilReadSlaves(ENCODER_INDEX_C),
          axilWriteMaster => axilWriteMasters(ENCODER_INDEX_C),
@@ -178,7 +178,7 @@ begin
          mpsSlave        => mpsSlave,
          diagnosticClk   => diagnosticClk,
          diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBusApp);
+         diagnosticBus   => diagnosticBus);
 
    ---------------------------------         
    -- MPS Backplane SALT Transceiver

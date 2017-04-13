@@ -59,7 +59,6 @@ entity AmcCarrierCoreAdv is
       timingRst            : in    sl;
       timingBus            : out   TimingBusType;
       timingPhy            : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
-      timingRefClk         : out   sl;
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
       timingRefClk         : out   sl;
@@ -374,7 +373,6 @@ begin
          timingRst            => timingRst,
          timingBus            => timingBusIntf,
          timingPhy            => timingPhy,
-         timingRefClk         => timingRefClk,
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,
          timingRefClk         => timingRefClk,

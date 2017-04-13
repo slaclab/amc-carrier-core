@@ -2,6 +2,7 @@
 -- File       : AppMpsPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
+-- Last update: 2017-04-13
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -16,6 +17,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
+use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
@@ -37,19 +40,19 @@ package AppMpsPkg is
    -- Mitigation message record
    ---------------------------------------------------   
    type MpsMitigationMsgType is record
-      strobe    : sl;                      -- valid
-      latchDiag : sl;                      -- latch the beam diagnostics with 'tag' 
-      tag       : slv(15 downto 0);      
+      strobe    : sl;                   -- valid
+      latchDiag : sl;  -- latch the beam diagnostics with 'tag' 
+      tag       : slv(15 downto 0);
       timeStamp : slv(15 downto 0);
       class     : Slv4Array(15 downto 0);  -- power class limits for each of 16 destinations
    end record;
 
-   type MpsMitigationMsgArray is array (natural range <>) of MpsMitigationMsgType;   
-   
+   type MpsMitigationMsgArray is array (natural range <>) of MpsMitigationMsgType;
+
    constant MPS_MITIGATION_MSG_INIT_C : MpsMitigationMsgType := (
       strobe    => '0',
       latchDiag => '0',
-      tag       => (others => '0'),      
+      tag       => (others => '0'),
       timeStamp => (others => '0'),
       class     => (others => (others => '0')));
 
@@ -61,8 +64,8 @@ package AppMpsPkg is
    ---------------------------------------------------   
    type MpsMessageType is record
       valid     : sl;
-      lcls      : sl; -- '0' LCLS-II, '1' LCLS-I
-      inputType : sl; -- '0' Digital, '1' Analog      
+      lcls      : sl;                   -- '0' LCLS-II, '1' LCLS-I
+      inputType : sl;                   -- '0' Digital, '1' Analog      
       timeStamp : slv(15 downto 0);
       appId     : slv(15 downto 0);
       message   : Slv8Array(31 downto 0);
@@ -73,8 +76,8 @@ package AppMpsPkg is
 
    constant MPS_MESSAGE_INIT_C : MpsMessageType := (
       valid     => '0',
-      lcls      => '0',    
-      inputType => '0',      
+      lcls      => '0',
+      inputType => '0',
       timeStamp => (others => '0'),
       appId     => (others => '0'),
       message   => (others => (others => '0')),
@@ -87,35 +90,35 @@ package AppMpsPkg is
    -- MPS Channel Configuration
    ---------------------------------------------------   
    type MpsChanConfigType is record
-      THOLD_COUNT_C  : integer range 0 to 8;
-      LCLS1_EN_C     : boolean;
-      IDLE_EN_C      : boolean;
-      ALT_EN_C       : boolean;
-      BYTE_MAP_C     : integer range 0 to MPS_CHAN_COUNT_C-1;
+      THOLD_COUNT_C : integer range 0 to 8;
+      LCLS1_EN_C    : boolean;
+      IDLE_EN_C     : boolean;
+      ALT_EN_C      : boolean;
+      BYTE_MAP_C    : integer range 0 to MPS_CHAN_COUNT_C-1;
    end record;
 
    type MpsChanConfigArray is array (natural range <>) of MpsChanConfigType;
 
    constant MPS_CHAN_CONFIG_INIT_C : MpsChanConfigType := (
-      THOLD_COUNT_C  => 0,
-      LCLS1_EN_C     => false,
-      IDLE_EN_C      => false,
-      ALT_EN_C       => false,
-      BYTE_MAP_C     => 0);
+      THOLD_COUNT_C => 0,
+      LCLS1_EN_C    => false,
+      IDLE_EN_C     => false,
+      ALT_EN_C      => false,
+      BYTE_MAP_C    => 0);
 
    ---------------------------------------------------
    -- MPS App Configuration
    ---------------------------------------------------   
    type MpsAppConfigType is record
-      DIGITAL_EN_C   : boolean; -- APP is digital
-      BYTE_COUNT_C   : integer range 0 to MPS_CHAN_COUNT_C-1; -- MPS message bytes
-      CHAN_CONFIG_C  : MpsChanConfigArray(MPS_CHAN_COUNT_C-1 downto 0);
+      DIGITAL_EN_C  : boolean;          -- APP is digital
+      BYTE_COUNT_C  : integer range 0 to MPS_CHAN_COUNT_C-1;  -- MPS message bytes
+      CHAN_CONFIG_C : MpsChanConfigArray(MPS_CHAN_COUNT_C-1 downto 0);
    end record;
 
    constant MPS_APP_CONFIG_INIT_C : MpsAppConfigType := (
-      DIGITAL_EN_C   => false,
-      BYTE_COUNT_C   => 0,
-      CHAN_CONFIG_C  => (others=>MPS_CHAN_CONFIG_INIT_C));
+      DIGITAL_EN_C  => false,
+      BYTE_COUNT_C  => 0,
+      CHAN_CONFIG_C => (others => MPS_CHAN_CONFIG_INIT_C));
 
    ---------------------------------------------------
    -- MPS Channel Thold Registers
@@ -132,26 +135,26 @@ package AppMpsPkg is
    constant MPS_CHAN_THOLD_INIT_C : MpsChanTholdType := (
       minTholdEn => '0',
       maxTholdEn => '0',
-      minThold   => (others=>'0'),
-      maxThold   => (others=>'0'));
+      minThold   => (others => '0'),
+      maxThold   => (others => '0'));
 
    ---------------------------------------------------
    -- MPS Channel Registers
    ---------------------------------------------------   
    type MpsChanRegType is record
-      stdTholds    : MpsChanTholdArray(7 downto 0);
-      lcls1Thold   : MpsChanTholdType;
-      idleThold    : MpsChanTholdType;
-      altTholds    : MpsChanTholdArray(7 downto 0);
+      stdTholds  : MpsChanTholdArray(7 downto 0);
+      lcls1Thold : MpsChanTholdType;
+      idleThold  : MpsChanTholdType;
+      altTholds  : MpsChanTholdArray(7 downto 0);
    end record;
 
    type MpsChanRegArray is array (natural range <>) of MpsChanRegType;
 
    constant MPS_CHAN_REG_INIT_C : MpsChanRegType := (
-      stdTholds    => (others=>MPS_CHAN_THOLD_INIT_C),
-      lcls1Thold   => MPS_CHAN_THOLD_INIT_C,
-      idleThold    => MPS_CHAN_THOLD_INIT_C,
-      altTholds    => (others=>MPS_CHAN_THOLD_INIT_C));
+      stdTholds  => (others => MPS_CHAN_THOLD_INIT_C),
+      lcls1Thold => MPS_CHAN_THOLD_INIT_C,
+      idleThold  => MPS_CHAN_THOLD_INIT_C,
+      altTholds  => (others => MPS_CHAN_THOLD_INIT_C));
 
    ---------------------------------------------------
    -- MPS Application Registers
@@ -165,8 +168,9 @@ package AppMpsPkg is
 
    type MpsAppRegType is record
       mpsEnable    : sl;
-      mpsAddId     : slv(9 downto 0);
+      mpsAppId     : slv(9 downto 0);
       lcls1Mode    : sl;
+      kickDetMode  : sl;
       beamDestMask : slv(15 downto 0);
       altDestMask  : slv(15 downto 0);
       mpsChanReg   : MpsChanRegArray(MPS_CHAN_COUNT_C-1 downto 0);
@@ -176,37 +180,38 @@ package AppMpsPkg is
 
    constant MPS_APP_REG_INIT_C : MpsAppRegType := (
       mpsEnable    => '0',
-      mpsAddId     => (others=>'0'),
+      mpsAppId     => (others => '0'),
       lcls1Mode    => '0',
-      beamDestMask => (others=>'0'),
-      altDestMask  => (others=>'0'),
-      mpsChanReg   => (others=>MPS_CHAN_REG_INIT_C));
+      kickDetMode  => '0',
+      beamDestMask => (others => '0'),
+      altDestMask  => (others => '0'),
+      mpsChanReg   => (others => MPS_CHAN_REG_INIT_C));
 
    ---------------------------------------------------
    -- MPS Select Data
    ---------------------------------------------------   
    type MpsSelectType is record
-      valid        : sl;
-      timeStamp    : slv(15 downto 0);
-      selectIdle   : sl;
-      selectAlt    : sl;
-      digitalBus   : slv(63 downto 0);
-      mpsError     : slv(MPS_CHAN_COUNT_C-1 downto 0);
-      mpsIgnore    : slv(MPS_CHAN_COUNT_C-1 downto 0);
-      chanData     : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
+      valid      : sl;
+      timeStamp  : slv(15 downto 0);
+      selectIdle : sl;
+      selectAlt  : sl;
+      digitalBus : slv(63 downto 0);
+      mpsError   : slv(MPS_CHAN_COUNT_C-1 downto 0);
+      mpsIgnore  : slv(MPS_CHAN_COUNT_C-1 downto 0);
+      chanData   : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
    end record;
 
    constant MPS_SELECT_INIT_C : MpsSelectType := (
-      valid        => '0',
-      timeStamp    => (others=>'0'),
-      selectIdle   => '0',
-      selectAlt    => '0',
-      digitalBus   => (others=>'0'),
-      mpsError     => (others=>'0'),
-      mpsIgnore    => (others=>'0'),
-      chanData     => (others=>(others=>'0')));
+      valid      => '0',
+      timeStamp  => (others => '0'),
+      selectIdle => '0',
+      selectAlt  => '0',
+      digitalBus => (others => '0'),
+      mpsError   => (others => '0'),
+      mpsIgnore  => (others => '0'),
+      chanData   => (others => (others => '0')));
 
-   function toSlv (m : MpsSelectType) return slv;
+   function toSlv (m         : MpsSelectType) return slv;
    function toMpsSelect (vec : slv; valid : sl) return MpsSelectType;
 
    ---------------------------------------------------
@@ -224,8 +229,8 @@ package body AppMpsPkg is
       variable i      : integer                               := 0;
    begin
       assignSlv(i, vector, m.strobe);
-      assignSlv(i, vector, m.latchDiag);      
-      assignSlv(i, vector, m.tag);      
+      assignSlv(i, vector, m.latchDiag);
+      assignSlv(i, vector, m.tag);
       assignSlv(i, vector, m.timeStamp);
 
       for j in 0 to 15 loop
@@ -241,7 +246,7 @@ package body AppMpsPkg is
    begin
       assignrecord(i, vec, m.strobe);
       assignrecord(i, vec, m.latchDiag);
-      assignrecord(i, vec, m.tag);      
+      assignrecord(i, vec, m.tag);
       assignRecord(i, vec, m.timeStamp);
 
       for j in 0 to 15 loop
@@ -257,11 +262,11 @@ package body AppMpsPkg is
    begin
       assignSlv(i, vector, m.valid);
       assignSlv(i, vector, m.lcls);
-      assignSlv(i, vector, m.inputType);      
-      assignSlv(i, vector, m.msgSize);      
+      assignSlv(i, vector, m.inputType);
+      assignSlv(i, vector, m.msgSize);
       assignSlv(i, vector, m.appId);
       assignSlv(i, vector, m.timeStamp);
-      
+
       for j in 0 to 31 loop
          assignSlv(i, vector, m.message(j));
       end loop;
@@ -277,7 +282,7 @@ package body AppMpsPkg is
       assignRecord(i, vec, m.lcls);
       assignRecord(i, vec, m.inputType);
       assignRecord(i, vec, m.msgSize);
-      assignRecord(i, vec, m.appId);      
+      assignRecord(i, vec, m.appId);
       assignRecord(i, vec, m.timeStamp);
 
       for j in 0 to 31 loop
@@ -340,19 +345,19 @@ package body AppMpsPkg is
 
             for i in 0 to 2 loop
 
-               -- Inputs 1, 2, 3
-               ret.CHAN_CONFIG_C(i+1).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i+1).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i+1).IDLE_EN_C     := ite(i=0,true,false); -- Charge
-               ret.CHAN_CONFIG_C(i+1).ALT_EN_C      := ite(i=1,true,false); -- x position
-               ret.CHAN_CONFIG_C(i+1).BYTE_MAP_C    := i; -- 0, 1, 2
+               -- Inputs 0, 1, 2
+               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i).IDLE_EN_C     := ite(i = 2, true, false);  -- Charge
+               ret.CHAN_CONFIG_C(i).ALT_EN_C      := ite(i = 0, true, false);  -- x position
+               ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;  -- 0, 1, 2
 
-               -- Inputs 5, 6, 7
-               ret.CHAN_CONFIG_C(i+5).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i+5).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i+5).IDLE_EN_C     := ite(i=0,true,false); -- Charge
-               ret.CHAN_CONFIG_C(i+5).ALT_EN_C      := ite(i=1,true,false); -- x position
-               ret.CHAN_CONFIG_C(i+5).BYTE_MAP_C    := i+3; -- 3, 4, 5
+               -- Inputs 16, 17, 18
+               ret.CHAN_CONFIG_C(i+16).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i+16).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i+16).IDLE_EN_C     := ite(i = 2, true, false);  -- Charge
+               ret.CHAN_CONFIG_C(i+16).ALT_EN_C      := ite(i = 0, true, false);  -- x position
+               ret.CHAN_CONFIG_C(i+16).BYTE_MAP_C    := i+3;  -- 3, 4, 5
             end loop;
 
          when APP_BLEN_TYPE_C =>

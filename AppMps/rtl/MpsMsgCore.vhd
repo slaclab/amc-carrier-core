@@ -2,7 +2,7 @@
 -- File       : MpsMsgCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2016-05-06
+-- Last update: 2017-04-13
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -30,19 +30,20 @@ use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.AmcCarrierPkg.all;
+use work.AppMpsPkg.all;
 
 entity MpsMsgCore is
    generic (
       TPD_G            : time    := 1 ns;
-      SIM_ERROR_HALT_G : boolean := false
+      SIM_ERROR_HALT_G : boolean := false);
    port (
-      clk       : in  sl;
-      rst       : in  sl;
+      clk        : in  sl;
+      rst        : in  sl;
       -- Inbound Message Value
-      mpsMessage : in MpsMessageType;
+      mpsMessage : in  MpsMessageType;
       -- Outbound MPS Interface
-      mpsMaster : out AxiStreamMasterType;
-      mpsSlave  : in  AxiStreamSlaveType);   
+      mpsMaster  : out AxiStreamMasterType;
+      mpsSlave   : in  AxiStreamSlaveType);
 end MpsMsgCore;
 
 architecture rtl of MpsMsgCore is
@@ -52,21 +53,21 @@ architecture rtl of MpsMsgCore is
       HEADER_S,
       APP_ID_S,
       TIMESTAMP_S,
-      PAYLOAD_S); 
+      PAYLOAD_S);
 
    type RegType is record
-      cnt       : natural range 0 to 63;
+      cnt        : natural range 0 to 63;
       mpsMessage : MpsMessageType;
-      mpsMaster : AxiStreamMasterType;
-      state     : StateType;
-      stateDly  : StateType;
+      mpsMaster  : AxiStreamMasterType;
+      state      : StateType;
+      stateDly   : StateType;
    end record RegType;
    constant REG_INIT_C : RegType := (
       cnt        => 0,
       mpsMessage => MPS_MESSAGE_INIT_C,
       mpsMaster  => AXI_STREAM_MASTER_INIT_C,
       state      => IDLE_S,
-      stateDly   => IDLE_S);      
+      stateDly   => IDLE_S);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -76,7 +77,7 @@ architecture rtl of MpsMsgCore is
 
 begin
 
-   comb : process (mpsSlave, r, rst, mpsMessage) is
+   comb : process (mpsMessage, mpsSlave, r, rst) is
       variable v : RegType;
    begin
       -- Latch the current value
@@ -108,15 +109,15 @@ begin
             if v.mpsMaster.tValid = '0' then
                -- Send the header
                v.mpsMaster.tValid             := '1';
-               v.mpsMaster.tData(15)          := '0';                     -- Mitigation Message flag has to be '0' (Will be checked at receiving end)
-               v.mpsMaster.tData(14)          := r.mpsMessage.lcls;         -- Set the LCLS flag
-               v.mpsMaster.tData(13)          := r.mpsMessage.inputType;    -- Set the input type A/D  
-               v.mpsMaster.tData(12 downto 8) := (others => '0');               
+               v.mpsMaster.tData(15)          := '0';  -- Mitigation Message flag has to be '0' (Will be checked at receiving end)
+               v.mpsMaster.tData(14)          := r.mpsMessage.lcls;  -- Set the LCLS flag
+               v.mpsMaster.tData(13)          := r.mpsMessage.inputType;  -- Set the input type A/D  
+               v.mpsMaster.tData(12 downto 8) := (others => '0');
                v.mpsMaster.tData(7 downto 0)  := r.mpsMessage.msgSize+5;  -- Length in units of bytes
                -- Set SOF               
                ssiSetUserSof(MPS_AXIS_CONFIG_C, v.mpsMaster, '1');
                -- Next state
-               v.state                                         := APP_ID_S;
+               v.state                        := APP_ID_S;
             end if;
          ----------------------------------------------------------------------
          when APP_ID_S =>

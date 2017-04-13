@@ -48,7 +48,6 @@ entity AmcCarrierCore is
       timingRst            : in    sl;
       timingBus            : out   TimingBusType;
       timingPhy            : in    TimingPhyType;
-      timingRefClk         : out   sl;
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
       timingRefClk         : out   sl;
@@ -354,7 +353,6 @@ begin
          appTimingRst     => timingRst,
          appTimingBus     => timingBus,
          appTimingPhy     => timingPhy,
-         appTimingRefClk  => timingRefClk,
          appTimingPhyClk  => timingPhyClk,
          appTimingPhyRst  => timingPhyRst,
          appTimingRefClk     => timingRefClk,
