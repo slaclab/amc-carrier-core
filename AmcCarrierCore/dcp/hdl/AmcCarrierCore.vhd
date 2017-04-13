@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-24
+-- Last update: 2017-04-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -51,6 +51,8 @@ entity AmcCarrierCore is
       timingRefClk         : out   sl;
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
+      timingRefClk         : out   sl;
+      timingRefClkDiv2     : out   sl;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -355,6 +357,8 @@ begin
          appTimingRefClk  => timingRefClk,
          appTimingPhyClk  => timingPhyClk,
          appTimingPhyRst  => timingPhyRst,
+         appTimingRefClk     => timingRefClk,
+         appTimingRefClkDiv2 => timingRefClkDiv2,
          ----------------
          -- Core Ports --
          ----------------   

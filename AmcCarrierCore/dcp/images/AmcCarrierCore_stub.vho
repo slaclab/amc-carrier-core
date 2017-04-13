@@ -85,6 +85,8 @@ U_Core: entity work.AmcCarrierCore
     timingRefClk => timingRefClk,
     timingPhyClk => timingPhyClk,
     timingPhyRst => timingPhyRst,
+    timingRefClk => timingRefClk,
+    timingRefClkDiv2 => timingRefClkDiv2,
     diagnosticClk => diagnosticClk,
     diagnosticRst => diagnosticRst,
     \diagnosticBus[strobe]\ => diagnosticBus.strobe,

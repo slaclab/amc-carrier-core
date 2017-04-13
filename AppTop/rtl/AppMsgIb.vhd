@@ -74,19 +74,19 @@ architecture rtl of AppMsgIb is
       idx    := 0;
 
       -- Load the header array
-      for i in (HDR_SIZE_G-1) downto 0 loop
+      for i in 0 to (HDR_SIZE_G-1) loop
          retVar.hdr(i) := dout((idx*32)+31 downto (idx*32));
          idx           := idx + 1;
       end loop;
 
       -- Load the 64-bit time stamp
-      for i in 1 downto 0 loop
+      for i in 0 to 1 loop
          retVar.ts((i*32)+31 downto (i*32)) := dout((idx*32)+31 downto (idx*32));
          idx                                := idx + 1;
       end loop;
 
       -- Load the message array
-      for i in (DATA_SIZE_G-1) downto 0 loop
+      for i in 0 to (DATA_SIZE_G-1) loop
          retVar.msg(i) := dout((idx*32)+31 downto (idx*32));
          idx           := idx + 1;
       end loop;

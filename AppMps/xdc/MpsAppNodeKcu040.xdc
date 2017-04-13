@@ -23,6 +23,9 @@ set_property LOC BUFGCE_X1Y0  [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/
 set_property LOC HRIODIFFOUTBUF_X0Y0 [get_cells {U_Core/U_AppMps/U_Salt/APP_SLOT.U_SaltUltraScale/TX_ONLY.U_SaltUltraScaleCore/U0/lvds_transceiver_mw/serdes_10_to_1_ser8_i/io_data_out}]
 set_property LOC BITSLICE_RX_TX_X1Y0 [get_cells {U_Core/U_AppMps/U_Salt/APP_SLOT.U_SaltUltraScale/TX_ONLY.U_SaltUltraScaleCore/U0/lvds_transceiver_mw/serdes_10_to_1_ser8_i/oserdes_m}]
 
+create_pblock MPS_RTL_GRP; add_cells_to_pblock [get_pblocks MPS_RTL_GRP] [get_cells [list U_Core/U_AppMps/U_Salt/APP_SLOT.U_SaltUltraScale]]
+resize_pblock [get_pblocks MPS_RTL_GRP] -add {CLOCKREGION_X2Y0:CLOCKREGION_X2Y0}
+
 ##########################
 ## Misc. Configurations ##
 ##########################

@@ -1,13 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
 -- File       : AmcCarrierTiming.vhd
--- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
 -- Last update: 2017-02-05
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -65,6 +60,8 @@ entity AmcCarrierTiming is
       appTimingRefClk  : out sl;
       appTimingPhyClk  : out sl;
       appTimingPhyRst  : out sl;
+      appTimingRefClk      : out sl;
+      appTimingRefClkDiv2  : out sl;
       ----------------
       -- Core Ports --
       ----------------   
@@ -93,6 +90,7 @@ architecture mapping of AmcCarrierTiming is
          connectivity => x"FFFF"));
 
    signal timingRefClk   : sl;
+   signal timingRefClkDiv2   : sl;
    signal timingRecClkGt : sl;
    signal timingRecClk   : sl;
    signal timingClockSel : sl;
@@ -178,9 +176,19 @@ begin
          I     => timingRefClkInP,
          IB    => timingRefClkInN,
          CEB   => '0',
-         ODIV2 => open,
+         ODIV2 => timingRefClkDiv2,
          O     => timingRefClk);
 
+   U_BUFG_GT_DIV2 : BUFG_GT
+      port map (
+         I       => timingRefClkDiv2,
+         CE      => '1',
+         CEMASK  => '1',
+         CLR     => '0',
+         CLRMASK => '1',
+         DIV     => "000",              -- Divide by 1
+         O       => appTimingRefClkDiv2);         
+         
    appTimingRefClk <= timingRefClk;
          
    -------------------------------------------------------------------------------------------------

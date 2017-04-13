@@ -62,6 +62,8 @@ entity AmcCarrierCoreAdv is
       timingRefClk         : out   sl;
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
+      timingRefClk         : out   sl;
+      timingRefClkDiv2     : out   sl;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -375,6 +377,8 @@ begin
          timingRefClk         => timingRefClk,
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,
+         timingRefClk         => timingRefClk,
+         timingRefClkDiv2     => timingRefClkDiv2,     
          -- Diagnostic Interface (diagnosticClk domain)
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
