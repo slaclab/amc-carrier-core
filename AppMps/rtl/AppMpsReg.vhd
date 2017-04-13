@@ -4,6 +4,8 @@
 -- Created    : 2017-04-01
 -------------------------------------------------------------------------------
 -- Description: 
+-- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
+-- for associated spreadsheet
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 

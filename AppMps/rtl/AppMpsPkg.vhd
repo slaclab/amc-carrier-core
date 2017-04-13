@@ -20,6 +20,7 @@ use ieee.std_logic_1164.all;
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
+use work.AmcCarrierPkg.all;
 
 package AppMpsPkg is
 
@@ -30,7 +31,7 @@ package AppMpsPkg is
    constant MPS_MITIGATION_BITS_C : integer             := 98;
    constant MPS_MESSAGE_BITS_C    : integer             := 298;
    constant MPS_CHAN_COUNT_C      : integer             := 24;
-   constant MPS_SELECT_BITS_C     : integer             := 82 + (MPS_CHAN_COUNT*34);
+   constant MPS_SELECT_BITS_C     : integer             := 82 + (MPS_CHAN_COUNT_C*34);
 
    ---------------------------------------------------
    -- Mitigation message record
@@ -90,7 +91,7 @@ package AppMpsPkg is
       LCLS1_EN_C     : boolean;
       IDLE_EN_C      : boolean;
       ALT_EN_C       : boolean;
-      BYTE_MAP_C     : integer range 0 to MPS_CHAN_COUNT-1;
+      BYTE_MAP_C     : integer range 0 to MPS_CHAN_COUNT_C-1;
    end record;
 
    type MpsChanConfigArray is array (natural range <>) of MpsChanConfigType;
@@ -107,8 +108,8 @@ package AppMpsPkg is
    ---------------------------------------------------   
    type MpsAppConfigType is record
       DIGITAL_EN_C   : boolean; -- APP is digital
-      BYTE_COUNT_C   : integer range 0 to MPS_CHAN_COUNT-1; -- MPS message bytes
-      CHAN_CONFIG_C  : MpsChanConfigArray(MPS_CHAN_COUNT-1 downto 0);
+      BYTE_COUNT_C   : integer range 0 to MPS_CHAN_COUNT_C-1; -- MPS message bytes
+      CHAN_CONFIG_C  : MpsChanConfigArray(MPS_CHAN_COUNT_C-1 downto 0);
    end record;
 
    constant MPS_APP_CONFIG_INIT_C : MpsAppConfigType := (
@@ -129,8 +130,8 @@ package AppMpsPkg is
    type MpsChanTholdArray is array (natural range <>) of MpsChanTholdType;
 
    constant MPS_CHAN_THOLD_INIT_C : MpsChanTholdType := (
-      minTholdEn => 0,
-      maxTholdEn => 0,
+      minTholdEn => '0',
+      maxTholdEn => '0',
       minThold   => (others=>'0'),
       maxThold   => (others=>'0'));
 
@@ -140,7 +141,7 @@ package AppMpsPkg is
    type MpsChanRegType is record
       stdTholds    : MpsChanTholdArray(7 downto 0);
       lcls1Thold   : MpsChanTholdType;
-      idlehold     : MpsChanTholdType;
+      idleThold    : MpsChanTholdType;
       altTholds    : MpsChanTholdArray(7 downto 0);
    end record;
 
@@ -148,8 +149,8 @@ package AppMpsPkg is
 
    constant MPS_CHAN_REG_INIT_C : MpsChanRegType := (
       stdTholds    => (others=>MPS_CHAN_THOLD_INIT_C),
-      lcls1Thold   => MPS_CHAN_THOLD_INIT_C;
-      idleThold    => MPS_CHAN_THOLD_INIT_C;
+      lcls1Thold   => MPS_CHAN_THOLD_INIT_C,
+      idleThold    => MPS_CHAN_THOLD_INIT_C,
       altTholds    => (others=>MPS_CHAN_THOLD_INIT_C));
 
    ---------------------------------------------------
@@ -174,7 +175,7 @@ package AppMpsPkg is
    type MpsAppRegArray is array (natural range <>) of MpsAppRegType;
 
    constant MPS_APP_REG_INIT_C : MpsAppRegType := (
-      mpsEnable    => 0,
+      mpsEnable    => '0',
       mpsAddId     => (others=>'0'),
       lcls1Mode    => '0',
       beamDestMask => (others=>'0'),
@@ -206,13 +207,13 @@ package AppMpsPkg is
       chanData     => (others=>(others=>'0')));
 
    function toSlv (m : MpsSelectType) return slv;
-   function toMpsSelect (vec : slv, valid : sl) return MpsSelectType;
+   function toMpsSelect (vec : slv; valid : sl) return MpsSelectType;
 
    ---------------------------------------------------
    -- MPS Configuration Function
    ---------------------------------------------------   
 
-   function getMpsAppConfig (type : AppType) return MpsAppConfigType;
+   function getMpsAppConfig (app : AppType) return MpsAppConfigType;
 
 end package AppMpsPkg;
 
@@ -305,7 +306,7 @@ package body AppMpsPkg is
       return vector;
    end function;
 
-   function toMpsSelect (vec : slv, valid : sl) return MpsSelectType is
+   function toMpsSelect (vec : slv; valid : sl) return MpsSelectType is
       variable m : MpsSelectType;
       variable i : integer := 0;
    begin
@@ -318,7 +319,7 @@ package body AppMpsPkg is
       assignRecord(i, vec, m.mpsIgnore);
 
       for j in 0 to MPS_CHAN_COUNT_C-1 loop
-         assignRecord(i, vector, m.chanData(j));
+         assignRecord(i, vec, m.chanData(j));
       end loop;
 
       m.valid := valid;
@@ -326,10 +327,12 @@ package body AppMpsPkg is
       return m;
    end function;
 
+   -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
+   -- for associated spreadsheet
    function getMpsAppConfig (app : AppType) return MpsAppConfigType is
       variable ret : MpsAppConfigType;
    begin
-      ret = MPS_APP_CONFIG_INIT_C;
+      ret := MPS_APP_CONFIG_INIT_C;
 
       case app is
          when APP_BPM_STRIPLINE_TYPE_C | APP_BPM_CAVITY_TYPE_C =>
@@ -337,34 +340,30 @@ package body AppMpsPkg is
 
             for i in 0 to 2 loop
 
-               -- Inputs 0, 1, 2
-               ret.CHAN_CONFIG_C(i).
-               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i).IDLE_EN_C     := ite(i=2,true,false); -- Charge
-               ret.CHAN_CONFIG_C(i).ALT_EN_C      := ite(i=0,true,false); -- x position
-               ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i; -- 0, 1, 2
+               -- Inputs 1, 2, 3
+               ret.CHAN_CONFIG_C(i+1).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i+1).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i+1).IDLE_EN_C     := ite(i=0,true,false); -- Charge
+               ret.CHAN_CONFIG_C(i+1).ALT_EN_C      := ite(i=1,true,false); -- x position
+               ret.CHAN_CONFIG_C(i+1).BYTE_MAP_C    := i; -- 0, 1, 2
 
-               -- Inputs 16, 17, 18
-               ret.CHAN_CONFIG_C(i+16).
-               ret.CHAN_CONFIG_C(i+16).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i+16).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i+16).IDLE_EN_C     := ite(i=2,true,false); -- Charge
-               ret.CHAN_CONFIG_C(i+16).ALT_EN_C      := ite(i=0,true,false); -- x position
-               ret.CHAN_CONFIG_C(i+16).BYTE_MAP_C    := i+3; -- 3, 4, 5
+               -- Inputs 5, 6, 7
+               ret.CHAN_CONFIG_C(i+5).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i+5).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i+5).IDLE_EN_C     := ite(i=0,true,false); -- Charge
+               ret.CHAN_CONFIG_C(i+5).ALT_EN_C      := ite(i=1,true,false); -- x position
+               ret.CHAN_CONFIG_C(i+5).BYTE_MAP_C    := i+3; -- 3, 4, 5
             end loop;
 
          when APP_BLEN_TYPE_C =>
             ret.BYTE_COUNT_C := 2;
 
             -- Input 0
-            ret.CHAN_CONFIG_C(0).
             ret.CHAN_CONFIG_C(0).THOLD_COUNT_C := 4;
             ret.CHAN_CONFIG_C(0).IDLE_EN_C     := true;
             ret.CHAN_CONFIG_C(0).BYTE_MAP_C    := 0;
 
             -- Input 16
-            ret.CHAN_CONFIG_C(1).
             ret.CHAN_CONFIG_C(1).THOLD_COUNT_C := 4;
             ret.CHAN_CONFIG_C(1).IDLE_EN_C     := true;
             ret.CHAN_CONFIG_C(1).BYTE_MAP_C    := 1;
@@ -377,7 +376,6 @@ package body AppMpsPkg is
             ret.BYTE_COUNT_C := 24;
 
             for i in 0 to 23 loop
-               ret.CHAN_CONFIG_C(i).
                ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 4;
                ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;
@@ -387,7 +385,6 @@ package body AppMpsPkg is
             ret.BYTE_COUNT_C := 6;
 
             for i in 0 to 5 loop
-               ret.CHAN_CONFIG_C(i*4).
                ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
                ret.CHAN_CONFIG_C(i*4).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
@@ -397,7 +394,6 @@ package body AppMpsPkg is
             ret.BYTE_COUNT_C := 6;
 
             for i in 0 to 5 loop
-               ret.CHAN_CONFIG_C(i*4).
                ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
                ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
             end loop;
@@ -406,7 +402,6 @@ package body AppMpsPkg is
             ret.BYTE_COUNT_C := 6;
 
             for i in 0 to 5 loop
-               ret.CHAN_CONFIG_C(i*4).
                ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
                ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
                ret.CHAN_CONFIG_C(i*4).IDLE_EN_C     := true;
