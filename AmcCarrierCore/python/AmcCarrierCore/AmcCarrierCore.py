@@ -22,21 +22,26 @@ from AmcCarrierCore.AmcCarrierBsa import *
 from AppMps.AppMps import *
 
 class AmcCarrierCore(pr.Device):
-    def __init__(self, name="AmcCarrierCore", memBase=None, offset=0x0, hidden=False):
+    def __init__(   self, 
+                    name        = "AmcCarrierCore", 
+                    memBase     =  None, 
+                    offset      =  0x0, 
+                    hidden      = False,
+                ):
         super(self.__class__, self).__init__(name, "AmcCarrierCore", memBase, offset, hidden)
 
         ##############################
         # Variables
         ##############################
 
-        self.add(pr.Variable(   name         = "AMC_CARRIER_CORE_VERSION_C",
-                                description  = "FAMC Carrier Core Version Number",
-                                offset       =  0x00000400,
-                                bitSize      =  32,
-                                bitOffset    =  0x00,
-                                base         = "hex",
-                                mode         = "RO",
-                            ))
+        self.addVariable(   name         = "AMC_CARRIER_CORE_VERSION_C",
+                            description  = "FAMC Carrier Core Version Number",
+                            offset       =  0x00000400,
+                            bitSize      =  32,
+                            bitOffset    =  0x00,
+                            base         = "hex",
+                            mode         = "RO",
+                        )
 
         self.add(AxiVersion(
                                 offset       =  0x00000000

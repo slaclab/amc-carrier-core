@@ -24,7 +24,13 @@ from LclsTimingCore.TPGMiniCore import *
 from LclsTimingCore.GthRxAlignCheck import *
 
 class AmcCarrierTiming(pr.Device):
-    def __init__(self, name="AmcCarrierTiming", description="AMC Carrier Timing Receiver Module", memBase=None, offset=0x0, hidden=False):
+    def __init__(   self, 
+                    name        = "AmcCarrierTiming", 
+                    description = "AMC Carrier Timing Receiver Module", 
+                    memBase     =  None, 
+                    offset      =  0x0, 
+                    hidden      =  False,
+                ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
         ##############################
