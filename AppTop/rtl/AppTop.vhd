@@ -453,7 +453,8 @@ begin
          SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
          SIMULATION_G     => SIMULATION_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         JESD_USR_DIV_G   => JESD_USR_DIV_G)
       port map (
          -- Clocks and resets   
          jesdClk             => jesdClk,
