@@ -23,21 +23,27 @@ from surf._GenericMemory import *
 from surf._AxiStreamDmaRingWrite import *
 
 class BsaBufferControl(pr.Device):
-    def __init__(self, name="BsaBufferControl", description="Configuration and status of the BSA dignosic buffers", memBase=None, offset=0x0, hidden=False):
+    def __init__(   self, 
+                    name        = "BsaBufferControl", 
+                    description = "Configuration and status of the BSA dignosic buffers", 
+                    memBase     =  None, 
+                    offset      =  0x0, 
+                    hidden      =  False
+                ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
         ##############################
         # Variables
         ##############################
 
-        self.add(pr.Variable(   name         = "Timestamps",
-                                description  = "",
-                                offset       =  0x00000000,
-                                bitSize      =  32,
-                                bitOffset    =  0x00,
-                                base         = "hex",
-                                mode         = "RO",
-                            ))
+        self.addVariable(   name         = "Timestamps",
+                            description  = "",
+                            offset       =  0x00000000,
+                            bitSize      =  32,
+                            bitOffset    =  0x00,
+                            base         = "hex",
+                            mode         = "RO",
+                        )
 
         for i in range(64):
             self.Timestamps.add(GenericMemory(
