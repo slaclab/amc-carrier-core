@@ -105,7 +105,7 @@ begin
       v.mpsSelect.valid     := diagnosticBus.strobe;
       v.mpsSelect.timeStamp := diagnosticBus.timingMessage.timeStamp;
       v.mpsSelect.chanData  := diagnosticBus.data(MPS_CHAN_COUNT_C-1 downto 0);
-      v.mpsSelect.mpsIgnore := (others=>diagnosticBus.mpsIgnore);
+      v.mpsSelect.mpsIgnore := diagnosticBus.mpsIgnore(MPS_CHAN_COUNT_C-1 downto 0);
 
       for i in 0 to MPS_CHAN_COUNT_C-1 loop
          v.mpsSelect.mpsError(i) := ite(diagnosticBus.sevr(i) = 0, '0', '1');

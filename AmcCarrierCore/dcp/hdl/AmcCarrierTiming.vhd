@@ -310,6 +310,7 @@ begin
    begin
       if rising_edge(appTimingClk) then
          appTimingBus.strobe <= appBus.strobe after TPD_G;  -- Pipeline for register replication during impl_1
+         appTimingBus.valid  <= appBus.valid after TPD_G;   -- Pipeline for register replication during impl_1
       end if;
    end process;
    -- No pipelining: message, V1, and V2 only updated during strobe's HIGH cycle
