@@ -243,7 +243,6 @@ begin
             rxData           => rxData,
             rxDataK          => rxDataK);
 
-   end generate;
 
    -----------
    -- AXIS MUX
@@ -267,5 +266,14 @@ begin
          -- Master
          mAxisMaster     => mAxisMaster,
          mAxisSlave      => mAxisSlave);
+
+   end generate;
+
+   NO_GEN_EVR : if (MR_LCLS_APP_G = false) generate
+
+      mAxisMaster <= sAxisMaster;
+      sAxisSlave  <= mAxisSlave;
+
+   end generate;
 
 end mapping;
