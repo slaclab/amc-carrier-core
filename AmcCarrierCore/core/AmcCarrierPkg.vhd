@@ -156,7 +156,7 @@ package AmcCarrierPkg is
       mpsIgnore     => (others => '0'),
       timingMessage => TIMING_MESSAGE_INIT_C);
 
-   constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*35 + TIMING_MESSAGE_BITS_C;
+   constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*36 + TIMING_MESSAGE_BITS_C;
 
    function toSlv (b             : DiagnosticBusType) return slv;
    function toDiagnosticBus (vec : slv) return DiagnosticBusType;
