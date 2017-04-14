@@ -144,7 +144,7 @@ package AmcCarrierPkg is
       data          : Slv32Array(31 downto 0);
       sevr          : Slv2Array (31 downto 0); -- (0=NONE, 1=MINOR, 2=MAJOR, 3=INVALID)
       fixed         : slv       (31 downto 0); -- do not add/average (static)
-      mpsIgnore     : sl;
+      mpsIgnore     : slv       (31 downto 0); -- MPS ignores value
       timingMessage : TimingMessageType;
    end record;
    type DiagnosticBusArray is array (natural range <>) of DiagnosticBusType;
@@ -153,7 +153,7 @@ package AmcCarrierPkg is
       data          => (others => (others => '0')),
       sevr          => (others => (others => '1')),
       fixed         => (others => '0'),
-      mpsIgnore     => '0',
+      mpsIgnore     => (others => '0'),
       timingMessage => TIMING_MESSAGE_INIT_C);
 
    constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*35 + TIMING_MESSAGE_BITS_C;
@@ -172,9 +172,10 @@ package body AmcCarrierPkg is
       vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
       i                                        := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
-         assignSlv(i, vector, b.data (j));
-         assignSlv(i, vector, b.sevr (j));
-         assignSlv(i, vector, b.fixed(j));
+         assignSlv(i, vector, b.data     (j));
+         assignSlv(i, vector, b.sevr     (j));
+         assignSlv(i, vector, b.fixed    (j));
+         assignSlv(i, vector, b.mpsIgnore(j));
       end loop;
       assignSlv(i, vector, b.strobe);
       return vector;
@@ -187,12 +188,13 @@ package body AmcCarrierPkg is
       b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
       i               := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
-         assignRecord(i, vec, b.data (j));
-         assignRecord(i, vec, b.sevr (j));
-         assignRecord(i, vec, b.fixed(j));
+         assignRecord(i, vec, b.data     (j));
+         assignRecord(i, vec, b.sevr     (j));
+         assignRecord(i, vec, b.fixed    (j));
+         assignRecord(i, vec, b.mpsIgnore(j));
       end loop;
       assignRecord(i, vec, b.strobe);
       return b;
    end function;
-   
+  
 end package body AmcCarrierPkg;
