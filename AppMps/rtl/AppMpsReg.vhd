@@ -84,10 +84,9 @@ begin
       axiSlaveRegister(regEp, x"0000", 0, v.mpsReg.mpsAppId);
       axiSlaveRegister(regEp, x"0000", 16, v.mpsReg.mpsEnable);
       axiSlaveRegister(regEp, x"0000", 17, v.mpsReg.lcls1Mode);
-      axiSlaveRegister(regEp, x"0000", 24, v.mpsReg.kickDetMode);
 
---      axiSlaveRegisterR(regEp, x"0004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C,8); -- missing toSlv fuction
---      axiSlaveRegisterR(regEp, x"0004", 8, toSlv(APP_CONFIG_G.DIGITAL_EN_C,1); -- missing toSlv fuction
+      axiSlaveRegisterR(regEp, x"0004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C,8));
+      axiSlaveRegisterR(regEp, x"0004", 8, ite(APP_CONFIG_G.DIGITAL_EN_C,'1','0'));
 
       axiSlaveRegister(regEp, x"0008", 0, v.mpsReg.beamDestMask);
       axiSlaveRegister(regEp, x"0008", 16, v.mpsReg.altDestMask);
@@ -98,11 +97,11 @@ begin
             base := 32768 + (chan * 512);
 
             -- Offset base + 0x0
---            axiSlaveRegisterR(regEp, toSlv(base, 16),  0, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).THOLD_COUNT_C,8); -- missing toSlv fuction
---            axiSlaveRegisterR(regEp, toSlv(base, 16),  8, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).IDLE_EN_C,1); -- missing toSlv fuction
---            axiSlaveRegisterR(regEp, toSlv(base, 16),  9, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).ALT_EN_C,1); -- missing toSlv fuction
---            axiSlaveRegisterR(regEp, toSlv(base, 16), 10, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).LCLS1_EN_C,1); -- missing toSlv fuction
---            axiSlaveRegisterR(regEp, toSlv(base, 16), 16, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).BYTE_MAP_C,8); -- missing toSlv fuction
+            axiSlaveRegisterR(regEp, toSlv(base, 16),  0, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).THOLD_COUNT_C,8));
+            axiSlaveRegisterR(regEp, toSlv(base, 16),  8, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).IDLE_EN_C,'1','0'));
+            axiSlaveRegisterR(regEp, toSlv(base, 16),  9, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).ALT_EN_C,'1','0'));
+            axiSlaveRegisterR(regEp, toSlv(base, 16), 10, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).LCLS1_EN_C,'1','0'));
+            axiSlaveRegisterR(regEp, toSlv(base, 16), 16, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).BYTE_MAP_C,8));
 
             -- Offset base + 0x10, 0x14, 0x18
             if APP_CONFIG_G.CHAN_CONFIG_C(chan).LCLS1_EN_C then

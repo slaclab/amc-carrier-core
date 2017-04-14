@@ -80,7 +80,6 @@ architecture mapping of AppMpsEncoder is
       signedVal := signed(value);
       signedMin := signed(thold.minThold);
       signedMax := signed(thold.maxThold);
-      --ret       := false;
 
       if (thold.maxTholdEn = '1' and signedVal > signedMax) or
          (thold.minTholdEn = '1' and signedVal > signedMin) then
@@ -163,41 +162,41 @@ begin
 
             -- Threshold is enabled and mps channel is not ignored
             if APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C > 0 and mpsSelect.mpsIgnore(chan) = '0' then
-               null;
---               -- Channel is marked in error, set all bits
---               if mpsSelect.mpsError(chan) = '1' then
---                  v.mpsMessage(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C) := x"FF";
 
---               -- LCLS1 Mode
---               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.lcls1Mode = '1' then
---                  compareTholds (mpsReg.lcls1Thold, 
---                                 APP_CONFIG_C.CHAN_CONFIG_C(chan), 
---                                 mpsSelect.chanData(chan), 0, v.mpsMessage);
+               -- Channel is marked in error, set all bits
+               if mpsSelect.mpsError(chan) = '1' then
+                  v.mpsMessage.message(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C) := x"FF";
 
---               -- LCLS2 idle table
---               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsSelect.selectIdle = '1' then
---                  compareTholds (mpsReg.idleThold, 
---                                 APP_CONFIG_C.CHAN_CONFIG_C(chan), 
---                                 mpsSelect.chanData(chan), 7, v.mpsMessage);
+               -- LCLS1 Mode
+               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.lcls1Mode = '1' then
+                  compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold, 
+                                 APP_CONFIG_C.CHAN_CONFIG_C(chan), 
+                                 mpsSelect.chanData(chan), 0, v.mpsMessage);
 
---               -- Multiple thresholds
---               else
---                  for thold in 0 to (APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C-1) loop
+               -- LCLS2 idle table
+               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsSelect.selectIdle = '1' then
+                  compareTholds (mpsReg.mpsChanReg(chan).idleThold, 
+                                 APP_CONFIG_C.CHAN_CONFIG_C(chan), 
+                                 mpsSelect.chanData(chan), 7, v.mpsMessage);
 
---                     -- Alternate table
---                     if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
---                        compareTholds (mpsReg.altThold, 
---                                       APP_CONFIG_C.CHAN_CONFIG_C(chan), 
---                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
+               -- Multiple thresholds
+               else
+                  for thold in 0 to (APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C-1) loop
 
---                     -- Standard table
---                     else
---                        compareTholds (mpsReg.stdTholds, 
---                                       APP_CONFIG_C.CHAN_CONFIG_C(chan), 
---                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
---                     end if;
---                  end loop;
---               end if;
+                     -- Alternate table
+                     if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
+                        compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold), 
+                                       APP_CONFIG_C.CHAN_CONFIG_C(chan), 
+                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
+
+                     -- Standard table
+                     else
+                        compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold), 
+                                       APP_CONFIG_C.CHAN_CONFIG_C(chan), 
+                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
+                     end if;
+                  end loop;
+               end if;
             end if;
          end loop;
       end if;
