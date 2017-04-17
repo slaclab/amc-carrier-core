@@ -2,7 +2,7 @@
 -- File       : AmcMpsDigitalInputCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-06
--- Last update: 2017-02-06
+-- Last update: 2017-04-17
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_06_CXX
 -------------------------------------------------------------------------------
@@ -28,6 +28,9 @@ entity AmcMpsDigitalInputCore is
    port (
       -- MPS Digital Inputs
       amcMpsDin       : out   slv(31 downto 0);
+      -- MISC. Digital I/O
+      lemoDin         : out   slv(1 downto 0);
+      lemoDout        : in    slv(1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl                     := '0';
       axilRst         : in    sl                     := '0';
@@ -60,6 +63,12 @@ end AmcMpsDigitalInputCore;
 architecture mapping of AmcMpsDigitalInputCore is
 
 begin
+
+   lemoDin(0) <= jtagSec(0);
+   lemoDin(1) <= jtagSec(1);
+
+   jtagPri(0) <= lemoDout(0);
+   jtagPri(1) <= lemoDout(1);
 
    GEN_VEC :
    for i in 15 downto 0 generate
