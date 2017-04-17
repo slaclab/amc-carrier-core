@@ -410,6 +410,9 @@ package body AppMpsPkg is
                ret.CHAN_CONFIG_C(i*4).IDLE_EN_C     := true;
             end loop;
 
+        when others =>
+            NULL;
+            
       end case;
 
       return ret;
