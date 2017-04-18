@@ -146,3 +146,5 @@ set_property LOC BITSLICE_RX_TX_X0Y36  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN
 set_property LOC BITSLICE_RX_TX_X0Y227 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[13].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
 set_property LOC BITSLICE_RX_TX_X0Y34  [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[14].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
 set_property LOC BITSLICE_RX_TX_X0Y2   [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[15].OutputTapDelay_INST/U_ODELAYE3}] ; # Version1 Specific Mapping 
+
+set_property LOC MMCME3_ADV_X0Y2 [get_cells {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm}]
