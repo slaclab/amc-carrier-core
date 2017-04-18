@@ -403,8 +403,8 @@ begin
             IODELAY_GROUP_G    => IODELAY_GROUP_G,
             REFCLK_FREQUENCY_G => 370.0)  -- IDELAYCTRL uses jesdClk2x
          port map (
-            clk_i    => jesdClk,          -- DDR clock (using both edges)
-            rst_i    => jesdRst,
+            clk_i    => jesdClk2x,
+            rst_i    => jesdRst2x,
             load_i   => s_load(i),
             tapSet_i => s_tapDelaySet(i),
             tapGet_o => s_tapDelayStat(i),
