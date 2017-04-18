@@ -122,6 +122,7 @@ begin
    DACAxiCrossbar : entity work.AxiLiteCrossbar
    generic map (
       TPD_G              => TPD_G,
+      DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
       NUM_SLAVE_SLOTS_G  => 1,
       NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
       MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
