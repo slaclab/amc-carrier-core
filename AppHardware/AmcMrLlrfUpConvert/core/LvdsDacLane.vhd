@@ -68,7 +68,7 @@ entity LvdsDacLane is
       periodSize_i : in slv(ADDR_WIDTH_G-1 downto 0);
 
       -- Parallel data out 
-      sampleData_o : out slv(DATA_WIDTH_G-1 downto 0)
+      sampleData_o : out Slv2Array(DATA_WIDTH_G-1 downto 0)
       );
 end LvdsDacLane;
 
@@ -76,13 +76,15 @@ architecture rtl of LvdsDacLane is
 
    -- Register
    type RegType is record
-      sampleData : slv(sampleData_o'range);
+      fifoWr     : sl;
+      fifoDin    : slv((2*DATA_WIDTH_G)-1 downto 0);
       periodSize : slv(ADDR_WIDTH_G-1 downto 0);
       cnt        : slv(ADDR_WIDTH_G-1 downto 0);
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      sampleData => (others => '0'),
+      fifoWr     => '0',
+      fifoDin    => (others => '0'),
       periodSize => (others => '0'),
       cnt        => (others => '0'));
 
@@ -96,7 +98,9 @@ architecture rtl of LvdsDacLane is
 
    -- External data AxiStreamFifo
    signal s_extDataSync : slv(DATA_WIDTH_G-1 downto 0);
-   --
+
+
+   signal fifoDout : slv((2*DATA_WIDTH_G)-1 downto 0);
 
 begin
 
@@ -149,6 +153,7 @@ begin
                    s_ramData) is
       variable v : RegType;
    begin
+      -- Latch the current value
       v := r;
 
       -- rateDiv clock generator 
@@ -167,10 +172,14 @@ begin
       -- Register sample data before outputting
       -- If signal generator is disabled output external data
       if (enable_i = '0') then
-         v.sampleData := s_extDataSync;
+         v.fifoDin((2*DATA_WIDTH_G)-1 downto DATA_WIDTH_G) := s_extDataSync;
       else
-         v.sampleData := s_ramData;
+         v.fifoDin((2*DATA_WIDTH_G)-1 downto DATA_WIDTH_G) := s_ramData;
       end if;
+      v.fifoDin(DATA_WIDTH_G-1 downto 0) := r.fifoDin((2*DATA_WIDTH_G)-1 downto DATA_WIDTH_G);
+
+      -- Toggle the write strobe
+      v.fifoWr := not(r.fifoWr);
 
       if (devRst2x_i = '1') then
          v := REG_INIT_C;
@@ -186,6 +195,21 @@ begin
       end if;
    end process seq;
 
-   sampleData_o <= r.sampleData;
+   U_SyncOut : entity work.SynchronizerFifo
+      generic map (
+         TPD_G        => TPD_G,
+         DATA_WIDTH_G => (2*DATA_WIDTH_G))
+      port map (
+         wr_clk => devClk2x_i,
+         wr_en  => r.fifoWr,
+         din    => r.fifoDin,
+         rd_clk => devClk_i,
+         dout   => fifoDout);
+
+   GEN_VEC :
+   for i in DATA_WIDTH_G-1 downto 0 generate
+      sampleData_o(i)(0) <= fifoDout(i+0);
+      sampleData_o(i)(1) <= fifoDout(i+DATA_WIDTH_G);
+   end generate GEN_VEC;
 
 end rtl;

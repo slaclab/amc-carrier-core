@@ -161,7 +161,7 @@ architecture mapping of AmcMrLlrfUpConvertCore is
    signal attMuxSClk  : sl;
    signal attMuxSDout : sl;
 
-   signal s_dacData    : slv(15 downto 0);
+   signal s_dacData    : Slv2Array(15 downto 0);
    signal s_dacDataDly : slv(15 downto 0);
 
    signal s_load         : slv(15 downto 0);
@@ -403,8 +403,8 @@ begin
             IODELAY_GROUP_G    => IODELAY_GROUP_G,
             REFCLK_FREQUENCY_G => 370.0)  -- IDELAYCTRL uses jesdClk2x
          port map (
-            clk_i    => jesdClk2x,
-            rst_i    => jesdRst2x,
+            clk_i    => jesdClk,
+            rst_i    => jesdRst,
             load_i   => s_load(i),
             tapSet_i => s_tapDelaySet(i),
             tapGet_o => s_tapDelayStat(i),

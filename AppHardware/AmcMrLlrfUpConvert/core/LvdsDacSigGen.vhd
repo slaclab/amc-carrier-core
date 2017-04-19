@@ -70,7 +70,7 @@ entity LvdsDacSigGen is
       tapDelayStat_i : in  Slv9Array(DATA_WIDTH_G-1 downto 0);      
       
       -- Sample data output 
-      sampleData_o   : out Slv(DATA_WIDTH_G-1 downto 0)
+      sampleData_o   : out Slv2Array(DATA_WIDTH_G-1 downto 0)
    );
 end LvdsDacSigGen;
 
@@ -84,7 +84,7 @@ architecture rtl of LvdsDacSigGen is
    signal s_overflow     : sl;   
    signal s_periodSize   : slv(ADDR_WIDTH_G-1 downto 0);
    signal s_polarityMask : slv(DATA_WIDTH_G-1 downto 0);
-   signal s_sampleData   : slv(DATA_WIDTH_G-1 downto 0);   
+   signal s_sampleData   : Slv2Array(DATA_WIDTH_G-1 downto 0);   
    -------------------------------------------------------------------------------------------------
    -- AXI Lite Config and Signals
    -------------------------------------------------------------------------------------------------
@@ -193,6 +193,10 @@ begin
       );
    -----------------------------------------------------
    -- Reverse polarity on masked bits
-   sampleData_o <= s_sampleData xor s_polarityMask;
+   GEN_VEC :
+   for i in DATA_WIDTH_G-1 downto 0 generate
+      sampleData_o(i)(0) <= s_sampleData(i)(0) xor s_polarityMask(i);
+      sampleData_o(i)(1) <= s_sampleData(i)(1) xor s_polarityMask(i);
+   end generate GEN_VEC;   
    -----------------------------------------------------
 end rtl;
