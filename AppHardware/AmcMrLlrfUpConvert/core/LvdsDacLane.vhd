@@ -2,7 +2,7 @@
 -- File       : LvdsDacLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-29
--- Last update: 2017-04-18
+-- Last update: 2017-04-19
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
 --               The module contains a AXI-Lite accessible block RAM where the 
@@ -32,98 +32,55 @@ use work.SsiPkg.all;
 
 entity LvdsDacLane is
    generic (
-      -- General Configurations
-      TPD_G        : time                       := 1 ns;
-      ADDR_WIDTH_G : integer range 1 to (2**24) := 12;
-      DATA_WIDTH_G : integer range 1 to 32      := 16
-      );
+      TPD_G        : time     := 1 ns;
+      ADDR_WIDTH_G : positive := 10);
    port (
-      -- AXI Clk
-      axiClk_i : in sl;
-      axiRst_i : in sl;
-
-      -- devClk 2x - DAC sampling rate
-      devClk2x_i : in sl;
-      devRst2x_i : in sl;
-
-      -- devClk - DAC sampling rate/2 (External data rate)
-      devClk_i : in sl;
-      devRst_i : in sl;
-
-      -- External sample data input 
-      -- 2 samples per c-c
-      -- Should be little-endian none byte-swapped
-      extData_i   : in  slv((2*DATA_WIDTH_G)-1 downto 0);
-      overflow_o  : out sl;
-      underflow_o : out sl;
-
-      -- Lane number AXI number to be inserted into AXI stream
+      -- devClk2x Reference
+      devClk2x_i      : in  sl;
+      devRst2x_i      : in  sl;
+      -- AXI-Lite Interface (axilClk_i domain)
+      axilClk_i       : in  sl;
+      axilRst_i       : in  sl;
       axilReadMaster  : in  AxiLiteReadMasterType;
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
-
-      -- Control generation
-      enable_i     : in sl;
-      periodSize_i : in slv(ADDR_WIDTH_G-1 downto 0);
-
-      -- Parallel data out 
-      sampleData_o : out Slv2Array(DATA_WIDTH_G-1 downto 0)
-      );
+      -- DAC Interface (devClk_i domain)
+      -- Note: 2x 16-bit samples per 32-bit word
+      --       32-bit is little-endian & none byte-swapped
+      devClk_i        : in  sl;
+      devRst_i        : in  sl;
+      extData_i       : in  slv(31 downto 0);
+      -- Control generation  (devClk_i domain)
+      enable_i        : in  sl;
+      periodSize_i    : in  slv(ADDR_WIDTH_G-1 downto 0);
+      -- Parallel data out  (devClk_i domain)
+      sampleData_o    : out Slv2Array(15 downto 0));
 end LvdsDacLane;
 
 architecture rtl of LvdsDacLane is
 
-   -- Register
    type RegType is record
-      fifoWr     : sl;
-      fifoDin    : slv((2*DATA_WIDTH_G)-1 downto 0);
+      ramData    : slv(31 downto 0);
       periodSize : slv(ADDR_WIDTH_G-1 downto 0);
-      cnt        : slv(ADDR_WIDTH_G-1 downto 0);
+      addr       : slv(ADDR_WIDTH_G-1 downto 0);
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      fifoWr     => '0',
-      fifoDin    => (others => '0'),
+      ramData    => (others => '0'),
       periodSize => (others => '0'),
-      cnt        => (others => '0'));
+      addr       => (others => '0'));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   -- Signal generator
-   signal s_rdEn    : sl;
-   signal s_ramData : slv(DATA_WIDTH_G-1 downto 0);
-   signal s_ramOut  : slv(31 downto 0);
-
-   -- External data AxiStreamFifo
-   signal s_extDataSync : slv(DATA_WIDTH_G-1 downto 0);
-
-
-   signal fifoDout : slv((2*DATA_WIDTH_G)-1 downto 0);
+   signal f_ramData  : slv(15 downto 0);
+   signal s_ramData  : slv(31 downto 0);
+   signal ramDataReg : slv(31 downto 0);
 
 begin
 
-   s_rdEn <= enable_i;
-
-   Jesd32bTo16b_INST : entity work.Jesd32bTo16b
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         wrClk     => devClk_i,
-         wrRst     => devRst_i,
-         validIn   => '1',
-         overflow  => overflow_o,
-         underflow => underflow_o,
-         dataIn    => extData_i,
-         rdClk     => devClk2x_i,
-         rdRst     => devRst2x_i,
-         validOut  => open,
-         dataOut   => s_extDataSync);
-
-   -- Dual port RAM accessible from axiLite
-   -- This is where the signal period is defined in
-   AxiDualPortRam_INST : entity work.AxiDualPortRam
+   U_RAM : entity work.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
          BRAM_EN_G    => true,
@@ -133,59 +90,44 @@ begin
          DATA_WIDTH_G => 16,
          INIT_G       => "0")
       port map (
-         -- Axi clk domain
-         axiClk         => axiClk_i,
-         axiRst         => axiRst_i,
+         -- AXI-Lite Interface
+         axiClk         => axilClk_i,
+         axiRst         => axilRst_i,
          axiReadMaster  => axilReadMaster,
          axiReadSlave   => axilReadSlave,
          axiWriteMaster => axilWriteMaster,
          axiWriteSlave  => axilWriteSlave,
+         -- Signal Generator Interface
+         clk            => devClk2x_i,
+         rst            => devRst2x_i,
+         addr           => r.addr,
+         dout           => f_ramData);
 
-         -- Dev clk domain
-         clk  => devClk2x_i,
-         rst  => devRst2x_i,
-         en   => s_rdEn,
-         addr => r.cnt,
-         dout => s_ramData);
-
-   -- Address counter
-   comb : process (devRst2x_i, enable_i, periodSize_i, r, s_extDataSync,
-                   s_ramData) is
+   comb : process (devRst2x_i, periodSize_i, r) is
       variable v : RegType;
+      variable i : natural;
    begin
       -- Latch the current value
       v := r;
 
-      -- rateDiv clock generator 
-      -- divClk is aligned to trig on rising edge of trig_i. 
-      if (enable_i = '0') or (r.periodSize /= periodSize_i) then
-         v.cnt := (others => '0');
-      elsif (r.cnt = r.periodSize) then
-         v.cnt := (others => '0');
-      else
-         v.cnt := r.cnt + 1;
-      end if;
-
       -- Keep a delayed copy
       v.periodSize := periodSize_i;
 
-      -- Register sample data before outputting
-      -- If signal generator is disabled output external data
-      if (enable_i = '0') then
-         v.fifoDin((2*DATA_WIDTH_G)-1 downto DATA_WIDTH_G) := s_extDataSync;
+      -- Increment the counter
+      if (r.addr = r.periodSize) or (r.periodSize /= periodSize_i) then
+         v.addr := (others => '0');
       else
-         v.fifoDin((2*DATA_WIDTH_G)-1 downto DATA_WIDTH_G) := s_ramData;
+         v.addr := r.addr + 1;
       end if;
-      v.fifoDin(DATA_WIDTH_G-1 downto 0) := r.fifoDin((2*DATA_WIDTH_G)-1 downto DATA_WIDTH_G);
 
-      -- Toggle the write strobe
-      v.fifoWr := not(r.fifoWr);
-
+      -- Synchronous Reset
       if (devRst2x_i = '1') then
          v := REG_INIT_C;
       end if;
 
+      -- Register the variable for next clock cycle
       rin <= v;
+
    end process comb;
 
    seq : process (devClk2x_i) is
@@ -195,21 +137,32 @@ begin
       end if;
    end process seq;
 
-   U_SyncOut : entity work.SynchronizerFifo
+   U_Jesd16bTo32b : entity work.Jesd16bTo32b
       generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => (2*DATA_WIDTH_G))
+         TPD_G => TPD_G)
       port map (
-         wr_clk => devClk2x_i,
-         wr_en  => r.fifoWr,
-         din    => r.fifoDin,
-         rd_clk => devClk_i,
-         dout   => fifoDout);
+         -- 16-bit Write Interface
+         wrClk   => devClk2x_i,
+         wrRst   => devRst2x_i,
+         validIn => '1',
+         dataIn  => f_ramData,
+         -- 32-bit Read Interface
+         rdClk   => devClk_i,
+         rdRst   => devRst_i,
+         dataOut => s_ramData);
+
+   process (devClk_i) is
+   begin
+      if (rising_edge(devClk_i)) then
+         -- Help with timing
+         ramDataReg <= s_ramData after TPD_G;
+      end if;
+   end process;
 
    GEN_VEC :
-   for i in DATA_WIDTH_G-1 downto 0 generate
-      sampleData_o(i)(0) <= fifoDout(i+0);
-      sampleData_o(i)(1) <= fifoDout(i+DATA_WIDTH_G);
+   for i in 15 downto 0 generate
+      sampleData_o(i)(0) <= extData_i(i+0)  when(enable_i = '0') else ramDataReg(i+0);  -- ODDR's D1 port
+      sampleData_o(i)(1) <= extData_i(i+16) when(enable_i = '0') else ramDataReg(i+16);  -- ODDR's D2 port 
    end generate GEN_VEC;
 
 end rtl;

@@ -27,3 +27,4 @@ LvdsSigGenRam: &LvdsSigGenRam
       sizeBits: 16
       mode: RW
       description: "One sample per address [0x3ff:0x0]"
+    #########################################################    
