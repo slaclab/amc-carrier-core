@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierMitMsgRx.vhd
+-- File       : MpsMitMsgRx.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-01-26
 -- Last update: 2017-01-26
@@ -29,11 +29,10 @@ use ieee.std_logic_unsigned.all;
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
-use work.MpsCentralNodePkg.all;
 use work.AppMpsPkg.all;
 
 
-entity AmcCarrierMitMsgRx is
+entity MpsMitMsgRx is
    generic (
       TPD_G  : time  := 1 ns);
    port (
@@ -48,9 +47,9 @@ entity AmcCarrierMitMsgRx is
       mitMessage      : out MpsMitigationMsgType;
       msgError        : out sl
    );
-end AmcCarrierMitMsgRx;
+end MpsMitMsgRx;
 
-architecture rtl of AmcCarrierMitMsgRx is
+architecture rtl of MpsMitMsgRx is
 
    type StateType is (      
       HEADER0_S,
@@ -107,7 +106,7 @@ begin
             -- Check SOF
             if (mpsMaster.tData(15) /= '1'                            or 
                 mpsMaster.tData(7 downto 0) /= x"0E"                  or 
-                ssiGetUserSof(MPS_CONFIG_C,mpsMaster) /= '1'       
+                ssiGetUserSof(MPS_AXIS_CONFIG_C,mpsMaster) /= '1'       
             ) then
                v.intError := '1';
             end if;
@@ -175,7 +174,7 @@ begin
 
                -- Message is done
                elsif mpsMaster.tLast = '1' then
-                  v.msgError  := r.intError or ssiGetUserEofe(MPS_CONFIG_C,mpsMaster);
+                  v.msgError  := r.intError or ssiGetUserEofe(MPS_AXIS_CONFIG_C,mpsMaster);
                   v.mitMessage.strobe := not v.msgError;
                   v.state     := HEADER0_S;
                end if;

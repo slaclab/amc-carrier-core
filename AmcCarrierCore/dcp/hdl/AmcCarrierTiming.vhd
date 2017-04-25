@@ -51,14 +51,14 @@ entity AmcCarrierTiming is
       -- Top Level Interface
       ----------------------      
       -- Timing Interface 
-      recTimingClk         : out sl;
-      recTimingRst         : out sl;
-      appTimingClk         : in  sl;
-      appTimingRst         : in  sl;
-      appTimingBus         : out TimingBusType;
-      appTimingPhy         : in  TimingPhyType;  -- Input for timing generator only
-      appTimingPhyClk      : out sl;
-      appTimingPhyRst      : out sl;
+      recTimingClk     : out sl;
+      recTimingRst     : out sl;
+      appTimingClk     : in  sl;
+      appTimingRst     : in  sl;
+      appTimingBus     : out TimingBusType;
+      appTimingPhy     : in  TimingPhyType;  -- Input for timing generator only
+      appTimingPhyClk  : out sl;
+      appTimingPhyRst  : out sl;
       appTimingRefClk      : out sl;
       appTimingRefClkDiv2  : out sl;
       ----------------
@@ -177,7 +177,7 @@ begin
          CEB   => '0',
          ODIV2 => timingRefClkDiv2,
          O     => timingRefClk);
-         
+
    U_BUFG_GT_DIV2 : BUFG_GT
       port map (
          I       => timingRefClkDiv2,
@@ -310,6 +310,7 @@ begin
    begin
       if rising_edge(appTimingClk) then
          appTimingBus.strobe <= appBus.strobe after TPD_G;  -- Pipeline for register replication during impl_1
+         appTimingBus.valid  <= appBus.valid after TPD_G;   -- Pipeline for register replication during impl_1
       end if;
    end process;
    -- No pipelining: message, V1, and V2 only updated during strobe's HIGH cycle

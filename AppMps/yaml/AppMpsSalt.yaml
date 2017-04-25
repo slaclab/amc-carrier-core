@@ -78,24 +78,6 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 7
       description: See AmcCarrierPkg.vhd for defination
     #########################################################
-    MPS_CHANNELS_C:
-      at:
-        offset: 0x70C
-      class: IntField
-      name: MPS_CHANNELS_C
-      mode: RO
-      sizeBits: 32
-      description: Number of MPS channels
-    MPS_THRESHOLD_C:
-    #########################################################
-      at:
-        offset: 0x710
-      class: IntField
-      name: MPS_THRESHOLD_C
-      mode: RO
-      sizeBits: 32
-      description: Number of MPS Thresholds
-    #########################################################
     MpsPllLocked:
       at:
         offset: 0x714
@@ -105,26 +87,6 @@ AppMpsSalt: &AppMpsSalt
       lsBit: 0
       sizeBits: 1
       description: MPS PLL Lock Status
-    #########################################################
-    MpsEnable:
-      at:
-        offset: 0x800
-      class: IntField
-      name: MpsEnable
-      mode: RW
-      lsBit: 0
-      sizeBits: 1
-      description: MPS Enable Flag
-    #########################################################
-    MpsTestMode:
-      at:
-        offset: 0x804
-      class: IntField
-      name: MpsTestMode
-      mode: RW
-      lsBit: 0
-      sizeBits: 1
-      description: MPS Test Mode Flag
     #########################################################
     RollOverEn:
       at:
@@ -145,4 +107,14 @@ AppMpsSalt: &AppMpsSalt
       lsBit: 0
       sizeBits: 1
       description: Status Counter Reset
+    #########################################################
+    RstCnt:
+      name: RstCnt
+      class: SequenceCommand
+      at:
+        offset: 0x0
+      description: Reset all the status counters
+      sequence:
+      - entry: CntRst
+        value: 0x1      
     #########################################################

@@ -2,7 +2,7 @@
 -- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2016-12-05
+-- Last update: 2017-04-07
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -56,13 +56,14 @@ package AmcCarrierPkg is
    constant APP_BLEN_TYPE_C           : AppType := toSlv(12, AppType'length);
    constant APP_LLRF_TYPE_C           : AppType := toSlv(13, AppType'length);
    constant APP_EXTREF_GEN_TYPE_C     : AppType := toSlv(14, AppType'length);  --Timing Generator with external reference
+
    constant APP_BPM_STRIPLINE_TYPE_C  : AppType := toSlv(100, AppType'length);
    constant APP_BPM_CAVITY_TYPE_C     : AppType := toSlv(101, AppType'length);
-   constant APP_MPS_APP_TYPE_C        : AppType := toSlv(123, AppType'length);  -- MPS Application Node
-   constant APP_MPS_DIGITAL_TYPE_C    : AppType := toSlv(124, AppType'length);  -- MPS Link Node, RTM and AMC digital inputs
-   constant APP_MPS_LINK_AIN_TYPE_C   : AppType := toSlv(125, AppType'length);  -- MPS Link Node, Dual Analog AMC cards
-   constant APP_MPS_LINK_DIN_TYPE_C   : AppType := toSlv(126, AppType'length);  -- MPS Link Node, Dual Digital AMC cards
-   constant APP_MPS_LINK_MIXED_TYPE_C : AppType := toSlv(127, AppType'length);  -- MPS Link Node, Mixed Signal (1x Analog and 1x Digital AMC cards)
+
+   constant APP_MPS_BLM_TYPE_C        : AppType := toSlv(120, AppType'length);
+   constant APP_MPS_GAP_TYPE_C        : AppType := toSlv(121, AppType'length);
+   constant APP_MPS_BEND_TYPE_C       : AppType := toSlv(122, AppType'length);
+   constant APP_MPS_KICK_TYPE_C       : AppType := toSlv(123, AppType'length);
 
    -------------------------------------
    -- Common Platform: General Constants
@@ -91,7 +92,7 @@ package AmcCarrierPkg is
    -- BSA configuration
    -------------------------------------------------------------------------------------------------
    constant BSA_BUFFERS_C            : integer := 64;
-   constant BSA_DIAGNOSTIC_OUTPUTS_C : integer := 28;
+   constant BSA_DIAGNOSTIC_OUTPUTS_C : integer := 31;
    constant BSA_STREAM_BYTE_WIDTH_C  : integer := 8;
    constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data
 
@@ -141,15 +142,21 @@ package AmcCarrierPkg is
    type DiagnosticBusType is record
       strobe        : sl;
       data          : Slv32Array(31 downto 0);
+      sevr          : Slv2Array (31 downto 0); -- (0=NONE, 1=MINOR, 2=MAJOR, 3=INVALID)
+      fixed         : slv       (31 downto 0); -- do not add/average (static)
+      mpsIgnore     : slv       (31 downto 0); -- MPS ignores value
       timingMessage : TimingMessageType;
    end record;
    type DiagnosticBusArray is array (natural range <>) of DiagnosticBusType;
    constant DIAGNOSTIC_BUS_INIT_C : DiagnosticBusType := (
       strobe        => '0',
       data          => (others => (others => '0')),
+      sevr          => (others => (others => '1')),
+      fixed         => (others => '0'),
+      mpsIgnore     => (others => '0'),
       timingMessage => TIMING_MESSAGE_INIT_C);
 
-   constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*32 + TIMING_MESSAGE_BITS_C;
+   constant DIAGNOSTIC_BUS_BITS_C : integer := 1 + 32*36 + TIMING_MESSAGE_BITS_C;
 
    function toSlv (b             : DiagnosticBusType) return slv;
    function toDiagnosticBus (vec : slv) return DiagnosticBusType;
@@ -165,7 +172,10 @@ package body AmcCarrierPkg is
       vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
       i                                        := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
-         assignSlv(i, vector, b.data(j));
+         assignSlv(i, vector, b.data     (j));
+         assignSlv(i, vector, b.sevr     (j));
+         assignSlv(i, vector, b.fixed    (j));
+         assignSlv(i, vector, b.mpsIgnore(j));
       end loop;
       assignSlv(i, vector, b.strobe);
       return vector;
@@ -178,10 +188,13 @@ package body AmcCarrierPkg is
       b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
       i               := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
-         assignRecord(i, vec, b.data(j));
+         assignRecord(i, vec, b.data     (j));
+         assignRecord(i, vec, b.sevr     (j));
+         assignRecord(i, vec, b.fixed    (j));
+         assignRecord(i, vec, b.mpsIgnore(j));
       end loop;
       assignRecord(i, vec, b.strobe);
       return b;
    end function;
-   
+  
 end package body AmcCarrierPkg;

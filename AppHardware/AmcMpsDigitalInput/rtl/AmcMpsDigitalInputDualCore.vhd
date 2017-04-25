@@ -2,7 +2,7 @@
 -- File       : AmcMpsDigitalInputDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-06
--- Last update: 2017-02-06
+-- Last update: 2017-04-17
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_06_CXX
 -------------------------------------------------------------------------------
@@ -28,6 +28,9 @@ entity AmcMpsDigitalInputDualCore is
    port (
       -- MPS Digital Inputs
       amcMpsDin       : out   Slv32Array(1 downto 0);
+      -- MISC. Digital I/O
+      lemoDin         : out   Slv2Array(1 downto 0);
+      lemoDout        : in    Slv2Array(1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl                     := '0';
       axilRst         : in    sl                     := '0';
@@ -83,6 +86,9 @@ begin
          port map(
             -- MPS Digital Inputs
             amcMpsDin       => amcMpsDin(i),
+            -- MISC. Digital I/O
+            lemoDin         => lemoDin(i),
+            lemoDout        => lemoDout(i),
             -- AXI-Lite Interface
             axilClk         => '0',
             axilRst         => '0',

@@ -1,16 +1,10 @@
 -------------------------------------------------------------------------------
 -- File       : AppMpsEncoder.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-04
--- Last update: 2016-05-26
+-- Created    : 2017-04-01
+-- Last update: 2017-04-13
 -------------------------------------------------------------------------------
 -- Description: 
--------------------------------------------------------------------------------
--- Note: Do not forget to configure the ATCA crate to drive the clock from the slot#2 MPS link node
--- For the 7-slot crate:
---    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
--- For the 16-slot crate:
---    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -23,106 +17,221 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+use work.AxiLitePkg.all;
+use work.AppMpsPkg.all;
 use work.AmcCarrierPkg.all;
-use work.TimingPkg.all;
+
+library unisim;
+use unisim.vcomponents.all;
 
 entity AppMpsEncoder is
    generic (
-      TPD_G            : time             := 1 ns;
-      MPS_SLOT_G       : boolean         := false;
-      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));      
+      TPD_G            : time            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
+      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C);
    port (
-      -- Diagnostic Interface (diagnosticClk domain)
-      diagnosticClk   : in  sl;
-      diagnosticRst   : in  sl;
-      diagnosticBus   : in  DiagnosticBusType;   
-      -- AXI-Lite Interface
+      -- Clock & Reset
       axilClk         : in  sl;
       axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
-      -- Configurations 
-      enable          : in  sl;
-      testMode        : in  sl;
-      bsiBus          : in  BsiBusType;
-      -- MPS Interface
+      axilReadMaster  : in  AxiLiteReadMasterType;
+      axilReadSlave   : out AxiLiteReadSlaveType;
       mpsMaster       : out AxiStreamMasterType;
-      mpsSlave        : in  AxiStreamSlaveType);   
+      mpsSlave        : in  AxiStreamSlaveType;
+      -- Inputs
+      diagnosticClk   : in  sl;
+      diagnosticRst   : in  sl;
+      diagnosticBus   : in  DiagnosticBusType);
+
 end AppMpsEncoder;
 
 architecture mapping of AppMpsEncoder is
 
-   signal timeStrb  : sl;
-   signal timeStamp : slv(63 downto 0);
-   signal message   : Slv32Array(31 downto 0);
+   constant APP_CONFIG_C : MpsAppConfigType := getMpsAppConfig(APP_TYPE_G);
+
+   type RegType is record
+      mpsMessage : MpsMessageType;
+   end record;
+
+   constant REG_INIT_C : RegType := (
+      mpsMessage => MPS_MESSAGE_INIT_C);
+
+   signal r   : RegType := REG_INIT_C;
+   signal rin : RegType;
+
+   signal mpsSelect : MpsSelectType;
+
+   procedure compareTholds (thold  : in    MpsChanTholdType;
+                            config : in    MpsChanConfigType;
+                            value  : in    slv;
+                            bitPos : in    integer;
+                            mpsMsg : inout MpsMessageType) is
+
+      variable signedVal : signed(31 downto 0);
+      variable signedMax : signed(31 downto 0);
+      variable signedMin : signed(31 downto 0);
+   begin
+      signedVal := signed(value);
+      signedMin := signed(thold.minThold);
+      signedMax := signed(thold.maxThold);
+
+      if (thold.maxTholdEn = '1' and signedVal > signedMax) or
+         (thold.minTholdEn = '1' and signedVal > signedMin) then
+
+         mpsMsg.message(config.BYTE_MAP_C)(bitPos) := '1';
+
+      end if;
+   end procedure;
+
+   signal mpsReg : MpsAppRegType;
 
 begin
 
-   ------------------------------------ 
-   -- Time Stamp Synchronization Module
-   ------------------------------------ 
-   U_SyncFifo : entity work.SynchronizerFifo
-      generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => 64)
-      port map (
-         -- Asynchronous Reset
-         rst    => diagnosticRst,
-         -- Write Ports (wr_clk domain)
-         wr_clk => diagnosticClk,
-         wr_en  => diagnosticBus.strobe,
-         din    => diagnosticBus.timingMessage.timeStamp,
-         -- Read Ports (rd_clk domain)
-         rd_clk => axilClk,
-         valid  => timeStrb,
-         dout   => timeStamp);
-
    --------------------------------- 
-   -- Message Synchronization Module
+   -- Registers
    --------------------------------- 
-   GEN_VEC :
-   for i in 31 downto 0 generate
-
-      U_SyncFifo : entity work.SynchronizerFifo
-         generic map (
-            TPD_G        => TPD_G,
-            DATA_WIDTH_G => 32)
-         port map (
-            -- Asynchronous Reset
-            rst    => diagnosticRst,
-            -- Write Ports (wr_clk domain)
-            wr_clk => diagnosticClk,
-            wr_en  => diagnosticBus.strobe,
-            din    => diagnosticBus.data(i),
-            -- Read Ports (rd_clk domain)
-            rd_clk => axilClk,
-            dout   => message(i));
-
-   end generate GEN_VEC;
-
-   -- Placeholder for future code
-   mpsMaster <= AXI_STREAM_MASTER_INIT_C;
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+   U_AppMpsReg : entity work.AppMpsReg
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- Don't respond with error
+         APP_TYPE_G       => APP_TYPE_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         APP_CONFIG_G     => APP_CONFIG_C)
       port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMaster,
+         axilReadSlave   => axilReadSlave,
+         axilWriteMaster => axilWriteMaster,
+         axilWriteSlave  => axilWriteSlave,
+         mpsAppRegisters => mpsReg);
+
+   --------------------------------- 
+   -- Pattern decode and threshold select
+   --------------------------------- 
+   U_AppMpsSelect : entity work.AppMpsSelect
+      generic map (
+         TPD_G        => TPD_G,
+         APP_TYPE_G   => APP_TYPE_G,
+         APP_CONFIG_G => APP_CONFIG_C)
+      port map (
+         diagnosticClk => diagnosticClk,
+         diagnosticRst => diagnosticRst,
+         diagnosticBus => diagnosticBus,
+         axilClk       => axilClk,
+         axilRst       => axilRst,
+         mpsReg        => mpsReg,
+         mpsSelect     => mpsSelect);
+
+   --------------------------------- 
+   -- Thresholds
+   --------------------------------- 
+   comb : process (axilRst, mpsReg, mpsSelect, r) is
+      variable v     : RegType;
+      variable chan  : integer;
+      variable thold : integer;
+   begin
+      -- Latch the current value
+      v := r;
+
+      -- Init and setup MPS message
+      v.mpsMessage                   := MPS_MESSAGE_INIT_C;
+      v.mpsMessage.lcls              := mpsReg.lcls1Mode;
+      v.mpsMessage.timeStamp         := mpsSelect.timeStamp;
+      v.mpsMessage.appId(9 downto 0) := mpsReg.mpsAppId;
+      v.mpsMessage.msgSize           := toSlv(APP_CONFIG_C.BYTE_COUNT_C, 8);
+
+      -- Digtal Application
+      if APP_CONFIG_C.DIGITAL_EN_C = true then
+         v.mpsMessage.inputType := '0';
+
+         for i in 0 to APP_CONFIG_C.BYTE_COUNT_C-1 loop
+            v.mpsMessage.message(i) := mpsSelect.digitalBus(i*8+7 downto i*8);
+         end loop;
+
+      -- Analog Process each enabled channel
+      else
+         v.mpsMessage.inputType := '1';
+
+         for chan in 0 to (MPS_CHAN_COUNT_C-1) loop
+
+            -- Threshold is enabled and mps channel is not ignored
+            if APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C > 0 and mpsSelect.mpsIgnore(chan) = '0' then
+
+               -- Channel is marked in error, set all bits
+               if mpsSelect.mpsError(chan) = '1' then
+                  v.mpsMessage.message(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C) := x"FF";
+
+               -- LCLS1 Mode
+               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.lcls1Mode = '1' then
+                  compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold, 
+                                 APP_CONFIG_C.CHAN_CONFIG_C(chan), 
+                                 mpsSelect.chanData(chan), 0, v.mpsMessage);
+
+               -- LCLS2 idle table
+               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsSelect.selectIdle = '1' then
+                  compareTholds (mpsReg.mpsChanReg(chan).idleThold, 
+                                 APP_CONFIG_C.CHAN_CONFIG_C(chan), 
+                                 mpsSelect.chanData(chan), 7, v.mpsMessage);
+
+               -- Multiple thresholds
+               else
+                  for thold in 0 to (APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C-1) loop
+
+                     -- Alternate table
+                     if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
+                        compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold), 
+                                       APP_CONFIG_C.CHAN_CONFIG_C(chan), 
+                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
+
+                     -- Standard table
+                     else
+                        compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold), 
+                                       APP_CONFIG_C.CHAN_CONFIG_C(chan), 
+                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
+                     end if;
+                  end loop;
+               end if;
+            end if;
+         end loop;
+      end if;
+
+      -- Synchronous Reset
+      if (axilRst = '1') then
+         v := REG_INIT_C;
+      end if;
+
+      -- Register the variable for next clock cycle
+      rin <= v;
+
+   end process comb;
+
+   seq : process (axilClk) is
+   begin
+      if (rising_edge(axilClk)) then
+         r <= rin after TPD_G;
+      end if;
+   end process seq;
+
+   --------------------------------- 
+   -- MPS Message Generator
+   --------------------------------- 
+   U_MsgGen : entity work.MpsMsgCore
+      generic map (
+         TPD_G            => TPD_G,
+         SIM_ERROR_HALT_G => false)
+      port map (
+         clk        => axilClk,
+         rst        => axilRst,
+         mpsMessage => r.mpsMessage,
+         mpsMaster  => mpsMaster,
+         mpsSlave   => mpsSlave
+         );
 
 end mapping;
+

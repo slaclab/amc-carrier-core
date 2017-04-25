@@ -80,9 +80,8 @@ end AppMps;
 architecture mapping of AppMps is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
-
-   constant SALT_INDEX_C    : natural := 0;
-   constant ENCODER_INDEX_C : natural := 1;
+   constant SALT_INDEX_C      : natural := 0;
+   constant ENCODER_INDEX_C   : natural := 1;
 
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       SALT_INDEX_C    => (
@@ -107,11 +106,8 @@ architecture mapping of AppMps is
    signal mps625MHzRst : sl;
    signal mpsPllLocked : sl;
 
-   signal mpsTestMode : sl;
-   signal mpsEnable   : sl;
-
-   signal mpsMaster : AxiStreamMasterType;
-   signal mpsSlave  : AxiStreamSlaveType;
+   signal mpsMaster  : AxiStreamMasterType;
+   signal mpsSlave   : AxiStreamSlaveType;
 
 begin
 
@@ -164,35 +160,25 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   ----------------------
-   -- MPS Message Encoder
-   ----------------------
-   U_AppMpsEncoder : entity work.AppMpsEncoder
+   ----------------------------
+   -- Encoder Logic
+   ----------------------------
+   U_AppMpsEncoder: entity work.AppMpsEncoder
       generic map (
-         TPD_G            => TPD_G,
-         MPS_SLOT_G       => MPS_SLOT_G,
-         APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(ENCODER_INDEX_C).baseAddr)
+         TPD_G        => TPD_G,
+         APP_TYPE_G   => APP_TYPE_G)
       port map (
-         -- Diagnostic Interface (diagnosticClk domain)
-         diagnosticClk   => diagnosticClk,
-         diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBus,
-         -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
          axilReadMaster  => axilReadMasters(ENCODER_INDEX_C),
          axilReadSlave   => axilReadSlaves(ENCODER_INDEX_C),
          axilWriteMaster => axilWriteMasters(ENCODER_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(ENCODER_INDEX_C),
-         -- Inbound Message Value
-         enable          => mpsEnable,
-         testMode        => mpsTestMode,
-         bsiBus          => bsiBus,
-         -- MPS Interface
          mpsMaster       => mpsMaster,
-         mpsSlave        => mpsSlave);
+         mpsSlave        => mpsSlave,
+         diagnosticClk   => diagnosticClk,
+         diagnosticRst   => diagnosticRst,
+         diagnosticBus   => diagnosticBus);
 
    ---------------------------------         
    -- MPS Backplane SALT Transceiver
@@ -219,9 +205,6 @@ begin
          axilReadSlave   => axilReadSlaves(SALT_INDEX_C),
          axilWriteMaster => axilWriteMasters(SALT_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(SALT_INDEX_C),
-         -- MPS/BP_MSG configuration/status signals
-         mpsEnable       => mpsEnable,
-         mpsTestMode     => mpsTestMode,
          -- MPS Interface
          mpsIbMaster     => mpsMaster,
          mpsIbSlave      => mpsSlave,
@@ -241,3 +224,4 @@ begin
          mpsTxN          => mpsTxN);
 
 end mapping;
+
