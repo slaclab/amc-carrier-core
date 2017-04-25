@@ -48,6 +48,7 @@ entity AppTop is
       JESD_RX_ROUTES_G     : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
       JESD_TX_ROUTES_G     : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
       JESD_REF_SEL_G       : Slv2Array(1 downto 0)     := (others => DEV_CLK2_SEL_C);
+      JESD_USR_DIV_G       : natural                   := 4;
       -- Signal Generator Generics
       SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 0);
       SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0) := (others => 9);
@@ -177,6 +178,8 @@ architecture mapping of AppTop is
 
    signal jesdClk    : slv(1 downto 0);
    signal jesdRst    : slv(1 downto 0);
+   signal jesdUsrClk : slv(1 downto 0);
+   signal jesdUsrRst : slv(1 downto 0);
    signal jesdClk2x  : slv(1 downto 0);
    signal jesdRst2x  : slv(1 downto 0);
    signal jesdSysRef : slv(1 downto 0);
@@ -358,13 +361,16 @@ begin
             JESD_TX_POLARITY_G => JESD_TX_POLARITY_G(i),
             JESD_RX_ROUTES_G   => JESD_RX_ROUTES_G(i),
             JESD_TX_ROUTES_G   => JESD_TX_ROUTES_G(i),
-            JESD_REF_SEL_G     => JESD_REF_SEL_G(i))
+            JESD_REF_SEL_G     => JESD_REF_SEL_G(i),
+            JESD_USR_DIV_G     => JESD_USR_DIV_G)
          port map (
             -- Clock/reset/SYNC
             jesdClk         => jesdClk(i),
             jesdRst         => jesdRst(i),
             jesdClk2x       => jesdClk2x(i),
             jesdRst2x       => jesdRst2x(i),
+            jesdUsrClk      => jesdUsrClk(i),
+            jesdUsrRst      => jesdUsrRst(i),
             jesdSysRef      => jesdSysRef(i),
             jesdRxSync      => jesdRxSync(i),
             jesdTxSync      => jesdTxSync(i),
@@ -447,13 +453,16 @@ begin
          SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
          SIMULATION_G     => SIMULATION_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         JESD_USR_DIV_G   => JESD_USR_DIV_G)
       port map (
          -- Clocks and resets   
          jesdClk             => jesdClk,
          jesdRst             => jesdRst,
          jesdClk2x           => jesdClk2x,
          jesdRst2x           => jesdRst2x,
+         jesdUsrClk          => jesdUsrClk,
+         jesdUsrRst          => jesdUsrRst,
          -- DaqMux/Trig Interface (timingClk domain) 
          freezeHw            => freezeHw,
          evrTrig             => evrTrig,
