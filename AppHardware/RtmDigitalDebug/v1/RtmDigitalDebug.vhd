@@ -66,8 +66,8 @@ begin
          U_OBUFDS : OBUFDS
             port map (
                I  => dout(i),
-               O  => rtmLsP(i+0),
-               OB => rtmLsN(i+0));
+               O  => rtmLsP(i+16),
+               OB => rtmLsN(i+16));
       end generate;
 
       REG_OUT : if (REG_DOUT_EN_G(i) = '1') generate
@@ -83,8 +83,8 @@ begin
             U_OBUFDS : OBUFDS
                port map (
                   I  => doutReg(i),
-                  O  => rtmLsP(i+0),
-                  OB => rtmLsN(i+0));
+                  O  => rtmLsP(i+16),
+                  OB => rtmLsN(i+16));
          end generate;
 
          REG_CLK : if (REG_DOUT_MODE_G(i) = '1') generate
@@ -94,16 +94,16 @@ begin
                   XIL_DEVICE_G => "ULTRASCALE")
                port map (
                   clkIn   => doutClk(i),
-                  clkOutP => rtmLsP(i+0),
-                  clkOutN => rtmLsN(i+0));
+                  clkOutP => rtmLsP(i+16),
+                  clkOutN => rtmLsN(i+16));
          end generate;
 
       end generate;
 
       U_IBUFDS : IBUFDS
          port map (
-            I  => rtmLsP(i+16),
-            IB => rtmLsN(i+16),
+            I  => rtmLsP(i+0),
+            IB => rtmLsN(i+0),
             O  => din(i));
 
    end generate GEN_VEC;
