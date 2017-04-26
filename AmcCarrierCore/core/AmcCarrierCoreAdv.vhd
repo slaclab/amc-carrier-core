@@ -371,7 +371,7 @@ begin
          -- Timing Interface (timingClk domain) 
          timingClk            => timingClk,
          timingRst            => timingRst,
-         timingBus            => timingBusIntf,
+         timingBusIntf        => timingBusIntf,
          timingPhy            => timingPhy,
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,
