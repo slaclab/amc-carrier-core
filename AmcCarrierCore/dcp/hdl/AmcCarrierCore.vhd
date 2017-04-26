@@ -46,7 +46,7 @@ entity AmcCarrierCore is
       -- Timing Interface (timingClk domain) 
       timingClk            : in    sl;
       timingRst            : in    sl;
-      timingBus            : out   TimingBusType;
+      timingBusIntf        : out   TimingBusType;
       timingPhy            : in    TimingPhyType;
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
@@ -351,7 +351,7 @@ begin
          recTimingRst     => recTimingRst,
          appTimingClk     => timingClk,
          appTimingRst     => timingRst,
-         appTimingBus     => timingBus,
+         appTimingBus     => timingBusIntf,
          appTimingPhy     => timingPhy,
          appTimingPhyClk  => timingPhyClk,
          appTimingPhyRst  => timingPhyRst,
