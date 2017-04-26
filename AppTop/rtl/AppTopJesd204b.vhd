@@ -340,7 +340,12 @@ begin
    end generate RX_LANES_GEN;
 
    s_gtResetAll <= s_gtTxReset or s_gtRxReset;
-   dummyZeroBit <= devRst_i and s_txDone and s_rxDone;
+   process(devClk_i)
+   begin
+      if rising_edge(devClk_i) then
+         dummyZeroBit <= (devRst_i and s_txDone and s_rxDone) after TPD_G;
+      end if;
+   end process;
 
    U_Coregen : AppTopJesd204bCoregen
       port map (

@@ -15,7 +15,9 @@ LvdsSigGen: &LvdsSigGen
   configPrio: 1
   description: LvdsSigGen Module
   size: 0x100
+  #########
   children:
+    #########################################################
     Enable:
       at:
         offset: 0x000
@@ -25,8 +27,8 @@ LvdsSigGen: &LvdsSigGen
       lsBit: 0
       mode: RW
       description: Enable generation of waveform
-    PolarityMask:
     #########################################################
+    PolarityMask:
       at:
         offset: 0x004
       class: IntField
@@ -35,19 +37,19 @@ LvdsSigGen: &LvdsSigGen
       mode: RW
       description: 'Polarity of the corresponding LVDS output [15:0]: ''0'' Regular,
         ''1'' Inverted'
-    PeriodSize:
     #########################################################
+    PeriodSize:
       at:
         offset: 0x008
       class: IntField
       name: PeriodSize
-      sizeBits: 16
+      sizeBits: 10
       mode: RW
       description: 'Size of a generated signal period buffer. In number of RAM addresses
         (Zero inclusive). Example: For the signal period of 16 samples write register
         value ''0xf''. Note: Period changes allowed only when disabled'
-    LoadTap:
     #########################################################    
+    LoadTap:
       at:
         offset: 0x00C
       class: IntField
@@ -55,8 +57,8 @@ LvdsSigGen: &LvdsSigGen
       sizeBits: 16
       mode: RW
       description: Load TAP delays from registers tapDelayIn_o [15:0]
-    LvdsTapSet:
     #########################################################    
+    LvdsTapSet:
       at:
         offset: 0x040
         stride: 4
@@ -78,19 +80,3 @@ LvdsSigGen: &LvdsSigGen
       mode: RO
       description: Get 9-bit LVDS tap delay (16x) [0x2f:0x20]
     #########################################################    
-    FifoUnreflowCnt:
-      at:
-        offset: 0x0C0
-      class: IntField
-      name: FifoUnreflowCnt
-      mode: RO
-      description: "32 to 16 core Async Fifo underflow"
-    ######################################################### 
-    FifoOverflowCnt:
-      at:
-        offset: 0x0C4
-      class: IntField
-      name: FifoOverflowCnt
-      mode: RO
-      description: "32 to 16 core Async Fifo overflow"
-    ######################################################### 

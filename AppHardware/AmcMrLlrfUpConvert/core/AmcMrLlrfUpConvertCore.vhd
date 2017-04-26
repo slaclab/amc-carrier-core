@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfUpConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-07
--- Last update: 2017-04-04
+-- Last update: 2017-04-19
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ architecture mapping of AmcMrLlrfUpConvertCore is
    signal attMuxSClk  : sl;
    signal attMuxSDout : sl;
 
-   signal s_dacData    : slv(15 downto 0);
+   signal s_dacData    : Slv2Array(15 downto 0);
    signal s_dacDataDly : slv(15 downto 0);
 
    signal s_load         : slv(15 downto 0);
@@ -364,35 +364,34 @@ begin
    --attLatchEn_o   <= attCsbVec;
    attLatchEn_o <= attLEnVec;
 
-   ---------------------------------------------------------
-   -- LVDS DAC Signal generator one channel
-   -- Clock domain jesdClk2x (~370MHz)
-   ---------------------------------------------------------
+   ----------------------------
+   -- LVDS DAC Signal generator
+   ----------------------------
    U_DAC_SIG_GEN : entity work.LvdsDacSigGen
       generic map (
          TPD_G            => TPD_G,
          AXI_BASE_ADDR_G  => AXI_CONFIG_C(SIG_GEN_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         DATA_WIDTH_G     => 16)
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
-         -- Clocks and Resets
-         axiClk          => axilClk,
-         axiRst          => axilRst,
+         -- devClk2x Reference
          devClk2x_i      => jesdClk2x,
          devRst2x_i      => jesdRst2x,
-         -- DAC Interface (devClk_i domain)
-         devClk_i        => jesdClk,
-         devRst_i        => jesdRst,
-         extData_i       => dacValues,
-         -- AXI-Lite Interface
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
          axilReadMaster  => axilReadMasters(SIG_GEN_INDEX_C),
          axilReadSlave   => axilReadSlaves(SIG_GEN_INDEX_C),
          axilWriteMaster => axilWriteMasters(SIG_GEN_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(SIG_GEN_INDEX_C),
-         -- Delay control
+         -- DAC Interface (devClk_i domain)
+         devClk_i        => jesdClk,
+         devRst_i        => jesdRst,
+         extData_i       => dacValues,
+         -- Delay control (devClk_i domain)
          load_o          => s_load,
          tapDelaySet_o   => s_tapDelaySet,
          tapDelayStat_i  => s_tapDelayStat,
+         -- Sample data output (devClk_i domain)
          sampleData_o    => s_dacData);
 
    GEN_DLY_OUT :
@@ -401,9 +400,9 @@ begin
          generic map (
             TPD_G              => TPD_G,
             IODELAY_GROUP_G    => IODELAY_GROUP_G,
-            REFCLK_FREQUENCY_G => 370.0)  -- IDELAYCTRL uses jesdClk2x
+            REFCLK_FREQUENCY_G => 370.0)  -- external IDELAYCTRL uses jesdClk2x@370MHz
          port map (
-            clk_i    => jesdClk,          -- DDR clock (using both edges)
+            clk_i    => jesdClk,
             rst_i    => jesdRst,
             load_i   => s_load(i),
             tapSet_i => s_tapDelaySet(i),

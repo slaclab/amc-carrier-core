@@ -43,7 +43,8 @@ entity AppTopJesd is
       JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000";
       JESD_RX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;
       JESD_TX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;
-      JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C);
+      JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C;
+      JESD_USR_DIV_G     : natural              := 4);
    port (
       -- Clock/reset/SYNC
       jesdClk         : out sl;
@@ -53,6 +54,8 @@ entity AppTopJesd is
       jesdSysRef      : in  sl;
       jesdRxSync      : out sl;
       jesdTxSync      : in  sl;
+      jesdUsrClk      : out sl;
+      jesdUsrRst      : out sl;
       -- ADC Interface
       adcValids       : out slv(6 downto 0);
       adcValues       : out sampleDataArray(6 downto 0);
@@ -206,7 +209,7 @@ begin
          TYPE_G             => "MMCM",
          INPUT_BUFG_G       => false,
          FB_BUFG_G          => true,
-         NUM_CLOCKS_G       => 2,
+         NUM_CLOCKS_G       => 3,
          BANDWIDTH_G        => "OPTIMIZED",
          CLKIN_PERIOD_G     => 5.405,
          DIVCLK_DIVIDE_G    => 1,
@@ -214,14 +217,18 @@ begin
          CLKOUT0_DIVIDE_F_G => 6.000,
          CLKOUT0_RST_HOLD_G => 16,
          CLKOUT1_DIVIDE_G   => 3,
-         CLKOUT1_RST_HOLD_G => 32)
+         CLKOUT1_RST_HOLD_G => 32,
+         CLKOUT2_DIVIDE_G   => JESD_USR_DIV_G*3,
+         CLKOUT2_RST_HOLD_G => 32)
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
          clkOut(0)       => jesdClk185,
          clkOut(1)       => jesdClk2x,
+         clkOut(2)       => jesdUsrClk,
          rstOut(0)       => jesdRst185,
          rstOut(1)       => jesdRst2x,
+         rstOut(2)       => jesdUsrRst,
          locked          => jesdMmcmLocked,
          -- AXI-Lite Interface 
          axilClk         => axilClk,

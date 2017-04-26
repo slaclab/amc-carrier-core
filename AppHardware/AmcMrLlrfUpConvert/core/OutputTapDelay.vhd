@@ -44,7 +44,7 @@ entity OutputTapDelay is
       tapSet_i : in  slv(8 downto 0);
       tapGet_o : out slv(8 downto 0);   -- Tap status
       --
-      data_i   : in  sl;
+      data_i   : in  slv(1 downto 0);
       data_o   : out sl);
 end OutputTapDelay;
 
@@ -67,8 +67,8 @@ begin
       port map (
          Q  => dataReg,                 -- 1-bit output: Data output to IOB
          C  => clk_i,                   -- 1-bit input: High-speed clock input
-         D1 => data_i,                  -- 1-bit input: Parallel data input 1
-         D2 => data_i,                  -- 1-bit input: Parallel data input 2
+         D1 => data_i(0),               -- 1-bit input: Parallel data input 1
+         D2 => data_i(1),               -- 1-bit input: Parallel data input 2
          SR => rst_i);                  -- 1-bit input: Active High Async Reset
 
    -- ODELAYE3 module
