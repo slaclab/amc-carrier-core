@@ -1,4 +1,4 @@
-# Load RUCKUS environment and library - test
+# Load RUCKUS environment and library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 ## Check for version 2016.4 of Vivado
