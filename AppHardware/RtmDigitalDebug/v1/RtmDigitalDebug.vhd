@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebug.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-04-04
+-- Last update: 2017-04-27
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -34,6 +34,7 @@ entity RtmDigitalDebug is
       -- Digital I/O Interface
       dout            : in    slv(15 downto 0);
       doutClk         : in    slv(15 downto 0)       := x"0000";
+      doutDisable     : in    slv(15 downto 0)       := x"0000";
       din             : out   slv(15 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl                     := '0';
@@ -55,7 +56,8 @@ end RtmDigitalDebug;
 
 architecture mapping of RtmDigitalDebug is
 
-   signal doutReg : slv(15 downto 0);
+   signal doutReg  : slv(15 downto 0);
+   signal doutComb : slv(15 downto 0);
 
 begin
 
@@ -63,11 +65,15 @@ begin
    for i in 15 downto 0 generate
 
       NON_REG : if (REG_DOUT_EN_G(i) = '0') generate
+
+         doutComb(i) <= dout(i) and not(doutDisable(i));
+
          U_OBUFDS : OBUFDS
             port map (
-               I  => dout(i),
+               I  => doutComb(i),
                O  => rtmLsP(i+16),
                OB => rtmLsN(i+16));
+
       end generate;
 
       REG_OUT : if (REG_DOUT_EN_G(i) = '1') generate
@@ -79,7 +85,7 @@ begin
                   Q  => doutReg(i),
                   D1 => dout(i),
                   D2 => dout(i),
-                  SR => '0');
+                  SR => doutDisable(i));
             U_OBUFDS : OBUFDS
                port map (
                   I  => doutReg(i),
@@ -90,9 +96,11 @@ begin
          REG_CLK : if (REG_DOUT_MODE_G(i) = '1') generate
             U_CLK : entity work.ClkOutBufDiff
                generic map (
-                  TPD_G        => TPD_G,
-                  XIL_DEVICE_G => "ULTRASCALE")
+                  TPD_G          => TPD_G,
+                  RST_POLARITY_G => '1',
+                  XIL_DEVICE_G   => "ULTRASCALE")
                port map (
+                  rstIn   => doutDisable(i),
                   clkIn   => doutClk(i),
                   clkOutP => rtmLsP(i+16),
                   clkOutN => rtmLsN(i+16));
