@@ -48,6 +48,9 @@ entity AmcMrLlrfDownConvertCore is
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- Spare LMK Clock References
+      lmkDclk10       : out   sl;
+      lmkDclk12       : out   sl;
       -----------------------
       -- Application Ports --
       -----------------------      
@@ -252,7 +255,23 @@ begin
    spareN(12) <= dacCsL_o(0);
    spareP(12) <= dacCsL_o(1);
    spareN(13) <= dacCsL_o(2);
-
+   
+   U_lmkDclk10 : IBUFDS
+      generic map (
+         DIFF_TERM => true)
+      port map (
+         I  => syncInP(2),
+         IB => syncInN(2),
+         O  => lmkDclk10);     
+   
+   U_lmkDclk12 : IBUFDS
+      generic map (
+         DIFF_TERM => true)
+      port map (
+         I  => fpgaClkP(0),
+         IB => fpgaClkN(0),
+         O  => lmkDclk12); 
+         
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
