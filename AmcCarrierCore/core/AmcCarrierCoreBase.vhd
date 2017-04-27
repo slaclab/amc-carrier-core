@@ -861,6 +861,7 @@ begin
          BUILD_INFO_G     => BUILD_INFO_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          APP_TYPE_G       => APP_TYPE_G,
+         MPS_SLOT_G       => MPS_SLOT_G,
          FSBL_G           => false)
       port map (
          -- Primary AXI-Lite Interface
