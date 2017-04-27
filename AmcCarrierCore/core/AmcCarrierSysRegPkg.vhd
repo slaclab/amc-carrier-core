@@ -2,7 +2,7 @@
 -- File       : AmcCarrierSysRegPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2017-03-28
+-- Last update: 2017-04-26
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -65,30 +65,20 @@ package AmcCarrierSysRegPkg is
       1 => "01",   -- OUT[1] = IN[2], FPGA  = FPGA (loopback)
       0 => "00");  -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)
 
-   function xbarDefault(app : AppType; sel : boolean) return Slv2Array;
+   function xbarDefault(app : AppType; mpsLinkNode : boolean) return Slv2Array;
 
 end package AmcCarrierSysRegPkg;
 
 package body AmcCarrierSysRegPkg is
 
-   function xbarDefault (app : AppType; sel : boolean) return Slv2Array is
+   function xbarDefault (app : AppType; mpsLinkNode : boolean) return Slv2Array is
       variable retVar : Slv2Array(3 downto 0);
    begin
-      -- Check for Timing Generator Node
       if (app = APP_TIME_GEN_TYPE_C) then
          retVar := XBAR_TIME_GEN_C;
-      -- Check for MPS Link Node
-      -- elsif (app = APP_MPS_LINK_AIN_TYPE_C) or (app = APP_MPS_LINK_DIN_TYPE_C) or (app = APP_MPS_LINK_MIXED_TYPE_C) then
-      --   retVar := XBAR_TIME_GEN_C;
-      -- -- Check for LCLS-I timing
-      -- if (sel = TIMING_MODE_119MHZ_C) then
-      -- retVar := XBAR_MPS_I_LINK_C;
-      -- -- Check for LCLS-II timing
-      -- else
-      -- retVar := XBAR_MPS_II_LINK_C;
-      -- end if;
+      elsif (mpsLinkNode = true) then
+         retVar := XBAR_MPS_II_LINK_C;
       else
-         -- Else Application Node
          retVar := XBAR_APP_NODE_C;
       end if;
       return retVar;
