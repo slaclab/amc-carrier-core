@@ -37,7 +37,7 @@ entity AmcCarrierSysReg is
       BUILD_INFO_G     : BuildInfoType;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
-      TIMING_MODE_G    : boolean         := false;  -- false = Normal Operation, = LCLS-I timing only
+      MPS_SLOT_G       : boolean         := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
       FSBL_G           : boolean         := false);
    port (
       -- Primary AXI-Lite Interface
@@ -395,7 +395,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, TIMING_MODE_G),
+         XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, MPS_SLOT_G),
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
          -- XBAR Ports
