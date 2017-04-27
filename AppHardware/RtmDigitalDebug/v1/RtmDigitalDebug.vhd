@@ -34,7 +34,6 @@ entity RtmDigitalDebug is
       -- Digital I/O Interface
       dout            : in    slv(15 downto 0);
       doutClk         : in    slv(15 downto 0)       := x"0000";
-      doutDisable     : in    slv(15 downto 0)       := x"0000";
       din             : out   slv(15 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl                     := '0';
@@ -56,6 +55,20 @@ end RtmDigitalDebug;
 
 architecture mapping of RtmDigitalDebug is
 
+   type RegType is record
+      doutDisable    : slv(15 downto 0);
+      axilReadSlave  : AxiLiteReadSlaveType;
+      axilWriteSlave : AxiLiteWriteSlaveType;
+   end record RegType;
+
+   constant REG_INIT_C : RegType := (
+      doutDisable    => x"0000",
+      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
+
+   signal r   : RegType := REG_INIT_C;
+   signal rin : RegType;
+
    signal doutReg  : slv(15 downto 0);
    signal doutComb : slv(15 downto 0);
 
@@ -66,7 +79,7 @@ begin
 
       NON_REG : if (REG_DOUT_EN_G(i) = '0') generate
 
-         doutComb(i) <= dout(i) and not(doutDisable(i));
+         doutComb(i) <= dout(i) and not(r.doutDisable(i));
 
          U_OBUFDS : OBUFDS
             port map (
@@ -85,7 +98,7 @@ begin
                   Q  => doutReg(i),
                   D1 => dout(i),
                   D2 => dout(i),
-                  SR => doutDisable(i));
+                  SR => r.doutDisable(i));
             U_OBUFDS : OBUFDS
                port map (
                   I  => doutReg(i),
@@ -100,7 +113,7 @@ begin
                   RST_POLARITY_G => '1',
                   XIL_DEVICE_G   => "ULTRASCALE")
                port map (
-                  rstIn   => doutDisable(i),
+                  rstIn   => r.doutDisable(i),
                   clkIn   => doutClk(i),
                   clkOutP => rtmLsP(i+16),
                   clkOutN => rtmLsN(i+16));
@@ -116,16 +129,42 @@ begin
 
    end generate GEN_VEC;
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, r) is
+      variable v      : RegType;
+      variable axilEp : AxiLiteEndPointType;
+   begin
+      -- Latch the current value
+      v := r;
+
+      -- Determine the transaction type
+      axiSlaveWaitTxn(axilEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
+
+      -- Map the read registers 
+      axiSlaveRegister(axilEp, x"0", 0, v.doutDisable);
+
+      -- Closeout the transaction
+      axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+
+      -- Synchronous Reset
+      if (axilRst = '1') then
+         v := REG_INIT_C;
+      end if;
+
+      -- Register the variable for next clock cycle
+      rin <= v;
+
+      -- Outputs
+      axilReadSlave  <= r.axilReadSlave;
+      axilWriteSlave <= r.axilWriteSlave;
+
+   end process comb;
+
+   seq : process (axilClk) is
+   begin
+      if (rising_edge(axilClk)) then
+         r <= rin after TPD_G;
+      end if;
+   end process seq;
 
 end mapping;
