@@ -144,15 +144,15 @@ AmcCarrierCore: &AmcCarrierCore
         offset: 0x0A000000
         nelms: 1
         stride: 8
-      description: "ClientConfig[1:0]"
+      description: "ClientConfig"
     ##################################################
     UdpEngineServer:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000800
-        nelms: 4
+        nelms: 1
         stride: 8
-      description: "ServerConfig[4:0]"      
+      description: "ServerConfig"      
     ##################################################
     RssiServerSw:
       <<: *RssiCore
