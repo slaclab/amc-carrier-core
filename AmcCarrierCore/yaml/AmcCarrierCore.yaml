@@ -138,25 +138,33 @@ AmcCarrierCore: &AmcCarrierCore
       at:
         offset: 0x09000000    
     ##################################################
-    BpClientConfig:
+    BpUdpClient:
       <<: *UdpEngineClient
       at:
         offset: 0x0A000000
-      description: "BpClientConfig"
+      description: "BpUdpClient"
     ##################################################
-    BpServerStatus:
+    BpUdpServer:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000818
-      description: "BpServerStatus"      
+      description: "BpUdpServer" 
     ##################################################
-    RssiServerSw:
+    SwUdpServer:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x0A000808
+        nelms: 2
+        stride: 8         
+      description: "SwUdpServer"       
+    ##################################################
+    SwRssiServer:
       <<: *RssiCore
       at:
         offset: 0x0A010000 
         nelms: 2
         stride: 0x1000   
-      description: Server RSSI Software
+      description: SwRssiServer
     ##################################################
     AxiMemTester:
       <<: *AxiMemTester
