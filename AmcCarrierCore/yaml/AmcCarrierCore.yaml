@@ -138,21 +138,17 @@ AmcCarrierCore: &AmcCarrierCore
       at:
         offset: 0x09000000    
     ##################################################
-    UdpEngineClient:
+    BpClientConfig:
       <<: *UdpEngineClient
       at:
         offset: 0x0A000000
-        nelms: 1
-        stride: 8
-      description: "ClientConfig"
+      description: "BpClientConfig"
     ##################################################
-    UdpEngineServer:
+    BpServerStatus:
       <<: *UdpEngineServer
       at:
-        offset: 0x0A000800
-        nelms: 1
-        stride: 8
-      description: "ServerConfig"      
+        offset: 0x0A000818
+      description: "BpServerStatus"      
     ##################################################
     RssiServerSw:
       <<: *RssiCore
