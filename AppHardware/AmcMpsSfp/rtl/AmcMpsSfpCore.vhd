@@ -183,7 +183,7 @@ begin
 
    end generate;
 
-   BYP_HSR : if (EN_PLL_G = false) generate
+   BYP_HSR : if (EN_HS_REPEATER_G = false) generate
 
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
          generic map (
@@ -199,7 +199,7 @@ begin
 
    end generate;
 
-   GEN_HSR : if (EN_PLL_G = true) generate
+   GEN_HSR : if (EN_HS_REPEATER_G = true) generate
 
       pllLos <= syncInP(0);
       pllLol <= syncInP(1);
