@@ -38,12 +38,13 @@ entity Si5317a is
       pllRstL         : out   sl;
       pllInc          : out   sl;
       pllDec          : out   sl;
-      pllDbl2By       : inout sl;
+      pllBypass       : inout sl;
       pllFrqTbl       : inout sl;
       pllRate         : inout slv(1 downto 0);
       pllSFout        : inout slv(1 downto 0);
       pllBwSel        : inout slv(1 downto 0);
       pllFrqSel       : inout slv(3 downto 0);
+      pllLocked       : out   sl;
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -59,8 +60,8 @@ architecture rtl of Si5317a is
       pllRst         : sl;
       pllInc         : sl;
       pllDec         : sl;
-      pllDbl2By      : sl;
-      pllDbl2ByTri   : sl;
+      pllBypass      : sl;
+      pllBypassTri   : sl;
       pllFrqTbl      : sl;
       pllFrqTblTri   : sl;
       pllRate        : slv(1 downto 0);
@@ -80,8 +81,8 @@ architecture rtl of Si5317a is
       pllInc         => '0',
       pllDec         => '0',
       -- Default: DBL2_BY  : M = CKOUT2 disabled  (See Table 14 of datasheet)
-      pllDbl2By      => '1',
-      pllDbl2ByTri   => '1',
+      pllBypass      => '1',
+      pllBypassTri   => '1',
       -- Default: FrqTbl   : M (See Table 8 of datasheet)
       pllFrqTbl      => '1',
       pllFrqTblTri   => '1',
@@ -104,16 +105,34 @@ architecture rtl of Si5317a is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   attribute dont_touch      : string;
-   attribute dont_touch of r : signal is "TRUE";
+   signal los    : sl;
+   signal lol    : sl;
+   signal locked : sl;
+
+   -- attribute dont_touch      : string;
+   -- attribute dont_touch of r : signal is "TRUE";
 
 begin
 
-   U_pllDbl2By : OBUFT
+   pllLocked <= locked;
+   locked    <= not(los) and not(lol);
+
+   U_SyncInVec : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
       port map (
-         O => pllDbl2By,
-         I => r.pllDbl2By,
-         T => r.pllDbl2ByTri);
+         clk        => axilClk,
+         dataIn(0)  => pllLos,
+         dataIn(1)  => pllLol,
+         dataOut(0) => los,
+         dataOut(1) => lol);
+
+   U_pllBypass : OBUFT
+      port map (
+         O => pllBypass,
+         I => r.pllBypass,
+         T => r.pllBypassTri);
 
    U_pllFrqTbl : OBUFT
       port map (
@@ -155,7 +174,8 @@ begin
 
    end generate GEN_4B;
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, pllLol, pllLos, r) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, locked, lol, los,
+                   r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
@@ -169,10 +189,11 @@ begin
       axiSlaveRegister(regCon, x"0", 0, v.pllRst);         -- BIT[00:00]
       axiSlaveRegister(regCon, x"0", 1, v.pllInc);         -- BIT[01:01]
       axiSlaveRegister(regCon, x"0", 2, v.pllDec);         -- BIT[02:02]
-      axiSlaveRegisterR(regCon, x"0", 3, pllLos);          -- BIT[03:03]
-      axiSlaveRegisterR(regCon, x"0", 4, pllLol);          -- BIT[04:04]
-      axiSlaveRegister(regCon, x"0", 8, v.pllDbl2By);      -- BIT[08:08]
-      axiSlaveRegister(regCon, x"0", 9, v.pllDbl2ByTri);   -- BIT[09:09]
+      axiSlaveRegisterR(regCon, x"0", 3, los);             -- BIT[03:03]
+      axiSlaveRegisterR(regCon, x"0", 4, lol);             -- BIT[04:04]
+      axiSlaveRegisterR(regCon, x"0", 4, locked);          -- BIT[05:05]
+      axiSlaveRegister(regCon, x"0", 8, v.pllBypass);      -- BIT[08:08]
+      axiSlaveRegister(regCon, x"0", 9, v.pllBypassTri);   -- BIT[09:09]
       axiSlaveRegister(regCon, x"0", 10, v.pllFrqTbl);     -- BIT[10:10]
       axiSlaveRegister(regCon, x"0", 11, v.pllFrqTblTri);  -- BIT[11:11]
       axiSlaveRegister(regCon, x"0", 12, v.pllRate);       -- BIT[13:12]

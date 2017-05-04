@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebug.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-04-04
+-- Last update: 2017-05-04
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -26,15 +26,21 @@ use unisim.vcomponents.all;
 
 entity RtmDigitalDebug is
    generic (
-      TPD_G            : time             := 1 ns;
-      REG_DOUT_EN_G    : slv(15 downto 0) := x"0000";  -- '1' = registered, '0' = unregistered
-      REG_DOUT_MODE_G  : slv(15 downto 0) := x"0000";  -- If registered enabled, '1' = clk output, '0' = data output
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C);
+      TPD_G            : time            := 1 ns;
+      REG_DOUT_EN_G    : slv(7 downto 0) := x"00";  -- '1' = registered, '0' = unregistered
+      REG_DOUT_MODE_G  : slv(7 downto 0) := x"00";  -- If registered enabled, '1' = clk output, '0' = data output
+      DEFAULT_MODE_G   : boolean         := true;  -- true = 185 MHz clock, false = 119 MHz clock
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Digital I/O Interface
-      dout            : in    slv(15 downto 0);
-      doutClk         : in    slv(15 downto 0)       := x"0000";
-      din             : out   slv(15 downto 0);
+      dout            : in    slv(7 downto 0);
+      doutClk         : in    slv(7 downto 0)        := x"00";
+      doutDisable     : in    slv(7 downto 0)        := x"00";
+      din             : out   slv(7 downto 0);
+      -- Clock Jitter Cleaner
+      dirtyClkIn      : in    sl;
+      cleanClkOut     : out   sl;
+      cleanClkLocked  : out   sl;
       -- AXI-Lite Interface
       axilClk         : in    sl                     := '0';
       axilRst         : in    sl                     := '0';
@@ -55,18 +61,60 @@ end RtmDigitalDebug;
 
 architecture mapping of RtmDigitalDebug is
 
-   signal doutReg : slv(15 downto 0);
+   signal doutReg  : slv(7 downto 0);
+   signal cleanClk : sl;
 
 begin
 
+   U_DIN0 : IBUF
+      port map (
+         I => rtmLsP(2),
+         O => din(0));
+
+   U_DIN1 : IBUF
+      port map (
+         I => rtmLsN(2),
+         O => din(1));
+
+   U_DIN2 : IBUF
+      port map (
+         I => rtmLsP(3),
+         O => din(2));
+
+   U_DIN3 : IBUF
+      port map (
+         I => rtmLsN(3),
+         O => din(3));
+
+   U_DIN4 : IBUF
+      port map (
+         I => rtmLsP(4),
+         O => din(4));
+
+   U_DIN5 : IBUF
+      port map (
+         I => rtmLsN(4),
+         O => din(5));
+
+   U_DIN6 : IBUF
+      port map (
+         I => rtmLsP(5),
+         O => din(6));
+
+   U_DIN7 : IBUF
+      port map (
+         I => rtmLsN(5),
+         O => din(7));
+
    GEN_VEC :
-   for i in 15 downto 0 generate
+   for i in 7 downto 0 generate
 
       NON_REG : if (REG_DOUT_EN_G(i) = '0') generate
-         U_OBUF : OBUF
+         U_OBUFDS : OBUFDS
             port map (
-               I => dout(i),
-               O => rtmLsN(i));
+               I  => dout(i),
+               O  => rtmLsP(i+8),
+               OB => rtmLsN(i+8));
       end generate;
 
       REG_OUT : if (REG_DOUT_EN_G(i) = '1') generate
@@ -78,42 +126,81 @@ begin
                   Q  => doutReg(i),
                   D1 => dout(i),
                   D2 => dout(i),
-                  SR => '0');
-            U_OBUF : OBUF
+                  SR => doutDisable(i));
+            U_OBUFDS : OBUFDS
                port map (
-                  I => doutReg(i),
-                  O => rtmLsN(i));
+                  I  => doutReg(i),
+                  O  => rtmLsP(i+8),
+                  OB => rtmLsN(i+8));
          end generate;
 
          REG_CLK : if (REG_DOUT_MODE_G(i) = '1') generate
-            U_CLK : entity work.ClkOutBufSingle
+            U_CLK : entity work.ClkOutBufDiff
                generic map (
-                  TPD_G        => TPD_G,
-                  XIL_DEVICE_G => "ULTRASCALE")
+                  TPD_G          => TPD_G,
+                  RST_POLARITY_G => '1',
+                  XIL_DEVICE_G   => "ULTRASCALE")
                port map (
-                  clkIn  => doutClk(i),
-                  clkOut => rtmLsN(i));
+                  rstIn   => doutDisable(i),
+                  clkIn   => doutClk(i),
+                  clkOutP => rtmLsP(i+8),
+                  clkOutN => rtmLsN(i+8));
          end generate;
 
       end generate;
 
-      U_IBUF : IBUF
-         port map (
-            I => rtmLsP(i),
-            O => din(i));
-
    end generate GEN_VEC;
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+   U_CLK : entity work.ClkOutBufDiff
+      generic map (
+         TPD_G        => TPD_G,
+         XIL_DEVICE_G => "ULTRASCALE")
+      port map (
+         clkIn   => dirtyClkIn,
+         clkOutP => rtmLsP(0),
+         clkOutN => rtmLsN(0));
+
+   U_IBUFDS : IBUFDS
+      port map (
+         I  => rtmLsP(1),
+         IB => rtmLsN(1),
+         O  => cleanClk);
+
+   U_BUFG : BUFG
+      port map (
+         I => cleanClk,
+         O => cleanClkOut);
+
+   U_Si5317a : entity work.Si5317a
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+      port map(
+         -- PLL Parallel Interface
+         pllLol          => rtmLsP(18),
+         pllLos          => rtmLsN(18),
+         pllRstL         => rtmLsP(19),
+         pllInc          => open,
+         pllDec          => open,
+         pllFrqTbl       => open,
+         pllBypass       => open,
+         pllRate(0)      => open,
+         pllRate(1)      => open,
+         pllSFout(0)     => open,
+         pllSFout(1)     => open,
+         pllBwSel(0)     => rtmLsP(7),
+         pllBwSel(1)     => rtmLsN(7),
+         pllFrqSel(0)    => rtmLsP(16),
+         pllFrqSel(1)    => rtmLsN(16),
+         pllFrqSel(2)    => rtmLsP(17),
+         pllFrqSel(3)    => rtmLsN(17),
+         pllLocked       => cleanClkLocked,
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMaster,
+         axilReadSlave   => axilReadSlave,
+         axilWriteMaster => axilWriteMaster,
+         axilWriteSlave  => axilWriteSlave);
 
 end mapping;
