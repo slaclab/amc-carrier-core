@@ -2,7 +2,7 @@
 -- File       : AmcMpsSfpCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-28
--- Last update: 2017-02-28
+-- Last update: 2017-05-01
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_09_C00
 -------------------------------------------------------------------------------
@@ -92,6 +92,9 @@ architecture mapping of AmcMpsSfpCore is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
+   signal los : sl;
+   signal lol : sl;
+   
 begin
 
    --------------------
@@ -149,20 +152,25 @@ begin
 
    GEN_PLL : if (EN_PLL_G = true) generate
 
-      pllLos <= syncInP(0);
-      pllLol <= syncInP(1);
+      lol <= syncInP(0);
+      los <= syncInP(1);
+      
+      pllLol <= lol;
+      pllLos <= los;
 
-      U_PLL : entity work.AmcMpsSfpPll
+      U_PLL : entity work.Si5317a
          generic map (
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
          port map(
             -- PLL Parallel Interface
-            pllRst          => spareP(0),
+            pllLos          => los,
+            pllLol          => lol,            
+            pllRstL         => spareP(0),
             pllInc          => spareP(1),
             pllDec          => spareP(2),
             pllFrqTbl       => spareP(3),
-            pllDbly2By      => spareP(4),
+            pllDbl2By       => spareP(4),
             pllRate(0)      => spareP(5),
             pllRate(1)      => spareP(6),
             pllSFout(0)     => spareP(7),
