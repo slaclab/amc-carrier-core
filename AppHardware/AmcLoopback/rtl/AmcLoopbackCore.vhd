@@ -2,7 +2,7 @@
 -- File       : AmcLoopbackCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-06
--- Last update: 2017-02-06
+-- Last update: 2017-05-04
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_04_CXX
 -------------------------------------------------------------------------------
@@ -135,5 +135,8 @@ begin
       jtagPri(i)        <= loopbackIn(i+18);
       loopbackOut(i+18) <= jtagSec(i);
    end generate JTAG;
+
+   -- Internal loopback
+   loopbackOut(23) <= loopbackIn(23);
 
 end mapping;
