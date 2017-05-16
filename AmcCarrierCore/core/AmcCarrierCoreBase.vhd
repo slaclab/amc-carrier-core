@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-04-26
+-- Last update: 2017-05-16
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
