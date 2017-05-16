@@ -41,7 +41,7 @@ entity DacSigGenReg is
       AXI_ADDR_WIDTH_G    : positive               := 9;      
       ADDR_WIDTH_G : integer range 1 to (2**24)    := 9;
       -- Number of channels 
-      NUM_SIG_GEN_G : natural range 1 to 7         := 6 -- 0 - Disabled
+      NUM_SIG_GEN_G : natural range 1 to 10         := 6 -- 0 - Disabled
    );    
    port (
     -- AXI Clk
