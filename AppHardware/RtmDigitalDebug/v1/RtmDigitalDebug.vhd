@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebug.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-04-04
+-- Last update: 2017-04-27
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -55,7 +55,22 @@ end RtmDigitalDebug;
 
 architecture mapping of RtmDigitalDebug is
 
-   signal doutReg : slv(15 downto 0);
+   type RegType is record
+      doutDisable    : slv(15 downto 0);
+      axilReadSlave  : AxiLiteReadSlaveType;
+      axilWriteSlave : AxiLiteWriteSlaveType;
+   end record RegType;
+
+   constant REG_INIT_C : RegType := (
+      doutDisable    => x"0000",
+      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
+      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
+
+   signal r   : RegType := REG_INIT_C;
+   signal rin : RegType;
+
+   signal doutReg  : slv(15 downto 0);
+   signal doutComb : slv(15 downto 0);
 
 begin
 
@@ -63,9 +78,12 @@ begin
    for i in 15 downto 0 generate
 
       NON_REG : if (REG_DOUT_EN_G(i) = '0') generate
+
+         doutComb(i) <= dout(i) and not(r.doutDisable(i));
+
          U_OBUFDS : OBUFDS
             port map (
-               I  => dout(i),
+               I  => doutComb(i),
                O  => rtmLsP(i+16),
                OB => rtmLsN(i+16));
       end generate;
@@ -79,7 +97,7 @@ begin
                   Q  => doutReg(i),
                   D1 => dout(i),
                   D2 => dout(i),
-                  SR => '0');
+                  SR => r.doutDisable(i));
             U_OBUFDS : OBUFDS
                port map (
                   I  => doutReg(i),
@@ -90,9 +108,11 @@ begin
          REG_CLK : if (REG_DOUT_MODE_G(i) = '1') generate
             U_CLK : entity work.ClkOutBufDiff
                generic map (
-                  TPD_G        => TPD_G,
-                  XIL_DEVICE_G => "ULTRASCALE")
+                  TPD_G          => TPD_G,
+                  RST_POLARITY_G => '1',
+                  XIL_DEVICE_G   => "ULTRASCALE")
                port map (
+                  rstIn   => r.doutDisable(i),
                   clkIn   => doutClk(i),
                   clkOutP => rtmLsP(i+16),
                   clkOutN => rtmLsN(i+16));
@@ -108,16 +128,42 @@ begin
 
    end generate GEN_VEC;
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, r) is
+      variable v      : RegType;
+      variable axilEp : AxiLiteEndPointType;
+   begin
+      -- Latch the current value
+      v := r;
+
+      -- Determine the transaction type
+      axiSlaveWaitTxn(axilEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
+
+      -- Map the read registers 
+      axiSlaveRegister(axilEp, x"0", 0, v.doutDisable);
+
+      -- Closeout the transaction
+      axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+
+      -- Synchronous Reset
+      if (axilRst = '1') then
+         v := REG_INIT_C;
+      end if;
+
+      -- Register the variable for next clock cycle
+      rin <= v;
+
+      -- Outputs
+      axilReadSlave  <= r.axilReadSlave;
+      axilWriteSlave <= r.axilWriteSlave;
+
+   end process comb;
+
+   seq : process (axilClk) is
+   begin
+      if (rising_edge(axilClk)) then
+         r <= rin after TPD_G;
+      end if;
+   end process seq;
 
 end mapping;
