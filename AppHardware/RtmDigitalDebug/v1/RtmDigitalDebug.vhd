@@ -86,7 +86,6 @@ begin
                I  => doutComb(i),
                O  => rtmLsP(i+16),
                OB => rtmLsN(i+16));
-
       end generate;
 
       REG_OUT : if (REG_DOUT_EN_G(i) = '1') generate

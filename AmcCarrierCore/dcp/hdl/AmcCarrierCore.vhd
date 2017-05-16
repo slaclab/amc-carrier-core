@@ -46,7 +46,7 @@ entity AmcCarrierCore is
       -- Timing Interface (timingClk domain) 
       timingClk            : in    sl;
       timingRst            : in    sl;
-      timingBus            : out   TimingBusType;
+      timingBusIntf        : out   TimingBusType;
       timingPhy            : in    TimingPhyType;
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
@@ -337,39 +337,39 @@ begin
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
-         axilClk             => axilClk,
-         axilRst             => axilRst,
-         axilReadMaster      => timingReadMaster,
-         axilReadSlave       => timingReadSlave,
-         axilWriteMaster     => timingWriteMaster,
-         axilWriteSlave      => timingWriteSlave,
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMaster   => timingReadMaster,
+         axilReadSlave    => timingReadSlave,
+         axilWriteMaster  => timingWriteMaster,
+         axilWriteSlave   => timingWriteSlave,
          ----------------------
          -- Top Level Interface
          ----------------------         
          -- Timing Interface 
-         recTimingClk        => recTimingClk,
-         recTimingRst        => recTimingRst,
-         appTimingClk        => timingClk,
-         appTimingRst        => timingRst,
-         appTimingBus        => timingBus,
-         appTimingPhy        => timingPhy,
-         appTimingPhyClk     => timingPhyClk,
-         appTimingPhyRst     => timingPhyRst,
+         recTimingClk     => recTimingClk,
+         recTimingRst     => recTimingRst,
+         appTimingClk     => timingClk,
+         appTimingRst     => timingRst,
+         appTimingBus     => timingBusIntf,
+         appTimingPhy     => timingPhy,
+         appTimingPhyClk  => timingPhyClk,
+         appTimingPhyRst  => timingPhyRst,
          appTimingRefClk     => timingRefClk,
          appTimingRefClkDiv2 => timingRefClkDiv2,
          ----------------
          -- Core Ports --
          ----------------   
          -- LCLS Timing Ports
-         timingRxP           => timingRxP,
-         timingRxN           => timingRxN,
-         timingTxP           => timingTxP,
-         timingTxN           => timingTxN,
-         timingRefClkInP     => timingRefClkInP,
-         timingRefClkInN     => timingRefClkInN,
-         timingRecClkOutP    => timingRecClkOutP,
-         timingRecClkOutN    => timingRecClkOutN,
-         timingClkSel        => timingClkSel);
+         timingRxP        => timingRxP,
+         timingRxN        => timingRxN,
+         timingTxP        => timingTxP,
+         timingTxN        => timingTxN,
+         timingRefClkInP  => timingRefClkInP,
+         timingRefClkInN  => timingRefClkInN,
+         timingRecClkOutP => timingRecClkOutP,
+         timingRecClkOutN => timingRecClkOutN,
+         timingClkSel     => timingClkSel);
 
    --------------
    -- BSA Core
