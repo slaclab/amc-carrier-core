@@ -31,6 +31,7 @@ use unisim.vcomponents.all;
 entity AmcMrLlrfDownConvertCore is
    generic (
       TPD_G            : time             := 1 ns;
+      BUFGCE_DIVIDE_G  : positive         := 3;
       AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
@@ -48,6 +49,11 @@ entity AmcMrLlrfDownConvertCore is
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- Spare LMK Clock References
+      lmkDclk10       : out   sl;
+      lmkDclk12       : out   sl;
+      bufgCe          : in    sl := '1';      
+      bufgClr         : in    sl := '0';
       -----------------------
       -- Application Ports --
       -----------------------      
@@ -189,6 +195,8 @@ architecture mapping of AmcMrLlrfDownConvertCore is
    signal dacSclk_o : sl;
    signal dacSdi_o  : sl;
    signal dacCsL_o  : slv(2 downto 0);
+   
+   signal lmkDclk  : slv(1 downto 0);
 
 begin
 
@@ -252,7 +260,41 @@ begin
    spareN(12) <= dacCsL_o(0);
    spareP(12) <= dacCsL_o(1);
    spareN(13) <= dacCsL_o(2);
-
+   
+   U_lmkDclk10 : IBUFDS
+      generic map (
+         DIFF_TERM => true)
+      port map (
+         I  => syncInP(2),
+         IB => syncInN(2),
+         O  => lmkDclk(0));     
+   
+   U_lmkDclk12 : IBUFDS
+      generic map (
+         DIFF_TERM => true)
+      port map (
+         I  => fpgaClkP(0),
+         IB => fpgaClkN(0),
+         O  => lmkDclk(1)); 
+         
+   U_LMK10 : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => BUFGCE_DIVIDE_G)
+      port map (
+         I   => lmkDclk(0),
+         CLR => bufgClr,
+         CE  => bufgCe,
+         O   => lmkDclk10);
+         
+   U_LMK12 : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => BUFGCE_DIVIDE_G)
+      port map (
+         I   => lmkDclk(1),
+         CLR => bufgClr,
+         CE  => bufgCe,
+         O   => lmkDclk12);            
+         
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------

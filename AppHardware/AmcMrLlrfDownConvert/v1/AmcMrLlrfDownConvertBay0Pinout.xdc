@@ -80,4 +80,17 @@ set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareN[0][12]}] ; # dacCsL
 set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareP[0][12]}] ; # dacCsL_o[0][1]
 set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareN[0][13]}] ; # dacCsL_o[0][2]
 
+# Spare LMK clocks
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncInP[0][2]}] ; # lmkDclk10P[0]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncInN[0][2]}] ; # lmkDclk10N[0]
+
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {fpgaClkP[0][0]}] ; # lmkDclk12P[0]
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {fpgaClkN[0][0]}] ; # lmkDclk12N[0]
+
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets U_AppTop/U_AppCore/U_AMC0/U_lmkDclk10/O]
+set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets U_AppTop/U_AppCore/U_AMC0/U_lmkDclk12/O]
+
+create_clock -name lmkDclk10 -period  2.702  [get_ports {syncInP}]
+create_clock -name lmkDclk12 -period  2.702  [get_ports {fpgaClkP}]
+
 set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd0_370MHz}]
