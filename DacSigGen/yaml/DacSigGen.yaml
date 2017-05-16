@@ -122,6 +122,7 @@ DacSigGen: &DacSigGen
           mode: RW
           at:
             offset: 0x0
+            stride: 0x4
             nelms: *buffSize
     #########################################################
     #    Commands
