@@ -1,0 +1,138 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once Adc32Rf45.yaml
+
+Adc32Rf45: &Adc32Rf45
+  name: Adc32Rf45
+  description: Adc32Rf45 Module
+  class: MMIODev
+  configPrio: 1
+  size: 0x00020000
+  children:
+    GlobalReg_0x0000:
+      at:
+        offset: 0x00000
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    #########################################################
+    GlobalReg_0x0002:
+      at:
+        offset: 0x00008
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    #########################################################
+    GlobalReg_0x0003:
+      at:
+        offset: 0x0000C
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers  
+    #########################################################
+    GlobalReg_0x0004:
+      at:
+        offset: 0x00010
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers 
+    #########################################################
+    GlobalReg_0x0010:
+      at:
+        offset: 0x00040
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    #########################################################
+    GlobalReg_0x0011:
+      at:
+        offset: 0x00044
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    #########################################################
+    GlobalReg_0x0012:
+      at:
+        offset: 0x00048
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    ######################################################### 
+    MasterReg_0x0020:
+      at:
+        offset: 0x00080
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    #########################################################
+    MasterReg_0x0032:
+      at:
+        offset: 0x000C8
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers  
+    #########################################################
+    MasterReg_0x0039:
+      at:
+        offset: 0x000E4
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers 
+    #########################################################
+    MasterReg_0x003C:
+      at:
+        offset: 0x000F0
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    #########################################################
+    MasterReg_0x003D:
+      at:
+        offset: 0x000F4
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    #########################################################
+    MasterReg_0x005A:
+      at:
+        offset: 0x00168
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers 
+    #########################################################
+    MasterReg_0x0057:
+      at:
+        offset: 0x0015C
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers
+    #########################################################
+    MasterReg_0x0058:
+      at:
+        offset: 0x00160
+      class: IntField
+      sizeBits: 8
+      mode: RW
+      description: ADC Control Registers

@@ -5,8 +5,6 @@
 -- Last update: 2016-05-24
 -------------------------------------------------------------------------------
 -- Description: Reduces the sample rate:
---                   test_i = '1' : Output counter test data
---                   test_i = '0' : Output sample data
 --                   averaging_i = '1':
 --                         rateDiv_i (only powers of two)
 --                         0 - SR, 1 - SR, 2 - SR/2, 4 - SR/4, 8 - SR/8 up to 2^15
@@ -43,7 +41,6 @@ entity DaqDecimator is
       sampleData_i      : in  slv(31 downto 0);
       decSampData_o     : out slv(31 downto 0);
       
-      test_i            : in  sl;
       dec16or32_i       : in  sl;
       averaging_i       : in  sl;
       signed_i          : in  sl;
@@ -60,7 +57,6 @@ architecture rtl of DaqDecimator is
 
    type RegType is record
       sampleData     : slv(sampleData_i'range);
-      testDataCnt    : slv(sampleData_i'range); 
       cnt            : slv(15 downto 0);
       divClk         : sl;
       shft           : slv(1 downto 0);
@@ -73,7 +69,6 @@ architecture rtl of DaqDecimator is
 
    constant REG_INIT_C : RegType := (
       sampleData     => (others => '0'),
-      testDataCnt    => (others => '0'),
       cnt            => (others => '0'),
       divClk         => '0',
       shft           => "01",
@@ -96,26 +91,13 @@ begin
    s_countPeriod <= rateDiv_i when dec16or32_i = '0' else '0'& rateDiv_i(rateDiv_i'left downto 1);
    
    
-   comb : process (r, rst, trig_i, rateDiv_i, s_countPeriod, sampleData_i, dec16or32_i, averaging_i, test_i, signed_i) is
+   comb : process (r, rst, trig_i, rateDiv_i, s_countPeriod, sampleData_i, dec16or32_i, averaging_i, signed_i) is
       variable v        : RegType;
    begin
       v := r;
       
-      -- Test data counter
-      if (test_i = '0' or trig_i = '1') then 
-         v.testDataCnt := (others=>'0');
-      elsif (dec16or32_i = '0') then
-         v.testDataCnt := r.testDataCnt + 1;
-      else
-         v.testDataCnt := r.testDataCnt + 2;
-      end if;
-      
       -- Assign sample data according to different modes (or cases)
-      if (test_i = '1' and dec16or32_i = '0') then -- Test mode 32 bit
-         v.sampleData := r.testDataCnt;
-      elsif (test_i = '1' and dec16or32_i = '1') then -- Test mode 16 bit
-         v.sampleData := r.testDataCnt(15 downto 0)+1 & r.testDataCnt(15 downto 0);
-      elsif (rateDiv_i <= 1) then    -- No data manipulation
+      if (rateDiv_i <= 1) then    -- No data manipulation
          v.sampleData := sampleData_i;
       elsif (dec16or32_i = '0') then -- Signed mode 32 bit (if signed convert to unsigned)
          v.sampleData := (sampleData_i(31) xor signed_i) & sampleData_i(30 downto 0);

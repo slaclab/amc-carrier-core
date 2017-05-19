@@ -8,11 +8,11 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once AmcCryoDemoCore.yaml
+#once AmcCryoCore.yaml
 #include Lmk04828.yaml
-#include Adc16Dx370.yaml
+#include Adc32Rf45.yaml
 #include Dac38J84.yaml
-AmcCryoDemoCore: &AmcCryoDemoCore 
+AmcCryoCore: &AmcCryoCore 
   description: Cryo Amc Rf Demo Board Core
   class: MMIODev
   configPrio: 1
@@ -21,23 +21,25 @@ AmcCryoDemoCore: &AmcCryoDemoCore
   children:
   ########
     ##################################################     
-    Adc16Dx370:
-      <<: *Adc16Dx370
+    Adc32Rf45:
+      <<: *Adc32Rf45
       at:
         offset: 0x00020000 
         stride: 0x00020000              
-        nelms: 3
-    ##################################################     
-    Lmk04828:
-      <<: *Lmk04828
-      at:
-        offset: 0x00080000 
-    ##################################################     
+        nelms: 2
+    ##################################################  
     Dac38J84:
       <<: *Dac38J84
       at:
+        offset: 0x00060000 
+        stride: 0x00020000              
+        nelms: 2
+    ################################################## 
+    Lmk04828:
+      <<: *Lmk04828
+      at:
         offset: 0x000A0000 
-    ##################################################  
+    ##################################################     
     InitAmcCard:
       description: Initialization for AMC card's JESD modules
       at:
@@ -45,10 +47,10 @@ AmcCryoDemoCore: &AmcCryoDemoCore
       class: SequenceCommand
       sequence:
                     
-        # Calibrate the JESD ADCs
-        - entry: Adc16Dx370/CalibrateAdc
-          value: 0x1       
-        # 100 ms sleep
+        # # Calibrate the JESD ADCs
+        # - entry: Adc16Dx370/CalibrateAdc
+          # value: 0x1       
+        # # 100 ms sleep
         - entry: usleep
           value: 100000       
 

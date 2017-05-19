@@ -50,9 +50,7 @@ entity AmcCryoCore is
       
       -- For resetting ADC Chips on the board
       adcRst          : in slv(1 downto 0);
-      -- For giving LMK a reference clock from fpga
-      lmkRef          : in sl;            
-      
+     
       -- JESD Interface
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
@@ -85,10 +83,7 @@ entity AmcCryoCore is
       syncOutN        : inout slv(9 downto 0);
       -- AMC's Spare Ports
       spareP          : inout slv(15 downto 0);
-      spareN          : inout slv(15 downto 0);
-       -- AMC's IO Ports kcu60 only
-      amcIoP          : inout slv(3 downto 0);
-      amcIoN          : inout slv(3 downto 0)   
+      spareN          : inout slv(15 downto 0)   
       );
 end AmcCryoCore;
 
@@ -142,7 +137,6 @@ architecture top_level_app of AmcCryoCore is
    -----------------------
    -- Application Ports --
    -----------------------
-
    -------------------------------------------------------------------------------------------------
    -- JESD constants and signals
    -------------------------------------------------------------------------------------------------
@@ -201,18 +195,18 @@ begin
    -----------------------
 
    -- JESD Reference Ports
-   jesdSysRefP <= sysRefP(0);
+   jesdSysRefP <= sysRefP(0); -- Swapped
    jesdSysRefN <= sysRefN(0);
 
    -- JESD Sync Ports
-   syncInP(3) <= jesdRxSyncP(0);
+   syncInP(3) <= jesdRxSyncP(0); 
    syncInN(3) <= jesdRxSyncN(0);
-   syncInP(0) <= jesdRxSyncP(1);
-   syncInN(0) <= jesdRxSyncN(1);
-   jesdTxSyncP(0)  <= syncOutP(0);
-   jesdTxSyncN(0)  <= syncOutN(0);  
-   jesdTxSyncP(1)  <= syncOutP(1);
-   jesdTxSyncN(1)  <= syncOutN(1);
+   spareP(14) <= jesdRxSyncP(1); -- Swapped
+   spareN(14) <= jesdRxSyncN(1);
+   jesdTxSyncP(0)  <= sysRefP(1);-- Swapped
+   jesdTxSyncN(0)  <= sysRefN(1);  
+   jesdTxSyncP(1)  <= spareP(8);
+   jesdTxSyncN(1)  <= spareN(8);
    
    -- ADC SPI 
    spareP(2)   <= adcSpiDo;   
@@ -228,22 +222,14 @@ begin
    syncOutP(8) <= dacSpiCsb(1);
 
    -- LMK SPI
-   spareP(4) <= lmkSpiClk;
-   spareP(5) <= lmkSpiDio;
-   spareP(3) <= lmkSpiCsb;   
+   spareP(10) <= lmkSpiClk;
+   spareP(11) <= lmkSpiDio;
+   spareP(9) <= lmkSpiCsb;   
    
    -- ADC resets remapping
    spareN(3)   <= adcRst(0);
    syncOutN(9) <= adcRst(1);
-   
-   -- Fpga clock reference
-   
-   OBUFDS_lmkRef : OBUFDS
-      port map (
-         I  => lmkRef,
-         O  => amcIoP(2),
-         OB => amcIoN(2));
-   
+     
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
    -------------------------------------------------------------------------------------------------

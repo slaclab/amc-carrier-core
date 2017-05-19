@@ -50,7 +50,8 @@ entity DaqLane is
       -- General Configurations
       TPD_G                : time            := 1 ns;
       AXI_ERROR_RESP_G     : slv(1 downto 0) := AXI_RESP_SLVERR_C;
-      FRAME_BWIDTH_G       : positive        := 10; -- Dafault 10: 4096 byte frames
+      DECIMATOR_EN_G       : boolean         := true; -- Include or exclude decimator
+      FRAME_BWIDTH_G       : positive        := 10;   -- Dafault 10: 4096 byte frames
       FREZE_BUFFER_TUSER_G : integer         := 2   
    );  
    port (
@@ -139,48 +140,79 @@ architecture rtl of DaqLane is
    signal rin              : RegType;
    signal s_rateClk        : sl;
    signal s_trigDecimator  : sl;
+   signal s_sampleDataReg  : slv((GT_WORD_SIZE_C*8)-1 downto 0);   
    signal s_decSampData    : slv((GT_WORD_SIZE_C*8)-1 downto 0);
    signal s_sampDataExt    : slv((GT_WORD_SIZE_C*8)-1 downto 0);
+   signal s_sampDataTst    : slv((GT_WORD_SIZE_C*8)-1 downto 0);   
    
 begin
    -- Do not trigger decimator when busy
    -- because it will zero s_rateClk and data will be missed
    s_trigDecimator <= trig_i and not r.busy;
    
+   -- Register the data at the beginning to ease timing   
+   U_SyncRe: entity work.SyncRegister
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => (GT_WORD_SIZE_C*8))
+      port map (
+         clk   => devClk_i,
+         rst   => devRst_i,
+         sig_i => sampleData_i,
+         reg_o => s_sampleDataReg);
+
    -- Sign extension
-   signEx_comb : process (sampleData_i, signed_i, dec16or32_i, signWidth_i) is       
+   signEx_comb : process (s_sampleDataReg, signed_i, dec16or32_i, signWidth_i) is       
    begin
       if (signed_i = '0') then
-         s_sampDataExt <=  sampleData_i;
+         s_sampDataExt <=  s_sampleDataReg;
       elsif (dec16or32_i = '0') then
-         s_sampDataExt <= extSign(sampleData_i, conv_integer(signWidth_i));     
+         s_sampDataExt <= extSign(s_sampleDataReg, conv_integer(signWidth_i));     
       else
-         s_sampDataExt(15 downto 0)  <= extSign(sampleData_i(15 downto 0), conv_integer(signWidth_i));         
-         s_sampDataExt(31 downto 16) <= extSign(sampleData_i(31 downto 16), conv_integer(signWidth_i)); 
+         s_sampDataExt(15 downto 0)  <= extSign(s_sampleDataReg(15 downto 0), conv_integer(signWidth_i));         
+         s_sampDataExt(31 downto 16) <= extSign(s_sampleDataReg(31 downto 16), conv_integer(signWidth_i)); 
       end if;
 
-   end process signEx_comb;    
-
+   end process signEx_comb;
+   
+   -- Applies test data if enabled  
+   DaqTestSig_INST: entity work.DaqTestSig
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk          => devClk_i,
+         rst          => devRst_i,
+         sampleData_i => s_sampDataExt,
+         sampleData_o => s_sampDataTst,
+         test_i       => test_i,
+         dec16or32_i  => dec16or32_i,
+         trig_i       => s_trigDecimator);
+   
    -- Rate divider module:
    -- Decimates data,
-   -- Averages decimated data,
-   -- Applies test data,
-   Decimator_INST : entity work.DaqDecimator
-      generic map (
-         TPD_G => TPD_G
-         )
-      port map (
-         clk           => devClk_i,
-         rst           => devRst_i,
-         test_i        => test_i,
-         sampleData_i  => s_sampDataExt,
-         decSampData_o => s_decSampData,
-         dec16or32_i   => dec16or32_i,
-         rateDiv_i     => rateDiv_i,
-         signed_i      => signed_i,
-         trig_i        => s_trigDecimator,
-         averaging_i   => averaging_i,
-         rateClk_o     => s_rateClk);
+   -- Averages decimated data
+   GEN_DEC : if (DECIMATOR_EN_G = true) generate
+      Decimator_INST : entity work.DaqDecimator
+         generic map (
+            TPD_G => TPD_G
+            )
+         port map (
+            clk           => devClk_i,
+            rst           => devRst_i,
+            sampleData_i  => s_sampDataTst,
+            decSampData_o => s_decSampData,
+            dec16or32_i   => dec16or32_i,
+            rateDiv_i     => rateDiv_i,
+            signed_i      => signed_i,
+            trig_i        => s_trigDecimator,
+            averaging_i   => averaging_i,
+            rateClk_o     => s_rateClk);
+   end generate GEN_DEC;
+
+   GEN_N_DEC : if (DECIMATOR_EN_G = false) generate
+      s_decSampData <= s_sampDataTst;
+      s_rateClk <= '1';
+   end generate GEN_N_DEC;   
    
    comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i,dmod_i, dec16or32_i, averaging_i, test_i, rateDiv_i,
                    rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk, trig_i, headerEn_i, timeStamp_i, header_i, bsa_i) is
@@ -220,7 +252,6 @@ begin
             v.dataCnt := (others => '0');
             v.error   := r.error;
             v.busy    := '0';
-            v.pctCnt  := r.pctCnt;
 
             -- No data sent 
             v.txAxisMaster.tvalid := '0';
@@ -233,10 +264,9 @@ begin
                
                -- Clear error at the beginning of transmission
                v.error  := '0';
-               v.pctCnt := (others => '0');
-
                -- 
-               if (mode_i = '0') then 
+               if (mode_i = '0') then
+                  v.pctCnt := toSlv(1,pctCnt_o'length);
                   v.state  := HEADER_S; -- Next State when in triggered mode
                else   
                   v.state  := SOF_S;      -- Next State when in continuous mode
@@ -322,9 +352,8 @@ begin
             -- Go further after next data
             if s_rateClk = '1' then
                if (r.dataCnt = (HEADER_SIZE_C-1) and packetSize_i <= HEADER_SIZE_C) then
-                  v.pctCnt  := r.pctCnt+1;
                   v.state := IDLE_S;     -- End packet
-               elsif (r.dataCnt = (HEADER_SIZE_C-1)) then
+               elsif (r.dataCnt = (HEADER_SIZE_C-1)) then              
                   v.state := DATA_S;
                else
                   v.state := HEADER_S;
@@ -353,8 +382,6 @@ begin
                v.error := r.error;
             end if;
 
-            v.pctCnt := r.pctCnt;
-
             -- Send the JESD data
             v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
             v.txAxisMaster.tLast                                := '0';
@@ -376,6 +403,7 @@ begin
 
             -- Go further after next data
             if (s_rateClk = '1') then
+               v.pctCnt := r.pctCnt+1;
                if (r.dataCnt >= (packetSize_i-1) and mode_i = '0') then
                   -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
                   if (freeze_i = '1') then
@@ -383,8 +411,6 @@ begin
                   else
                      v.freeze := '0';
                   end if;
-                  
-                  v.pctCnt := r.pctCnt+1;
                   v.state := IDLE_S;
                else
                   v.state := DATA_S;
@@ -413,8 +439,6 @@ begin
                v.error := r.error;
             end if;
 
-            v.pctCnt := r.pctCnt;
-
             -- Send the JESD data 
             v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
             
@@ -441,14 +465,11 @@ begin
                ) then                                                -- Do not stop sending data if in continuous mode
 
                   v.freeze := '0';
-                  v.pctCnt := r.pctCnt+1;
                   v.state := IDLE_S;                   
                elsif (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) then -- Finish a frame if frame size reached
                   if enable_i = '1' then
-                     v.pctCnt := r.pctCnt+1;
                      v.state := SOF_S;                              -- Go to next frame                 
                   else
-                     v.pctCnt := r.pctCnt+1;
                      v.state := IDLE_S;                             -- End packet if disabled                             
                   end if;
                   

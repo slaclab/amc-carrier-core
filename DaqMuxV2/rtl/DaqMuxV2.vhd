@@ -31,6 +31,7 @@ entity DaqMuxV2 is
 
       -- AXI Lite and stream generics
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
+      DECIMATOR_EN_G   : boolean         := true;
 
       -- Number of data lanes
       N_DATA_IN_G : positive := 16;
@@ -291,7 +292,8 @@ begin
       AxiStreamDaq_INST : entity work.DaqLane
          generic map (
             TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            DECIMATOR_EN_G   => DECIMATOR_EN_G)
          port map (
 
             devClk_i       => devClk_i,
