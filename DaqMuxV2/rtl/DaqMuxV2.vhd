@@ -257,29 +257,31 @@ begin
    -----------------------------------------------------------
    -- MULTIPLEXER logic
    -----------------------------------------------------------    
-   comb : process (dataValidVec_i, s_muxSel, sampleDataArr_i) is
+   comb : process (devClk_i) is
    begin
-      for i in N_DATA_OUT_G-1 downto 0 loop
-         -- Data mode
-         if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
-            s_sampleDataArrMux(i) <= sampleDataArr_i(conv_integer(s_muxSel(i))-2);
-            s_dataValidVecMux(i)  <= dataValidVec_i(conv_integer(s_muxSel(i))-2);
-            s_enAxi(i)            <= '1';
-            s_enTest(i)           <= '0';
-         -- Test mode
-         elsif (s_muxSel(i) = 1) then 
-            s_sampleDataArrMux(i) <= (others => '0');
-            s_dataValidVecMux(i)  <= '1';
-            s_enAxi(i)            <= '1';        
-            s_enTest(i)           <= '1';
-         -- Disabled
-         else
-            s_sampleDataArrMux(i) <= (others => '0');
-            s_dataValidVecMux(i)  <= '0';
-            s_enAxi(i)            <= '0';
-            s_enTest(i)           <= '0';
-         end if;
-      end loop;
+      if rising_edge(devClk_i) then
+          for i in N_DATA_OUT_G-1 downto 0 loop
+             -- Data mode
+             if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
+                s_sampleDataArrMux(i) <= sampleDataArr_i(conv_integer(s_muxSel(i))-2);
+                s_dataValidVecMux(i)  <= dataValidVec_i(conv_integer(s_muxSel(i))-2);
+                s_enAxi(i)            <= '1';
+                s_enTest(i)           <= '0';
+             -- Test mode
+             elsif (s_muxSel(i) = 1) then 
+                s_sampleDataArrMux(i) <= (others => '0');
+                s_dataValidVecMux(i)  <= '1';
+                s_enAxi(i)            <= '1';        
+                s_enTest(i)           <= '1';
+             -- Disabled
+             else
+                s_sampleDataArrMux(i) <= (others => '0');
+                s_dataValidVecMux(i)  <= '0';
+                s_enAxi(i)            <= '0';
+                s_enTest(i)           <= '0';
+             end if;
+          end loop;
+      end if;
    ----------------------
    end process comb;
   
