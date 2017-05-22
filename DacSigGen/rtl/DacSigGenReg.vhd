@@ -63,6 +63,7 @@ entity DacSigGenReg is
       mode_o          : out slv(NUM_SIG_GEN_G-1 downto 0);
       sign_o          : out slv(NUM_SIG_GEN_G-1 downto 0);
       trigSw_o        : out slv(NUM_SIG_GEN_G-1 downto 0);
+      holdLast_o      : out slv(NUM_SIG_GEN_G-1 downto 0);
       period_o        : out slv32Array(NUM_SIG_GEN_G-1 downto 0);
       running_i       : in  slv(NUM_SIG_GEN_G-1 downto 0);
       overflow_i      : in  slv(NUM_SIG_GEN_G-1 downto 0);
@@ -77,7 +78,8 @@ architecture rtl of DacSigGenReg is
       enable   : slv(NUM_SIG_GEN_G-1 downto 0);
       mode     : slv(NUM_SIG_GEN_G-1 downto 0); 
       sign     : slv(NUM_SIG_GEN_G-1 downto 0);      
-      trigSw   : slv(NUM_SIG_GEN_G-1 downto 0);      
+      trigSw   : slv(NUM_SIG_GEN_G-1 downto 0);
+      holdLast : slv(NUM_SIG_GEN_G-1 downto 0);      
       period   : slv32Array(NUM_SIG_GEN_G-1 downto 0);
       
       -- AXI lite
@@ -95,6 +97,7 @@ architecture rtl of DacSigGenReg is
       mode         => (others=> '1'),
       sign         => (others=> '1'),      
       trigSw       => (others=> '0'),      
+      holdLast     => (others=> '0'),      
       period       => (others => toSlv(7,32)),      
       
  
@@ -145,6 +148,8 @@ begin
                v.sign    := axilWriteMaster.wdata(NUM_SIG_GEN_G-1 downto 0);
             when 16#03# => -- ADDR (0xC)
                v.trigSw  := axilWriteMaster.wdata(NUM_SIG_GEN_G-1 downto 0);
+            when 16#04# => -- ADDR (0x10)
+               v.holdLast  := axilWriteMaster.wdata(NUM_SIG_GEN_G-1 downto 0);
             when 16#10# to 16#1F# => -- ADDR (0x40-0x7C)
                for i in NUM_SIG_GEN_G-1 downto 0 loop
                   if (axilWriteMaster.awaddr(5 downto 2) = i) then
@@ -169,6 +174,8 @@ begin
                v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := r.sign;
             when 16#03# =>  -- ADDR (0xC)
                v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := r.trigSw;
+            when 16#04# =>  -- ADDR (0x10)
+               v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := r.holdLast;               
             when 16#08# =>  -- ADDR (0x20)
                v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := s_runningSync;
             when 16#09# =>  -- ADDR (0x24)
@@ -309,5 +316,18 @@ begin
          dout   => period_o(i)
       );
    end generate GEN_PERIOD_OUT;
+   
+   SyncFifo_OUT6 : entity work.SynchronizerFifo
+   generic map (
+      TPD_G        => TPD_G,
+      DATA_WIDTH_G => NUM_SIG_GEN_G
+   )
+   port map (
+      wr_clk => axiClk_i,
+      din    => r.holdLast,
+      rd_clk => devClk_i,
+      dout   => holdLast_o
+   );   
+   
 ---------------------------------------------------------------------
 end rtl;

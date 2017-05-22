@@ -71,6 +71,7 @@ entity DacSigGenLane is
       period_i        : in  slv(ADDR_WIDTH_G-1 downto 0);
       start_i         : in  sl;
       sign_i          : in  sl;
+      holdLast_i      : in  sl;
       --
       overflow_o      : out sl;
       underflow_o     : out sl;
@@ -211,16 +212,23 @@ begin
    begin
       if (rising_edge(jesdClk2x)) then
          r <= rin after TPD_G;
+         -- Determine zero data according to sign format
+         if (sign_i = '0') then
+            s_zeroData <= x"0000" after TPD_G;
+         else
+            s_zeroData <= x"8000" after TPD_G;
+         end if;
+         -- Check if running
+         if (r.runningD1 = '1') then
+            s_16bitData <= s_ramData after TPD_G;
+         -- Check if not holding last value
+         elsif (holdLast_i = '0') then
+            -- Set data to 0 volts
+            s_16bitData <= s_zeroData after TPD_G;
+         end if;
       end if;
    end process seq; 
    
-   -- Determine zero data according to sign format
-   s_zeroData <= x"0000" when sign_i = '0' else
-                 x"8000";
-   -- Zero data if disabled
-   s_16bitData <= s_ramData when r.runningD1 = '1' else 
-                  s_zeroData;
-
    -- jesdClk domain
    GEN_32bit : if INTERFACE_G = '0' generate
       -- Output sync and assignment      
