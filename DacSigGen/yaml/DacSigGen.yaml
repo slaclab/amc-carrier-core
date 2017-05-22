@@ -59,6 +59,15 @@ DacSigGen: &DacSigGen
       mode: RW
       description: "Mask Software trigger (applies in triggered mode, Internal edge detector)"
     #########################################################    
+    HoldLastValue: 
+      at:
+        offset: 0x010
+      class: IntField
+      name: HoldLastValue
+      sizeBits: *numOfChs
+      mode: RW
+      description: "BitMask: 1 to hold the last pattern value, 0 to zere out data at the end of pattern"    
+    #########################################################    
     Running: 
       at:
         offset: 0x020
