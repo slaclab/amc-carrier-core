@@ -89,7 +89,7 @@ begin
       end if;
 
       rin <= v;
-      sampleData_o <= v.sampleData;
+      sampleData_o <= r.sampleData;
    end process comb;
 
    seq : process (clk) is
