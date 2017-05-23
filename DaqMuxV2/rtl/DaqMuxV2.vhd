@@ -166,7 +166,7 @@ begin
    U_SyncRe: entity work.SyncRegister
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 32)
+         WIDTH_G => N_DATA_IN_G)
       port map (
          clk   => devClk_i,
          rst   => devRst_i,
