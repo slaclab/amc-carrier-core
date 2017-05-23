@@ -158,8 +158,8 @@ begin
          port map (
             clk   => devClk_i,
             rst   => devRst_i,
-            sig_i => sampleDataArr_i,
-            reg_o => s_sampleDataArr);
+            sig_i => sampleDataArr_i(i),
+            reg_o => s_sampleDataArr(i));
             
    end generate GEN_IN_LANES;
    
