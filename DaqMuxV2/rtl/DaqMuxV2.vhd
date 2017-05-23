@@ -89,7 +89,11 @@ end DaqMuxV2;
 architecture rtl of DaqMuxV2 is
 
    -- Internal signals
-
+   
+   signal s_sampleDataArr     : slv32Array(N_DATA_IN_G-1 downto 0);
+   signal s_dataValidVec      : slv(N_DATA_IN_G-1 downto 0);
+   
+   
    -- DAQ signals 
    signal s_enAxi             : slv(N_DATA_OUT_G-1 downto 0);
    signal s_enTest            : slv(N_DATA_OUT_G-1 downto 0);
@@ -142,6 +146,32 @@ begin
    -- Check JESD generics
    assert (1 <= N_DATA_IN_G and N_DATA_IN_G <= 29) report "N_DATA_IN_G must be between 1 and 29" severity failure;
    assert (1 <= N_DATA_OUT_G and N_DATA_OUT_G <= 16) report "N_DATA_OUT_G must be between 1 and 16"severity failure;
+   
+   -----------------------------------------------------------
+   -- Register the sample data and valids at the beginning to ease timing 
+   -----------------------------------------------------------
+   GEN_IN_LANES : for i in N_DATA_IN_G-1 downto 0 generate  
+      U_SyncRe: entity work.SyncRegister
+         generic map (
+            TPD_G   => TPD_G,
+            WIDTH_G => 32)
+         port map (
+            clk   => devClk_i,
+            rst   => devRst_i,
+            sig_i => sampleDataArr_i,
+            reg_o => s_sampleDataArr);
+            
+   end generate GEN_IN_LANES;
+   
+   U_SyncRe: entity work.SyncRegister
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 32)
+      port map (
+         clk   => devClk_i,
+         rst   => devRst_i,
+         sig_i => dataValidVec_i,
+         reg_o => s_dataValidVec);
 
    -----------------------------------------------------------
    -- Synchronize timestamp_i and bsa
@@ -258,13 +288,13 @@ begin
    -----------------------------------------------------------
    -- MULTIPLEXER logic
    -----------------------------------------------------------    
-   comb : process (dataValidVec_i, s_muxSel, sampleDataArr_i) is
+   comb : process (s_dataValidVec, s_muxSel, s_sampleDataArr) is
    begin
       for i in N_DATA_OUT_G-1 downto 0 loop
          -- Data mode
          if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
-            s_sampleDataArrMux(i) <= sampleDataArr_i(conv_integer(s_muxSel(i))-2);
-            s_dataValidVecMux(i)  <= dataValidVec_i(conv_integer(s_muxSel(i))-2);
+            s_sampleDataArrMux(i) <= s_sampleDataArr(conv_integer(s_muxSel(i))-2);
+            s_dataValidVecMux(i)  <= s_dataValidVec(conv_integer(s_muxSel(i))-2);
             s_enAxi(i)            <= '1';
             s_enTest(i)           <= '0';
          -- Test mode

@@ -150,27 +150,27 @@ begin
    -- because it will zero s_rateClk and data will be missed
    s_trigDecimator <= trig_i and not r.busy;
    
-   -- Register the data at the beginning to ease timing   
-   U_SyncRe: entity work.SyncRegister
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => (GT_WORD_SIZE_C*8))
-      port map (
-         clk   => devClk_i,
-         rst   => devRst_i,
-         sig_i => sampleData_i,
-         reg_o => s_sampleDataReg);
+   -- -- Register the data at the beginning to ease timing   
+   -- U_SyncRe: entity work.SyncRegister
+      -- generic map (
+         -- TPD_G   => TPD_G,
+         -- WIDTH_G => (GT_WORD_SIZE_C*8))
+      -- port map (
+         -- clk   => devClk_i,
+         -- rst   => devRst_i,
+         -- sig_i => sampleData_i,
+         -- reg_o => s_sampleData);
 
    -- Sign extension
-   signEx_comb : process (s_sampleDataReg, signed_i, dec16or32_i, signWidth_i) is       
+   signEx_comb : process (sampleData_i, signed_i, dec16or32_i, signWidth_i) is       
    begin
       if (signed_i = '0') then
-         s_sampDataExt <=  s_sampleDataReg;
+         s_sampDataExt <=  sampleData_i;
       elsif (dec16or32_i = '0') then
-         s_sampDataExt <= extSign(s_sampleDataReg, conv_integer(signWidth_i));     
+         s_sampDataExt <= extSign(sampleData_i, conv_integer(signWidth_i));     
       else
-         s_sampDataExt(15 downto 0)  <= extSign(s_sampleDataReg(15 downto 0), conv_integer(signWidth_i));         
-         s_sampDataExt(31 downto 16) <= extSign(s_sampleDataReg(31 downto 16), conv_integer(signWidth_i)); 
+         s_sampDataExt(15 downto 0)  <= extSign(sampleData_i(15 downto 0), conv_integer(signWidth_i));         
+         s_sampDataExt(31 downto 16) <= extSign(sampleData_i(31 downto 16), conv_integer(signWidth_i)); 
       end if;
 
    end process signEx_comb;
