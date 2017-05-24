@@ -209,11 +209,11 @@ begin
    jesdTxSyncN(1)  <= spareN(8);
    
    -- ADC SPI 
-   spareP(2)   <= adcSpiDo;   
+   adcSpiDo    <= spareP(2);   
    spareN(1)   <= adcSpiClk;   
    spareN(2)   <= adcSpiCsb(0);
    syncOutN(8) <= adcSpiCsb(1); 
-   adcSpiDi    <= syncOutP(9);
+   syncOutP(9) <= adcSpiDi;
    
    -- DAC SPI
    spareP(0) <= dacSpiClk;
@@ -229,7 +229,8 @@ begin
    -- ADC resets remapping
    spareN(3)   <= adcRst(0);
    syncOutN(9) <= adcRst(1);
-     
+   
+   
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
    -------------------------------------------------------------------------------------------------
