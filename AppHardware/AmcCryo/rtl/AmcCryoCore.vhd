@@ -260,25 +260,32 @@ begin
       port map (
          I  => jesdSysRefP,
          IB => jesdSysRefN,
-         O  => jesdSysRef);
+         O  => not jesdSysRef); -- Note inverted because it is Swapped on the board
          
-   GEN_RX_SYNC :
-   for i in 1 downto 0 generate
-      OBUFDS_RxSync : OBUFDS
-         port map (
-            I  => jesdRxSync,
-            O  => jesdRxSyncP(i),
-            OB => jesdRxSyncN(i));
-   end generate GEN_RX_SYNC;
-   
-   GEN_TX_SYNC :
-   for i in 1 downto 0 generate
-   IBUFDS_TxSync : IBUFDS
+   OBUFDS0_RxSync : OBUFDS
       port map (
-         I  => jesdTxSyncP(i),
-         IB => jesdTxSyncN(i),
-         O  => jesdTxSyncVec(i));
-   end generate GEN_TX_SYNC;
+         I  => jesdRxSync,
+         O  => jesdRxSyncP(0),
+         OB => jesdRxSyncN(0));
+   
+   OBUFDS1_RxSync : OBUFDS
+      port map (
+         I  => not jesdRxSync, -- Note inverted because it is Swapped on the board
+         O  => jesdRxSyncP(1),
+         OB => jesdRxSyncN(1)); 
+      
+   IBUFDS0_TxSync : IBUFDS
+      port map (
+         I  => not jesdTxSyncP(0), -- Note inverted because it is Swapped on the board
+         IB => jesdTxSyncN(0),
+         O  => jesdTxSyncVec(0));
+         
+   IBUFDS1_TxSync : IBUFDS
+      port map (
+         I  => jesdTxSyncP(1),
+         IB => jesdTxSyncN(1),
+         O  => jesdTxSyncVec(1));
+
    
    jesdTxSync <= uOr(jesdTxSyncVec); -- Warning!!! Or only at initial debug TODO make it AND
    -- jesdTxSync <= uAnd(jesdTxSyncVec);   
