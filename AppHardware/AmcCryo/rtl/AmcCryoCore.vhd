@@ -260,8 +260,10 @@ begin
       port map (
          I  => jesdSysRefP,
          IB => jesdSysRefN,
-         O  => not jesdSysRef); -- Note inverted because it is Swapped on the board
-         
+         O  => s_jesdSysRef); 
+
+   jesdSysRef <= not s_jesdSysRef; -- Note inverted because it is Swapped on the board
+
    OBUFDS0_RxSync : OBUFDS
       port map (
          I  => jesdRxSync,
@@ -276,7 +278,7 @@ begin
       
    IBUFDS0_TxSync : IBUFDS
       port map (
-         I  => not jesdTxSyncP(0), -- Note inverted because it is Swapped on the board
+         I  => jesdTxSyncP(0), 
          IB => jesdTxSyncN(0),
          O  => jesdTxSyncVec(0));
          
@@ -287,8 +289,9 @@ begin
          O  => jesdTxSyncVec(1));
 
    
-   jesdTxSync <= uOr(jesdTxSyncVec); -- Warning!!! Or only at initial debug TODO make it AND
-   -- jesdTxSync <= uAnd(jesdTxSyncVec);   
+   jesdTxSync <= not jesdTxSyncVec(0) or jesdTxSyncVec(1); -- Warning!!! Or only at initial debug TODO make it AND
+                                                           -- Note inverted because it is Swapped on the board
+   -- jesdTxSync <= not jesdTxSyncVec(0) and jesdTxSyncVec(1);
    
    ----------------------------------------------------------------
    -- SPI interface ADC
