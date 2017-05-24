@@ -129,7 +129,7 @@ architecture rtl of DaqLane is
       averaging  : sl;          
       dec16or32  : sl;          
       headerEn   : sl;
-      signWidth  : sl;
+      signWidth  : slv(4 downto 0);
       signed     : sl;
       --
       state        : StateType;
