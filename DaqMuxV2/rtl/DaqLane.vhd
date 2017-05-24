@@ -121,7 +121,17 @@ architecture rtl of DaqLane is
       freeze       : sl;
       busy         : sl;      
       pctCnt       : slv(pctCnt_o'range);
-      trig         : sl;  
+      trig         : sl;
+      
+      -- Register the inputs
+      packetSize : slv(31 downto 0); 
+      rateDiv    : slv(15 downto 0);         
+      averaging  : sl;          
+      dec16or32  : sl;          
+      headerEn   : sl;
+      signWidth  : sl;
+      signed     : sl;
+      --
       state        : StateType;
    end record;
    
@@ -133,6 +143,16 @@ architecture rtl of DaqLane is
       busy         => '0',
       pctCnt       => (others => '0'),
       trig         => '0',
+      -- 
+      packetSize  => (others => '0'),
+      rateDiv     => (others => '0'),
+      averaging   => '0',
+      dec16or32   => '0',
+      headerEn    => '0',
+      signWidth   => (others => '0'),
+      signed      => '0',
+      
+      --
       state        => IDLE_S
       );
 
@@ -140,11 +160,11 @@ architecture rtl of DaqLane is
    signal rin              : RegType;
    signal s_rateClk        : sl;
    signal s_trigDecimator  : sl;
-   signal s_sampleDataReg  : slv((GT_WORD_SIZE_C*8)-1 downto 0);   
-   signal s_decSampData    : slv((GT_WORD_SIZE_C*8)-1 downto 0);
+   signal s_sampleDataReg  : slv((GT_WORD_SIZE_C*8)-1 downto 0);  
    signal s_sampDataExt    : slv((GT_WORD_SIZE_C*8)-1 downto 0);
-   signal s_sampDataTst    : slv((GT_WORD_SIZE_C*8)-1 downto 0);   
-   
+   signal s_sampDataTst    : slv((GT_WORD_SIZE_C*8)-1 downto 0);    
+   signal s_decSampData    : slv((GT_WORD_SIZE_C*8)-1 downto 0);
+
 begin
    -- Do not trigger decimator when busy
    -- because it will zero s_rateClk and data will be missed
@@ -162,15 +182,15 @@ begin
          reg_o => s_sampleDataReg);
 
    -- Sign extension
-   signEx_comb : process (s_sampleDataReg, signed_i, dec16or32_i, signWidth_i) is       
+   signEx_comb : process (s_sampleDataReg, r.signed, r.dec16or32, r.signWidth) is       
    begin
-      if (signed_i = '0') then
+      if (r.signed = '0') then
          s_sampDataExt <=  s_sampleDataReg;
-      elsif (dec16or32_i = '0') then
-         s_sampDataExt <= extSign(s_sampleDataReg, conv_integer(signWidth_i));     
+      elsif (r.dec16or32 = '0') then
+         s_sampDataExt <= extSign(s_sampleDataReg, conv_integer(r.signWidth));     
       else
-         s_sampDataExt(15 downto 0)  <= extSign(s_sampleDataReg(15 downto 0), conv_integer(signWidth_i));         
-         s_sampDataExt(31 downto 16) <= extSign(s_sampleDataReg(31 downto 16), conv_integer(signWidth_i)); 
+         s_sampDataExt(15 downto 0)  <= extSign(s_sampleDataReg(15 downto 0), conv_integer(r.signWidth));         
+         s_sampDataExt(31 downto 16) <= extSign(s_sampleDataReg(31 downto 16), conv_integer(r.signWidth)); 
       end if;
 
    end process signEx_comb;
@@ -185,7 +205,7 @@ begin
          sampleData_i => s_sampDataExt,
          sampleData_o => s_sampDataTst,
          test_i       => test_i,
-         dec16or32_i  => dec16or32_i,
+         dec16or32_i  => r.dec16or32,
          trig_i       => s_trigDecimator);
    
    -- Rate divider module:
@@ -201,11 +221,11 @@ begin
             rst           => devRst_i,
             sampleData_i  => s_sampDataTst,
             decSampData_o => s_decSampData,
-            dec16or32_i   => dec16or32_i,
-            rateDiv_i     => rateDiv_i,
-            signed_i      => signed_i,
+            dec16or32_i   => r.dec16or32,
+            rateDiv_i     => r.rateDiv,
+            signed_i      => r.signed,
             trig_i        => s_trigDecimator,
-            averaging_i   => averaging_i,
+            averaging_i   => r.averaging,
             rateClk_o     => s_rateClk);
    end generate GEN_DEC;
 
@@ -223,7 +243,7 @@ begin
       s_rateClk <= '1';
    end generate GEN_N_DEC;   
    
-   comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i,dmod_i, dec16or32_i, averaging_i, test_i, rateDiv_i,
+   comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i,dmod_i, dec16or32_i, averaging_i, test_i, rateDiv_i,signWidth_i, signed_i
                    rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk, trig_i, headerEn_i, timeStamp_i, header_i, bsa_i) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
@@ -232,6 +252,17 @@ begin
    begin
       -- Latch the current value
       v := r;
+      
+      -- Register values      
+      v.packetSize := packetSize_i;
+      v.rateDiv    := rateDiv_i;
+      v.averaging  := averaging_i;
+      v.dec16or32  := dec16or32_i;
+      v.headerEn   := headerEn_i;
+      v.signWidth  := signWidth_i;
+      v.signed     := signed_i;
+      
+      
       
       -- Register trigger
       v.trig := trig_i;
@@ -309,7 +340,7 @@ begin
             end if;
 
             -- Insert header words depending on which it is
-            if (headerEn_i = '1') then
+            if (r.headerEn = '1') then
                Header : case (r.dataCnt) is
                   when toSlv(0, 32) =>
                      v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(31 downto 0);
@@ -336,9 +367,9 @@ begin
                   when toSlv(11, 32) =>
                      v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(31 downto 0);
                   when toSlv(12, 32) =>
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := packetSize_i;
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := r.packetSize;
                   when toSlv(13, 32) =>
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & dec16or32_i & averaging_i & test_i & '0' & toSlv(axiNum_i, 4) & rateDiv_i ;            
+                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & r.dec16or32 & r.averaging & test_i & '0' & toSlv(axiNum_i, 4) & r.rateDiv ;            
                   when others =>
                      v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := (others=>'0');                  
                end case Header;    
@@ -350,7 +381,7 @@ begin
             v.txAxisMaster.tDest := toSlv(axiNum_i, 8);
              
             -- Insert tLast at the end of header and EOFE if packetSize_i less or equal to HEADER_SIZE_C 
-            if ((r.dataCnt = (HEADER_SIZE_C-1)) and (packetSize_i <= HEADER_SIZE_C)) then
+            if ((r.dataCnt = (HEADER_SIZE_C-1)) and (r.packetSize <= HEADER_SIZE_C)) then
                -- Set the EOF(tlast) bit       
                v.txAxisMaster.tLast := '1';
                -- Set the EOFE bit in tUser if error occurred during packet transmission
@@ -360,7 +391,7 @@ begin
              
             -- Go further after next data
             if s_rateClk = '1' then
-               if (r.dataCnt = (HEADER_SIZE_C-1) and packetSize_i <= HEADER_SIZE_C) then
+               if (r.dataCnt = (HEADER_SIZE_C-1) and r.packetSize <= HEADER_SIZE_C) then
                   v.state := IDLE_S;     -- End packet
                elsif (r.dataCnt = (HEADER_SIZE_C-1)) then              
                   v.state := DATA_S;
@@ -401,7 +432,7 @@ begin
             ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, '1');
             
             -- Set the tLast bit            
-            if (r.dataCnt >= (packetSize_i-1) and mode_i = '0') then
+            if (r.dataCnt >= (r.packetSize-1) and mode_i = '0') then
                v.txAxisMaster.tLast := '1';
                -- Set the EOFE bit in tUser if error occurred during packet transmission
                ssiSetUserEofe(SSI_CONFIG_C, v.txAxisMaster, r.error);
@@ -413,7 +444,7 @@ begin
             -- Go further after next data
             if (s_rateClk = '1') then
                v.pctCnt := r.pctCnt+1;
-               if (r.dataCnt >= (packetSize_i-1) and mode_i = '0') then
+               if (r.dataCnt >= (r.packetSize-1) and mode_i = '0') then
                   -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
                   if (freeze_i = '1') then
                      v.freeze := '1';
@@ -455,7 +486,7 @@ begin
             v.txAxisMaster.tLast := '0';
             
             -- Set the tLast bit            
-            if ((r.dataCnt >= (packetSize_i-1) and mode_i = '0') or
+            if ((r.dataCnt >= (r.packetSize-1) and mode_i = '0') or
                 (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) or
                 (r.error = '1')
             ) then
@@ -470,7 +501,7 @@ begin
             -- Next state conditioning
             if (s_rateClk = '1') then
                if ((r.error = '1') or                               -- Immediately stop sending data if error occurs
-                   (r.dataCnt >= (packetSize_i-1) and mode_i = '0') -- Stop sending data if packet size reached 
+                   (r.dataCnt >= (r.packetSize-1) and mode_i = '0') -- Stop sending data if packet size reached 
                ) then                                                -- Do not stop sending data if in continuous mode
 
                   v.freeze := '0';
