@@ -243,7 +243,7 @@ begin
       s_rateClk <= '1';
    end generate GEN_N_DEC;   
    
-   comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i,dmod_i, dec16or32_i, averaging_i, test_i, rateDiv_i,signWidth_i, signed_i
+   comb : process (r, axiNum_i, dataReady_i, devRst_i, enable_i, packetSize_i, mode_i, freeze_i,dmod_i, dec16or32_i, averaging_i, test_i, rateDiv_i,signWidth_i, signed_i,
                    rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk, trig_i, headerEn_i, timeStamp_i, header_i, bsa_i) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
