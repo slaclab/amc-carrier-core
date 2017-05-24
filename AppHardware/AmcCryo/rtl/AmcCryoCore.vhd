@@ -148,8 +148,8 @@ architecture top_level_app of AmcCryoCore is
    signal jesdRxSyncN : slv(1 downto 0);
    signal jesdTxSyncP : slv(1 downto 0);
    signal jesdTxSyncN : slv(1 downto 0);
-   signal jesdTxSyncVec : slv(1 downto 0);   
-
+   signal jesdTxSyncVec : slv(1 downto 0); 
+   signal s_jesdSysRef  : sl;
    -------------------------------------------------------------------------------------------------
    -- SPI
    -------------------------------------------------------------------------------------------------   
