@@ -161,10 +161,10 @@ architecture top_level_app of AmcCryoCore is
 
    signal adcMuxClk  : sl;
    signal adcMuxDout : sl;
+   signal adcMuxDin  : sl;  
    
    signal adcSpiClk : sl;
-   signal adcSpiDi  : sl;
-   signal adcSpiDo  : sl;
+   signal adcSpiDio : sl;
    signal adcSpiCsb : slv(1 downto 0);
    
    -- DAC SPI config interface 
@@ -209,11 +209,11 @@ begin
    jesdTxSyncN(1)  <= spareN(8);
    
    -- ADC SPI 
-   adcSpiDo    <= spareP(2);   
+   -- adcSpiDo    <= spareP(2);   
    spareN(1)   <= adcSpiClk;   
    spareN(2)   <= adcSpiCsb(0);
    syncOutN(8) <= adcSpiCsb(1); 
-   syncOutP(9) <= adcSpiDi;
+   syncOutP(9) <= adcSpiDio;
    
    -- DAC SPI
    spareP(0) <= dacSpiClk;
@@ -312,7 +312,7 @@ begin
             axiWriteMaster => locAxilWriteMasters(ADC_0_INDEX_C+i),
             axiWriteSlave  => locAxilWriteSlaves(ADC_0_INDEX_C+i),
             coreSclk       => adcCoreClk(i),
-            coreSDin       => adcSpiDo,
+            coreSDin       => adcMuxDin,
             coreSDout      => adcCoreDout(i),
             coreCsb        => adcCoreCsb(i));
    end generate GEN_ADC;
@@ -327,9 +327,17 @@ begin
       adcMuxDout <=  adcCoreDout(0) when "10",
                      adcCoreDout(1) when "01",
                      '0'            when others;
+                     
+   -- IO Assignment
+   IOBUF_Adc : IOBUF
+      port map (
+         I  => '0',
+         O  => adcMuxDin,
+         IO => adcSpiDio,
+         T  => adcMuxDout);                  
+
    -- IO Assignment
    adcSpiClk <= adcMuxClk;
-   adcSpiDi  <= adcMuxDout;   
    adcSpiCsb <= adcCoreCsb;
    
       
