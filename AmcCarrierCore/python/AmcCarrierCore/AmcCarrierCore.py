@@ -84,7 +84,7 @@ class AmcCarrierCore(pr.Device):
 
         self.add(Axi24LC64FT(
                                 offset       =  0x04000000,
-                                #instantiate  =  False,
+                                instantiate  =  False,
                             ))
 
         self.add(AxiCdcm6208(
