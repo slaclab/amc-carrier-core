@@ -107,24 +107,30 @@ class AmcCarrierCore(pr.Device):
                                 offset       =  0x09000000,
                             ))
               
-        for i in range(4):                                       
-            self.add(UdpEngineClient(
-                                    name         = "UdpEngineClient_%i" % (i),
-                                    offset       =  0x0A000000 + (i * 0x08),
-                                    description  = "ClientConfig[1:0]. Client: %i" % (i),
-                                ))
+         self.add(UdpEngineClient(
+                                name         = "BpUdpClient",
+                                offset       =  0x0A000000,
+                                description  = "BpUdpClient",
+                            ))
 
-        for i in range(4):                                       
+        self.add(UdpEngineServer(
+                                name         = "BpUdpServer",
+                                offset       =  0x0A000818,
+                                description  = "BpUdpServer",
+                            ))
+
+
+        for i in range(2):                                       
             self.add(UdpEngineServer(
-                                    name         = "UdpEngineServer_%i" % (i),
-                                    offset       =  0x0A000800 + (i * 0x08),
-                                    description  = "ServerConfig[4:0]. Server: %i" % (i),             
+                                    name         = "SwUdpServer_%i" % (i),
+                                    offset       =  0x0A000808 + (i * 0x08),
+                                    description  = "SwUdpServer. Server: %i" % (i),             
                                 ))
         for i in range(2):
             self.add(RssiCore(
-                                    name         = "RssiServerSw_%i" % (i),
-                                    offset       =  0x0A010000 + (i * 0x08),
-                                    description  = "ServerConfig[4:0]. Server: %i" % (i),                                
+                                    name         = "SwRssiServer_%i" % (i),
+                                    offset       =  0x0A010000 + (i * 0x1000),
+                                    description  = "SwRssiServer. Server: %i" % (i),                                
                                 ))
 
         self.add(AxiMemTester(
