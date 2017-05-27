@@ -3,7 +3,7 @@
 # Title      : PyRogue AmcCarrier MPS PHY Module
 #-----------------------------------------------------------------------------
 # File       : AppMpsSalt.py
-# Created    : 2017-04-12
+# Created    : 2017-05-26
 #-----------------------------------------------------------------------------
 # Description:
 # PyRogue AmcCarrier MPS PHY Module
@@ -89,24 +89,6 @@ class AppMpsSalt(pr.Device):
                             mode         = "RO",
                         )
 
-        self.addVariable(   name         = "MPS_CHANNELS_C",
-                            description  = "Number of MPS channels",
-                            offset       =  0x70C,
-                            bitSize      =  32,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
-
-        self.addVariable(   name         = "MPS_THRESHOLD_C",
-                            description  = "Number of MPS Thresholds",
-                            offset       =  0x710,
-                            bitSize      =  32,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
-
         self.addVariable(   name         = "MpsPllLocked",
                             description  = "MPS PLL Lock Status",
                             offset       =  0x714,
@@ -114,24 +96,6 @@ class AppMpsSalt(pr.Device):
                             bitOffset    =  0x00,
                             base         = "hex",
                             mode         = "RO",
-                        )
-
-        self.addVariable(   name         = "MpsEnable",
-                            description  = "MPS Enable Flag",
-                            offset       =  0x800,
-                            bitSize      =  1,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RW",
-                        )
-
-        self.addVariable(   name         = "MpsTestMode",
-                            description  = "MPS Test Mode Flag",
-                            offset       =  0x804,
-                            bitSize      =  1,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RW",
                         )
 
         self.addVariable(   name         = "RollOverEn",
@@ -150,5 +114,16 @@ class AppMpsSalt(pr.Device):
                             bitOffset    =  0x00,
                             base         = "hex",
                             mode         = "WO",
+                        )
+
+        ##############################
+        # Commands
+        ##############################
+
+        self.addCommand(    name         = "RstCnt",
+                            description  = "Reset all the status counters",
+                            function     = """\
+                                           self.CntRst.set(1)
+                                           """
                         )
 
