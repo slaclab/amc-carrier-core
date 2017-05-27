@@ -107,7 +107,7 @@ class AmcCarrierCore(pr.Device):
                                 offset       =  0x09000000,
                             ))
               
-         self.add(UdpEngineClient(
+        self.add(UdpEngineClient(
                                 name         = "BpUdpClient",
                                 offset       =  0x0A000000,
                                 description  = "BpUdpClient",
