@@ -27,10 +27,8 @@ entity Adc32Rf45SpiMaster is
    generic (
       TPD_G             : time            := 1 ns;
       AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      ADDRESS_SIZE_G    : natural         := 15;
-      DATA_SIZE_G       : natural         := 8;
-      CLK_PERIOD_G      : real            := 6.4E-9;
-      SPI_SCLK_PERIOD_G : real            := 10.0E-6);
+      CLK_PERIOD_G      : real            := (1.0/156.25E+6);
+      SPI_SCLK_PERIOD_G : real            := (1.0/10.0E+6));
    port (
       -- Clock and Reset
       axiClk         : in  sl;
@@ -81,7 +79,7 @@ architecture rtl of Adc32Rf45SpiMaster is
       wrArray       => (others => (others => '0')),
       axiWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C,
       axiReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
-      state         => WAIT_AXI_TXN_S);
+      state         => IDLE_S);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -139,70 +137,70 @@ begin
             -- Note: Refer to https://docs.google.com/a/stanford.edu/spreadsheets/d/1FF_dsCxRgwguseu1B2kBMGiVdTbknMDl8cHdPX8geNY/edit?usp=sharing
             case r.xferType is
                -- General Registers: (XFER_Type = 0x0)
-               when 0 =>
+               when x"0" =>
                   v.size       := 1;
                   v.wrArray(0) := (r.axiRd & "000" & r.addr & r.data);
                -- Analog Bank: (XFER_Type = 0x1)
-               when 1 =>
+               when x"1" =>
                   v.size       := 3;
                   v.wrArray(0) := (x"0012" & x"04");
                   v.wrArray(1) := (x"0011" & x"FF");
                   v.wrArray(2) := (r.axiRd & "000" & r.addr & r.data);
                -- Offset corrector page channel A: (XFER_Type = 0x2)
-               when 2 =>
+               when x"2" =>
                   v.size       := 4;
-                  v.wrArray(0) := x"4004" & x"61");
-                  v.wrArray(1) := x"4003" & x"00");
-                  v.wrArray(2) := x"4002" & x"00");
+                  v.wrArray(0) := (x"4004" & x"61");
+                  v.wrArray(1) := (x"4003" & x"00");
+                  v.wrArray(2) := (x"4002" & x"00");
                   v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
                -- Offset corrector page channel B: (XFER_Type = 0x3)
-               when 3 =>
+               when x"3" =>
                   v.size       := 4;
-                  v.wrArray(0) := x"4004" & x"61");
-                  v.wrArray(1) := x"4003" & x"01");
-                  v.wrArray(2) := x"4002" & x"00");
+                  v.wrArray(0) := (x"4004" & x"61");
+                  v.wrArray(1) := (x"4003" & x"01");
+                  v.wrArray(2) := (x"4002" & x"00");
                   v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
                -- Digital gain page channel A: (XFER_Type = 0x4)
-               when 4 =>
+               when x"4" =>
                   v.size       := 4;
-                  v.wrArray(0) := x"4004" & x"61");
-                  v.wrArray(1) := x"4003" & x"00");
-                  v.wrArray(2) := x"4002" & x"05");
+                  v.wrArray(0) := (x"4004" & x"61");
+                  v.wrArray(1) := (x"4003" & x"00");
+                  v.wrArray(2) := (x"4002" & x"05");
                   v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
                -- Digital gain page channel B: (XFER_Type = 0x5)
-               when 5 =>
+               when x"5" =>
                   v.size       := 4;
-                  v.wrArray(0) := x"4004" & x"61");
-                  v.wrArray(1) := x"4003" & x"01");
-                  v.wrArray(2) := x"4002" & x"05");
+                  v.wrArray(0) := (x"4004" & x"61");
+                  v.wrArray(1) := (x"4003" & x"01");
+                  v.wrArray(2) := (x"4002" & x"05");
                   v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
                -- Main digital page channel A: (XFER_Type = 0x6)
-               when 6 =>
+               when x"6" =>
                   v.size       := 4;
-                  v.wrArray(0) := x"4004" & x"68");
-                  v.wrArray(1) := x"4003" & x"00");
-                  v.wrArray(2) := x"4002" & x"00");
+                  v.wrArray(0) := (x"4004" & x"68");
+                  v.wrArray(1) := (x"4003" & x"00");
+                  v.wrArray(2) := (x"4002" & x"00");
                   v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
                -- Main digital page channel B: (XFER_Type = 0x7)
-               when 7 =>
+               when x"7" =>
                   v.size       := 4;
-                  v.wrArray(0) := x"4004" & x"68");
-                  v.wrArray(1) := x"4003" & x"01");
-                  v.wrArray(2) := x"4002" & x"00");
+                  v.wrArray(0) := (x"4004" & x"68");
+                  v.wrArray(1) := (x"4003" & x"01");
+                  v.wrArray(2) := (x"4002" & x"00");
                   v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
                -- JESD digital page channel A: (XFER_Type = 0x08)
-               when 8 =>
+               when x"8" =>
                   v.size       := 4;
-                  v.wrArray(0) := x"4004" & x"69");
-                  v.wrArray(1) := x"4003" & x"00");
-                  v.wrArray(2) := x"4002" & x"00");
+                  v.wrArray(0) := (x"4004" & x"69");
+                  v.wrArray(1) := (x"4003" & x"00");
+                  v.wrArray(2) := (x"4002" & x"00");
                   v.wrArray(3) := (r.axiRd & "111" & r.addr & r.data);  -- JESD digital page: use the CH bit to select channel B (CH = 0) or channel A (CH = 1).
                -- JESD digital page channel B: (XFER_Type = 0x0A)
-               when 9 =>
+               when x"9" =>
                   v.size       := 4;
-                  v.wrArray(0) := x"4004" & x"69");
-                  v.wrArray(1) := x"4003" & x"00");
-                  v.wrArray(2) := x"4002" & x"00");
+                  v.wrArray(0) := (x"4004" & x"69");
+                  v.wrArray(1) := (x"4003" & x"00");
+                  v.wrArray(2) := (x"4002" & x"00");
                   v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);  -- JESD digital page: use the CH bit to select channel B (CH = 0) or channel A (CH = 1).
                -- Decimation Filter and Power Detector Pages: (XFER_Type = 0xA)
                when others =>
