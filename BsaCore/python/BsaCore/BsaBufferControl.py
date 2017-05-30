@@ -45,13 +45,12 @@ class BsaBufferControl(pr.Device):
                             mode         = "RO",
                         )
 
-        for i in range(64):
-            self.Timestamps.add(GenericMemory(
-                                    name         = "GenericMemory_%.*i" % (2, i),
-                                    offset       =  0x00 + (i * 0x04),
-                                    bitSize      =  64,
-                                    mode         = "RO"
-                                ))
+        self.add(GenericMemory(
+                                offset     = 0x00,
+                                nelms      = 64,
+                                bitSize    = 64,
+                                mode       = "RO",
+                              ))
 
         self.add(AxiStreamDmaRingWrite(
                                 offset       =  0x00001000,
