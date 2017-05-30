@@ -19,8 +19,6 @@
 
 import pyrogue as pr
 
-from DacSigGen.Waveform import *
-
 class DacSigGen(pr.Device):
     def __init__(   self, 
                     name        = "DacSigGen", 
@@ -123,7 +121,7 @@ class DacSigGen(pr.Device):
 
         digits = len(str(abs(numOfChs-1))) 
         for i in range(numOfChs):
-            self.add(Waveform(
+            self.add(GenericMemory(
                                     name         = "Waveform_%.*i" % (digits, i),
                                     description  = "Waveform data 16-bit samples.",
                                     offset       =  0x01000000 + (i * 0x01000000),
