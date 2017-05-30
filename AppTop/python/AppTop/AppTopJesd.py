@@ -41,11 +41,11 @@ class AppTopJesd(pr.Device):
         self.add(JesdRx(
                                 offset       =  0x00000000,
                                 numRxLanes   =  numRxLanes,
-                                # instantiate  =  False,
+                                instantiate  =  False,
                             ))
 
         self.add(JesdTx(
                                 offset       =  0x01000000,
                                 numTxLanes   =  numTxLanes,
-                                # instantiate  =  False,
+                                instantiate  =  False,
                     ))
