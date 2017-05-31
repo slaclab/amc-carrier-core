@@ -115,6 +115,8 @@ architecture rtl of DaqLane is
       );  
 
    type RegType is record
+      packetSize   : slv(31 downto 0);
+      maxSize      : slv(31 downto 0);
       dataCnt      : slv(packetSize_i'range);
       txAxisMaster : AxiStreamMasterType;
       error        : sl;
@@ -136,6 +138,8 @@ architecture rtl of DaqLane is
    end record;
    
    constant REG_INIT_C : RegType := (
+      packetSize   => (others => '0'),
+      maxSize      => (others => '0'),
       dataCnt      => (others => '0'),
       txAxisMaster => AXI_STREAM_MASTER_INIT_C,
       error        => '0',
@@ -292,6 +296,10 @@ begin
             v.dataCnt := (others => '0');
             v.error   := r.error;
             v.busy    := '0';
+            
+            -- Update the local copy of packetSize
+            v.packetSize := packetSize_i;
+            v.maxSize    := (packetSize_i-1);
 
             -- No data sent 
             v.txAxisMaster.tvalid := '0';
@@ -325,7 +333,9 @@ begin
             -- Increment the counter
             -- and sample data on s_rateClk rate
             if s_rateClk = '1' then
-               v.dataCnt             := r.dataCnt + 1;
+               if (r.dataCnt /= r.maxSize) then
+                  v.dataCnt             := r.dataCnt + 1;
+               end if;
                v.txAxisMaster.tvalid := '1';
             else
                v.dataCnt             := r.dataCnt;
@@ -380,7 +390,7 @@ begin
             v.txAxisMaster.tLast := '0';
             v.txAxisMaster.tDest := toSlv(axiNum_i, 8);
              
-            -- Insert tLast at the end of header and EOFE if packetSize_i less or equal to HEADER_SIZE_C 
+            -- Insert tLast at the end of header and EOFE if packetSize less or equal to HEADER_SIZE_C 
             if ((r.dataCnt = (HEADER_SIZE_C-1)) and (r.packetSize <= HEADER_SIZE_C)) then
                -- Set the EOF(tlast) bit       
                v.txAxisMaster.tLast := '1';
@@ -408,7 +418,9 @@ begin
             -- Increment the counter
             -- and sample data on s_rateClk rate
             if s_rateClk = '1' then
-               v.dataCnt             := r.dataCnt + 1;
+               if (r.dataCnt /= r.maxSize) then
+                  v.dataCnt             := r.dataCnt + 1;
+               end if;
                v.txAxisMaster.tvalid := '1';
             else
                v.dataCnt             := r.dataCnt;
@@ -432,7 +444,7 @@ begin
             ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, '1');
             
             -- Set the tLast bit            
-            if (r.dataCnt >= (r.packetSize-1) and mode_i = '0') then
+            if (r.dataCnt = r.maxSize and mode_i = '0') then
                v.txAxisMaster.tLast := '1';
                -- Set the EOFE bit in tUser if error occurred during packet transmission
                ssiSetUserEofe(SSI_CONFIG_C, v.txAxisMaster, r.error);
@@ -444,7 +456,7 @@ begin
             -- Go further after next data
             if (s_rateClk = '1') then
                v.pctCnt := r.pctCnt+1;
-               if (r.dataCnt >= (r.packetSize-1) and mode_i = '0') then
+               if (r.dataCnt = r.maxSize and mode_i = '0') then
                   -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
                   if (freeze_i = '1') then
                      v.freeze := '1';
@@ -465,7 +477,9 @@ begin
             -- Increment the counter
             -- and sample data on s_rateClk rate
             if s_rateClk = '1' then
-               v.dataCnt             := r.dataCnt + 1;
+               if (r.dataCnt /= r.maxSize) then
+                  v.dataCnt             := r.dataCnt + 1;
+               end if;
                v.txAxisMaster.tvalid := '1';
             else
                v.dataCnt             := r.dataCnt;
@@ -486,7 +500,7 @@ begin
             v.txAxisMaster.tLast := '0';
             
             -- Set the tLast bit            
-            if ((r.dataCnt >= (r.packetSize-1) and mode_i = '0') or
+            if ((r.dataCnt = r.maxSize and mode_i = '0') or
                 (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) or
                 (r.error = '1')
             ) then
@@ -501,7 +515,7 @@ begin
             -- Next state conditioning
             if (s_rateClk = '1') then
                if ((r.error = '1') or                               -- Immediately stop sending data if error occurs
-                   (r.dataCnt >= (r.packetSize-1) and mode_i = '0') -- Stop sending data if packet size reached 
+                   (r.dataCnt = r.maxSize and mode_i = '0') -- Stop sending data if packet size reached 
                ) then                                                -- Do not stop sending data if in continuous mode
 
                   v.freeze := '0';
