@@ -19,6 +19,8 @@
 
 import pyrogue as pr
 
+from surf._GenericMemory import *
+
 class DacSigGen(pr.Device):
     def __init__(   self, 
                     name        = "DacSigGen", 
@@ -127,7 +129,7 @@ class DacSigGen(pr.Device):
                                     offset       =  0x01000000 + (i * 0x01000000),
                                     bitSize      =  16,
                                     mode         = "RW",
-                                    buffSize     =  buffSize,
+                                    nelms        =  buffSize,
                                 ))
 
         ##############################
