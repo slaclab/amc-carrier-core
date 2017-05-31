@@ -94,41 +94,40 @@ architecture top_level_app of AmcCryoCore is
    -------------------------------------------------------------------------------------------------
    constant NUM_AXI_MASTERS_C : natural := 5;
 
-   constant ADC_0_INDEX_C        : natural := 0;
-   constant ADC_1_INDEX_C        : natural := 1;
-   constant DAC_0_INDEX_C        : natural := 2;
-   constant DAC_1_INDEX_C        : natural := 3;
-   constant LMK_INDEX_C          : natural := 4;
+   constant LMK_INDEX_C          : natural := 0;
+   constant DAC_0_INDEX_C        : natural := 1;
+   constant DAC_1_INDEX_C        : natural := 2;
+   constant ADC_0_INDEX_C        : natural := 3;
+   constant ADC_1_INDEX_C        : natural := 4;
 
-   constant ADC_0_BASE_ADDR_C        : slv(31 downto 0) := X"0002_0000" + AXI_BASE_ADDR_G;
-   constant ADC_1_BASE_ADDR_C        : slv(31 downto 0) := X"0004_0000" + AXI_BASE_ADDR_G;
-   constant DAC_0_BASE_ADDR_C        : slv(31 downto 0) := X"0006_0000" + AXI_BASE_ADDR_G;
-   constant DAC_1_BASE_ADDR_C        : slv(31 downto 0) := X"0008_0000" + AXI_BASE_ADDR_G;
-   constant LMK_BASE_ADDR_C          : slv(31 downto 0) := X"000A_0000" + AXI_BASE_ADDR_G;
+   constant LMK_BASE_ADDR_C      : slv(31 downto 0) := x"0002_0000" + AXI_BASE_ADDR_G;
+   constant DAC_0_BASE_ADDR_C    : slv(31 downto 0) := x"0004_0000" + AXI_BASE_ADDR_G;
+   constant DAC_1_BASE_ADDR_C    : slv(31 downto 0) := x"0006_0000" + AXI_BASE_ADDR_G;
+   constant ADC_0_BASE_ADDR_C    : slv(31 downto 0) := x"0008_0000" + AXI_BASE_ADDR_G;
+   constant ADC_1_BASE_ADDR_C    : slv(31 downto 0) := x"000C_0000" + AXI_BASE_ADDR_G;
 
-   
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      ADC_0_INDEX_C        => (
-         baseAddr          => ADC_0_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      ADC_1_INDEX_C        => (
-         baseAddr          => ADC_1_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      DAC_0_INDEX_C        => (
-         baseAddr          => DAC_0_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      DAC_1_INDEX_C        => (
-         baseAddr          => DAC_1_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),  
       LMK_INDEX_C          => (
          baseAddr          => LMK_BASE_ADDR_C,
          addrBits          => 17,
-         connectivity      => X"FFFF"));
-
+         connectivity      => x"FFFF"),  
+      DAC_0_INDEX_C        => (
+         baseAddr          => DAC_0_BASE_ADDR_C,
+         addrBits          => 17,
+         connectivity      => x"FFFF"),
+      DAC_1_INDEX_C        => (
+         baseAddr          => DAC_1_BASE_ADDR_C,
+         addrBits          => 17,
+         connectivity      => x"FFFF"),  
+      ADC_0_INDEX_C        => (
+         baseAddr          => ADC_0_BASE_ADDR_C,
+         addrBits          => 18,
+         connectivity      => x"FFFF"),
+      ADC_1_INDEX_C        => (
+         baseAddr          => ADC_1_BASE_ADDR_C,
+         addrBits          => 18,
+         connectivity      => x"FFFF"));
+         
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal locAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -297,13 +296,20 @@ begin
    -- SPI interface ADC
    ----------------------------------------------------------------
    GEN_ADC : for i in 1 downto 0 generate
-      AxiSpiMaster_INST : entity work.AxiSpiMaster
-         generic map (
-            TPD_G             => TPD_G,
-            ADDRESS_SIZE_G    => 15,
-            DATA_SIZE_G       => 8,
-            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-            SPI_SCLK_PERIOD_G => 10.0E-6)
+--      AxiSpiMaster_INST : entity work.AxiSpiMaster
+--         generic map (
+--            TPD_G             => TPD_G,
+--            ADDRESS_SIZE_G    => 15,
+--            DATA_SIZE_G       => 8,
+--            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
+--            SPI_SCLK_PERIOD_G => 10.0E-6)
+            
+     AxiSpiMaster_INST : entity work.Adc32Rf45SpiMaster
+        generic map (
+           TPD_G             => TPD_G,
+           AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
+           CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
+           SPI_SCLK_PERIOD_G => (1.0/1.0E+6))            
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -315,6 +321,7 @@ begin
             coreSDin       => adcMuxDin,
             coreSDout      => adcCoreDout(i),
             coreCsb        => adcCoreCsb(i));
+            
    end generate GEN_ADC;
 
    -- Output mux

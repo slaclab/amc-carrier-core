@@ -3,7 +3,7 @@
 # Title      : PyRogue Cryo Amc Core
 #-----------------------------------------------------------------------------
 # File       : AmcCryoCore.py
-# Created    : 2017-05-30
+# Created    : 2017-04-03
 #-----------------------------------------------------------------------------
 # Description:
 # PyRogue Cryo Amc Core
@@ -22,11 +22,11 @@ import pyrogue as pr
 from surf._Adc16Dx370 import *
 from surf._Lmk04828 import *
 from surf._Dac38J84 import *
-from surf._Adc32Rf45 import *
+from AmcCryoDemo._adc32Rf45 import *
 
 class AmcCryoCore(pr.Device):
     def __init__(   self, 
-                    name        = "AmcCryoDemoCore", 
+                    name        = "AmcCryoCore", 
                     description = "Cryo Amc Rf Demo Board Core", 
                     memBase     =  None, 
                     offset      =  0x0, 
@@ -34,33 +34,21 @@ class AmcCryoCore(pr.Device):
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
-        ##############################
-        # Variables
-        ##############################
-        
-        for i in range(2):
-          self.add(Adc32Rf45(
-                                  name         = "Adc32Rf45_%i" % (i),
-                                  offset       =  0x00020000 + (i * 0x00020000),
-                              ))
-        
-        self.add(Lmk04828(
-                                offset       = 0x000A0000,
-                            ))
-#        for i in range(2):
-#          self.add(Dac38J84(
-#                                  name         = "Dac38J84_%i" % (i),
-#                                  offset       =  0x00060000 + (i * 0x00020000),
-#                              ))
+        #########
+        # Devices
+        #########
+        self.add(Lmk04828( offset=0x00020000))
+        self.add(Dac38J84( offset=0x00040000,name='DAC_0'))
+        self.add(Dac38J84( offset=0x00060000,name='DAC_1'))
+        self.add(Adc32Rf45(offset=0x00080000,name='ADC_0'))
+        self.add(Adc32Rf45(offset=0x000C0000,name='ADC_1'))        
 
-        ##############################
+        ##########
         # Commands
-        ##############################
-
+        ##########
         self.addCommand(    name         = "InitAmcCard",
                             description  = "Initialization for AMC card's JESD modules",
                             function     = """\
-                                           self.usleep(1000000)
                                            self.Lmk04828.PwrUpSysRef.set(1)
                                            self.usleep(1000000)
                                            self.Dac38J84.InitDac.set(1)
