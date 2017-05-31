@@ -79,7 +79,8 @@ begin
    generic map (
       TPD_G            => TPD_G,
       N_DATA_IN_G      => N_DATA_IN_G,
-      N_DATA_OUT_G     => N_DATA_OUT_G)
+      N_DATA_OUT_G     => N_DATA_OUT_G,
+      FRAME_BWIDTH_G   => 4)
    port map (
       axiClk            => clk_i,
       axiRst            => rst_i,
@@ -123,12 +124,17 @@ begin
    StimuliProcess : process
    begin
       wait until rst_i = '0';
-
+      
+      rxAxisSlaveArr_i(0)  <= AXI_STREAM_SLAVE_INIT_C;
+      
       wait for CLK_PERIOD_C*200;
       trigHw_i <= '1';    
       wait for CLK_PERIOD_C*20;
       trigHw_i <= '0';
-      
+
+      wait for CLK_PERIOD_C*500;
+      rxAxisSlaveArr_i(0)  <= AXI_STREAM_SLAVE_FORCE_C;
+    
       wait for CLK_PERIOD_C*500;
       trigHw_i <= '1';    
       wait for CLK_PERIOD_C*20;
@@ -151,9 +157,9 @@ begin
       
       -- Insert error
       wait for CLK_PERIOD_C*3000;
-      rxAxisSlaveArr_i(0)  <= AXI_STREAM_SLAVE_INIT_C;
+
       wait for CLK_PERIOD_C*20;    
-      rxAxisSlaveArr_i(0)  <= AXI_STREAM_SLAVE_FORCE_C;
+
       
       wait for CLK_PERIOD_C*100;
       freezeHw_i <= '1';    

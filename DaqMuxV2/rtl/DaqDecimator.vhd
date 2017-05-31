@@ -21,6 +21,7 @@
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
@@ -83,8 +84,7 @@ architecture rtl of DaqDecimator is
    signal rin : RegType;
    
    signal s_countPeriod : slv(rateDiv_i'range);
-   
-   
+  
 begin
    
    -- Divide count period by 2 if 16-bit
@@ -177,7 +177,7 @@ begin
       
       -- If disabled zero some of the data
       -- trig_i also resets the module and therefore syncs internal counters of all lanes
-      if (trig_i = '1') then
+      if (trig_i = '1' and rateDiv_i > 1) then
          v.divClk    := '0';
          v.rateClk   := '0';
          v.cnt       := (others => '0');

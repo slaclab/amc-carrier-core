@@ -32,7 +32,7 @@ entity DaqMuxV2 is
       -- AXI Lite and stream generics
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
       DECIMATOR_EN_G   : boolean         := true;
-
+      FRAME_BWIDTH_G   : positive        := 10;   -- Axi stream frame size Dafault 10: 4096 byte frames
       -- Number of data lanes
       N_DATA_IN_G : positive := 16;
 
@@ -207,6 +207,7 @@ begin
       rst     => devRst_i,
       dataIn  => dmod_i,      
       dataOut => s_dmodSync);
+      
    -----------------------------------------------------------
    -- AXI lite
    ----------------------------------------------------------- 
@@ -323,7 +324,8 @@ begin
          generic map (
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            DECIMATOR_EN_G   => DECIMATOR_EN_G)
+            DECIMATOR_EN_G   => DECIMATOR_EN_G,
+            FRAME_BWIDTH_G   => FRAME_BWIDTH_G)
          port map (
 
             devClk_i       => devClk_i,

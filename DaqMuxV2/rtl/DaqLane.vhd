@@ -210,7 +210,16 @@ begin
    end generate GEN_DEC;
 
    GEN_N_DEC : if (DECIMATOR_EN_G = false) generate
-      s_decSampData <= s_sampDataTst;
+   
+   U_SyncRe: entity work.SyncRegister
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => (GT_WORD_SIZE_C*8))
+      port map (
+         clk   => devClk_i,
+         rst   => devRst_i,
+         sig_i => s_sampDataTst,
+         reg_o => s_decSampData);
       s_rateClk <= '1';
    end generate GEN_N_DEC;   
    
@@ -260,7 +269,7 @@ begin
             v.txAxisMaster.tDest  := toSlv(axiNum_i, 8);
 
             -- Check if fifo and JESD is ready
-            if (rxAxisCtrl_i.pause = '0' and enable_i = '1' and rxAxisSlave_i.tReady = '1' and dataReady_i = '1' and r.trig = '1') then
+            if (rxAxisCtrl_i.pause = '0' and enable_i = '1' and rxAxisSlave_i.tReady = '1' and dataReady_i = '1' and trig_i = '1') then
                
                -- Clear error at the beginning of transmission
                v.error  := '0';
