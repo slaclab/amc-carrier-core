@@ -47,11 +47,11 @@ class AmcCryoCore(pr.Device):
         self.add(Lmk04828(
                                 offset       = 0x000A0000,
                             ))
-        for i in range(2):
-          self.add(Dac38J84(
-                                  name         = "Dac38J84_%i" % (i),
-                                  offset       =  0x00060000 + (i * 0x00020000),
-                              ))
+#        for i in range(2):
+#          self.add(Dac38J84(
+#                                  name         = "Dac38J84_%i" % (i),
+#                                  offset       =  0x00060000 + (i * 0x00020000),
+#                              ))
 
         ##############################
         # Commands
