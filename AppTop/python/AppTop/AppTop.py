@@ -49,11 +49,11 @@ class AppTop(pr.Device):
                                 offset       =  0x10000000,
                             ))
 
-        for i in range(2):
-            self.add(DaqMuxV2(
-                                    name         = "DaqMuxV2_%i" % (i),
-                                    offset       =  0x20000000 + (i * 0x10000000),
-                                ))
+#        for i in range(2):
+#            self.add(DaqMuxV2(
+#                                    name         = "DaqMuxV2_%i" % (i),
+#                                    offset       =  0x20000000 + (i * 0x10000000),
+#                                ))
 
         for i in range(2):
             self.add(AppTopJesd(
