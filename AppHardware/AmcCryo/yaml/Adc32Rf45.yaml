@@ -17,6 +17,7 @@ Adc32Rf45: &Adc32Rf45
   configPrio: 1
   size: 0x00020000
   children:
+    #########################################################
     GlobalReg_0x0000:
       at:
         offset: 0x00000
@@ -75,7 +76,7 @@ Adc32Rf45: &Adc32Rf45
     ######################################################### 
     MasterReg_0x0020:
       at:
-        offset: 0x00080
+        offset: 0x1C080
       class: IntField
       sizeBits: 8
       mode: RW
@@ -83,7 +84,7 @@ Adc32Rf45: &Adc32Rf45
     #########################################################
     MasterReg_0x0032:
       at:
-        offset: 0x000C8
+        offset: 0x1C0C8
       class: IntField
       sizeBits: 8
       mode: RW
@@ -91,7 +92,7 @@ Adc32Rf45: &Adc32Rf45
     #########################################################
     MasterReg_0x0039:
       at:
-        offset: 0x000E4
+        offset: 0x1C0E4
       class: IntField
       sizeBits: 8
       mode: RW
@@ -99,7 +100,7 @@ Adc32Rf45: &Adc32Rf45
     #########################################################
     MasterReg_0x003C:
       at:
-        offset: 0x000F0
+        offset: 0x1C0F0
       class: IntField
       sizeBits: 8
       mode: RW
@@ -107,7 +108,7 @@ Adc32Rf45: &Adc32Rf45
     #########################################################
     MasterReg_0x003D:
       at:
-        offset: 0x000F4
+        offset: 0x1C0F4
       class: IntField
       sizeBits: 8
       mode: RW
@@ -115,7 +116,7 @@ Adc32Rf45: &Adc32Rf45
     #########################################################
     MasterReg_0x005A:
       at:
-        offset: 0x00168
+        offset: 0x1C168
       class: IntField
       sizeBits: 8
       mode: RW
@@ -123,7 +124,7 @@ Adc32Rf45: &Adc32Rf45
     #########################################################
     MasterReg_0x0057:
       at:
-        offset: 0x0015C
+        offset: 0x1C15C
       class: IntField
       sizeBits: 8
       mode: RW
@@ -131,7 +132,7 @@ Adc32Rf45: &Adc32Rf45
     #########################################################
     MasterReg_0x0058:
       at:
-        offset: 0x00160
+        offset: 0x1C160
       class: IntField
       sizeBits: 8
       mode: RW
