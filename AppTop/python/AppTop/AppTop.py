@@ -67,6 +67,6 @@ class AppTop(pr.Device):
             self.add(DacSigGen(
                                     name         = "DacSigGen_%i" % (i),
                                     offset       =  0x60000000 + (i * 0x10000000),
-                                    # instantiate    =  False,
+                                    instantiate    =  False,
                                 ))
 
