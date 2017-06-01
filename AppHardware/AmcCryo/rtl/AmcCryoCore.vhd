@@ -226,8 +226,8 @@ begin
    spareP(9) <= lmkSpiCsb;   
    
    -- ADC resets remapping
-   spareN(3)   <= adcRst(0);
-   syncOutN(9) <= adcRst(1);
+   spareN(3)   <= axilRst;
+   syncOutN(9) <= axilRst;
    
    
    -------------------------------------------------------------------------------------------------

@@ -19,7 +19,7 @@
 
 import pyrogue as pr
 
-from surf._AxiStreamDmaRingWrite import *
+from surf.axi._AxiStreamDmaRingWrite import *
 
 class BsaWaveformEngine(pr.Device):
     def __init__(   self, 

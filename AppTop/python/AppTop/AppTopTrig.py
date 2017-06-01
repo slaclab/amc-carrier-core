@@ -23,7 +23,6 @@ from LclsTimingCore.LclsTriggerPulse import *
 from LclsTimingCore.EvrV1Reg import *
 from LclsTimingCore.EvrV1Isr import *
 
-
 class AppTopTrig(pr.Device):
     def __init__(   self, 
                     name         = "AppTopTrig", 
@@ -31,9 +30,10 @@ class AppTopTrig(pr.Device):
                     memBase      =  None, 
                     offset       =  0x0, 
                     hidden       =  False, 
-                    numTrigPulse =  1
+                    numTrigPulse =  1,
+                    expand      =  True,
                 ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
+        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
 
         ##############################
         # Variables
