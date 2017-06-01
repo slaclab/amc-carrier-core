@@ -111,8 +111,7 @@ architecture rtl of DaqLane is
       IDLE_S,
       HEADER_S,
       SOF_S,
-      DATA_S
-      );  
+      DATA_S);  
 
    type RegType is record
       packetSize   : slv(31 downto 0);
@@ -124,16 +123,12 @@ architecture rtl of DaqLane is
       busy         : sl;      
       pctCnt       : slv(pctCnt_o'range);
       trig         : sl;
-      
-      -- Register the inputs
-      packetSize : slv(31 downto 0); 
-      rateDiv    : slv(15 downto 0);         
-      averaging  : sl;          
-      dec16or32  : sl;          
-      headerEn   : sl;
-      signWidth  : slv(4 downto 0);
-      signed     : sl;
-      --
+      rateDiv      : slv(15 downto 0);         
+      averaging    : sl;          
+      dec16or32    : sl;          
+      headerEn     : sl;
+      signWidth    : slv(4 downto 0);
+      signed       : sl;
       state        : StateType;
    end record;
    
@@ -147,18 +142,13 @@ architecture rtl of DaqLane is
       busy         => '0',
       pctCnt       => (others => '0'),
       trig         => '0',
-      -- 
-      packetSize  => (others => '0'),
-      rateDiv     => (others => '0'),
-      averaging   => '0',
-      dec16or32   => '0',
-      headerEn    => '0',
-      signWidth   => (others => '0'),
-      signed      => '0',
-      
-      --
-      state        => IDLE_S
-      );
+      rateDiv      => (others => '0'),
+      averaging    => '0',
+      dec16or32    => '0',
+      headerEn     => '0',
+      signWidth    => (others => '0'),
+      signed       => '0',
+      state        => IDLE_S);
 
    signal r                : RegType := REG_INIT_C;
    signal rin              : RegType;
@@ -257,16 +247,6 @@ begin
       -- Latch the current value
       v := r;
       
-      -- Register values      
-      v.packetSize := packetSize_i;
-      v.rateDiv    := rateDiv_i;
-      v.averaging  := averaging_i;
-      v.dec16or32  := dec16or32_i;
-      v.headerEn   := headerEn_i;
-      v.signWidth  := signWidth_i;
-      v.signed     := signed_i;
-      
-      
       
       -- Register trigger
       v.trig := trig_i;
@@ -297,9 +277,15 @@ begin
             v.error   := r.error;
             v.busy    := '0';
             
-            -- Update the local copy of packetSize
+            -- Register values      
             v.packetSize := packetSize_i;
             v.maxSize    := (packetSize_i-1);
+            v.rateDiv    := rateDiv_i;
+            v.averaging  := averaging_i;
+            v.dec16or32  := dec16or32_i;
+            v.headerEn   := headerEn_i;
+            v.signWidth  := signWidth_i;
+            v.signed     := signed_i;            
 
             -- No data sent 
             v.txAxisMaster.tvalid := '0';
