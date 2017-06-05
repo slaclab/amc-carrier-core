@@ -151,7 +151,7 @@ begin
    -- Register the sample data and valids at the beginning to ease timing 
    -----------------------------------------------------------
    GEN_IN_LANES : for i in N_DATA_IN_G-1 downto 0 generate  
-      U_SyncRe: entity work.SyncRegister
+      U_SyncRe: entity work.RegisterVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 32)
@@ -163,7 +163,7 @@ begin
             
    end generate GEN_IN_LANES;
    
-   U_SyncRe: entity work.SyncRegister
+   U_SyncRe: entity work.RegisterVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => N_DATA_IN_G)
@@ -283,37 +283,40 @@ begin
       freeze_o          => s_freeze
       );
    
+   
    -- Sw trigger goes directly out to Cascade so it is aligned with the next nodule as much as possible
    trigCasc_o <= s_trigSw;  
    armCasc_o  <= s_trigHwArm;
    -----------------------------------------------------------
    -- MULTIPLEXER logic
    -----------------------------------------------------------    
-   comb : process (s_dataValidVec, s_muxSel, s_sampleDataArr) is
+   sync : process (devClk_i) is
    begin
-      for i in N_DATA_OUT_G-1 downto 0 loop
-         -- Data mode
-         if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
-            s_sampleDataArrMux(i) <= s_sampleDataArr(conv_integer(s_muxSel(i))-2);
-            s_dataValidVecMux(i)  <= s_dataValidVec(conv_integer(s_muxSel(i))-2);
-            s_enAxi(i)            <= '1';
-            s_enTest(i)           <= '0';
-         -- Test mode
-         elsif (s_muxSel(i) = 1) then 
-            s_sampleDataArrMux(i) <= (others => '0');
-            s_dataValidVecMux(i)  <= '1';
-            s_enAxi(i)            <= '1';        
-            s_enTest(i)           <= '1';
-         -- Disabled
-         else
-            s_sampleDataArrMux(i) <= (others => '0');
-            s_dataValidVecMux(i)  <= '0';
-            s_enAxi(i)            <= '0';
-            s_enTest(i)           <= '0';
-         end if;
-      end loop;
+      if rising_edge(devClk_i) then
+          for i in N_DATA_OUT_G-1 downto 0 loop
+             -- Data mode
+             if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
+                s_sampleDataArrMux(i) <= s_sampleDataArr(conv_integer(s_muxSel(i))-2);
+                s_dataValidVecMux(i)  <= s_dataValidVec(conv_integer(s_muxSel(i))-2);
+                s_enAxi(i)            <= '1';
+                s_enTest(i)           <= '0';
+             -- Test mode
+             elsif (s_muxSel(i) = 1) then 
+                s_sampleDataArrMux(i) <= (others => '0');
+                s_dataValidVecMux(i)  <= '1';
+                s_enAxi(i)            <= '1';        
+                s_enTest(i)           <= '1';
+             -- Disabled
+             else
+                s_sampleDataArrMux(i) <= (others => '0');
+                s_dataValidVecMux(i)  <= '0';
+                s_enAxi(i)            <= '0';
+                s_enTest(i)           <= '0';
+             end if;
+          end loop;
+      end if;
    ----------------------
-   end process comb;
+   end process sync;
   
   
    s_header <= "00000" & s_trigHeader;
