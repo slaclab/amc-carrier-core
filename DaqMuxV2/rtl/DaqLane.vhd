@@ -165,7 +165,7 @@ begin
    s_trigDecimator <= trig_i and not r.busy;
    
    -- Register the data at the beginning to ease timing   
-   U_SyncRe: entity work.SyncRegister
+   U_SyncRe: entity work.RegisterVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => (GT_WORD_SIZE_C*8))
@@ -225,7 +225,7 @@ begin
 
    GEN_N_DEC : if (DECIMATOR_EN_G = false) generate
    
-   U_SyncRe: entity work.SyncRegister
+   U_SyncRe: entity work.RegisterVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => (GT_WORD_SIZE_C*8))
