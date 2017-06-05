@@ -283,7 +283,6 @@ begin
       freeze_o          => s_freeze
       );
    
-   
    -- Sw trigger goes directly out to Cascade so it is aligned with the next nodule as much as possible
    trigCasc_o <= s_trigSw;  
    armCasc_o  <= s_trigHwArm;
