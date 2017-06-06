@@ -164,16 +164,17 @@ begin
    -- because it will zero s_rateClk and data will be missed
    s_trigDecimator <= trig_i and not r.busy;
    
-   -- Register the data at the beginning to ease timing   
-   U_SyncRe: entity work.RegisterVector
+   -- Register the data at the beginning to ease timing
+   U_Register: entity work.SlvDelay
       generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => (GT_WORD_SIZE_C*8))
+         TPD_G          => TPD_G,
+         WIDTH_G        => (GT_WORD_SIZE_C*8))
       port map (
          clk   => devClk_i,
          rst   => devRst_i,
-         sig_i => sampleData_i,
-         reg_o => s_sampleDataReg);
+         delay => "1",
+         din   => sampleData_i,
+         dout  => s_sampleDataReg);
 
    -- Sign extension
    signEx_comb : process (s_sampleDataReg, r.signed, r.dec16or32, r.signWidth) is       
@@ -225,15 +226,17 @@ begin
 
    GEN_N_DEC : if (DECIMATOR_EN_G = false) generate
    
-   U_SyncRe: entity work.RegisterVector
+      U_Register: entity work.SlvDelay
       generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => (GT_WORD_SIZE_C*8))
+         TPD_G          => TPD_G,
+         WIDTH_G        => (GT_WORD_SIZE_C*8))
       port map (
          clk   => devClk_i,
          rst   => devRst_i,
-         sig_i => s_sampDataTst,
-         reg_o => s_decSampData);
+         delay => "1",
+         din   => s_sampDataTst,
+         dout  => s_decSampData);
+
       s_rateClk <= '1';
    end generate GEN_N_DEC;   
    

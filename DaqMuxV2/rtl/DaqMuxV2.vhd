@@ -150,29 +150,30 @@ begin
    -----------------------------------------------------------
    -- Register the sample data and valids at the beginning to ease timing 
    -----------------------------------------------------------
-   GEN_IN_LANES : for i in N_DATA_IN_G-1 downto 0 generate  
-      U_SyncRe: entity work.RegisterVector
+   GEN_IN_LANES : for i in N_DATA_IN_G-1 downto 0 generate 
+      U_Register: entity work.SlvDelay
          generic map (
-            TPD_G   => TPD_G,
-            WIDTH_G => 32)
+            TPD_G          => TPD_G,
+            WIDTH_G        => 32)
          port map (
             clk   => devClk_i,
             rst   => devRst_i,
-            sig_i => sampleDataArr_i(i),
-            reg_o => s_sampleDataArr(i));
-            
+            delay => "1",
+            din   => sampleDataArr_i(i),
+            dout  => s_sampleDataArr(i));  
    end generate GEN_IN_LANES;
+
    
-   U_SyncRe: entity work.RegisterVector
+   U_RegisterValid: entity work.SlvDelay
       generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => N_DATA_IN_G)
+         TPD_G          => TPD_G,
+         WIDTH_G        => N_DATA_IN_G)
       port map (
          clk   => devClk_i,
          rst   => devRst_i,
-         sig_i => dataValidVec_i,
-         reg_o => s_dataValidVec);
-
+         delay => "1",
+         din   => dataValidVec_i,
+         dout  => s_dataValidVec);
    -----------------------------------------------------------
    -- Synchronize timestamp_i and bsa
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
