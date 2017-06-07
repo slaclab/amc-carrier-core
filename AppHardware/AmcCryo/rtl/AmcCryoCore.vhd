@@ -160,10 +160,10 @@ architecture top_level_app of AmcCryoCore is
 
    signal adcMuxClk  : sl;
    signal adcMuxDout : sl;
-   signal adcMuxDin  : sl;  
    
    signal adcSpiClk : sl;
-   signal adcSpiDio : sl;
+   signal adcSpiDi  : sl;
+   signal adcSpiDo  : sl;
    signal adcSpiCsb : slv(1 downto 0);
    
    -- DAC SPI config interface 
