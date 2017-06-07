@@ -27,36 +27,17 @@ class AmcCarrierCore(pr.Device):
                     memBase     =  None, 
                     offset      =  0x0, 
                     hidden      = False,
+                    expand	    = False,
                 ):
-        super(self.__class__, self).__init__(name, "AmcCarrierCore", memBase, offset, hidden)
+        super(self.__class__, self).__init__(name, "AmcCarrierCore", memBase, offset, hidden, expand=expand)   
 
         ##############################
         # Variables
-        ##############################
-
-        self.addVariable(   name         = "AMC_CARRIER_CORE_VERSION_C",
-                            description  = "FAMC Carrier Core Version Number",
-                            offset       =  0x00000400,
-                            bitSize      =  32,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
-
-        self.add(AxiVersion(
-                                offset       =  0x00000000
-                            ))
-
-        self.add(AxiSysMonUltraScale(
-                                offset       =  0x01000000
-                            ))
-
-        self.add(AxiMicronN25Q(
-                                offset=0x02000000
-                            ))
-
-        self.add(AxiSy56040(
-                                offset       =  0x03000000, 
+        ##############################                        
+        self.add(AxiVersion(            offset=0x00000000, expand=False))
+        self.add(AxiSysMonUltraScale(   offset=0x01000000, expand=False))
+        self.add(AxiSy56040(            offset=0x03000000, 
+                                expand       = False,
                                 description  = "\n\
                                                 Timing Crossbar:\n\
                                                 -----------------------------------------------------------------\n\
@@ -82,61 +63,48 @@ class AmcCarrierCore(pr.Device):
                                                 -----------------------------------------------------------------\n"\
                             ))
 
-        self.add(Axi24LC64FT(
-                                offset       =  0x04000000,
-                                instantiate  =  False,
-                            ))
-
-        self.add(AxiCdcm6208(
-                                offset       =  0x05000000,
-                            ))
-
-        self.add(DdrSpd(
-                                offset       =  0x06000000,
-                            ))
-
-        self.add(AmcCarrierBsi(
-                                offset       =  0x07000000,
-                            ))
-        
-        self.add(AmcCarrierTiming(
-                                offset       =  0x08000000,
-                            ))
-
-        self.add(AmcCarrierBsa(
-                                offset       =  0x09000000,
-                            ))
-              
+        # self.add(Axi24LC64FT(
+                                # offset       =  0x04000000,
+                                # instantiate  =  False,
+                                # hidden       =  True,
+                            # ))
+                            
+        # self.add(AxiCdcm6208(     offset=0x05000000, expand=False))
+        # self.add(DdrSpd(          offset=0x06000000, expand=False, hidden=True))
+        self.add(AmcCarrierBsi(   offset=0x07000000, expand=False))
+        # self.add(AmcCarrierTiming(offset=0x08000000, expand=False))
+        self.add(AmcCarrierBsa(   offset=0x09000000, expand=False))
+                            
         self.add(UdpEngineClient(
                                 name         = "BpUdpClient",
                                 offset       =  0x0A000000,
                                 description  = "BpUdpClient",
+                                expand       = False,
                             ))
 
         self.add(UdpEngineServer(
                                 name         = "BpUdpServer",
                                 offset       =  0x0A000818,
                                 description  = "BpUdpServer",
+                                expand       = False,
                             ))
 
 
         for i in range(2):                                       
             self.add(UdpEngineServer(
-                                    name         = "SwUdpServer_%i" % (i),
+                                    name         = "SwUdpServer[%i]" % (i),
                                     offset       =  0x0A000808 + (i * 0x08),
-                                    description  = "SwUdpServer. Server: %i" % (i),             
+                                    description  = "SwUdpServer. Server: %i" % (i),  
+                                    expand       = False,                                    
                                 ))
         for i in range(2):
             self.add(RssiCore(
-                                    name         = "SwRssiServer_%i" % (i),
+                                    name         = "SwRssiServer[%i]" % (i),
                                     offset       =  0x0A010000 + (i * 0x1000),
                                     description  = "SwRssiServer. Server: %i" % (i),                                
+                                    expand       = False,                                    
                                 ))
 
-        self.add(AxiMemTester(
-                                offset       =  0x0B000000
-                            ))
+        self.add(AxiMemTester(offset=0x0B000000, expand=False, hidden=True))
+        self.add(AppMps(      offset=0x0C000000, expand=False))
 
-        self.add(AppMps(
-                                offset       =  0x0C000000
-                            ))

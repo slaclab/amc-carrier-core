@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-----------------------------------------------------------------------------
-# Title      : PyRogue AmcCarrier BSA Module
+# Title      : PyRogue Common Application Top Level Trigger Module
 #-----------------------------------------------------------------------------
-# File       : AmcCarrierBsa.py
+# File       : AppTopTrig.py
 # Created    : 2017-04-04
 #-----------------------------------------------------------------------------
 # Description:
-# PyRogue AmcCarrier BSA Module
+# PyRogue Common Application Top Level Trigger Module
 #-----------------------------------------------------------------------------
 # This file is part of the rogue software platform. It is subject to
 # the license terms in the LICENSE.txt file found in the top-level directory
@@ -19,16 +19,18 @@
 
 import pyrogue as pr
 
-from BsaCore.BsaBufferControl import *
-from BsaCore.BsaWaveformEngine import *
+from LclsTimingCore.LclsTriggerPulse import *
+from LclsTimingCore.EvrV1Reg import *
+from LclsTimingCore.EvrV1Isr import *
 
-class AmcCarrierBsa(pr.Device):
+class AppTopTrig(pr.Device):
     def __init__(   self, 
-                    name        = "AmcCarrierBsa", 
-                    description = "AmcCarrier BSA Module", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
-                    hidden      =  False,
+                    name         = "AppTopTrig", 
+                    description  = "Common Application Top Level Trigger Module", 
+                    memBase      =  None, 
+                    offset       =  0x0, 
+                    hidden       =  False, 
+                    numTrigPulse =  1,
                     expand      =  True,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
@@ -37,13 +39,17 @@ class AmcCarrierBsa(pr.Device):
         # Variables
         ##############################
 
-        self.add(BsaBufferControl(
-                                offset       =  0x00000000,
+        digits = len(str(abs(numTrigPulse-1))) 
+        for i in range(numTrigPulse):
+            self.add(LclsTriggerPulse(
+                                    name         = "LclsTriggerPulse_%.*i" % (digits, i),
+                                    offset       =  0x00000000 + (i * 0x00001000),
+                                ))
+
+        self.add(EvrV1Reg(
+                                offset       =  0x01000000,
                             ))
 
-        for i in range(2):
-            self.add(BsaWaveformEngine(
-                                    name         = "BsaWaveformEngine[%i]" % (i), 
-                                    offset       =  0x00010000 + i * 0x00010000,
-                                ))
-       
+        self.add(EvrV1Isr(
+                                offset       =  0x02000000,
+                            ))

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-----------------------------------------------------------------------------
-# Title      : PyRogue AmcCarrier BSA Module
+# Title      : PyRogue MPS Application Module
 #-----------------------------------------------------------------------------
-# File       : AmcCarrierBsa.py
+# File       : AppMps.py
 # Created    : 2017-04-04
 #-----------------------------------------------------------------------------
 # Description:
-# PyRogue AmcCarrier BSA Module
+# PyRogue MPS Application Module
 #-----------------------------------------------------------------------------
 # This file is part of the rogue software platform. It is subject to
 # the license terms in the LICENSE.txt file found in the top-level directory
@@ -19,13 +19,12 @@
 
 import pyrogue as pr
 
-from BsaCore.BsaBufferControl import *
-from BsaCore.BsaWaveformEngine import *
+from AppMps.AppMpsSalt import *
 
-class AmcCarrierBsa(pr.Device):
+class AppMps(pr.Device):
     def __init__(   self, 
-                    name        = "AmcCarrierBsa", 
-                    description = "AmcCarrier BSA Module", 
+                    name        = "AppMps", 
+                    description = "MPS Application", 
                     memBase     =  None, 
                     offset      =  0x0, 
                     hidden      =  False,
@@ -37,13 +36,6 @@ class AmcCarrierBsa(pr.Device):
         # Variables
         ##############################
 
-        self.add(BsaBufferControl(
+        self.add(AppMpsSalt(
                                 offset       =  0x00000000,
                             ))
-
-        for i in range(2):
-            self.add(BsaWaveformEngine(
-                                    name         = "BsaWaveformEngine[%i]" % (i), 
-                                    offset       =  0x00010000 + i * 0x00010000,
-                                ))
-       

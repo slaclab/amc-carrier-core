@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-----------------------------------------------------------------------------
-# Title      : PyRogue AmcCarrier BSA Module
+# Title      : PyRogue BSA Waveform Engine Module
 #-----------------------------------------------------------------------------
-# File       : AmcCarrierBsa.py
-# Created    : 2017-04-04
+# File       : BsaWaveformEngine.py
+# Created    : 2017-04-03
 #-----------------------------------------------------------------------------
 # Description:
-# PyRogue AmcCarrier BSA Module
+# PyRogue BSA Waveform Engine Module
 #-----------------------------------------------------------------------------
 # This file is part of the rogue software platform. It is subject to
 # the license terms in the LICENSE.txt file found in the top-level directory
@@ -19,31 +19,23 @@
 
 import pyrogue as pr
 
-from BsaCore.BsaBufferControl import *
-from BsaCore.BsaWaveformEngine import *
+from surf.axi._AxiStreamDmaRingWrite import *
 
-class AmcCarrierBsa(pr.Device):
+class BsaWaveformEngine(pr.Device):
     def __init__(   self, 
-                    name        = "AmcCarrierBsa", 
-                    description = "AmcCarrier BSA Module", 
+                    name        = "BsaWaveformEngine", 
+                    description = "Configuration and status of the BSA dignosic buffers", 
                     memBase     =  None, 
                     offset      =  0x0, 
-                    hidden      =  False,
-                    expand      =  True,
+                    hidden      =  False
                 ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
+        super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
 
         ##############################
         # Variables
         ##############################
 
-        self.add(BsaBufferControl(
+        self.add(AxiStreamDmaRingWrite(
                                 offset       =  0x00000000,
+                                name         = "WaveformEngineBuffers",
                             ))
-
-        for i in range(2):
-            self.add(BsaWaveformEngine(
-                                    name         = "BsaWaveformEngine[%i]" % (i), 
-                                    offset       =  0x00010000 + i * 0x00010000,
-                                ))
-       
