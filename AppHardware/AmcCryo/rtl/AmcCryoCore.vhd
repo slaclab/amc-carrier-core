@@ -208,11 +208,11 @@ begin
    jesdTxSyncN(1)  <= spareN(8);
    
    -- ADC SPI 
-   -- adcSpiDo    <= spareP(2);   
+   spareP(2)   <= adcSpiDo;   
    spareN(1)   <= adcSpiClk;   
    spareN(2)   <= adcSpiCsb(0);
    syncOutN(8) <= adcSpiCsb(1); 
-   syncOutP(9) <= adcSpiDio;
+   adcSpiDi    <= syncOutP(9);
    
    -- DAC SPI
    spareP(0) <= dacSpiClk;
@@ -296,20 +296,22 @@ begin
    -- SPI interface ADC
    ----------------------------------------------------------------
    GEN_ADC : for i in 1 downto 0 generate
---      AxiSpiMaster_INST : entity work.AxiSpiMaster
---         generic map (
---            TPD_G             => TPD_G,
---            ADDRESS_SIZE_G    => 15,
---            DATA_SIZE_G       => 8,
---            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
---            SPI_SCLK_PERIOD_G => 10.0E-6)
-            
-     AxiSpiMaster_INST : entity work.Adc32Rf45SpiMaster
+   
+     AxiSpiMaster_INST : entity work.AxiSpiMaster
         generic map (
            TPD_G             => TPD_G,
-           AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
+           ADDRESS_SIZE_G    => 15,
+           DATA_SIZE_G       => 8,
            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-           SPI_SCLK_PERIOD_G => (1.0/10.0E+3)) -- Changing to 10k            
+           SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+            
+     -- AxiSpiMaster_INST : entity work.Adc32Rf45SpiMaster
+        -- generic map (
+           -- TPD_G             => TPD_G,
+           -- AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
+           -- CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
+           -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -318,7 +320,7 @@ begin
             axiWriteMaster => locAxilWriteMasters(ADC_0_INDEX_C+i),
             axiWriteSlave  => locAxilWriteSlaves(ADC_0_INDEX_C+i),
             coreSclk       => adcCoreClk(i),
-            coreSDin       => adcMuxDin,
+            coreSDin       => adcSpiDo,
             coreSDout      => adcCoreDout(i),
             coreCsb        => adcCoreCsb(i));
             
@@ -334,17 +336,9 @@ begin
       adcMuxDout <=  adcCoreDout(0) when "10",
                      adcCoreDout(1) when "01",
                      '0'            when others;
-                     
-   -- IO Assignment
-   IOBUF_Adc : IOBUF
-      port map (
-         I  => '0',
-         O  => adcMuxDin,
-         IO => adcSpiDio,
-         T  => adcMuxDout);                  
-
    -- IO Assignment
    adcSpiClk <= adcMuxClk;
+   adcSpiDi  <= adcMuxDout;   
    adcSpiCsb <= adcCoreCsb;
    
       
@@ -358,7 +352,7 @@ begin
             ADDRESS_SIZE_G    => 7,
             DATA_SIZE_G       => 16,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-            SPI_SCLK_PERIOD_G => (1.0/10.0E+3)) -- Changing to 10k 
+            SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -403,7 +397,7 @@ begin
          ADDRESS_SIZE_G    => 15,
          DATA_SIZE_G       => 8,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => (1.0/10.0E+3)) -- Changing to 10k 
+         SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
