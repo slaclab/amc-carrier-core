@@ -154,6 +154,7 @@ architecture top_level_app of AmcCryoCore is
    -------------------------------------------------------------------------------------------------   
    
    -- ADC SPI config interface   
+   signal adcCoreRst  : slv(1 downto 0) := "00";
    signal adcCoreClk  : slv(1 downto 0);
    signal adcCoreDout : slv(1 downto 0);
    signal adcCoreCsb  : slv(1 downto 0);
@@ -226,8 +227,8 @@ begin
    spareP(9) <= lmkSpiCsb;   
    
    -- ADC resets remapping
-   spareN(3)   <= axilRst;
-   syncOutN(9) <= axilRst;
+   spareN(3)   <= axilRst or adcCoreRst(0);
+   syncOutN(9) <= axilRst or adcCoreRst(1);
    
    
    -------------------------------------------------------------------------------------------------
@@ -297,20 +298,21 @@ begin
    ----------------------------------------------------------------
    GEN_ADC : for i in 1 downto 0 generate
    
-     AxiSpiMaster_INST : entity work.AxiSpiMaster
-        generic map (
-           TPD_G             => TPD_G,
-           ADDRESS_SIZE_G    => 15,
-           DATA_SIZE_G       => 8,
-           CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-           SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
-            
-     -- AxiSpiMaster_INST : entity work.Adc32Rf45SpiMaster
+     -- AxiSpiMaster_INST : entity work.AxiSpiMaster
         -- generic map (
            -- TPD_G             => TPD_G,
-           -- AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
+           -- ADDRESS_SIZE_G    => 15,
+           -- DATA_SIZE_G       => 8,
            -- CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
            -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+            
+     AxiSpiMaster_INST : entity work.Adc32Rf45SpiMaster
+        generic map (
+           TPD_G             => TPD_G,
+           AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
+           CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
+           -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+           SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
 
          port map (
             axiClk         => axilClk,
@@ -319,6 +321,7 @@ begin
             axiReadSlave   => locAxilReadSlaves(ADC_0_INDEX_C+i),
             axiWriteMaster => locAxilWriteMasters(ADC_0_INDEX_C+i),
             axiWriteSlave  => locAxilWriteSlaves(ADC_0_INDEX_C+i),
+            coreRst        => adcCoreRst(i),
             coreSclk       => adcCoreClk(i),
             coreSDin       => adcSpiDo,
             coreSDout      => adcCoreDout(i),
@@ -340,7 +343,6 @@ begin
    adcSpiClk <= adcMuxClk;
    adcSpiDi  <= adcMuxDout;   
    adcSpiCsb <= adcCoreCsb;
-   
       
    ----------------------------------------------------------------
    -- SPI interface DAC
@@ -352,7 +354,8 @@ begin
             ADDRESS_SIZE_G    => 7,
             DATA_SIZE_G       => 16,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-            SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+            -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+            SPI_SCLK_PERIOD_G => (1.0/500.0E+3))
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -397,7 +400,8 @@ begin
          ADDRESS_SIZE_G    => 15,
          DATA_SIZE_G       => 8,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+         -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+         SPI_SCLK_PERIOD_G => (1.0/500.0E+3))
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,

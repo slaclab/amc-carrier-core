@@ -27,6 +27,7 @@ class Adc32Rf45Channel(pr.Device):
                     offset      =  0x00,
                     hidden      =  False,
                     expand      =  True,
+                    verify      =  False,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
         
@@ -40,382 +41,421 @@ class Adc32Rf45Channel(pr.Device):
         decFilter       = (0x5 << 14)
         pwrDet          = (0x6 << 14)
         
-        # ##################
-        # # Offset Corr Page 
-        # ##################
-        # self.addVariable(  name         = "SEL_EXT_EST",
-                            # description  = "This bit selects the external estimate for the offset correction block",
-                            # offset       =  (offsetCorrector + (4*0x34)),
-                            # bitSize      =  1,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        ##################
+        # Offset Corr Page 
+        ##################
+        self.addVariable(  name         = "SEL_EXT_EST",
+                            description  = "This bit selects the external estimate for the offset correction block",
+                            offset       =  (offsetCorrector + (4*0x34)),
+                            bitSize      =  1,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "FREEZE_OFFSET_CORR",
-                            # description  = "Use this bit to freeze the offset estimation process of the offset corrector",
-                            # offset       =  (offsetCorrector + (4*0x68)),
-                            # bitSize      =  1,
-                            # bitOffset    =  7,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )                        
+        self.addVariable(  name         = "FREEZE_OFFSET_CORR",
+                            description  = "Use this bit to freeze the offset estimation process of the offset corrector",
+                            offset       =  (offsetCorrector + (4*0x68)),
+                            bitSize      =  1,
+                            bitOffset    =  7,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )                        
 
-        # self.addVariable(  name         = "AlwaysWrite0x1_A",
-                            # description  = "Always set this bit to 1",
-                            # offset       =  (offsetCorrector + (4*0x68)),
-                            # bitSize      =  1,
-                            # bitOffset    =  5,
-                            # base         = "hex",
-                            # mode         = "WO",
-                            # value        = 0x1,
-                            # hidden       = True,
-                        # )
+        self.addVariable(  name         = "AlwaysWrite0x1_A",
+                            description  = "Always set this bit to 1",
+                            offset       =  (offsetCorrector + (4*0x68)),
+                            bitSize      =  1,
+                            bitOffset    =  5,
+                            base         = "hex",
+                            mode         = "WO",
+                            value        = 0x1,
+                            hidden       = True,
+                            verify       = False,
+                        )
 
-        # self.addVariable(  name         = "DIS_OFFSET_CORR",
-                            # description  = "0 = Offset correction block is enabled, 1 = Offset correction block is disabled",
-                            # offset       =  (offsetCorrector + (4*0x68)),
-                            # bitSize      =  1,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "DIS_OFFSET_CORR",
+                            description  = "0 = Offset correction block is enabled, 1 = Offset correction block is disabled",
+                            offset       =  (offsetCorrector + (4*0x68)),
+                            bitSize      =  1,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "AlwaysWrite0x1_B",
-                            # description  = "Always set this bit to 1",
-                            # offset       =  (offsetCorrector + (4*0x68)),
-                            # bitSize      =  1,
-                            # bitOffset    =  1,
-                            # base         = "hex",
-                            # mode         = "WO",
-                            # value        = 0x1,
-                            # hidden       = True,
-                        # )
+        self.addVariable(  name         = "AlwaysWrite0x1_B",
+                            description  = "Always set this bit to 1",
+                            offset       =  (offsetCorrector + (4*0x68)),
+                            bitSize      =  1,
+                            bitOffset    =  1,
+                            base         = "hex",
+                            mode         = "WO",
+                            value        = 0x1,
+                            hidden       = True,
+                            verify       = False,
+                        )
 
-        # ###################
-        # # Digital Gain Page
-        # ###################
-        # self.addVariable(  name         = "DIGITAL_GAIN",
-                            # description  = "These bits set the digital gain of the ADC output data prior to decimation up to 11 dB",
-                            # offset       =  (digitalGain + (4*0x0A6)),
-                            # bitSize      =  4,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",                        
-                        # )   
+        ###################
+        # Digital Gain Page
+        ###################
+        self.addVariable(  name         = "DIGITAL_GAIN",
+                            description  = "These bits set the digital gain of the ADC output data prior to decimation up to 11 dB",
+                            offset       =  (digitalGain + (4*0x0A6)),
+                            bitSize      =  4,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",                        
+                            verify       = verify,
+                        )   
 
-        # ###################
-        # # Main Digital Page
-        # ###################
-        # self.addVariable(  name         = "DIG_CORE_RESET_GBL",
-                            # description  = "All Nyquist zone settings take effect when this bit is pulsed.",
-                            # offset       =  (mainDigital + (4*0x000)),
-                            # bitSize      =  1,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        ###################
+        # Main Digital Page
+        ###################
+        self.addVariable(  name         = "DIG_CORE_RESET_GBL",
+                            description  = "All Nyquist zone settings take effect when this bit is pulsed.",
+                            offset       =  (mainDigital + (4*0x000)),
+                            bitSize      =  1,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "NQ_ZONE_EN",
-                            # description  = "0 = Nyquist zone specification disabled, 1 = Nyquist zone specification enabled",
-                            # offset       =  (mainDigital + (4*0x0A2)),
-                            # bitSize      =  1,
-                            # bitOffset    =  3,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "NQ_ZONE_EN",
+                            description  = "0 = Nyquist zone specification disabled, 1 = Nyquist zone specification enabled",
+                            offset       =  (mainDigital + (4*0x0A2)),
+                            bitSize      =  1,
+                            bitOffset    =  3,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "NYQUIST_ZONE",
-                            # description  = "These bits specify the operating Nyquist zone for the analog correction loop",
-                            # offset       =  (mainDigital + (4*0x0A2)),
-                            # bitSize      =  3,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "NYQUIST_ZONE",
+                            description  = "These bits specify the operating Nyquist zone for the analog correction loop",
+                            offset       =  (mainDigital + (4*0x0A2)),
+                            bitSize      =  3,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # ###################
-        # # JESD DIGITAL PAGE
-        # ###################
-        # self.addVariable(  name         = "CTRL_K",
-                            # description  = "0 = Default is five frames per multiframe, 1 = Frames per multiframe can be set in register 06h",
-                            # offset       =  (jesdDigital + (4*0x001)),
-                            # bitSize      =  1,
-                            # bitOffset    =  7,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        ###################
+        # JESD DIGITAL PAGE
+        ###################
+        self.addVariable(  name         = "CTRL_K",
+                            description  = "0 = Default is five frames per multiframe, 1 = Frames per multiframe can be set in register 06h",
+                            offset       =  (jesdDigital + (4*0x001)),
+                            bitSize      =  1,
+                            bitOffset    =  7,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        ) 
 
-        # self.addVariable(  name         = "TESTMODE_EN",
-                            # description  = "0 = Test mode disabled, 1 = Test mode enabled",
-                            # offset       =  (jesdDigital + (4*0x001)),
-                            # bitSize      =  1,
-                            # bitOffset    =  4,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "TESTMODE_EN",
+                            description  = "0 = Test mode disabled, 1 = Test mode enabled",
+                            offset       =  (jesdDigital + (4*0x001)),
+                            bitSize      =  1,
+                            bitOffset    =  4,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "LANE_ALIGN",
-                            # description  = "0 = Normal operation, 1 = Inserts lane alignment characters",
-                            # offset       =  (jesdDigital + (4*0x001)),
-                            # bitSize      =  1,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "LANE_ALIGN",
+                            description  = "0 = Normal operation, 1 = Inserts lane alignment characters",
+                            offset       =  (jesdDigital + (4*0x001)),
+                            bitSize      =  1,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "FRAME_ALIGN",
-                            # description  = "0 = Normal operation, 1 = Inserts frame alignment characters",
-                            # offset       =  (jesdDigital + (4*0x001)),
-                            # bitSize      =  1,
-                            # bitOffset    =  1,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "FRAME_ALIGN",
+                            description  = "0 = Normal operation, 1 = Inserts frame alignment characters",
+                            offset       =  (jesdDigital + (4*0x001)),
+                            bitSize      =  1,
+                            bitOffset    =  1,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "TX_LINK_DIS",
-                            # description  = "0 = Normal operation, 1 = ILA disabled",
-                            # offset       =  (jesdDigital + (4*0x001)),
-                            # bitSize      =  1,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "TX_LINK_DIS",
+                            description  = "0 = Normal operation, 1 = ILA disabled",
+                            offset       =  (jesdDigital + (4*0x001)),
+                            bitSize      =  1,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "SYNC_REG",
-                            # description  = "0 = Normal operation, 1 = ADC output data are replaced with K28.5 characters",
-                            # offset       =  (jesdDigital + (4*0x002)),
-                            # bitSize      =  1,
-                            # bitOffset    =  7,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "SYNC_REG",
+                            description  = "0 = Normal operation, 1 = ADC output data are replaced with K28.5 characters",
+                            offset       =  (jesdDigital + (4*0x002)),
+                            bitSize      =  1,
+                            bitOffset    =  7,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "SYNC_REG_EN",
-                            # description  = "0 = Normal operation, 1 = SYNC control through the SPI is enabled",
-                            # offset       =  (jesdDigital + (4*0x002)),
-                            # bitSize      =  1,
-                            # bitOffset    =  6,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "SYNC_REG_EN",
+                            description  = "0 = Normal operation, 1 = SYNC control through the SPI is enabled",
+                            offset       =  (jesdDigital + (4*0x002)),
+                            bitSize      =  1,
+                            bitOffset    =  6,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "12BIT MODE",
-                            # description  = "00 = Normal operation, 14-bit output, 01 & 10 = Unused, 11 = High-efficient data packing enabled",
-                            # offset       =  (jesdDigital + (4*0x002)),
-                            # bitSize      =  2,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "12BIT MODE",
+                            description  = "00 = Normal operation, 14-bit output, 01 & 10 = Unused, 11 = High-efficient data packing enabled",
+                            offset       =  (jesdDigital + (4*0x002)),
+                            bitSize      =  2,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "JESD_MODE0",
-                            # description  = "These bits select the configuration register to configure the correct LMFS frame assemblies for different decimation settings;",
-                            # offset       =  (jesdDigital + (4*0x002)),
-                            # bitSize      =  2,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "JESD_MODE0",
+                            description  = "These bits select the configuration register to configure the correct LMFS frame assemblies for different decimation settings;",
+                            offset       =  (jesdDigital + (4*0x002)),
+                            bitSize      =  2,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "LINK_LAYER_TESTMODE",
-                            # description  = "These bits generate a pattern",
-                            # offset       =  (jesdDigital + (4*0x003)),
-                            # bitSize      =  3,
-                            # bitOffset    =  5,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "LINK_LAYER_TESTMODE",
+                            description  = "These bits generate a pattern",
+                            offset       =  (jesdDigital + (4*0x003)),
+                            bitSize      =  3,
+                            bitOffset    =  5,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "LINK_LAY_RPAT",
-                            # description  = "0 = Normal operation, 1 = Changes disparity",
-                            # offset       =  (jesdDigital + (4*0x003)),
-                            # bitSize      =  1,
-                            # bitOffset    =  4,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "LINK_LAY_RPAT",
+                            description  = "0 = Normal operation, 1 = Changes disparity",
+                            offset       =  (jesdDigital + (4*0x003)),
+                            bitSize      =  1,
+                            bitOffset    =  4,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "LMFC_MASK_RESET",
-                            # description  = "0 = Normal operation",
-                            # offset       =  (jesdDigital + (4*0x003)),
-                            # bitSize      =  1,
-                            # bitOffset    =  3,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "LMFC_MASK_RESET",
+                            description  = "0 = Normal operation",
+                            offset       =  (jesdDigital + (4*0x003)),
+                            bitSize      =  1,
+                            bitOffset    =  3,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "JESD_MODE1",
-                            # description  = "These bits select the configuration register to configure the correct LMFS frame assemblies for different decimation settings",
-                            # offset       =  (jesdDigital + (4*0x003)),
-                            # bitSize      =  1,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                            # # value        = 0x1,
-                        # )  
+        self.addVariable(  name         = "JESD_MODE1",
+                            description  = "These bits select the configuration register to configure the correct LMFS frame assemblies for different decimation settings",
+                            offset       =  (jesdDigital + (4*0x003)),
+                            bitSize      =  1,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )  
 
-        # self.addVariable(  name         = "JESD_MODE2",
-                            # description  = "These bits select the configuration register to configure the correct LMFS frame assemblies for different decimation settings",
-                            # offset       =  (jesdDigital + (4*0x003)),
-                            # bitSize      =  1,
-                            # bitOffset    =  1,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        self.addVariable(  name         = "JESD_MODE2",
+                            description  = "These bits select the configuration register to configure the correct LMFS frame assemblies for different decimation settings",
+                            offset       =  (jesdDigital + (4*0x003)),
+                            bitSize      =  1,
+                            bitOffset    =  1,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        ) 
 
-        # self.addVariable(  name         = "RAMP_12BIT",
-                            # description  = "This bit enables the RAMP test pattern for 12-bit mode only (LMFS = 82820): 0 = Normal data output, 1 = Digital output is the RAMP pattern",
-                            # offset       =  (jesdDigital + (4*0x003)),
-                            # bitSize      =  1,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        self.addVariable(  name         = "RAMP_12BIT",
+                            description  = "This bit enables the RAMP test pattern for 12-bit mode only (LMFS = 82820): 0 = Normal data output, 1 = Digital output is the RAMP pattern",
+                            offset       =  (jesdDigital + (4*0x003)),
+                            bitSize      =  1,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        ) 
 
-        # self.addVariable(  name         = "REL_ILA_SEQ",
-                            # description  = "These bits delay the generation of the lane alignment sequence by 0, 1, 2, or 3 multiframes after the code group synchronization",
-                            # offset       =  (jesdDigital + (4*0x004)),
-                            # bitSize      =  2,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )     
+        self.addVariable(  name         = "REL_ILA_SEQ",
+                            description  = "These bits delay the generation of the lane alignment sequence by 0, 1, 2, or 3 multiframes after the code group synchronization",
+                            offset       =  (jesdDigital + (4*0x004)),
+                            bitSize      =  2,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )     
 
-        # self.addVariable(  name         = "SCRAMBLE_EN",
-                            # description  = "0 = Scrambling disabled, 1 = Scrambling enabled",
-                            # offset       =  (jesdDigital + (4*0x006)),
-                            # bitSize      =  1,
-                            # bitOffset    =  7,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        self.addVariable(  name         = "SCRAMBLE_EN",
+                            description  = "0 = Scrambling disabled, 1 = Scrambling enabled",
+                            offset       =  (jesdDigital + (4*0x006)),
+                            bitSize      =  1,
+                            bitOffset    =  7,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        ) 
 
-        # self.addVariable(  name         = "FRAMES_PER_MULTIFRAME",
-                            # description  = "These bits set the number of multiframes. Actual K is the value in hex + 1 (that is, 0Fh is K = 16).",
-                            # offset       =  (jesdDigital + (4*0x007)),
-                            # bitSize      =  5,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )  
+        self.addVariable(  name         = "FRAMES_PER_MULTIFRAME",
+                            description  = "These bits set the number of multiframes. Actual K is the value in hex + 1 (that is, 0Fh is K = 16).",
+                            offset       =  (jesdDigital + (4*0x007)),
+                            bitSize      =  5,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )  
 
-        # self.addVariable(  name         = "40X_MODE",
-                            # description  = "This register must be set for 40X mode operation: 000 = Register is set for 20X and 80X mode, 111 = Register must be set for 40X mode",
-                            # offset       =  (jesdDigital + (4*0x016)),
-                            # bitSize      =  3,
-                            # bitOffset    =  4,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )    
+        self.addVariable(  name         = "40X_MODE",
+                            description  = "This register must be set for 40X mode operation: 000 = Register is set for 20X and 80X mode, 111 = Register must be set for 40X mode",
+                            offset       =  (jesdDigital + (4*0x016)),
+                            bitSize      =  3,
+                            bitOffset    =  4,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )    
 
-        # self.addVariable(  name         = "LANE0_POL",
-                            # description  = "0 = Polarity as given in the pinout (noninverted), 1 = Inverts polarity (positive, P, or negative, M)",
-                            # offset       =  (jesdDigital + (4*0x017)),
-                            # bitSize      =  1,
-                            # bitOffset    =  3,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        self.addVariable(  name         = "LANE0_POL",
+                            description  = "0 = Polarity as given in the pinout (noninverted), 1 = Inverts polarity (positive, P, or negative, M)",
+                            offset       =  (jesdDigital + (4*0x017)),
+                            bitSize      =  1,
+                            bitOffset    =  3,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        ) 
 
-        # self.addVariable(  name         = "LANE1_POL",
-                            # description  = "0 = Polarity as given in the pinout (noninverted), 1 = Inverts polarity (positive, P, or negative, M)",
-                            # offset       =  (jesdDigital + (4*0x017)),
-                            # bitSize      =  1,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )
+        self.addVariable(  name         = "LANE1_POL",
+                            description  = "0 = Polarity as given in the pinout (noninverted), 1 = Inverts polarity (positive, P, or negative, M)",
+                            offset       =  (jesdDigital + (4*0x017)),
+                            bitSize      =  1,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )
 
-        # self.addVariable(  name         = "LANE2_POL",
-                            # description  = "0 = Polarity as given in the pinout (noninverted), 1 = Inverts polarity (positive, P, or negative, M)",
-                            # offset       =  (jesdDigital + (4*0x017)),
-                            # bitSize      =  1,
-                            # bitOffset    =  1,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        self.addVariable(  name         = "LANE2_POL",
+                            description  = "0 = Polarity as given in the pinout (noninverted), 1 = Inverts polarity (positive, P, or negative, M)",
+                            offset       =  (jesdDigital + (4*0x017)),
+                            bitSize      =  1,
+                            bitOffset    =  1,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        ) 
 
-        # self.addVariable(  name         = "LANE3_POL",
-                            # description  = "0 = Polarity as given in the pinout (noninverted), 1 = Inverts polarity (positive, P, or negative, M)",
-                            # offset       =  (jesdDigital + (4*0x017)),
-                            # bitSize      =  1,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        self.addVariable(  name         = "LANE3_POL",
+                            description  = "0 = Polarity as given in the pinout (noninverted), 1 = Inverts polarity (positive, P, or negative, M)",
+                            offset       =  (jesdDigital + (4*0x017)),
+                            bitSize      =  1,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        ) 
 
-        # self.addVariable(  name         = "SEL_EMP_LANE0",
-                            # description  = "These bits select the amount of de-emphasis for the JESD output transmitter.",
-                            # offset       =  (jesdDigital + (4*0x032)),
-                            # bitSize      =  6,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        self.addVariable(  name         = "SEL_EMP_LANE0",
+                            description  = "These bits select the amount of de-emphasis for the JESD output transmitter.",
+                            offset       =  (jesdDigital + (4*0x032)),
+                            bitSize      =  6,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        ) 
 
-        # self.addVariable(  name         = "SEL_EMP_LANE1",
-                            # description  = "These bits select the amount of de-emphasis for the JESD output transmitter.",
-                            # offset       =  (jesdDigital + (4*0x033)),
-                            # bitSize      =  6,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )    
+        self.addVariable(  name         = "SEL_EMP_LANE1",
+                            description  = "These bits select the amount of de-emphasis for the JESD output transmitter.",
+                            offset       =  (jesdDigital + (4*0x033)),
+                            bitSize      =  6,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )    
 
-        # self.addVariable(  name         = "SEL_EMP_LANE2",
-                            # description  = "These bits select the amount of de-emphasis for the JESD output transmitter.",
-                            # offset       =  (jesdDigital + (4*0x034)),
-                            # bitSize      =  6,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )    
+        self.addVariable(  name         = "SEL_EMP_LANE2",
+                            description  = "These bits select the amount of de-emphasis for the JESD output transmitter.",
+                            offset       =  (jesdDigital + (4*0x034)),
+                            bitSize      =  6,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )    
 
-        # self.addVariable(  name         = "SEL_EMP_LANE3",
-                            # description  = "These bits select the amount of de-emphasis for the JESD output transmitter.",
-                            # offset       =  (jesdDigital + (4*0x035)),
-                            # bitSize      =  6,
-                            # bitOffset    =  2,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )  
+        self.addVariable(  name         = "SEL_EMP_LANE3",
+                            description  = "These bits select the amount of de-emphasis for the JESD output transmitter.",
+                            offset       =  (jesdDigital + (4*0x035)),
+                            bitSize      =  6,
+                            bitOffset    =  2,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )    
 
-        # self.addVariable(  name         = "CMOS_SYNCB",
-                            # description  = "0 = Differential SYNCB input, 1 = Single-ended SYNCB input using pin 63",
-                            # offset       =  (jesdDigital + (4*0x036)),
-                            # bitSize      =  1,
-                            # bitOffset    =  6,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )  
+        self.addVariable(  name         = "CMOS_SYNCB",
+                            description  = "0 = Differential SYNCB input, 1 = Single-ended SYNCB input using pin 63",
+                            offset       =  (jesdDigital + (4*0x036)),
+                            bitSize      =  1,
+                            bitOffset    =  6,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )    
 
-        # self.addVariable(  name         = "PLL_MODE",
-                            # description  = "These bits select the PLL multiplication factor",
-                            # offset       =  (jesdDigital + (4*0x037)),
-                            # bitSize      =  2,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
+        self.addVariable(  name         = "PLL_MODE",
+                            description  = "These bits select the PLL multiplication factor",
+                            offset       =  (jesdDigital + (4*0x037)),
+                            bitSize      =  2,
+                            bitOffset    =  0,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )    
 
-        # self.addVariable(  name         = "MASK_CLKDIV_SYSREF",
-                            # description  = "0 = Input clock divider is reset when SYSREF is asserted, 1 = Input clock divider ignores SYSREF assertions",
-                            # offset       =  (jesdDigital + (4*0x03E)),
-                            # bitSize      =  1,
-                            # bitOffset    =  6,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )   
+        self.addVariable(  name         = "MASK_CLKDIV_SYSREF",
+                            description  = "0 = Input clock divider is reset when SYSREF is asserted, 1 = Input clock divider ignores SYSREF assertions",
+                            offset       =  (jesdDigital + (4*0x03E)),
+                            bitSize      =  1,
+                            bitOffset    =  6,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )    
 
-        # self.addVariable(  name         = "MASK_NCO_SYSREF",
-                            # description  = "0 = NCO phase and LMFC counter are reset when SYSREF is asserted, 1 = NCO and LMFC counter ignore SYSREF assertions",
-                            # offset       =  (jesdDigital + (4*0x03E)),
-                            # bitSize      =  1,
-                            # bitOffset    =  5,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )                           
+        self.addVariable(  name         = "MASK_NCO_SYSREF",
+                            description  = "0 = NCO phase and LMFC counter are reset when SYSREF is asserted, 1 = NCO and LMFC counter ignore SYSREF assertions",
+                            offset       =  (jesdDigital + (4*0x03E)),
+                            bitSize      =  1,
+                            bitOffset    =  5,
+                            base         = "hex",
+                            mode         = "RW",
+                            verify       = verify,
+                        )    
                         
         ########################
         # DECIMATION FILTER PAGE
@@ -427,7 +467,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )   
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DECIM_FACTOR",
                             description  = "These bits configure the decimation filter setting.",
@@ -436,7 +477,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                           
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DUAL_BAND_EN",
                             description  = "0 = Single-band DDC, 1 = Dual-band DDC",
@@ -445,7 +487,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "REAL_OUT_EN",
                             description  = "0 = Complex output format, 1 = Real output format",
@@ -454,7 +497,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC_MUX",
                             description  = "0 = Normal operation, 1 = DDC block takes input from the alternate ADC",
@@ -463,7 +507,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC0_NCO1_LSB",
                             description  = "These bits are the LSB of the NCO frequency word for NCO1 of DDC0 (band 1).",
@@ -472,7 +517,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC0_NCO1_MSB",
                             description  = "These bits are the MSB of the NCO frequency word for NCO1 of DDC0 (band 1).",
@@ -481,7 +527,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC0_NCO2_LSB",
                             description  = "These bits are the LSB of the NCO frequency word for NCO2 of DDC0 (band 1).",
@@ -490,7 +537,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC0_NCO2_MSB",
                             description  = "These bits are the MSB of the NCO frequency word for NCO2 of DDC0 (band 1).",
@@ -499,7 +547,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "DDC0_NCO3_LSB",
                             description  = "These bits are the LSB of the NCO frequency word for NCO3 of DDC0 (band 1).",
@@ -508,7 +557,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC0_NCO3_MSB",
                             description  = "These bits are the MSB of the NCO frequency word for NCO3 of DDC0 (band 1).",
@@ -517,7 +567,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC0_NCO4_LSB",
                             description  = "These bits are the LSB of the NCO frequency word for NCO4 of DDC0 (band 1).",
@@ -526,7 +577,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC0_NCO4_MSB",
                             description  = "These bits are the MSB of the NCO frequency word for NCO4 of DDC0 (band 1).",
@@ -535,7 +587,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                             
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "NCO_SEL_PIN",
                             description  = "0 = NCO selection through SPI (see address 0h10), 1 = NCO selection through GPIO pins",
@@ -544,7 +597,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "NCO_SEL",
                             description  = "These bits enable NCO selection through register setting.",
@@ -553,7 +607,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )   
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "LMFC_RESET_MODE",
                             description  = "These bits reset the configuration for all DDCs and NCOs.",
@@ -562,7 +617,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                           
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DDC0_6DB_GAIN",
                             description  = "0 = Normal operation, 1 = 6-dB digital gain is added",
@@ -571,7 +627,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "DDC1_6DB_GAIN",
                             description  = "0 = Normal operation, 1 = 6-dB digital gain is added",
@@ -580,7 +637,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "DDC_DET_LAT",
                             description  = "These bits ensure deterministic latency depending on the decimation setting used",
@@ -589,7 +647,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  4,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "WBF_6DB_GAIN",
                             description  = "0 = Normal operation, 1 = 6-dB digital gain is added",
@@ -598,7 +657,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                          
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "CUSTOM_PATTERN1_LSB",
                             description  = "These bits set the custom test pattern",
@@ -607,7 +667,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "CUSTOM_PATTERN1_MSB",
                             description  = "These bits set the custom test pattern",
@@ -616,7 +677,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "CUSTOM_PATTERN2_LSB",
                             description  = "These bits set the custom test pattern",
@@ -625,7 +687,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "CUSTOM_PATTERN2_MSB",
                             description  = "These bits set the custom test pattern",
@@ -634,6 +697,7 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )    
 
         self.addVariable(  name         = "TEST_PATTERN_SEL",
@@ -643,7 +707,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )   
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "TEST_PAT_RES",
                             description  = "0 = Normal operation, 1 = Reset the test pattern",
@@ -652,7 +717,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  1,
                             base         = "hex",
                             mode         = "RW",
-                        )   
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "TP_RES_EN",
                             description  = "0 = Reset disabled, 1 = Reset enabled",
@@ -661,7 +727,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                           
+                            verify       = verify,
+                        )    
                         
 
         #####################
@@ -674,7 +741,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )   
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "BLKPKDET_LSB",
                             description  = "This register specifies the block length in terms of number of samples (S) used for peak power computation",
@@ -683,7 +751,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "BLKPKDET_MSB",
                             description  = "This register specifies the block length in terms of number of samples (S) used for peak power computation",
@@ -692,7 +761,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                             
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "BLKPKDET16",
                             description  = "This register specifies the block length in terms of number of samples (S) used for peak power computation",
@@ -701,7 +771,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "BLKTHHH",
                             description  = "These registers set the four different thresholds for the hysteresis function threshold values from 0 to 256 (2TH), where 256 is equivalent to the peak amplitude.",
@@ -710,7 +781,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "BLKTHHL",
                             description  = "These registers set the four different thresholds for the hysteresis function threshold values from 0 to 256 (2TH), where 256 is equivalent to the peak amplitude.",
@@ -719,7 +791,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )   
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "BLKTHLH",
                             description  = "These registers set the four different thresholds for the hysteresis function threshold values from 0 to 256 (2TH), where 256 is equivalent to the peak amplitude.",
@@ -728,6 +801,7 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )    
 
         self.addVariable(  name         = "BLKTHLL",
@@ -737,7 +811,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                            
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "DWELL_LSB",
                             description  = "DWELL time counter",
@@ -746,7 +821,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DWELL_MSB",
                             description  = "DWELL time counter",
@@ -755,7 +831,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "FILT0LPSEL",
                             description  = "0 = Use the output of the high comparators (HH and HL) as the input of the IIR filter, 1 = Combine the output of the high (HH and HL) and low (LH and LL) comparators to generate a 3-level input to the IIR filter (–1, 0, 1)",
@@ -764,7 +841,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "TIMECONST",
                             description  = "These bits set the crossing detector time period",
@@ -773,7 +851,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                             
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "FIL0THH_LSB",
                             description  = "Comparison thresholds for the crossing detector counter",
@@ -782,7 +861,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "FIL0THH_MSB",
                             description  = "Comparison thresholds for the crossing detector counter",
@@ -791,7 +871,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "FIL0THL_LSB",
                             description  = "Comparison thresholds for the crossing detector counter",
@@ -800,7 +881,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "FIL0THL_MSB",
                             description  = "Comparison thresholds for the crossing detector counter",
@@ -809,7 +891,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "IIR0_2BIT_EN",
                             description  = "0 = Selects 1-bit output format, 1 = Selects 2-bit output format",
@@ -818,7 +901,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "FIL1THH_LSB",
                             description  = "Comparison thresholds for the crossing detector counter",
@@ -827,7 +911,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "FIL1THH_MSB",
                             description  = "Comparison thresholds for the crossing detector counter",
@@ -836,7 +921,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "FIL1THL_LSB",
                             description  = "Comparison thresholds for the crossing detector counter",
@@ -845,7 +931,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "FIL1THL_MSB",
                             description  = "Comparison thresholds for the crossing detector counter",
@@ -854,7 +941,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "IIR1_2BIT_EN",
                             description  = "0 = Selects 1-bit output format, 1 = Selects 2-bit output format",
@@ -863,7 +951,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "DWELLIIR_LSB",
                             description  = "DWELL time counter for the IIR output comparators",
@@ -872,7 +961,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "DWELLIIR_MSB",
                             description  = "DWELL time counter for the IIR output comparators",
@@ -881,7 +971,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )  
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "RMSDET_EN",
                             description  = "0 = Power detector disabled, 1 = Power detector enabled",
@@ -890,7 +981,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "PWRDETACCU",
                             description  = "These bits program the block length to be used for RMS power computation",
@@ -899,7 +991,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                             
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "PWRDETH_LSB",
                             description  = "The computed average power is compared against these high and low thresholds",
@@ -908,7 +1001,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "PWRDETH_MSB",
                             description  = "The computed average power is compared against these high and low thresholds",
@@ -917,7 +1011,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "PWRDETL_LSB",
                             description  = "The computed average power is compared against these high and low thresholds",
@@ -926,7 +1021,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "PWRDETL_MSB",
                             description  = "The computed average power is compared against these high and low thresholds",
@@ -935,7 +1031,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                         
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "RMS_2BIT_EN",
                             description  = "0 = Selects 1-bit output format, 1 = Selects 2-bit output format",
@@ -944,7 +1041,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "RESET_AGC",
                             description  = "0 = Clear AGC reset, 1 = Set AGC reset",
@@ -953,7 +1051,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  4,
                             base         = "hex",
                             mode         = "RW",
-                        )      
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "OUTSEL_GPIO1",
                             description  = "These bits set the function or signal for each GPIO pin.",
@@ -962,6 +1061,7 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )    
 
         self.addVariable(  name         = "OUTSEL_GPIO2",
@@ -971,6 +1071,7 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )    
 
         self.addVariable(  name         = "OUTSEL_GPIO3",
@@ -980,6 +1081,7 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )    
 
         self.addVariable(  name         = "OUTSEL_GPIO4",
@@ -989,6 +1091,7 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )    
 
         self.addVariable(  name         = "IODIR_GPIO4",
@@ -998,7 +1101,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  3,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
                         
         self.addVariable(  name         = "IODIR_GPIO3",
                             description  = "0 = Input (for the NCO control), 1 = Output (for the AGC alarm function)",
@@ -1007,7 +1111,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  2,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "IODIR_GPIO2",
                             description  = "0 = Input (for the NCO control), 1 = Output (for the AGC alarm function)",
@@ -1016,7 +1121,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  1,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "IODIR_GPIO1",
                             description  = "0 = Input (for the NCO control), 1 = Output (for the AGC alarm function)",
@@ -1025,7 +1131,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )     
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "INSEL1",
                             description  = "These bits select which GPIO pin is used for the INSEL1 bit",
@@ -1034,7 +1141,8 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  4,
                             base         = "hex",
                             mode         = "RW",
-                        ) 
+                            verify       = verify,
+                        )    
 
         self.addVariable(  name         = "INSEL0",
                             description  = "These bits select which GPIO pin is used for the INSEL0 bit.",
@@ -1043,4 +1151,5 @@ class Adc32Rf45Channel(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                        )                         
+                            verify       = verify,
+                        )    

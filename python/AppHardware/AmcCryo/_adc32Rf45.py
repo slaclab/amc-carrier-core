@@ -28,6 +28,7 @@ class Adc32Rf45(pr.Device):
                     memBase     =  None,
                     offset      =  0x00,
                     hidden      =  False,
+                    verify      =  False,
                     expand      =  True,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
@@ -42,8 +43,8 @@ class Adc32Rf45(pr.Device):
         #####################
         # Add Device Channels
         #####################
-        self.add(Adc32Rf45Channel(name='CHA',offset=(0x0 << 14),expand=expand))
-        # self.add(Adc32Rf45Channel(name='CHB',offset=(0x8 << 14),expand=expand))         
+        self.add(Adc32Rf45Channel(name='CHA',offset=(0x0 << 14),expand=expand,verify=verify))
+        self.add(Adc32Rf45Channel(name='CHB',offset=(0x8 << 14),expand=expand,verify=verify))      
                 
         ##################
         # General Register
@@ -57,21 +58,8 @@ class Adc32Rf45(pr.Device):
                             base         = "hex",
                             mode         = "WO",
                             verify       =  False,                            
-                            # hidden       =  True,                            
+                            hidden       =  True,                            
                         )
-                        
-        # self.addVariable(  name         = "SPI_CONFIG",
-                            # description  = "0 = 4-wire SPI (default), 1 = 3-wire SPI where SDIN become input or output",
-                            # offset       =  (generalAddr + (4*0x010)),
-                            # bitSize      =  1,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "WO",
-                            # # SDOUT pin on ADC32RF45 is not tri-stated when CS is high rendering it useless in a 4wire SPI configuration. 
-                            # # TI has acknowledged this error.  Remove routing to this pin and operate in 3 wire SPI mode (this has been verified to work)
-                            # value        =  0,
-                            # # hidden       =  True,
-                        # )  
 
         self.addVariable(  name         = "HW_RST",
                             description  = "Hardware Reset",
@@ -80,114 +68,8 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
-                            # hidden       =  True,
+                            hidden       =  True,
                         ) 
-
-
-        self.addVariable(  name         = "BASE_4",
-                            offset       =  (0x00080000+(0x4<<2)),
-                            bitSize      =  8,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RO",                                              
-                            verify       =  False,
-                        )     
-
-        self.addVariable(  name         = "BASE_3",
-                            offset       =  (0x00080000+(0x3<<2)),
-                            bitSize      =  8,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RO",                                      
-                            verify       =  False,
-                        ) 
-
-        self.addVariable(  name         = "BASE_2",
-                            offset       =  (0x00080000+(0x2<<2)),
-                            bitSize      =  8,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RO",
-                            verify       =  False,
-                        ) 
-
-        self.addVariable(  name         = "BASE_10",
-                            offset       =  (0x00080000+(0x10<<2)),
-                            bitSize      =  8,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RO",                                                
-                            verify       =  False,
-                        )                         
-                        
-        self.addVariable(  name         = "BASE_11",
-                            offset       =  (0x00080000+(0x11<<2)),
-                            bitSize      =  8,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "WO",                                                
-                            verify       =  False,
-                        ) 
-
-        self.addVariable(  name         = "BASE_12",
-                            offset       =  (0x00080000+(0x12<<2)),
-                            bitSize      =  8,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "WO",
-                            verify       =  False,
-                        )                                
-                        
-                        
-                        
-        # self.addVariable(  name         = "TEMP2",
-                            # offset       =  (generalAddr+(0x4<<2)),
-                            # bitSize      =  8,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",                                              
-                        # )     
-
-        # self.addVariable(  name         = "TEMP1",
-                            # offset       =  (generalAddr+(0x3<<2)),
-                            # bitSize      =  8,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",                                      
-                        # ) 
-
-        # self.addVariable(  name         = "TEMP0",
-                            # offset       =  (generalAddr+(0x2<<2)),
-                            # bitSize      =  8,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # ) 
-
-        # self.addVariable(  name         = "TEMP_A",
-                            # offset       =  (generalAddr+(0x10<<2)),
-                            # bitSize      =  8,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",                                              
-                        # ) 
-
-        # self.addVariable(  name         = "TEMP_B",
-                            # offset       =  (generalAddr+(0x11<<2)),
-                            # bitSize      =  8,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",                                                
-                        # ) 
-
-        # self.addVariable(  name         = "TEMP_C",
-                            # offset       =  (generalAddr+(0x12<<2)),
-                            # bitSize      =  8,
-                            # bitOffset    =  0,
-                            # base         = "hex",
-                            # mode         = "RW",
-                        # )                          
-                        
                         
         #############
         # Master Page 
@@ -199,6 +81,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  4,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )
                         
         self.addVariable(  name         = "PDN_CHB",
@@ -208,6 +91,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  1,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )                          
                         
         self.addVariable(  name         = "GLOBAL_PDN",
@@ -217,6 +101,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )  
 
         self.addVariable(  name         = "INCR_CM_IMPEDANCE",
@@ -226,6 +111,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  5,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )                          
                         
         self.addVariable(  name         = "AlwaysWrite0x1_A",
@@ -237,6 +123,7 @@ class Adc32Rf45(pr.Device):
                             mode         = "WO",
                             value        = 0x1,
                             hidden       = True,
+                            verify       = False,
                         )
                         
         self.addVariable(  name         = "AlwaysWrite0x1_B",
@@ -248,6 +135,7 @@ class Adc32Rf45(pr.Device):
                             mode         = "WO",
                             value        = 0x1,
                             hidden       = True,
+                            verify       = False,
                         )                             
 
         self.addVariable(  name         = "PDN_CHB_EN",
@@ -257,6 +145,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  1,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )                             
 
         self.addVariable(  name         = "SYNC_TERM_DIS",
@@ -266,6 +155,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )
 
         self.addVariable(  name         = "SYSREF_DEL_EN",
@@ -275,6 +165,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  6,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )    
 
         self.addVariable(  name         = "SYSREF_DEL_HI",
@@ -284,6 +175,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )
 
         self.addVariable(  name         = "JESD_OUTPUT_SWING",
@@ -293,6 +185,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  0,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         ) 
 
         self.addVariable(  name         = "SYSREF_DEL_LO",
@@ -302,6 +195,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  5,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )
 
         self.addVariable(  name         = "SEL_SYSREF_REG",
@@ -311,6 +205,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  4,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )  
                         
         self.addVariable(  name         = "ASSERT_SYSREF_REG",
@@ -320,6 +215,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  3,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )  
                         
         self.addVariable(  name         = "SYNCB_POL",
@@ -329,6 +225,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  5,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )  
                        
         # ##########
@@ -341,6 +238,7 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  2,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )
                         
         self.addVariable(  name         = "SLOW_SP_EN2",
@@ -350,18 +248,15 @@ class Adc32Rf45(pr.Device):
                             bitOffset    =  2,
                             base         = "hex",
                             mode         = "RW",
+                            verify       = verify,
                         )
                         
         ##############################
         # Commands
         ##############################
         def reset(dev, cmd, arg):
-            dev.HW_RST.set(0x1)
-            time.sleep(0.1)
-            dev.HW_RST.set(0x0)
             dev.RESET.set(0x81)
-            dev.SPI_CONFIG.set(0x1)
-                
+            time.sleep(0.1)
         self.addCommand(    name         = "devRst",
                             description  = "device reset",
                             function     = reset

@@ -2,7 +2,7 @@
 -- File       : Adc32Rf45SpiMaster.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-26
--- Last update: 2017-05-29
+-- Last update: 2017-06-07
 -------------------------------------------------------------------------------
 -- Description: SPI Master Wrapper that includes a state machine for SPI paging
 -------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ entity Adc32Rf45SpiMaster is
       axiWriteMaster : in  AxiLiteWriteMasterType;
       axiWriteSlave  : out AxiLiteWriteSlaveType;
       -- SPI Interface
+      coreRst        : out sl;
       coreSclk       : out sl;
       coreSDin       : in  sl;
       coreSDout      : out sl;
@@ -53,21 +54,23 @@ architecture rtl of Adc32Rf45SpiMaster is
       TRANS_S);
 
    type RegType is record
+      rst           : sl;
       axiRd         : sl;
       wrEn          : sl;
       wrData        : slv(23 downto 0);
       data          : slv(7 downto 0);
       addr          : slv(11 downto 0);
       xferType      : slv(3 downto 0);
-      cnt           : natural range 0 to 4;
-      size          : natural range 0 to 4;
-      wrArray       : Slv24Array(3 downto 0);
+      cnt           : natural range 0 to 5;
+      size          : natural range 0 to 5;
+      wrArray       : Slv24Array(4 downto 0);
       axiReadSlave  : AxiLiteReadSlaveType;
       axiWriteSlave : AxiLiteWriteSlaveType;
       state         : StateType;
    end record RegType;
 
    constant REG_INIT_C : RegType := (
+      rst           => '0',
       axiRd         => '0',
       wrEn          => '0',
       wrData        => (others => '0'),
@@ -114,8 +117,6 @@ begin
                v.data     := axiWriteMaster.wdata(7 downto 0);
                v.addr     := axiWriteMaster.awaddr(13 downto 2);
                v.xferType := axiWriteMaster.awaddr(17 downto 14);
-               -- Send the write response
-               axiSlaveWriteResponse(v.axiWriteSlave);
                -- Next State
                v.state    := INIT_S;
             -- Check if read transaction      
@@ -131,8 +132,10 @@ begin
             end if;
          ----------------------------------------------------------------------
          when INIT_S =>
+            -- Next State
+            v.state := TRANS_S;
             -- Reset the counter
-            v.cnt := 0;
+            v.cnt   := 0;
             -- Check the transfer type
             -- Note: Refer to https://docs.google.com/a/stanford.edu/spreadsheets/d/1FF_dsCxRgwguseu1B2kBMGiVdTbknMDl8cHdPX8geNY/edit?usp=sharing
             case r.xferType is
@@ -142,32 +145,36 @@ begin
                   v.wrArray(0) := (r.axiRd & "000" & r.addr & r.data);
                -- Offset corrector page channel A: (XFER_Type = 0x1)
                when x"1" =>
-                  v.size       := 4;
-                  v.wrArray(0) := (x"4004" & x"61");
-                  v.wrArray(1) := (x"4003" & x"00");
-                  v.wrArray(2) := (x"4002" & x"00");
-                  v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
+                  v.size       := 5;
+                  v.wrArray(0) := (x"4001" & x"00");
+                  v.wrArray(1) := (x"4002" & x"00");
+                  v.wrArray(2) := (x"4003" & x"00");
+                  v.wrArray(3) := (x"4004" & x"61");
+                  v.wrArray(4) := (r.axiRd & "110" & r.addr & r.data);
                -- Digital gain page channel A: (XFER_Type = 0x2)
                when x"2" =>
-                  v.size       := 4;
-                  v.wrArray(0) := (x"4004" & x"61");
-                  v.wrArray(1) := (x"4003" & x"00");
-                  v.wrArray(2) := (x"4002" & x"05");
-                  v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
+                  v.size       := 5;
+                  v.wrArray(0) := (x"4001" & x"00");
+                  v.wrArray(1) := (x"4002" & x"05");
+                  v.wrArray(2) := (x"4003" & x"00");
+                  v.wrArray(3) := (x"4004" & x"61");
+                  v.wrArray(4) := (r.axiRd & "110" & r.addr & r.data);
                -- Main digital page channel A: (XFER_Type = 0x3)
                when x"3" =>
-                  v.size       := 4;
-                  v.wrArray(0) := (x"4004" & x"68");
-                  v.wrArray(1) := (x"4003" & x"00");
-                  v.wrArray(2) := (x"4002" & x"00");
-                  v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
+                  v.size       := 5;
+                  v.wrArray(0) := (x"4001" & x"00");
+                  v.wrArray(1) := (x"4002" & x"00");
+                  v.wrArray(2) := (x"4003" & x"00");
+                  v.wrArray(3) := (x"4004" & x"68");
+                  v.wrArray(4) := (r.axiRd & "110" & r.addr & r.data);
                -- JESD digital page channel A: (XFER_Type = 0x04)
                when x"4" =>
-                  v.size       := 4;
-                  v.wrArray(0) := (x"4004" & x"69");
-                  v.wrArray(1) := (x"4003" & x"00");
-                  v.wrArray(2) := (x"4002" & x"00");
-                  v.wrArray(3) := (r.axiRd & "111" & r.addr & r.data);  -- JESD digital page: use the CH bit to select channel B (CH = 0) or channel A (CH = 1).
+                  v.size       := 5;
+                  v.wrArray(0) := (x"4001" & x"00");
+                  v.wrArray(1) := (x"4002" & x"00");
+                  v.wrArray(2) := (x"4003" & x"00");
+                  v.wrArray(3) := (x"4004" & x"69");
+                  v.wrArray(4) := (r.axiRd & "111" & r.addr & r.data);  -- JESD digital page: use the CH bit to select channel B (CH = 0) or channel A (CH = 1).
                --  Decimation Filter Page channel A: (XFER_Type = 0x5)
                when x"5" =>
                   v.size       := 1;  -- Address bit A[11] selects channel A (A[11] = 0) or channel B (A[11] = 1).
@@ -175,60 +182,87 @@ begin
                --  Power Detector Page channel A: (XFER_Type = 0x6)
                when x"6" =>
                   v.size       := 1;  -- Address bit A[11] selects channel A (A[11] = 0) or channel B (A[11] = 1).
-                  v.wrArray(0) := (r.axiRd & "101" & "0100" & r.addr(7 downto 0) & r.data);  -- Address bit A[10] selects the decimation filter page (A[10] = 0) or the power detector page (A[10] = 1)                    
-               -- Analog Bank: (XFER_Type = 0x1)
+                  v.wrArray(0) := (r.axiRd & "101" & "0100" & r.addr(7 downto 0) & r.data);  -- Address bit A[10] selects the decimation filter page (A[10] = 0) or the power detector page (A[10] = 1)        
+               -- Master Bank: (XFER_Type = 0x7)
+               when x"7" =>
+                  v.size       := 3;
+                  v.wrArray(0) := (x"0011" & x"00");
+                  v.wrArray(1) := (x"0012" & x"04");
+                  v.wrArray(2) := (r.axiRd & "000" & r.addr & r.data);
+               -- Analog Bank: (XFER_Type = 0x8)
                when x"8" =>
                   v.size       := 3;
-                  v.wrArray(0) := (x"0012" & x"04");
+                  v.wrArray(0) := (x"0012" & x"00");
                   v.wrArray(1) := (x"0011" & x"FF");
                   v.wrArray(2) := (r.axiRd & "000" & r.addr & r.data);
                -- Offset corrector page channel B: (XFER_Type = 0x9)
                when x"9" =>
-                  v.size       := 4;
-                  v.wrArray(0) := (x"4004" & x"61");
-                  v.wrArray(1) := (x"4003" & x"01");
-                  v.wrArray(2) := (x"4002" & x"00");
-                  v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
+                  v.size       := 5;
+                  v.wrArray(0) := (x"4001" & x"00");
+                  v.wrArray(1) := (x"4002" & x"00");
+                  v.wrArray(2) := (x"4003" & x"01");
+                  v.wrArray(3) := (x"4004" & x"61");
+                  v.wrArray(4) := (r.axiRd & "110" & r.addr & r.data);
                -- Digital gain page channel B: (XFER_Type = 0xA)
                when x"A" =>
-                  v.size       := 4;
-                  v.wrArray(0) := (x"4004" & x"61");
-                  v.wrArray(1) := (x"4003" & x"01");
-                  v.wrArray(2) := (x"4002" & x"05");
-                  v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
+                  v.size       := 5;
+                  v.wrArray(0) := (x"4001" & x"00");
+                  v.wrArray(1) := (x"4002" & x"05");
+                  v.wrArray(2) := (x"4003" & x"01");
+                  v.wrArray(3) := (x"4004" & x"61");
+                  v.wrArray(4) := (r.axiRd & "110" & r.addr & r.data);
                -- Main digital page channel B: (XFER_Type = 0xB)
                when x"B" =>
-                  v.size       := 4;
-                  v.wrArray(0) := (x"4004" & x"68");
-                  v.wrArray(1) := (x"4003" & x"01");
-                  v.wrArray(2) := (x"4002" & x"00");
-                  v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);
+                  v.size       := 5;
+                  v.wrArray(0) := (x"4001" & x"00");
+                  v.wrArray(1) := (x"4002" & x"00");
+                  v.wrArray(2) := (x"4003" & x"01");
+                  v.wrArray(3) := (x"4004" & x"68");
+                  v.wrArray(4) := (r.axiRd & "110" & r.addr & r.data);
                -- JESD digital page channel B: (XFER_Type = 0x0C)
                when x"C" =>
-                  v.size       := 4;
-                  v.wrArray(0) := (x"4004" & x"69");
-                  v.wrArray(1) := (x"4003" & x"00");
-                  v.wrArray(2) := (x"4002" & x"00");
-                  v.wrArray(3) := (r.axiRd & "110" & r.addr & r.data);  -- JESD digital page: use the CH bit to select channel B (CH = 0) or channel A (CH = 1).
+                  v.size       := 5;
+                  v.wrArray(0) := (x"4001" & x"00");
+                  v.wrArray(1) := (x"4002" & x"00");
+                  v.wrArray(2) := (x"4003" & x"00");
+                  v.wrArray(3) := (x"4004" & x"69");
+                  v.wrArray(4) := (r.axiRd & "110" & r.addr & r.data);  -- JESD digital page: use the CH bit to select channel B (CH = 0) or channel A (CH = 1).
                --  Decimation Filter Page channel B: (XFER_Type = 0xD)
                when x"D" =>
                   v.size       := 1;  -- Address bit A[11] selects channel A (A[11] = 0) or channel B (A[11] = 1).
                   v.wrArray(0) := (r.axiRd & "101" & "1000" & r.addr(7 downto 0) & r.data);  -- Address bit A[10] selects the decimation filter page (A[10] = 0) or the power detector page (A[10] = 1)  
                --  Power Detector Page channel B: (XFER_Type = 0xE)
-               when others =>
+               when x"E" =>
                   v.size       := 1;  -- Address bit A[11] selects channel A (A[11] = 0) or channel B (A[11] = 1).
-                  v.wrArray(0) := (r.axiRd & "101" & "1100" & r.addr(7 downto 0) & r.data);  -- Address bit A[10] selects the decimation filter page (A[10] = 0) or the power detector page (A[10] = 1)                   
+                  v.wrArray(0) := (r.axiRd & "101" & "1100" & r.addr(7 downto 0) & r.data);  -- Address bit A[10] selects the decimation filter page (A[10] = 0) or the power detector page (A[10] = 1)          
+               -- Hardware Reset (XFER_Type = 0xF)
+               when others =>
+                  -- Check if transaction type
+                  if (r.axiRd = '0') then
+                     -- Write the bit
+                     v.rst := axiWriteMaster.wdata(0);
+                     -- Send the write response
+                     axiSlaveWriteResponse(v.axiWriteSlave);
+                  else
+                     -- Reade the bit
+                     v.axiReadSlave.rdata(7 downto 0) := ("0000000" & r.rst);
+                     -- Send the response 
+                     axiSlaveReadResponse(v.axiReadSlave);
+                  end if;
+                  --- Next state
+                  v.state := IDLE_S;
             end case;
-            -- Next State
-            v.state := TRANS_S;
          ----------------------------------------------------------------------
          when TRANS_S =>
             -- Wait for the transaction to complete
             if (rdEn = '1') and (r.wrEn = '0') then
                -- Check for last transaction
                if (r.size = r.cnt) then
-                  -- Check if read transaction
-                  if (r.axiRd = '1') then
+                  -- Check if transaction type
+                  if (r.axiRd = '0') then
+                     -- Send the write response
+                     axiSlaveWriteResponse(v.axiWriteSlave);
+                  else
                      -- Latch the read byte
                      v.axiReadSlave.rdata(7 downto 0) := rdData(7 downto 0);
                      -- Send the response 
@@ -258,6 +292,7 @@ begin
       -- Outputs 
       axiWriteSlave <= r.axiWriteSlave;
       axiReadSlave  <= r.axiReadSlave;
+      coreRst       <= (r.rst or axiRst);
 
    end process comb;
 
