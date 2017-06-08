@@ -48,10 +48,13 @@ end entity Adc32Rf45SpiMaster;
 
 architecture rtl of Adc32Rf45SpiMaster is
 
+   constant DLY_C : natural := integer(1.0E-6/CLK_PERIOD_G);  -- min. 1us delay between SPI cycles
+
    type StateType is (
       IDLE_S,
       INIT_S,
-      TRANS_S);
+      REQ_S,
+      ACK_S);
 
    type RegType is record
       rst           : sl;
@@ -61,6 +64,7 @@ architecture rtl of Adc32Rf45SpiMaster is
       data          : slv(7 downto 0);
       addr          : slv(11 downto 0);
       xferType      : slv(3 downto 0);
+      timer         : natural range 0 to DLY_C;
       cnt           : natural range 0 to 5;
       size          : natural range 0 to 5;
       wrArray       : Slv24Array(4 downto 0);
@@ -77,6 +81,7 @@ architecture rtl of Adc32Rf45SpiMaster is
       data          => (others => '0'),
       addr          => (others => '0'),
       xferType      => (others => '0'),
+      timer         => 0,
       cnt           => 0,
       size          => 0,
       wrArray       => (others => (others => '0')),
@@ -101,6 +106,11 @@ begin
 
       -- Reset strobes
       v.wrEn := '0';
+
+      -- Increment the timer
+      if (r.timer /= DLY_C) then
+         v.timer := r.timer + 1;
+      end if;
 
       -- Get the AXI-Lite status
       axiSlaveWaitTxn(axiWriteMaster, axiReadMaster, v.axiWriteSlave, v.axiReadSlave, axiStatus);
@@ -133,7 +143,7 @@ begin
          ----------------------------------------------------------------------
          when INIT_S =>
             -- Next State
-            v.state := TRANS_S;
+            v.state := REQ_S;
             -- Reset the counter
             v.cnt   := 0;
             -- Check the transfer type
@@ -253,9 +263,23 @@ begin
                   v.state := IDLE_S;
             end case;
          ----------------------------------------------------------------------
-         when TRANS_S =>
+         when REQ_S =>
+            -- Check for min. chip select gap
+            if (r.timer = DLY_C) then
+               -- Start the transaction
+               v.wrEn   := '1';
+               v.wrData := r.wrArray(r.cnt);
+               -- Increment the counter
+               v.cnt    := r.cnt + 1;
+               --- Next state
+               v.state  := ACK_S;
+            end if;
+         ----------------------------------------------------------------------
+         when ACK_S =>
             -- Wait for the transaction to complete
             if (rdEn = '1') and (r.wrEn = '0') then
+               -- Reset the timer
+               v.timer := 0;
                -- Check for last transaction
                if (r.size = r.cnt) then
                   -- Check if transaction type
@@ -271,11 +295,8 @@ begin
                   --- Next state
                   v.state := IDLE_S;
                else
-                  -- Start the transaction
-                  v.wrEn   := '1';
-                  v.wrData := r.wrArray(r.cnt);
-                  -- Increment the counter
-                  v.cnt    := r.cnt + 1;
+                  --- Next state
+                  v.state := REQ_S;
                end if;
             end if;
       ----------------------------------------------------------------------
