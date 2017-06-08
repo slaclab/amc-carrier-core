@@ -1,22 +1,17 @@
 import pyrogue as pr
 
 # Modules from surf
-from surf.axi._AxiVersion import *
-from surf.xilinx._AxiSysMonUltraScale import *
-from surf.devices.micron._AxiMicronN25Q import *
-from surf.devices.microchip._AxiSy56040 import *
-from surf.devices.ti._AxiCdcm6208 import *
-from surf.ethernet.udp._UdpEngineClient import *
-from surf.ethernet.udp._UdpEngineServer import *
-from surf.protocols.rssi._RssiCore import *
-from surf.axi._AxiMemTester import *
-from surf.devices.microchip._Axi24LC64FT import *
-from surf.devices.micron._DdrSpd import *
+from surf.axi import *
+from surf.devices.microchip import *
+from surf.ethernet import *
+from surf.misc import *
+from surf.protocols import *
+from surf.xilinx import *
+from surf.ethernet.udp import *
+from surf.protocols.rssi import *
 
 # Modules from AmcCarrierCore
-from AmcCarrierCore.AmcCarrierBsi import *
-from AmcCarrierCore.AmcCarrierTiming import *
-from AmcCarrierCore.AmcCarrierBsa import *
+from AmcCarrierCore import *
 
 # Modules from AppMps
 from AppMps.AppMps import *
