@@ -36,15 +36,6 @@ class BsaBufferControl(pr.Device):
         # Variables
         ##############################
 
-#        self.addVariable(   name         = "Timestamps",
-#                            description  = "",
-#                            offset       =  0x00000000,
-#                            bitSize      =  512,
-#                            bitOffset    =  0x00,
-#                            base         = "hex",
-#                            mode         = "RO",
-#                        )
-
         self.add(GenericMemory(
                                 name       = "Timestamps",
                                 offset     =  0x00,
