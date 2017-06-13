@@ -3,6 +3,8 @@ import pyrogue as pr
 # Modules from surf
 from surf.axi import *
 from surf.devices.microchip import *
+from surf.devices.ti import *
+from surf.devices.micron import *
 from surf.ethernet import *
 from surf.misc import *
 from surf.protocols import *
