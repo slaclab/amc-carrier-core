@@ -114,15 +114,15 @@ class Adc32Rf45Channel(pr.Device):
         ###################
         # Main Digital Page
         ###################
-        self.addVariable(  name         = "DIG_CORE_RESET_GBL",
-                            description  = "All Nyquist zone settings take effect when this bit is pulsed.",
-                            offset       =  (mainDigital + (4*0x000)),
-                            bitSize      =  1,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RW",
-                            verify       = verify,
-                        )
+        # self.addVariable(  name         = "DIG_CORE_RESET_GBL",
+                            # description  = "All Nyquist zone settings take effect when this bit is pulsed.",
+                            # offset       =  (mainDigital + (4*0x000)),
+                            # bitSize      =  1,
+                            # bitOffset    =  0,
+                            # base         = "hex",
+                            # mode         = "RW",
+                            # verify       = verify,
+                        # )
 
         self.addVariable(  name         = "NQ_ZONE_EN",
                             description  = "0 = Nyquist zone specification disabled, 1 = Nyquist zone specification enabled",

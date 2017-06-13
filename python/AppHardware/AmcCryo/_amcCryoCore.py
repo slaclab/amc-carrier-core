@@ -35,10 +35,7 @@ class AmcCryoCore(pr.Device):
                     expand      =  True,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
-        
-        # self.backdoor = RawBlock(self)
-        # self.backdoor.write(0x000,0xFF) 
-        
+                
         #########
         # Devices
         #########
@@ -52,12 +49,11 @@ class AmcCryoCore(pr.Device):
         # Commands
         ##########
         def initAmcCard(dev, cmd, arg):
-            dev.Lmk04828.PwrUpSysRef.set(1)
-            time.sleep(1)
-            dev.Dac38J84.InitDac.set(1)
-            time.sleep(1)
-            dev.Dac38J84.ClearAlarms.set(1)                
-                
+            dev.LMK.Init()
+            dev.DAC[0].Init()
+            dev.DAC[1].Init()
+            dev.ADC[0].Init()
+            dev.ADC[1].Init()                            
         self.addCommand(    name         = "InitAmcCard",
                             description  = "Initialization for AMC card's JESD modules",
                             function     = initAmcCard

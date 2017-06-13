@@ -149,6 +149,7 @@ architecture top_level_app of AmcCryoCore is
    signal jesdTxSyncN : slv(1 downto 0);
    signal jesdTxSyncVec : slv(1 downto 0); 
    signal s_jesdSysRef  : sl;
+   signal jesdRxSyncL  : sl;
    -------------------------------------------------------------------------------------------------
    -- SPI
    -------------------------------------------------------------------------------------------------   
@@ -195,14 +196,16 @@ begin
    -----------------------
 
    -- JESD Reference Ports
-   jesdSysRefP <= sysRefP(0); -- Swapped
+   jesdSysRefP <= sysRefP(0); -- Polarity swapped on page 2 of schematics
    jesdSysRefN <= sysRefN(0);
 
-   -- JESD Sync Ports
+   -- JESD RX Sync Ports
    syncInP(3) <= jesdRxSyncP(0); 
    syncInN(3) <= jesdRxSyncN(0);
    spareP(14) <= jesdRxSyncP(1); -- Swapped
    spareN(14) <= jesdRxSyncN(1);
+   
+   -- JESD TX Sync Ports
    jesdTxSyncP(0)  <= sysRefP(1);-- Swapped
    jesdTxSyncN(0)  <= sysRefN(1);  
    jesdTxSyncP(1)  <= spareP(8);
@@ -262,7 +265,7 @@ begin
          IB => jesdSysRefN,
          O  => s_jesdSysRef); 
 
-   jesdSysRef <= not s_jesdSysRef; -- Note inverted because it is Swapped on the board
+   jesdSysRef <= not(s_jesdSysRef); -- Note inverted because it is Swapped on the board
 
    OBUFDS0_RxSync : OBUFDS
       port map (
@@ -270,9 +273,11 @@ begin
          O  => jesdRxSyncP(0),
          OB => jesdRxSyncN(0));
    
+   jesdRxSyncL <= not(jesdRxSync);-- Note inverted because it is Swapped on the board
+   
    OBUFDS1_RxSync : OBUFDS
       port map (
-         I  => not jesdRxSync, -- Note inverted because it is Swapped on the board
+         I  => jesdRxSyncL, 
          O  => jesdRxSyncP(1),
          OB => jesdRxSyncN(1)); 
       
@@ -288,10 +293,8 @@ begin
          IB => jesdTxSyncN(1),
          O  => jesdTxSyncVec(1));
 
-   
-   jesdTxSync <= not jesdTxSyncVec(0) or jesdTxSyncVec(1); -- Warning!!! Or only at initial debug TODO make it AND
-                                                           -- Note inverted because it is Swapped on the board
-   -- jesdTxSync <= not jesdTxSyncVec(0) and jesdTxSyncVec(1);
+   -- jesdTxSync <= not(jesdTxSyncVec(0)) or jesdTxSyncVec(1); -- Warning!!! OR-ing only at initial debug TODO make it AND
+   jesdTxSync <= not(jesdTxSyncVec(0)) and jesdTxSyncVec(1);
    
    ----------------------------------------------------------------
    -- SPI interface ADC
@@ -312,7 +315,8 @@ begin
            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
            -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
-           SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
+           SPI_SCLK_PERIOD_G => (1.0/1.0E+6))
+           -- SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
 
          port map (
             axiClk         => axilClk,
