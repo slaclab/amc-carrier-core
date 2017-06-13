@@ -42,31 +42,38 @@ class AppTop(pr.Device):
         # Variables
         ##############################
 
-        self.add(AppCore(   offset=0x00000000, expand=True))
-        # self.add(AppTopTrig(offset=0x10000000, expand=False))
+        self.add(AppCore(   
+                                    offset       =  0x00000000, 
+                                    expand       =  True
+                        ))
+
+        self.add(AppTopTrig(
+                                    offset       =  0x10000000, 
+                                    expand       =  False
+                           ))
 
         for i in range(2):
             self.add(DaqMuxV2(
-                                   name         = "DaqMuxV2[%i]" % (i),
-                                   offset       = 0x20000000 + (i * 0x10000000),
-                                   expand       = False,
-                               ))
+                                        name         = "DaqMuxV2[%i]" % (i),
+                                        offset       =  0x20000000 + (i * 0x10000000),
+                                        expand       =  False,
+                             ))
 
         for i in range(2):
             if ((numRxLanes[i] > 0) or (numTxLanes[i] > 0)):
                 self.add(AppTopJesd(
-                                    name         = "AppTopJesd[%i]" % (i),
-                                    offset       =  0x40000000 + (i * 0x10000000),
-                                    numRxLanes   =  numRxLanes[i],
-                                    numTxLanes   =  numTxLanes[i],
-                                    expand       = False,
-                                    ))
+                                            name         = "AppTopJesd[%i]" % (i),
+                                            offset       =  0x40000000 + (i * 0x10000000),
+                                            numRxLanes   =  numRxLanes[i],
+                                            numTxLanes   =  numTxLanes[i],
+                                            expand       =  False,
+                                   ))
 
-        # for i in range(2):
-            # self.add(DacSigGen(
-                                    # name         = "DacSigGen[%i]" % (i),
-                                    # offset       =  0x60000000 + (i * 0x10000000),
-                                    # instantiate    =  False,
-                                    # expand       = False
-                                # ))
+        for i in range(2):
+            self.add(DacSigGen(
+                                        name         = "DacSigGen[%i]" % (i),
+                                        offset       =  0x60000000 + (i * 0x10000000),
+                                        instantiate  =  False,
+                                        expand       =  False
+                              ))
 
