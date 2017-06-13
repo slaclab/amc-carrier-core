@@ -257,7 +257,7 @@ begin
    -----------------------------------------------------------
    -- MULTIPLEXER logic
    -----------------------------------------------------------    
-   comb : process (devClk_i) is
+   MUX : process (devClk_i) is
    begin
       if rising_edge(devClk_i) then
           for i in N_DATA_OUT_G-1 downto 0 loop
@@ -283,7 +283,7 @@ begin
           end loop;
       end if;
    ----------------------
-   end process comb;
+   end process MUX;
   
   
    s_header <= "00000" & s_trigHeader;
