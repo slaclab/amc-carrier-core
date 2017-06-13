@@ -31,8 +31,9 @@ class DacSigGen(pr.Device):
                     numOfChs    =  2, 
                     buffSize    =  0x200,
                     instantiate =  True,
+                    expand      =  True,
                 ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
+        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
 
         ##############################
         # Variables
