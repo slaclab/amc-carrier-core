@@ -19,7 +19,7 @@
 
 import pyrogue as pr
 
-from surf.misc._GenericMemory import *
+from surf.misc import *
 
 class DacSigGen(pr.Device):
     def __init__(   self, 

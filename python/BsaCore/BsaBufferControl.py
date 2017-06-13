@@ -19,8 +19,8 @@
 
 import pyrogue as pr
 
-from surf.misc._GenericMemory import *
-from surf.axi._AxiStreamDmaRingWrite import *
+from surf.misc import *
+from surf.axi import *
 
 class BsaBufferControl(pr.Device):
     def __init__(   self, 
