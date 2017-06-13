@@ -423,31 +423,31 @@ class DaqMuxV2(pr.Device):
         self.addCommand(    name         = "TriggerDaq",
                             description  = "Trigger data aquisition from software.",
                             function     = """\
-                                           self.TriggerSw.set(1)
-                                           self.TriggerSw.set(0)
+                                           dev.TriggerSw.set(1)
+                                           dev.TriggerSw.set(0)
                                            """
                         )
 
         self.addCommand(    name         = "ArmHwTrigger",
                             description  = "Arm Hardware Trigger.",
                             function     = """\
-                                           self.TriggerHwArm.set(1)
-                                           self.TriggerHwArm.set(0)
+                                           dev.TriggerHwArm.set(1)
+                                           dev.TriggerHwArm.set(0)
                                            """
                         )
 
         self.addCommand(    name         = "FreezeBuffers",
                             description  = "Freeze circular buffers from software.",
                             function     = """\
-                                           self.FreezeSw.set(1)
-                                           self.FreezeSw.set(0)
+                                           dev.FreezeSw.set(1)
+                                           dev.FreezeSw.set(0)
                                            """
                         )
 
         self.addCommand(    name         = "ClearTrigStatus",
                             description  = "Clear the status.",
                             function     = """\
-                                           self.TriggerClearStatus.set(1)
-                                           self.TriggerClearStatus.set(0)
+                                           dev.TriggerClearStatus.set(1)
+                                           dev.TriggerClearStatus.set(0)
                                            """
                         )
