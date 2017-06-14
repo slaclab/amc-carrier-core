@@ -19,8 +19,7 @@
 
 import pyrogue as pr
 
-from surf.protocols.jesd204b._JesdRx import *
-from surf.protocols.jesd204b._JesdTx import *
+from surf.protocols.jesd204b import *
 
 class AppTopJesd(pr.Device):
     def __init__(   self, 

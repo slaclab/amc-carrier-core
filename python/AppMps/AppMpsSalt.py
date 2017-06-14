@@ -123,7 +123,7 @@ class AppMpsSalt(pr.Device):
         self.addCommand(    name         = "RstCnt",
                             description  = "Reset all the status counters",
                             function     = """\
-                                           self.CntRst.set(1)
+                                           dev.CntRst.set(1)
                                            """
                         )
 

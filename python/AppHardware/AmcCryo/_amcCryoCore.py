@@ -20,8 +20,7 @@
 import pyrogue as pr
 import time
 
-from surf.devices.ti._Dac38J84 import *
-from surf.devices.ti._Lmk04828 import *
+from surf.devices.ti import *
 
 from AppHardware.AmcCryo._adc32Rf45 import *
 

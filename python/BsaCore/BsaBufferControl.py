@@ -19,8 +19,8 @@
 
 import pyrogue as pr
 
-from surf.misc._GenericMemory import *
-from surf.axi._AxiStreamDmaRingWrite import *
+from surf.misc import *
+from surf.axi import *
 
 class BsaBufferControl(pr.Device):
     def __init__(   self, 
@@ -36,23 +36,18 @@ class BsaBufferControl(pr.Device):
         # Variables
         ##############################
 
-        self.addVariable(   name         = "Timestamps",
-                            description  = "",
-                            offset       =  0x00000000,
-                            bitSize      =  32,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
-
         self.add(GenericMemory(
-                                offset     = 0x00,
-                                nelms      = 64,
-                                bitSize    = 64,
+                                name       = "Timestamps",
+                                offset     =  0x00,
+                                nelms      =  64,
+                                bitSize    =  64,
+                                stride     =  8,
+                                base       = "hex",
                                 mode       = "RO",
                               ))
 
-        self.add(AxiStreamDmaRingWrite(
-                                offset       =  0x00001000,
-                                name         = "BsaBuffers"
-                            ))
+        #self.add(AxiStreamDmaRingWrite(
+        #                        offset       =  0x00001000,
+        #                        name         = "BsaBuffers",
+        #                        numBuffers   =  64,
+        #                    ))
