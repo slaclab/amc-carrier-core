@@ -46,8 +46,8 @@ class BsaBufferControl(pr.Device):
                                 mode       = "RO",
                               ))
 
-        #self.add(AxiStreamDmaRingWrite(
-        #                        offset       =  0x00001000,
-        #                        name         = "BsaBuffers",
-        #                        numBuffers   =  64,
-        #                    ))
+        self.add(AxiStreamDmaRingWrite(
+                                offset       =  0x00001000,
+                                name         = "BsaBuffers",
+                                numBuffers   =  64,
+                            ))
