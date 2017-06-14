@@ -26,10 +26,11 @@ class AmcCarrierBsa(pr.Device):
     def __init__(   self, 
                     name        = "AmcCarrierBsa", 
                     description = "AmcCarrier BSA Module", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
-                    hidden      =  False,
-                    expand      =  True,
+                    memBase     = None, 
+                    offset      = 0x0, 
+                    enableBsa   = True,
+                    hidden      = False,
+                    expand      = True,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
 
@@ -37,9 +38,10 @@ class AmcCarrierBsa(pr.Device):
         # Variables
         ##############################
 
-        self.add(BsaBufferControl(
-                                offset       =  0x00000000,
-                            ))
+        if (enableBsa):
+            self.add(BsaBufferControl(
+                                    offset       =  0x00000000,
+                                ))
 
         for i in range(2):
             self.add(BsaWaveformEngine(

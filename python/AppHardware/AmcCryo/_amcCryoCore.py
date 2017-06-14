@@ -20,9 +20,11 @@
 import pyrogue as pr
 import time
 
-from surf.devices.ti import *
+from surf.devices.ti._Dac38J84 import *
+from surf.devices.ti._Lmk04828 import *
 
 from AppHardware.AmcCryo._adc32Rf45 import *
+from AppHardware.AmcCryo._amcCryoCtrl import *
 
 class AmcCryoCore(pr.Device):
     def __init__(   self, 
@@ -38,11 +40,12 @@ class AmcCryoCore(pr.Device):
         #########
         # Devices
         #########
-        self.add(Lmk04828( offset=0x00020000,name='LMK',   expand=False))
-        self.add(Dac38J84( offset=0x00040000,name='DAC[0]', expand=False))
-        self.add(Dac38J84( offset=0x00060000,name='DAC[1]', expand=False))
-        self.add(Adc32Rf45(offset=0x00080000,name='ADC[0]', expand=False))
-        self.add(Adc32Rf45(offset=0x000C0000,name='ADC[1]', expand=False))
+        self.add(AmcCryoCtrl(   offset=0x00000000,name='DBG',   expand=False))
+        self.add(Lmk04828(      offset=0x00020000,name='LMK',   expand=False))
+        self.add(Dac38J84(      offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
+        self.add(Dac38J84(      offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
+        self.add(Adc32Rf45(     offset=0x00080000,name='ADC[0]', expand=False))
+        self.add(Adc32Rf45(     offset=0x000C0000,name='ADC[1]', expand=False))
 
         ##########
         # Commands

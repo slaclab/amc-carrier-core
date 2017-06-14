@@ -92,14 +92,16 @@ architecture top_level_app of AmcCryoCore is
    -------------------------------------------------------------------------------------------------
    -- AXI Lite Config and Signals
    -------------------------------------------------------------------------------------------------
-   constant NUM_AXI_MASTERS_C : natural := 5;
+   constant NUM_AXI_MASTERS_C : natural := 6;
 
-   constant LMK_INDEX_C          : natural := 0;
-   constant DAC_0_INDEX_C        : natural := 1;
-   constant DAC_1_INDEX_C        : natural := 2;
-   constant ADC_0_INDEX_C        : natural := 3;
-   constant ADC_1_INDEX_C        : natural := 4;
+   constant CTRL_INDEX_C         : natural := 0;
+   constant LMK_INDEX_C          : natural := 1;
+   constant DAC_0_INDEX_C        : natural := 2;
+   constant DAC_1_INDEX_C        : natural := 3;
+   constant ADC_0_INDEX_C        : natural := 4;
+   constant ADC_1_INDEX_C        : natural := 5;
 
+   constant CTRL_BASE_ADDR_C     : slv(31 downto 0) := x"0000_0000" + AXI_BASE_ADDR_G;
    constant LMK_BASE_ADDR_C      : slv(31 downto 0) := x"0002_0000" + AXI_BASE_ADDR_G;
    constant DAC_0_BASE_ADDR_C    : slv(31 downto 0) := x"0004_0000" + AXI_BASE_ADDR_G;
    constant DAC_1_BASE_ADDR_C    : slv(31 downto 0) := x"0006_0000" + AXI_BASE_ADDR_G;
@@ -107,6 +109,10 @@ architecture top_level_app of AmcCryoCore is
    constant ADC_1_BASE_ADDR_C    : slv(31 downto 0) := x"000C_0000" + AXI_BASE_ADDR_G;
 
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
+      CTRL_INDEX_C          => (
+         baseAddr          => CTRL_BASE_ADDR_C,
+         addrBits          => 17,
+         connectivity      => x"FFFF"),    
       LMK_INDEX_C          => (
          baseAddr          => LMK_BASE_ADDR_C,
          addrBits          => 17,
@@ -147,7 +153,9 @@ architecture top_level_app of AmcCryoCore is
    signal jesdRxSyncN : slv(1 downto 0);
    signal jesdTxSyncP : slv(1 downto 0);
    signal jesdTxSyncN : slv(1 downto 0);
+   signal jesdTxSyncRaw : slv(1 downto 0); 
    signal jesdTxSyncVec : slv(1 downto 0); 
+   signal jesdTxSyncMask : slv(1 downto 0); 
    signal s_jesdSysRef  : sl;
    signal jesdRxSyncL  : sl;
    -------------------------------------------------------------------------------------------------
@@ -256,6 +264,24 @@ begin
          mAxiReadMasters     => locAxilReadMasters,
          mAxiReadSlaves      => locAxilReadSlaves);
          
+     U_Ctrl : entity work.AmcCryoCoreCtrl
+        generic map (
+           TPD_G             => TPD_G,
+           AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G)
+         port map (
+            -- AXI-Lite Interface
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => locAxilReadMasters(CTRL_INDEX_C),
+            axilReadSlave   => locAxilReadSlaves(CTRL_INDEX_C),
+            axilWriteMaster => locAxilWriteMasters(CTRL_INDEX_C),
+            axilWriteSlave  => locAxilWriteSlaves(CTRL_INDEX_C),
+            -- AMC Debug Signals
+            rxSync          => jesdRxSync,
+            txSyncRaw       => jesdTxSyncRaw,
+            txSync          => jesdTxSyncVec,
+            txSyncMask      => jesdTxSyncMask);
+         
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
@@ -285,16 +311,18 @@ begin
       port map (
          I  => jesdTxSyncP(0), 
          IB => jesdTxSyncN(0),
-         O  => jesdTxSyncVec(0));
+         O  => jesdTxSyncRaw(0));
          
    IBUFDS1_TxSync : IBUFDS
       port map (
          I  => jesdTxSyncP(1),
          IB => jesdTxSyncN(1),
-         O  => jesdTxSyncVec(1));
+         O  => jesdTxSyncRaw(1));
 
-   -- jesdTxSync <= not(jesdTxSyncVec(0)) or jesdTxSyncVec(1); -- Warning!!! OR-ing only at initial debug TODO make it AND
-   jesdTxSync <= not(jesdTxSyncVec(0)) and jesdTxSyncVec(1);
+   jesdTxSyncVec(0) <= jesdTxSyncMask(0) or not(jesdTxSyncRaw(0));
+   jesdTxSyncVec(1) <= jesdTxSyncMask(1) or jesdTxSyncRaw(1);
+         
+   jesdTxSync <= jesdTxSyncVec(0) and jesdTxSyncVec(1);
    
    ----------------------------------------------------------------
    -- SPI interface ADC

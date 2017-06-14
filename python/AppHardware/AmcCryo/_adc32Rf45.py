@@ -51,8 +51,8 @@ class Adc32Rf45(pr.Device):
         #####################
         # Add Device Channels
         #####################
-        self.add(Adc32Rf45Channel(name='CHA',offset=(0x0 << 14),expand=expand,verify=verify))
-        self.add(Adc32Rf45Channel(name='CHB',offset=(0x8 << 14),expand=expand,verify=verify))      
+        self.add(Adc32Rf45Channel(name='CH[0]',description='Channel A',offset=(0x0 << 14),expand=expand,verify=verify))
+        self.add(Adc32Rf45Channel(name='CH[1]',description='Channel B',offset=(0x8 << 14),expand=expand,verify=verify))      
         
         ####################################
         # Backdoor accesses for undocumented 

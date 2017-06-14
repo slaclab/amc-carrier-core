@@ -76,7 +76,7 @@ class AmcCarrierBsi(pr.Device):
                             description  = "BSI's Minor Version Number",
                             offset       =  0x8C,
                             bitSize      =  8,
-                            bitOffset    =  0x08,
+                            bitOffset    =  0,
                             base         = "hex",
                             mode         = "RO",
                         )
@@ -85,7 +85,7 @@ class AmcCarrierBsi(pr.Device):
                             description  = "BSI's Major Version Number",
                             offset       =  0x90,
                             bitSize      =  8,
-                            bitOffset    =  0x08,
+                            bitOffset    =  8,
                             base         = "hex",
                             mode         = "RO",
                         )

@@ -21,8 +21,9 @@ from AppMps.AppMps import *
 class AmcCarrierCore(pr.Device):
     def __init__(   self, 
                     name        = "AmcCarrierCore", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
+                    memBase     = None, 
+                    offset      = 0x0, 
+                    enableBsa   = True,
                     hidden      = False,
                     expand	    = False,
                 ):
@@ -68,37 +69,38 @@ class AmcCarrierCore(pr.Device):
                                                 -----------------------------------------------------------------\n"\
                             ))
 
-        self.add(Axi24LC64FT(
-                                offset       =  0x04000000,
-                                nelms        =  0x800,
-                                instantiate  =  False,
-                                hidden       =  True,
-                            ))
+        # self.add(Axi24LC64FT(
+                                # offset       =  0x04000000,
+                                # nelms        =  0x800,
+                                # instantiate  =  False,
+                                # hidden       =  True,
+                            # ))
                             
         self.add(AxiCdcm6208(     
                                 offset       =  0x05000000, 
-                                expand       =  False
+                                expand       =  False,
                             ))
 
-        self.add(DdrSpd(          
-                                offset       =  0x06000000, 
-                                expand       =  False, 
-                                hidden       =  True
-                            ))
+        # self.add(DdrSpd(          
+                                # offset       =  0x06000000, 
+                                # expand       =  False, 
+                                # hidden       =  True,
+                            # ))
 
         self.add(AmcCarrierBsi(   
                                 offset       =  0x07000000, 
-                                expand       =  False
+                                expand       =  False,
                             ))
 
         self.add(AmcCarrierTiming(
                                 offset       =  0x08000000, 
-                                expand       =  False
+                                expand       =  False,
                             ))
 
         self.add(AmcCarrierBsa(   
                                 offset       =  0x09000000, 
-                                expand       =  False
+                                enableBsa    =  enableBsa,
+                                expand       =  False,
                             ))
                             
         self.add(UdpEngineClient(
