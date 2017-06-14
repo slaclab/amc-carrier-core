@@ -61,6 +61,20 @@ class AmcCryoCore(pr.Device):
                             function     = initAmcCard
                         )
                         
+        def enLmkRef(dev, cmd, arg):
+            dev.LMK.LmkReg_0x011F.set(0x7)                   
+        self.addCommand(    name         = "CmdEnLmkRef",
+                            description  = "Enable Front Panel LMK reference",
+                            function     = enLmkRef
+                        )      
+
+        def disLmkRef(dev, cmd, arg):
+            dev.LMK.LmkReg_0x011F.set(0x0)                   
+        self.addCommand(    name         = "CmdDisLmkRef",
+                            description  = "Disable Front Panel LMK reference",
+                            function     = disLmkRef
+                        )                              
+                        
                         
                         
                         
