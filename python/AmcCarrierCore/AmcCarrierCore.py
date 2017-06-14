@@ -91,7 +91,10 @@ class AmcCarrierCore(pr.Device):
                                 expand       =  False
                             ))
 
-        #self.add(AmcCarrierTiming(offset=0x08000000, expand=False))
+        self.add(AmcCarrierTiming(
+                                offset       =  0x08000000, 
+                                expand       =  False
+                            ))
 
         self.add(AmcCarrierBsa(   
                                 offset       =  0x09000000, 
