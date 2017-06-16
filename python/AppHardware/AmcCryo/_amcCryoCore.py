@@ -50,16 +50,21 @@ class AmcCryoCore(pr.Device):
         ##########
         # Commands
         ##########
-        def initAmcCard(dev, cmd, arg):
+        @self.command(name="InitAmcCar", description="Initialization for AMC card's JESD modules",)
+        def InitAmcCard(dev, cmd, arg):
+            dev.checkBlocks(varUpdate=True, recurse=True)
             dev.LMK.Init()
             dev.DAC[0].Init()
             dev.DAC[1].Init()
             dev.ADC[0].Init()
-            dev.ADC[1].Init()                            
-        self.addCommand(    name         = "InitAmcCard",
-                            description  = "Initialization for AMC card's JESD modules",
-                            function     = initAmcCard
-                        )
+            dev.ADC[1].Init()
+            dev.readBlocks(recurse=True)
+            dev.checkBlocks(varUpdate=True, recurse=True)            
+            
+#         self.addCommand(    name         = "InitAmcCard",
+#                             description  = "Initialization for AMC card's JESD modules",
+#                             function     = initAmcCard
+#                         )
                         
         def enLmkRef(dev, cmd, arg):
             dev.LMK.LmkReg_0x011F.set(0x7)                   
@@ -73,7 +78,45 @@ class AmcCryoCore(pr.Device):
         self.addCommand(    name         = "CmdDisLmkRef",
                             description  = "Disable Front Panel LMK reference",
                             function     = disLmkRef
-                        )                              
+                        )
+
+    def writeBlocks(self, force=False, recurse=True, variable=None):
+        """
+        Write all of the blocks held by this Device to memory
+        """
+        if not self.enable.get(): return
+
+
+        # Process local blocks.
+        if variable is not None:
+            variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
+        else:
+            for block in self._blocks:
+                if force or block.stale:
+                    if block.bulkEn:
+                        block.backgroundTransaction(rogue.interfaces.memory.Write)
+
+
+        # Retire any in-flight transactions before starting
+        self._root.checkBlocks(varUpdate=True, recurse=True)
+
+        self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+
+        self.InitAmCard()
+        
+        self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+
+        self.checkBlocks(recurse=True)
+
+        
+        # Process rest of tree
+        # if recurse:
+#             for key,value in self.devices.items():
+#                 value.writeBlocks(force=force, recurse=True)
                         
                         
                         

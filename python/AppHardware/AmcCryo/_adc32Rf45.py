@@ -63,16 +63,16 @@ class Adc32Rf45(pr.Device):
         ##################
         # General Register
         ##################
-                        
-        self.addVariable(  name         = "RESET",
-                            description  = "Send 0x81 value to reset the device",
-                            offset       =  (generalAddr + (4*0x000)),
-                            bitSize      =  8,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "WO",
-                            verify       =  False,                            
-                            hidden       =  True,                            
+
+        self.add(pr.RemoteCommand(  name         = "RESET",
+                                    description  = "Send 0x81 value to reset the device",
+                                    offset       =  (generalAddr + (4*0x000)),
+                                    bitSize      =  8,
+                                    bitOffset    =  0,
+                                    base         = pr.UInt,
+                                    mode         = "WO",
+                                    hidden       =  True,
+                                    function     = pr.BaseCommand.createTouch(0x81)
                         )
 
         self.addVariable(  name         = "HW_RST",
@@ -267,11 +267,11 @@ class Adc32Rf45(pr.Device):
                         
         ##############################
         # Commands
-        ##############################        
+        ##############################
+        @self.command(name         = "Init", description  = "Device Initiation")        
         def adcInit(dev, cmd, arg):        
             
-            
-            dev.RESET.set(0x81) 
+            dev.RESET()
             
             
             ##############
@@ -498,7 +498,4 @@ class Adc32Rf45(pr.Device):
             
             
             
-        self.addCommand(    name         = "Init",
-                            description  = "Device Initiation",
-                            function     = adcInit
-                        )        
+     
