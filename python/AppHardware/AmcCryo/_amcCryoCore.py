@@ -50,7 +50,7 @@ class AmcCryoCore(pr.Device):
         ##########
         # Commands
         ##########
-        @self.command(name="InitAmcCar", description="Initialization for AMC card's JESD modules",)
+        @self.command(name="InitAmcCard", description="Initialization for AMC card's JESD modules",)
         def InitAmcCard(dev, cmd, arg):
             dev.checkBlocks(varUpdate=True, recurse=True)
             dev.LMK.Init()
@@ -105,7 +105,7 @@ class AmcCryoCore(pr.Device):
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
-        self.InitAmCard()
+        self.InitAmcCard()
         
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
