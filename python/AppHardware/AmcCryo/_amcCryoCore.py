@@ -51,21 +51,15 @@ class AmcCryoCore(pr.Device):
         # Commands
         ##########
         @self.command(name="InitAmcCard", description="Initialization for AMC card's JESD modules",)
-        def InitAmcCard(dev, cmd, arg):
-            dev.checkBlocks(varUpdate=True, recurse=True)
-            dev.LMK.Init()
-            dev.DAC[0].Init()
-            dev.DAC[1].Init()
-            dev.ADC[0].Init()
-            dev.ADC[1].Init()
-            dev.readBlocks(recurse=True)
-            dev.checkBlocks(varUpdate=True, recurse=True)            
-            
-#         self.addCommand(    name         = "InitAmcCard",
-#                             description  = "Initialization for AMC card's JESD modules",
-#                             function     = initAmcCard
-#                         )
-                        
+        def InitAmcCard():
+            self.checkBlocks(varUpdate=True, recurse=True)
+            self.LMK.Init()
+            self.DAC[0].Init()
+            self.DAC[1].Init()
+            self.ADC[0].Init()
+            self.ADC[1].Init()
+            self.checkBlocks(varUpdate=True, recurse=True)            
+
         def enLmkRef(dev, cmd, arg):
             dev.LMK.LmkReg_0x011F.set(0x7)                   
         self.addCommand(    name         = "CmdEnLmkRef",
@@ -109,7 +103,7 @@ class AmcCryoCore(pr.Device):
         
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
-
+        self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
 
         

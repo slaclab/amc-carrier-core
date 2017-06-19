@@ -37,7 +37,10 @@ class AppTop(pr.Device):
                     expand      =  True,
                 ):
         super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
-
+        
+        self._numRxLanes = numRxLanes
+        self._numTxLanes = numTxLanes
+        
         ##############################
         # Variables
         ##############################
@@ -76,4 +79,37 @@ class AppTop(pr.Device):
                                         instantiate  =  False,
                                         expand       =  False
                               ))
+                              
+    def writeBlocks(self, force=False, recurse=True, variable=None):
+        """
+        Write all of the blocks held by this Device to memory
+        """
+        if not self.enable.get(): return
 
+        # Process local blocks.
+        if variable is not None:
+            variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
+        else:
+            for block in self._blocks:
+                if force or block.stale:
+                    if block.bulkEn:
+                        block.backgroundTransaction(rogue.interfaces.memory.Write)
+
+        # Process rest of tree
+        if recurse:
+            for key,value in self.devices.items():
+                value.writeBlocks(force=force, recurse=True)                        
+                        
+        # Retire any in-flight transactions before starting
+        self._root.checkBlocks(varUpdate=True, recurse=True)
+                        
+        for i in range(2):
+            if (self._numRxLanes[i] > 0):
+                v = getattr(self, 'AppTopJesd[%i]'%i)
+                v.JesdRx.CmdResetGTs()
+                v.JesdRx.CmdClearErrors()
+            if (self._numTxLanes[i] > 0):
+                v = getattr(self, 'AppTopJesd[%i]'%i)
+                v.JesdTx.CmdResetGTs()
+                v.JesdTx.CmdClearErrors()                
+        self.checkBlocks(recurse=True)

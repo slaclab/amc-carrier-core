@@ -69,12 +69,12 @@ class AmcCarrierCore(pr.Device):
                                                 -----------------------------------------------------------------\n"\
                             ))
 
-        # self.add(Axi24LC64FT(
-                                # offset       =  0x04000000,
-                                # nelms        =  0x800,
-                                # instantiate  =  False,
-                                # hidden       =  True,
-                            # ))
+        self.add(Axi24LC64FT(
+                                offset       =  0x04000000,
+                                nelms        =  0x800,
+                                instantiate  =  False,
+                                hidden       =  True,
+                            ))
                             
         self.add(AxiCdcm6208(     
                                 offset       =  0x05000000, 
@@ -143,3 +143,32 @@ class AmcCarrierCore(pr.Device):
                                 expand       =  False
                             ))
 
+    def writeBlocks(self, force=False, recurse=True, variable=None):
+        """
+        Write all of the blocks held by this Device to memory
+        """
+        if not self.enable.get(): return
+
+        # Process local blocks.
+        if variable is not None:
+            variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
+        else:
+            for block in self._blocks:
+                if force or block.stale:
+                    if block.bulkEn:
+                        block.backgroundTransaction(rogue.interfaces.memory.Write)
+
+        # Process rest of tree
+        if recurse:
+            for key,value in self.devices.items():
+                value.writeBlocks(force=force, recurse=True)                        
+                        
+        # Retire any in-flight transactions before starting
+        self._root.checkBlocks(varUpdate=True, recurse=True)
+        
+        for i in range(2):
+            v = getattr(self.AmcCarrierBsa, 'BsaWaveformEngine[%i]'%i)
+            v.WaveformEngineBuffers.Initialize()
+        
+        self.checkBlocks(recurse=True)
+        
