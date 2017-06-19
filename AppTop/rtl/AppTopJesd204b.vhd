@@ -289,29 +289,29 @@ begin
       s_gtTxReset <= devRst_i;
    end generate;
 
-   -------------------------------------------
-   -- Generate the internal or external SYSREF 
-   -------------------------------------------
-   SELF_TEST_GEN : if SYSREF_GEN_G = true generate
-      -- Generate the sysref internally
-      -- Sysref period will be 8x K_G.
-      SysrefGen_INST : entity work.LmfcGen
-         generic map (
-            TPD_G => TPD_G,
-            K_G   => 256,
-            F_G   => 2)
-         port map (
-            clk      => devClk_i,
-            rst      => devRst_i,
-            nSync_i  => '0',
-            sysref_i => '0',
-            lmfc_o   => s_sysRef
-            );
-   end generate SELF_TEST_GEN;
+--   -------------------------------------------
+--   -- Generate the internal or external SYSREF 
+--   -------------------------------------------
+--   SELF_TEST_GEN : if SYSREF_GEN_G = true generate
+--      -- Generate the sysref internally
+--      -- Sysref period will be 8x K_G.
+--      SysrefGen_INST : entity work.LmfcGen
+--         generic map (
+--            TPD_G => TPD_G,
+--            K_G   => 256,
+--            F_G   => 2)
+--         port map (
+--            clk      => devClk_i,
+--            rst      => devRst_i,
+--            nSync_i  => '0',
+--            sysref_i => '0',
+--            lmfc_o   => s_sysRef
+--            );
+--   end generate SELF_TEST_GEN;
 
-   OPER_GEN : if SYSREF_GEN_G = false generate
+--   OPER_GEN : if SYSREF_GEN_G = false generate
       s_sysRef <= sysRef_i;
-   end generate OPER_GEN;
+--   end generate OPER_GEN;
 
    -----------------
    -- GTH TX signals
