@@ -318,7 +318,6 @@ begin
    ----------------------
    end process sync;
   
-  
    s_header <= "00000" & s_trigHeader;
   
    -- AXI stream interface two parallel lanes 
