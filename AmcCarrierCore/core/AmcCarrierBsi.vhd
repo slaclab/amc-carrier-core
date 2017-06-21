@@ -400,9 +400,7 @@ begin
 
       -- Map the read registers
       for i in BSI_MAC_SIZE_C-1 downto 0 loop
-         axiSlaveRegisterR(regCon, toSlv(8*i+0, 8), 0, r.macAddress(i)(31 downto 0));
-         axiSlaveRegisterR(regCon, toSlv(8*i+4, 8), 0, r.macAddress(i)(47 downto 32));
-         axiSlaveRegisterR(regCon, toSlv(8*i+4, 8), 16, x"0000");
+         axiSlaveRegisterR(regCon, toSlv(8*i, 8), 0, r.macAddress(i));
       end loop;
       axiSlaveRegisterR(regCon, x"80", 0, r.crateId);
       axiSlaveRegisterR(regCon, x"84", 0, r.slotNumber);

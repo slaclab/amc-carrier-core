@@ -66,6 +66,7 @@ architecture mapping of DacSigGen is
    signal s_mode      : slv(6 downto 0);
    signal s_sign      : slv(6 downto 0);
    signal s_trigSw    : slv(6 downto 0);
+   signal s_holdLast  : slv(6 downto 0);
    signal s_trig      : slv(6 downto 0);
    signal s_overflow  : slv(6 downto 0);
    signal s_underflow : slv(6 downto 0);
@@ -135,6 +136,7 @@ begin
             mode_o          => s_mode(SIG_GEN_SIZE_G-1 downto 0),
             sign_o          => s_sign(SIG_GEN_SIZE_G-1 downto 0),
             trigSw_o        => s_trigSw(SIG_GEN_SIZE_G-1 downto 0),
+            holdLast_o      => s_holdLast(SIG_GEN_SIZE_G-1 downto 0),
             period_o        => s_period(SIG_GEN_SIZE_G-1 downto 0),
             running_i       => s_running(SIG_GEN_SIZE_G-1 downto 0),
             overflow_i      => s_overflow(SIG_GEN_SIZE_G-1 downto 0),
@@ -167,6 +169,7 @@ begin
                mode_i          => s_mode(i),
                sign_i          => s_sign(i),
                period_i        => s_period(i)(SIG_GEN_ADDR_WIDTH_G-1 downto 0),
+               holdLast_i      => s_holdLast(i),
                start_i         => s_trig(i),
                overflow_o      => s_overflow(i),
                underflow_o     => s_underflow(i),

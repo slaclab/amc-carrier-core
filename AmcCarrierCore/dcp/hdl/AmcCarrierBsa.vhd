@@ -366,6 +366,7 @@ begin
             TPD_G               => TPD_G,
             PIPE_STAGES_G       => 1,
             FIFO_PAUSE_THRESH_G => 128,
+            TX_VALID_THOLD_G    => 256,-- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
             SLAVE_READY_EN_G    => true,
             GEN_SYNC_FIFO_G     => false,
             AXI_CLK_FREQ_G      => 200.0E+6,
