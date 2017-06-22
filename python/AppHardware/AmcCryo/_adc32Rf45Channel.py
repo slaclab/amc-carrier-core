@@ -217,7 +217,7 @@ class Adc32Rf45Channel(pr.Device):
                             verify       = verify,
                         )
 
-        self.addVariable(  name         = "12BIT MODE",
+        self.addVariable(  name         = "12BIT_MODE",
                             description  = "00 = Normal operation, 14-bit output, 01 & 10 = Unused, 11 = High-efficient data packing enabled",
                             offset       =  (jesdDigital + (4*0x002)),
                             bitSize      =  2,
