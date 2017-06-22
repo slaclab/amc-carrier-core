@@ -64,6 +64,7 @@ package AppMpsPkg is
    ---------------------------------------------------   
    type MpsMessageType is record
       valid     : sl;
+      version   : slv(4 downto 0);      -- Message version (wrong version is detected by MpsAppTimeout)
       lcls      : sl;                   -- '0' LCLS-II, '1' LCLS-I
       inputType : sl;                   -- '0' Digital, '1' Analog      
       timeStamp : slv(15 downto 0);
@@ -76,6 +77,7 @@ package AppMpsPkg is
 
    constant MPS_MESSAGE_INIT_C : MpsMessageType := (
       valid     => '0',
+      version   => (others => '0'),      
       lcls      => '0',
       inputType => '0',
       timeStamp => (others => '0'),
