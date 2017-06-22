@@ -33,7 +33,6 @@ entity AmcCryoDualCore is
    port (
       -- Internal ports
       adcRst          : in   Slv2Array(1 downto 0);
-      lmkRef          : in   slv(1 downto 0);
       
       -- JESD Interface
       jesdSysRef      : out   slv(1 downto 0);
@@ -66,10 +65,7 @@ entity AmcCryoDualCore is
       syncOutN         : inout Slv10Array(1 downto 0);
       -- AMC's Spare Ports
       spareP           : inout Slv16Array(1 downto 0);
-      spareN           : inout Slv16Array(1 downto 0);
-       -- AMC's IO Ports kcu60 only 
-      amcIoP           : inout Slv4Array(1 downto 0);
-      amcIoN           : inout Slv4Array(1 downto 0)
+      spareN           : inout Slv16Array(1 downto 0)
       );
 end AmcCryoDualCore;
 
@@ -121,7 +117,6 @@ begin
          port map(
             -- Internal ports
             adcRst       => adcRst(i),
-            lmkRef       => lmkRef(i),
             -- JESD SYNC Interface
             jesdSysRef      => jesdSysRef(i),
             jesdRxSync      => jesdRxSync(i),
@@ -153,11 +148,7 @@ begin
             syncOutN        => syncOutN(i),
             -- AMC's Spare Ports
             spareP          => spareP(i),
-            spareN          => spareN(i),
-            -- AMC's IO Ports kcu60 only
-            amcIoP          => amcIoP(i),
-            amcIoN          => amcIoN(i)
+            spareN          => spareN(i)
             );  
    end generate GEN_AMC;
-
 end mapping;

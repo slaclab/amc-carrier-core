@@ -50,9 +50,7 @@ entity AmcCryoCore is
       
       -- For resetting ADC Chips on the board
       adcRst          : in slv(1 downto 0);
-      -- For giving LMK a reference clock from fpga
-      lmkRef          : in sl;            
-      
+     
       -- JESD Interface
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
@@ -85,10 +83,7 @@ entity AmcCryoCore is
       syncOutN        : inout slv(9 downto 0);
       -- AMC's Spare Ports
       spareP          : inout slv(15 downto 0);
-      spareN          : inout slv(15 downto 0);
-       -- AMC's IO Ports kcu60 only
-      amcIoP          : inout slv(3 downto 0);
-      amcIoN          : inout slv(3 downto 0)   
+      spareN          : inout slv(15 downto 0)   
       );
 end AmcCryoCore;
 
@@ -97,43 +92,48 @@ architecture top_level_app of AmcCryoCore is
    -------------------------------------------------------------------------------------------------
    -- AXI Lite Config and Signals
    -------------------------------------------------------------------------------------------------
-   constant NUM_AXI_MASTERS_C : natural := 5;
+   constant NUM_AXI_MASTERS_C : natural := 6;
 
-   constant ADC_0_INDEX_C        : natural := 0;
-   constant ADC_1_INDEX_C        : natural := 1;
+   constant CTRL_INDEX_C         : natural := 0;
+   constant LMK_INDEX_C          : natural := 1;
    constant DAC_0_INDEX_C        : natural := 2;
    constant DAC_1_INDEX_C        : natural := 3;
-   constant LMK_INDEX_C          : natural := 4;
+   constant ADC_0_INDEX_C        : natural := 4;
+   constant ADC_1_INDEX_C        : natural := 5;
 
-   constant ADC_0_BASE_ADDR_C        : slv(31 downto 0) := X"0002_0000" + AXI_BASE_ADDR_G;
-   constant ADC_1_BASE_ADDR_C        : slv(31 downto 0) := X"0004_0000" + AXI_BASE_ADDR_G;
-   constant DAC_0_BASE_ADDR_C        : slv(31 downto 0) := X"0006_0000" + AXI_BASE_ADDR_G;
-   constant DAC_1_BASE_ADDR_C        : slv(31 downto 0) := X"0008_0000" + AXI_BASE_ADDR_G;
-   constant LMK_BASE_ADDR_C          : slv(31 downto 0) := X"000A_0000" + AXI_BASE_ADDR_G;
+   constant CTRL_BASE_ADDR_C     : slv(31 downto 0) := x"0000_0000" + AXI_BASE_ADDR_G;
+   constant LMK_BASE_ADDR_C      : slv(31 downto 0) := x"0002_0000" + AXI_BASE_ADDR_G;
+   constant DAC_0_BASE_ADDR_C    : slv(31 downto 0) := x"0004_0000" + AXI_BASE_ADDR_G;
+   constant DAC_1_BASE_ADDR_C    : slv(31 downto 0) := x"0006_0000" + AXI_BASE_ADDR_G;
+   constant ADC_0_BASE_ADDR_C    : slv(31 downto 0) := x"0008_0000" + AXI_BASE_ADDR_G;
+   constant ADC_1_BASE_ADDR_C    : slv(31 downto 0) := x"000C_0000" + AXI_BASE_ADDR_G;
 
-   
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      ADC_0_INDEX_C        => (
-         baseAddr          => ADC_0_BASE_ADDR_C,
+      CTRL_INDEX_C          => (
+         baseAddr          => CTRL_BASE_ADDR_C,
          addrBits          => 17,
-         connectivity      => X"FFFF"),
-      ADC_1_INDEX_C        => (
-         baseAddr          => ADC_1_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      DAC_0_INDEX_C        => (
-         baseAddr          => DAC_0_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      DAC_1_INDEX_C        => (
-         baseAddr          => DAC_1_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),  
+         connectivity      => x"FFFF"),    
       LMK_INDEX_C          => (
          baseAddr          => LMK_BASE_ADDR_C,
          addrBits          => 17,
-         connectivity      => X"FFFF"));
-
+         connectivity      => x"FFFF"),  
+      DAC_0_INDEX_C        => (
+         baseAddr          => DAC_0_BASE_ADDR_C,
+         addrBits          => 17,
+         connectivity      => x"FFFF"),
+      DAC_1_INDEX_C        => (
+         baseAddr          => DAC_1_BASE_ADDR_C,
+         addrBits          => 17,
+         connectivity      => x"FFFF"),  
+      ADC_0_INDEX_C        => (
+         baseAddr          => ADC_0_BASE_ADDR_C,
+         addrBits          => 18,
+         connectivity      => x"FFFF"),
+      ADC_1_INDEX_C        => (
+         baseAddr          => ADC_1_BASE_ADDR_C,
+         addrBits          => 18,
+         connectivity      => x"FFFF"));
+         
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal locAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -142,7 +142,6 @@ architecture top_level_app of AmcCryoCore is
    -----------------------
    -- Application Ports --
    -----------------------
-
    -------------------------------------------------------------------------------------------------
    -- JESD constants and signals
    -------------------------------------------------------------------------------------------------
@@ -154,13 +153,17 @@ architecture top_level_app of AmcCryoCore is
    signal jesdRxSyncN : slv(1 downto 0);
    signal jesdTxSyncP : slv(1 downto 0);
    signal jesdTxSyncN : slv(1 downto 0);
-   signal jesdTxSyncVec : slv(1 downto 0);   
-
+   signal jesdTxSyncRaw : slv(1 downto 0); 
+   signal jesdTxSyncVec : slv(1 downto 0); 
+   signal jesdTxSyncMask : slv(1 downto 0); 
+   signal s_jesdSysRef  : sl;
+   signal jesdRxSyncL  : sl;
    -------------------------------------------------------------------------------------------------
    -- SPI
    -------------------------------------------------------------------------------------------------   
    
    -- ADC SPI config interface   
+   signal adcCoreRst  : slv(1 downto 0) := "00";
    signal adcCoreClk  : slv(1 downto 0);
    signal adcCoreDout : slv(1 downto 0);
    signal adcCoreCsb  : slv(1 downto 0);
@@ -201,18 +204,20 @@ begin
    -----------------------
 
    -- JESD Reference Ports
-   jesdSysRefP <= sysRefP(0);
+   jesdSysRefP <= sysRefP(0); -- Polarity swapped on page 2 of schematics
    jesdSysRefN <= sysRefN(0);
 
-   -- JESD Sync Ports
-   syncInP(3) <= jesdRxSyncP(0);
+   -- JESD RX Sync Ports
+   syncInP(3) <= jesdRxSyncP(0); 
    syncInN(3) <= jesdRxSyncN(0);
-   syncInP(0) <= jesdRxSyncP(1);
-   syncInN(0) <= jesdRxSyncN(1);
-   jesdTxSyncP(0)  <= syncOutP(0);
-   jesdTxSyncN(0)  <= syncOutN(0);  
-   jesdTxSyncP(1)  <= syncOutP(1);
-   jesdTxSyncN(1)  <= syncOutN(1);
+   spareP(14) <= jesdRxSyncP(1); -- Swapped
+   spareN(14) <= jesdRxSyncN(1);
+   
+   -- JESD TX Sync Ports
+   jesdTxSyncP(0)  <= sysRefP(1);-- Swapped
+   jesdTxSyncN(0)  <= sysRefN(1);  
+   jesdTxSyncP(1)  <= spareP(8);
+   jesdTxSyncN(1)  <= spareN(8);
    
    -- ADC SPI 
    spareP(2)   <= adcSpiDo;   
@@ -228,21 +233,14 @@ begin
    syncOutP(8) <= dacSpiCsb(1);
 
    -- LMK SPI
-   spareP(4) <= lmkSpiClk;
-   spareP(5) <= lmkSpiDio;
-   spareP(3) <= lmkSpiCsb;   
+   spareP(10) <= lmkSpiClk;
+   spareP(11) <= lmkSpiDio;
+   spareP(9) <= lmkSpiCsb;   
    
    -- ADC resets remapping
-   spareN(3)   <= adcRst(0);
-   syncOutN(9) <= adcRst(1);
+   spareN(3)   <= axilRst or adcCoreRst(0);
+   syncOutN(9) <= axilRst or adcCoreRst(1);
    
-   -- Fpga clock reference
-   
-   OBUFDS_lmkRef : OBUFDS
-      port map (
-         I  => lmkRef,
-         O  => amcIoP(2),
-         OB => amcIoN(2));
    
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
@@ -266,6 +264,24 @@ begin
          mAxiReadMasters     => locAxilReadMasters,
          mAxiReadSlaves      => locAxilReadSlaves);
          
+     U_Ctrl : entity work.AmcCryoCoreCtrl
+        generic map (
+           TPD_G             => TPD_G,
+           AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G)
+         port map (
+            -- AXI-Lite Interface
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => locAxilReadMasters(CTRL_INDEX_C),
+            axilReadSlave   => locAxilReadSlaves(CTRL_INDEX_C),
+            axilWriteMaster => locAxilWriteMasters(CTRL_INDEX_C),
+            axilWriteSlave  => locAxilWriteSlaves(CTRL_INDEX_C),
+            -- AMC Debug Signals
+            rxSync          => jesdRxSync,
+            txSyncRaw       => jesdTxSyncRaw,
+            txSync          => jesdTxSyncVec,
+            txSyncMask      => jesdTxSyncMask);
+         
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
@@ -273,40 +289,63 @@ begin
       port map (
          I  => jesdSysRefP,
          IB => jesdSysRefN,
-         O  => jesdSysRef);
-         
-   GEN_RX_SYNC :
-   for i in 1 downto 0 generate
-      OBUFDS_RxSync : OBUFDS
-         port map (
-            I  => jesdRxSync,
-            O  => jesdRxSyncP(i),
-            OB => jesdRxSyncN(i));
-   end generate GEN_RX_SYNC;
-   
-   GEN_TX_SYNC :
-   for i in 1 downto 0 generate
-   IBUFDS_TxSync : IBUFDS
+         O  => s_jesdSysRef); 
+
+   jesdSysRef <= not(s_jesdSysRef); -- Note inverted because it is Swapped on the board
+
+   OBUFDS0_RxSync : OBUFDS
       port map (
-         I  => jesdTxSyncP(i),
-         IB => jesdTxSyncN(i),
-         O  => jesdTxSyncVec(i));
-   end generate GEN_TX_SYNC;
+         I  => jesdRxSync,
+         O  => jesdRxSyncP(0),
+         OB => jesdRxSyncN(0));
    
-   jesdTxSync <= uOr(jesdTxSyncVec); -- Warning!!! Or only at initial debug TODO make it AND
-   -- jesdTxSync <= uAnd(jesdTxSyncVec);   
+   jesdRxSyncL <= not(jesdRxSync);-- Note inverted because it is Swapped on the board
+   
+   OBUFDS1_RxSync : OBUFDS
+      port map (
+         I  => jesdRxSyncL, 
+         O  => jesdRxSyncP(1),
+         OB => jesdRxSyncN(1)); 
+      
+   IBUFDS0_TxSync : IBUFDS
+      port map (
+         I  => jesdTxSyncP(0), 
+         IB => jesdTxSyncN(0),
+         O  => jesdTxSyncRaw(0));
+         
+   IBUFDS1_TxSync : IBUFDS
+      port map (
+         I  => jesdTxSyncP(1),
+         IB => jesdTxSyncN(1),
+         O  => jesdTxSyncRaw(1));
+
+   jesdTxSyncVec(0) <= jesdTxSyncMask(0) or not(jesdTxSyncRaw(0));
+   jesdTxSyncVec(1) <= jesdTxSyncMask(1) or jesdTxSyncRaw(1);
+         
+   jesdTxSync <= jesdTxSyncVec(0) and jesdTxSyncVec(1);
    
    ----------------------------------------------------------------
    -- SPI interface ADC
    ----------------------------------------------------------------
    GEN_ADC : for i in 1 downto 0 generate
-      AxiSpiMaster_INST : entity work.AxiSpiMaster
-         generic map (
-            TPD_G             => TPD_G,
-            ADDRESS_SIZE_G    => 15,
-            DATA_SIZE_G       => 8,
-            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-            SPI_SCLK_PERIOD_G => 10.0E-6)
+   
+     -- AxiSpiMaster_INST : entity work.AxiSpiMaster
+        -- generic map (
+           -- TPD_G             => TPD_G,
+           -- ADDRESS_SIZE_G    => 15,
+           -- DATA_SIZE_G       => 8,
+           -- CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
+           -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+            
+     AxiSpiMaster_INST : entity work.Adc32Rf45SpiMaster
+        generic map (
+           TPD_G             => TPD_G,
+           AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
+           CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
+           -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+           SPI_SCLK_PERIOD_G => (1.0/1.0E+6))
+           -- SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
+
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -314,10 +353,12 @@ begin
             axiReadSlave   => locAxilReadSlaves(ADC_0_INDEX_C+i),
             axiWriteMaster => locAxilWriteMasters(ADC_0_INDEX_C+i),
             axiWriteSlave  => locAxilWriteSlaves(ADC_0_INDEX_C+i),
+            coreRst        => adcCoreRst(i),
             coreSclk       => adcCoreClk(i),
             coreSDin       => adcSpiDo,
             coreSDout      => adcCoreDout(i),
             coreCsb        => adcCoreCsb(i));
+            
    end generate GEN_ADC;
 
    -- Output mux
@@ -334,7 +375,6 @@ begin
    adcSpiClk <= adcMuxClk;
    adcSpiDi  <= adcMuxDout;   
    adcSpiCsb <= adcCoreCsb;
-   
       
    ----------------------------------------------------------------
    -- SPI interface DAC
@@ -346,7 +386,8 @@ begin
             ADDRESS_SIZE_G    => 7,
             DATA_SIZE_G       => 16,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-            SPI_SCLK_PERIOD_G => 10.0E-6)
+            -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+            SPI_SCLK_PERIOD_G => (1.0/500.0E+3))
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -391,7 +432,8 @@ begin
          ADDRESS_SIZE_G    => 15,
          DATA_SIZE_G       => 8,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => 1.0E-6)
+         -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+         SPI_SCLK_PERIOD_G => (1.0/500.0E+3))
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,

@@ -180,6 +180,7 @@ begin
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
+         TX_VALID_THOLD_G    => 256,-- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
          AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)

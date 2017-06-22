@@ -31,7 +31,8 @@ entity DaqMuxV2 is
 
       -- AXI Lite and stream generics
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
-
+      DECIMATOR_EN_G   : boolean         := true;
+      FRAME_BWIDTH_G   : positive        := 10;   -- Axi stream frame size Dafault 10: 4096 byte frames
       -- Number of data lanes
       N_DATA_IN_G : positive := 16;
 
@@ -88,7 +89,11 @@ end DaqMuxV2;
 architecture rtl of DaqMuxV2 is
 
    -- Internal signals
-
+   
+   signal s_sampleDataArr     : slv32Array(N_DATA_IN_G-1 downto 0);
+   signal s_dataValidVec      : slv(N_DATA_IN_G-1 downto 0);
+   
+   
    -- DAQ signals 
    signal s_enAxi             : slv(N_DATA_OUT_G-1 downto 0);
    signal s_enTest            : slv(N_DATA_OUT_G-1 downto 0);
@@ -141,7 +146,34 @@ begin
    -- Check JESD generics
    assert (1 <= N_DATA_IN_G and N_DATA_IN_G <= 29) report "N_DATA_IN_G must be between 1 and 29" severity failure;
    assert (1 <= N_DATA_OUT_G and N_DATA_OUT_G <= 16) report "N_DATA_OUT_G must be between 1 and 16"severity failure;
+   
+   -----------------------------------------------------------
+   -- Register the sample data and valids at the beginning to ease timing 
+   -----------------------------------------------------------
+   GEN_IN_LANES : for i in N_DATA_IN_G-1 downto 0 generate 
+      U_Register: entity work.SlvDelay
+         generic map (
+            TPD_G          => TPD_G,
+            WIDTH_G        => 32)
+         port map (
+            clk   => devClk_i,
+            rst   => devRst_i,
+            delay => "1",
+            din   => sampleDataArr_i(i),
+            dout  => s_sampleDataArr(i));  
+   end generate GEN_IN_LANES;
 
+   
+   U_RegisterValid: entity work.SlvDelay
+      generic map (
+         TPD_G          => TPD_G,
+         WIDTH_G        => N_DATA_IN_G)
+      port map (
+         clk   => devClk_i,
+         rst   => devRst_i,
+         delay => "1",
+         din   => dataValidVec_i,
+         dout  => s_dataValidVec);
    -----------------------------------------------------------
    -- Synchronize timestamp_i and bsa
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
@@ -176,6 +208,7 @@ begin
       rst     => devRst_i,
       dataIn  => dmod_i,      
       dataOut => s_dmodSync);
+      
    -----------------------------------------------------------
    -- AXI lite
    ----------------------------------------------------------- 
@@ -257,14 +290,14 @@ begin
    -----------------------------------------------------------
    -- MULTIPLEXER logic
    -----------------------------------------------------------    
-   comb : process (devClk_i) is
+   sync : process (devClk_i) is
    begin
       if rising_edge(devClk_i) then
           for i in N_DATA_OUT_G-1 downto 0 loop
              -- Data mode
              if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
-                s_sampleDataArrMux(i) <= sampleDataArr_i(conv_integer(s_muxSel(i))-2);
-                s_dataValidVecMux(i)  <= dataValidVec_i(conv_integer(s_muxSel(i))-2);
+                s_sampleDataArrMux(i) <= s_sampleDataArr(conv_integer(s_muxSel(i))-2);
+                s_dataValidVecMux(i)  <= s_dataValidVec(conv_integer(s_muxSel(i))-2);
                 s_enAxi(i)            <= '1';
                 s_enTest(i)           <= '0';
              -- Test mode
@@ -283,8 +316,7 @@ begin
           end loop;
       end if;
    ----------------------
-   end process comb;
-  
+   end process sync;
   
    s_header <= "00000" & s_trigHeader;
   
@@ -293,7 +325,9 @@ begin
       AxiStreamDaq_INST : entity work.DaqLane
          generic map (
             TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            DECIMATOR_EN_G   => DECIMATOR_EN_G,
+            FRAME_BWIDTH_G   => FRAME_BWIDTH_G)
          port map (
 
             devClk_i       => devClk_i,
