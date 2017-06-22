@@ -1152,4 +1152,11 @@ class Adc32Rf45Channel(pr.Device):
                             base         = "hex",
                             mode         = "RW",
                             verify       = verify,
-                        )    
+                        )
+
+        @self.command(name = "TestPattern", description  = "Set the Digital bank Test Pattern mode")        
+        def TestPattern(arg):
+            self.TEST_PATTERN_SEL.set(int(arg))
+            self.TEST_PAT_RES.set(0x1)
+            self.TEST_PAT_RES.set(0x0)
+  
