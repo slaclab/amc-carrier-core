@@ -24,6 +24,7 @@ from AppTop.AppTopJesd import *
 from DacSigGen.DacSigGen import *
 from DaqMuxV2.DaqMuxV2 import *
 from common.AppCore import *
+import time
 
 class AppTop(pr.Device):
     def __init__(   self, 
@@ -47,13 +48,15 @@ class AppTop(pr.Device):
 
         self.add(AppCore(   
                                     offset       =  0x00000000, 
-                                    expand       =  True
+                                    numRxLanes   =  numRxLanes,
+                                    numTxLanes   =  numTxLanes,
+                                    expand       =  True,
                         ))
 
-        self.add(AppTopTrig(
-                                    offset       =  0x10000000, 
-                                    expand       =  False
-                           ))
+        # self.add(AppTopTrig(
+                                    # offset       =  0x10000000, 
+                                    # expand       =  False,
+                           # ))
 
         for i in range(2):
             self.add(DaqMuxV2(
@@ -107,9 +110,14 @@ class AppTop(pr.Device):
             if (self._numRxLanes[i] > 0):
                 v = getattr(self, 'AppTopJesd[%i]'%i)
                 v.JesdRx.CmdResetGTs()
-                v.JesdRx.CmdClearErrors()
             if (self._numTxLanes[i] > 0):
                 v = getattr(self, 'AppTopJesd[%i]'%i)
                 v.JesdTx.CmdResetGTs()
-                v.JesdTx.CmdClearErrors()                
+        for i in range(2):
+            if (self._numRxLanes[i] > 0):
+                v = getattr(self, 'AppTopJesd[%i]'%i)
+                v.JesdRx.CmdClearErrors()
+            if (self._numTxLanes[i] > 0):
+                v = getattr(self, 'AppTopJesd[%i]'%i)
+                v.JesdTx.CmdClearErrors()                   
         self.checkBlocks(recurse=True)

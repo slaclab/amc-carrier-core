@@ -420,6 +420,7 @@ begin
          TPD_G            => TPD_G,
          ADDR_WIDTH_G     => 13,
          I2C_ADDR_G       => "1010000",
+         I2C_SCL_FREQ_G   => 400.0E+3,   -- units of Hz
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
@@ -442,7 +443,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         I2C_SCL_FREQ_G   => 10.0E+3,   -- 10k clk
+         I2C_SCL_FREQ_G   => 100.0E+3,   -- units of Hz
          DEVICE_MAP_G     => TIME_DEVICE_MAP_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
@@ -464,6 +465,7 @@ begin
    AxiI2cRegMaster_2 : entity work.AxiI2cRegMaster
       generic map (
          TPD_G            => TPD_G,
+         I2C_SCL_FREQ_G   => 400.0E+3,   -- units of Hz
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          DEVICE_MAP_G     => DDR_DEVICE_MAP_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
