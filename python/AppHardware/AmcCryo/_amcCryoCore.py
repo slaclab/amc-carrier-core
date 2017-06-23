@@ -103,6 +103,11 @@ class AmcCryoCore(pr.Device):
         
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+        
+        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self.ADC[0].DigRst()
+        self.ADC[1].DigRst()
+        
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
 

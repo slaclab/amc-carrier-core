@@ -398,6 +398,7 @@ class Adc32Rf45(pr.Device):
             
         @self.command(name= "DigRst", description  = "Digital Reset")        
         def DigRst():               
+            time.sleep(0.050)   # Wait for 50 ms for the device to estimate the interleaving errors          
             self.backdoor.write(jesdDigital + chA + (4*0x000),0x00) # clear reset
             self.backdoor.write(jesdDigital + chB + (4*0x000),0x00) # clear reset
             self.backdoor.write(jesdDigital + chA + (4*0x000),0x01) # CHA digital reset

@@ -342,8 +342,8 @@ begin
            TPD_G             => TPD_G,
            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-           -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
-           SPI_SCLK_PERIOD_G => (1.0/1.0E+6))
+           SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+           -- SPI_SCLK_PERIOD_G => (1.0/1.0E+6))
            -- SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
 
          port map (
