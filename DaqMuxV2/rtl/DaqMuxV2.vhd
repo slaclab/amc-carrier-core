@@ -150,15 +150,16 @@ begin
    -----------------------------------------------------------
    -- Register the sample data and valids at the beginning to ease timing 
    -----------------------------------------------------------
-   GEN_IN_LANES : for i in N_DATA_IN_G-1 downto 0 generate 
+   GEN_IN_LANES : for i in N_DATA_IN_G-1 downto 0 generate
       U_Register: entity work.SlvDelay
          generic map (
             TPD_G          => TPD_G,
+            DELAY_G        => 4,
             WIDTH_G        => 32)
          port map (
             clk   => devClk_i,
             rst   => devRst_i,
-            delay => "1",
+            delay => "11",
             din   => sampleDataArr_i(i),
             dout  => s_sampleDataArr(i));  
    end generate GEN_IN_LANES;
@@ -167,11 +168,12 @@ begin
    U_RegisterValid: entity work.SlvDelay
       generic map (
          TPD_G          => TPD_G,
+         DELAY_G        => 4,
          WIDTH_G        => N_DATA_IN_G)
       port map (
          clk   => devClk_i,
          rst   => devRst_i,
-         delay => "1",
+         delay => "11",
          din   => dataValidVec_i,
          dout  => s_dataValidVec);
    -----------------------------------------------------------
@@ -288,7 +290,7 @@ begin
    trigCasc_o <= s_trigSw;  
    armCasc_o  <= s_trigHwArm;
    -----------------------------------------------------------
-   -- MULTIPLEXER logic
+   -- Sync MULTIPLEXER logic
    -----------------------------------------------------------    
    sync : process (devClk_i) is
    begin
@@ -296,22 +298,22 @@ begin
           for i in N_DATA_OUT_G-1 downto 0 loop
              -- Data mode
              if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
-                s_sampleDataArrMux(i) <= s_sampleDataArr(conv_integer(s_muxSel(i))-2);
-                s_dataValidVecMux(i)  <= s_dataValidVec(conv_integer(s_muxSel(i))-2);
-                s_enAxi(i)            <= '1';
-                s_enTest(i)           <= '0';
+                s_sampleDataArrMux(i) <= s_sampleDataArr(conv_integer(s_muxSel(i))-2) after TPD_G;
+                s_dataValidVecMux(i)  <= s_dataValidVec(conv_integer(s_muxSel(i))-2) after TPD_G;
+                s_enAxi(i)            <= '1' after TPD_G;
+                s_enTest(i)           <= '0' after TPD_G;
              -- Test mode
              elsif (s_muxSel(i) = 1) then 
-                s_sampleDataArrMux(i) <= (others => '0');
-                s_dataValidVecMux(i)  <= '1';
-                s_enAxi(i)            <= '1';        
-                s_enTest(i)           <= '1';
+                s_sampleDataArrMux(i) <= (others => '0') after TPD_G;
+                s_dataValidVecMux(i)  <= '1' after TPD_G;
+                s_enAxi(i)            <= '1' after TPD_G;        
+                s_enTest(i)           <= '1' after TPD_G;
              -- Disabled
              else
-                s_sampleDataArrMux(i) <= (others => '0');
-                s_dataValidVecMux(i)  <= '0';
-                s_enAxi(i)            <= '0';
-                s_enTest(i)           <= '0';
+                s_sampleDataArrMux(i) <= (others => '0') after TPD_G;
+                s_dataValidVecMux(i)  <= '0' after TPD_G;
+                s_enAxi(i)            <= '0' after TPD_G;
+                s_enTest(i)           <= '0' after TPD_G;
              end if;
           end loop;
       end if;
@@ -321,8 +323,8 @@ begin
    s_header <= "00000" & s_trigHeader;
   
    -- AXI stream interface two parallel lanes 
-   genAxiStreamLanes : for i in N_DATA_OUT_G-1 downto 0 generate
-      AxiStreamDaq_INST : entity work.DaqLane
+   GEN_OUT_LANES : for i in N_DATA_OUT_G-1 downto 0 generate
+      U_DaqLane : entity work.DaqLane
          generic map (
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
@@ -432,10 +434,8 @@ begin
             dataIn  => rxAxisCtrlArr_i(i).idle,
             dataOut => s_rxAxisCtrlArr(i).idle
             );
-   
-   
-   end generate genAxiStreamLanes;
-   
+   end generate GEN_OUT_LANES;
+   ----------------------------------------
    s_daqBusy    <= uOr(s_daqBusyVec);
    
    

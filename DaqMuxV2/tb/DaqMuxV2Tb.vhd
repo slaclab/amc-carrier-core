@@ -123,7 +123,19 @@ begin
    
    StimuliProcess : process
    begin
+      wait for CLK_PERIOD_C; 
       wait until rst_i = '0';
+      
+      wait for CLK_PERIOD_C*100; 
+      
+      axiLiteBusSimWrite(clk_i,axilWriteMaster,axilWriteSlave, x"0000_0000", x"0000_0106"); 
+      axiLiteBusSimWrite(clk_i,axilWriteMaster,axilWriteSlave, x"0000_000C", x"0000_0200");
+      -- Mux selects
+      axiLiteBusSimWrite(clk_i,axilWriteMaster,axilWriteSlave, x"0000_0040", x"0000_0001");
+      axiLiteBusSimWrite(clk_i,axilWriteMaster,axilWriteSlave, x"0000_0044", x"0000_0002");     
+      -- Data format
+      axiLiteBusSimWrite(clk_i,axilWriteMaster,axilWriteSlave, x"0000_00C0", x"0000_0020");
+      axiLiteBusSimWrite(clk_i,axilWriteMaster,axilWriteSlave, x"0000_00C4", x"0000_00ec");
       
       rxAxisSlaveArr_i(0)  <= AXI_STREAM_SLAVE_INIT_C;
       

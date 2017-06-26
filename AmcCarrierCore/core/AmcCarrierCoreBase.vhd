@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-05-16
+-- Last update: 2017-06-22
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -1609,5 +1609,6 @@ begin
          ddrAlertL                                        => ddrAlertL,
          ddrPg                                            => ddrPg,
          ddrPwrEnL                                        => ddrPwrEnL);
+
 
 end mapping;

@@ -112,7 +112,7 @@ begin
                v.mpsMaster.tData(15)          := '0';  -- Mitigation Message flag has to be '0' (Will be checked at receiving end)
                v.mpsMaster.tData(14)          := r.mpsMessage.lcls;  -- Set the LCLS flag
                v.mpsMaster.tData(13)          := r.mpsMessage.inputType;  -- Set the input type A/D  
-               v.mpsMaster.tData(12 downto 8) := (others => '0');
+               v.mpsMaster.tData(12 downto 8) := r.mpsMessage.version; -- Set the message version
                v.mpsMaster.tData(7 downto 0)  := r.mpsMessage.msgSize+5;  -- Length in units of bytes
                -- Set SOF               
                ssiSetUserSof(MPS_AXIS_CONFIG_C, v.mpsMaster, '1');
