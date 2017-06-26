@@ -122,7 +122,7 @@ architecture rtl of DaqLane is
       freeze       : sl;
       busy         : sl;      
       pctCnt       : slv(pctCnt_o'range);
-      trig         : sl;
+      trigSh       : slv(3 downto 0);
       rateDiv      : slv(15 downto 0);         
       averaging    : sl;          
       dec16or32    : sl;          
@@ -141,7 +141,7 @@ architecture rtl of DaqLane is
       freeze       => '0',
       busy         => '0',
       pctCnt       => (others => '0'),
-      trig         => '0',
+      trigSh       => (others => '0'),
       rateDiv      => (others => '0'),
       averaging    => '0',
       dec16or32    => '0',
@@ -168,11 +168,12 @@ begin
    U_Register: entity work.SlvDelay
       generic map (
          TPD_G          => TPD_G,
+         DELAY_G        => 1,
          WIDTH_G        => (GT_WORD_SIZE_C*8))
       port map (
          clk   => devClk_i,
          rst   => devRst_i,
-         delay => "1",
+         delay => "0",
          din   => sampleData_i,
          dout  => s_sampleDataReg);
 
@@ -191,7 +192,7 @@ begin
    end process signEx_comb;
    
    -- Applies test data if enabled  
-   DaqTestSig_INST: entity work.DaqTestSig
+   U_DaqTestSig: entity work.DaqTestSig
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -225,18 +226,18 @@ begin
    end generate GEN_DEC;
 
    GEN_N_DEC : if (DECIMATOR_EN_G = false) generate
-   
       U_Register: entity work.SlvDelay
-      generic map (
-         TPD_G          => TPD_G,
-         WIDTH_G        => (GT_WORD_SIZE_C*8))
-      port map (
-         clk   => devClk_i,
-         rst   => devRst_i,
-         delay => "1",
-         din   => s_sampDataTst,
-         dout  => s_decSampData);
-
+         generic map (
+            TPD_G          => TPD_G,
+            DELAY_G        => 2,
+            WIDTH_G        => (GT_WORD_SIZE_C*8))
+         port map (
+            clk   => devClk_i,
+            rst   => devRst_i,
+            delay => "1",
+            din   => s_sampDataTst,
+            dout  => s_decSampData);
+      -- 
       s_rateClk <= '1';
    end generate GEN_N_DEC;   
    
@@ -252,7 +253,7 @@ begin
       
       
       -- Register trigger
-      v.trig := trig_i;
+      v.trigSh := r.trigSh(2 downto 0) & trig_i;
       
       -- Reset strobing signals
       ssiResetFlags(v.txAxisMaster);
@@ -297,7 +298,7 @@ begin
             v.txAxisMaster.tDest  := toSlv(axiNum_i, 8);
 
             -- Check if fifo and JESD is ready
-            if (rxAxisCtrl_i.pause = '0' and enable_i = '1' and rxAxisSlave_i.tReady = '1' and dataReady_i = '1' and trig_i = '1') then
+            if (rxAxisCtrl_i.pause = '0' and enable_i = '1' and rxAxisSlave_i.tReady = '1' and dataReady_i = '1' and r.trigSh(2) = '1') then
                
                -- Clear error at the beginning of transmission
                v.error  := '0';
