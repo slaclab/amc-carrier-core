@@ -80,6 +80,7 @@ begin
       TPD_G            => TPD_G,
       N_DATA_IN_G      => N_DATA_IN_G,
       N_DATA_OUT_G     => N_DATA_OUT_G,
+      DECIMATOR_EN_G   => true,
       FRAME_BWIDTH_G   => 4)
    port map (
       axiClk            => clk_i,
@@ -167,12 +168,7 @@ begin
       wait for CLK_PERIOD_C*20;
       freezeHw_i <= '0';
       
-      -- Insert error
-      wait for CLK_PERIOD_C*3000;
-
-      wait for CLK_PERIOD_C*20;    
-
-      
+  
       wait for CLK_PERIOD_C*100;
       freezeHw_i <= '1';    
       wait for CLK_PERIOD_C*20;
@@ -187,7 +183,25 @@ begin
       trigCasc_i <= '1';    
       wait for CLK_PERIOD_C*20;
       trigCasc_i <= '0';
+      --------------------------------------
+      -- Decimation 2
+      wait for CLK_PERIOD_C*500;      
+      axiLiteBusSimWrite(clk_i,axilWriteMaster,axilWriteSlave, x"0000_0008", x"0000_0002");
       
+      wait for CLK_PERIOD_C*1000;
+      trigHw_i <= '1';    
+      wait for CLK_PERIOD_C*20;
+      trigHw_i <= '0';
+      --------------------------------------
+      -- Decimation 4
+      wait for CLK_PERIOD_C*500;      
+      axiLiteBusSimWrite(clk_i,axilWriteMaster,axilWriteSlave, x"0000_0008", x"0000_0004");
+      
+      wait for CLK_PERIOD_C*1000;
+      trigHw_i <= '1';    
+      wait for CLK_PERIOD_C*20;
+      trigHw_i <= '0';     
+      ----
       wait;
    end process StimuliProcess;
   
