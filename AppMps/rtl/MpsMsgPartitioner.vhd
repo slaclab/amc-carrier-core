@@ -116,7 +116,7 @@ begin
    overflowDet <= rxCtrl.overflow;
    queueStatus <= txCtrl.pause;
 
-   RX_FIFO : entity work.AxiStreamFifo
+   RX_FIFO : entity work.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 1,    
@@ -314,7 +314,7 @@ begin
       end if;
    end process seq;
 
-   TX_FIFO : entity work.AxiStreamFifo
+   TX_FIFO : entity work.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          -- General Configurations

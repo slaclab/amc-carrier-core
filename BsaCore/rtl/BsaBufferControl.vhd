@@ -318,7 +318,7 @@ begin
             axisClk      => axiClk,                -- [in]
             axisRst      => axiRst);               -- [in]
 
-      U_AxiStreamFifo_INT : entity work.AxiStreamFifo
+      U_AxiStreamFifo_INT : entity work.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
             INT_PIPE_STAGES_G   => 0,
@@ -362,7 +362,7 @@ begin
          axisClk      => axiClk,             -- [in]
          axisRst      => axiRst);            -- [in]
 
-   U_AxiStreamFifo_LAST : entity work.AxiStreamFifo
+   U_AxiStreamFifo_LAST : entity work.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 0,
