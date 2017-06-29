@@ -2,7 +2,7 @@
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-03-10
+-- Last update: 2017-06-29
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -116,6 +116,10 @@ architecture mapping of AppTopJesd is
    signal jesdRst185     : sl;
    signal jesdMmcmLocked : sl;
 
+   signal clkOut : slv(2 downto 0);
+   signal rstOut : slv(2 downto 0);
+   signal locked : sl;
+
    signal drpClk  : slv(6 downto 0)   := (others => '0');
    signal drpRdy  : slv(6 downto 0)   := (others => '0');
    signal drpEn   : slv(6 downto 0)   := (others => '0');
@@ -223,13 +227,9 @@ begin
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
-         clkOut(0)       => jesdClk185,
-         clkOut(1)       => jesdClk2x,
-         clkOut(2)       => jesdUsrClk,
-         rstOut(0)       => jesdRst185,
-         rstOut(1)       => jesdRst2x,
-         rstOut(2)       => jesdUsrRst,
-         locked          => jesdMmcmLocked,
+         clkOut          => clkOut,
+         rstOut          => rstOut,
+         locked          => locked,
          -- AXI-Lite Interface 
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -237,6 +237,14 @@ begin
          axilReadSlave   => axilReadSlaves(MMCM_INDEX_C),
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
+
+   jesdClk185     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(0);
+   jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(1);
+   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(2);
+   jesdRst185     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(0);
+   jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(1);
+   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(2);
+   jesdMmcmLocked <= locked  when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else locked;
 
    jesdClk <= jesdClk185;
    jesdRst <= jesdRst185;
