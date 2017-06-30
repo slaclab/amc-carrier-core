@@ -2,14 +2,14 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 # Load local Source Code and constraints
-loadSource           -dir "$::DIR_PATH/rtl"
-loadSource -sim_only -dir "$::DIR_PATH/tb/"
+loadSource           -dir  "$::DIR_PATH/rtl"
+loadSource -sim_only -dir  "$::DIR_PATH/tb/"
+loadConstraints      -path "$::DIR_PATH/xdc/AppTop.xdc"
 
 # Check for valid FPGA 
 if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
 
    loadSource      -dir  "$::DIR_PATH/rtl/xcku040"
-   loadConstraints -path  "$::DIR_PATH/xdc/AppTopXCKU040.xdc"
    
    loadSource  -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.dcp"
    #loadSource -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.xci"
