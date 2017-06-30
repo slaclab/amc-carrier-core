@@ -25,7 +25,7 @@ from surf.axi import *
 class BsaBufferControl(pr.Device):
     def __init__(   self, 
         name        = "BsaBufferControl", 
-        description = "Configuration and status of the BSA dignosic buffers", 
+        description = "Configuration and status of the BSA diagnostic buffers", 
         memBase     =  None, 
         offset      =  0x0, 
         hidden      =  False,

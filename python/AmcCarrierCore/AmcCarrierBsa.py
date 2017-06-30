@@ -54,4 +54,3 @@ class AmcCarrierBsa(pr.Device):
                 name         = "BsaWaveformEngine[%i]" % (i), 
                 offset       =  0x00010000 + i * 0x00010000,
             ))
-            

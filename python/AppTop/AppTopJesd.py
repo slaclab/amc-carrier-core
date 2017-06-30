@@ -23,30 +23,37 @@ from surf.protocols.jesd204b import *
 
 class AppTopJesd(pr.Device):
     def __init__(   self, 
-                    name        = "AppTopJesd", 
-                    description = "Common Application Top Level JESD Module", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
-                    hidden      =  False, 
-                    numRxLanes  =  6, 
-                    numTxLanes  =  2,
-                    expand      =  True,
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
+        name        = "AppTopJesd", 
+        description = "Common Application Top Level JESD Module", 
+        memBase     =  None, 
+        offset      =  0x0, 
+        hidden      =  False, 
+        numRxLanes  =  6, 
+        numTxLanes  =  2,
+        expand      =  True,
+    ):
+        super().__init__(
+            name        = name,
+            description = description,
+            memBase     = memBase,
+            offset      = offset,
+            hidden      = hidden,
+            expand      = expand,
+        )
 
         ##############################
         # Variables
         ##############################
         if (numRxLanes > 0):
             self.add(JesdRx(
-                                    offset       =  0x00000000,
-                                    numRxLanes   =  numRxLanes,
-                                    expand       = expand,
-                                ))
+                offset       =  0x00000000,
+                numRxLanes   =  numRxLanes,
+                expand       = expand,
+            ))
 
         if (numTxLanes > 0):
             self.add(JesdTx(
-                                    offset       =  0x01000000,
-                                    numTxLanes   =  numTxLanes,
-                                    expand       = expand,
-                        ))
+                offset       =  0x01000000,
+                numTxLanes   =  numTxLanes,
+                expand       = expand,
+            ))
