@@ -32,20 +32,26 @@ class AmcCarrierBsa(pr.Device):
                     hidden      = False,
                     expand      = True,
                 ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
-
+        super().__init__(
+            name        = name, 
+            description = description, 
+            memBase     = memBase, 
+            offset      = offset, 
+            hidden      = hidden, 
+            expand      = expand,
+        )
         ##############################
         # Variables
         ##############################
 
         if (enableBsa):
             self.add(BsaBufferControl(
-                                    offset       =  0x00000000,
-                                ))
+                offset       =  0x00000000,
+            ))
 
         for i in range(2):
             self.add(BsaWaveformEngine(
-                                    name         = "BsaWaveformEngine[%i]" % (i), 
-                                    offset       =  0x00010000 + i * 0x00010000,
-                                ))
-       
+                name         = "BsaWaveformEngine[%i]" % (i), 
+                offset       =  0x00010000 + i * 0x00010000,
+            ))
+            

@@ -21,14 +21,21 @@ import pyrogue as pr
 
 class DaqMuxV2(pr.Device):
     def __init__(   self,       
-                    name        = "DaqMuxV2",
-                    description = "Waveform Data Acquisition Module",
-                    memBase     =  None,
-                    offset      =  0x00,
-                    hidden      =  False,
-                    expand      =  True,
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)   
+        name        = "DaqMuxV2",
+        description = "Waveform Data Acquisition Module",
+        memBase     =  None,
+        offset      =  0x00,
+        hidden      =  False,
+        expand      =  True,
+    ):
+        super().__init__(
+            name        = name,
+            description = description,
+            memBase     = memBase,
+            offset      = offset,
+            hidden      = hidden,
+            expand      = expand,
+        )
 
         ##############################
         # Variables
@@ -142,6 +149,7 @@ class DaqMuxV2(pr.Device):
                             bitOffset    =  0x00,
                             base         = "hex",
                             mode         = "RO",
+                            pollInterval =  1,                            
                         )
 
         self.addVariable(   name         = "TriggerCascStatus",
@@ -151,6 +159,7 @@ class DaqMuxV2(pr.Device):
                             bitOffset    =  0x01,
                             base         = "hex",
                             mode         = "RO",
+                            pollInterval =  1,                            
                         )
 
         self.addVariable(   name         = "TriggerHwStatus",
@@ -160,6 +169,7 @@ class DaqMuxV2(pr.Device):
                             bitOffset    =  0x02,
                             base         = "hex",
                             mode         = "RO",
+                            pollInterval =  1,                            
                         )
 
         self.addVariable(   name         = "TriggerHwArmed",
@@ -169,6 +179,7 @@ class DaqMuxV2(pr.Device):
                             bitOffset    =  0x03,
                             base         = "hex",
                             mode         = "RO",
+                            pollInterval =  1,                            
                         )
 
         self.addVariable(   name         = "TriggerStatus",
@@ -178,6 +189,7 @@ class DaqMuxV2(pr.Device):
                             bitOffset    =  0x04,
                             base         = "hex",
                             mode         = "RO",
+                            pollInterval =  1,                            
                         )
 
         self.addVariable(   name         = "FreezeStatus",
@@ -187,6 +199,7 @@ class DaqMuxV2(pr.Device):
                             bitOffset    =  0x05,
                             base         = "hex",
                             mode         = "RO",
+                            pollInterval =  1,                            
                         )
 
         self.addVariable(   name         = "DecimationRateDiv",
@@ -216,6 +229,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  2,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "Bsa",
@@ -227,6 +241,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  4,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariable(   name         = "TrigCount",
@@ -236,6 +251,7 @@ class DaqMuxV2(pr.Device):
                             bitOffset    =  0x00,
                             base         = "hex",
                             mode         = "RO",
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "InputMuxSel",
@@ -292,6 +308,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  4,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "StreamReady",
@@ -303,6 +320,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  4,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "StreamOverflow",
@@ -314,6 +332,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  4,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "StreamError",
@@ -325,6 +344,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  4,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "InputDataValid",
@@ -336,6 +356,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  4,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "StreamEnabled",
@@ -347,6 +368,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  4,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "FrameCnt",
@@ -358,6 +380,7 @@ class DaqMuxV2(pr.Device):
                             mode         = "RO",
                             number       =  4,
                             stride       =  4,
+                            pollInterval =  1,                            
                         )
 
         self.addVariables(  name         = "FormatSignWidth",

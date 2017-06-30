@@ -321,24 +321,14 @@ begin
    -- SPI interface ADC
    ----------------------------------------------------------------
    GEN_ADC : for i in 1 downto 0 generate
-
-      -- AxiSpiMaster_INST : entity work.AxiSpiMaster
-      -- generic map (
-      -- TPD_G             => TPD_G,
-      -- ADDRESS_SIZE_G    => 15,
-      -- DATA_SIZE_G       => 8,
-      -- CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-      -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
-
-      AxiSpiMaster_INST : entity work.Adc32Rf45SpiMaster
+      U_ADC : entity work.adc32rf45
          generic map (
             TPD_G             => TPD_G,
             AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-            SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
-         -- SPI_SCLK_PERIOD_G => (1.0/1.0E+6))
-         -- SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
-
+            -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+            SPI_SCLK_PERIOD_G => (1.0/1.0E+6))
+            -- SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -351,7 +341,6 @@ begin
             coreSDin       => adcSpiDo,
             coreSDout      => adcCoreDout(i),
             coreCsb        => adcCoreCsb(i));
-
    end generate GEN_ADC;
 
    -- Output mux
@@ -373,7 +362,7 @@ begin
    -- SPI interface DAC
    ----------------------------------------------------------------
    GEN_DAC : for i in 1 downto 0 generate
-      U_dacAxiSpiMaster : entity work.AxiSpiMaster
+      U_DAC : entity work.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 7,
@@ -418,7 +407,7 @@ begin
    -----------------
    -- SPI interface LMK
    -----------------   
-   U_lmkAxiSpiMaster : entity work.AxiSpiMaster
+   U_LMK : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
