@@ -64,7 +64,7 @@ architecture rtl of AmcCarrierBsi is
    constant BUILD_INFO_C : BuildInfoRetType := toBuildInfo(BUILD_INFO_G);
 
    constant BSI_MAJOR_VERSION_C : slv(7 downto 0) := x"01";
-   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"03";
+   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"02";-- Should be 0x3 but amcc_dump_bsi needs to get updated first to support BSI v1.3
 
    constant TIMEOUT_1HZ_C : natural := (getTimeRatio(1.0, 6.4E-9) -1);
 
