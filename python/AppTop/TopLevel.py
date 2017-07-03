@@ -110,7 +110,11 @@ class TopLevel(pr.Device):
                 if force or block.stale:
                     if block.bulkEn:
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
-
+        
+        # Process rest of tree
+        if recurse:
+            for key,value in self.devices.items():
+                value.writeBlocks(force=force, recurse=True)
 
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(varUpdate=True, recurse=True)
