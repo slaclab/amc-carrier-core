@@ -196,6 +196,7 @@ architecture mapping of AppTop is
    signal debugValues : sampleDataVectorArray(1 downto 0, 3 downto 0);
 
    signal dataValids : Slv20Array(1 downto 0);
+   signal linkReady  : Slv20Array(1 downto 0);
 
    signal dacSigCtrl   : DacSigCtrlArray(1 downto 0);
    signal dacSigStatus : DacSigStatusArray(1 downto 0);
@@ -332,7 +333,8 @@ begin
             sampleDataArr_i(17) => debugValues(i, 1),
             sampleDataArr_i(18) => debugValues(i, 2),
             sampleDataArr_i(19) => debugValues(i, 3),
-            dataValidVec_i      => dataValids(i),
+            sampleValidVec_i    => dataValids(i),
+            linkReadyVec_i      => linkReady(i),
             -- Output AXI Streaming Interface (Has to be synced with waveform clk)
             wfClk_i             => waveformClk,
             wfRst_i             => waveformRst,
@@ -347,6 +349,7 @@ begin
             rxAxisCtrlArr_i(3)  => obAppWaveformSlaves(i)(3).ctrl);
 
       dataValids(i) <= debugValids(i) & dacValids(i) & adcValids(i);
+      linkReady(i)  <= x"F"           & dacValids(i) & adcValids(i);
 
       ------------
       -- JESD Core

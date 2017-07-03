@@ -2,7 +2,7 @@
 -- File       : DaqDecimator.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
--- Last update: 2017-06-27
+-- Last update: 2017-07-03
 -------------------------------------------------------------------------------
 -- Description: Reduces the sample rate:
 --                   averaging_i = '1':
@@ -39,6 +39,7 @@ entity DaqDecimator is
 
       -- Sample data I/O
       sampleData_i  : in  slv(31 downto 0);
+      sampleValid_i : in  sl;
       decSampData_o : out slv(31 downto 0);
 
       dec16or32_i : in sl;
@@ -92,7 +93,7 @@ begin
    s_countPeriod <= rateDiv_i when (dec16or32_i = '0') else ('0'& rateDiv_i(rateDiv_i'left downto 1));
 
    comb : process (averaging_i, dec16or32_i, r, rateDiv_i, rst, s_countPeriod,
-                   sampleData_i, signed_i, trig_i) is
+                   sampleData_i, sampleValid_i, signed_i, trig_i) is
       variable v : RegType;
    begin
       -- Latch the current value
@@ -118,15 +119,20 @@ begin
          v.sampleData(15 downto 0)  := (sampleData_i(15) xor signed_i) & sampleData_i(14 downto 0);
       end if;
 
-      -- rateDiv clock generator 
-      if (r.cntPeriod = 0) or (r.enable = '0') then
-         v.cnt    := (others => '0');
-         v.divClk := '1';
-      elsif (r.cnt = (r.cntPeriod-1)) then
-         v.cnt    := (others => '0');
-         v.divClk := '1';
+      -- Throttle rate to the inbound data valid
+      if (sampleValid_i = '1') then
+         -- rateDiv clock generator 
+         if (r.cntPeriod = 0) or (r.enable = '0') then
+            v.cnt    := (others => '0');
+            v.divClk := '1';
+         elsif (r.cnt = (r.cntPeriod-1)) then
+            v.cnt    := (others => '0');
+            v.divClk := '1';
+         else
+            v.cnt    := r.cnt + 1;
+            v.divClk := '0';
+         end if;
       else
-         v.cnt    := r.cnt + 1;
          v.divClk := '0';
       end if;
 

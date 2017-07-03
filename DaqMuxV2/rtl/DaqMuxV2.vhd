@@ -2,7 +2,7 @@
 -- File       : DaqMuxV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-07-12
--- Last update: 2017-06-28
+-- Last update: 2017-07-03
 -------------------------------------------------------------------------------
 -- Description: Data acquisition top module:
 --              https://confluence.slac.stanford.edu/display/ppareg/AmcAxisDaqV2+Requirements
@@ -72,8 +72,9 @@ entity DaqMuxV2 is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
 
       -- Sample data input 
-      sampleDataArr_i : in slv32Array(N_DATA_IN_G-1 downto 0);
-      dataValidVec_i  : in slv(N_DATA_IN_G-1 downto 0);
+      sampleDataArr_i  : in slv32Array(N_DATA_IN_G-1 downto 0);
+      sampleValidVec_i : in slv(N_DATA_IN_G-1 downto 0);
+      linkReadyVec_i   : in slv(N_DATA_IN_G-1 downto 0);
 
       -- Output AXI Streaming Interface (Has to be synced with waveform clk)
       wfClk_i           : in  sl;
@@ -87,22 +88,22 @@ end DaqMuxV2;
 architecture rtl of DaqMuxV2 is
 
    -- Internal signals
-
-   signal s_sampleDataArr : slv32Array(N_DATA_IN_G-1 downto 0);
-   signal s_dataValidVec  : slv(N_DATA_IN_G-1 downto 0);
-
+   signal s_sampleDataArr     : slv32Array(N_DATA_OUT_G-1 downto 0) := (others => (others => '0'));
+   signal s_sampleValidVec    : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
+   signal s_LinkReadyVec      : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
+   signal s_sampleDataArrMux  : slv32Array(N_DATA_OUT_G-1 downto 0) := (others => (others => '0'));
+   signal s_sampleValidVecMux : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
+   signal s_LinkReadyVecMux   : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
 
    -- DAQ signals 
-   signal s_enAxi            : slv(N_DATA_OUT_G-1 downto 0);
-   signal s_enTest           : slv(N_DATA_OUT_G-1 downto 0);
-   signal s_sampleDataArrMux : slv32Array(N_DATA_OUT_G-1 downto 0) := (others => (others => '0'));
-   signal s_dataValidVecMux  : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
-   signal s_dataSize         : slv(31 downto 0);
-   signal s_muxSel           : Slv5Array(N_DATA_OUT_G-1 downto 0);
-   signal s_rateDiv          : slv(15 downto 0);
-   signal s_timeStampSync    : slv(63 downto 0);
-   signal s_bsaSync          : slv(127 downto 0);
-   signal s_dmodSync         : slv(191 downto 0);
+   signal s_enAxi         : slv(N_DATA_OUT_G-1 downto 0);
+   signal s_enTest        : slv(N_DATA_OUT_G-1 downto 0);
+   signal s_dataSize      : slv(31 downto 0);
+   signal s_muxSel        : Slv5Array(N_DATA_OUT_G-1 downto 0);
+   signal s_rateDiv       : slv(15 downto 0);
+   signal s_timeStampSync : slv(63 downto 0);
+   signal s_bsaSync       : slv(127 downto 0);
+   signal s_dmodSync      : slv(191 downto 0);
 
    -- Trigger related signals
    signal s_trigCascMask    : sl;
@@ -145,35 +146,6 @@ begin
    assert (1 <= N_DATA_IN_G and N_DATA_IN_G <= 29) report "N_DATA_IN_G must be between 1 and 29" severity failure;
    assert (1 <= N_DATA_OUT_G and N_DATA_OUT_G <= 16) report "N_DATA_OUT_G must be between 1 and 16"severity failure;
 
-   -----------------------------------------------------------
-   -- Register the sample data and valids at the beginning to ease timing 
-   -----------------------------------------------------------
-   GEN_IN_LANES : for i in N_DATA_IN_G-1 downto 0 generate
-      U_Register : entity work.SlvDelay
-         generic map (
-            TPD_G   => TPD_G,
-            DELAY_G => 4,
-            WIDTH_G => 32)
-         port map (
-            clk   => devClk_i,
-            rst   => devRst_i,
-            delay => "11",
-            din   => sampleDataArr_i(i),
-            dout  => s_sampleDataArr(i));
-   end generate GEN_IN_LANES;
-
-
-   U_RegisterValid : entity work.SlvDelay
-      generic map (
-         TPD_G   => TPD_G,
-         DELAY_G => 4,
-         WIDTH_G => N_DATA_IN_G)
-      port map (
-         clk   => devClk_i,
-         rst   => devRst_i,
-         delay => "11",
-         din   => dataValidVec_i,
-         dout  => s_dataValidVec);
    -----------------------------------------------------------
    -- Synchronize timestamp_i and bsa
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
@@ -294,24 +266,31 @@ begin
    begin
       if rising_edge(devClk_i) then
          for i in N_DATA_OUT_G-1 downto 0 loop
+            -- Register to help with timing
+            s_sampleDataArr(i)  <= sampleDataArr_i(i)  after TPD_G;
+            s_sampleValidVec(i) <= sampleValidVec_i(i) after TPD_G;
+            s_LinkReadyVec(i)   <= linkReadyVec_i(i)   after TPD_G;
             -- Data mode
             if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
-               s_sampleDataArrMux(i) <= s_sampleDataArr(conv_integer(s_muxSel(i))-2) after TPD_G;
-               s_dataValidVecMux(i)  <= s_dataValidVec(conv_integer(s_muxSel(i))-2)  after TPD_G;
-               s_enAxi(i)            <= '1'                                          after TPD_G;
-               s_enTest(i)           <= '0'                                          after TPD_G;
+               s_sampleDataArrMux(i)  <= s_sampleDataArr(conv_integer(s_muxSel(i))-2)  after TPD_G;
+               s_sampleValidVecMux(i) <= s_sampleValidVec(conv_integer(s_muxSel(i))-2) after TPD_G;
+               s_LinkReadyVecMux(i)   <= s_LinkReadyVec(conv_integer(s_muxSel(i))-2)   after TPD_G;
+               s_enAxi(i)             <= '1'                                           after TPD_G;
+               s_enTest(i)            <= '0'                                           after TPD_G;
             -- Test mode
             elsif (s_muxSel(i) = 1) then
-               s_sampleDataArrMux(i) <= (others => '0') after TPD_G;
-               s_dataValidVecMux(i)  <= '1'             after TPD_G;
-               s_enAxi(i)            <= '1'             after TPD_G;
-               s_enTest(i)           <= '1'             after TPD_G;
+               s_sampleDataArrMux(i)  <= (others => '0') after TPD_G;
+               s_sampleValidVecMux(i) <= '1'             after TPD_G;
+               s_LinkReadyVecMux(i)   <= '1'             after TPD_G;
+               s_enAxi(i)             <= '1'             after TPD_G;
+               s_enTest(i)            <= '1'             after TPD_G;
             -- Disabled
             else
-               s_sampleDataArrMux(i) <= (others => '0') after TPD_G;
-               s_dataValidVecMux(i)  <= '0'             after TPD_G;
-               s_enAxi(i)            <= '0'             after TPD_G;
-               s_enTest(i)           <= '0'             after TPD_G;
+               s_sampleDataArrMux(i)  <= (others => '0') after TPD_G;
+               s_sampleValidVecMux(i) <= '0'             after TPD_G;
+               s_LinkReadyVecMux(i)   <= '0'             after TPD_G;
+               s_enAxi(i)             <= '0'             after TPD_G;
+               s_enTest(i)            <= '0'             after TPD_G;
             end if;
          end loop;
       end if;
@@ -360,8 +339,9 @@ begin
             busy_o   => s_daqBusyVec(i),
 
             -- DAQ flow and data
-            sampleData_i => s_sampleDataArrMux(i),
-            dataReady_i  => s_dataValidVecMux(i),
+            sampleData_i  => s_sampleDataArrMux(i),
+            sampleValid_i => s_sampleValidVecMux(i),
+            LinkReady_i   => s_LinkReadyVecMux(i),
 
             -- Axi stream out
             rxAxisCtrl_i   => s_rxAxisCtrlArr(i),
@@ -370,7 +350,7 @@ begin
             );
 
       -- Status register assignment
-      s_daqStatus(i) <= s_pctCntVec(i) & s_enAxi(i) & s_dataValidVecMux(i) & s_errorVec(i) & rxAxisCtrlArr_i(i).overflow & rxAxisSlaveArr_i(i).tReady & rxAxisCtrlArr_i(i).pause;
+      s_daqStatus(i) <= s_pctCntVec(i) & s_enAxi(i) & s_LinkReadyVecMux(i) & s_errorVec(i) & rxAxisCtrlArr_i(i).overflow & rxAxisSlaveArr_i(i).tReady & rxAxisCtrlArr_i(i).pause;
 
       -- Synchronize stream with the output waveform clock
       U_AsyncOutFifo : entity work.AxiStreamFifoV2

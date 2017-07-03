@@ -2,7 +2,7 @@
 -- File       : DaqDecimatorTb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
--- Last update: 2017-06-27
+-- Last update: 2017-07-03
 -------------------------------------------------------------------------------
 -- Description: Simulation Testbed for DaqDecimator
 ------------------------------------------------------------------------------
@@ -69,6 +69,7 @@ begin
          clk           => clk_i,
          rst           => rst_i,
          sampleData_i  => sampleData_i,
+         sampleValid_i => '1',
          decSampData_o => decSampData_o,
          dec16or32_i   => dec16or32_c,
          averaging_i   => averaging_c,
