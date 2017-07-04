@@ -106,18 +106,6 @@ architecture rtl of DaqRegItf is
       
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
-   
-   -- Tastbench defaults 
-   -- Note: Use with DaqMuxV2Tb.vhd
---   constant REG_INIT_C : RegType := (
---      control        => "100000110",
---      rateDiv        => x"0001",    
---      dataSize       => x"0000_0200",
---      muxSel         => (1 => '0'&x"1"  , 0 => '0'& x"3"),
---      dataFormat     => (1 => "00000000", 0 => "111" & '0'& x"d"),
-      
---      axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
---      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;

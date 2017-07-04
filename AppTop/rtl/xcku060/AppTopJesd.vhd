@@ -2,7 +2,7 @@
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-03-10
+-- Last update: 2017-06-30
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -25,26 +25,27 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.jesd204bpkg.all;
 use work.AppTopPkg.all;
+use work.AppTopPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
 entity AppTopJesd is
    generic (
-      TPD_G              : time                 := 1 ns;
-      SIM_SPEEDUP_G      : boolean              := false;
-      SIMULATION_G       : boolean              := false;
-      AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
-      JESD_DRP_EN_G      : boolean              := true;
-      JESD_RX_LANE_G     : natural range 0 to 7 := 7;
-      JESD_TX_LANE_G     : natural range 0 to 7 := 7;
-      JESD_RX_POLARITY_G : slv(6 downto 0)      := "0000000";
-      JESD_TX_POLARITY_G : slv(6 downto 0)      := "0000000";
-      JESD_RX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;
-      JESD_TX_ROUTES_G   : AppTopJesdRouteType  := JESD_ROUTES_INIT_C;
-      JESD_REF_SEL_G     : slv(1 downto 0)      := DEV_CLK2_SEL_C;
-      JESD_USR_DIV_G     : natural              := 4);
+      TPD_G              : time                  := 1 ns;
+      SIM_SPEEDUP_G      : boolean               := false;
+      SIMULATION_G       : boolean               := false;
+      AXI_ERROR_RESP_G   : slv(1 downto 0)       := AXI_RESP_DECERR_C;
+      AXI_BASE_ADDR_G    : slv(31 downto 0)      := (others => '0');
+      JESD_DRP_EN_G      : boolean               := false;
+      JESD_RX_LANE_G     : natural range 0 to 10 := 8;
+      JESD_TX_LANE_G     : natural range 0 to 10 := 8;
+      JESD_RX_POLARITY_G : slv(9 downto 0)       := "0000000000";
+      JESD_TX_POLARITY_G : slv(9 downto 0)       := "0000000000";
+      JESD_RX_ROUTES_G   : AppTopJesdRouteType   := JESD_ROUTES_INIT_C;
+      JESD_TX_ROUTES_G   : AppTopJesdRouteType   := JESD_ROUTES_INIT_C;
+      JESD_REF_SEL_G     : slv(1 downto 0)       := DEV_CLK2_SEL_C;
+      JESD_USR_DIV_G     : natural               := 4);
    port (
       -- Clock/reset/SYNC
       jesdClk         : out sl;
@@ -57,11 +58,11 @@ entity AppTopJesd is
       jesdUsrClk      : out sl;
       jesdUsrRst      : out sl;
       -- ADC Interface
-      adcValids       : out slv(6 downto 0);
-      adcValues       : out sampleDataArray(6 downto 0);
+      adcValids       : out slv(9 downto 0);
+      adcValues       : out sampleDataArray(9 downto 0);
       -- DAC interface
-      dacValids       : in  slv(6 downto 0);
-      dacValues       : in  sampleDataArray(6 downto 0);
+      dacValids       : in  slv(9 downto 0);
+      dacValues       : in  sampleDataArray(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -73,12 +74,12 @@ entity AppTopJesd is
       -- Application Ports --
       -----------------------
       -- JESD High Speed Ports
-      jesdRxP         : in  slv(6 downto 0);
-      jesdRxN         : in  slv(6 downto 0);
-      jesdTxP         : out slv(6 downto 0);
-      jesdTxN         : out slv(6 downto 0);
-      jesdClkP        : in  slv(2 downto 0);
-      jesdClkN        : in  slv(2 downto 0));
+      jesdRxP         : in  slv(9 downto 0);
+      jesdRxN         : in  slv(9 downto 0);
+      jesdTxP         : out slv(9 downto 0);
+      jesdTxN         : out slv(9 downto 0);
+      jesdClkP        : in  slv(3 downto 0);
+      jesdClkN        : in  slv(3 downto 0));
 end AppTopJesd;
 
 architecture mapping of AppTopJesd is
@@ -108,34 +109,39 @@ architecture mapping of AppTopJesd is
 
    signal refClkDiv2Vec  : slv(2 downto 0);
    signal refClkVec      : slv(2 downto 0);
-   signal refClk         : sl;
+   signal refClkR        : sl;
+   signal refClkL        : sl;
    signal amcClkVec      : slv(2 downto 0);
    signal amcClk         : sl;
    signal amcRst         : sl;
-   signal jesdClk185     : sl;
-   signal jesdRst185     : sl;
+   signal jesdClk1x      : sl;
+   signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
-   signal drpClk  : slv(6 downto 0)   := (others => '0');
-   signal drpRdy  : slv(6 downto 0)   := (others => '0');
-   signal drpEn   : slv(6 downto 0)   := (others => '0');
-   signal drpWe   : slv(6 downto 0)   := (others => '0');
-   signal drpAddr : slv(62 downto 0)  := (others => '0');
-   signal drpDi   : slv(111 downto 0) := (others => '0');
-   signal drpDo   : slv(111 downto 0) := (others => '0');
+   signal clkOut : slv(2 downto 0);
+   signal rstOut : slv(2 downto 0);
+   signal locked : sl;
 
-   signal adcEn : slv(6 downto 0)             := (others => '0');
-   signal adc   : sampleDataArray(6 downto 0) := (others => (others => '0'));
-   signal dac   : sampleDataArray(6 downto 0) := (others => (others => '0'));
+   signal drpClk  : slv(9 downto 0)       := (others => '0');
+   signal drpRdy  : slv(9 downto 0)       := (others => '0');
+   signal drpEn   : slv(9 downto 0)       := (others => '0');
+   signal drpWe   : slv(9 downto 0)       := (others => '0');
+   signal drpAddr : slv(10*9-1 downto 0)  := (others => '0');
+   signal drpDi   : slv(10*16-1 downto 0) := (others => '0');
+   signal drpDo   : slv(10*16-1 downto 0) := (others => '0');
+
+   signal rawAdcValids : slv(9 downto 0)             := (others => '0');
+   signal rawAdcValues : sampleDataArray(9 downto 0) := (others => (others => '0'));
+   signal rawDacValues : sampleDataArray(9 downto 0) := (others => (others => '0'));
 
 begin
 
-   GEN_ROUTE : for i in 6 downto 0 generate
+   GEN_ROUTE : for i in 9 downto 0 generate
 
-      adcValids(i) <= adcEn(JESD_RX_ROUTES_G(i));
-      adcValues(i) <= adc(JESD_RX_ROUTES_G(i));
+      adcValids(i) <= rawAdcValids(JESD_RX_ROUTES_G(i));
+      adcValues(i) <= rawAdcValues(JESD_RX_ROUTES_G(i));
 
-      dac(JESD_TX_ROUTES_G(i)) <= dacValues(i);
+      rawDacValues(JESD_TX_ROUTES_G(i)) <= dacValues(i);
 
    end generate GEN_ROUTE;
 
@@ -164,7 +170,22 @@ begin
    ----------------
    -- JESD Clocking
    ----------------
-   GEN_GTH_CLK : for i in 2 downto 0 generate
+
+   -- Left column reference
+   U_IBUFDS_GTE3 : IBUFDS_GTE3
+      generic map (
+         REFCLK_EN_TX_PATH  => '0',
+         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_ICNTL_RX    => "00")
+      port map (
+         I     => jesdClkP(3),
+         IB    => jesdClkN(3),
+         CEB   => '0',
+         ODIV2 => open,  -- 185 MHz, Frequency the same as jesdRefClk
+         O     => refClkL);             -- 185 MHz    
+
+   -- Choose Right coulumn reference
+   GEN_GTH_R_CLK : for i in 2 downto 0 generate
 
       U_IBUFDS_GTE3 : IBUFDS_GTE3
          generic map (
@@ -188,10 +209,10 @@ begin
             DIV     => "000",             -- Divide by 1
             O       => amcClkVec(i));     -- 185 MHz
 
-   end generate GEN_GTH_CLK;
+   end generate GEN_GTH_R_CLK;
 
-   refClk <= refClkVec(conv_integer(JESD_REF_SEL_G));
-   amcClk <= amcClkVec(conv_integer(JESD_REF_SEL_G));
+   refClkR <= refClkVec(conv_integer(JESD_REF_SEL_G));
+   amcClk  <= amcClkVec(conv_integer(JESD_REF_SEL_G));
 
    U_PwrUpRst : entity work.PwrUpRst
       generic map (
@@ -211,25 +232,23 @@ begin
          FB_BUFG_G          => true,
          NUM_CLOCKS_G       => 3,
          BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => 5.405,
+         --CLKIN_PERIOD_G     => 3.2,
+         CLKIN_PERIOD_G     => 3.2,
+         --CLKIN_PERIOD_G     => 6.4,
          DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 6.000,
-         CLKOUT0_DIVIDE_F_G => 6.000,
+         CLKFBOUT_MULT_F_G  => 4.000,
+         CLKOUT0_DIVIDE_F_G => 4.000,
          CLKOUT0_RST_HOLD_G => 16,
-         CLKOUT1_DIVIDE_G   => 3,
+         CLKOUT1_DIVIDE_G   => 2,
          CLKOUT1_RST_HOLD_G => 32,
          CLKOUT2_DIVIDE_G   => JESD_USR_DIV_G*3,
          CLKOUT2_RST_HOLD_G => 32)
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
-         clkOut(0)       => jesdClk185,
-         clkOut(1)       => jesdClk2x,
-         clkOut(2)       => jesdUsrClk,
-         rstOut(0)       => jesdRst185,
-         rstOut(1)       => jesdRst2x,
-         rstOut(2)       => jesdUsrRst,
-         locked          => jesdMmcmLocked,
+         clkOut          => clkOut,
+         rstOut          => rstOut,
+         locked          => locked,
          -- AXI-Lite Interface 
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -238,8 +257,16 @@ begin
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
-   jesdClk <= jesdClk185;
-   jesdRst <= jesdRst185;
+   jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(0);
+   jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(1);
+   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(2);
+   jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(0);
+   jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(1);
+   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(2);
+   jesdMmcmLocked <= '1'     when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else locked;
+
+   jesdClk <= jesdClk1x;
+   jesdRst <= jesdRst1x;
 
    -------------
    -- JESD block
@@ -251,6 +278,7 @@ begin
          SYSREF_GEN_G       => false,
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
          JESD_TX_LANE_G     => JESD_TX_LANE_G,
+         GT_LANE_G          => 10,
          JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
          JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
          AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)
@@ -275,18 +303,19 @@ begin
          txWriteMaster   => axilWriteMasters(JESD_TX_INDEX_C),
          txWriteSlave    => axilWriteSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         dataValidVec_o  => adcEn,
-         sampleDataArr_o => adc,
-         sampleDataArr_i => dac,
+         dataValidVec_o  => rawAdcValids,
+         sampleDataArr_o => rawAdcValues,
+         sampleDataArr_i => rawDacValues,
          -------
          -- JESD
          -------
          -- Clocks
          stableClk       => axilClk,
-         refClk          => refClk,
-         devClk_i        => jesdClk185,
-         devClk2_i       => jesdClk185,
-         devRst_i        => jesdRst185,
+         refClkR         => refClkR,
+         refClkL         => refClkL,
+         devClk_i        => jesdClk1x,
+         devClk2_i       => jesdClk1x,
+         devRst_i        => jesdRst1x,
          devClkActive_i  => jesdMmcmLocked,
          -- GTH Ports
          gtTxP           => jesdTxP,

@@ -97,9 +97,6 @@ package AmcCarrierPkg is
    constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data
 
    constant WAVEFORM_STREAMS_C     : integer := 8;
-   constant WAVEFORM_AXIS_CONFIG_C : AxiStreamConfigType :=
-      ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
-
    constant WAVEFORM_TRIGGER_BIT_C : integer := 2;
 
    subtype WaveformMasterType is AxiStreamMasterArray(3 downto 0);
