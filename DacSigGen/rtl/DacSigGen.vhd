@@ -28,9 +28,9 @@ entity DacSigGen is
       TPD_G                : time                   := 1 ns;
       AXI_BASE_ADDR_G      : slv(31 downto 0)       := (others => '0');
       AXI_ERROR_RESP_G     : slv(1 downto 0)        := AXI_RESP_DECERR_C;
-      SIG_GEN_SIZE_G       : natural range 0 to 7   := 0;                 -- 0 = Disabled
+      SIG_GEN_SIZE_G       : natural range 0 to 10   := 0;                 -- 0 = Disabled
       SIG_GEN_ADDR_WIDTH_G : positive range 1 to 24 := 9;
-      SIG_GEN_LANE_MODE_G  : slv(6 downto 0)        := (others => '0'));  -- '0': 32 bit, '1': 16 bit
+      SIG_GEN_LANE_MODE_G  : slv(DAC_SIG_WIDTH_C-1 downto 0)        := (others => '0'));  -- '0': 32 bit, '1': 16 bit
    port (
       -- DAC Signal Generator Interface
       jesdClk         : in  sl;
@@ -39,8 +39,8 @@ entity DacSigGen is
       jesdRst2x       : in  sl;
       dacSigCtrl      : in  DacSigCtrlType;
       dacSigStatus    : out DacSigStatusType;
-      dacSigValids    : out slv(6 downto 0);
-      dacSigValues    : out sampleDataArray(6 downto 0);
+      dacSigValids    : out slv(DAC_SIG_WIDTH_C-1 downto 0);
+      dacSigValues    : out sampleDataArray(DAC_SIG_WIDTH_C-1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -62,16 +62,16 @@ architecture mapping of DacSigGen is
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
    -- Internal signals
-   signal s_enable    : slv(6 downto 0);
-   signal s_mode      : slv(6 downto 0);
-   signal s_sign      : slv(6 downto 0);
-   signal s_trigSw    : slv(6 downto 0);
-   signal s_holdLast  : slv(6 downto 0);
-   signal s_trig      : slv(6 downto 0);
-   signal s_overflow  : slv(6 downto 0);
-   signal s_underflow : slv(6 downto 0);
-   signal s_running   : slv(6 downto 0);
-   signal s_period    : slv32Array(6 downto 0);
+   signal s_enable    : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_mode      : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_sign      : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_trigSw    : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_holdLast  : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_trig      : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_overflow  : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_underflow : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_running   : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_period    : slv32Array(DAC_SIG_WIDTH_C-1 downto 0);
    
 begin
    

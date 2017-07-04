@@ -2,7 +2,7 @@
 -- File       : AppTopPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-03-10
+-- Last update: 2017-06-30
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -22,13 +22,15 @@ use work.StdRtlPkg.all;
 
 package AppTopPkg is
 
-   type AppTopJesdRouteType  is array (6 downto 0) of natural;
-   type AppTopJesdRouteArray  is array (1 downto 0) of AppTopJesdRouteType;
+   type AppTopJesdRouteType is array (6 downto 0) of natural;
+   type AppTopJesdRouteArray is array (1 downto 0) of AppTopJesdRouteType;
 
    constant DEV_CLK0_SEL_C : slv(1 downto 0) := toSLv(0, 2);
    constant DEV_CLK1_SEL_C : slv(1 downto 0) := toSLv(1, 2);
    constant DEV_CLK2_SEL_C : slv(1 downto 0) := toSLv(2, 2);
    constant DEV_CLK3_SEL_C : slv(1 downto 0) := toSLv(3, 2);  -- KU060 only
+
+   constant DAC_SIG_WIDTH_C : positive := 7;
 
    constant JESD_ROUTES_INIT_C : AppTopJesdRouteType := (
       0 => 0,
@@ -46,7 +48,7 @@ package AppTopPkg is
       3 => 3,
       4 => 4,
       5 => 5,
-      6 => 6);   
+      6 => 6);
 
    type AppTopTrigType is record
       trigPulse : slv(15 downto 0);

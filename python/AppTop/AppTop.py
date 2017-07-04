@@ -24,19 +24,31 @@ from AppTop.AppTopJesd import *
 from DacSigGen.DacSigGen import *
 from DaqMuxV2.DaqMuxV2 import *
 from common.AppCore import *
+import time
 
 class AppTop(pr.Device):
     def __init__(   self, 
-                    name        = "AppTop", 
-                    description = "Common Application Top Level", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
-                    hidden      =  False, 
-                    numRxLanes  =  [0,0], 
-                    numTxLanes  =  [0,0],
-                    expand      =  True,
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
+        name           = "AppTop", 
+        description    = "Common Application Top Level", 
+        memBase        = None, 
+        offset         = 0x0, 
+        hidden         = False, 
+        numRxLanes     = [0,0], 
+        numTxLanes     = [0,0],
+        numSigGen      = [0,0],
+        sizeSigGen     = [0,0],
+        numTrigPulse   = 0,
+        enableEvr      = True,
+        expand         = True,
+    ):
+        super().__init__(
+            name        = name,
+            description = description,
+            memBase     = memBase,
+            offset      = offset,
+            hidden      = hidden,
+            expand      = expand,
+        )
         
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
@@ -46,39 +58,46 @@ class AppTop(pr.Device):
         ##############################
 
         self.add(AppCore(   
-                                    offset       =  0x00000000, 
-                                    expand       =  True
-                        ))
+            offset       =  0x00000000, 
+            numRxLanes   =  numRxLanes,
+            numTxLanes   =  numTxLanes,
+            expand       =  True,
+        ))
 
         self.add(AppTopTrig(
-                                    offset       =  0x10000000, 
-                                    expand       =  False
-                           ))
+            offset       =  0x10000000, 
+            numTrigPulse =  numTrigPulse,
+            enableEvr    =  enableEvr,
+            expand       =  False,
+        ))
 
         for i in range(2):
-            self.add(DaqMuxV2(
-                                        name         = "DaqMuxV2[%i]" % (i),
-                                        offset       =  0x20000000 + (i * 0x10000000),
-                                        expand       =  False,
-                             ))
+            if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
+                self.add(DaqMuxV2(
+                    name         = "DaqMuxV2[%i]" % (i),
+                    offset       =  0x20000000 + (i * 0x10000000),
+                    expand       =  False,
+                ))
 
         for i in range(2):
-            if ((numRxLanes[i] > 0) or (numTxLanes[i] > 0)):
+            if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
                 self.add(AppTopJesd(
-                                            name         = "AppTopJesd[%i]" % (i),
-                                            offset       =  0x40000000 + (i * 0x10000000),
-                                            numRxLanes   =  numRxLanes[i],
-                                            numTxLanes   =  numTxLanes[i],
-                                            expand       =  False,
-                                   ))
+                    name         = "AppTopJesd[%i]" % (i),
+                    offset       =  0x40000000 + (i * 0x10000000),
+                    numRxLanes   =  numRxLanes[i],
+                    numTxLanes   =  numTxLanes[i],
+                    expand       =  False,
+                ))
 
         for i in range(2):
-            self.add(DacSigGen(
-                                        name         = "DacSigGen[%i]" % (i),
-                                        offset       =  0x60000000 + (i * 0x10000000),
-                                        instantiate  =  False,
-                                        expand       =  False
-                              ))
+            if ( (numSigGen[i] > 0) and (sizeSigGen[i] > 0) ):
+                self.add(DacSigGen(
+                    name         = "DacSigGen[%i]" % (i),
+                    offset       =  0x60000000 + (i * 0x10000000),
+                    numOfChs     =  numSigGen[i],
+                    buffSize     =  sizeSigGen[i],
+                    expand       =  False,
+                ))
                               
     def writeBlocks(self, force=False, recurse=True, variable=None):
         """
@@ -107,9 +126,16 @@ class AppTop(pr.Device):
             if (self._numRxLanes[i] > 0):
                 v = getattr(self, 'AppTopJesd[%i]'%i)
                 v.JesdRx.CmdResetGTs()
-                v.JesdRx.CmdClearErrors()
             if (self._numTxLanes[i] > 0):
                 v = getattr(self, 'AppTopJesd[%i]'%i)
                 v.JesdTx.CmdResetGTs()
-                v.JesdTx.CmdClearErrors()                
+        self.checkBlocks(recurse=True)
+        time.sleep(1)
+        for i in range(2):
+            if (self._numRxLanes[i] > 0):
+                v = getattr(self, 'AppTopJesd[%i]'%i)
+                v.JesdRx.CmdClearErrors()
+            if (self._numTxLanes[i] > 0):
+                v = getattr(self, 'AppTopJesd[%i]'%i)
+                v.JesdTx.CmdClearErrors()                   
         self.checkBlocks(recurse=True)

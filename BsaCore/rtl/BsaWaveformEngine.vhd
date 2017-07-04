@@ -28,10 +28,10 @@ use work.AmcCarrierPkg.all;
 entity BsaWaveformEngine is
 
    generic (
-      TPD_G            : time             := 1 ns;
-      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
-      AXI_CONFIG_G     : AxiConfigType    := axiConfig(33, 16, 1, 8)
-      );
+      TPD_G                  : time                   := 1 ns;
+      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4;
+      AXIL_BASE_ADDR_G       : slv(31 downto 0)       := (others => '0');
+      AXI_CONFIG_G           : AxiConfigType          := axiConfig(33, 16, 1, 8));
    port (
       -- Diagnostic data interface
       waveformClk : in sl;
@@ -68,6 +68,9 @@ entity BsaWaveformEngine is
 end entity BsaWaveformEngine;
 
 architecture rtl of BsaWaveformEngine is
+
+   constant WAVEFORM_AXIS_CONFIG_C : AxiStreamConfigType :=
+      ssiAxiStreamConfig(WAVEFORM_TDATA_BYTES_G, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
 
    constant STREAMS_C : integer := WaveformMasterType'length;
 
@@ -146,7 +149,7 @@ begin
    -- Input fifos
    -- These should probably be 4k bytes deep for best throughput
    AXIS_IN_FIFOS : for i in STREAMS_C-1 downto 0 generate
-      AxiStreamFifo : entity work.AxiStreamFifo
+      AxiStreamFifo : entity work.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
@@ -191,7 +194,7 @@ begin
          axisRst      => axiRst);
 
    -- Extra buffer on output of mux
-   AxiStreamFifo_MUX_FIFO : entity work.AxiStreamFifo
+   AxiStreamFifo_MUX_FIFO : entity work.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
@@ -314,7 +317,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Buffer the read dma data to transition to data clk 
    -------------------------------------------------------------------------------------------------
-   AxiStreamFifo_RD_DATA : entity work.AxiStreamFifo
+   AxiStreamFifo_RD_DATA : entity work.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,

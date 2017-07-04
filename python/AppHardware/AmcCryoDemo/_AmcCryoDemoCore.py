@@ -24,48 +24,52 @@ from surf.devices.ti import *
 
 class AmcCryoDemoCore(pr.Device):
     def __init__(   self, 
-                    name        = "AmcCryoDemoCore", 
-                    description = "Cryo Amc Rf Demo Board Core", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
-                    hidden      =  False
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden)
+        name        = "AmcCryoDemoCore", 
+        description = "Cryo Amc Rf Demo Board Core", 
+        memBase     =  None, 
+        offset      =  0x0, 
+        hidden      =  False
+        expand      =  True,
+    ):
+        super().__init__(
+            name        = name,
+            description = description,
+            memBase     = memBase,
+            offset      = offset,
+            hidden      = hidden,
+            expand      = expand,
+        )
 
         ##############################
         # Variables
         ##############################
         
         for i in range(3):
-          self.add(Adc16Dx370(
-                                  name         = "Adc16Dx370_%i" % (i),
-                                  offset       =  0x00010000 + (i * 0x00010000),
-                              ))
+            self.add(Adc16Dx370(
+                name   = "Adc16Dx370_%i" % (i),
+                offset =  0x00010000 + (i * 0x00010000),
+            ))
         
         self.add(Lmk04828(
-                                offset       =  0x00040000,
-                            ))
+            offset =  0x00040000,
+        ))
         
         self.add(Dac38J84(
-                                offset       =  0x00050000,
-                            ))
+            offset =  0x00050000,
+        ))
 
         ##############################
         # Commands
         ##############################
-
-        self.addCommand(    name         = "InitAmcCard",
-                            description  = "Initialization for AMC card's JESD modules",
-                            function     = """\
-                                           dev.Adc16Dx370_0.CalibrateAdc.set(1)
-                                           dev.Adc16Dx370_1.CalibrateAdc.set(1)
-                                           dev.Adc16Dx370_2.CalibrateAdc.set(1)
-                                           time.sleep(1.0)
-                                           dev.Lmk04828.PwrUpSysRef.set(1)
-                                           time.sleep(1.0)
-                                           dev.Dac38J84.InitDac.set(1)
-                                           time.sleep(0.1)
-                                           time.sleep(1.0)
-                                           dev.Dac38J84.ClearAlarms.set(1)
-                                           """
-                        )
+        @self.command(name="InitAmcCard", description="Initialization for AMC card's JESD modules",)
+        def InitAmcCard():
+           self.Adc16Dx370_0.CalibrateAdc.set(1)
+           self.Adc16Dx370_1.CalibrateAdc.set(1)
+           self.Adc16Dx370_2.CalibrateAdc.set(1)
+           time.sleep(1.0)
+           self.Lmk04828.PwrUpSysRef.set(1)
+           time.sleep(1.0)
+           self.Dac38J84.InitDac.set(1)
+           time.sleep(0.1)
+           time.sleep(1.0)
+           self.Dac38J84.ClearAlarms.set(1)

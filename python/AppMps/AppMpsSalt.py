@@ -21,109 +21,121 @@ import pyrogue as pr
 
 class AppMpsSalt(pr.Device):
     def __init__(   self,       
-                    name        = "AppMpsSalt",
-                    description = "AmcCarrier MPS PHY Module",
-                    memBase     =  None,
-                    offset      =  0x00,
-                    hidden      =  False,
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, )
+        name        = "AppMpsSalt",
+        description = "AmcCarrier MPS PHY Module",
+        memBase     =  None,
+        offset      =  0x00,
+        hidden      =  False,
+        expand      =  True,
+    ):
+        super().__init__(
+            name        = name,
+            description = description,
+            memBase     = memBase,
+            offset      = offset,
+            hidden      = hidden,
+            expand      = expand,
+        )
 
         ##############################
         # Variables
         ##############################
 
-        self.addVariable(   name         = "MpsTxLinkUpCnt",
-                            description  = "MPS TX LinkUp Counter",
-                            offset       =  0x00,
-                            bitSize      =  32,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
+        self.addVariable(   
+            name         = "MpsTxLinkUpCnt",
+            description  = "MPS TX LinkUp Counter",
+            offset       =  0x00,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "RO",
+        )
 
-        self.addVariables(  name         = "MpsRxLinkUpCnt",
-                            description  = "MPS RX LinkUp Counter[13:0]",
-                            offset       =  0x04,
-                            bitSize      =  32,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                            number       =  14,
-                            stride       =  4,
-                        )
+        self.addVariables(  
+            name         = "MpsRxLinkUpCnt",
+            description  = "MPS RX LinkUp Counter[13:0]",
+            offset       =  0x04,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "RO",
+            number       =  14,
+            stride       =  4,
+        )
 
-        self.addVariable(   name         = "MpsTxLinkUP",
-                            description  = "MPS TX LinkUp",
-                            offset       =  0x700,
-                            bitSize      =  1,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
+        self.addVariable(   
+            name         = "MpsTxLinkUP",
+            description  = "MPS TX LinkUp",
+            offset       =  0x700,
+            bitSize      =  1,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "RO",
+        )
 
-        self.addVariable(   name         = "MpsRxLinkUP",
-                            description  = "MPS TX LinkUp[13:0]",
-                            offset       =  0x700,
-                            bitSize      =  14,
-                            bitOffset    =  0x01,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
+        self.addVariable(   
+            name         = "MpsRxLinkUP",
+            description  = "MPS TX LinkUp[13:0]",
+            offset       =  0x700,
+            bitSize      =  14,
+            bitOffset    =  0x01,
+            base         = "hex",
+            mode         = "RO",
+        )
 
-        self.addVariable(   name         = "MPS_SLOT_G",
-                            description  = "MPS_SLOT_G",
-                            offset       =  0x704,
-                            bitSize      =  1,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
+        self.addVariable(   
+            name         = "MPS_SLOT_G",
+            description  = "MPS_SLOT_G",
+            offset       =  0x704,
+            bitSize      =  1,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "RO",
+        )
 
-        self.addVariable(   name         = "APP_TYPE_G",
-                            description  = "See AmcCarrierPkg.vhd for defination",
-                            offset       =  0x708,
-                            bitSize      =  7,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
+        self.addVariable(   
+            name         = "APP_TYPE_G",
+            description  = "See AmcCarrierPkg.vhd for defination",
+            offset       =  0x708,
+            bitSize      =  7,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "RO",
+        )
 
-        self.addVariable(   name         = "MpsPllLocked",
-                            description  = "MPS PLL Lock Status",
-                            offset       =  0x714,
-                            bitSize      =  1,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RO",
-                        )
+        self.addVariable(   
+            name         = "MpsPllLocked",
+            description  = "MPS PLL Lock Status",
+            offset       =  0x714,
+            bitSize      =  1,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "RO",
+        )
 
-        self.addVariable(   name         = "RollOverEn",
-                            description  = "Status Counter Roll Over Enable",
-                            offset       =  0xFF0,
-                            bitSize      =  15,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "RW",
-                        )
+        self.addVariable(   
+            name         = "RollOverEn",
+            description  = "Status Counter Roll Over Enable",
+            offset       =  0xFF0,
+            bitSize      =  15,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "RW",
+        )
 
-        self.addVariable(   name         = "CntRst",
-                            description  = "Status Counter Reset",
-                            offset       =  0xFF4,
-                            bitSize      =  1,
-                            bitOffset    =  0x00,
-                            base         = "hex",
-                            mode         = "WO",
-                        )
+        self.addVariable(   
+            name         = "CntRst",
+            description  = "Status Counter Reset",
+            offset       =  0xFF4,
+            bitSize      =  1,
+            bitOffset    =  0x00,
+            base         = "hex",
+            mode         = "WO",
+        )
 
         ##############################
         # Commands
         ##############################
-
-        self.addCommand(    name         = "RstCnt",
-                            description  = "Reset all the status counters",
-                            function     = """\
-                                           dev.CntRst.set(1)
-                                           """
-                        )
-
+        @self.command(name="RstCnt", description="Reset all the status counters",)
+        def RstCnt():
+            self.CntRst.set(1)
