@@ -72,12 +72,11 @@ class AppTop(pr.Device):
         ))
 
         for i in range(2):
-            if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
-                self.add(DaqMuxV2(
-                    name         = "DaqMuxV2[%i]" % (i),
-                    offset       =  0x20000000 + (i * 0x10000000),
-                    expand       =  False,
-                ))
+            self.add(DaqMuxV2(
+                name         = "DaqMuxV2[%i]" % (i),
+                offset       =  0x20000000 + (i * 0x10000000),
+                expand       =  False,
+            ))
 
         for i in range(2):
             if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
