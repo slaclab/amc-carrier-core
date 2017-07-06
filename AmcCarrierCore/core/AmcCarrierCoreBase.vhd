@@ -1610,5 +1610,4 @@ begin
          ddrPg                                            => ddrPg,
          ddrPwrEnL                                        => ddrPwrEnL);
 
-
 end mapping;

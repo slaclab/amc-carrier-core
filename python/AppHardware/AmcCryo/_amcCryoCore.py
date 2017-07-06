@@ -20,22 +20,29 @@
 import pyrogue as pr
 import time
 
-from surf.devices.ti._Dac38J84 import *
-from surf.devices.ti._Lmk04828 import *
+from surf.devices.ti._adc32Rf45 import *
+from surf.devices.ti._Dac38J84  import *
+from surf.devices.ti._Lmk04828  import *
 
-from AppHardware.AmcCryo._adc32Rf45 import *
 from AppHardware.AmcCryo._amcCryoCtrl import *
 
 class AmcCryoCore(pr.Device):
     def __init__(   self, 
-                    name        = "AmcCryoCore", 
-                    description = "Cryo Amc Rf Demo Board Core", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
-                    hidden      =  False,
-                    expand      =  True,
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
+        name        = "AmcCryoCore", 
+        description = "Cryo Amc Rf Demo Board Core", 
+        memBase     =  None, 
+        offset      =  0x0, 
+        hidden      =  False,
+        expand      =  True,
+    ):
+        super().__init__(
+            name        = name,
+            description = description,
+            memBase     = memBase,
+            offset      = offset,
+            hidden      = hidden,
+            expand      = expand,
+        )
                 
         #########
         # Devices
@@ -59,20 +66,14 @@ class AmcCryoCore(pr.Device):
             self.ADC[0].Init()
             self.ADC[1].Init()
             self.checkBlocks(varUpdate=True, recurse=True)            
-
-        def enLmkRef(dev, cmd, arg):
-            dev.LMK.LmkReg_0x011F.set(0x7)                   
-        self.addCommand(    name         = "CmdEnLmkRef",
-                            description  = "Enable Front Panel LMK reference",
-                            function     = enLmkRef
-                        )      
-
-        def disLmkRef(dev, cmd, arg):
-            dev.LMK.LmkReg_0x011F.set(0x0)                   
-        self.addCommand(    name         = "CmdDisLmkRef",
-                            description  = "Disable Front Panel LMK reference",
-                            function     = disLmkRef
-                        )
+            
+        @self.command(name="CmdEnLmkRef", description="Enable Front Panel LMK referenc",)
+        def CmdEnLmkRef():            
+            self.LMK.LmkReg_0x011F.set(0x7) 
+            
+        @self.command(name="CmdDisLmkRef", description="Disable Front Panel LMK referenc",)
+        def CmdDisLmkRef():            
+            self.LMK.LmkReg_0x011F.set(0x0)             
 
     def writeBlocks(self, force=False, recurse=True, variable=None):
         """
@@ -103,15 +104,10 @@ class AmcCryoCore(pr.Device):
         
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+        
+        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self.ADC[0].DigRst()
+        self.ADC[1].DigRst()
+        
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
-
-        
-        # Process rest of tree
-        # if recurse:
-#             for key,value in self.devices.items():
-#                 value.writeBlocks(force=force, recurse=True)
-                        
-                        
-                        
-                        
