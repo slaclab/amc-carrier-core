@@ -64,7 +64,7 @@ entity MpsMsgPartitioner is
       mAxisRst    : in  sl;
       mAxisMaster : out AxiStreamMasterType;
       mAxisSlave  : in  AxiStreamSlaveType;
-      mTLastTUser : out slv(7 downto 0));       
+      mTLastTUser : out slv(127 downto 0));       
 end MpsMsgPartitioner;
 
 architecture rtl of MpsMsgPartitioner is
@@ -346,6 +346,6 @@ begin
          mAxisRst    => mAxisRst,
          mAxisMaster => mAxisMaster,
          mAxisSlave  => mAxisSlave,
-         mTLastTUser => mTLastTUser); 
+         mTLastTUser => mTLastTUser(7 downto 0)); 
 
 end rtl;
