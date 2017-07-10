@@ -105,6 +105,7 @@ set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks 
 set_clock_groups -asynchronous -group [get_clocks {recTimingClkDiv2}] -group [get_clocks {rtmAdcDataClk}]
 set_clock_groups -asynchronous -group [get_clocks {recTimingClkDiv2}] -group [get_clocks {rtmAdcDataClkDiv2}]
 set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {rtmAdcDataClkDiv2}]
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {rtmAdcDataClkDiv2}]
 
 # Adding placement constraints 
 set_property LOC BITSLICE_CONTROL_X0Y1 [get_cells {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/U_IDELAYCTRL}]
