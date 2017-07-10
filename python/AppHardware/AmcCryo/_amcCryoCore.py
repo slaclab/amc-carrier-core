@@ -67,11 +67,11 @@ class AmcCryoCore(pr.Device):
             self.ADC[1].Init()
             self.checkBlocks(varUpdate=True, recurse=True)            
             
-        @self.command(name="CmdEnLmkRef", description="Enable Front Panel LMK referenc",)
+        @self.command(name="CmdEnLmkRef", description="Enable Front Panel LMK reference",)
         def CmdEnLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x7) 
             
-        @self.command(name="CmdDisLmkRef", description="Disable Front Panel LMK referenc",)
+        @self.command(name="CmdDisLmkRef", description="Disable Front Panel LMK reference",)
         def CmdDisLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x0)             
 
@@ -81,7 +81,6 @@ class AmcCryoCore(pr.Device):
         """
         if not self.enable.get(): return
 
-
         # Process local blocks.
         if variable is not None:
             variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
@@ -90,7 +89,6 @@ class AmcCryoCore(pr.Device):
                 if force or block.stale:
                     if block.bulkEn:
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
-
 
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(varUpdate=True, recurse=True)

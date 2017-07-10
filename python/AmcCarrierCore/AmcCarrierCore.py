@@ -154,7 +154,7 @@ class AmcCarrierCore(pr.Device):
         # Process rest of tree
         if recurse:
             for key,value in self.devices.items():
-                value.writeBlocks(force=force, recurse=True)                        
+                value.writeBlocks(force=force, recurse=True)                     
                         
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(varUpdate=True, recurse=True)

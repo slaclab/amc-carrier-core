@@ -37,43 +37,43 @@ class AmcCryoCtrl(pr.Device):
             expand      = expand,
         )
                         
-        self.addVariable(  
+        self.add(pr.RemoteVariable(   
             name         = "txSyncRaw",
             description  = "txSyncRaw",
             offset       =  0x7F0,
             bitSize      =  2,
             bitOffset    =  0,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )       
+        ))      
 
-        self.addVariable(  
+        self.add(pr.RemoteVariable(   
             name         = "txSync",
             description  = "txSync",
             offset       =  0x7F4,
             bitSize      =  2,
             bitOffset    =  0,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )        
+        ))       
 
-        self.addVariable(  
+        self.add(pr.RemoteVariable(   
             name         = "rxSync",
             description  = "rxSync",
             offset       =  0x7F8,
             bitSize      =  1,
             bitOffset    =  0,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )                                
+        ))                               
         
-        self.addVariable(  
+        self.add(pr.RemoteVariable(   
             name         = "txSyncMask",
             description  = "txSyncMask",
             offset       =  0x800,
             bitSize      =  2,
             bitOffset    =  0,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RW",
-        )                            
+        ))                           
                         

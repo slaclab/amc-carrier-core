@@ -50,7 +50,7 @@ class BsaBufferControl(pr.Device):
             nelms   =  64,
             bitSize =  64,
             stride  =  8,
-            base    = "hex",
+            base    = pr.UInt,
             mode    = "RO",                           
         ))
         
