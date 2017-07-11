@@ -41,7 +41,7 @@ class AmcCarrierBsi(pr.Device):
         # Variables
         ##############################
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(  
             name         = "MAC",
             description  = "MAC Address[3:0]",
             offset       =  0x00,
@@ -51,7 +51,7 @@ class AmcCarrierBsi(pr.Device):
             mode         = "RO",
             number       =  4,
             stride       =  8,
-        ))
+        )
 
         self.add(pr.RemoteVariable(     
             name         = "CrateId",

@@ -232,7 +232,7 @@ class DaqMuxV2(pr.Device):
             mode         = "RW",
         ))
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(  
             name         = "Timestamp",
             description  = "Timestamp 63:0",
             offset       =  0x10,
@@ -243,9 +243,9 @@ class DaqMuxV2(pr.Device):
             number       =  2,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables( 
             name         = "Bsa",
             description  = "bsa(0) - edefAvgDn, bsa(1) - edefMinor, bsa(2) - edefMajor, bsa(3) - edefInit",
             offset       =  0x18,
@@ -256,7 +256,7 @@ class DaqMuxV2(pr.Device):
             number       =  4,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
         self.add(pr.RemoteVariable(   
             name         = "TrigCount",
@@ -269,7 +269,7 @@ class DaqMuxV2(pr.Device):
             pollInterval =  1,                            
         ))
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(   
             name         = "InputMuxSel",
             description  = "Input Mux select. Maximum number of channels is 29.",
             offset       =  0x40,
@@ -312,9 +312,9 @@ class DaqMuxV2(pr.Device):
                   30 : "Ch28",
                   31 : "Ch29",
             },
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(    
             name         = "StreamPause",
             description  = "Raw diagnostic stream control Pause.",
             offset       =  0x80,
@@ -325,9 +325,9 @@ class DaqMuxV2(pr.Device):
             number       =  4,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(    
             name         = "StreamReady",
             description  = "Raw diagnostic stream control Ready.",
             offset       =  0x80,
@@ -338,9 +338,9 @@ class DaqMuxV2(pr.Device):
             number       =  4,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(    
             name         = "StreamOverflow",
             description  = "Raw diagnostic stream control Overflow.",
             offset       =  0x80,
@@ -351,9 +351,9 @@ class DaqMuxV2(pr.Device):
             number       =  4,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(   
             name         = "StreamError",
             description  = "Error during last Acquisition (Raw diagnostic stream control Ready or incoming data valid dropped).",
             offset       =  0x80,
@@ -364,9 +364,9 @@ class DaqMuxV2(pr.Device):
             number       =  4,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(    
             name         = "InputDataValid",
             description  = "The incoming data is Valid (Usually connected to JESD valid signal).",
             offset       =  0x80,
@@ -377,9 +377,9 @@ class DaqMuxV2(pr.Device):
             number       =  4,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(   
             name         = "StreamEnabled",
             description  = "Output stream enabled.",
             offset       =  0x80,
@@ -390,9 +390,9 @@ class DaqMuxV2(pr.Device):
             number       =  4,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(    
             name         = "FrameCnt",
             description  = "Number of 4096 byte frames sent.",
             offset       =  0x80,
@@ -403,9 +403,9 @@ class DaqMuxV2(pr.Device):
             number       =  4,
             stride       =  4,
             pollInterval =  1,                            
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(   
             name         = "FormatSignWidth",
             description  = "Indicating sign extension point.",
             offset       =  0xC0,
@@ -415,9 +415,9 @@ class DaqMuxV2(pr.Device):
             mode         = "RW",
             number       =  4,
             stride       =  4,
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(   
             name         = "FormatDataWidth",
             description  = "Data width 32-bit or 16-bit.",
             offset       =  0xC0,
@@ -430,9 +430,9 @@ class DaqMuxV2(pr.Device):
                 0 : "D32-bit",
                 1 : "D16-bit",
             },
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(   
             name         = "FormatSign",
             description  = "Sign format.",
             offset       =  0xC0,
@@ -445,9 +445,9 @@ class DaqMuxV2(pr.Device):
                 0 : "Unsigned",
                 1 : "Signed",
             },
-        ))
+        )
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables(    
             name         = "DecimationAveraging",
             description  = "Decimation Averaging.",
             offset       =  0xC0,
@@ -460,7 +460,7 @@ class DaqMuxV2(pr.Device):
                 0 : "Disabled",
                 1 : "Enabled",
             },
-        ))
+        )
 
         ##############################
         # Commands
