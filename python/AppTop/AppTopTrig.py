@@ -25,23 +25,12 @@ from LclsTimingCore.EvrV1Isr import *
 
 class AppTopTrig(pr.Device):
     def __init__(   self, 
-        name         = "AppTopTrig", 
-        description  = "Common Application Top Level Trigger Module", 
-        memBase      =  None, 
-        offset       =  0x0, 
-        hidden       =  False, 
-        numTrigPulse =  1,
-        enableEvr    =  True,
-        expand       =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name         = "AppTopTrig", 
+            description  = "Common Application Top Level Trigger Module", 
+            numTrigPulse =  1,
+            enableEvr    =  True,
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables

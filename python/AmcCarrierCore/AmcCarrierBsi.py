@@ -21,21 +21,10 @@ import pyrogue as pr
 
 class AmcCarrierBsi(pr.Device):
     def __init__(   self,       
-        name        = "AmcCarrierBsi",
-        description = "AmcCarrier BSI Module",
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "AmcCarrierBsi",
+            description = "AmcCarrier BSI Module",
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables

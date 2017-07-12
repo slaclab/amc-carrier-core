@@ -21,21 +21,10 @@ import pyrogue as pr
 
 class DaqMuxV2(pr.Device):
     def __init__(   self,       
-        name        = "DaqMuxV2",
-        description = "Waveform Data Acquisition Module",
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "DaqMuxV2",
+            description = "Waveform Data Acquisition Module",
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables

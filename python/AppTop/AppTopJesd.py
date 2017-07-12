@@ -23,23 +23,13 @@ from surf.protocols.jesd204b import *
 
 class AppTopJesd(pr.Device):
     def __init__(   self, 
-        name        = "AppTopJesd", 
-        description = "Common Application Top Level JESD Module", 
-        memBase     =  None, 
-        offset      =  0x0, 
-        hidden      =  False, 
-        numRxLanes  =  6, 
-        numTxLanes  =  2,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "AppTopJesd", 
+            description = "Common Application Top Level JESD Module", 
+            numRxLanes  =  6, 
+            numTxLanes  =  2,
+            expand      =  False,
+            **kwargs):
+        super().__init__(name=name, description=description, expand=expand, **kwargs)
 
         ##############################
         # Variables

@@ -28,21 +28,10 @@ from AppHardware.AmcCryo._amcCryoCtrl import *
 
 class AmcCryoCore(pr.Device):
     def __init__(   self, 
-        name        = "AmcCryoCore", 
-        description = "Cryo Amc Rf Demo Board Core", 
-        memBase     =  None, 
-        offset      =  0x0, 
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "AmcCryoCore", 
+            description = "Cryo Amc Rf Demo Board Core", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
                 
         #########
         # Devices

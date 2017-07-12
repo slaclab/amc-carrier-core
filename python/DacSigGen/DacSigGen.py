@@ -23,23 +23,12 @@ from surf.misc import *
 
 class DacSigGen(pr.Device):
     def __init__(   self, 
-        name        = "DacSigGen", 
-        description = "Signal generator module", 
-        memBase     =  None, 
-        offset      =  0x0, 
-        hidden      =  False, 
-        numOfChs    =  2, 
-        buffSize    =  0x200,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "DacSigGen", 
+            description = "Signal generator module", 
+            numOfChs    =  2, 
+            buffSize    =  0x200,
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables

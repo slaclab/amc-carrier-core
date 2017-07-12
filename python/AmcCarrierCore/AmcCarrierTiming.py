@@ -25,21 +25,10 @@ from LclsTimingCore.GthRxAlignCheck import *
 
 class AmcCarrierTiming(pr.Device):
     def __init__(   self, 
-        name        = "AmcCarrierTiming", 
-        description = "AMC Carrier Timing Receiver Module", 
-        memBase     =  None, 
-        offset      =  0x0, 
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "AmcCarrierTiming", 
+            description = "AMC Carrier Timing Receiver Module", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables

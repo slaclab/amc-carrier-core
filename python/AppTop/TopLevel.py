@@ -27,31 +27,20 @@ from AppTop import *
 
 class TopLevel(pr.Device):
     def __init__(   self, 
-        name         = "FpgaTopLevel", 
-        description  = "FPGA Top-Level", 
-        memBase      = None, 
-        offset       = 0x0, 
-        hidden       = False,
-        expand       = True,
-        simGui       = False,
-        ipAddr       = "10.0.1.101",
-        numRxLanes   = [0,0],
-        numTxLanes   = [0,0],
-        numSigGen    = [0,0],
-        sizeSigGen   = [0,0],
-        numTrigPulse = 0,
-        enableBsa    = True,
-        enableMps    = True,
-        enableEvr    = True,
-    ):
-        super().__init__(
-            name=name,
-            description=description,
-            memBase=memBase,
-            offset=offset,
-            hidden=hidden,
-            expand=expand,
-        )
+            name         = "FpgaTopLevel", 
+            description  = "FPGA Top-Level", 
+            simGui       = False,
+            ipAddr       = "10.0.1.101",
+            numRxLanes   = [0,0],
+            numTxLanes   = [0,0],
+            numSigGen    = [0,0],
+            sizeSigGen   = [0,0],
+            numTrigPulse = 0,
+            enableBsa    = True,
+            enableMps    = True,
+            enableEvr    = True,
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
         
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
@@ -62,20 +51,20 @@ class TopLevel(pr.Device):
         else:
         
             # File writer
-            dataWriter = pyrogue.utilities.fileio.StreamWriter('dataWriter')
+            dataWriter = pyrogue.utilities.fileio.StreamWriter(name='dataWriter')
             self.add(dataWriter)
             
             # Create SRP/ASYNC_MSG interface
             #  - This system uses UDP(port 8193, size 1500) + RSSI + Pack and SRP v3
             srp = rogue.protocols.srp.SrpV3()
-            udp = pyrogue.protocols.UdpRssiPack( ipAddr, 8193, 1500 )
+            udp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1500 )
             
             # Connect the SRPv3 to tDest = 0x0
             pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
 
             # Create stream interface
             # - This system uses UDP(port 8194, size 1500) + RSSI + Pack
-            udpStream = self.stream = pr.protocols.UdpRssiPack( ipAddr, 8194, 1500 )
+            udpStream = self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1500 )
             
             # Add data streams
             for i in range(8):
