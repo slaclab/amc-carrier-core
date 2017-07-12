@@ -9,7 +9,7 @@
 ##############################################################################
 
 set_property -dict { IOSTANDARD LVDS } [get_ports {fpgaClkP[0][0]}]
-set_property -dict { IOSTANDARD LVDS } [get_ports {fpgaClkN[0][0]}]ž
+set_property -dict { IOSTANDARD LVDS } [get_ports {fpgaClkN[0][0]}]
 
 set_property PACKAGE_PIN AN4 [get_ports {jesdTxP[0][0]}]; #P11 PIN32
 set_property PACKAGE_PIN AN3 [get_ports {jesdTxN[0][0]}]; #P11 PIN33
