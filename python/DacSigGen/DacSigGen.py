@@ -128,7 +128,7 @@ class DacSigGen(pr.Device):
             pollInterval =  1,                            
         ))
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables( 
             name         = "PeriodSize",
             description  = "In Periodic mode: Period size (Zero inclusive). In Triggered mode: Waveform size (Zero inclusive). Separate values for separate channels.",
             offset       =  0x40,
@@ -138,7 +138,7 @@ class DacSigGen(pr.Device):
             mode         = "RW",
             number       =  2,
             stride       =  4,
-        ))
+        )
     
         # ## Need to replace this with Ben future "MemoryNode" device
         # for i in range(numOfChs):  

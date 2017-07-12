@@ -51,7 +51,7 @@ class AppMpsSalt(pr.Device):
             mode         = "RO",
         ))
 
-        self.add(pr.RemoteVariable(  
+        self.addRemoteVariables( 
             name         = "MpsRxLinkUpCnt",
             description  = "MPS RX LinkUp Counter[13:0]",
             offset       =  0x04,
@@ -61,7 +61,7 @@ class AppMpsSalt(pr.Device):
             mode         = "RO",
             number       =  14,
             stride       =  4,
-        ))
+        )
 
         self.add(pr.RemoteVariable(    
             name         = "MpsTxLinkUP",
