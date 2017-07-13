@@ -81,7 +81,9 @@ class AmcCryoCore(pr.Device):
 
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(varUpdate=True, recurse=True)
-
+        
+        # Note: Requires that AmcCryoCore: enable: 'True' in defaults.yml file
+        
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
@@ -95,6 +97,9 @@ class AmcCryoCore(pr.Device):
         self._root.checkBlocks(varUpdate=True, recurse=True)
         self.ADC[0].DigRst()
         self.ADC[1].DigRst()
+        
+        # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
+        self.enable.set(False)
         
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
