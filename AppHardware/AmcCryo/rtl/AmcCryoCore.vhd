@@ -200,6 +200,9 @@ begin
    jesdSysRefP <= sysRefP(0);  -- Polarity swapped on page 2 of schematics
    jesdSysRefN <= sysRefN(0);
 
+   sysRefP(2) <= '0'; -- driven the unconnected ext sysref to GND (prevent floating antenna) 
+   sysRefN(2) <= '0'; -- driven the unconnected ext sysref to GND (prevent floating antenna) 
+   
    -- JESD RX Sync Ports
    syncInP(3) <= jesdRxSyncP(0);
    syncInN(3) <= jesdRxSyncN(0);

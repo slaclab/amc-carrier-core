@@ -21,21 +21,10 @@ import pyrogue as pr
 
 class AppMpsSalt(pr.Device):
     def __init__(   self,       
-        name        = "AppMpsSalt",
-        description = "AmcCarrier MPS PHY Module",
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "AppMpsSalt",
+            description = "AmcCarrier MPS PHY Module",
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables

@@ -20,22 +20,13 @@ from AppMps.AppMps import *
 
 class AmcCarrierCore(pr.Device):
     def __init__(   self, 
-        name        = "AmcCarrierCore", 
-        memBase     = None, 
-        offset      = 0x0, 
-        enableBsa   = True,
-        enableMps   = True,
-        hidden      = False,
-        expand	    = False,
-    ):
-        super().__init__(
-            name        = name,
+            name        = "AmcCarrierCore", 
             description = "AmcCarrierCore", 
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )   
+            enableBsa   = True,
+            enableMps   = True,
+            expand	    = False,
+            **kwargs):
+        super().__init__(name=name, description=description, expand=expand, **kwargs)  
 
         ##############################
         # Variables

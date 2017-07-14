@@ -28,27 +28,16 @@ import time
 
 class AppTop(pr.Device):
     def __init__(   self, 
-        name           = "AppTop", 
-        description    = "Common Application Top Level", 
-        memBase        = None, 
-        offset         = 0x0, 
-        hidden         = False, 
-        numRxLanes     = [0,0], 
-        numTxLanes     = [0,0],
-        numSigGen      = [0,0],
-        sizeSigGen     = [0,0],
-        numTrigPulse   = 0,
-        enableEvr      = True,
-        expand         = True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name           = "AppTop", 
+            description    = "Common Application Top Level", 
+            numRxLanes     = [0,0], 
+            numTxLanes     = [0,0],
+            numSigGen      = [0,0],
+            sizeSigGen     = [0,0],
+            numTrigPulse   = 0,
+            enableEvr      = True,
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
         
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes

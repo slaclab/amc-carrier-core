@@ -23,21 +23,10 @@ from AppMps.AppMpsSalt import *
 
 class AppMps(pr.Device):
     def __init__(   self, 
-        name        = "AppMps", 
-        description = "MPS Application", 
-        memBase     =  None, 
-        offset      =  0x0, 
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "AppMps", 
+            description = "MPS Application", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables

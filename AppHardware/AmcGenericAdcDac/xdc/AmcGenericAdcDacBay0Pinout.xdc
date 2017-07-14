@@ -108,5 +108,3 @@ set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[0][5]}] ; #lemoDoutN
 set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[0][6]}] ; #lemoDoutP[0][1]
 set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[0][6]}] ; #lemoDoutN[0][1]
 set_property -dict { IOSTANDARD LVCMOS25 } [get_ports {jtagPri[0][0]}] ; #bcmL[0]
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd0_370MHz}]

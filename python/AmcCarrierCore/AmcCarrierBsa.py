@@ -23,23 +23,13 @@ from BsaCore.BsaBufferControl import *
 from BsaCore.BsaWaveformEngine import *
 
 class AmcCarrierBsa(pr.Device):
-    def __init__(   self, 
-                    name        = "AmcCarrierBsa", 
-                    description = "AmcCarrier BSA Module", 
-                    memBase     = None, 
-                    offset      = 0x0, 
-                    enableBsa   = True,
-                    hidden      = False,
-                    expand      = True,
-                ):
-        super().__init__(
-            name        = name, 
-            description = description, 
-            memBase     = memBase, 
-            offset      = offset, 
-            hidden      = hidden, 
-            expand      = expand,
-        )
+    def __init__( self, 
+            name        = "AmcCarrierBsa", 
+            description = "AmcCarrier BSA Module", 
+            enableBsa   = True,
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
+        
         ##############################
         # Variables
         ##############################
