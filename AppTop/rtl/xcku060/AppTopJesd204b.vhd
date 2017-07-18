@@ -131,6 +131,7 @@ architecture mapping of AppTopJesd204b is
          txctrl1_in : in STD_LOGIC_VECTOR ( 111 downto 0 );
          txctrl2_in : in STD_LOGIC_VECTOR ( 55 downto 0 );
          txdiffctrl_in : in STD_LOGIC_VECTOR ( 27 downto 0 );
+         txinhibit_in : in STD_LOGIC_VECTOR(6 downto 0);
          txpd_in : in STD_LOGIC_VECTOR ( 13 downto 0 );
          txpolarity_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
          txpostcursor_in : in STD_LOGIC_VECTOR ( 34 downto 0 );
@@ -197,6 +198,7 @@ architecture mapping of AppTopJesd204b is
          txctrl1_in : in STD_LOGIC_VECTOR ( 47 downto 0 );
          txctrl2_in : in STD_LOGIC_VECTOR ( 23 downto 0 );
          txdiffctrl_in : in STD_LOGIC_VECTOR ( 11 downto 0 );
+         txinhibit_in : in STD_LOGIC_VECTOR(2 downto 0);
          txpd_in : in STD_LOGIC_VECTOR ( 5 downto 0 );
          txpolarity_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
          txpostcursor_in : in STD_LOGIC_VECTOR ( 14 downto 0 );
@@ -257,6 +259,7 @@ architecture mapping of AppTopJesd204b is
    signal txPreCursor   : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
    signal txPolarity    : slv(GT_LANE_G-1 downto 0)       := (others => '0');
    signal rxPolarity    : slv(GT_LANE_G-1 downto 0)       := (others => '0');
+   signal txInhibit     : slv(GT_LANE_G-1 downto 0)       := (others => '1');
    signal loopback      : slv(GT_LANE_G-1 downto 0)       := (others => '0');
              
    signal gtTxDiffCtrl    : slv(GT_LANE_G*4-1 downto 0) := (others => '1');   
@@ -367,6 +370,7 @@ begin
             txPostCursor         => txPostCursor,
             txPreCursor          => txPreCursor,
             txPolarity           => txPolarity,   
+            txEnableL            => txInhibit,   
             loopback             => loopback);            
             
       s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
@@ -509,6 +513,7 @@ begin
          txctrl1_in                            => (others => '0'),
          txctrl2_in                            => s_txDataK(55 downto 0),
          txdiffctrl_in                         => gtTxDiffCtrl(27 downto 0),
+         txinhibit_in                          => txInhibit(6 downto 0),
          txpd_in                               => (others => '0'),
          txpolarity_in                         => txPolarity(6 downto 0),
          txpostcursor_in                       => gtTxPostCursor(34 downto 0),
@@ -573,6 +578,7 @@ begin
          txctrl1_in                            => (others => '0'),
          txctrl2_in                            => s_txDataK(79 downto 56),
          txdiffctrl_in                         => gtTxDiffCtrl(39 downto 28),
+         txinhibit_in                          => txInhibit(9 downto 7),
          txpd_in                               => (others => '0'),
          txpolarity_in                         => txPolarity(9 downto 7),
          txpostcursor_in                       => gtTxPostCursor(49 downto 35),
