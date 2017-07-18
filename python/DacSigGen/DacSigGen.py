@@ -153,7 +153,7 @@ class DacSigGen(pr.Device):
             # ))
     
         # self.add(pr.LocalVariable(    
-            # name         = "CvsFilePath",
+            # name         = "CsvFilePath",
             # description  = "Used if command's argument is empty",
             # mode         = "RW",
             # value        = "",            
@@ -169,12 +169,12 @@ class DacSigGen(pr.Device):
            self.SoftwareTrigger.set(trigAllCh)
            self.SoftwareTrigger.set(0x00)        
            
-        @self.command(value='',description="Load the .CVS",)
-        def LoadCvsFile(arg):
+        @self.command(value='',description="Load the .CSV",)
+        def LoadCsvFile(arg):
             if (arg != ""):
                 path = arg
             else:
-                path = self.CvsFilePath.get()
+                path = self.CsvFilePath.get()
                 
             with open(path) as csvfile:
                 reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
@@ -189,10 +189,10 @@ class DacSigGen(pr.Device):
                             entry.append(row[ch])
                         cvsData.append(entry)  
                         idx  += 1                
-                click.secho( ('LoadCvsFile(): %d samples per chanel found' % idx ), fg='green')
+                click.secho( ('LoadCsvFile(): %d samples per chanel found' % idx ), fg='green')
                 if ( cnt>idx ): 
-                    click.secho( ('\tHowever %d of samples detected in the CVS file' % cnt ), fg='red')
-                    click.secho( ('\tCVS data dropped because firmware only support up to %d samples' % idx ), fg='red')
+                    click.secho( ('\tHowever %d of samples detected in the CSV file' % cnt ), fg='red')
+                    click.secho( ('\tCSV data dropped because firmware only support up to %d samples' % idx ), fg='red')
                 for ch in range(self._numOfChs): 
                     idx  = 0
                     data = []
