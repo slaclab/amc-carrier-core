@@ -132,6 +132,6 @@ class AppTop(pr.Device):
             if ( (self._numSigGen[i] > 0) and (self._sizeSigGen[i] > 0) ):
                 v = getattr(self, 'DacSigGen[%i]'%i)
                 pass
-                # if ( v.CvsFilePath.get() != "" ):
-                    # v.LoadCvsFile("")
+                # if ( v.CsvFilePath.get() != "" ):
+                    # v.LoadCsvFile("")
         self.checkBlocks(recurse=True)

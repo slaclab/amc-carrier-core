@@ -89,7 +89,7 @@ class TopLevel(pr.Device):
         ))
 
         # Define SW trigger command
-        @self.command(name="SwDaqMuxTrig", description="Software Trigger for DAQ MUX",)
+        @self.command(description="Software Trigger for DAQ MUX",)
         def SwDaqMuxTrig():
             for i in range(2): 
                 self.AppTop.DaqMuxV2[i].TriggerDaq.call()
