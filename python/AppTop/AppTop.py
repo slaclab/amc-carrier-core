@@ -41,6 +41,8 @@ class AppTop(pr.Device):
         
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
+        self._numSigGen  = numSigGen
+        self._sizeSigGen = sizeSigGen
         
         ##############################
         # Variables
@@ -125,5 +127,11 @@ class AppTop(pr.Device):
                 v.JesdRx.CmdClearErrors()
             if (self._numTxLanes[i] > 0):
                 v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdTx.CmdClearErrors()                   
+                v.JesdTx.CmdClearErrors()
+        for i in range(2):
+            if ( (self._numSigGen[i] > 0) and (self._sizeSigGen[i] > 0) ):
+                v = getattr(self, 'DacSigGen[%i]'%i)
+                pass
+                # if ( v.CvsFilePath.get() != "" ):
+                    # v.LoadCvsFile("")
         self.checkBlocks(recurse=True)
