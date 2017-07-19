@@ -29,8 +29,7 @@ class DacSigGen(pr.Device):
             numOfChs    =  2, 
             buffSize    =  0x200,
             **kwargs):
-        # super().__init__(name=name, description=description, size=0x10000000, **kwargs)
-        super().__init__(name=name, description=description, **kwargs)
+        super().__init__(name=name, description=description, size=0x10000000, **kwargs)
 
         self._numOfChs = numOfChs
         # self._buffSize  = buffSize
@@ -152,12 +151,12 @@ class DacSigGen(pr.Device):
                 # # hidden       =  True,
             # ))
     
-        # self.add(pr.LocalVariable(    
-            # name         = "CsvFilePath",
-            # description  = "Used if command's argument is empty",
-            # mode         = "RW",
-            # value        = "",            
-        # ))
+        self.add(pr.LocalVariable(    
+            name         = "CsvFilePath",
+            description  = "Used if command's argument is empty",
+            mode         = "RW",
+            value        = "",            
+        ))
         
         ##############################
         # Commands

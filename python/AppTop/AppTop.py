@@ -92,8 +92,10 @@ class AppTop(pr.Device):
                 
         @self.command(description  = "JESD Reset")        
         def JesdReset():   
-            # lmkDevices = self.find(name=Lmk04828)
-            # print (lmkDevices)
+            lmkDevices = self.find(typ=Lmk04828)
+            for lmk in lmkDevices: 
+                lmk.PwrDwnSysRef()
+            self.checkBlocks(recurse=True)
             for i in range(2):
                 if (self._numRxLanes[i] > 0):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
@@ -102,7 +104,10 @@ class AppTop(pr.Device):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
                     v.JesdTx.CmdResetGTs()
             self.checkBlocks(recurse=True)
-            time.sleep(1)
+            time.sleep(0.5)
+            for lmk in lmkDevices: 
+                lmk.PwrUpSysRef()            
+            time.sleep(0.5)
             for i in range(2):
                 if (self._numRxLanes[i] > 0):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
@@ -137,7 +142,6 @@ class AppTop(pr.Device):
         for i in range(2):
             if ( (self._numSigGen[i] > 0) and (self._sizeSigGen[i] > 0) ):
                 v = getattr(self, 'DacSigGen[%i]'%i)
-                pass
-                # if ( v.CvsFilePath.get() != "" ):
-                    # v.LoadCvsFile("")
+                if ( v.CsvFilePath.get() != "" ):
+                    v.LoadCsvFile("")
         self.checkBlocks(recurse=True)
