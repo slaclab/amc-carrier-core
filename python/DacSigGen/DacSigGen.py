@@ -134,7 +134,7 @@ class DacSigGen(pr.Device):
             number       =  2,
             stride       =  4,
         )
-    
+                
         # ###########################################################
         # ## Need to replace this with Ben future "MemoryNode" device
         # ###########################################################
