@@ -137,7 +137,7 @@ class AppTop(pr.Device):
                 value.writeBlocks(force=force, recurse=True)                        
                         
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self._root.checkBlocks(recurse=True)
         self.JesdReset()
         for i in range(2):
             if ( (self._numSigGen[i] > 0) and (self._sizeSigGen[i] > 0) ):

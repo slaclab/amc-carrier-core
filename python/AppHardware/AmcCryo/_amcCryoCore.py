@@ -48,13 +48,13 @@ class AmcCryoCore(pr.Device):
         ##########
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            self.checkBlocks(varUpdate=True, recurse=True)
+            self.checkBlocks(recurse=True)
             self.LMK.Init()
             self.DAC[0].Init()
             self.DAC[1].Init()
             self.ADC[0].Init()
             self.ADC[1].Init()
-            self.checkBlocks(varUpdate=True, recurse=True)            
+            self.checkBlocks(recurse=True)            
             
         @self.command(description="Enable Front Panel LMK reference",)
         def CmdEnLmkRef():            
@@ -80,7 +80,7 @@ class AmcCryoCore(pr.Device):
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self._root.checkBlocks(recurse=True)
         
         # Note: Requires that AmcCryoCore: enable: 'True' in defaults.yml file
         
@@ -94,7 +94,7 @@ class AmcCryoCore(pr.Device):
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
         
-        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self._root.checkBlocks(recurse=True)
         self.ADC[0].DigRst()
         self.ADC[1].DigRst()
         

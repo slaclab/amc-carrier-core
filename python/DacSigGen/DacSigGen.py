@@ -32,8 +32,8 @@ class DacSigGen(pr.Device):
         super().__init__(name=name, description=description, size=0x10000000, **kwargs)
 
         self._numOfChs = numOfChs
-        # self._buffSize  = buffSize
-        self._buffSize  = 0x400  ########## rawWrite() only support a 4kB transfer right now
+        self._buffSize  = buffSize
+        # self._buffSize  = 0x400  ########## rawWrite() only support a 4kB transfer right now
         
         ##############################
         # Variables
@@ -200,7 +200,7 @@ class DacSigGen(pr.Device):
                             data.append(int(row[ch]))
                             idx  += 1
                     self._rawWrite(
-                        address = (0x01000000 + (ch*0x01000000)),
+                        offset   = (0x01000000 + (ch*0x01000000)),
                         data    = data,
                         base    = pr.Int,
                         stride  = 4,
