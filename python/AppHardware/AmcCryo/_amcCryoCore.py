@@ -46,7 +46,7 @@ class AmcCryoCore(pr.Device):
         ##########
         # Commands
         ##########
-        @self.command(name="InitAmcCard", description="Initialization for AMC card's JESD modules",)
+        @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
             self.checkBlocks(varUpdate=True, recurse=True)
             self.LMK.Init()
@@ -56,11 +56,11 @@ class AmcCryoCore(pr.Device):
             self.ADC[1].Init()
             self.checkBlocks(varUpdate=True, recurse=True)            
             
-        @self.command(name="CmdEnLmkRef", description="Enable Front Panel LMK reference",)
+        @self.command(description="Enable Front Panel LMK reference",)
         def CmdEnLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x7) 
             
-        @self.command(name="CmdDisLmkRef", description="Disable Front Panel LMK reference",)
+        @self.command(description="Disable Front Panel LMK reference",)
         def CmdDisLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x0)             
 

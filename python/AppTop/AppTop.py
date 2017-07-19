@@ -23,6 +23,7 @@ from AppTop.AppTopTrig import *
 from AppTop.AppTopJesd import *
 from DacSigGen.DacSigGen import *
 from DaqMuxV2.DaqMuxV2 import *
+from surf.devices.ti._Lmk04828  import *
 from common.AppCore import *
 import time
 
@@ -88,7 +89,28 @@ class AppTop(pr.Device):
                     buffSize     =  sizeSigGen[i],
                     expand       =  False,
                 ))
-                              
+                
+        @self.command(description  = "JESD Reset")        
+        def JesdReset():   
+            # lmkDevices = self.find(name=Lmk04828)
+            # print (lmkDevices)
+            for i in range(2):
+                if (self._numRxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdRx.CmdResetGTs()
+                if (self._numTxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdTx.CmdResetGTs()
+            self.checkBlocks(recurse=True)
+            time.sleep(1)
+            for i in range(2):
+                if (self._numRxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdRx.CmdClearErrors()
+                if (self._numTxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdTx.CmdClearErrors()        
+        
     def writeBlocks(self, force=False, recurse=True, variable=None):
         """
         Write all of the blocks held by this Device to memory
@@ -111,27 +133,11 @@ class AppTop(pr.Device):
                         
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(varUpdate=True, recurse=True)
-                        
-        for i in range(2):
-            if (self._numRxLanes[i] > 0):
-                v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdRx.CmdResetGTs()
-            if (self._numTxLanes[i] > 0):
-                v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdTx.CmdResetGTs()
-        self.checkBlocks(recurse=True)
-        time.sleep(1)
-        for i in range(2):
-            if (self._numRxLanes[i] > 0):
-                v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdRx.CmdClearErrors()
-            if (self._numTxLanes[i] > 0):
-                v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdTx.CmdClearErrors()
+        self.JesdReset()
         for i in range(2):
             if ( (self._numSigGen[i] > 0) and (self._sizeSigGen[i] > 0) ):
                 v = getattr(self, 'DacSigGen[%i]'%i)
                 pass
-                # if ( v.CsvFilePath.get() != "" ):
-                    # v.LoadCsvFile("")
+                # if ( v.CvsFilePath.get() != "" ):
+                    # v.LoadCvsFile("")
         self.checkBlocks(recurse=True)
