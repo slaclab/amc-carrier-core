@@ -28,37 +28,50 @@ class AmcCryoDemoCore(pr.Device):
             description = "Cryo Amc Rf Demo Board Core", 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
+        
+        self.add(Adc16Dx370(offset=0x00020000, name='ADC[0]', expand=False))
+        self.add(Adc16Dx370(offset=0x00040000, name='ADC[1]', expand=False))
+        self.add(Adc16Dx370(offset=0x00060000, name='ADC[2]', expand=False))
+        self.add(Lmk04828(  offset=0x00080000, name='LMK',    expand=False))
+        self.add(Dac38J84(  offset=0x000A0000, name='DAC',    expand=False, numTxLanes=2))
 
-        ##############################
-        # Variables
-        ##############################
-        
-        for i in range(3):
-            self.add(Adc16Dx370(
-                name   = "Adc16Dx370_%i" % (i),
-                offset =  0x00010000 + (i * 0x00010000),
-            ))
-        
-        self.add(Lmk04828(
-            offset =  0x00040000,
-        ))
-        
-        self.add(Dac38J84(
-            offset =  0x00050000,
-        ))
-
-        ##############################
-        # Commands
-        ##############################
-        @self.command(name="InitAmcCard", description="Initialization for AMC card's JESD modules",)
+        @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-           self.Adc16Dx370_0.CalibrateAdc.set(1)
-           self.Adc16Dx370_1.CalibrateAdc.set(1)
-           self.Adc16Dx370_2.CalibrateAdc.set(1)
-           time.sleep(1.0)
-           self.Lmk04828.PwrUpSysRef.set(1)
-           time.sleep(1.0)
-           self.Dac38J84.InitDac.set(1)
-           time.sleep(0.1)
-           time.sleep(1.0)
-           self.Dac38J84.ClearAlarms.set(1)
+            self.checkBlocks(varUpdate=True, recurse=True)
+            self.ADC[0].CalibrateAdc()
+            self.ADC[1].CalibrateAdc()
+            self.ADC[2].CalibrateAdc()
+            self.LMK.Init()
+            self.DAC.Init()        
+            self.checkBlocks(varUpdate=True, recurse=True)  
+           
+    def writeBlocks(self, force=False, recurse=True, variable=None):
+        """
+        Write all of the blocks held by this Device to memory
+        """
+        if not self.enable.get(): return
+
+        # Process local blocks.
+        if variable is not None:
+            variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
+        else:
+            for block in self._blocks:
+                if force or block.stale:
+                    if block.bulkEn:
+                        block.backgroundTransaction(rogue.interfaces.memory.Write)
+
+        # Process rest of tree
+        if recurse:
+            for key,value in self.devices.items():
+                value.writeBlocks(force=force, recurse=True)                        
+                        
+        # Retire any in-flight transactions before starting
+        self._root.checkBlocks(varUpdate=True, recurse=True)
+        
+        # Init the AMC card
+        self.InitAmcCard()
+        
+        # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
+        self.enable.set(False)       
+        self.checkBlocks(recurse=True)        
+        
