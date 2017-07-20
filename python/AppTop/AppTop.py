@@ -35,6 +35,7 @@ class AppTop(pr.Device):
             numTxLanes     = [0,0],
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
+            modeSigGen     = [False,False],
             numTrigPulse   = 0,
             enableEvr      = True,
             **kwargs):
@@ -87,6 +88,7 @@ class AppTop(pr.Device):
                     offset       =  0x60000000 + (i * 0x10000000),
                     numOfChs     =  numSigGen[i],
                     buffSize     =  sizeSigGen[i],
+                    fillMode     =  modeSigGen[i],
                     expand       =  False,
                 ))
                 

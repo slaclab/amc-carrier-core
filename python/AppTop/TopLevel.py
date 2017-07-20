@@ -35,6 +35,7 @@ class TopLevel(pr.Device):
             numTxLanes   = [0,0],
             numSigGen    = [0,0],
             sizeSigGen   = [0,0],
+            modeSigGen   = [False,False],
             numTrigPulse = 0,
             enableBsa    = True,
             enableMps    = True,
@@ -84,6 +85,7 @@ class TopLevel(pr.Device):
             numTxLanes   =  numTxLanes,
             numSigGen    =  numSigGen,
             sizeSigGen   =  sizeSigGen,
+            modeSigGen   =  modeSigGen,
             numTrigPulse =  numTrigPulse,
             enableEvr    =  enableEvr,
         ))

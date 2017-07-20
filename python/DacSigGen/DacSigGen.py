@@ -26,13 +26,14 @@ class DacSigGen(pr.Device):
     def __init__(   self, 
             name        = "DacSigGen", 
             description = "Signal generator module", 
-            numOfChs    =  2, 
-            buffSize    =  0x200,
+            numOfChs    = 2, 
+            buffSize    = 0x200,
+            fillMode    = False, # False = 16-bit RAM, True = 32-bit RAM
             **kwargs):
         super().__init__(name=name, description=description, size=0x10000000, **kwargs)
 
         self._numOfChs = numOfChs
-        self._buffSize  = buffSize
+        self._buffSize = (buffSize<<1) if (fillMode) else buffSize
         
         ##############################
         # Variables
@@ -179,31 +180,48 @@ class DacSigGen(pr.Device):
                 idx     = 0
                 cnt     = 0
                 cvsData = []
+                # Loop through the rows in the CSV file
                 for row in reader:
-                    cnt  += 1                
                     if ( idx<self._buffSize ):
                         entry = []
                         for ch in range(self._numOfChs): 
                             entry.append(row[ch])
                         cvsData.append(entry)  
+                        # Increment the counter
                         idx  += 1                
+                    # Increment the counter
+                    cnt  += 1                
+                # User friendly print message
                 click.secho( ('LoadCsvFile(): %d samples per chanel found' % idx ), fg='green')
                 if ( cnt>idx ): 
                     click.secho( ('\tHowever %d of samples detected in the CSV file' % cnt ), fg='red')
                     click.secho( ('\tCSV data dropped because firmware only support up to %d samples' % idx ), fg='red')
+                # Check for 32-bit fill mode and odd number of samples    
+                if (fillMode) and ( (cnt%2) == 1 ):
+                    cvsData.append(cvsData[cnt-1])
+                    cnt += 1 
+                # Loop through the channels
                 for ch in range(self._numOfChs): 
                     idx  = 0
                     data = []
                     for row in cvsData:
-                        if ( idx<self._buffSize ):
-                            data.append(int(row[ch]))
-                            idx  += 1
+                        if (fillMode):
+                            if ( (idx%2) == 0 ):
+                                smplA = (int(row[ch])) & 0xffff
+                            else:
+                                smplB = (int(row[ch])) & 0xffff
+                                sample = (smplB<<16) | smplA
+                                data.append(sample)
+                            # Increment the counter
+                            idx += 1
+                        else:
+                            data.append(int(row[ch]) & 0xffffffff)
                     self._rawWrite(
                         offset   = (0x01000000 + (ch*0x01000000)),
                         data    = data,
-                        base    = pr.Int,
+                        base    = pr.UInt,
                         stride  = 4,
                     )
                     v = getattr(self, 'PeriodSize[%i]'%ch)
-                    v.set(cnt-1)
-                
+                    periodSize = ((cnt>>1)-1) if (fillMode) else (cnt-1)
+                    v.set(periodSize)

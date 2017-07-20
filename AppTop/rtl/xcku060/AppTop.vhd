@@ -53,6 +53,7 @@ entity AppTop is
       SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 8);
       SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
       SIG_GEN_LANE_MODE_G    : Slv10Array(1 downto 0)    := (others => "0000000000");
+      SIG_GEN_RAM_CLK_G      : Slv10Array(1 downto 0)    := (others => "0000000000");
       -- Triggering Generics
       TRIG_SIZE_G            : positive range 1 to 16    := 3;
       TRIG_DELAY_WIDTH_G     : integer range 1 to 32     := 32;
@@ -429,7 +430,8 @@ begin
             AXI_ERROR_RESP_G     => AXI_ERROR_RESP_G,
             SIG_GEN_SIZE_G       => SIG_GEN_SIZE_G(i),
             SIG_GEN_ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G(i),
-            SIG_GEN_LANE_MODE_G  => SIG_GEN_LANE_MODE_G(i))
+            SIG_GEN_LANE_MODE_G  => SIG_GEN_LANE_MODE_G(i),
+            SIG_GEN_RAM_CLK_G    => SIG_GEN_RAM_CLK_G(i))
          port map (
             -- DAC Signal Generator Interface
             jesdClk         => jesdClk(i),
