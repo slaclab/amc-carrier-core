@@ -434,8 +434,8 @@ begin
             -- DAC Signal Generator Interface
             jesdClk         => jesdClk(i),
             jesdRst         => jesdRst(i),
-            jesdClk2x       => jesdClk(i),
-            jesdRst2x       => jesdRst(i),
+            jesdClk2x       => jesdClk2x(i),
+            jesdRst2x       => jesdRst2x(i),
             dacSigCtrl      => dacSigCtrl(i),
             dacSigStatus    => dacSigStatus(i),
             dacSigValids    => dacSigValids(i),
