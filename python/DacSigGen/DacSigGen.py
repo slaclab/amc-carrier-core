@@ -33,7 +33,6 @@ class DacSigGen(pr.Device):
 
         self._numOfChs = numOfChs
         self._buffSize  = buffSize
-        # self._buffSize  = 0x400  ########## rawWrite() only support a 4kB transfer right now
         
         ##############################
         # Variables
@@ -205,4 +204,6 @@ class DacSigGen(pr.Device):
                         base    = pr.Int,
                         stride  = 4,
                     )
-                    
+                    v = getattr(self, 'PeriodSize[%i]'%ch)
+                    v.set(cnt-1)
+                

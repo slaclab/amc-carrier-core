@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-02-09
+-- Last update: 2017-07-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,15 +31,15 @@ use unisim.vcomponents.all;
 
 entity AppTopJesd204b is
    generic (
-      TPD_G              : time                 := 1 ns;
-      TEST_G             : boolean              := false;
-      SYSREF_GEN_G       : boolean              := false;
+      TPD_G              : time                  := 1 ns;
+      TEST_G             : boolean               := false;
+      SYSREF_GEN_G       : boolean               := false;
       JESD_RX_LANE_G     : natural range 0 to 10 := 8;
       JESD_TX_LANE_G     : natural range 0 to 10 := 8;
       GT_LANE_G          : natural range 0 to 10 := 8;
-      JESD_RX_POLARITY_G : slv(9 downto 0)      := "0000000000";
-      JESD_TX_POLARITY_G : slv(9 downto 0)      := "0000000000";
-      AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_SLVERR_C);
+      JESD_RX_POLARITY_G : slv(9 downto 0)       := "0000000000";
+      JESD_TX_POLARITY_G : slv(9 downto 0)       := "0000000000";
+      AXI_ERROR_RESP_G   : slv(1 downto 0)       := AXI_RESP_SLVERR_C);
    port (
       -- DRP Interface
       drpClk          : in  slv(GT_LANE_G-1 downto 0);
@@ -92,157 +92,157 @@ architecture mapping of AppTopJesd204b is
 
    component JesdCryoCoreRightColumn
       port (
-         gtwiz_userclk_tx_active_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_userclk_rx_active_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_buffbypass_tx_reset_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_buffbypass_tx_start_user_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_buffbypass_tx_done_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_buffbypass_tx_error_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_clk_freerun_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_all_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_tx_pll_and_datapath_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_tx_datapath_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_rx_pll_and_datapath_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_rx_datapath_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_rx_cdr_stable_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_tx_done_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_rx_done_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_userdata_tx_in : in STD_LOGIC_VECTOR ( 223 downto 0 );
-         gtwiz_userdata_rx_out : out STD_LOGIC_VECTOR ( 223 downto 0 );
-         drpaddr_in : in STD_LOGIC_VECTOR ( 62 downto 0 );
-         drpclk_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         drpdi_in : in STD_LOGIC_VECTOR ( 111 downto 0 );
-         drpen_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         drpwe_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         gthrxn_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         gthrxp_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         gtrefclk0_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         loopback_in : IN STD_LOGIC_VECTOR(20 DOWNTO 0);
-         rx8b10ben_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxcommadeten_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxmcommaalignen_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxpcommaalignen_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxpd_in : in STD_LOGIC_VECTOR ( 13 downto 0 );
-         rxpolarity_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxusrclk_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxusrclk2_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         tx8b10ben_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         txctrl0_in : in STD_LOGIC_VECTOR ( 111 downto 0 );
-         txctrl1_in : in STD_LOGIC_VECTOR ( 111 downto 0 );
-         txctrl2_in : in STD_LOGIC_VECTOR ( 55 downto 0 );
-         txdiffctrl_in : in STD_LOGIC_VECTOR ( 27 downto 0 );
-         txinhibit_in : in STD_LOGIC_VECTOR(6 downto 0);
-         txpd_in : in STD_LOGIC_VECTOR ( 13 downto 0 );
-         txpolarity_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         txpostcursor_in : in STD_LOGIC_VECTOR ( 34 downto 0 );
-         txprecursor_in : in STD_LOGIC_VECTOR ( 34 downto 0 );         
-         txusrclk_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         txusrclk2_in : in STD_LOGIC_VECTOR ( 6 downto 0 );
-         drpdo_out : out STD_LOGIC_VECTOR ( 111 downto 0 );
-         drprdy_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         gthtxn_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         gthtxp_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxbyteisaligned_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxbyterealign_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxcommadet_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxctrl0_out : out STD_LOGIC_VECTOR ( 111 downto 0 );
-         rxctrl1_out : out STD_LOGIC_VECTOR ( 111 downto 0 );
-         rxctrl2_out : out STD_LOGIC_VECTOR ( 55 downto 0 );
-         rxctrl3_out : out STD_LOGIC_VECTOR ( 55 downto 0 );
-         rxoutclk_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         rxpmaresetdone_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         txoutclk_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         txpmaresetdone_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-         txprgdivresetdone_out : out STD_LOGIC_VECTOR ( 6 downto 0 )
-      );
+         gtwiz_userclk_tx_active_in         : in  std_logic_vector (0 to 0);
+         gtwiz_userclk_rx_active_in         : in  std_logic_vector (0 to 0);
+         gtwiz_buffbypass_tx_reset_in       : in  std_logic_vector (0 to 0);
+         gtwiz_buffbypass_tx_start_user_in  : in  std_logic_vector (0 to 0);
+         gtwiz_buffbypass_tx_done_out       : out std_logic_vector (0 to 0);
+         gtwiz_buffbypass_tx_error_out      : out std_logic_vector (0 to 0);
+         gtwiz_reset_clk_freerun_in         : in  std_logic_vector (0 to 0);
+         gtwiz_reset_all_in                 : in  std_logic_vector (0 to 0);
+         gtwiz_reset_tx_pll_and_datapath_in : in  std_logic_vector (0 to 0);
+         gtwiz_reset_tx_datapath_in         : in  std_logic_vector (0 to 0);
+         gtwiz_reset_rx_pll_and_datapath_in : in  std_logic_vector (0 to 0);
+         gtwiz_reset_rx_datapath_in         : in  std_logic_vector (0 to 0);
+         gtwiz_reset_rx_cdr_stable_out      : out std_logic_vector (0 to 0);
+         gtwiz_reset_tx_done_out            : out std_logic_vector (0 to 0);
+         gtwiz_reset_rx_done_out            : out std_logic_vector (0 to 0);
+         gtwiz_userdata_tx_in               : in  std_logic_vector (223 downto 0);
+         gtwiz_userdata_rx_out              : out std_logic_vector (223 downto 0);
+         drpaddr_in                         : in  std_logic_vector (62 downto 0);
+         drpclk_in                          : in  std_logic_vector (6 downto 0);
+         drpdi_in                           : in  std_logic_vector (111 downto 0);
+         drpen_in                           : in  std_logic_vector (6 downto 0);
+         drpwe_in                           : in  std_logic_vector (6 downto 0);
+         gthrxn_in                          : in  std_logic_vector (6 downto 0);
+         gthrxp_in                          : in  std_logic_vector (6 downto 0);
+         gtrefclk0_in                       : in  std_logic_vector (6 downto 0);
+         loopback_in                        : in  std_logic_vector(20 downto 0);
+         rx8b10ben_in                       : in  std_logic_vector (6 downto 0);
+         rxcommadeten_in                    : in  std_logic_vector (6 downto 0);
+         rxmcommaalignen_in                 : in  std_logic_vector (6 downto 0);
+         rxpcommaalignen_in                 : in  std_logic_vector (6 downto 0);
+         rxpd_in                            : in  std_logic_vector (13 downto 0);
+         rxpolarity_in                      : in  std_logic_vector (6 downto 0);
+         rxusrclk_in                        : in  std_logic_vector (6 downto 0);
+         rxusrclk2_in                       : in  std_logic_vector (6 downto 0);
+         tx8b10ben_in                       : in  std_logic_vector (6 downto 0);
+         txctrl0_in                         : in  std_logic_vector (111 downto 0);
+         txctrl1_in                         : in  std_logic_vector (111 downto 0);
+         txctrl2_in                         : in  std_logic_vector (55 downto 0);
+         txdiffctrl_in                      : in  std_logic_vector (27 downto 0);
+         txinhibit_in                       : in  std_logic_vector(6 downto 0);
+         txpd_in                            : in  std_logic_vector (13 downto 0);
+         txpolarity_in                      : in  std_logic_vector (6 downto 0);
+         txpostcursor_in                    : in  std_logic_vector (34 downto 0);
+         txprecursor_in                     : in  std_logic_vector (34 downto 0);
+         txusrclk_in                        : in  std_logic_vector (6 downto 0);
+         txusrclk2_in                       : in  std_logic_vector (6 downto 0);
+         drpdo_out                          : out std_logic_vector (111 downto 0);
+         drprdy_out                         : out std_logic_vector (6 downto 0);
+         gthtxn_out                         : out std_logic_vector (6 downto 0);
+         gthtxp_out                         : out std_logic_vector (6 downto 0);
+         rxbyteisaligned_out                : out std_logic_vector (6 downto 0);
+         rxbyterealign_out                  : out std_logic_vector (6 downto 0);
+         rxcommadet_out                     : out std_logic_vector (6 downto 0);
+         rxctrl0_out                        : out std_logic_vector (111 downto 0);
+         rxctrl1_out                        : out std_logic_vector (111 downto 0);
+         rxctrl2_out                        : out std_logic_vector (55 downto 0);
+         rxctrl3_out                        : out std_logic_vector (55 downto 0);
+         rxoutclk_out                       : out std_logic_vector (6 downto 0);
+         rxpmaresetdone_out                 : out std_logic_vector (6 downto 0);
+         txoutclk_out                       : out std_logic_vector (6 downto 0);
+         txpmaresetdone_out                 : out std_logic_vector (6 downto 0);
+         txprgdivresetdone_out              : out std_logic_vector (6 downto 0)
+         );
    end component;
 
    component JesdCryoCoreLeftColumn
       port (
-         gtwiz_userclk_tx_active_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_userclk_rx_active_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_buffbypass_tx_reset_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_buffbypass_tx_start_user_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_buffbypass_tx_done_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_buffbypass_tx_error_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_clk_freerun_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_all_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_tx_pll_and_datapath_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_tx_datapath_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_rx_pll_and_datapath_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_rx_datapath_in : in STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_rx_cdr_stable_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_tx_done_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_reset_rx_done_out : out STD_LOGIC_VECTOR ( 0 to 0 );
-         gtwiz_userdata_tx_in : in STD_LOGIC_VECTOR ( 95 downto 0 );
-         gtwiz_userdata_rx_out : out STD_LOGIC_VECTOR ( 95 downto 0 );
-         drpaddr_in : in STD_LOGIC_VECTOR ( 26 downto 0 );
-         drpclk_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         drpdi_in : in STD_LOGIC_VECTOR ( 47 downto 0 );
-         drpen_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         drpwe_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         gthrxn_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         gthrxp_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         gtrefclk0_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         loopback_in : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
-         rx8b10ben_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxcommadeten_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxmcommaalignen_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxpcommaalignen_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxpd_in : in STD_LOGIC_VECTOR ( 5 downto 0 );
-         rxpolarity_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxusrclk_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxusrclk2_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         tx8b10ben_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         txctrl0_in : in STD_LOGIC_VECTOR ( 47 downto 0 );
-         txctrl1_in : in STD_LOGIC_VECTOR ( 47 downto 0 );
-         txctrl2_in : in STD_LOGIC_VECTOR ( 23 downto 0 );
-         txdiffctrl_in : in STD_LOGIC_VECTOR ( 11 downto 0 );
-         txinhibit_in : in STD_LOGIC_VECTOR(2 downto 0);
-         txpd_in : in STD_LOGIC_VECTOR ( 5 downto 0 );
-         txpolarity_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         txpostcursor_in : in STD_LOGIC_VECTOR ( 14 downto 0 );
-         txprecursor_in : in STD_LOGIC_VECTOR ( 14 downto 0 );         
-         txusrclk_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         txusrclk2_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-         drpdo_out : out STD_LOGIC_VECTOR ( 47 downto 0 );
-         drprdy_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         gthtxn_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         gthtxp_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxbyteisaligned_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxbyterealign_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxcommadet_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxctrl0_out : out STD_LOGIC_VECTOR ( 47 downto 0 );
-         rxctrl1_out : out STD_LOGIC_VECTOR ( 47 downto 0 );
-         rxctrl2_out : out STD_LOGIC_VECTOR ( 23 downto 0 );
-         rxctrl3_out : out STD_LOGIC_VECTOR ( 23 downto 0 );
-         rxoutclk_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         rxpmaresetdone_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         txoutclk_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         txpmaresetdone_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-         txprgdivresetdone_out : out STD_LOGIC_VECTOR ( 2 downto 0 )
-      );
+         gtwiz_userclk_tx_active_in         : in  std_logic_vector (0 to 0);
+         gtwiz_userclk_rx_active_in         : in  std_logic_vector (0 to 0);
+         gtwiz_buffbypass_tx_reset_in       : in  std_logic_vector (0 to 0);
+         gtwiz_buffbypass_tx_start_user_in  : in  std_logic_vector (0 to 0);
+         gtwiz_buffbypass_tx_done_out       : out std_logic_vector (0 to 0);
+         gtwiz_buffbypass_tx_error_out      : out std_logic_vector (0 to 0);
+         gtwiz_reset_clk_freerun_in         : in  std_logic_vector (0 to 0);
+         gtwiz_reset_all_in                 : in  std_logic_vector (0 to 0);
+         gtwiz_reset_tx_pll_and_datapath_in : in  std_logic_vector (0 to 0);
+         gtwiz_reset_tx_datapath_in         : in  std_logic_vector (0 to 0);
+         gtwiz_reset_rx_pll_and_datapath_in : in  std_logic_vector (0 to 0);
+         gtwiz_reset_rx_datapath_in         : in  std_logic_vector (0 to 0);
+         gtwiz_reset_rx_cdr_stable_out      : out std_logic_vector (0 to 0);
+         gtwiz_reset_tx_done_out            : out std_logic_vector (0 to 0);
+         gtwiz_reset_rx_done_out            : out std_logic_vector (0 to 0);
+         gtwiz_userdata_tx_in               : in  std_logic_vector (95 downto 0);
+         gtwiz_userdata_rx_out              : out std_logic_vector (95 downto 0);
+         drpaddr_in                         : in  std_logic_vector (26 downto 0);
+         drpclk_in                          : in  std_logic_vector (2 downto 0);
+         drpdi_in                           : in  std_logic_vector (47 downto 0);
+         drpen_in                           : in  std_logic_vector (2 downto 0);
+         drpwe_in                           : in  std_logic_vector (2 downto 0);
+         gthrxn_in                          : in  std_logic_vector (2 downto 0);
+         gthrxp_in                          : in  std_logic_vector (2 downto 0);
+         gtrefclk0_in                       : in  std_logic_vector (2 downto 0);
+         loopback_in                        : in  std_logic_vector(8 downto 0);
+         rx8b10ben_in                       : in  std_logic_vector (2 downto 0);
+         rxcommadeten_in                    : in  std_logic_vector (2 downto 0);
+         rxmcommaalignen_in                 : in  std_logic_vector (2 downto 0);
+         rxpcommaalignen_in                 : in  std_logic_vector (2 downto 0);
+         rxpd_in                            : in  std_logic_vector (5 downto 0);
+         rxpolarity_in                      : in  std_logic_vector (2 downto 0);
+         rxusrclk_in                        : in  std_logic_vector (2 downto 0);
+         rxusrclk2_in                       : in  std_logic_vector (2 downto 0);
+         tx8b10ben_in                       : in  std_logic_vector (2 downto 0);
+         txctrl0_in                         : in  std_logic_vector (47 downto 0);
+         txctrl1_in                         : in  std_logic_vector (47 downto 0);
+         txctrl2_in                         : in  std_logic_vector (23 downto 0);
+         txdiffctrl_in                      : in  std_logic_vector (11 downto 0);
+         txinhibit_in                       : in  std_logic_vector(2 downto 0);
+         txpd_in                            : in  std_logic_vector (5 downto 0);
+         txpolarity_in                      : in  std_logic_vector (2 downto 0);
+         txpostcursor_in                    : in  std_logic_vector (14 downto 0);
+         txprecursor_in                     : in  std_logic_vector (14 downto 0);
+         txusrclk_in                        : in  std_logic_vector (2 downto 0);
+         txusrclk2_in                       : in  std_logic_vector (2 downto 0);
+         drpdo_out                          : out std_logic_vector (47 downto 0);
+         drprdy_out                         : out std_logic_vector (2 downto 0);
+         gthtxn_out                         : out std_logic_vector (2 downto 0);
+         gthtxp_out                         : out std_logic_vector (2 downto 0);
+         rxbyteisaligned_out                : out std_logic_vector (2 downto 0);
+         rxbyterealign_out                  : out std_logic_vector (2 downto 0);
+         rxcommadet_out                     : out std_logic_vector (2 downto 0);
+         rxctrl0_out                        : out std_logic_vector (47 downto 0);
+         rxctrl1_out                        : out std_logic_vector (47 downto 0);
+         rxctrl2_out                        : out std_logic_vector (23 downto 0);
+         rxctrl3_out                        : out std_logic_vector (23 downto 0);
+         rxoutclk_out                       : out std_logic_vector (2 downto 0);
+         rxpmaresetdone_out                 : out std_logic_vector (2 downto 0);
+         txoutclk_out                       : out std_logic_vector (2 downto 0);
+         txpmaresetdone_out                 : out std_logic_vector (2 downto 0);
+         txprgdivresetdone_out              : out std_logic_vector (2 downto 0)
+         );
    end component;
-   
-   
+
+
    signal r_jesdGtRxArr : jesdGtRxLaneTypeArray(GT_LANE_G-1 downto 0) := (others => JESD_GT_RX_LANE_INIT_C);
    signal r_jesdGtTxArr : jesdGtTxLaneTypeArray(GT_LANE_G-1 downto 0) := (others => JESD_GT_TX_LANE_INIT_C);
 
    signal s_gtRxUserReset : slv(GT_LANE_G-1 downto 0) := (others => '0');
-   signal s_gtRxReset     : sl              := '0';
+   signal s_gtRxReset     : sl                        := '0';
    signal s_gtTxUserReset : slv(GT_LANE_G-1 downto 0) := (others => '0');
-   signal s_gtTxReset     : sl              := '0';
-   signal s_gtResetAll    : sl              := '0';
+   signal s_gtTxReset     : sl                        := '0';
+   signal s_gtResetAll    : sl                        := '0';
 
-   signal s_sysRef        : sl                          := '0';
-   signal s_sysRefDbg     : sl                          := '0';
-   signal s_rxctrl0       : slv(GT_LANE_G*16-1 downto 0)           := (others => '0');
-   signal s_rxctrl1       : slv(GT_LANE_G*16-1 downto 0)           := (others => '0');
-   signal s_rxctrl2       : slv(GT_LANE_G*8-1 downto 0)            := (others => '0');
-   signal s_rxctrl3       : slv(GT_LANE_G*8-1 downto 0)            := (others => '0');
-   signal s_rxData        : slv(GT_LANE_G*32-1 downto 0)           := (others => '0');
-   signal s_txData        : slv(GT_LANE_G*32-1 downto 0)           := (others => '0');
-   signal s_txDataK       : slv(GT_LANE_G*8-1 downto 0)            := (others => '0');
+   signal s_sysRef        : sl                                    := '0';
+   signal s_sysRefDbg     : sl                                    := '0';
+   signal s_rxctrl0       : slv(GT_LANE_G*16-1 downto 0)          := (others => '0');
+   signal s_rxctrl1       : slv(GT_LANE_G*16-1 downto 0)          := (others => '0');
+   signal s_rxctrl2       : slv(GT_LANE_G*8-1 downto 0)           := (others => '0');
+   signal s_rxctrl3       : slv(GT_LANE_G*8-1 downto 0)           := (others => '0');
+   signal s_rxData        : slv(GT_LANE_G*32-1 downto 0)          := (others => '0');
+   signal s_txData        : slv(GT_LANE_G*32-1 downto 0)          := (others => '0');
+   signal s_txDataK       : slv(GT_LANE_G*8-1 downto 0)           := (others => '0');
    signal s_devClkVec     : slv(GT_LANE_G-1 downto 0)             := (others => '0');
    signal s_devClk2Vec    : slv(GT_LANE_G-1 downto 0)             := (others => '0');
    signal s_stableClkVec  : slv(GT_LANE_G-1 downto 0)             := (others => '0');
@@ -254,33 +254,31 @@ architecture mapping of AppTopJesd204b is
    signal s_dataValidVec  : slv(GT_LANE_G-1 downto 0)             := (others => '0');
    signal s_sampleDataArr : sampleDataArray(GT_LANE_G-1 downto 0) := (others => (others => '0'));
 
-   signal txDiffCtrl    : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '1'));
-   signal txPostCursor  : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
-   signal txPreCursor   : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
-   signal txPolarity    : slv(GT_LANE_G-1 downto 0)       := (others => '0');
-   signal rxPolarity    : slv(GT_LANE_G-1 downto 0)       := (others => '0');
-   signal txInhibit     : slv(GT_LANE_G-1 downto 0)       := (others => '1');
-   signal loopback      : slv(GT_LANE_G-1 downto 0)       := (others => '0');
-             
-   signal gtTxDiffCtrl    : slv(GT_LANE_G*4-1 downto 0) := (others => '1');   
-   signal gtTxPostCursor  : slv(GT_LANE_G*5-1 downto 0) := (others => '0');   
-   signal gtTxPreCursor   : slv(GT_LANE_G*5-1 downto 0) := (others => '0');   
-   signal gtLoopback      : slv(GT_LANE_G*3-1 downto 0) := (others => '0');   
-   
+   signal txDiffCtrl   : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '1'));
+   signal txPostCursor : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
+   signal txPreCursor  : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
+   signal txPolarity   : slv(GT_LANE_G-1 downto 0)       := (others => '0');
+   signal rxPolarity   : slv(GT_LANE_G-1 downto 0)       := (others => '0');
+   signal txInhibit    : slv(GT_LANE_G-1 downto 0)       := (others => '1');
+
+   signal gtTxDiffCtrl   : slv(GT_LANE_G*4-1 downto 0) := (others => '1');
+   signal gtTxPostCursor : slv(GT_LANE_G*5-1 downto 0) := (others => '0');
+   signal gtTxPreCursor  : slv(GT_LANE_G*5-1 downto 0) := (others => '0');
+
    signal s_cdrStable  : slv(1 downto 0);
    signal dummyZeroBit : sl;
-   
+
    type RegType is record
       jesdGtRxArr : jesdGtRxLaneTypeArray(GT_LANE_G-1 downto 0);
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      jesdGtRxArr  => (others => JESD_GT_RX_LANE_INIT_C)
-   );
+      jesdGtRxArr => (others => JESD_GT_RX_LANE_INIT_C)
+      );
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
-   
+
 begin
 
    dataValidVec_o  <= s_dataValidVec;
@@ -298,29 +296,29 @@ begin
             K_G              => 32,
             L_G              => JESD_RX_LANE_G)
          port map (
-            axiClk            => axilClk,
-            axiRst            => axilRst,
-            axilReadMaster    => rxReadMaster,
-            axilReadSlave     => rxReadSlave,
-            axilWriteMaster   => rxWriteMaster,
-            axilWriteSlave    => rxWriteSlave,
-            devClk_i          => devClk_i,
-            devRst_i          => devRst_i,
-            sysRef_i          => s_sysRef,
-            sysRefDbg_o       => s_sysRefDbg,
-            r_jesdGtRxArr     => r.jesdGtRxArr(JESD_RX_LANE_G-1 downto 0),
-            gtRxReset_o       => s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0),
-            sampleDataArr_o   => s_sampleDataArr(JESD_RX_LANE_G-1 downto 0),
-            dataValidVec_o    => s_dataValidVec(JESD_RX_LANE_G-1 downto 0),
-            nSync_o           => nSync_o,
-            rxPolarity        => rxPolarity);
+            axiClk          => axilClk,
+            axiRst          => axilRst,
+            axilReadMaster  => rxReadMaster,
+            axilReadSlave   => rxReadSlave,
+            axilWriteMaster => rxWriteMaster,
+            axilWriteSlave  => rxWriteSlave,
+            devClk_i        => devClk_i,
+            devRst_i        => devRst_i,
+            sysRef_i        => s_sysRef,
+            sysRefDbg_o     => s_sysRefDbg,
+            r_jesdGtRxArr   => r.jesdGtRxArr(JESD_RX_LANE_G-1 downto 0),
+            gtRxReset_o     => s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0),
+            sampleDataArr_o => s_sampleDataArr(JESD_RX_LANE_G-1 downto 0),
+            dataValidVec_o  => s_dataValidVec(JESD_RX_LANE_G-1 downto 0),
+            nSync_o         => nSync_o,
+            rxPolarity      => rxPolarity);
       s_gtRxReset <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
    end generate;
-   
+
    TERM_UNUSED : if (JESD_RX_LANE_G /= GT_LANE_G) generate
       s_dataValidVec(GT_LANE_G-1 downto JESD_RX_LANE_G)  <= (others => dummyZeroBit);
       s_sampleDataArr(GT_LANE_G-1 downto JESD_RX_LANE_G) <= (others => (others => dummyZeroBit));
-   end generate;   
+   end generate;
 
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
@@ -334,10 +332,10 @@ begin
             axiReadSlave   => rxReadSlave,
             axiWriteMaster => rxWriteMaster,
             axiWriteSlave  => rxWriteSlave);
-      s_gtRxReset     <= devRst_i;
+      s_gtRxReset <= devRst_i;
    end generate;
 
-   
+
    ---------------
    -- JESD TX core
    ---------------         
@@ -369,10 +367,9 @@ begin
             txDiffCtrl           => txDiffCtrl,
             txPostCursor         => txPostCursor,
             txPreCursor          => txPreCursor,
-            txPolarity           => txPolarity,   
-            txEnableL            => txInhibit,   
-            loopback             => loopback);            
-            
+            txPolarity           => txPolarity,
+            txEnableL            => txInhibit);
+
       s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
    end generate;
 
@@ -427,40 +424,38 @@ begin
             s_txDataK((i*8)+7 downto (i*8))   <= (x"0" & r_jesdGtTxArr(i).dataK) after TPD_G;
          end if;
       end process;
-      
-      s_gtTxReady(i)                   <= s_txDone(0) when (i<7) else s_txDone(1);
+
+      s_gtTxReady(i)                   <= s_txDone(0) when (i < 7) else s_txDone(1);
       gtTxDiffCtrl(i*4-1 downto i*4)   <= txDiffCtrl(i)(3 downto 0);
       gtTxPostCursor(i*5-1 downto i*5) <= txPostCursor(i)(4 downto 0);
       gtTxPreCursor(i*5-1 downto i*5)  <= txPreCursor(i)(4 downto 0);
-      
+
    end generate TX_LANES_GEN;
 
    -----------------
    -- GTH RX signals
    -----------------
    RX_LANES_GEN : for i in GT_LANE_G-1 downto 0 generate
-      
+
       r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
       r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
       r_jesdGtRxArr(i).dispErr   <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
       r_jesdGtRxArr(i).decErr    <= s_rxctrl3(i*8+GT_WORD_SIZE_C-1 downto i*8);
-      r_jesdGtRxArr(i).rstDone   <= s_rxDone(0) when i<7 else s_rxDone(1);
-      r_jesdGtRxArr(i).cdrStable <= s_cdrStable(0) when i<7 else s_cdrStable(1);
-      
-      s_devClkVec(i)             <= devClk_i;
-      s_devClk2Vec(i)            <= devClk2_i;
-      s_stableClkVec(i)          <= stableClk;
-      s_gtRefClkVec(i)           <= refClkR when i<7 else refClkL;  
-     
-      gtLoopback(3*i+1)          <= loopback(i);
-     
+      r_jesdGtRxArr(i).rstDone   <= s_rxDone(0)    when i < 7 else s_rxDone(1);
+      r_jesdGtRxArr(i).cdrStable <= s_cdrStable(0) when i < 7 else s_cdrStable(1);
+
+      s_devClkVec(i)    <= devClk_i;
+      s_devClk2Vec(i)   <= devClk2_i;
+      s_stableClkVec(i) <= stableClk;
+      s_gtRefClkVec(i)  <= refClkR when i < 7 else refClkL;
+
       process(devClk_i)
       begin
          if rising_edge(devClk_i) then
             s_allignEnVec(i) <= not(s_dataValidVec(i)) after TPD_G;
-         end if; 
-      end process;      
-      
+         end if;
+      end process;
+
    end generate RX_LANES_GEN;
 
    process(devClk_i)
@@ -468,8 +463,8 @@ begin
       if rising_edge(devClk_i) then
          s_gtResetAll <= s_gtTxReset or s_gtRxReset                     after TPD_G;
          dummyZeroBit <= devRst_i and uAnd(s_txDone) and uAnd(s_rxDone) after TPD_G;
-      end if; 
-   end process;    
+      end if;
+   end process;
 
    U_Coregen_Right : JesdCryoCoreRightColumn
       port map (
@@ -499,7 +494,7 @@ begin
          gthrxn_in                             => gtRxN(6 downto 0),
          gthrxp_in                             => gtRxP(6 downto 0),
          gtrefclk0_in                          => s_gtRefClkVec(6 downto 0),
-         loopback_in                           => gtLoopback(20 downto 0),
+         loopback_in                           => (others => '0'),
          rx8b10ben_in                          => (others => '1'),
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec(6 downto 0),
@@ -535,7 +530,7 @@ begin
          rxpmaresetdone_out                    => open,
          txoutclk_out                          => open,
          txpmaresetdone_out                    => open);
-         
+
    U_Coregen_Left : JesdCryoCoreLeftColumn
       port map (
          -- Clocks
@@ -564,7 +559,7 @@ begin
          gthrxn_in                             => gtRxN(9 downto 7),
          gthrxp_in                             => gtRxP(9 downto 7),
          gtrefclk0_in                          => s_gtRefClkVec(9 downto 7),
-         loopback_in                           => gtLoopback(29 downto 21),
+         loopback_in                           => (others => '0'),
          rx8b10ben_in                          => (others => '1'),
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec(9 downto 7),
@@ -582,7 +577,7 @@ begin
          txpd_in                               => (others => '0'),
          txpolarity_in                         => txPolarity(9 downto 7),
          txpostcursor_in                       => gtTxPostCursor(49 downto 35),
-         txprecursor_in                        => gtTxPreCursor(49 downto 35),       
+         txprecursor_in                        => gtTxPreCursor(49 downto 35),
          txusrclk_in                           => s_devClkVec(9 downto 7),
          txusrclk2_in                          => s_devClk2Vec(9 downto 7),
          drpdo_out                             => drpDo(159 downto 112),
@@ -600,23 +595,23 @@ begin
          rxpmaresetdone_out                    => open,
          txoutclk_out                          => open,
          txpmaresetdone_out                    => open);
-         
-         
-         
-   comb : process (r, devRst_i, r_jesdGtRxArr) is
+
+
+
+   comb : process (devRst_i, r, r_jesdGtRxArr) is
       variable v : RegType;
    begin
       v := r;
-      
+
       -- Register/Delay for 1 clock cycle 
       v.jesdGtRxArr := r_jesdGtRxArr;
-      
+
       if (devRst_i = '1') then
          v := REG_INIT_C;
       end if;
-      
+
       -- Output assignment
-      rin   <= v;
+      rin <= v;
    end process comb;
 
    seq : process (devClk_i) is
@@ -625,6 +620,6 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 --------------------------------------------------------------------
 end mapping;
