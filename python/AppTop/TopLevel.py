@@ -35,6 +35,7 @@ class TopLevel(pr.Device):
             numTxLanes   = [0,0],
             numSigGen    = [0,0],
             sizeSigGen   = [0,0],
+            modeSigGen   = [False,False],
             numTrigPulse = 0,
             enableBsa    = True,
             enableMps    = True,
@@ -84,12 +85,13 @@ class TopLevel(pr.Device):
             numTxLanes   =  numTxLanes,
             numSigGen    =  numSigGen,
             sizeSigGen   =  sizeSigGen,
+            modeSigGen   =  modeSigGen,
             numTrigPulse =  numTrigPulse,
             enableEvr    =  enableEvr,
         ))
 
         # Define SW trigger command
-        @self.command(name="SwDaqMuxTrig", description="Software Trigger for DAQ MUX",)
+        @self.command(description="Software Trigger for DAQ MUX",)
         def SwDaqMuxTrig():
             for i in range(2): 
                 self.AppTop.DaqMuxV2[i].TriggerDaq.call()
@@ -115,7 +117,7 @@ class TopLevel(pr.Device):
                 value.writeBlocks(force=force, recurse=True)  
 
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self._root.checkBlocks(recurse=True)
 
         # Calculate the BsaWaveformEngine buffer sizes
         size    = [[0,0,0,0],[0,0,0,0]]

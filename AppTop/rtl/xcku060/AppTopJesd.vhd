@@ -257,13 +257,13 @@ begin
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
-   jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(0);
-   jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(1);
-   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else clkOut(2);
-   jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(0);
-   jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(1);
-   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else rstOut(2);
-   jesdMmcmLocked <= '1'     when((JESD_RX_LANE_G = 0) and (JESD_RX_LANE_G = 0)) else locked;
+   jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(0);
+   jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(1);
+   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);
+   jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(0);
+   jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(1);
+   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(2);
+   jesdMmcmLocked <= '1'     when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else locked;
 
    jesdClk <= jesdClk1x;
    jesdRst <= jesdRst1x;

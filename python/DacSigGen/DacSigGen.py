@@ -18,18 +18,23 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-
 from surf.misc import *
+import click 
+import csv
 
 class DacSigGen(pr.Device):
     def __init__(   self, 
             name        = "DacSigGen", 
             description = "Signal generator module", 
-            numOfChs    =  2, 
-            buffSize    =  0x200,
+            numOfChs    = 2, 
+            buffSize    = 0x200,
+            fillMode    = False, # False = 16-bit RAM, True = 32-bit RAM
             **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
+        super().__init__(name=name, description=description, size=0x10000000, **kwargs)
 
+        self._numOfChs = numOfChs
+        self._buffSize = (buffSize<<1) if (fillMode) else buffSize
+        
         ##############################
         # Variables
         ##############################
@@ -37,7 +42,7 @@ class DacSigGen(pr.Device):
             name         = "EnableMask",
             description  = "Mask Enable channels.",
             offset       =  0x00,
-            bitSize      =  2,
+            bitSize      =  self._numOfChs,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
@@ -47,7 +52,7 @@ class DacSigGen(pr.Device):
             name         = "ModeMask",
             description  = "Mask select Mode: 0 - Triggered Mode. 1 - Periodic Mode",
             offset       =  0x04,
-            bitSize      =  2,
+            bitSize      =  self._numOfChs,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
@@ -57,7 +62,7 @@ class DacSigGen(pr.Device):
             name         = "SignFormat",
             description  = "Mask select Sign: 0 - Signed 2's complement, 1 - Offset binary (Currently Applies only to zero data)",
             offset       =  0x08,
-            bitSize      =  2,
+            bitSize      =  self._numOfChs,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
@@ -67,17 +72,18 @@ class DacSigGen(pr.Device):
             name         = "SoftwareTrigger",
             description  = "Mask Software trigger (applies in triggered mode, Internal edge detector)",
             offset       =  0x0C,
-            bitSize      =  2,
+            bitSize      =  self._numOfChs,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
+            hidden       = True,
         ))
 
         self.add(pr.RemoteVariable(    
             name         = "Running",
             description  = "Mask Running status",
             offset       =  0x20,
-            bitSize      =  2,
+            bitSize      =  self._numOfChs,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
@@ -88,7 +94,7 @@ class DacSigGen(pr.Device):
             name         = "Underflow",
             description  = "Mask Underflow status: 16bit to 32bit conversion underflow (applies in 32bit interface).",
             offset       =  0x24,
-            bitSize      =  2,
+            bitSize      =  self._numOfChs,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
@@ -99,7 +105,7 @@ class DacSigGen(pr.Device):
             name         = "Overflow",
             description  = "Mask Overflow status: 16bit to 32bit conversion underflow (applies in 32bit interface).",
             offset       =  0x28,
-            bitSize      =  2,
+            bitSize      =  self._numOfChs,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
@@ -128,24 +134,83 @@ class DacSigGen(pr.Device):
             number       =  2,
             stride       =  4,
         )
-    
+                
+        # ###########################################################
         # ## Need to replace this with Ben future "MemoryNode" device
-        # for i in range(numOfChs):  
+        # ###########################################################
+        # for i in range(self._numOfChs):  
             # self.add(GenericMemory(
                 # name         = "Waveform[%i]" % (i),
                 # description  = "Waveform data 16-bit samples.",
                 # offset       =  0x01000000 + (i * 0x01000000),
                 # bitSize      =  16,
+                # stride       =  4,
                 # mode         = "RW",
-                # nelms        =  buffSize,
-                # hidden       =  True,
+                # # nelms        =  self._buffSize,
+                # nelms        =  16,
+                # # hidden       =  True,
             # ))
     
+        self.add(pr.LocalVariable(    
+            name         = "CsvFilePath",
+            description  = "Used if command's argument is empty",
+            mode         = "RW",
+            value        = "",            
+        ))
+        
         ##############################
         # Commands
         ##############################
         # Define SW trigger command
-        @self.command(name="SwTrigger", description="Trigger waveform from software (All channels. Triggered mode).",)
+        @self.command(description="Trigger waveform from software (All channels. Triggered mode).",)
         def SwTrigger():
-           self.SoftwareTrigger.set(0x7F)
+           trigAllCh = int(2**self._numOfChs)-1
+           self.SoftwareTrigger.set(trigAllCh)
            self.SoftwareTrigger.set(0x00)        
+           
+        @self.command(value='',description="Load the .CSV",)
+        def LoadCsvFile(arg):
+            if (arg != ""):
+                path = arg
+            else:
+                path = self.CsvFilePath.get()
+                
+            with open(path) as csvfile:
+                reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
+                idx     = 0
+                cnt     = 0
+                csvData = []
+                # Loop through the rows in the CSV file
+                for row in reader:
+                    if ( idx<self._buffSize ):
+                        entry = []
+                        for ch in range(self._numOfChs): 
+                            entry.append(row[ch])
+                        csvData.append(entry)  
+                        # Increment the counter
+                        idx  += 1                
+                    # Increment the counter
+                    cnt  += 1                
+                # User friendly print message
+                click.secho( ('LoadCsvFile(): %d samples per chanel found' % idx ), fg='green')
+                if ( cnt>idx ): 
+                    click.secho( ('\tHowever %d of samples detected in the CSV file' % cnt ), fg='red')
+                    click.secho( ('\tCSV data dropped because firmware only support up to %d samples' % idx ), fg='red')
+                # Check for 32-bit fill mode and odd number of samples    
+                if (fillMode) and ( (cnt%2) == 1 ):
+                    csvData.append(csvData[cnt-1])
+                    cnt += 1 
+                # Loop through the channels
+                for ch in range(self._numOfChs):
+                    data = []
+                    for row in csvData:
+                        data.append(int(row[ch]))
+                    self._rawWrite(
+                        offset      = (0x01000000 + (ch*0x01000000)),
+                        data        = data,
+                        base        = pr.Int,
+                        stride      = (2  if (fillMode) else  4),
+                        wordBitSize = (16 if (fillMode) else 32)
+                    )
+                    v = getattr(self, 'PeriodSize[%i]'%ch)
+                    v.set(((cnt>>1)-1) if (fillMode) else (cnt-1))

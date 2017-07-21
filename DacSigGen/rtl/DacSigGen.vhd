@@ -2,7 +2,7 @@
 -- File       : DacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2016-11-18
+-- Last update: 2017-07-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -25,12 +25,13 @@ use work.AppTopPkg.all;
 
 entity DacSigGen is
    generic (
-      TPD_G                : time                   := 1 ns;
-      AXI_BASE_ADDR_G      : slv(31 downto 0)       := (others => '0');
-      AXI_ERROR_RESP_G     : slv(1 downto 0)        := AXI_RESP_DECERR_C;
-      SIG_GEN_SIZE_G       : natural range 0 to 10   := 0;                 -- 0 = Disabled
-      SIG_GEN_ADDR_WIDTH_G : positive range 1 to 24 := 9;
-      SIG_GEN_LANE_MODE_G  : slv(DAC_SIG_WIDTH_C-1 downto 0)        := (others => '0'));  -- '0': 32 bit, '1': 16 bit
+      TPD_G                : time                            := 1 ns;
+      AXI_BASE_ADDR_G      : slv(31 downto 0)                := (others => '0');
+      AXI_ERROR_RESP_G     : slv(1 downto 0)                 := AXI_RESP_DECERR_C;
+      SIG_GEN_SIZE_G       : natural range 0 to 10           := 0;  -- 0 = Disabled
+      SIG_GEN_ADDR_WIDTH_G : positive range 1 to 24          := 9;
+      SIG_GEN_LANE_MODE_G  : slv(DAC_SIG_WIDTH_C-1 downto 0) := (others => '0');  -- '0': 32 bit, '1': 16 bit
+      SIG_GEN_RAM_CLK_G    : slv(DAC_SIG_WIDTH_C-1 downto 0) := (others => '0'));  -- '0': jesdClk2x, '1': jesdClk
    port (
       -- DAC Signal Generator Interface
       jesdClk         : in  sl;
@@ -72,9 +73,9 @@ architecture mapping of DacSigGen is
    signal s_underflow : slv(DAC_SIG_WIDTH_C-1 downto 0);
    signal s_running   : slv(DAC_SIG_WIDTH_C-1 downto 0);
    signal s_period    : slv32Array(DAC_SIG_WIDTH_C-1 downto 0);
-   
+
 begin
-   
+
    GEN_EMPTY : if SIG_GEN_SIZE_G = 0 generate
       dacSigStatus <= DAC_SIG_STATUS_INIT_C;
       dacSigValids <= (others => '0');
@@ -114,7 +115,7 @@ begin
             mAxiWriteMasters    => axilWriteMasters,
             mAxiWriteSlaves     => axilWriteSlaves,
             mAxiReadMasters     => axilReadMasters,
-            mAxiReadSlaves      => axilReadSlaves); 
+            mAxiReadSlaves      => axilReadSlaves);
 
       -- DAQ control register interface
       U_DacSigGenReg : entity work.DacSigGenReg
@@ -153,7 +154,8 @@ begin
             generic map (
                TPD_G        => TPD_G,
                ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G,
-               INTERFACE_G  => SIG_GEN_LANE_MODE_G(i))
+               INTERFACE_G  => SIG_GEN_LANE_MODE_G(i),
+               RAM_CLK_G    => SIG_GEN_RAM_CLK_G(i))
             port map (
                jesdClk         => jesdClk,
                jesdRst         => jesdRst,

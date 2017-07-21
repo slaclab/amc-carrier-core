@@ -148,7 +148,7 @@ class AmcCarrierCore(pr.Device):
                 value.writeBlocks(force=force, recurse=True)                     
                         
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self._root.checkBlocks(recurse=True)
         
         for i in range(2):
             v = getattr(self.AmcCarrierBsa, 'BsaWaveformEngine[%i]'%i)
