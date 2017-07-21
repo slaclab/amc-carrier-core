@@ -60,7 +60,15 @@ set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk11}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {jesdClk12}] 
 
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_185MHz}] -group [get_clocks {jesd1_370MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd1_185MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd1_370MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_185MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_370MHz}] 
+
+set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {jesd0_185MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks {jesd0_370MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd1_370MHz}] -group [get_clocks {jesd0_185MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd1_370MHz}] -group [get_clocks {jesd0_370MHz}] 
 
 set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {recTimingClk}] 
 set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {ddrIntClk0}] 
