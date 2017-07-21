@@ -179,14 +179,14 @@ class DacSigGen(pr.Device):
                 reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
                 idx     = 0
                 cnt     = 0
-                cvsData = []
+                csvData = []
                 # Loop through the rows in the CSV file
                 for row in reader:
                     if ( idx<self._buffSize ):
                         entry = []
                         for ch in range(self._numOfChs): 
                             entry.append(row[ch])
-                        cvsData.append(entry)  
+                        csvData.append(entry)  
                         # Increment the counter
                         idx  += 1                
                     # Increment the counter
@@ -198,30 +198,19 @@ class DacSigGen(pr.Device):
                     click.secho( ('\tCSV data dropped because firmware only support up to %d samples' % idx ), fg='red')
                 # Check for 32-bit fill mode and odd number of samples    
                 if (fillMode) and ( (cnt%2) == 1 ):
-                    cvsData.append(cvsData[cnt-1])
+                    csvData.append(csvData[cnt-1])
                     cnt += 1 
                 # Loop through the channels
-                for ch in range(self._numOfChs): 
-                    idx  = 0
+                for ch in range(self._numOfChs):
                     data = []
-                    for row in cvsData:
-                        if (fillMode):
-                            if ( (idx%2) == 0 ):
-                                smplA = (int(row[ch])) & 0xffff
-                            else:
-                                smplB = (int(row[ch])) & 0xffff
-                                sample = (smplB<<16) | smplA
-                                data.append(sample)
-                            # Increment the counter
-                            idx += 1
-                        else:
-                            data.append(int(row[ch]) & 0xffffffff)
+                    for row in csvData:
+                        data.append(int(row[ch]))
                     self._rawWrite(
-                        offset   = (0x01000000 + (ch*0x01000000)),
-                        data    = data,
-                        base    = pr.UInt,
-                        stride  = 4,
+                        offset      = (0x01000000 + (ch*0x01000000)),
+                        data        = data,
+                        base        = pr.Int,
+                        stride      = (2  if (fillMode) else  4),
+                        wordBitSize = (16 if (fillMode) else 32)
                     )
                     v = getattr(self, 'PeriodSize[%i]'%ch)
-                    periodSize = ((cnt>>1)-1) if (fillMode) else (cnt-1)
-                    v.set(periodSize)
+                    v.set(((cnt>>1)-1) if (fillMode) else (cnt-1))
