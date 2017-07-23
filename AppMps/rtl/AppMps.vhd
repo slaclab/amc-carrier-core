@@ -61,6 +61,7 @@ entity AppMps is
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk   : in  sl;
       diagnosticRst   : in  sl;
+      mpsCoreReg      : out MpsCoreRegType;
       diagnosticBus   : in  DiagnosticBusType;
       -- MPS Interface
       mpsObMasters    : out AxiStreamMasterArray(14 downto 0);
@@ -178,6 +179,7 @@ begin
          mpsSlave        => mpsSlave,
          diagnosticClk   => diagnosticClk,
          diagnosticRst   => diagnosticRst,
+         mpsCoreReg      => mpsCoreReg,
          diagnosticBus   => diagnosticBus);
 
    ---------------------------------         

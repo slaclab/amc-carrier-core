@@ -81,9 +81,9 @@ begin
       axiSlaveWaitTxn(regEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Top level registers
-      axiSlaveRegister(regEp, x"0000", 0, v.mpsReg.mpsAppId);
-      axiSlaveRegister(regEp, x"0000", 16, v.mpsReg.mpsEnable);
-      axiSlaveRegister(regEp, x"0000", 17, v.mpsReg.lcls1Mode);
+      axiSlaveRegister(regEp, x"0000", 0, v.mpsReg.mpsCore.mpsAppId);
+      axiSlaveRegister(regEp, x"0000", 16, v.mpsReg.mpsCore.mpsEnable);
+      axiSlaveRegister(regEp, x"0000", 17, v.mpsReg.mpsCore.lcls1Mode);
 
       axiSlaveRegisterR(regEp, x"0004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C,8));
       axiSlaveRegisterR(regEp, x"0004", 8, ite(APP_CONFIG_G.DIGITAL_EN_C,'1','0'));

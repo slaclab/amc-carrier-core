@@ -35,6 +35,7 @@ package AppMpsPkg is
    constant MPS_MESSAGE_BITS_C    : integer             := 298;
    constant MPS_CHAN_COUNT_C      : integer             := 24;
    constant MPS_SELECT_BITS_C     : integer             := 82 + (MPS_CHAN_COUNT_C*34);
+   constant MPS_CORE_REG_BITS_C   : integer             := 17;
 
    ---------------------------------------------------
    -- Mitigation message record
@@ -161,6 +162,23 @@ package AppMpsPkg is
    ---------------------------------------------------
    -- MPS Application Registers
    ---------------------------------------------------   
+   type MpsCoreRegType is record
+      mpsEnable    : sl;
+      mpsAppId     : slv(9 downto 0);
+      mpsVersion   : slv(4 downto 0);
+      lcls1Mode    : sl;
+   end record;
+
+   type MpsCoreRegArray is array (natural range <>) of MpsCoreRegType;
+
+   constant MPS_CORE_REG_INIT_C : MpsCoreRegType := (
+      mpsEnable    => '0',
+      mpsAppId     => (others => '0'),
+      mpsVersion   => (others => '0'),
+      lcls1Mode    => '0');
+
+   function toSlv (m : MpsCoreRegType) return slv;
+   function toMpsCoreReg (vec : slv) return MpsCoreRegType;
 
    -- Kick detect modes
    constant MPS_KICK_DISABLE : slv(1 downto 0) := "00";
@@ -169,9 +187,7 @@ package AppMpsPkg is
    constant MPS_KICK_OTHER   : slv(1 downto 0) := "11";
 
    type MpsAppRegType is record
-      mpsEnable    : sl;
-      mpsAppId     : slv(9 downto 0);
-      lcls1Mode    : sl;
+      mpsCore      : MpsCoreRegType;
       beamDestMask : slv(15 downto 0);
       altDestMask  : slv(15 downto 0);
       mpsChanReg   : MpsChanRegArray(MPS_CHAN_COUNT_C-1 downto 0);
@@ -180,9 +196,7 @@ package AppMpsPkg is
    type MpsAppRegArray is array (natural range <>) of MpsAppRegType;
 
    constant MPS_APP_REG_INIT_C : MpsAppRegType := (
-      mpsEnable    => '0',
-      mpsAppId     => (others => '0'),
-      lcls1Mode    => '0',
+      mpsCore      => MPS_CORE_REG_INIT_C,
       beamDestMask => (others => '0'),
       altDestMask  => (others => '0'),
       mpsChanReg   => (others => MPS_CHAN_REG_INIT_C));
@@ -328,6 +342,32 @@ package body AppMpsPkg is
       end loop;
 
       m.valid := valid;
+
+      return m;
+   end function;
+
+   function toSlv (m : MpsCoreRegType) return slv is
+      variable vector : slv(MPS_CORE_REG_BITS_C-1 downto 0) := (others => '0');
+      variable i      : integer                             := 0;
+   begin
+
+      assignSlv(i, vector, m.mpsEnable);
+      assignSlv(i, vector, m.mpsAppId);
+      assignSlv(i, vector, m.mpsVersion);
+      assignSlv(i, vector, m.lcls1Mode);
+
+      return vector;
+   end function;
+
+   function toMpsCoreReg (vec : slv; valid : sl) return MpsCoreRegType is
+      variable m : MpsCoreRegType;
+      variable i : integer := 0;
+   begin
+
+      assignRecord(i, vector, m.mpsEnable);
+      assignRecord(i, vector, m.mpsAppId);
+      assignRecord(i, vector, m.mpsVersion);
+      assignRecord(i, vector, m.lcls1Mode);
 
       return m;
    end function;

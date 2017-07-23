@@ -68,6 +68,7 @@ entity AmcCarrierCoreAdv is
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
       diagnosticBus        : in    DiagnosticBusType;
+      mpsCoreReg           : out   MpsCoreRegType;
       --  Waveform Capture interface (waveformClk domain)
       waveformClk          : out   sl;
       waveformRst          : out   sl;
@@ -339,6 +340,7 @@ begin
          diagnosticClk   => diagnosticClk,
          diagnosticRst   => diagnosticRst,
          diagnosticBus   => diagnosticBus,
+         mpsCoreReg      => mpsCoreReg,
          -- MPS Interface
          mpsObMasters    => mpsObMasters,
          mpsObSlaves     => mpsObSlaves,

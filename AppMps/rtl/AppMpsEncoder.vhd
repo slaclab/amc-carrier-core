@@ -47,6 +47,7 @@ entity AppMpsEncoder is
       -- Inputs
       diagnosticClk   : in  sl;
       diagnosticRst   : in  sl;
+      mpsCoreReg      : out MpsCoreRegType;
       diagnosticBus   : in  DiagnosticBusType);
 
 end AppMpsEncoder;
@@ -90,6 +91,9 @@ architecture mapping of AppMpsEncoder is
    end procedure;
 
    signal mpsReg : MpsAppRegType;
+
+   signal mpsCoreRegDin  : slv(MPS_CORE_REG_BITS_C-1 downto 0);
+   signal mpsCoreRegDout : slv(MPS_CORE_REG_BITS_C-1 downto 0);
 
 begin
 
@@ -141,9 +145,9 @@ begin
 
       -- Init and setup MPS message
       v.mpsMessage                   := MPS_MESSAGE_INIT_C;
-      v.mpsMessage.lcls              := mpsReg.lcls1Mode;
+      v.mpsMessage.lcls              := mpsReg.mpsCore.lcls1Mode;
       v.mpsMessage.timeStamp         := mpsSelect.timeStamp;
-      v.mpsMessage.appId(9 downto 0) := mpsReg.mpsAppId;
+      v.mpsMessage.appId(9 downto 0) := mpsReg.mpsCore.mpsAppId;
       v.mpsMessage.msgSize           := toSlv(APP_CONFIG_C.BYTE_COUNT_C, 8);
 
       -- Digtal Application
@@ -168,7 +172,7 @@ begin
                   v.mpsMessage.message(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C) := x"FF";
 
                -- LCLS1 Mode
-               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.lcls1Mode = '1' then
+               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.mpsCore.lcls1Mode = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
                                  mpsSelect.chanData(chan), 0, v.mpsMessage);
@@ -232,6 +236,22 @@ begin
          mpsMaster  => mpsMaster,
          mpsSlave   => mpsSlave
          );
+
+   --------------------------------- 
+   -- Synchronize core to diagnostic clock
+   --------------------------------- 
+   U_MpsRegSync : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => MPS_CORE_REG_BITS_C)
+      port map (
+         clk     => diagnosticClk,
+         rst     => diagnosticRst,
+         dataIn  => mpsCoreRegDin,
+         dataOut => mpsCoreRegDout);
+
+   mpsCoreRegDin <= toSlv(mpsReg.mpsCore);
+   mpsCoreReg    <= toMpsCoreReg(mpsCoreRegDout);
 
 end mapping;
 
