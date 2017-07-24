@@ -174,6 +174,7 @@ begin
    U_Si5317a : entity work.Si5317a
       generic map (
          TPD_G            => TPD_G,
+         TIMING_MODE_G    => DEFAULT_MODE_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map(
          -- PLL Parallel Interface
