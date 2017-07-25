@@ -140,7 +140,7 @@ begin
       -- Determine the transaction type
       axiSlaveWaitTxn(axilEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
-      -- Map the read registers 
+      -- Map the registers 
       axiSlaveRegister(axilEp, x"0", 0, v.doutDisable);
 
       -- Closeout the transaction
