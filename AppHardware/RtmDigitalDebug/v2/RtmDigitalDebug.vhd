@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebug.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-05-04
+-- Last update: 2017-07-25
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -34,8 +34,6 @@ entity RtmDigitalDebug is
    port (
       -- Digital I/O Interface
       dout            : in    slv(7 downto 0);
-      doutClk         : in    slv(7 downto 0)        := x"00";
-      doutDisable     : in    slv(7 downto 0)        := x"00";
       din             : out   slv(7 downto 0);
       -- Clock Jitter Cleaner
       dirtyClkIn      : in    sl;
@@ -61,8 +59,11 @@ end RtmDigitalDebug;
 
 architecture mapping of RtmDigitalDebug is
 
-   signal doutReg  : slv(7 downto 0);
-   signal cleanClk : sl;
+   signal userValue   : slv(31 downto 0);
+   signal doutDisable : slv(7 downto 0);
+   signal doutReg     : slv(7 downto 0);
+   signal cleanClock  : sl;
+   signal cleanClk    : sl;
 
 begin
 
@@ -122,7 +123,7 @@ begin
          REG_DATA : if (REG_DOUT_MODE_G(i) = '0') generate
             U_ODDR : ODDRE1
                port map (
-                  C  => doutClk(i),
+                  C  => cleanClk,
                   Q  => doutReg(i),
                   D1 => dout(i),
                   D2 => dout(i),
@@ -142,7 +143,7 @@ begin
                   XIL_DEVICE_G   => "ULTRASCALE")
                port map (
                   rstIn   => doutDisable(i),
-                  clkIn   => doutClk(i),
+                  clkIn   => cleanClk,
                   clkOutP => rtmLsP(i+8),
                   clkOutN => rtmLsN(i+8));
          end generate;
@@ -164,12 +165,14 @@ begin
       port map (
          I  => rtmLsP(1),
          IB => rtmLsN(1),
-         O  => cleanClk);
+         O  => cleanClock);
 
    U_BUFG : BUFG
       port map (
-         I => cleanClk,
-         O => cleanClkOut);
+         I => cleanClock,
+         O => cleanClk);
+
+   cleanClkOut <= cleanClk;
 
    U_Si5317a : entity work.Si5317a
       generic map (
@@ -196,6 +199,8 @@ begin
          pllFrqSel(2)    => rtmLsP(17),
          pllFrqSel(3)    => rtmLsN(17),
          pllLocked       => cleanClkLocked,
+         -- Misc Interface
+         userValue       => userValue,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -203,5 +208,7 @@ begin
          axilReadSlave   => axilReadSlave,
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave);
+
+   doutDisable <= userValue(7 downto 0);
 
 end mapping;
