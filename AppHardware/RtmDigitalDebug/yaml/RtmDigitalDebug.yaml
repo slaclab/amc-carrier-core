@@ -27,3 +27,12 @@ RtmDigitalDebug: &RtmDigitalDebug
       sizeBits: 16
       description: 16-bit Output Disable Mask
     #########################################################
+    FpgaPllLock:
+      at:
+        offset: 0x08
+      class: IntField
+      name: FpgaPllLock
+      mode: RW
+      sizeBits: 1
+      description: FPGA PLL Lock status     
+    #########################################################

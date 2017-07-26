@@ -2,7 +2,7 @@
 -- File       : Si5317a.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2017-07-25
+-- Last update: 2017-07-26
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -46,7 +46,8 @@ entity Si5317a is
       pllFrqSel       : inout slv(3 downto 0);
       pllLocked       : out   sl;
       -- Misc Interface
-      userValue       : out   slv(31 downto 0);
+      userValueIn     : in    slv(31 downto 0);
+      userValueOut    : out   slv(31 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -74,7 +75,7 @@ architecture rtl of Si5317a is
       pllBwSelTri    : slv(1 downto 0);
       pllFrqSel      : slv(3 downto 0);
       pllFrqSelTri   : slv(3 downto 0);
-      userValue      : slv(31 downto 0);
+      userValueOut   : slv(31 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -102,7 +103,7 @@ architecture rtl of Si5317a is
       pllFrqSel      => ite(TIMING_MODE_G, "1111", "1001"),
       pllFrqSelTri   => ite(TIMING_MODE_G, "0110", "0001"),
       -- MISC
-      userValue      => (others => '0'),
+      userValueOut   => (others => '0'),
       -- AXI-Lite
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
@@ -180,7 +181,7 @@ begin
    end generate GEN_4B;
 
    comb : process (axilReadMaster, axilRst, axilWriteMaster, locked, lol, los,
-                   r) is
+                   r, userValueIn) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
@@ -191,7 +192,7 @@ begin
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read only registers
-      axiSlaveRegister(regCon, x"0", 0, v.userValue);
+      axiSlaveRegister(regCon, x"0", 0, v.userValueOut);
       axiSlaveRegister(regCon, x"4", 0, v.pllRst);         -- BIT[00:00]
       axiSlaveRegister(regCon, x"4", 1, v.pllInc);         -- BIT[01:01]
       axiSlaveRegister(regCon, x"4", 2, v.pllDec);         -- BIT[02:02]
@@ -210,6 +211,7 @@ begin
       axiSlaveRegister(regCon, x"4", 22, v.pllBwSelTri);   -- BIT[23:22]
       axiSlaveRegister(regCon, x"4", 24, v.pllFrqSel);     -- BIT[27:24]
       axiSlaveRegister(regCon, x"4", 28, v.pllFrqSelTri);  -- BIT[31:28]
+      axiSlaveRegisterR(regCon, x"8", 0, userValueIn);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -228,7 +230,7 @@ begin
       pllRstL        <= not(r.pllRst) and not(axilRst);
       pllInc         <= r.pllInc;
       pllDec         <= r.pllDec;
-      userValue      <= r.userValue;
+      userValueOut   <= r.userValueOut;
 
    end process comb;
 

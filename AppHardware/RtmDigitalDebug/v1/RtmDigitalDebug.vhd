@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebug.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-04-27
+-- Last update: 2017-07-26
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -142,6 +142,7 @@ begin
 
       -- Map the registers 
       axiSlaveRegister(axilEp, x"0", 0, v.doutDisable);
+      axiSlaveRegisterR(axilEp, x"8", 0, x"00000000");  -- Added this register to be forward compatible with v2
 
       -- Closeout the transaction
       axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
