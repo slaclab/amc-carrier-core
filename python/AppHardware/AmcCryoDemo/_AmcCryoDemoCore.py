@@ -68,10 +68,20 @@ class AmcCryoDemoCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
         
+        self.enable.set(True)
+        self.ADC[0].enable.set(True)
+        self.ADC[1].enable.set(True)         
+        self.ADC[2].enable.set(True)         
+        self.LMK.enable.set(True)        
+        self.DAC.enable.set(True)
+        
         # Init the AMC card
         self.InitAmcCard()
         
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
-        self.enable.set(False)       
+        self.ADC[0].enable.set(False)
+        self.ADC[1].enable.set(False)         
+        self.ADC[2].enable.set(False)         
+        self.DAC.enable.set(False)    
         self.checkBlocks(recurse=True)        
         

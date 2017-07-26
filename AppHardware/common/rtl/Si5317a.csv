@@ -1,0 +1,7 @@
+,Data Table 8 Configuration,BIT[31:28],BIT[27:24],BIT[23:22],BIT[21:20],BIT[19:18],BIT[17:16],BIT[15:14],BIT[13:12],BIT[11],BIT[10],BIT[9],BIT[8],BIT[7:3],BIT[2],BIT[1],BIT[0],32-bit word
+Clock Frequency,,pllFrqSelTri,pllFrqSel,pllBwSelTri,pllBwSel,pllSFoutTri,pllSFout,pllRateTri,pllRate,pllFrqTblTri,pllFrqTbl,pllBypassTri,pllBypass,Spare/RO,pllDec,pllInc,pllRst,
+119 MHz,"FRQTBL=M, FRQSEL=HLLM","""0001""","""1001""","""01""","""11""","""01""","""11""","""11""","""11""",'1','1','0','0',"""00000""",'0','0','0',0x1977FC00
+185 MHz,"FRQTBL=M, FRQSEL=HMMH","""0110""","""1111""","""01""","""11""","""01""","""11""","""11""","""11""",'1','1','0','0',"""00000""",'0','0','0',0x6F77FC00
+238 MHz,"FRQTBL=M, FRQSEL=HHML","""0010""","""1110""","""01""","""11""","""01""","""11""","""11""","""11""",'1','1','0','0',"""00000""",'0','0','0',0x2E77FC00
+,,,,,,,,,,,,,,,,,,
+Note: Ports GND in HW,,,,,,,,,,,,BYPS=GND,BYPS=GND,,DEC=GND,INC=GND,,
