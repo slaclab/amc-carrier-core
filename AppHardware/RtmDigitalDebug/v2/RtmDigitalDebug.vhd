@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebug.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-07-26
+-- Last update: 2017-07-27
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -73,6 +73,11 @@ architecture mapping of RtmDigitalDebug is
    signal doutP        : slv(7 downto 0);
    signal doutN        : slv(7 downto 0);
    signal cleanClock   : sl;
+
+
+   signal pllBwSel  : slv(1 downto 0);
+   signal pllFrqSel : slv(3 downto 0);
+
 
    -- Prevent optimization of the "cleanClock" signal
    -- such that the IBUFDS termination doesn't get removed
@@ -190,16 +195,10 @@ begin
          pllDec          => open,       -- Hard wired on the RTM
          pllFrqTbl       => open,       -- Hard wired on the RTM
          pllBypass       => open,       -- Hard wired on the RTM
-         pllRate(0)      => open,       -- Hard wired on the RTM
-         pllRate(1)      => open,       -- Hard wired on the RTM
-         pllSFout(0)     => open,       -- Hard wired on the RTM
-         pllSFout(1)     => open,       -- Hard wired on the RTM
-         pllBwSel(0)     => rtmLsP(7),
-         pllBwSel(1)     => rtmLsN(7),
-         pllFrqSel(0)    => rtmLsP(16),
-         pllFrqSel(1)    => rtmLsN(16),
-         pllFrqSel(2)    => rtmLsP(17),
-         pllFrqSel(3)    => rtmLsN(17),
+         pllRate         => open,       -- Hard wired on the RTM
+         pllSFout        => open,       -- Hard wired on the RTM
+         pllBwSel        => pllBwSel,
+         pllFrqSel       => pllFrqSel,
          pllLocked       => cleanClkLocked,
          -- Misc Interface
          userValueIn     => userValueIn,
@@ -211,5 +210,12 @@ begin
          axilReadSlave   => axilReadSlave,
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave);
+
+   rtmLsP(7)  <= pllBwSel(0);
+   rtmLsN(7)  <= pllBwSel(1);
+   rtmLsP(16) <= pllFrqSel(0);
+   rtmLsN(16) <= pllFrqSel(1);
+   rtmLsP(17) <= pllFrqSel(2);
+   rtmLsN(17) <= pllFrqSel(3);
 
 end mapping;

@@ -2,7 +2,7 @@
 -- File       : Si5317a.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2017-07-26
+-- Last update: 2017-07-27
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -134,49 +134,55 @@ begin
          dataOut(0) => los,
          dataOut(1) => lol);
 
-   U_pllBypass : OBUFT
+   U_pllBypass : IOBUF
       port map (
-         O => pllBypass,
-         I => r.pllBypass,
-         T => r.pllBypassTri);
+         IO => pllBypass,
+         I  => r.pllBypass,
+         O  => open,
+         T  => r.pllBypassTri);
 
-   U_pllFrqTbl : OBUFT
+   U_pllFrqTbl : IOBUF
       port map (
-         O => pllFrqTbl,
-         I => r.pllFrqTbl,
-         T => r.pllFrqTblTri);
+         IO => pllFrqTbl,
+         I  => r.pllFrqTbl,
+         O  => open,
+         T  => r.pllFrqTblTri);
 
    GEN_2B :
    for i in 1 downto 0 generate
 
-      U_pllRate : OBUFT
+      U_pllRate : IOBUF
          port map (
-            O => pllRate(i),
-            I => r.pllRate(i),
-            T => r.pllRateTri(i));
+            IO => pllRate(i),
+            I  => r.pllRate(i),
+            O  => open,
+            T  => r.pllRateTri(i));
 
-      U_pllSFout : OBUFT
+      U_pllSFout : IOBUF
          port map (
-            O => pllSFout(i),
-            I => r.pllSFout(i),
-            T => r.pllSFoutTri(i));
+            IO => pllSFout(i),
+            I  => r.pllSFout(i),
+            O  => open,
+            T  => r.pllSFoutTri(i));
 
-      U_pllBwSel : OBUFT
+      U_pllBwSel : IOBUF
          port map (
-            O => pllBwSel(i),
-            I => r.pllBwSel(i),
-            T => r.pllBwSelTri(i));
+            IO => pllBwSel(i),
+            I  => r.pllBwSel(i),
+            O  => open,
+            T  => r.pllBwSelTri(i));
 
    end generate GEN_2B;
 
    GEN_4B :
    for i in 3 downto 0 generate
 
-      U_pllFrqSel : OBUFT
+      U_pllFrqSel : IOBUF
          port map (
-            O => pllFrqSel(i),
-            I => r.pllFrqSel(i),
-            T => r.pllFrqSelTri(i));
+            IO => pllFrqSel(i),
+            I  => r.pllFrqSel(i),
+            O  => open,
+            T  => r.pllFrqSelTri(i));
 
    end generate GEN_4B;
 

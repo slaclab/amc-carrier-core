@@ -32,7 +32,7 @@ RtmDigitalDebug: &RtmDigitalDebug
         offset: 0x08
       class: IntField
       name: FpgaPllLock
-      mode: RW
+      mode: RO
       sizeBits: 1
       description: FPGA PLL Lock status     
     #########################################################
