@@ -37,9 +37,9 @@ class TopLevel(pr.Device):
             sizeSigGen   = [0,0],
             modeSigGen   = [False,False],
             numTrigPulse = 0,
-            enableBsa    = True,
-            enableMps    = True,
-            enableEvr    = True,
+            enableBsa    = False,
+            enableMps    = False,
+            enableEvr    = False,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
