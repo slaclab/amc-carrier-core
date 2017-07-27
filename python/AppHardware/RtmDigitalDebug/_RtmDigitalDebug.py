@@ -58,7 +58,8 @@ class RtmDigitalDebug(pr.Device):
             bitOffset    =  3,
             base         = pr.UInt,
             mode         = "RO",
-        ))       
+            # pollInterval = 1
+        ))      
 
         self.add(pr.RemoteVariable(   
             name         = "lol",
@@ -68,7 +69,8 @@ class RtmDigitalDebug(pr.Device):
             bitOffset    =  4,
             base         = pr.UInt,
             mode         = "RO",
-        ))     
+            # pollInterval = 1
+        ))  
 
         self.add(pr.RemoteVariable(   
             name         = "locked",
@@ -78,7 +80,8 @@ class RtmDigitalDebug(pr.Device):
             bitOffset    =  5,
             base         = pr.UInt,
             mode         = "RO",
-        ))             
+            # pollInterval = 1
+        ))           
         
         self.add(pr.RemoteVariable(   
             name         = "pllFrqTbl",
@@ -188,5 +191,6 @@ class RtmDigitalDebug(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-        ))        
+            # pollInterval = 1
+        ))  
         
