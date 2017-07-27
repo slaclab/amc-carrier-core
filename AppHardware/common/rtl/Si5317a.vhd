@@ -204,7 +204,7 @@ begin
       axiSlaveRegister(regCon, x"4", 2, v.pllDec);         -- BIT[02:02]
       axiSlaveRegisterR(regCon, x"4", 3, los);             -- BIT[03:03]
       axiSlaveRegisterR(regCon, x"4", 4, lol);             -- BIT[04:04]
-      axiSlaveRegisterR(regCon, x"4", 4, locked);          -- BIT[05:05]
+      axiSlaveRegisterR(regCon, x"4", 5, locked);          -- BIT[05:05]
       axiSlaveRegister(regCon, x"4", 8, v.pllBypass);      -- BIT[08:08]
       axiSlaveRegister(regCon, x"4", 9, v.pllBypassTri);   -- BIT[09:09]
       axiSlaveRegister(regCon, x"4", 10, v.pllFrqTbl);     -- BIT[10:10]
