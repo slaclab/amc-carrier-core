@@ -37,8 +37,8 @@ set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[7]}]
 
 # Clocks
 create_clock -period 2.801 -name rtmAdcDataClk [get_ports {rtmLsP[3]}]
-create_generated_clock -name rtmAdcDataClkDiv2 [get_pins {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/U_BUFGCE_DIV/O}]
-create_generated_clock -name recTimingClkDiv2  [get_pins {U_AppTop/U_AppCore/U_RTM/U_CORE/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
+create_generated_clock -name rtmAdcDataClkDiv2 [get_pins -hier -filter {NAME =~ *U_RTM/U_CORE/U_Ad9229Core/U_BUFGCE_DIV/O}]
+create_generated_clock -name recTimingClkDiv2  [get_pins -hier -filter {NAME =~ *U_RTM/U_CORE/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 
 set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {rtmAdcDataClk}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {rtmAdcDataClk}]
