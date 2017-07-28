@@ -23,7 +23,7 @@ Si5317a: &Si5317a
         offset: 0x4
       class: IntField
       name: pllRst
-      mode: RW
+      mode: WO
       sizeBits: 1
       lsBit: 0
       description: pllRst    
@@ -198,4 +198,49 @@ Si5317a: &Si5317a
       lsBit: 4
       description: pllFrqSelTri    
     #########################################################
-    
+    cntLos:
+      at:
+        offset: 0x80
+      class: IntField
+      name: cntLos
+      mode: RO
+      sizeBits: 32
+      description: status counter for los   
+    #########################################################
+    cntLol:
+      at:
+        offset: 0x84
+      class: IntField
+      name: cntLol
+      mode: RO
+      sizeBits: 32
+      description: status counter for los        
+    #########################################################
+    cntLocked:
+      at:
+        offset: 0x88
+      class: IntField
+      name: cntLocked
+      mode: RO
+      sizeBits: 32
+      description: status counter for pllLocked  
+    #########################################################
+    cntPllRst:
+      at:
+        offset: 0x8C
+      class: IntField
+      name: cntPllRst
+      mode: RO
+      sizeBits: 32
+      description: status counter for pllRst        
+    #########################################################
+    cntRst:
+      at:
+        offset: 0xFC
+      class: IntField
+      name: cntRst
+      mode: WO
+      sizeBits: 1
+      lsBit: 0
+      description: cntRst      
+    #########################################################

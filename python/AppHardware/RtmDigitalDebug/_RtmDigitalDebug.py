@@ -47,7 +47,7 @@ class RtmDigitalDebug(pr.Device):
             bitSize      =  1,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "RW",
+            mode         = "WO",
         ))    
 
         self.add(pr.RemoteVariable(   
@@ -191,6 +191,60 @@ class RtmDigitalDebug(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-            # pollInterval = 1
+            pollInterval = 1
         ))  
+        
+        self.add(pr.RemoteVariable(   
+            name         = "cntLos",
+            description  = "cntLos",
+            offset       =  0x80,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1
+        ))  
+
+        self.add(pr.RemoteVariable(   
+            name         = "cntLol",
+            description  = "cntLol",
+            offset       =  0x84,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1
+        ))   
+
+        self.add(pr.RemoteVariable(   
+            name         = "cntLocked",
+            description  = "cntLocked",
+            offset       =  0x88,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1
+        ))
+
+        self.add(pr.RemoteVariable(   
+            name         = "cntPllRst",
+            description  = "cntPllRst",
+            offset       =  0x8C,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1
+        ))        
+
+        self.add(pr.RemoteVariable(   
+            name         = "cntRst",
+            description  = "cntRst",
+            offset       =  0xFC,
+            bitSize      =  1,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "WO",
+        ))            
         
