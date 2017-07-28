@@ -2,7 +2,7 @@
 -- File       : Si5317a.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2017-07-27
+-- Last update: 2017-07-28
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -60,6 +60,14 @@ end Si5317a;
 architecture rtl of Si5317a is
 
    type RegType is record
+      los            : sl;
+      lol            : sl;
+      locked         : sl;
+      cntRst         : sl;
+      cntLos         : slv(31 downto 0);
+      cntLol         : slv(31 downto 0);
+      cntLocked      : slv(31 downto 0);
+      cntPllRst      : slv(31 downto 0);
       pllRst         : sl;
       pllInc         : sl;
       pllDec         : sl;
@@ -81,7 +89,15 @@ architecture rtl of Si5317a is
    end record;
 
    constant REG_INIT_C : RegType := (
-      pllRst         => '0',
+      los            => '0',
+      lol            => '0',
+      locked         => '0',
+      cntRst         => '1',
+      cntLos         => (others => '0'),
+      cntLol         => (others => '0'),
+      cntLocked      => (others => '0'),
+      cntPllRst      => (others => '0'),
+      pllRst         => '1',
       pllInc         => '0',
       pllDec         => '0',
       -- Default: DBL2_BY  : M = CKOUT2 disabled  (See Table 14 of datasheet)
@@ -123,16 +139,25 @@ begin
    pllLocked <= locked;
    locked    <= not(los) and not(lol);
 
-   U_SyncInVec : entity work.SynchronizerVector
+   U_pllLos : entity work.Debouncer
       generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => 2)
+         TPD_G             => TPD_G,
+         INPUT_POLARITY_G  => '1',
+         OUTPUT_POLARITY_G => '1')
       port map (
-         clk        => axilClk,
-         dataIn(0)  => pllLos,
-         dataIn(1)  => pllLol,
-         dataOut(0) => los,
-         dataOut(1) => lol);
+         clk => axilClk,
+         i   => pllLos,
+         o   => los);
+
+   U_pllLol : entity work.Debouncer
+      generic map (
+         TPD_G             => TPD_G,
+         INPUT_POLARITY_G  => '1',
+         OUTPUT_POLARITY_G => '1')
+      port map (
+         clk => axilClk,
+         i   => pllLol,
+         o   => lol);
 
    U_pllBypass : IOBUF
       port map (
@@ -194,33 +219,97 @@ begin
       -- Latch the current value
       v := r;
 
+      -- Reset strobes
+      v.cntRst := '0';
+      v.pllRst := '0';
+
       -- Determine the transaction type
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read only registers
-      axiSlaveRegister(regCon, x"0", 0, v.userValueOut);
-      axiSlaveRegister(regCon, x"4", 0, v.pllRst);         -- BIT[00:00]
-      axiSlaveRegister(regCon, x"4", 1, v.pllInc);         -- BIT[01:01]
-      axiSlaveRegister(regCon, x"4", 2, v.pllDec);         -- BIT[02:02]
-      axiSlaveRegisterR(regCon, x"4", 3, los);             -- BIT[03:03]
-      axiSlaveRegisterR(regCon, x"4", 4, lol);             -- BIT[04:04]
-      axiSlaveRegisterR(regCon, x"4", 5, locked);          -- BIT[05:05]
-      axiSlaveRegister(regCon, x"4", 8, v.pllBypass);      -- BIT[08:08]
-      axiSlaveRegister(regCon, x"4", 9, v.pllBypassTri);   -- BIT[09:09]
-      axiSlaveRegister(regCon, x"4", 10, v.pllFrqTbl);     -- BIT[10:10]
-      axiSlaveRegister(regCon, x"4", 11, v.pllFrqTblTri);  -- BIT[11:11]
-      axiSlaveRegister(regCon, x"4", 12, v.pllRate);       -- BIT[13:12]
-      axiSlaveRegister(regCon, x"4", 14, v.pllRateTri);    -- BIT[15:14]
-      axiSlaveRegister(regCon, x"4", 16, v.pllSFout);      -- BIT[17:16]
-      axiSlaveRegister(regCon, x"4", 18, v.pllSFoutTri);   -- BIT[19:18]
-      axiSlaveRegister(regCon, x"4", 20, v.pllBwSel);      -- BIT[21:20]
-      axiSlaveRegister(regCon, x"4", 22, v.pllBwSelTri);   -- BIT[23:22]
-      axiSlaveRegister(regCon, x"4", 24, v.pllFrqSel);     -- BIT[27:24]
-      axiSlaveRegister(regCon, x"4", 28, v.pllFrqSelTri);  -- BIT[31:28]
-      axiSlaveRegisterR(regCon, x"8", 0, userValueIn);
+      axiSlaveRegister(regCon, x"00", 0, v.userValueOut);
+
+      axiSlaveRegister(regCon, x"04", 0, v.pllRst);         -- BIT[00:00]
+      axiSlaveRegister(regCon, x"04", 1, v.pllInc);         -- BIT[01:01]
+      axiSlaveRegister(regCon, x"04", 2, v.pllDec);         -- BIT[02:02]
+      axiSlaveRegisterR(regCon, x"04", 3, los);             -- BIT[03:03]
+      axiSlaveRegisterR(regCon, x"04", 4, lol);             -- BIT[04:04]
+      axiSlaveRegisterR(regCon, x"04", 5, locked);          -- BIT[05:05]
+      axiSlaveRegister(regCon, x"04", 8, v.pllBypass);      -- BIT[08:08]
+      axiSlaveRegister(regCon, x"04", 9, v.pllBypassTri);   -- BIT[09:09]
+      axiSlaveRegister(regCon, x"04", 10, v.pllFrqTbl);     -- BIT[10:10]
+      axiSlaveRegister(regCon, x"04", 11, v.pllFrqTblTri);  -- BIT[11:11]
+      axiSlaveRegister(regCon, x"04", 12, v.pllRate);       -- BIT[13:12]
+      axiSlaveRegister(regCon, x"04", 14, v.pllRateTri);    -- BIT[15:14]
+      axiSlaveRegister(regCon, x"04", 16, v.pllSFout);      -- BIT[17:16]
+      axiSlaveRegister(regCon, x"04", 18, v.pllSFoutTri);   -- BIT[19:18]
+      axiSlaveRegister(regCon, x"04", 20, v.pllBwSel);      -- BIT[21:20]
+      axiSlaveRegister(regCon, x"04", 22, v.pllBwSelTri);   -- BIT[23:22]
+      axiSlaveRegister(regCon, x"04", 24, v.pllFrqSel);     -- BIT[27:24]
+      axiSlaveRegister(regCon, x"04", 28, v.pllFrqSelTri);  -- BIT[31:28]
+
+      axiSlaveRegisterR(regCon, x"08", 0, userValueIn);
+
+      axiSlaveRegisterR(regCon, x"80", 0, r.cntLos);
+      axiSlaveRegisterR(regCon, x"84", 0, r.cntLol);
+      axiSlaveRegisterR(regCon, x"88", 0, r.cntLocked);
+      axiSlaveRegisterR(regCon, x"8C", 0, r.cntPllRst);
+
+      axiSlaveRegister(regCon, x"FC", 0, v.cntRst);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+
+      -- Check a local copy 
+      v.los    := los;
+      v.lol    := lol;
+      v.locked := locked;
+
+      -- Check for loss of signal event
+      if (r.los = '0') and (los = '1') then
+         v.cntLos := r.cntLos + 1;
+      end if;
+
+      -- Check for loss of locked event
+      if (r.lol = '0') and (lol = '1') then
+         v.cntLol := r.cntLol + 1;
+      end if;
+
+      -- Check for locked event
+      if (r.locked = '0') and (locked = '1') then
+         v.cntLocked := r.cntLocked + 1;
+      end if;
+
+      -- Check for rst event
+      if (r.pllRst = '1') then
+         v.cntPllRst := r.cntPllRst + 1;
+      end if;
+
+      -- Check for counter reset
+      if (r.cntRst = '1') then
+         v.cntLos    := (others => '0');
+         v.cntLol    := (others => '0');
+         v.cntLocked := (others => '0');
+      end if;
+
+      -- Check for change in configuration register
+      if (v.pllInc /= r.pllInc)
+         or (v.pllDec /= r.pllDec)
+         or (v.pllBypass /= r.pllBypass)
+         or (v.pllBypassTri /= r.pllBypassTri)
+         or (v.pllFrqTbl /= r.pllFrqTbl)
+         or (v.pllFrqTblTri /= r.pllFrqTblTri)
+         or (v.pllRate /= r.pllRate)
+         or (v.pllRateTri /= r.pllRateTri)
+         or (v.pllSFout /= r.pllSFout)
+         or (v.pllSFoutTri /= r.pllSFoutTri)
+         or (v.pllBwSel /= r.pllBwSel)
+         or (v.pllBwSelTri /= r.pllBwSelTri)
+         or (v.pllFrqSel /= r.pllFrqSel)
+         or (v.pllFrqSelTri /= r.pllFrqSelTri) then
+         -- Issue a reset automatically in firmware
+         v.pllRst := '1';
+      end if;
 
       -- Synchronous Reset
       if (axilRst = '1') then
@@ -233,7 +322,6 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
-      pllRstL        <= not(r.pllRst) and not(axilRst);
       pllInc         <= r.pllInc;
       pllDec         <= r.pllDec;
       userValueOut   <= r.userValueOut;
@@ -246,5 +334,16 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   U_pllRst : entity work.PwrUpRst
+      generic map (
+         TPD_G          => TPD_G,
+         IN_POLARITY_G  => '1',         -- active HIGH input
+         OUT_POLARITY_G => '0',         -- active LOW output
+         DURATION_G     => 15625000)    -- 100 ms
+      port map (
+         clk    => axilClk,
+         arst   => r.pllRst,
+         rstOut => pllRstL);
 
 end rtl;
