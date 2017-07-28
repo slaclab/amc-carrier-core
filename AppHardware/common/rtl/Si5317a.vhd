@@ -112,9 +112,9 @@ architecture rtl of Si5317a is
       -- Default: SFout    : HM = LVDS (See Table 12 of datasheet)
       pllSFout       => "11",
       pllSFoutTri    => "01",
-      -- Default: BwSel    : HM (See Table 12 of datasheet)
+      -- Default: BwSel    : MM (See Table 12 of datasheet)
       pllBwSel       => "11",
-      pllBwSelTri    => "01",
+      pllBwSelTri    => "11",
       -- Default: FrqSel   : ite(TIMING_MODE_G,HMMH,HLLM) (See Table 12 of datasheet)
       pllFrqSel      => ite(TIMING_MODE_G, "1111", "1001"),
       pllFrqSelTri   => ite(TIMING_MODE_G, "0110", "0001"),
