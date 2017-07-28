@@ -266,22 +266,22 @@ begin
       v.locked := locked;
 
       -- Check for loss of signal event
-      if (r.los = '0') and (los = '1') then
+      if (r.los = '0') and (los = '1') and (r.cntLos /= x"FFFFFFFF") then
          v.cntLos := r.cntLos + 1;
       end if;
 
       -- Check for loss of locked event
-      if (r.lol = '0') and (lol = '1') then
+      if (r.lol = '0') and (lol = '1') and (r.cntLol /= x"FFFFFFFF") then
          v.cntLol := r.cntLol + 1;
       end if;
 
       -- Check for locked event
-      if (r.locked = '0') and (locked = '1') then
+      if (r.locked = '0') and (locked = '1') and (r.cntLocked /= x"FFFFFFFF") then
          v.cntLocked := r.cntLocked + 1;
       end if;
 
       -- Check for rst event
-      if (r.pllRst = '1') then
+      if (r.pllRst = '1') and (r.cntPllRst /= x"FFFFFFFF") then
          v.cntPllRst := r.cntPllRst + 1;
       end if;
 
@@ -290,6 +290,7 @@ begin
          v.cntLos    := (others => '0');
          v.cntLol    := (others => '0');
          v.cntLocked := (others => '0');
+         v.cntPllRst := (others => '0');
       end if;
 
       -- Check for change in configuration register
