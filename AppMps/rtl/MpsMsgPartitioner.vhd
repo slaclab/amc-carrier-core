@@ -148,7 +148,7 @@ begin
          mAxisRst    => rst,
          mAxisMaster => rxMaster,
          mAxisSlave  => rxSlave,
-         mTLastTUser => rxTLastTUser.tUser);  
+         mTLastTUser => rxTLastTUser.tUser(7 downto 0));  
 
    GEN_SYNC_SLAVE : if (SLAVE_SYNC_FIFO_G = true) generate
       rxCtrl <= sCtrl;
@@ -346,6 +346,6 @@ begin
          mAxisRst    => mAxisRst,
          mAxisMaster => mAxisMaster,
          mAxisSlave  => mAxisSlave,
-         mTLastTUser => mTLastTUser); 
+         mTLastTUser => mTLastTUser(7 downto 0)); 
 
 end rtl;

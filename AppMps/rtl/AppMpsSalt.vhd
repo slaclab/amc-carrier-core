@@ -57,6 +57,8 @@ entity AppMpsSalt is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- MPS Interface
+      mpsIbClk        : in  sl;
+      mpsIbRst        : in  sl;
       mpsIbMaster     : in  AxiStreamMasterType;
       mpsIbSlave      : out AxiStreamSlaveType;
       ----------------------
@@ -158,8 +160,8 @@ begin
             iDelayCtrlRdy => '1',          -- Not using RX path
             linkUp        => mpsTxLinkUp,
             -- Slave Port
-            sAxisClk      => axilClk,
-            sAxisRst      => axilRst,
+            sAxisClk      => mpsIbClk,
+            sAxisRst      => mpsIbRst,
             sAxisMaster   => mpsIbMaster,
             sAxisSlave    => mpsIbSlave,
             -- Master Port
