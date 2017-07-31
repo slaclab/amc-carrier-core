@@ -21,117 +21,106 @@ import pyrogue as pr
 
 class AppMpsSalt(pr.Device):
     def __init__(   self,       
-        name        = "AppMpsSalt",
-        description = "AmcCarrier MPS PHY Module",
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "AppMpsSalt",
+            description = "AmcCarrier MPS PHY Module",
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables
         ##############################
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "MpsTxLinkUpCnt",
             description  = "MPS TX LinkUp Counter",
             offset       =  0x00,
             bitSize      =  32,
             bitOffset    =  0x00,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )
+        ))
 
-        self.addVariables(  
+        self.addRemoteVariables( 
             name         = "MpsRxLinkUpCnt",
             description  = "MPS RX LinkUp Counter[13:0]",
             offset       =  0x04,
             bitSize      =  32,
             bitOffset    =  0x00,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
             number       =  14,
             stride       =  4,
         )
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "MpsTxLinkUP",
             description  = "MPS TX LinkUp",
             offset       =  0x700,
             bitSize      =  1,
             bitOffset    =  0x00,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )
+        ))
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "MpsRxLinkUP",
             description  = "MPS TX LinkUp[13:0]",
             offset       =  0x700,
             bitSize      =  14,
             bitOffset    =  0x01,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )
+        ))
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "MPS_SLOT_G",
             description  = "MPS_SLOT_G",
             offset       =  0x704,
             bitSize      =  1,
             bitOffset    =  0x00,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )
+        ))
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "APP_TYPE_G",
             description  = "See AmcCarrierPkg.vhd for defination",
             offset       =  0x708,
             bitSize      =  7,
             bitOffset    =  0x00,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )
+        ))
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "MpsPllLocked",
             description  = "MPS PLL Lock Status",
             offset       =  0x714,
             bitSize      =  1,
             bitOffset    =  0x00,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RO",
-        )
+        ))
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "RollOverEn",
             description  = "Status Counter Roll Over Enable",
             offset       =  0xFF0,
             bitSize      =  15,
             bitOffset    =  0x00,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "RW",
-        )
+        ))
 
-        self.addVariable(   
+        self.add(pr.RemoteVariable(    
             name         = "CntRst",
             description  = "Status Counter Reset",
             offset       =  0xFF4,
             bitSize      =  1,
             bitOffset    =  0x00,
-            base         = "hex",
+            base         = pr.UInt,
             mode         = "WO",
-        )
+        ))
 
         ##############################
         # Commands

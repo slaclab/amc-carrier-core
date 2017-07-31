@@ -12,7 +12,7 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
    loadSource      -dir  "$::DIR_PATH/rtl/xcku040"
    
    loadSource  -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.dcp"
-   #loadSource -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.xci"
+   # loadIpCore -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.xci"
    
 } elseif { $::env(PRJ_PART) == "XCKU060-FFVA1156-2-E" } { 
 

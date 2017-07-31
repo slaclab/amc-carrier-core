@@ -20,17 +20,17 @@ Si5317a: &Si5317a
     #########################################################
     pllRst:
       at:
-        offset: 0x00
+        offset: 0x4
       class: IntField
       name: pllRst
-      mode: RW
+      mode: WO
       sizeBits: 1
       lsBit: 0
       description: pllRst    
     #########################################################
     pllInc:
       at:
-        offset: 0x00
+        offset: 0x4
       class: IntField
       name: pllInc
       mode: RW
@@ -40,7 +40,7 @@ Si5317a: &Si5317a
     #########################################################
     pllDec:
       at:
-        offset: 0x00
+        offset: 0x4
       class: IntField
       name: pllDec
       mode: RW
@@ -50,7 +50,7 @@ Si5317a: &Si5317a
     #########################################################
     pllLos:
       at:
-        offset: 0x00
+        offset: 0x4
       class: IntField
       name: pllLos
       mode: RO
@@ -60,7 +60,7 @@ Si5317a: &Si5317a
     #########################################################
     pllLol:
       at:
-        offset: 0x00
+        offset: 0x4
       class: IntField
       name: pllLol
       mode: RO
@@ -70,7 +70,7 @@ Si5317a: &Si5317a
     #########################################################
     pllLocked:
       at:
-        offset: 0x00
+        offset: 0x4
       class: IntField
       name: pllLocked
       mode: RO
@@ -80,7 +80,7 @@ Si5317a: &Si5317a
     #########################################################
     pllDbl2By:
       at:
-        offset: 0x01
+        offset: 0x5
       class: IntField
       name: pllDbl2By
       mode: RW
@@ -90,7 +90,7 @@ Si5317a: &Si5317a
     #########################################################
     pllDbl2ByTri:
       at:
-        offset: 0x01
+        offset: 0x5
       class: IntField
       name: pllDbl2ByTri
       mode: RW
@@ -100,7 +100,7 @@ Si5317a: &Si5317a
     #########################################################
     pllFrqTbl:
       at:
-        offset: 0x01
+        offset: 0x5
       class: IntField
       name: pllFrqTbl
       mode: RW
@@ -110,7 +110,7 @@ Si5317a: &Si5317a
     #########################################################
     pllFrqTblTri:
       at:
-        offset: 0x01
+        offset: 0x5
       class: IntField
       name: pllFrqTblTri
       mode: RW
@@ -120,7 +120,7 @@ Si5317a: &Si5317a
     #########################################################
     pllRate:
       at:
-        offset: 0x01
+        offset: 0x5
       class: IntField
       name: pllRate
       mode: RW
@@ -130,7 +130,7 @@ Si5317a: &Si5317a
     #########################################################
     pllRateTri:
       at:
-        offset: 0x01
+        offset: 0x5
       class: IntField
       name: pllRateTri
       mode: RW
@@ -140,7 +140,7 @@ Si5317a: &Si5317a
     #########################################################
     pllSFout:
       at:
-        offset: 0x02
+        offset: 0x6
       class: IntField
       name: pllSFout
       mode: RW
@@ -150,7 +150,7 @@ Si5317a: &Si5317a
     #########################################################
     pllSFoutTri:
       at:
-        offset: 0x02
+        offset: 0x6
       class: IntField
       name: pllSFoutTri
       mode: RW
@@ -160,7 +160,7 @@ Si5317a: &Si5317a
     #########################################################
     pllBwSel:
       at:
-        offset: 0x02
+        offset: 0x6
       class: IntField
       name: pllBwSel
       mode: RW
@@ -170,7 +170,7 @@ Si5317a: &Si5317a
     #########################################################
     pllBwSelTri:
       at:
-        offset: 0x02
+        offset: 0x6
       class: IntField
       name: pllBwSelTri
       mode: RW
@@ -180,7 +180,7 @@ Si5317a: &Si5317a
     #########################################################
     pllFrqSel:
       at:
-        offset: 0x03
+        offset: 0x7
       class: IntField
       name: pllFrqSel
       mode: RW
@@ -190,7 +190,7 @@ Si5317a: &Si5317a
     #########################################################
     pllFrqSelTri:
       at:
-        offset: 0x03
+        offset: 0x7
       class: IntField
       name: pllFrqSelTri
       mode: RW
@@ -198,4 +198,49 @@ Si5317a: &Si5317a
       lsBit: 4
       description: pllFrqSelTri    
     #########################################################
-    
+    cntLos:
+      at:
+        offset: 0x80
+      class: IntField
+      name: cntLos
+      mode: RO
+      sizeBits: 32
+      description: status counter for los   
+    #########################################################
+    cntLol:
+      at:
+        offset: 0x84
+      class: IntField
+      name: cntLol
+      mode: RO
+      sizeBits: 32
+      description: status counter for los        
+    #########################################################
+    cntLocked:
+      at:
+        offset: 0x88
+      class: IntField
+      name: cntLocked
+      mode: RO
+      sizeBits: 32
+      description: status counter for pllLocked  
+    #########################################################
+    cntPllRst:
+      at:
+        offset: 0x8C
+      class: IntField
+      name: cntPllRst
+      mode: RO
+      sizeBits: 32
+      description: status counter for pllRst        
+    #########################################################
+    cntRst:
+      at:
+        offset: 0xFC
+      class: IntField
+      name: cntRst
+      mode: WO
+      sizeBits: 1
+      lsBit: 0
+      description: cntRst      
+    #########################################################

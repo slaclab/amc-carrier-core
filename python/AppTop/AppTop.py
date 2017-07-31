@@ -23,35 +23,28 @@ from AppTop.AppTopTrig import *
 from AppTop.AppTopJesd import *
 from DacSigGen.DacSigGen import *
 from DaqMuxV2.DaqMuxV2 import *
+from surf.devices.ti._Lmk04828  import *
 from common.AppCore import *
 import time
 
 class AppTop(pr.Device):
     def __init__(   self, 
-        name           = "AppTop", 
-        description    = "Common Application Top Level", 
-        memBase        = None, 
-        offset         = 0x0, 
-        hidden         = False, 
-        numRxLanes     = [0,0], 
-        numTxLanes     = [0,0],
-        numSigGen      = [0,0],
-        sizeSigGen     = [0,0],
-        numTrigPulse   = 0,
-        enableEvr      = True,
-        expand         = True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name           = "AppTop", 
+            description    = "Common Application Top Level", 
+            numRxLanes     = [0,0], 
+            numTxLanes     = [0,0],
+            numSigGen      = [0,0],
+            sizeSigGen     = [0,0],
+            modeSigGen     = [False,False],
+            numTrigPulse   = 0,
+            enableEvr      = True,
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
         
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
+        self._numSigGen  = numSigGen
+        self._sizeSigGen = sizeSigGen
         
         ##############################
         # Variables
@@ -72,12 +65,11 @@ class AppTop(pr.Device):
         ))
 
         for i in range(2):
-            if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
-                self.add(DaqMuxV2(
-                    name         = "DaqMuxV2[%i]" % (i),
-                    offset       =  0x20000000 + (i * 0x10000000),
-                    expand       =  False,
-                ))
+            self.add(DaqMuxV2(
+                name         = "DaqMuxV2[%i]" % (i),
+                offset       =  0x20000000 + (i * 0x10000000),
+                expand       =  False,
+            ))
 
         for i in range(2):
             if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
@@ -96,9 +88,36 @@ class AppTop(pr.Device):
                     offset       =  0x60000000 + (i * 0x10000000),
                     numOfChs     =  numSigGen[i],
                     buffSize     =  sizeSigGen[i],
+                    fillMode     =  modeSigGen[i],
                     expand       =  False,
                 ))
-                              
+                
+        @self.command(description  = "JESD Reset")        
+        def JesdReset():   
+            lmkDevices = self.find(typ=Lmk04828)
+            for lmk in lmkDevices: 
+                lmk.PwrDwnSysRef()
+            self.checkBlocks(recurse=True)
+            for i in range(2):
+                if (self._numRxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdRx.CmdResetGTs()
+                if (self._numTxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdTx.CmdResetGTs()
+            self.checkBlocks(recurse=True)
+            time.sleep(0.5)
+            for lmk in lmkDevices: 
+                lmk.PwrUpSysRef()            
+            time.sleep(0.5)
+            for i in range(2):
+                if (self._numRxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdRx.CmdClearErrors()
+                if (self._numTxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdTx.CmdClearErrors()        
+        
     def writeBlocks(self, force=False, recurse=True, variable=None):
         """
         Write all of the blocks held by this Device to memory
@@ -120,22 +139,11 @@ class AppTop(pr.Device):
                 value.writeBlocks(force=force, recurse=True)                        
                         
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(varUpdate=True, recurse=True)
-                        
+        self._root.checkBlocks(recurse=True)
+        self.JesdReset()
         for i in range(2):
-            if (self._numRxLanes[i] > 0):
-                v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdRx.CmdResetGTs()
-            if (self._numTxLanes[i] > 0):
-                v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdTx.CmdResetGTs()
-        self.checkBlocks(recurse=True)
-        time.sleep(1)
-        for i in range(2):
-            if (self._numRxLanes[i] > 0):
-                v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdRx.CmdClearErrors()
-            if (self._numTxLanes[i] > 0):
-                v = getattr(self, 'AppTopJesd[%i]'%i)
-                v.JesdTx.CmdClearErrors()                   
+            if ( (self._numSigGen[i] > 0) and (self._sizeSigGen[i] > 0) ):
+                v = getattr(self, 'DacSigGen[%i]'%i)
+                if ( v.CsvFilePath.get() != "" ):
+                    v.LoadCsvFile("")
         self.checkBlocks(recurse=True)

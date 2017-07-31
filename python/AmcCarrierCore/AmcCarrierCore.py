@@ -20,22 +20,13 @@ from AppMps.AppMps import *
 
 class AmcCarrierCore(pr.Device):
     def __init__(   self, 
-        name        = "AmcCarrierCore", 
-        memBase     = None, 
-        offset      = 0x0, 
-        enableBsa   = True,
-        enableMps   = True,
-        hidden      = False,
-        expand	    = False,
-    ):
-        super().__init__(
-            name        = name,
+            name        = "AmcCarrierCore", 
             description = "AmcCarrierCore", 
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )   
+            enableBsa   = True,
+            enableMps   = True,
+            expand	    = False,
+            **kwargs):
+        super().__init__(name=name, description=description, expand=expand, **kwargs)  
 
         ##############################
         # Variables
@@ -154,10 +145,10 @@ class AmcCarrierCore(pr.Device):
         # Process rest of tree
         if recurse:
             for key,value in self.devices.items():
-                value.writeBlocks(force=force, recurse=True)                        
+                value.writeBlocks(force=force, recurse=True)                     
                         
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self._root.checkBlocks(recurse=True)
         
         for i in range(2):
             v = getattr(self.AmcCarrierBsa, 'BsaWaveformEngine[%i]'%i)

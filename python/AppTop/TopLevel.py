@@ -20,37 +20,28 @@
 import pyrogue as pr
 import pyrogue.simulation
 import pyrogue.protocols
+import pyrogue.utilities.fileio
 
 from AmcCarrierCore import *
 from AppTop import *
 
 class TopLevel(pr.Device):
     def __init__(   self, 
-        name         = "FpgaTopLevel", 
-        description  = "FPGA Top-Level", 
-        memBase      = None, 
-        offset       = 0x0, 
-        hidden       = False,
-        expand       = True,
-        simGui       = False,
-        ipAddr       = "10.0.1.101",
-        numRxLanes   = [0,0],
-        numTxLanes   = [0,0],
-        numSigGen    = [0,0],
-        sizeSigGen   = [0,0],
-        numTrigPulse = 0,
-        enableBsa    = True,
-        enableMps    = True,
-        enableEvr    = True,
-    ):
-        super().__init__(
-            name=name,
-            description=description,
-            memBase=memBase,
-            offset=offset,
-            hidden=hidden,
-            expand=expand,
-        )
+            name         = "FpgaTopLevel", 
+            description  = "FPGA Top-Level", 
+            simGui       = False,
+            ipAddr       = "10.0.1.101",
+            numRxLanes   = [0,0],
+            numTxLanes   = [0,0],
+            numSigGen    = [0,0],
+            sizeSigGen   = [0,0],
+            modeSigGen   = [False,False],
+            numTrigPulse = 0,
+            enableBsa    = False,
+            enableMps    = False,
+            enableEvr    = False,
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
         
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
@@ -59,17 +50,26 @@ class TopLevel(pr.Device):
             # Create simulation srp interface
             srp=pyrogue.simulation.MemEmulate()
         else:
+        
+            # File writer
+            dataWriter = pyrogue.utilities.fileio.StreamWriter(name='dataWriter')
+            self.add(dataWriter)
+            
             # Create SRP/ASYNC_MSG interface
             #  - This system uses UDP(port 8193, size 1500) + RSSI + Pack and SRP v3
             srp = rogue.protocols.srp.SrpV3()
-            urp = pyrogue.protocols.UdpRssiPack( ipAddr, 8193, 1500 )
+            udp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1500 )
             
             # Connect the SRPv3 to tDest = 0x0
-            pr.streamConnectBiDir( srp, urp.application(dest=0x0) )
+            pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
 
             # Create stream interface
             # - This system uses UDP(port 8194, size 1500) + RSSI + Pack
-            self.stream = pr.protocols.UdpRssiPack( ipAddr, 8194, 1500 )
+            udpStream = self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1500 )
+            
+            # Add data streams
+            for i in range(8):
+                pyrogue.streamConnect(udpStream.application(0x80 + i), dataWriter.getChannel(i))            
         
         # Add devices
         self.add(AmcCarrierCore(    
@@ -85,16 +85,16 @@ class TopLevel(pr.Device):
             numTxLanes   =  numTxLanes,
             numSigGen    =  numSigGen,
             sizeSigGen   =  sizeSigGen,
+            modeSigGen   =  modeSigGen,
             numTrigPulse =  numTrigPulse,
             enableEvr    =  enableEvr,
         ))
 
         # Define SW trigger command
-        @self.command(name="SwDaqMuxTrig", description="Software Trigger for DAQ MUX",)
+        @self.command(description="Software Trigger for DAQ MUX",)
         def SwDaqMuxTrig():
-            for i in range(2):
-                if ((self._numRxLanes[i] > 0) or (self._numTxLanes[i] > 0)):    
-                    self.AppTop.DaqMuxV2[i].TriggerDaq.call()
+            for i in range(2): 
+                self.AppTop.DaqMuxV2[i].TriggerDaq.call()
 
     def writeBlocks(self, force=False, recurse=True, variable=None):
         """
@@ -110,14 +110,14 @@ class TopLevel(pr.Device):
                 if force or block.stale:
                     if block.bulkEn:
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
-        
+
         # Process rest of tree
         if recurse:
             for key,value in self.devices.items():
-                value.writeBlocks(force=force, recurse=True)
+                value.writeBlocks(force=force, recurse=True)  
 
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self._root.checkBlocks(recurse=True)
 
         # Calculate the BsaWaveformEngine buffer sizes
         size    = [[0,0,0,0],[0,0,0,0]]

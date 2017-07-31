@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-02-09
+-- Last update: 2017-07-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -115,6 +115,7 @@ architecture mapping of AppTopJesd204b is
          gthrxn_in                          : in  std_logic_vector(6 downto 0);
          gthrxp_in                          : in  std_logic_vector(6 downto 0);
          gtrefclk0_in                       : in  std_logic_vector(6 downto 0);
+         loopback_in                        : in  std_logic_vector(20 downto 0);
          rx8b10ben_in                       : in  std_logic_vector(6 downto 0);
          rxcommadeten_in                    : in  std_logic_vector(6 downto 0);
          rxmcommaalignen_in                 : in  std_logic_vector(6 downto 0);
@@ -128,8 +129,11 @@ architecture mapping of AppTopJesd204b is
          txctrl1_in                         : in  std_logic_vector(111 downto 0);
          txctrl2_in                         : in  std_logic_vector(55 downto 0);
          txdiffctrl_in                      : in  std_logic_vector(27 downto 0);
+         txinhibit_in                       : in  std_logic_vector(6 downto 0);
          txpd_in                            : in  std_logic_vector(13 downto 0);
          txpolarity_in                      : in  std_logic_vector(6 downto 0);
+         txpostcursor_in                    : in  std_logic_vector(34 downto 0);
+         txprecursor_in                     : in  std_logic_vector(34 downto 0);
          txusrclk_in                        : in  std_logic_vector(6 downto 0);
          txusrclk2_in                       : in  std_logic_vector(6 downto 0);
          drpdo_out                          : out std_logic_vector(111 downto 0);
@@ -178,6 +182,17 @@ architecture mapping of AppTopJesd204b is
    signal s_dataValidVec  : slv(6 downto 0)             := (others => '0');
    signal s_sampleDataArr : sampleDataArray(6 downto 0) := (others => (others => '0'));
 
+   signal txDiffCtrl   : Slv8Array(6 downto 0) := (others => (others => '1'));
+   signal txPostCursor : Slv8Array(6 downto 0) := (others => (others => '0'));
+   signal txPreCursor  : Slv8Array(6 downto 0) := (others => (others => '0'));
+   signal txPolarity   : slv(6 downto 0)       := (others => '0');
+   signal rxPolarity   : slv(6 downto 0)       := (others => '0');
+   signal txInhibit    : slv(6 downto 0)       := (others => '1');
+
+   signal gtTxDiffCtrl   : slv(7*4-1 downto 0) := (others => '1');
+   signal gtTxPostCursor : slv(7*5-1 downto 0) := (others => '0');
+   signal gtTxPreCursor  : slv(7*5-1 downto 0) := (others => '0');
+
    signal s_cdrStable  : sl;
    signal dummyZeroBit : sl;
 
@@ -199,32 +214,29 @@ begin
             K_G              => 32,
             L_G              => JESD_RX_LANE_G)
          port map (
-            axiClk            => axilClk,
-            axiRst            => axilRst,
-            axilReadMaster    => rxReadMaster,
-            axilReadSlave     => rxReadSlave,
-            axilWriteMaster   => rxWriteMaster,
-            axilWriteSlave    => rxWriteSlave,
-            rxAxisMasterArr_o => open,
-            rxCtrlArr_i       => (others => AXI_STREAM_CTRL_UNUSED_C),
-            devClk_i          => devClk_i,
-            devRst_i          => devRst_i,
-            sysRef_i          => s_sysRef,
-            sysRefDbg_o       => s_sysRefDbg,
-            r_jesdGtRxArr     => r_jesdGtRxArr(JESD_RX_LANE_G-1 downto 0),
-            gtRxReset_o       => s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0),
-            sampleDataArr_o   => s_sampleDataArr(JESD_RX_LANE_G-1 downto 0),
-            dataValidVec_o    => s_dataValidVec(JESD_RX_LANE_G-1 downto 0),
-            nSync_o           => nSync_o,
-            pulse_o           => open,
-            leds_o            => open);
+            axiClk          => axilClk,
+            axiRst          => axilRst,
+            axilReadMaster  => rxReadMaster,
+            axilReadSlave   => rxReadSlave,
+            axilWriteMaster => rxWriteMaster,
+            axilWriteSlave  => rxWriteSlave,
+            devClk_i        => devClk_i,
+            devRst_i        => devRst_i,
+            sysRef_i        => s_sysRef,
+            sysRefDbg_o     => s_sysRefDbg,
+            r_jesdGtRxArr   => r_jesdGtRxArr(JESD_RX_LANE_G-1 downto 0),
+            gtRxReset_o     => s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0),
+            sampleDataArr_o => s_sampleDataArr(JESD_RX_LANE_G-1 downto 0),
+            dataValidVec_o  => s_dataValidVec(JESD_RX_LANE_G-1 downto 0),
+            nSync_o         => nSync_o,
+            rxPolarity      => rxPolarity(JESD_RX_LANE_G-1 downto 0));
       s_gtRxReset <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
    end generate;
-   
+
    TERM_UNUSED : if (JESD_RX_LANE_G /= 7) generate
       s_dataValidVec(6 downto JESD_RX_LANE_G)  <= (others => dummyZeroBit);
       s_sampleDataArr(6 downto JESD_RX_LANE_G) <= (others => (others => dummyZeroBit));
-   end generate;   
+   end generate;
 
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
@@ -238,7 +250,7 @@ begin
             axiReadSlave   => rxReadSlave,
             axiWriteMaster => rxWriteMaster,
             axiWriteSlave  => rxWriteSlave);
-      s_gtRxReset     <= devRst_i;
+      s_gtRxReset <= devRst_i;
    end generate;
 
    ---------------
@@ -259,8 +271,6 @@ begin
             axilReadSlave        => txReadSlave,
             axilWriteMaster      => txWriteMaster,
             axilWriteSlave       => txWriteSlave,
-            txAxisMasterArr_i    => (others => AXI_STREAM_MASTER_INIT_C),
-            txAxisSlaveArr_o     => open,
             extSampleDataArray_i => sampleDataArr_i(JESD_TX_LANE_G-1 downto 0),
             devClk_i             => devClk_i,
             devRst_i             => devRst_i,
@@ -269,8 +279,11 @@ begin
             gtTxReady_i          => s_gtTxReady(JESD_TX_LANE_G-1 downto 0),
             gtTxReset_o          => s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0),
             r_jesdGtTxArr        => r_jesdGtTxArr(JESD_TX_LANE_G-1 downto 0),
-            pulse_o              => open,
-            leds_o               => open);
+            txDiffCtrl           => txDiffCtrl(JESD_TX_LANE_G-1 downto 0),
+            txPostCursor         => txPostCursor(JESD_TX_LANE_G-1 downto 0),
+            txPreCursor          => txPreCursor(JESD_TX_LANE_G-1 downto 0),
+            txPolarity           => txPolarity(JESD_TX_LANE_G-1 downto 0),
+            txEnableL            => txInhibit(JESD_TX_LANE_G-1 downto 0));
       s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
    end generate;
 
@@ -310,7 +323,7 @@ begin
 --   end generate SELF_TEST_GEN;
 
 --   OPER_GEN : if SYSREF_GEN_G = false generate
-      s_sysRef <= sysRef_i;
+   s_sysRef <= sysRef_i;
 --   end generate OPER_GEN;
 
    -----------------
@@ -320,6 +333,9 @@ begin
       s_txData((i*32)+31 downto (i*32)) <= r_jesdGtTxArr(i).data;
       s_txDataK((i*8)+7 downto (i*8))   <= x"0" & r_jesdGtTxArr(i).dataK;
       s_gtTxReady(i)                    <= s_txDone;
+      gtTxDiffCtrl(i*4-1 downto i*4)    <= txDiffCtrl(i)(3 downto 0);
+      gtTxPostCursor(i*5-1 downto i*5)  <= txPostCursor(i)(4 downto 0);
+      gtTxPreCursor(i*5-1 downto i*5)   <= txPreCursor(i)(4 downto 0);
    end generate TX_LANES_GEN;
 
    -----------------
@@ -375,6 +391,7 @@ begin
          gthrxn_in                             => gtRxN,
          gthrxp_in                             => gtRxP,
          gtrefclk0_in                          => s_gtRefClkVec,
+         loopback_in                           => (others => '0'),
          rx8b10ben_in                          => (others => '1'),
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec,
@@ -387,9 +404,12 @@ begin
          txctrl0_in                            => (others => '0'),
          txctrl1_in                            => (others => '0'),
          txctrl2_in                            => s_txDataK,
-         txdiffctrl_in                         => (others => '1'),
+         txdiffctrl_in                         => gtTxDiffCtrl,
+         txinhibit_in                          => txInhibit,
          txpd_in                               => (others => '0'),
          txpolarity_in                         => JESD_TX_POLARITY_G,
+         txpostcursor_in                       => gtTxPostCursor,
+         txprecursor_in                        => gtTxPreCursor,
          txusrclk_in                           => s_devClkVec,
          txusrclk2_in                          => s_devClk2Vec,
          drpdo_out                             => drpDo,

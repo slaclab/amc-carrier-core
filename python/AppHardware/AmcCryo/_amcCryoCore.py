@@ -28,21 +28,10 @@ from AppHardware.AmcCryo._amcCryoCtrl import *
 
 class AmcCryoCore(pr.Device):
     def __init__(   self, 
-        name        = "AmcCryoCore", 
-        description = "Cryo Amc Rf Demo Board Core", 
-        memBase     =  None, 
-        offset      =  0x0, 
-        hidden      =  False,
-        expand      =  True,
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-        )
+            name        = "AmcCryoCore", 
+            description = "Cryo Amc Rf Demo Board Core", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
                 
         #########
         # Devices
@@ -57,21 +46,21 @@ class AmcCryoCore(pr.Device):
         ##########
         # Commands
         ##########
-        @self.command(name="InitAmcCard", description="Initialization for AMC card's JESD modules",)
+        @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            self.checkBlocks(varUpdate=True, recurse=True)
+            self.checkBlocks(recurse=True)
             self.LMK.Init()
             self.DAC[0].Init()
             self.DAC[1].Init()
             self.ADC[0].Init()
             self.ADC[1].Init()
-            self.checkBlocks(varUpdate=True, recurse=True)            
+            self.checkBlocks(recurse=True)            
             
-        @self.command(name="CmdEnLmkRef", description="Enable Front Panel LMK referenc",)
+        @self.command(description="Enable Front Panel LMK reference",)
         def CmdEnLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x7) 
             
-        @self.command(name="CmdDisLmkRef", description="Disable Front Panel LMK referenc",)
+        @self.command(description="Disable Front Panel LMK reference",)
         def CmdDisLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x0)             
 
@@ -80,7 +69,6 @@ class AmcCryoCore(pr.Device):
         Write all of the blocks held by this Device to memory
         """
         if not self.enable.get(): return
-
 
         # Process local blocks.
         if variable is not None:
@@ -91,10 +79,18 @@ class AmcCryoCore(pr.Device):
                     if block.bulkEn:
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
-
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(varUpdate=True, recurse=True)
-
+        self._root.checkBlocks(recurse=True)
+        
+        # Note: Requires that AmcCryoCore: enable: 'True' in defaults.yml file
+        self.enable.set(True)
+        self.DBG.enable.set(True)
+        self.LMK.enable.set(True)
+        self.DAC[0].enable.set(True)
+        self.DAC[1].enable.set(True)
+        self.ADC[0].enable.set(True)
+        self.ADC[1].enable.set(True)       
+        
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
@@ -105,9 +101,15 @@ class AmcCryoCore(pr.Device):
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
         
-        self._root.checkBlocks(varUpdate=True, recurse=True)
+        self._root.checkBlocks(recurse=True)
         self.ADC[0].DigRst()
         self.ADC[1].DigRst()
+        
+        # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
+        self.DAC[0].enable.set(False)
+        self.DAC[1].enable.set(False)
+        self.ADC[0].enable.set(False)
+        self.ADC[1].enable.set(False)          
         
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
