@@ -332,10 +332,10 @@ package body AppMpsPkg is
       variable i : integer := 0;
    begin
 
-      assignRecord(i, vector, m.mpsEnable);
-      assignRecord(i, vector, m.mpsAppId);
-      assignRecord(i, vector, m.mpsVersion);
-      assignRecord(i, vector, m.lcls1Mode);
+      assignRecord(i, vec, m.mpsEnable);
+      assignRecord(i, vec, m.mpsAppId);
+      assignRecord(i, vec, m.mpsVersion);
+      assignRecord(i, vec, m.lcls1Mode);
 
       return m;
    end function;
