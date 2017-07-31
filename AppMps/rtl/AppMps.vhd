@@ -99,13 +99,22 @@ architecture mapping of AppMps is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
+   signal encWriteMaster : AxiLiteWriteMasterType;
+   signal encWriteSlave  : AxiLiteWriteSlaveType;
+   signal encReadMaster  : AxiLiteReadMasterType;
+   signal encReadSlave   : AxiLiteReadSlaveType;
+
    signal mps125MHzClk : sl;
    signal mps125MHzRst : sl;
    signal mps312MHzClk : sl;
    signal mps312MHzRst : sl;
    signal mps625MHzClk : sl;
    signal mps625MHzRst : sl;
+   signal mpsTholdClk  : sl;
+   signal mpsTholdRst  : sl;
    signal mpsPllLocked : sl;
+   signal mps100MHzClk : sl;
+   signal mps100MHzRst : sl;
 
    signal mpsMaster  : AxiStreamMasterType;
    signal mpsSlave   : AxiStreamSlaveType;
@@ -131,6 +140,8 @@ begin
          mps312MHzRst => mps312MHzRst,
          mps625MHzClk => mps625MHzClk,
          mps625MHzRst => mps625MHzRst,
+         mpsTholdClk  => mpsTholdClk,
+         mpsTholdRst  => mpsTholdRst,
          mpsPllLocked => mpsPllLocked,
          ----------------
          -- Core Ports --
@@ -164,17 +175,38 @@ begin
    ----------------------------
    -- Encoder Logic
    ----------------------------
+   U_MpsCoreAsync: entity work.AxiLiteAsync
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         COMMON_CLK_G     => false,
+         NUM_ADDR_BITS_G  => 16)
+      port map (
+         sAxiClk         => axilClk,
+         sAxiClkRst      => axilRst,
+         sAxiReadMaster  => axilReadMasters(ENCODER_INDEX_C),
+         sAxiReadSlave   => axilReadSlaves(ENCODER_INDEX_C),
+         sAxiWriteMaster => axilWriteMasters(ENCODER_INDEX_C),
+         sAxiWriteSlave  => axilWriteSlaves(ENCODER_INDEX_C),
+         mAxiClk         => mpsTholdClk,
+         mAxiClkRst      => mpsTholdRst,
+         mAxiReadMaster  => encReadMaster,
+         mAxiReadSlave   => encReadSlave,
+         mAxiWriteMaster => encWriteMaster,
+         mAxiWriteSlave  => encWriteSlave);
+
    U_AppMpsEncoder: entity work.AppMpsEncoder
       generic map (
-         TPD_G        => TPD_G,
-         APP_TYPE_G   => APP_TYPE_G)
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         APP_TYPE_G       => APP_TYPE_G)
       port map (
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(ENCODER_INDEX_C),
-         axilReadSlave   => axilReadSlaves(ENCODER_INDEX_C),
-         axilWriteMaster => axilWriteMasters(ENCODER_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(ENCODER_INDEX_C),
+         axilClk         => mpsTholdClk,
+         axilRst         => mpsTholdRst,
+         axilReadMaster  => encReadMaster,
+         axilReadSlave   => encReadSlave,
+         axilWriteMaster => encWriteMaster,
+         axilWriteSlave  => encWriteSlave,
          mpsMaster       => mpsMaster,
          mpsSlave        => mpsSlave,
          diagnosticClk   => diagnosticClk,
@@ -208,6 +240,8 @@ begin
          axilWriteMaster => axilWriteMasters(SALT_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(SALT_INDEX_C),
          -- MPS Interface
+         mpsIbClk        => mpsTholdClk,
+         mpsIbRst        => mpsTholdRst,
          mpsIbMaster     => mpsMaster,
          mpsIbSlave      => mpsSlave,
          ----------------------
