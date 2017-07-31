@@ -145,10 +145,12 @@ begin
 
       -- Init and setup MPS message
       v.mpsMessage                   := MPS_MESSAGE_INIT_C;
+      v.mpsMessage.version           := mpsReg.mpsCore.version;
       v.mpsMessage.lcls              := mpsReg.mpsCore.lcls1Mode;
       v.mpsMessage.timeStamp         := mpsSelect.timeStamp;
       v.mpsMessage.appId(9 downto 0) := mpsReg.mpsCore.mpsAppId;
       v.mpsMessage.msgSize           := toSlv(APP_CONFIG_C.BYTE_COUNT_C, 8);
+      v.mpsMessage.valid             := mpsSelect.valid;
 
       -- Digtal Application
       if APP_CONFIG_C.DIGITAL_EN_C = true then
@@ -238,7 +240,7 @@ begin
          );
 
    --------------------------------- 
-   -- Synchronize core to diagnostic clock
+   -- Synchronize core registers to diagnostic clock
    --------------------------------- 
    U_MpsRegSync : entity work.SynchronizerVector
       generic map (
