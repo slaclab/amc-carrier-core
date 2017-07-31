@@ -61,8 +61,8 @@ architecture mapping of AppMpsClk is
    signal mpsRefClk     : sl;
    signal mpsClk        : sl;
    signal mpsRst        : sl;
-   signal mpsMmcmClkOut : slv(2 downto 0);
-   signal mpsMmcmRstOut : slv(2 downto 0);
+   signal mpsMmcmClkOut : slv(3 downto 0);
+   signal mpsMmcmRstOut : slv(3 downto 0);
    signal locked        : sl;
 
 

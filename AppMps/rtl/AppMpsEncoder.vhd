@@ -145,7 +145,7 @@ begin
 
       -- Init and setup MPS message
       v.mpsMessage                   := MPS_MESSAGE_INIT_C;
-      v.mpsMessage.version           := mpsReg.mpsCore.version;
+      v.mpsMessage.version           := mpsReg.mpsCore.mpsVersion;
       v.mpsMessage.lcls              := mpsReg.mpsCore.lcls1Mode;
       v.mpsMessage.timeStamp         := mpsSelect.timeStamp;
       v.mpsMessage.appId(9 downto 0) := mpsReg.mpsCore.mpsAppId;

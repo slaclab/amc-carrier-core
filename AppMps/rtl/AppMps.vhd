@@ -30,6 +30,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
+use work.AppMpsPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
 use work.TimingPkg.all;
