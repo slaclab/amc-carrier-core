@@ -46,6 +46,8 @@ entity AppMpsClk is
       mps625MHzClk : out sl;
       mps625MHzRst : out sl;
       mpsPllLocked : out sl;
+      mpsTholdClk  : out sl;
+      mpsTholdRst  : out sl;
       ----------------
       -- Core Ports --
       ----------------   
@@ -81,7 +83,7 @@ begin
          INPUT_BUFG_G       => ite(MPS_SLOT_G, false, true),
          FB_BUFG_G          => true,
          RST_IN_POLARITY_G  => '1',
-         NUM_CLOCKS_G       => 3,
+         NUM_CLOCKS_G       => 4,
          -- MMCM attributes
          BANDWIDTH_G        => "OPTIMIZED",
          CLKIN_PERIOD_G     => ite(MPS_SLOT_G, 6.4, 8.0),
@@ -90,7 +92,8 @@ begin
          CLKOUT0_DIVIDE_F_G => 2.0,                         -- 625 MHz = 1.25 GHz/2.0
          CLKOUT0_RST_HOLD_G => 4,
          CLKOUT1_DIVIDE_G   => 4,                           -- 312.5 MHz = 1.25 GHz/4
-         CLKOUT2_DIVIDE_G   => 10)                          -- 125 MHz = 1.25 GHz/10
+         CLKOUT2_DIVIDE_G   => 10,                          -- 125 MHz = 1.25 GHz/10
+         CLKOUT3_DIVIDE_G   => 20)                          -- 62.5 MHz = 1.25 GHz/20
       port map(
          -- Clock Input
          clkIn  => mpsClk,
@@ -109,6 +112,9 @@ begin
          clk     => axilClk,
          dataIn  => locked,
          dataOut => mpsPllLocked);            
+
+   mpsTholdClk <= mpsMmcmClkOut(3);
+   mpsTholdRst <= mpsMmcmRstOut(3);
 
    mps125MHzClk <= mpsMmcmClkOut(2);
    mps125MHzRst <= mpsMmcmRstOut(2);
