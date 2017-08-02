@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmDigitalDebug.vhd
+-- File       : RtmDigitalDebugV1.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
 -- Last update: 2017-07-26
@@ -24,7 +24,7 @@ use work.AxiLitePkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity RtmDigitalDebug is
+entity RtmDigitalDebugV1 is
    generic (
       TPD_G            : time             := 1 ns;
       REG_DOUT_EN_G    : slv(15 downto 0) := x"0000";  -- '1' = registered, '0' = unregistered
@@ -51,9 +51,9 @@ entity RtmDigitalDebug is
       --  RTM's Clock Reference
       genClkP         : in    sl;
       genClkN         : in    sl);
-end RtmDigitalDebug;
+end RtmDigitalDebugV1;
 
-architecture mapping of RtmDigitalDebug is
+architecture mapping of RtmDigitalDebugV1 is
 
    type RegType is record
       doutDisable    : slv(15 downto 0);
