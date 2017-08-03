@@ -180,7 +180,7 @@ begin
                                  mpsSelect.chanData(chan), 0, v.mpsMessage);
 
                -- LCLS2 idle table
-               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsSelect.selectIdle = '1' then
+               elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
                                  mpsSelect.chanData(chan), 7, v.mpsMessage);
