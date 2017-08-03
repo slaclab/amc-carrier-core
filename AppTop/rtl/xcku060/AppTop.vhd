@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-06-28
+-- Last update: 2017-08-03
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -39,6 +39,7 @@ entity AppTop is
       SIMULATION_G           : boolean                   := false;
       MR_LCLS_APP_G          : boolean                   := true;
       WAVEFORM_TDATA_BYTES_G : positive                  := 4;
+      TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";  -- "AXIL"
       AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
       JESD_DRP_EN_G          : boolean                   := false;
@@ -46,8 +47,8 @@ entity AppTop is
       JESD_TX_LANE_G         : NaturalArray(1 downto 0)  := (others => 8);
       JESD_RX_POLARITY_G     : Slv10Array(1 downto 0)    := (others => "0000000000");
       JESD_TX_POLARITY_G     : Slv10Array(1 downto 0)    := (others => "0000000000");
-      JESD_RX_ROUTES_G       : AppTopJesdRouteArray  := (others => JESD_ROUTES_INIT_C);
-      JESD_TX_ROUTES_G       : AppTopJesdRouteArray  := (others => JESD_ROUTES_INIT_C);
+      JESD_RX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
+      JESD_TX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
       JESD_REF_SEL_G         : Slv2Array(1 downto 0)     := (others => DEV_CLK0_SEL_C);
       -- Signal Generator Generics
       SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 8);
@@ -212,8 +213,8 @@ begin
    --------------------------
    -- Clock and reset mapping
    --------------------------
-   timingClk <= recTimingClk;
-   timingRst <= recTimingRst;
+   timingClk <= recTimingClk when(TIMING_BUS_DOMAIN_G = "REC_CLK") else axilClk;
+   timingRst <= recTimingRst when(TIMING_BUS_DOMAIN_G = "REC_CLK") else axilRst;
 
    ---------------------
    -- AXI-Lite Crossbar
@@ -350,7 +351,7 @@ begin
             rxAxisCtrlArr_i(3)  => obAppWaveformSlaves(i)(3).ctrl);
 
       dataValids(i) <= debugValids(i) & dacValids(i) & adcValids(i);
-      linkReady(i)  <= x"F"           & dacValids(i) & adcValids(i);
+      linkReady(i)  <= x"F" & dacValids(i) & adcValids(i);
 
       ------------
       -- JESD Core
