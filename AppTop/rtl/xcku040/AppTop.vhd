@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-04-03
+-- Last update: 2017-08-03
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -38,6 +38,7 @@ entity AppTop is
       SIM_SPEEDUP_G        : boolean                   := false;
       SIMULATION_G         : boolean                   := false;
       MR_LCLS_APP_G        : boolean                   := true;
+      TIMING_BUS_DOMAIN_G  : string                    := "REC_CLK";  -- "AXIL"
       AXI_ERROR_RESP_G     : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
       JESD_DRP_EN_G        : boolean                   := false;
@@ -53,7 +54,7 @@ entity AppTop is
       SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 0);
       SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0) := (others => 9);
       SIG_GEN_LANE_MODE_G  : Slv7Array(1 downto 0)     := (others => "0000000");
-      SIG_GEN_RAM_CLK_G    : Slv7Array(1 downto 0)     := (others => "0000000");      
+      SIG_GEN_RAM_CLK_G    : Slv7Array(1 downto 0)     := (others => "0000000");
       -- Triggering Generics
       TRIG_SIZE_G          : positive range 1 to 16    := 3;
       TRIG_DELAY_WIDTH_G   : integer range 1 to 32     := 32;
@@ -212,8 +213,8 @@ begin
    --------------------------
    -- Clock and reset mapping
    --------------------------
-   timingClk <= recTimingClk;
-   timingRst <= recTimingRst;
+   timingClk <= recTimingClk when(TIMING_BUS_DOMAIN_G = "REC_CLK") else axilClk;
+   timingRst <= recTimingRst when(TIMING_BUS_DOMAIN_G = "REC_CLK") else axilRst;
 
    ---------------------
    -- AXI-Lite Crossbar
@@ -346,7 +347,7 @@ begin
             rxAxisCtrlArr_i(3)  => obAppWaveformSlaves(i)(3).ctrl);
 
       dataValids(i) <= debugValids(i) & dacValids(i) & adcValids(i);
-      linkReady(i)  <= x"F"           & dacValids(i) & adcValids(i);
+      linkReady(i)  <= x"F" & dacValids(i) & adcValids(i);
 
       ------------
       -- JESD Core
