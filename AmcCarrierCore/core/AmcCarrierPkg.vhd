@@ -60,7 +60,8 @@ package AmcCarrierPkg is
    constant APP_BPM_STRIPLINE_TYPE_C  : AppType := toSlv(100, AppType'length);
    constant APP_BPM_CAVITY_TYPE_C     : AppType := toSlv(101, AppType'length);
 
-   constant APP_MPS_TYPE_C            : AppType := toSlv(120, AppType'length);
+   constant APP_MPS_24CH_TYPE_C       : AppType := toSlv(120, AppType'length);
+   constant APP_MPS_6CH_TYPE_C        : AppType := toSlv(121, AppType'length);
 
    -------------------------------------
    -- Common Platform: General Constants
