@@ -99,7 +99,13 @@ begin
 
             -- Offset base + 0x0
             axiSlaveRegisterR(regEp, toSlv(base, 16),  0, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).THOLD_COUNT_C,8));
-            axiSlaveRegisterR(regEp, toSlv(base, 16),  8, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).IDLE_EN_C,'1','0'));
+
+            if APP_CONFIG_G.CHAN_CONFIG_C(chan).IDLE_EN_C then
+               axiSlaveRegister(regEp, toSlv(base, 16),  8, v.mpsReg.mpsChanReg(chan).idleEn);
+            else
+               axiSlaveRegisterR(regEp, toSlv(base, 16),  8, '0');
+            end if;
+
             axiSlaveRegisterR(regEp, toSlv(base, 16),  9, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).ALT_EN_C,'1','0'));
             axiSlaveRegisterR(regEp, toSlv(base, 16), 10, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).LCLS1_EN_C,'1','0'));
             axiSlaveRegisterR(regEp, toSlv(base, 16), 16, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).BYTE_MAP_C,8));
