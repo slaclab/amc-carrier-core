@@ -9,10 +9,17 @@ loadConstraints      -path "$::DIR_PATH/xdc/AppTop.xdc"
 # Check for valid FPGA 
 if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
 
-   loadSource      -dir  "$::DIR_PATH/rtl/xcku040"
-   
-   loadSource  -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.dcp"
-   # loadIpCore -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.xci"
+   if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
+      loadSource      -dir  "$::DIR_PATH/rtl/xcku040"
+      
+      loadSource  -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.dcp"
+      # loadIpCore -path "$::DIR_PATH/coregen/xcku040/AppTopJesd204bCoregen.xci"
+   } else {
+      loadSource      -dir  "$::DIR_PATH/rtl/xcku040_mpsln"
+      
+      loadSource  -path "$::DIR_PATH/coregen/xcku040_mpsln/AppTopJesd204bCoregen.dcp"
+      #loadIpCore -path "$::DIR_PATH/coregen/xcku040_mpsln/AppTopJesd204bCoregen.xci"
+   }
    
 } elseif { $::env(PRJ_PART) == "XCKU060-FFVA1156-2-E" } { 
 
