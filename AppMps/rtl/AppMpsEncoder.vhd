@@ -57,10 +57,12 @@ architecture mapping of AppMpsEncoder is
    constant APP_CONFIG_C : MpsAppConfigType := getMpsAppConfig(APP_TYPE_G);
 
    type RegType is record
+      tholdMem   : Slv8VectorArray(MPS_CHAN_COUNT_G,8);
       mpsMessage : MpsMessageType;
    end record;
 
    constant REG_INIT_C : RegType := (
+      tholdMem   => (others=>(others=>'0'));
       mpsMessage => MPS_MESSAGE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
@@ -68,11 +70,13 @@ architecture mapping of AppMpsEncoder is
 
    signal mpsSelect : MpsSelectType;
 
-   procedure compareTholds (thold  : in    MpsChanTholdType;
-                            config : in    MpsChanConfigType;
-                            value  : in    slv;
-                            bitPos : in    integer;
-                            mpsMsg : inout MpsMessageType) is
+   procedure compareTholds (thold       : in    MpsChanTholdType;
+                            config      : in    MpsChanConfigType;
+                            value       : in    slv;
+                            bitPos      : in    integer;
+                            tholdMemIn  : in    slv;
+                            tholdMemOut : inout slv;
+                            mpsMsg      : inout MpsMessageType) is
 
       variable signedVal : signed(31 downto 0);
       variable signedMax : signed(31 downto 0);
@@ -82,11 +86,18 @@ architecture mapping of AppMpsEncoder is
       signedMin := signed(thold.minThold);
       signedMax := signed(thold.maxThold);
 
+      -- Threshold is exceeded. Set current bit and set 8 bit shift vector
       if (thold.maxTholdEn = '1' and signedVal > signedMax) or
          (thold.minTholdEn = '1' and signedVal > signedMin) then
 
+         tholdMemOut := (others=>'1');
          mpsMsg.message(config.BYTE_MAP_C)(bitPos) := '1';
 
+      -- Threhold was exceeded within the last 8 clocks
+      elsif tholdMemIn /= 0 then
+         tholdMemOut(7 downto 1) := tholdMemIn(6 downto 0);
+         tholdMemOut(0)          := '0';
+         mpsMsg.message(config.BYTE_MAP_C)(bitPos) := '1';
       end if;
    end procedure;
 
@@ -171,19 +182,22 @@ begin
 
                -- Channel is marked in error, set all bits
                if mpsSelect.mpsError(chan) = '1' then
-                  v.mpsMessage.message(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C) := x"FF";
+                  for i in 0 to (APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C-1) loop
+                     v.mpsMessage.message(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C)(i) := '1';
+                     v.tholdMem(chan,0) := (others=>'1');
+                  end loop;
 
                -- LCLS1 Mode
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.mpsCore.lcls1Mode = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 mpsSelect.chanData(chan), 0, v.mpsMessage);
+                                 mpsSelect.chanData(chan), 0, r.tholdMem(chan,0), v.tholdMem(chan,0), v.mpsMessage);
 
                -- LCLS2 idle table
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 mpsSelect.chanData(chan), 7, v.mpsMessage);
+                                 mpsSelect.chanData(chan), 7, r.tholdMem(chan,7), r.tholdMem(chan,7), v.mpsMessage);
 
                -- Multiple thresholds
                else
@@ -193,13 +207,13 @@ begin
                      if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
                         compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold), 
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
+                                       mpsSelect.chanData(chan), thold, v.tholdMem(chan,thold), r.tholdMem(chan,thold), v.mpsMessage);
 
                      -- Standard table
                      else
                         compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold), 
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       mpsSelect.chanData(chan), thold, v.mpsMessage);
+                                       mpsSelect.chanData(chan), thold, v.tholdMem(chan,thold), r.tholdMem(chan,thold), v.mpsMessage);
                      end if;
                   end loop;
                end if;
