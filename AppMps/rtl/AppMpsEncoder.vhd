@@ -161,7 +161,7 @@ begin
       v.mpsMessage.timeStamp         := mpsSelect.timeStamp;
       v.mpsMessage.appId(9 downto 0) := mpsReg.mpsCore.mpsAppId;
       v.mpsMessage.msgSize           := toSlv(APP_CONFIG_C.BYTE_COUNT_C, 8);
-      v.mpsMessage.valid             := mpsSelect.valid;
+      v.mpsMessage.valid             := mpsSelect.valid and mpsReg.mpsCore.mpsEnable;
 
       -- Digtal Application
       if APP_CONFIG_C.DIGITAL_EN_C = true then
