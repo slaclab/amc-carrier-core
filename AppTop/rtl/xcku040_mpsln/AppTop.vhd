@@ -70,6 +70,7 @@ entity AppTop is
       axilReadSlave        : out   AxiLiteReadSlaveType;
       axilWriteMaster      : in    AxiLiteWriteMasterType;
       axilWriteSlave       : out   AxiLiteWriteSlaveType;
+      mpsCoreReg           : in    MpsCoreRegType;
       -- Timing Interface (timingClk domain) 
       timingClk            : out   sl;
       timingRst            : out   sl;
@@ -510,6 +511,7 @@ begin
          axilReadSlave       => axilReadSlaves(CORE_INDEX_C),
          axilWriteMaster     => axilWriteMasters(CORE_INDEX_C),
          axilWriteSlave      => axilWriteSlaves(CORE_INDEX_C),
+         mpsCoreReg          => mpsCoreReg,
          ----------------------
          -- Top Level Interface
          ----------------------

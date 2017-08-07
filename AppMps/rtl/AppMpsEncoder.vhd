@@ -44,10 +44,10 @@ entity AppMpsEncoder is
       axilReadSlave   : out AxiLiteReadSlaveType;
       mpsMaster       : out AxiStreamMasterType;
       mpsSlave        : in  AxiStreamSlaveType;
+      mpsCoreReg      : out MpsCoreRegType;
       -- Inputs
       diagnosticClk   : in  sl;
       diagnosticRst   : in  sl;
-      mpsCoreReg      : out MpsCoreRegType;
       diagnosticBus   : in  DiagnosticBusType);
 
 end AppMpsEncoder;
@@ -247,8 +247,8 @@ begin
          TPD_G   => TPD_G,
          WIDTH_G => MPS_CORE_REG_BITS_C)
       port map (
-         clk     => diagnosticClk,
-         rst     => diagnosticRst,
+         clk     => axilClk,
+         rst     => axilRst,
          dataIn  => mpsCoreRegDin,
          dataOut => mpsCoreRegDout);
 
