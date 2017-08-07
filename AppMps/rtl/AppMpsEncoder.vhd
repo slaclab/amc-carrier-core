@@ -182,7 +182,7 @@ begin
 
                -- Channel is marked in error, set all bits
                if mpsSelect.mpsError(chan) = '1' then
-                  for i in 0 to (APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C-1) loop
+                  for i in 0 to 7 loop
                      v.mpsMessage.message(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C)(i) := '1';
                      v.tholdMem(chan,0) := (others=>'1');
                   end loop;
@@ -197,7 +197,7 @@ begin
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 mpsSelect.chanData(chan), 7, r.tholdMem(chan,7), r.tholdMem(chan,7), v.mpsMessage);
+                                 mpsSelect.chanData(chan), 7, r.tholdMem(chan,7), v.tholdMem(chan,7), v.mpsMessage);
 
                -- Multiple thresholds
                else
@@ -207,13 +207,13 @@ begin
                      if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
                         compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold), 
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       mpsSelect.chanData(chan), thold, v.tholdMem(chan,thold), r.tholdMem(chan,thold), v.mpsMessage);
+                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan,thold), v.tholdMem(chan,thold), v.mpsMessage);
 
                      -- Standard table
                      else
                         compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold), 
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       mpsSelect.chanData(chan), thold, v.tholdMem(chan,thold), r.tholdMem(chan,thold), v.mpsMessage);
+                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan,thold), v.tholdMem(chan,thold), v.mpsMessage);
                      end if;
                   end loop;
                end if;
