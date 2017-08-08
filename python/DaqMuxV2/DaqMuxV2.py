@@ -257,6 +257,28 @@ class DaqMuxV2(pr.Device):
             mode         = "RO",
             pollInterval =  1,                            
         ))
+        
+        self.add(pr.RemoteVariable(   
+            name         = "DbgInputValid",
+            description  = "Input Valid bus for debugging",
+            offset       =  0x2C,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval =  1,                            
+        ))       
+
+        self.add(pr.RemoteVariable(   
+            name         = "DbgLinkReady",
+            description  = "Input LinkReady bus for debugging",
+            offset       =  0x30,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval =  1,                            
+        ))               
 
         self.addRemoteVariables(   
             name         = "InputMuxSel",
