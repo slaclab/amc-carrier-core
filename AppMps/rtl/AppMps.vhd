@@ -50,6 +50,7 @@ entity AppMps is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
+      mpsCoreReg      : out MpsCoreRegType;
       -- System Status
       bsiBus          : in  BsiBusType;     -- axilClk domain
       ethLinkUp       : in  sl;             -- axilClk domain
@@ -62,7 +63,6 @@ entity AppMps is
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk   : in  sl;
       diagnosticRst   : in  sl;
-      mpsCoreReg      : out MpsCoreRegType;
       diagnosticBus   : in  DiagnosticBusType;
       -- MPS Interface
       mpsObMasters    : out AxiStreamMasterArray(14 downto 0);
