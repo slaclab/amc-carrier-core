@@ -116,22 +116,12 @@ begin
       beamDest(conv_integer(diagnosticBus.timingMessage.beamRequest(7 downto 4))) := '1';
 
       -- Beam enable decode
-      beamEn := ((beamDest and beamDestInt) /= 0);
+      v.mpsSelect.selectIdle := ite(((beamDest and beamDestInt) /= 0),'0', '1');
 
       -- Alt table decode
-      altEn := ((beamDest and altDestInt) /= 0);
-
-      -- BPM mode, alt = kick, idle = no beam
-      if APP_TYPE_G = APP_BPM_STRIPLINE_TYPE_C or APP_TYPE_G = APP_BPM_CAVITY_TYPE_C then
-         v.mpsSelect.selectIdle := ite(beamEn, '0', '1');
-         v.mpsSelect.selectAlt  := ite(altEn, '1', '0');
-
-      -- Kicker mode, idle = no kick
-      elsif APP_TYPE_G = APP_MPS_KICK_TYPE_C then
-         v.mpsSelect.selectIdle := ite(beamEn, '0', '1');
-      end if;
-
-      -- LLRF is the only digital app right now
+      v.mpsSelect.selectAlt := ite(((beamDest and altDestInt) /= 0),'1','0');
+      
+      -- Digital APP
       if APP_CONFIG_G.DIGITAL_EN_C then
          v.mpsSelect.digitalBus(3 downto 0) := diagnosticBus.data(30)(3 downto 0);
          v.mpsSelect.digitalBus(7 downto 4) := diagnosticBus.data(31)(3 downto 0);

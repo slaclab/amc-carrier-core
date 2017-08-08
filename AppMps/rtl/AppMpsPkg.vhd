@@ -145,6 +145,7 @@ package AppMpsPkg is
       stdTholds  : MpsChanTholdArray(7 downto 0);
       lcls1Thold : MpsChanTholdType;
       idleThold  : MpsChanTholdType;
+      idleEn     : sl;
       altTholds  : MpsChanTholdArray(7 downto 0);
    end record;
 
@@ -154,6 +155,7 @@ package AppMpsPkg is
       stdTholds  => (others => MPS_CHAN_THOLD_INIT_C),
       lcls1Thold => MPS_CHAN_THOLD_INIT_C,
       idleThold  => MPS_CHAN_THOLD_INIT_C,
+      idleEn     => '0',
       altTholds  => (others => MPS_CHAN_THOLD_INIT_C));
 
    ---------------------------------------------------
@@ -431,37 +433,22 @@ package body AppMpsPkg is
             ret.DIGITAL_EN_C := true;
             ret.BYTE_COUNT_C := 1;
 
-         when APP_MPS_BLM_TYPE_C =>
+         when APP_MPS_24CH_TYPE_C =>
             ret.BYTE_COUNT_C := 24;
 
             for i in 0 to 23 loop
-               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 7;
                ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;
+               ret.CHAN_CONFIG_C(i).IDLE_EN_C     := true;
             end loop;
 
-         when APP_MPS_GAP_TYPE_C =>
+         when APP_MPS_6CH_TYPE_C =>
             ret.BYTE_COUNT_C := 6;
 
             for i in 0 to 5 loop
-               ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
+               ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 7;
                ret.CHAN_CONFIG_C(i*4).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
-            end loop;
-
-         when APP_MPS_BEND_TYPE_C =>
-            ret.BYTE_COUNT_C := 6;
-
-            for i in 0 to 5 loop
-               ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
-               ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
-            end loop;
-
-         when APP_MPS_KICK_TYPE_C =>
-            ret.BYTE_COUNT_C := 6;
-
-            for i in 0 to 5 loop
-               ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 8;
                ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
                ret.CHAN_CONFIG_C(i*4).IDLE_EN_C     := true;
             end loop;
