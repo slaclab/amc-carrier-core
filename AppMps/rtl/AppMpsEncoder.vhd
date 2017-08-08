@@ -57,12 +57,12 @@ architecture mapping of AppMpsEncoder is
    constant APP_CONFIG_C : MpsAppConfigType := getMpsAppConfig(APP_TYPE_G);
 
    type RegType is record
-      tholdMem   : Slv8VectorArray(MPS_CHAN_COUNT_G,8);
+      tholdMem   : Slv8VectorArray(MPS_CHAN_COUNT_C-1 downto 0,7 downto 0);
       mpsMessage : MpsMessageType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      tholdMem   => (others=>(others=>'0'));
+      tholdMem   => (others=>(others=>(others=>'0'))),
       mpsMessage => MPS_MESSAGE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
