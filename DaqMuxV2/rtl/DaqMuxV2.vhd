@@ -88,9 +88,9 @@ end DaqMuxV2;
 architecture rtl of DaqMuxV2 is
 
    -- Internal signals
-   signal s_sampleDataArr     : slv32Array(N_DATA_OUT_G-1 downto 0) := (others => (others => '0'));
-   signal s_sampleValidVec    : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
-   signal s_LinkReadyVec      : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
+   signal s_sampleDataArr     : slv32Array(N_DATA_IN_G-1 downto 0)  := (others => (others => '0'));
+   signal s_sampleValidVec    : slv(N_DATA_IN_G-1 downto 0)         := (others => '0');
+   signal s_LinkReadyVec      : slv(N_DATA_IN_G-1 downto 0)         := (others => '0');
    signal s_sampleDataArrMux  : slv32Array(N_DATA_OUT_G-1 downto 0) := (others => (others => '0'));
    signal s_sampleValidVecMux : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
    signal s_LinkReadyVecMux   : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
@@ -268,11 +268,13 @@ begin
    sync : process (devClk_i) is
    begin
       if rising_edge(devClk_i) then
-         for i in N_DATA_OUT_G-1 downto 0 loop
+         for i in N_DATA_IN_G-1 downto 0 loop
             -- Register to help with timing
             s_sampleDataArr(i)  <= sampleDataArr_i(i)  after TPD_G;
             s_sampleValidVec(i) <= sampleValidVec_i(i) after TPD_G;
             s_LinkReadyVec(i)   <= linkReadyVec_i(i)   after TPD_G;
+         end loop;
+         for i in N_DATA_OUT_G-1 downto 0 loop
             -- Data mode
             if (s_muxSel(i) < (N_DATA_IN_G+2) and s_muxSel(i) > 1) then
                s_sampleDataArrMux(i)  <= s_sampleDataArr(conv_integer(s_muxSel(i))-2)  after TPD_G;
