@@ -181,6 +181,8 @@ begin
             pllFrqSel(1)    => spareP(12),
             pllFrqSel(2)    => spareP(13),
             pllFrqSel(3)    => spareP(14),
+            userValueIn     => (others=>'0'),
+            userValueOut    => open,
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
