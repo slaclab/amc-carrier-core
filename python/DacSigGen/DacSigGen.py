@@ -214,3 +214,14 @@ class DacSigGen(pr.Device):
                     )
                     v = getattr(self, 'PeriodSize[%i]'%ch)
                     v.set(((cnt>>1)-1) if (fillMode) else (cnt-1))
+                    # Let's verify the data
+                    readBack = self._rawRead(
+                        offset      = (0x01000000 + (ch*0x01000000)),
+                        numWords    = cnt,
+                        base        = pr.Int,
+                        stride      = (2  if (fillMode) else  4),
+                        wordBitSize = (16 if (fillMode) else 32)
+                    )
+                    for i in range(cnt):
+                        if ( data[i] != readBack[i] ):
+                            click.secho( ('LoadCsvFile(): Failed verification: data[%d] = %d != readBack[%d] = %d' % (i,data[i],i,readBack[i])), fg='red')
