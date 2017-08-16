@@ -170,11 +170,14 @@ class DacSigGen(pr.Device):
            
         @self.command(value='',description="Load the .CSV",)
         def LoadCsvFile(arg):
+            # Check if non-empty argument 
             if (arg != ""):
                 path = arg
             else:
+                # Use the variable path instead
                 path = self.CsvFilePath.get()
-                
+            
+            # Open the .CSV file
             with open(path) as csvfile:
                 reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
                 idx     = 0
@@ -200,6 +203,10 @@ class DacSigGen(pr.Device):
                 if (fillMode) and ( (cnt%2) == 1 ):
                     csvData.append(csvData[cnt-1])
                     cnt += 1 
+                # Get the current enable mask value
+                enableMask = self.EnableMask.get()
+                # Reset the enable mask during the load
+                self.EnableMask.set(0x0)
                 # Loop through the channels
                 for ch in range(self._numOfChs):
                     data = []
@@ -225,3 +232,5 @@ class DacSigGen(pr.Device):
                     for i in range(cnt):
                         if ( data[i] != readBack[i] ):
                             click.secho( ('LoadCsvFile(): Failed verification: data[%d] = %d != readBack[%d] = %d' % (i,data[i],i,readBack[i])), fg='red')
+                # Restore the enable mask value
+                self.EnableMask.set(enableMask)
