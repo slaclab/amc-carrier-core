@@ -5,9 +5,13 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 loadSource -dir "$::DIR_PATH/rtl/"
 loadSource -path "$::DIR_PATH/coregen/MpsPgpGthCore.dcp"
 
-if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
-   loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu040.xdc"
-} else {
-   loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu060.xdc"
-}
+if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
 
+   if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
+      loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu040.xdc"
+   } else {
+      loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu060.xdc"
+   }
+} else {
+   loadConstraints -path "$::DIR_PATH/xdc/MpsLinkNodeSaltSerdes.xdc"
+}

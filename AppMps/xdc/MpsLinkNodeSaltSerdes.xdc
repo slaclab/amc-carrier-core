@@ -8,6 +8,20 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+set_property PACKAGE_PIN B6 [get_ports rtmHsTxP]
+set_property PACKAGE_PIN B5 [get_ports rtmHsTxN]
+set_property PACKAGE_PIN A4 [get_ports rtmHsRxP]
+set_property PACKAGE_PIN A3 [get_ports rtmHsRxN]
+
+set_property DIFF_TERM_ADV TERM_100 [get_ports {mpsBusRxP[*]}]
+set_property DIFF_TERM_ADV TERM_100 [get_ports {mpsBusRxN[*]}]
+
+set_false_path -to [get_pins U_Core/U_AppMps/U_Salt/MPS_SLOT.U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst/RST]
+set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AppMps/U_Salt/MPS_SLOT.U_SaltDelayCtrl/SALT_IDELAY_CTRL_Inst*}]
+set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AppMps/U_Salt/*/idelay_cal}]
+set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AppMps/U_Salt/*/idelay_m}]
+set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AppMps/U_Salt/*/idelay_s}]
+
 #####################################
 ## Core Area/Placement Constraints ##
 #####################################
