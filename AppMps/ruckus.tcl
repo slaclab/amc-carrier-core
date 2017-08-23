@@ -14,4 +14,5 @@ if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
    }
 } else {
    loadConstraints -path "$::DIR_PATH/xdc/MpsLinkNodeSaltSerdes.xdc"
+   # set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
 }
