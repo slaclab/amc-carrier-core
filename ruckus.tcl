@@ -16,10 +16,18 @@ proc SubmoduleCheck { name lockTag } {
    # Compare the tag version for the targeted submodule version lock
    if { [expr { ${major} < ${majorLock} }] } {
       set invalidTag 1
-   } elseif { [expr { ${minor} < ${minorLock} }] } {
-      set invalidTag 1
+   } elseif { [expr { ${minor} < ${minorLock} }] } {      
+      if { [expr { ${major} >= ${majorLock} }] } {
+         set invalidTag 0
+      } else {
+         set invalidTag 1
+      }      
    } elseif { [expr { ${patch} < ${patchLock} }] } {
-      set invalidTag 1
+      if { [expr { ${minor} >= ${minorLock} }] } {
+         set invalidTag 0
+      } else {
+         set invalidTag 1
+      }
    } else { 
       set invalidTag 0 
    }
@@ -38,8 +46,8 @@ proc SubmoduleCheck { name lockTag } {
 }
 
 ## Check for submodule tagging
-if { [SubmoduleCheck {ruckus}             {1.3.3} ] < 0 } {exit -1}
-if { [SubmoduleCheck {surf}               {1.3.7} ] < 0 } {exit -1}
+if { [SubmoduleCheck {ruckus}             {1.4.0} ] < 0 } {exit -1}
+if { [SubmoduleCheck {surf}               {1.3.8} ] < 0 } {exit -1}
 if { [SubmoduleCheck {lcls-timing-core}   {1.7.3} ] < 0 } {exit -1}
 
 ## Check for version 2016.4 of Vivado
