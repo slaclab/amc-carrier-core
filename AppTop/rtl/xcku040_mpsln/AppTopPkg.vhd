@@ -2,7 +2,7 @@
 -- File       : AppTopPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-06-30
+-- Last update: 2017-08-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -62,11 +62,12 @@ package AppTopPkg is
       start => (others => '0'));
 
    type DacSigStatusType is record
+      sow     : slv(4 downto 0);  -- Start of waveform strobe (running = '1' and RAM Address = 0x0)   
       running : slv(4 downto 0);
    end record;
    type DacSigStatusArray is array (natural range <>) of DacSigStatusType;
    constant DAC_SIG_STATUS_INIT_C : DacSigStatusType := (
+      sow     => (others => '0'),
       running => (others => '0'));
 
 end package AppTopPkg;
-
