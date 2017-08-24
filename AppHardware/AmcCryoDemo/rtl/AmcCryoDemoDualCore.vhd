@@ -4,8 +4,7 @@
 -- Created    : 2015-10-28
 -- Last update: 2016-07-12
 -------------------------------------------------------------------------------
--- Description: 
---    https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 

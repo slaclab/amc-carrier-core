@@ -1,22 +1,10 @@
 -------------------------------------------------------------------------------
--- Title      : LCLS-II Cryo-Sensor High Speed ADC/DAC Board
--------------------------------------------------------------------------------
 -- File       : AmcCryoCore.vhd
--- Author     : Uros Legat <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
 -- Last update: 2017-06-29
--- Platform   : LCLS2 Common Plaform Carrier
---              AMC ADC/Analog demo
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
--- Description:
---    
---    8 lane JESD receiver ADC
---    8 lane JESD transmitter DAC
---    SPI: 1 LMK chip, 2 ADC chip (ADC32RF45), and 2 DAC chip () 
---
---    https://confluence.slac.stanford.edu/pages/viewpage.action?spaceKey=AIRTRACK&title=PC_379_396_23_C00
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_23_C00
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 LLRF Development'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
