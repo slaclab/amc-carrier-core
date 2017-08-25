@@ -65,12 +65,12 @@ set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {spareP[1][8]}] 
 set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {spareN[1][8]}] ; # jesdTxSyncN(1)
 
 # ADC SPI
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][2]}]    ; # adcSpiDo
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][2]}]    ; # adcSpiDo(0)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {syncInN[1][0]}]   ; # adcSpiDo(1)
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][1]}]    ; # adcSpiClk
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][2]}]    ; # adcSpiCsb(0)
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {syncOutN[1][8]}]  ; # adcSpiCsb(1)
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {syncOutP[1][9]}]  ; # adcSpiDi
-
 
 # DAC SPI
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][0]}]    ; # dacSpiClk
@@ -81,7 +81,15 @@ set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {syncOutP[1][8]}
 # LMK SPI
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][10]}]    ; # lmkSpiClk
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][11]}]    ; # lmkSpiDio
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][9]}]    ; # lmkSpiCsb
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][9]}]     ; # lmkSpiCsb
+
+# LMK SPI
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][6]}]    ; # pllSpiClk
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][6]}]    ; # pllSpiDio
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][9]}]    ; # pllSpiCsb(0)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][9]}]    ; # pllSpiCsb(1)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][7]}]    ; # pllSpiCsb(2)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][7]}]    ; # pllSpiCsb(3)
 
 # ADC resets
 set_property -dict {IOSTANDARD LVCMOS18} [get_ports {spareN[1][3]}]    ; # adcRst(0)

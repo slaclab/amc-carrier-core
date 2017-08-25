@@ -2,7 +2,7 @@
 -- File       : MicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
--- Last update: 2017-06-29
+-- Last update: 2017-08-25
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -120,6 +120,13 @@ architecture top_level_app of MicrowaveMuxCore is
    signal locAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal locAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
+   constant REG_CONFIG_C : AxiLiteCrossbarMasterConfigArray(4 downto 0) := genAxiLiteConfig(5, CTRL_BASE_ADDR_C, 16, 12);
+
+   signal regWriteMasters : AxiLiteWriteMasterArray(4 downto 0);
+   signal regWriteSlaves  : AxiLiteWriteSlaveArray(4 downto 0);
+   signal regReadMasters  : AxiLiteReadMasterArray(4 downto 0);
+   signal regReadSlaves   : AxiLiteReadSlaveArray(4 downto 0);
+
    -----------------------
    -- Application Ports --
    -----------------------
@@ -154,7 +161,7 @@ architecture top_level_app of MicrowaveMuxCore is
 
    signal adcSpiClk : sl;
    signal adcSpiDi  : sl;
-   signal adcSpiDo  : sl;
+   signal adcSpiDo  : slv(1 downto 0);
    signal adcSpiCsb : slv(1 downto 0);
 
    -- DAC SPI config interface 
@@ -170,7 +177,6 @@ architecture top_level_app of MicrowaveMuxCore is
    signal dacSpiDio : sl;
    signal dacSpiCsb : slv(1 downto 0);
 
-
    -- LMK SPI config interface
    signal lmkSpiDout : sl;
    signal lmkSpiDin  : sl;
@@ -178,6 +184,11 @@ architecture top_level_app of MicrowaveMuxCore is
    signal lmkSpiClk : sl;
    signal lmkSpiDio : sl;
    signal lmkSpiCsb : sl;
+
+   -- PLL interface
+   signal pllSpiClk : sl;
+   signal pllSpiDi  : sl;
+   signal pllSpiCsb : slv(3 downto 0);
 
 begin
    -----------------------
@@ -188,9 +199,9 @@ begin
    jesdSysRefP <= sysRefP(0);  -- Polarity swapped on page 2 of schematics
    jesdSysRefN <= sysRefN(0);
 
-   sysRefP(2) <= '0'; -- driven the unconnected ext sysref to GND (prevent floating antenna) 
-   sysRefN(2) <= '0'; -- driven the unconnected ext sysref to GND (prevent floating antenna) 
-   
+   sysRefP(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna) 
+   sysRefN(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna) 
+
    -- JESD RX Sync Ports
    syncInP(3) <= jesdRxSyncP(0);
    syncInN(3) <= jesdRxSyncN(0);
@@ -204,11 +215,12 @@ begin
    jesdTxSyncN(1) <= spareN(8);
 
    -- ADC SPI 
-   spareP(2)   <= adcSpiDo;
+   adcSpiDo(0) <= spareP(2);
+   adcSpiDo(1) <= syncInN(0);
    spareN(1)   <= adcSpiClk;
    spareN(2)   <= adcSpiCsb(0);
    syncOutN(8) <= adcSpiCsb(1);
-   adcSpiDi    <= syncOutP(9);
+   syncOutP(9) <= adcSpiDi;
 
    -- DAC SPI
    spareP(0)   <= dacSpiClk;
@@ -221,10 +233,17 @@ begin
    spareP(11) <= lmkSpiDio;
    spareP(9)  <= lmkSpiCsb;
 
+   -- PLL SPI
+   spareP(6) <= pllSpiClk;
+   spareN(6) <= pllSpiDio;
+   spareN(9) <= pllSpiCsb(0);
+   spareP(9) <= pllSpiCsb(1);
+   spareP(7) <= pllSpiCsb(2);
+   spareN(7) <= pllSpiCsb(3);
+
    -- ADC resets remapping
    spareN(3)   <= axilRst or adcCoreRst(0);
    syncOutN(9) <= axilRst or adcCoreRst(1);
-
 
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
@@ -248,6 +267,26 @@ begin
          mAxiReadMasters     => locAxilReadMasters,
          mAxiReadSlaves      => locAxilReadSlaves);
 
+
+   U_XBAR1 : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 5,
+         MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => locAxilWriteMasters(CTRL_INDEX_C),
+         sAxiWriteSlaves(0)  => locAxilWriteSlaves(CTRL_INDEX_C),
+         sAxiReadMasters(0)  => locAxilReadMasters(CTRL_INDEX_C),
+         sAxiReadSlaves(0)   => locAxilReadSlaves(CTRL_INDEX_C),
+         mAxiWriteMasters    => regWriteMasters,
+         mAxiWriteSlaves     => regWriteSlaves,
+         mAxiReadMasters     => regReadMasters,
+         mAxiReadSlaves      => regReadSlaves);
+
    U_Ctrl : entity work.MicrowaveMuxCoreCtrl
       generic map (
          TPD_G            => TPD_G,
@@ -256,15 +295,35 @@ begin
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => locAxilReadMasters(CTRL_INDEX_C),
-         axilReadSlave   => locAxilReadSlaves(CTRL_INDEX_C),
-         axilWriteMaster => locAxilWriteMasters(CTRL_INDEX_C),
-         axilWriteSlave  => locAxilWriteSlaves(CTRL_INDEX_C),
+         axilReadMaster  => regReadMasters(0),
+         axilReadSlave   => regReadSlaves(0),
+         axilWriteMaster => regWriteMasters(0),
+         axilWriteSlave  => regWriteSlaves(0),
          -- AMC Debug Signals
          rxSync          => jesdRxSync,
          txSyncRaw       => jesdTxSyncRaw,
          txSync          => jesdTxSyncVec,
          txSyncMask      => jesdTxSyncMask);
+
+   GEN_PLL : for i in 3 downto 0 generate
+
+      U_PLL : entity work.AxiLiteEmpty
+         generic map (
+            TPD_G            => TPD_G,
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         port map (
+            axiClk         => axilClk,
+            axiClkRst      => axilRst,
+            axiReadMaster  => regReadMasters(i+1),
+            axiReadSlave   => regReadSlaves(i+1),
+            axiWriteMaster => regWriteMasters(i+1),
+            axiWriteSlave  => regWriteSlaves(i+1));
+
+      pllSpiClk <= '1';
+      pllSpiDi  <= '1';
+      pllSpiCsb <= (others => '1');
+
+   end generate GEN_PLL;
 
    ----------------------------------------------------------------
    -- JESD Buffers
@@ -319,7 +378,7 @@ begin
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
             -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
             SPI_SCLK_PERIOD_G => (1.0/1.0E+6))
-            -- SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
+         -- SPI_SCLK_PERIOD_G => (1.0/10.0E+6))
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -329,7 +388,7 @@ begin
             axiWriteSlave  => locAxilWriteSlaves(ADC_0_INDEX_C+i),
             coreRst        => adcCoreRst(i),
             coreSclk       => adcCoreClk(i),
-            coreSDin       => adcSpiDo,
+            coreSDin       => adcSpiDo(i),
             coreSDout      => adcCoreDout(i),
             coreCsb        => adcCoreCsb(i));
    end generate GEN_ADC;
