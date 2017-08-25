@@ -235,7 +235,7 @@ begin
 
    -- PLL SPI
    spareP(6) <= pllSpiClk;
-   spareN(6) <= pllSpiDio;
+   spareN(6) <= pllSpiDi;
    spareN(9) <= pllSpiCsb(0);
    spareP(9) <= pllSpiCsb(1);
    spareP(7) <= pllSpiCsb(2);
@@ -274,7 +274,7 @@ begin
          DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => 5,
-         MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
+         MASTERS_CONFIG_G   => REG_CONFIG_C)
       port map (
          axiClk              => axilClk,
          axiClkRst           => axilRst,
@@ -286,6 +286,10 @@ begin
          mAxiWriteSlaves     => regWriteSlaves,
          mAxiReadMasters     => regReadMasters,
          mAxiReadSlaves      => regReadSlaves);
+
+   ----------------------------------------------------------------
+   -- Debug Control Module
+   ----------------------------------------------------------------            
 
    U_Ctrl : entity work.MicrowaveMuxCoreCtrl
       generic map (
@@ -305,6 +309,10 @@ begin
          txSync          => jesdTxSyncVec,
          txSyncMask      => jesdTxSyncMask);
 
+   ----------------------------------------------------------------
+   -- SPI interface PLL (ADF5355)
+   ----------------------------------------------------------------         
+
    GEN_PLL : for i in 3 downto 0 generate
 
       U_PLL : entity work.AxiLiteEmpty
@@ -319,11 +327,12 @@ begin
             axiWriteMaster => regWriteMasters(i+1),
             axiWriteSlave  => regWriteSlaves(i+1));
 
-      pllSpiClk <= '1';
-      pllSpiDi  <= '1';
-      pllSpiCsb <= (others => '1');
-
    end generate GEN_PLL;
+
+
+   pllSpiClk <= '1';
+   pllSpiDi  <= '1';
+   pllSpiCsb <= (others => '1');
 
    ----------------------------------------------------------------
    -- JESD Buffers
@@ -368,7 +377,7 @@ begin
    jesdTxSync <= jesdTxSyncVec(0) and jesdTxSyncVec(1);
 
    ----------------------------------------------------------------
-   -- SPI interface ADC
+   -- SPI interface ADC (ADC32R44)
    ----------------------------------------------------------------
    GEN_ADC : for i in 1 downto 0 generate
       U_ADC : entity work.adc32rf45
@@ -409,7 +418,7 @@ begin
    adcSpiCsb <= adcCoreCsb;
 
    ----------------------------------------------------------------
-   -- SPI interface DAC
+   -- SPI interface DAC (DAC38J84IAAV)
    ----------------------------------------------------------------
    GEN_DAC : for i in 1 downto 0 generate
       U_DAC : entity work.AxiSpiMaster
@@ -454,9 +463,9 @@ begin
    dacSpiClk <= dacMuxClk;
    dacSpiCsb <= dacCoreCsb;
 
-   -----------------
-   -- SPI interface LMK
-   -----------------   
+   -------------------------------
+   -- SPI interface LMK (LMK04828)
+   -------------------------------
    U_LMK : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
