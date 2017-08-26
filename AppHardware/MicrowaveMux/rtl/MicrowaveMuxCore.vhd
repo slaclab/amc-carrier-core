@@ -190,7 +190,13 @@ architecture top_level_app of MicrowaveMuxCore is
    signal pllSpiDi  : sl;
    signal pllSpiCsb : slv(3 downto 0);
 
+   -- Misc.
+   signal axilRstL : sl;
+
 begin
+
+   axilRstL <= not(axilRst);
+
    -----------------------
    -- Generalized Mapping 
    -----------------------
@@ -234,12 +240,12 @@ begin
    spareP(9)  <= lmkSpiCsb;
 
    -- PLL SPI
-   spareP(6) <= pllSpiClk;
-   spareN(6) <= pllSpiDi;
-   spareN(9) <= pllSpiCsb(0);
-   spareP(9) <= pllSpiCsb(1);
-   spareP(7) <= pllSpiCsb(2);
-   spareN(7) <= pllSpiCsb(3);
+   spareP(12) <= pllSpiClk;
+   spareN(12) <= pllSpiDi;
+   spareN(15) <= pllSpiCsb(0);
+   spareP(15) <= pllSpiCsb(1);
+   spareP(13) <= pllSpiCsb(2);
+   spareN(13) <= pllSpiCsb(3);
 
    -- ADC resets remapping
    spareN(3)   <= axilRst or adcCoreRst(0);
@@ -330,9 +336,9 @@ begin
    end generate GEN_PLL;
 
 
-   pllSpiClk <= '1';
-   pllSpiDi  <= '1';
-   pllSpiCsb <= (others => '1');
+   pllSpiClk <= axilRstL;
+   pllSpiDi  <= axilRstL;
+   pllSpiCsb <= (others => axilRstL);
 
    ----------------------------------------------------------------
    -- JESD Buffers

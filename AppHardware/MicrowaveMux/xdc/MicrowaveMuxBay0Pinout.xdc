@@ -83,16 +83,13 @@ set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][11]}]
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][9]}]     ; # lmkSpiCsb
 
 # LMK SPI
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][6]}]    ; # pllSpiClk
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[0][6]}]    ; # pllSpiDio
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[0][9]}]    ; # pllSpiCsb(0)
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][9]}]    ; # pllSpiCsb(1)
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][7]}]    ; # pllSpiCsb(2)
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[0][7]}]    ; # pllSpiCsb(3)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][12]}]    ; # pllSpiClk
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[0][12]}]    ; # pllSpiDio
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[0][15]}]    ; # pllSpiCsb(0)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][15]}]    ; # pllSpiCsb(1)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][13]}]    ; # pllSpiCsb(2)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[0][13]}]    ; # pllSpiCsb(3)
 
 # ADC resets
 set_property -dict {IOSTANDARD LVCMOS18} [get_ports {spareN[0][3]}]    ; # adcRst(0)
 set_property -dict {IOSTANDARD LVCMOS18} [get_ports {syncOutN[0][9]}]  ; # adcRst(1)
-
-
-

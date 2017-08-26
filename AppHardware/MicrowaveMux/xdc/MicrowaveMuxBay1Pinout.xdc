@@ -49,7 +49,6 @@ set_property PACKAGE_PIN D32 [get_ports {jesdTxN[1][9]}] ; #
 set_property PACKAGE_PIN E33 [get_ports {jesdRxP[1][9]}] ; #
 set_property PACKAGE_PIN E34 [get_ports {jesdRxN[1][9]}] ; #
 
-
 # JESD Reference Ports
 set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {sysRefP[1][0]}] ; #jesdSysRefP 
 set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {sysRefN[1][0]}] ; #jesdSysRefN
@@ -84,15 +83,13 @@ set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][11]}]
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][9]}]     ; # lmkSpiCsb
 
 # LMK SPI
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][6]}]    ; # pllSpiClk
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][6]}]    ; # pllSpiDio
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][9]}]    ; # pllSpiCsb(0)
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][9]}]    ; # pllSpiCsb(1)
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][7]}]    ; # pllSpiCsb(2)
-set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][7]}]    ; # pllSpiCsb(3)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][12]}]    ; # pllSpiClk
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][12]}]    ; # pllSpiDio
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][15]}]    ; # pllSpiCsb(0)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][15]}]    ; # pllSpiCsb(1)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][13]}]    ; # pllSpiCsb(2)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][13]}]    ; # pllSpiCsb(3)
 
 # ADC resets
 set_property -dict {IOSTANDARD LVCMOS18} [get_ports {spareN[1][3]}]    ; # adcRst(0)
 set_property -dict {IOSTANDARD LVCMOS18} [get_ports {syncOutN[1][9]}]  ; # adcRst(1)
-
-
