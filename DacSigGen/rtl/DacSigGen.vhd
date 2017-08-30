@@ -2,7 +2,7 @@
 -- File       : DacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-07-20
+-- Last update: 2017-08-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -72,6 +72,7 @@ architecture mapping of DacSigGen is
    signal s_overflow  : slv(DAC_SIG_WIDTH_C-1 downto 0);
    signal s_underflow : slv(DAC_SIG_WIDTH_C-1 downto 0);
    signal s_running   : slv(DAC_SIG_WIDTH_C-1 downto 0);
+   signal s_sow       : slv(DAC_SIG_WIDTH_C-1 downto 0);
    signal s_period    : slv32Array(DAC_SIG_WIDTH_C-1 downto 0);
 
 begin
@@ -176,12 +177,14 @@ begin
                overflow_o      => s_overflow(i),
                underflow_o     => s_underflow(i),
                running_o       => s_running(i),
+               sow_o           => s_sow(i),
                valid_o         => dacSigValids(i),
                dacSigValues_o  => dacSigValues(i));
       end generate GEN_CHS;
 
       -- Assign out
       dacSigStatus.running <= s_running;
+      dacSigStatus.sow     <= s_sow;
    ------
    end generate GEN_SIGGEN;
 -----------------------------------

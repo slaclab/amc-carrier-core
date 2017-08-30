@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
--- File       : AmcCryoDualCore.vhd
+-- File       : MicrowaveMuxDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-11
 -- Last update: 2017-06-29
 -------------------------------------------------------------------------------
--- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_23_C00
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -23,7 +23,7 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.jesd204bpkg.all;
 
-entity AmcCryoDualCore is
+entity MicrowaveMuxDualCore is
    generic (
       TPD_G            : time             := 1 ns;
       AXI_CLK_FREQ_G   : real             := 156.25E+6;
@@ -62,9 +62,9 @@ entity AmcCryoDualCore is
       spareP          : inout Slv16Array(1 downto 0);
       spareN          : inout Slv16Array(1 downto 0)
       );
-end AmcCryoDualCore;
+end MicrowaveMuxDualCore;
 
-architecture mapping of AmcCryoDualCore is
+architecture mapping of MicrowaveMuxDualCore is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
@@ -103,7 +103,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcCryoCore
+      U_AMC : entity work.MicrowaveMuxCore
          generic map (
             TPD_G            => TPD_G,
             AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
