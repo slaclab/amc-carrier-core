@@ -50,8 +50,8 @@ class Adf5355(pr.Device):
         ))    
 
         self.add(pr.RemoteVariable(   
-            name         = "PRESCALER",
-            description  = "Prescaler Value",
+            name         = "Integer16bValue",
+            description  = "16-Bit Integer Value",
             offset       =  (0x0 << 2), # Register 0
             bitSize      =  16,
             bitOffset    =  4,
@@ -549,7 +549,7 @@ class Adf5355(pr.Device):
         ###     Register 11        ###
         ##############################          
         self.add(pr.RemoteVariable(   
-            name         = "REG8_RESERVED",
+            name         = "REG11_RESERVED",
             description  = "The bits in Register 11 are reserved and must be programmed with 0x0061300B",
             offset       =  (0xB << 2), # Register 11
             bitSize      =  32,
