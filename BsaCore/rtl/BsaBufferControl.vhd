@@ -1,8 +1,8 @@
--------------------------------------------------------------------------------
+,,,-------------------------------------------------------------------------------
 -- File       : BsaBufferControl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2017-03-10
+-- Last update: 2017-09-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -154,9 +154,11 @@ architecture rtl of BsaBufferControl is
       excSquare      : sl;
       syncRdEn       : sl;
       timestampEn    : sl;
+      timestampAddr  : slv(BSA_ADDR_BITS_C-1 downto 0);
       headerEn       : sl;
       accumulateEn   : sl;
       lastEn         : sl;
+      adderEn        : sl;
       adderCount     : slv(5 downto 0);
       adderPhase     : slv(2 downto 0);
    end record RegType;
@@ -169,9 +171,11 @@ architecture rtl of BsaBufferControl is
       excSquare      => '0',
       syncRdEn       => '0',
       timestampEn    => '0',
+      timestampAddr  => (others => '0'),
       headerEn       => '0',
       accumulateEn   => '0',
       lastEn         => '0',
+      adderEn        => '0',
       adderCount     => (others => '0'),
       adderPhase     => (others => '0'));
 
@@ -212,7 +216,7 @@ begin
          mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
 
    -- Store timestamps during accumulate phase since we are already iterating over
-   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.adderCount));
+   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.timestampAddr));
    U_AxiDualPortRam_TimeStamps : entity work.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
@@ -232,7 +236,7 @@ begin
          clk            => axiClk,
          rst            => axiRst,
          we             => timeStampRamWe,
-         addr           => r.adderCount(BSA_ADDR_BITS_C-1 downto 0),
+         addr           => r.timestampAddr,
          din            => diagnosticBusSync.timingMessage.timeStamp,
          dout           => open);
 
@@ -417,7 +421,7 @@ begin
          axiClk           => axiClk,                                -- [in]
          axiRst           => axiRst,                                -- [in]
          bufferClearEn    => timeStampRamWe,                        -- [in]
-         bufferClear      => r.adderCount,                          -- [in]
+         bufferClear      => r.timestampAddr,                       -- [in]
          bufferEnabled    => bufferEnabled,                         -- [out]
          axisDataMaster   => lastFifoAxisMaster,                    -- [in]
          axisDataSlave    => lastFifoAxisSlave,                     -- [out]
@@ -443,7 +447,7 @@ begin
       ----------------------------------------------------------------------------------------------
       -- Accumulation stage - shift new diagnostic data through the accumulators
       ----------------------------------------------------------------------------------------------
-      if r.adderPhase="100" and r.timestampEn='1' then
+      if r.adderPhase="100" and r.adderEn='1' then
 
         v.adderPhase := "000";
         v.adderCount := r.adderCount + 1;
@@ -470,21 +474,28 @@ begin
           v.accumulateEn := '1';
         end if;
 
-        ----------------------------------------------------------------------------------------------
-        -- Disable timestamps after iterating through all bsa indicies
-        ----------------------------------------------------------------------------------------------
         if (r.adderCount = NUM_ACCUMULATIONS_C+1) then
-          v.timestampEn := '0';
+          v.adderEn     := '0';
           v.syncRdEn    := '1';            
         end if;
 
       end if;
       
       ----------------------------------------------------------------------------------------------
+      -- Disable timestamps after iterating through all bsa indicies
+      ----------------------------------------------------------------------------------------------
+      if r.timestampEn = '1' then
+        v.timestampAddr := r.timestampAddr+1;
+        if r.timestampAddr = BSA_BUFFERS_G-1 then
+          v.timestampEn := '0';
+        end if;
+      end if;
+      
+      ----------------------------------------------------------------------------------------------
       -- Synchronization
       -- Wait for synchronized strobe signal, then latch the timing message onto the local clock      
       ----------------------------------------------------------------------------------------------
-      if (diagnosticBusSyncValid = '1' and r.accumulateEn = '0' and r.timeStampEn = '0' and r.syncRdEn = '0') then
+      if (diagnosticBusSyncValid = '1' and r.accumulateEn = '0' and r.adderEn = '0' and r.syncRdEn = '0') then
          --  Header data
          v.dataSquare := diagnosticBusSync.timingMessage.pulseId(63 downto 16);
          v.diagnosticData(NUM_ACCUMULATIONS_C) :=
@@ -503,6 +514,8 @@ begin
          v.excSquare      := '0';
          v.accumulateEn   := '1';
          v.timestampEn    := '1';
+         v.timestampAddr  := (others => '0');
+         v.adderEn        := '1';
          v.adderCount     := (others => '0');
          v.adderPhase     := (others => '0');
       end if;
