@@ -47,7 +47,7 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 32
       description: MPS TX Packet Sent Counter
     #########################################################
-    MpsRxLinkUpCnt:
+    MpsRxPktRcvdSentCnt:
       at:
         offset: 0x084
         stride: 4
