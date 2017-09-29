@@ -111,7 +111,7 @@ package AppMpsPkg is
    ---------------------------------------------------   
    type MpsAppConfigType is record
       DIGITAL_EN_C  : boolean;          -- APP is digital
-      BYTE_COUNT_C  : integer range 0 to MPS_CHAN_COUNT_C-1;  -- MPS message bytes
+      BYTE_COUNT_C  : integer range 0 to MPS_CHAN_COUNT_C;  -- MPS message bytes
       CHAN_CONFIG_C : MpsChanConfigArray(MPS_CHAN_COUNT_C-1 downto 0);
    end record;
 
