@@ -2,7 +2,7 @@
 -- File       : adf5355.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-26
--- Last update: 2017-09-08
+-- Last update: 2017-10-03
 -------------------------------------------------------------------------------
 -- Description: SPI Master Wrapper for ADI ADF5355 IC
 -------------------------------------------------------------------------------
@@ -51,6 +51,7 @@ architecture rtl of adf5355 is
 
    type StateType is (
       WAIT_AXI_TXN_S,
+      RD_RESP_S,
       WAIT_CYCLE_S,
       WAIT_SPI_TXN_DONE_S);
 
@@ -117,11 +118,17 @@ begin
             end if;
             -- Check for a read transaction
             if (axiStatus.readEnable = '1') then
-               -- Reade the bit
-               v.axiReadSlave.rdata := cacheData;
-               -- Send the response 
-               axiSlaveReadResponse(v.axiReadSlave);
+               -- Next state
+               v.state := RD_RESP_S;
             end if;
+         ----------------------------------------------------------------------            
+         when RD_RESP_S =>
+            -- Reade the bit
+            v.axiReadSlave.rdata := cacheData;
+            -- Send the response 
+            axiSlaveReadResponse(v.axiReadSlave);
+            -- Next state
+            v.state              := WAIT_AXI_TXN_S;
          ----------------------------------------------------------------------            
          when WAIT_CYCLE_S =>
             -- Wait for rdEn to drop
@@ -188,19 +195,21 @@ begin
    U_Cache : entity work.SimpleDualPortRam
       generic map(
          TPD_G        => TPD_G,
-         BRAM_EN_G    => false,         -- LUT RAM
-         DOB_REG_G    => false,         -- zero latency read
-         DATA_WIDTH_G => 32,
+         BRAM_EN_G    => false,
+         DOB_REG_G    => false,
+         DATA_WIDTH_G => 28,
          ADDR_WIDTH_G => 4)
       port map (
          -- Port A
          clka  => axiClk,
          wea   => r.cacheWr,
          addra => r.wrData(3 downto 0),
-         dina  => r.wrData,
+         dina  => r.wrData(31 downto 4),
          -- Port B
          clkb  => axiClk,
          addrb => axiReadMaster.araddr(5 downto 2),
-         doutb => cacheData);
+         doutb => cacheData(31 downto 4));
+
+   cacheData(3 downto 0) <= x"0";
 
 end architecture rtl;
