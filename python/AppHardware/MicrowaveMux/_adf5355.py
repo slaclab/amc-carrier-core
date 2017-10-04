@@ -36,7 +36,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  21,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))  
 
         self.add(pr.RemoteVariable(   
@@ -46,7 +46,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  20,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))    
 
         self.add(pr.RemoteVariable(   
@@ -56,7 +56,7 @@ class Adf5355(pr.Device):
             bitSize      =  16,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))            
        
         ##############################    
@@ -69,7 +69,7 @@ class Adf5355(pr.Device):
             bitSize      =  24,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))    
 
         ##############################    
@@ -82,7 +82,7 @@ class Adf5355(pr.Device):
             bitSize      =  14,
             bitOffset    =  18,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))            
        
         self.add(pr.RemoteVariable(   
@@ -92,7 +92,7 @@ class Adf5355(pr.Device):
             bitSize      =  14,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))            
               
         ##############################    
@@ -105,7 +105,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  30,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         )) 
 
         self.add(pr.RemoteVariable(   
@@ -115,7 +115,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  29,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))  
 
         self.add(pr.RemoteVariable(   
@@ -125,7 +125,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  28,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))          
        
         self.add(pr.RemoteVariable(   
@@ -135,7 +135,7 @@ class Adf5355(pr.Device):
             bitSize      =  24,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))         
        
         ##############################    
@@ -148,7 +148,7 @@ class Adf5355(pr.Device):
             bitSize      =  3,
             bitOffset    =  27,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))   
 
         self.add(pr.RemoteVariable(   
@@ -158,7 +158,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  26,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))  
 
         self.add(pr.RemoteVariable(   
@@ -168,7 +168,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  25,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         )) 
 
         self.add(pr.RemoteVariable(   
@@ -178,7 +178,7 @@ class Adf5355(pr.Device):
             bitSize      =  10,
             bitOffset    =  15,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))         
        
         self.add(pr.RemoteVariable(   
@@ -188,7 +188,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  14,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))    
        
         self.add(pr.RemoteVariable(   
@@ -198,7 +198,7 @@ class Adf5355(pr.Device):
             bitSize      =  4,
             bitOffset    =  10,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))            
        
         self.add(pr.RemoteVariable(   
@@ -208,7 +208,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  9,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         )) 
         
         self.add(pr.RemoteVariable(   
@@ -218,7 +218,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  8,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))   
         
         self.add(pr.RemoteVariable(   
@@ -228,7 +228,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  7,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))            
         
         self.add(pr.RemoteVariable(   
@@ -238,7 +238,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  6,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))    
         
         self.add(pr.RemoteVariable(   
@@ -248,7 +248,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  5,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))            
         
         self.add(pr.RemoteVariable(   
@@ -258,7 +258,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         )) 
         
         
@@ -272,7 +272,7 @@ class Adf5355(pr.Device):
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
             value        = 0x00800025,
         ))   
         
@@ -286,7 +286,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  30,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))   
 
         self.add(pr.RemoteVariable(   
@@ -296,7 +296,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  29,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))           
         
         self.add(pr.RemoteVariable(   
@@ -306,7 +306,7 @@ class Adf5355(pr.Device):
             bitSize      =  4,
             bitOffset    =  25,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
             value        = 0xA,
         ))          
         
@@ -317,7 +317,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  24,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))  
 
         self.add(pr.RemoteVariable(   
@@ -327,7 +327,7 @@ class Adf5355(pr.Device):
             bitSize      =  3,
             bitOffset    =  21,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         )) 
 
         self.add(pr.RemoteVariable(   
@@ -337,7 +337,7 @@ class Adf5355(pr.Device):
             bitSize      =  8,
             bitOffset    =  13,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))         
         
         self.add(pr.RemoteVariable(   
@@ -347,7 +347,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  11,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))  
         
         self.add(pr.RemoteVariable(   
@@ -357,7 +357,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  10,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))   
 
         self.add(pr.RemoteVariable(   
@@ -367,7 +367,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  6,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))           
         
         self.add(pr.RemoteVariable(   
@@ -377,7 +377,7 @@ class Adf5355(pr.Device):
             bitSize      =  2,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))           
         
         ##############################    
@@ -390,7 +390,7 @@ class Adf5355(pr.Device):
             bitSize      =  6,
             bitOffset    =  26,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
             value        = 0x4,
         ))          
         
@@ -401,7 +401,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  25,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))   
 
         self.add(pr.RemoteVariable(   
@@ -411,7 +411,7 @@ class Adf5355(pr.Device):
             bitSize      =  2,
             bitOffset    =  8,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))           
         
         self.add(pr.RemoteVariable(   
@@ -421,7 +421,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  7,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))          
 
         self.add(pr.RemoteVariable(   
@@ -431,7 +431,7 @@ class Adf5355(pr.Device):
             bitSize      =  2,
             bitOffset    =  5,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))  
         
         self.add(pr.RemoteVariable(   
@@ -441,7 +441,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))  
 
         ##############################    
@@ -454,7 +454,7 @@ class Adf5355(pr.Device):
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
             value        = 0x102D0428,
         ))   
 
@@ -468,7 +468,7 @@ class Adf5355(pr.Device):
             bitSize      =  8,
             bitOffset    =  24,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))  
         
         self.add(pr.RemoteVariable(   
@@ -478,7 +478,7 @@ class Adf5355(pr.Device):
             bitSize      =  10,
             bitOffset    =  14,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))   
         
         self.add(pr.RemoteVariable(   
@@ -488,7 +488,7 @@ class Adf5355(pr.Device):
             bitSize      =  5,
             bitOffset    =  9,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))     
         
         self.add(pr.RemoteVariable(   
@@ -498,7 +498,7 @@ class Adf5355(pr.Device):
             bitSize      =  5,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))             
 
         ##############################    
@@ -511,7 +511,7 @@ class Adf5355(pr.Device):
             bitSize      =  18,
             bitOffset    =  14,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
             value        = 0x300,
         ))            
 
@@ -522,7 +522,7 @@ class Adf5355(pr.Device):
             bitSize      =  8,
             bitOffset    =  6,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))    
 
         self.add(pr.RemoteVariable(   
@@ -532,7 +532,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  5,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         )) 
 
         self.add(pr.RemoteVariable(   
@@ -542,7 +542,7 @@ class Adf5355(pr.Device):
             bitSize      =  1,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))         
 
         ##############################    
@@ -555,7 +555,7 @@ class Adf5355(pr.Device):
             bitSize      =  32,
             bitOffset    =  0,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
             value        = 0x0061300B,
         ))           
         
@@ -569,7 +569,7 @@ class Adf5355(pr.Device):
             bitSize      =  16,
             bitOffset    =  16,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))           
         
         self.add(pr.RemoteVariable(   
@@ -579,7 +579,7 @@ class Adf5355(pr.Device):
             bitSize      =  12,
             bitOffset    =  4,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
             value        = 0x41,
         ))         
            
