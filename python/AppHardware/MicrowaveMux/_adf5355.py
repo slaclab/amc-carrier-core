@@ -18,6 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
+import time
 
 class Adf5355(pr.Device):
     def __init__(   self, 
@@ -583,4 +584,41 @@ class Adf5355(pr.Device):
             value        = 0x41,
         ))         
            
-        
+        @self.command(name= "RegInitSeq", description  = "refer to REGISTER INITIALIZATION SEQUENCE section of datasheet")        
+        def RegInitSeq():  
+            # Reset AUTOCAL
+            self.AUTOCAL.set(0x0)
+            
+            # Write REG12 through REG1
+            for i in range( 12, 0, -1 ): 
+                self._rawWrite((4*i),self._rawRead(4*i)) 
+                time.sleep(0.001)
+                
+            # Write REG0 + set AUTOCAL
+            self.AUTOCAL.set(0x1)
+            time.sleep(0.001)
+            
+            # Write REG6
+            self._rawWrite((4*6),self._rawRead(4*6)) 
+            time.sleep(0.001)
+            
+            # Write REG4 + set counter reset            
+            self.CounterReset.set(0x1)
+            time.sleep(0.001)
+            
+            # Write REG2
+            self._rawWrite((4*2),self._rawRead(4*2)) 
+            time.sleep(0.001)
+
+            # Write REG1
+            self._rawWrite((4*1),self._rawRead(4*1)) 
+            time.sleep(0.001)
+
+            # Reset AUTOCAL
+            self.AUTOCAL.set(0x0)            
+            time.sleep(0.001)
+
+            # Reset counter reset 
+            self.CounterReset.set(0x0)
+            time.sleep(0.001)
+            
