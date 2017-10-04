@@ -585,7 +585,9 @@ class Adf5355(pr.Device):
         ))         
            
         @self.command(name= "RegInitSeq", description  = "refer to REGISTER INITIALIZATION SEQUENCE section of datasheet")        
-        def RegInitSeq():  
+        def RegInitSeq(): 
+            # print ('Adf5355.RegInitSeq()')
+            
             # Reset AUTOCAL
             self.AUTOCAL.set(0x0)
             

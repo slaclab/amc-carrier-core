@@ -118,6 +118,11 @@ class MicrowaveMuxCore(pr.Device):
         self.ADC[0].DigRst()
         self.ADC[1].DigRst()
         
+        self.PLL[0].RegInitSeq()
+        self.PLL[1].RegInitSeq()        
+        self.PLL[2].RegInitSeq()        
+        self.PLL[3].RegInitSeq()        
+        
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
         self.DAC[0].enable.set(False)
         self.DAC[1].enable.set(False)
