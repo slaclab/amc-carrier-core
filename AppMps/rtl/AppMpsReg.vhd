@@ -129,17 +129,17 @@ begin
             for thold in 0 to (APP_CONFIG_G.CHAN_CONFIG_C(chan).THOLD_COUNT_C-1) loop
 
                -- standard: thold 0 = base + 0x100, thold 1 = base + 0x110, thold 7 = base + 0x170
-               axiSlaveRegister(regEp, toSlv(base + (thold*16) + 0, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).minTholdEn);
-               axiSlaveRegister(regEp, toSlv(base + (thold*16) + 0, 16), 1, v.mpsReg.mpsChanReg(chan).stdTholds(thold).maxTholdEn);
-               axiSlaveRegister(regEp, toSlv(base + (thold*16) + 4, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).minThold);
-               axiSlaveRegister(regEp, toSlv(base + (thold*16) + 8, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).maxThold);
+               axiSlaveRegister(regEp, toSlv(base + 256 + (thold*16) + 0, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).minTholdEn);
+               axiSlaveRegister(regEp, toSlv(base + 256 + (thold*16) + 0, 16), 1, v.mpsReg.mpsChanReg(chan).stdTholds(thold).maxTholdEn);
+               axiSlaveRegister(regEp, toSlv(base + 256 + (thold*16) + 4, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).minThold);
+               axiSlaveRegister(regEp, toSlv(base + 256 + (thold*16) + 8, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).maxThold);
 
                -- alt: thold 0 = base + 0x180, thold 1 = base + 0x190, thold 7 = base + 0x1F0
                if APP_CONFIG_G.CHAN_CONFIG_C(chan).ALT_EN_C then
-                  axiSlaveRegister(regEp, toSlv(base + 128 + (thold*16) + 0, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).minTholdEn);
-                  axiSlaveRegister(regEp, toSlv(base + 128 + (thold*16) + 0, 16), 1, v.mpsReg.mpsChanReg(chan).altTholds(thold).maxTholdEn);
-                  axiSlaveRegister(regEp, toSlv(base + 128 + (thold*16) + 4, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).minThold);
-                  axiSlaveRegister(regEp, toSlv(base + 128 + (thold*16) + 8, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).maxThold);
+                  axiSlaveRegister(regEp, toSlv(base + 384 + (thold*16) + 0, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).minTholdEn);
+                  axiSlaveRegister(regEp, toSlv(base + 384 + (thold*16) + 0, 16), 1, v.mpsReg.mpsChanReg(chan).altTholds(thold).maxTholdEn);
+                  axiSlaveRegister(regEp, toSlv(base + 384 + (thold*16) + 4, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).minThold);
+                  axiSlaveRegister(regEp, toSlv(base + 384 + (thold*16) + 8, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).maxThold);
                end if;
             end loop;
          end if;
