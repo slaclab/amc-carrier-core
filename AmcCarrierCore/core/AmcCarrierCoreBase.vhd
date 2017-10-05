@@ -849,7 +849,13 @@ architecture mapping of AmcCarrierCoreBase is
 begin
 
    axilClk     <= ref156MHzClk;
-   axilRst     <= ref156MHzRst;
+   U_Rst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => ref156MHzClk,
+         rstIn  => ref156MHzRst,
+         rstOut => axilRst); 
    ipmiBsi     <= bsiBus;
    ethPhyReady <= ethLinkUp;
    timingBus   <= timingBusIntf;

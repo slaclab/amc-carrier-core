@@ -64,21 +64,25 @@ class AmcGenericAdcDacCore(pr.Device):
                     if block.bulkEn:
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
-        # Process rest of tree
-        if recurse:
-            for key,value in self.devices.items():
-                value.writeBlocks(force=force, recurse=True)                        
-                        
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
         
+        # Note: Requires that AmcCryoCore: enable: 'True' in defaults.yml file
         self.enable.set(True)
-        self.ADC[0].enable.set(True)
-        self.ADC[1].enable.set(True)                  
-        self.LMK.enable.set(True)        
+        self.DBG.enable.set(True)
         self.DAC.enable.set(True)
+        self.LMK.enable.set(True)        
+        self.ADC[0].enable.set(True)
+        self.ADC[1].enable.set(True)    
+
+        self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
         
-        # Init the AMC card
+        self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+
         self.InitAmcCard()
         
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
