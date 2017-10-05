@@ -103,7 +103,7 @@ begin
 
       -- Data
       v.mpsSelect.valid     := diagnosticBus.strobe;
-      v.mpsSelect.timeStamp := diagnosticBus.timingMessage.timeStamp;
+      v.mpsSelect.timeStamp := diagnosticBus.timingMessage.timeStamp(15 downto 0);
       v.mpsSelect.chanData  := diagnosticBus.data(MPS_CHAN_COUNT_C-1 downto 0);
       v.mpsSelect.mpsIgnore := diagnosticBus.mpsIgnore(MPS_CHAN_COUNT_C-1 downto 0);
 
@@ -159,7 +159,6 @@ begin
          wr_en  => r.mpsSelect.valid,
          din    => mpsSelectDin,
          rd_clk => axilClk,
-         rd_en  => axilRst,
          valid  => mpsSelectValid,
          dout   => mpsSelectDout);
 
