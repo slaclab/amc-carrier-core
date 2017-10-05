@@ -2,7 +2,7 @@
 -- File       : DacSigGenLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-16
--- Last update: 2017-07-20
+-- Last update: 2017-08-24
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
 --               The module contains a AXI-Lite accessible block RAM where the 
@@ -71,6 +71,7 @@ entity DacSigGenLane is
       overflow_o      : out sl;
       underflow_o     : out sl;
       running_o       : out sl;
+      sow_o           : out sl;
       valid_o         : out sl;
       dacSigValues_o  : out slv(31 downto 0));
 end DacSigGenLane;
@@ -95,6 +96,7 @@ architecture rtl of DacSigGenLane is
    -- Register
    type RegType is record
       cnt       : slv(ADDR_WIDTH_G-1 downto 0);
+      sow       : sl;
       running   : sl;
       runningD1 : sl;
       state     : StateType;
@@ -102,6 +104,7 @@ architecture rtl of DacSigGenLane is
 
    constant REG_INIT_C : RegType := (
       cnt       => (others => '0'),
+      sow       => '0',
       running   => '0',
       runningD1 => '0',
       state     => IDLE_S);
@@ -159,6 +162,9 @@ begin
       -- Latch the current value
       v := r;
 
+      -- Reset the strobes
+      v.sow := '0';
+
       -- Delay to align with ram data
       v.runningD1 := r.running;
 
@@ -178,6 +184,10 @@ begin
          when RUNNING_S =>
             -- Update the status
             v.running := '1';
+            -- Check for start of waveform
+            if (r.cnt = 0) then
+               v.sow := '1';
+            end if;
             -- Check the counter
             if (r.cnt = period_i) then
                -- Reset the counter
@@ -259,6 +269,15 @@ begin
                dataIn  => r.runningD1,
                dataOut => running_o);
 
+         U_SyncOneShot : entity work.SynchronizerOneShot
+            generic map (
+               TPD_G => TPD_G)
+            port map (
+               clk     => jesdClk,
+               rst     => jesdRst,
+               dataIn  => r.sow,
+               dataOut => sow_o);
+
       end generate GEN_32bit;
 
       -- jesdClk2x domain
@@ -267,6 +286,7 @@ begin
          overflow_o                   <= '0';
          underflow_o                  <= '0';
          running_o                    <= r.runningD1;
+         sow_o                        <= r.sow;
          valid_o                      <= enable_i;
          dacSigValues_o(15 downto 0)  <= s_dacData(15 downto 0);
          dacSigValues_o(31 downto 16) <= (others => '0');
@@ -280,6 +300,7 @@ begin
       overflow_o     <= '0';
       underflow_o    <= '0';
       running_o      <= r.runningD1;
+      sow_o          <= r.sow;
       valid_o        <= enable_i;
       dacSigValues_o <= s_dacData;
    end generate GEN_RAM_CLK_MODE1;

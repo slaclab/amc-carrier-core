@@ -118,9 +118,10 @@ architecture mapping of AppTopJesd is
    signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
-   signal clkOut : slv(2 downto 0);
-   signal rstOut : slv(2 downto 0);
-   signal locked : sl;
+   signal clkOut   : slv(2 downto 0);
+   signal resetOut : slv(2 downto 0);
+   signal rstOut   : slv(2 downto 0);
+   signal locked   : sl;
 
    signal drpClk  : slv(9 downto 0)       := (others => '0');
    signal drpRdy  : slv(9 downto 0)       := (others => '0');
@@ -247,7 +248,7 @@ begin
          clkIn           => amcClk,
          rstIn           => amcRst,
          clkOut          => clkOut,
-         rstOut          => rstOut,
+         rstOut          => resetOut,
          locked          => locked,
          -- AXI-Lite Interface 
          axilClk         => axilClk,
@@ -257,6 +258,16 @@ begin
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
+   GEN_RST : for i in 2 downto 0 generate
+      U_RstPipeline : entity work.RstPipeline
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk    => clkOut(i),
+            rstIn  => resetOut(i),
+            rstOut => rstOut(i));           
+   end generate GEN_RST;      
+         
    jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(0);
    jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(1);
    jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);

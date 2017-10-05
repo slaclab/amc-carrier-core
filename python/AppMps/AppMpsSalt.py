@@ -51,6 +51,28 @@ class AppMpsSalt(pr.Device):
             number       =  14,
             stride       =  4,
         )
+        
+        self.add(pr.RemoteVariable(    
+            name         = "MpsTxPktSentCnt",
+            description  = "MPS TX Packet Sent Counter",
+            offset       =  0x80,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+        ))
+
+        self.addRemoteVariables( 
+            name         = "MpsRxPktRcvdSentCnt",
+            description  = "MPS RX Packet Received Counter[13:0]",
+            offset       =  0x84,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            number       =  14,
+            stride       =  4,
+        )        
 
         self.add(pr.RemoteVariable(    
             name         = "MpsTxLinkUP",

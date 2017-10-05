@@ -262,6 +262,24 @@ DaqMuxV2: &DaqMuxV2
       mode: RO
       description:  "Counts valid data acquisition triggers."
     #########################################################
+    DbgInputValid:
+      at:
+        offset: 0x02C
+      class: IntField
+      name: DbgInputValid
+      sizeBits: 32
+      mode: RO
+      description:  "Input Valid bus for debugging"   
+    #########################################################
+    DbgLinkReady:
+      at:
+        offset: 0x030
+      class: IntField
+      name: DbgInputValid
+      sizeBits: 32
+      mode: RO
+      description:  "Input LinkReady bus for debugging"         
+    #########################################################
     InputMuxSel:
       at:
         offset: 0x040

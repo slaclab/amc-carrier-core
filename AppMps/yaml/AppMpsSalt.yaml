@@ -38,6 +38,26 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 32
       description: MPS RX LinkUp Counter[13:0]
     #########################################################
+    MpsTxPktSentCnt:
+      at:
+        offset: 0x080
+      class: IntField
+      name: MpsTxPktSentCnt
+      mode: RO
+      sizeBits: 32
+      description: MPS TX Packet Sent Counter
+    #########################################################
+    MpsRxPktRcvdSentCnt:
+      at:
+        offset: 0x084
+        stride: 4
+        nelms: 14
+      class: IntField
+      name: MpsRxPktRcvdSentCnt
+      mode: RO
+      sizeBits: 32
+      description: MPS RX Packet Received Counter[13:0]      
+    #########################################################
     MpsTxLinkUP:
       at:
         offset: 0x700
