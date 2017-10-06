@@ -2,7 +2,7 @@
 -- File       : MicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
--- Last update: 2017-08-25
+-- Last update: 2017-09-07
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -186,9 +186,13 @@ architecture top_level_app of MicrowaveMuxCore is
    signal lmkSpiCsb : sl;
 
    -- PLL interface
-   signal pllSpiClk : sl;
-   signal pllSpiDi  : sl;
-   signal pllSpiCsb : slv(3 downto 0);
+   signal pllSpiCsb     : slv(3 downto 0);
+   signal pllSpiClkVec  : slv(3 downto 0);
+   signal pllSpiDiVec   : slv(3 downto 0);
+   signal pllSpiBusyVec : slv(3 downto 0);
+   signal pllSpiClk     : sl;
+   signal pllSpiDi      : sl;
+   signal pllSpiBusy    : sl;
 
    -- Misc.
    signal axilRstL : sl;
@@ -321,24 +325,52 @@ begin
 
    GEN_PLL : for i in 3 downto 0 generate
 
-      U_PLL : entity work.AxiLiteEmpty
+      U_PLL : entity work.adf5355
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            TPD_G             => TPD_G,
+            CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
+            -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
+            SPI_SCLK_PERIOD_G => (1.0/500.0E+3))
          port map (
+            -- Clock and Reset
             axiClk         => axilClk,
-            axiClkRst      => axilRst,
+            axiRst         => axilRst,
+            -- AXI-Lite Interface
             axiReadMaster  => regReadMasters(i+1),
             axiReadSlave   => regReadSlaves(i+1),
             axiWriteMaster => regWriteMasters(i+1),
-            axiWriteSlave  => regWriteSlaves(i+1));
+            axiWriteSlave  => regWriteSlaves(i+1),
+            -- Multiple Chip Support
+            busyIn         => pllSpiBusy,
+            busyOut        => pllSpiBusyVec(i),
+            -- SPI Interface
+            coreSclk       => pllSpiClkVec(i),
+            coreSDout      => pllSpiDiVec(i),
+            coreCsb        => pllSpiCsb(i));
 
    end generate GEN_PLL;
 
+   pllSpiBusy <= uOr(pllSpiBusyVec);
 
-   pllSpiClk <= axilRstL;
-   pllSpiDi  <= axilRstL;
-   pllSpiCsb <= (others => axilRstL);
+   process(pllSpiClkVec, pllSpiCsb, pllSpiDiVec)
+   begin
+      if pllSpiCsb(0) = '0' then
+         pllSpiClk <= pllSpiClkVec(0);
+         pllSpiDi  <= pllSpiDiVec(0);
+      elsif pllSpiCsb(1) = '0' then
+         pllSpiClk <= pllSpiClkVec(1);
+         pllSpiDi  <= pllSpiDiVec(1);
+      elsif pllSpiCsb(2) = '0' then
+         pllSpiClk <= pllSpiClkVec(2);
+         pllSpiDi  <= pllSpiDiVec(2);
+      elsif pllSpiCsb(3) = '0' then
+         pllSpiClk <= pllSpiClkVec(3);
+         pllSpiDi  <= pllSpiDiVec(3);
+      else
+         pllSpiClk <= '0';
+         pllSpiDi  <= '0';
+      end if;
+   end process;
 
    ----------------------------------------------------------------
    -- JESD Buffers

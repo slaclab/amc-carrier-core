@@ -25,6 +25,7 @@ from surf.devices.ti._Dac38J84  import *
 from surf.devices.ti._Lmk04828  import *
 
 from AppHardware.MicrowaveMux._microwaveMuxCtrl import *
+from AppHardware.MicrowaveMux._adf5355 import *
 
 class MicrowaveMuxCore(pr.Device):
     def __init__(   self, 
@@ -36,8 +37,12 @@ class MicrowaveMuxCore(pr.Device):
         #########
         # Devices
         #########
-        self.add(MicrowaveMuxCtrl(offset=0x00000000,name='DBG',   expand=False))
-        self.add(Lmk04828(        offset=0x00020000,name='LMK',   expand=False))
+        self.add(MicrowaveMuxCtrl(offset=0x00000000,name='DBG',    expand=False))
+        self.add(Adf5355(         offset=0x00001000,name='PLL[0]', expand=False))
+        self.add(Adf5355(         offset=0x00002000,name='PLL[1]', expand=False))
+        self.add(Adf5355(         offset=0x00003000,name='PLL[2]', expand=False))
+        self.add(Adf5355(         offset=0x00004000,name='PLL[3]', expand=False))        
+        self.add(Lmk04828(        offset=0x00020000,name='LMK',    expand=False))
         self.add(Dac38J84(        offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
         self.add(Dac38J84(        offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
         self.add(Adc32Rf45(       offset=0x00080000,name='ADC[0]', expand=False))
@@ -85,6 +90,10 @@ class MicrowaveMuxCore(pr.Device):
         # Note: Requires that MicrowaveMuxCore: enable: 'True' in defaults.yml file
         self.enable.set(True)
         self.DBG.enable.set(True)
+        self.PLL[0].enable.set(True)
+        self.PLL[1].enable.set(True)
+        self.PLL[2].enable.set(True)
+        self.PLL[3].enable.set(True)
         self.LMK.enable.set(True)
         self.DAC[0].enable.set(True)
         self.DAC[1].enable.set(True)
@@ -92,6 +101,10 @@ class MicrowaveMuxCore(pr.Device):
         self.ADC[1].enable.set(True)       
         
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.PLL[0].writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.PLL[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.PLL[2].writeBlocks(force=force, recurse=recurse, variable=variable)
+        self.PLL[3].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
@@ -105,11 +118,20 @@ class MicrowaveMuxCore(pr.Device):
         self.ADC[0].DigRst()
         self.ADC[1].DigRst()
         
+        self.PLL[0].RegInitSeq()
+        self.PLL[1].RegInitSeq()        
+        self.PLL[2].RegInitSeq()        
+        self.PLL[3].RegInitSeq()        
+        
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
         self.DAC[0].enable.set(False)
         self.DAC[1].enable.set(False)
         self.ADC[0].enable.set(False)
         self.ADC[1].enable.set(False)          
+        # self.PLL[0].enable.set(False)
+        # self.PLL[1].enable.set(False)
+        # self.PLL[2].enable.set(False)
+        # self.PLL[3].enable.set(False)
         
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
