@@ -338,7 +338,7 @@ create_clock -name jesdClk02 -period 5.405 [get_ports {jesdClkP[0][2]}]
 create_clock -name jesdClk10 -period 5.405 [get_ports {jesdClkP[1][0]}]
 create_clock -name jesdClk11 -period 5.405 [get_ports {jesdClkP[1][1]}]
 create_clock -name jesdClk12 -period 5.405 [get_ports {jesdClkP[1][2]}]
-create_clock -name mpsClkP   -period 8.000 [get_ports {mpsClkIn}]
+create_clock -name mpsClkIn  -period 8.000 [get_ports {mpsClkIn}]
 
 create_generated_clock -name mpsClk625MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT0}] 
 create_generated_clock -name mpsClk312MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT1}] 
@@ -362,7 +362,7 @@ set_clock_groups -asynchronous \
     -group [get_clocks -include_generated_clocks {ddrClkIn}] \
     -group [get_clocks -include_generated_clocks {fabClk}] \
     -group [get_clocks -include_generated_clocks {ethRef}] \
-    -group [get_clocks -include_generated_clocks {mpsClkP}] \
+    -group [get_clocks -include_generated_clocks {mpsClkIn}] \
     -group [get_clocks -include_generated_clocks {jesd0_185MHz}] \
     -group [get_clocks -include_generated_clocks {jesd1_185MHz}]
     
@@ -372,8 +372,7 @@ set_clock_groups -asynchronous \
     -group [get_clocks -include_generated_clocks {jesd1_370MHz}]  
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {ddrClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]
-
-
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {mpsClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]
 
 ##########################
 ## Misc. Configurations ##
