@@ -24,8 +24,8 @@ if { ( $::env(AMC_ADV_BUILD)  != 1) && ( $::env(RTM_ETH)  != 0) } {puts "\n\nERR
 # Load ruckus files
 loadRuckusTcl "$::DIR_PATH/AmcCarrierCore"   "quiet"
 loadRuckusTcl "$::DIR_PATH/BsaCore"          "quiet"
-loadRuckusTcl "$::DIR_PATH/AppTop"           
-loadRuckusTcl "$::DIR_PATH/AppMps"           
+loadRuckusTcl "$::DIR_PATH/AppTop"           "quiet"
+loadRuckusTcl "$::DIR_PATH/AppMps"           "quiet"
 loadRuckusTcl "$::DIR_PATH/DacSigGen"        "quiet"
 loadRuckusTcl "$::DIR_PATH/DaqMuxV2"         "quiet"
-loadRuckusTcl "$::DIR_PATH/AppHardware"
+loadRuckusTcl "$::DIR_PATH/AppHardware"      "quiet"
