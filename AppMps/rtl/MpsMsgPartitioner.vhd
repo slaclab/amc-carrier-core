@@ -130,7 +130,7 @@ begin
          GEN_SYNC_FIFO_G     => SLAVE_SYNC_FIFO_G,
          FIFO_ADDR_WIDTH_G   => 9,
          FIFO_FIXED_THRESH_G => true,
-         FIFO_PAUSE_THRESH_G => 500,
+         FIFO_PAUSE_THRESH_G => 250,
          CASCADE_SIZE_G      => SLAVE_CASCADE_SIZE_G,
          CASCADE_PAUSE_SEL_G => SLAVE_CASCADE_SIZE_G-1,
          -- AXI Stream Port Configurations
