@@ -2,7 +2,7 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 ## Check for submodule tagging
-if { [SubmoduleCheck {ruckus}             {1.5.1} ] < 0 } {exit -1}
+if { [SubmoduleCheck {ruckus}             {1.5.2} ] < 0 } {exit -1}
 if { [SubmoduleCheck {surf}               {1.4.0} ] < 0 } {exit -1}
 if { [SubmoduleCheck {lcls-timing-core}   {1.7.3} ] < 0 } {exit -1}
 
