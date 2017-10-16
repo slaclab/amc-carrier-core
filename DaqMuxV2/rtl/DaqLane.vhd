@@ -2,7 +2,7 @@
 -- File       : DaqLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-02
--- Last update: 2017-07-03
+-- Last update: 2017-10-16
 -------------------------------------------------------------------------------
 -- Description:   This module sends sample data to a single Lane.
 --                In non-continuous mode
@@ -158,6 +158,9 @@ architecture rtl of DaqLane is
    signal s_sampDataTst   : slv((GT_WORD_SIZE_C*8)-1 downto 0);
    signal s_decSampData   : slv((GT_WORD_SIZE_C*8)-1 downto 0);
 
+   signal packetSizeVar : slv(31 downto 0);
+   signal compCheck     : sl;
+
 begin
    -- Do not trigger decimator when busy
    -- because it will zero s_rateClk and data will be missed
@@ -209,11 +212,21 @@ begin
       s_rateClk     <= s_sampValidTst;
    end generate GEN_N_DEC;
 
-   comb : process (LinkReady_i, averaging_i, axiNum_i, bsa_i, dec16or32_i,
-                   devRst_i, dmod_i, enable_i, freeze_i, headerEn_i, header_i,
-                   mode_i, packetSize_i, r, rateDiv_i, rxAxisCtrl_i,
-                   rxAxisSlave_i, s_decSampData, s_rateClk, signWidth_i,
-                   signed_i, test_i, timeStamp_i, trig_i) is
+   U_DspComparator : entity work.DspComparator
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 32)
+      port map (
+         clk  => devClk_i,
+         ain  => packetSizeVar,
+         bin  => toSlv(HEADER_SIZE_C, 32),
+         lsEq => compCheck);  -- less than or equal to (a <= b) --- (r.packetSize <= HEADER_SIZE_C)  
+
+   comb : process (LinkReady_i, averaging_i, axiNum_i, bsa_i, compCheck,
+                   dec16or32_i, devRst_i, dmod_i, enable_i, freeze_i,
+                   headerEn_i, header_i, mode_i, packetSize_i, r, rateDiv_i,
+                   rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk,
+                   signWidth_i, signed_i, test_i, timeStamp_i, trig_i) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -330,7 +343,7 @@ begin
                   v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
                end if;
                -- Check if packet length error
-               if (r.dataCnt = (HEADER_SIZE_C-1)) and (r.packetSize <= HEADER_SIZE_C) then
+               if (r.dataCnt = (HEADER_SIZE_C-1)) and (compCheck = '1') then
                   -- Set the EOF bit
                   v.txAxisMaster.tLast := '1';
                   -- Set the EOFE bit
@@ -417,6 +430,7 @@ begin
       rin <= v;
 
       -- Output assignment
+      packetSizeVar  <= v.packetSize;
       rxAxisMaster_o <= r.txAxisMaster;
       error_o        <= r.error;
       pctCnt_o       <= r.pctCnt;
