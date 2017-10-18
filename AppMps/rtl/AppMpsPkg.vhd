@@ -425,9 +425,32 @@ package body AppMpsPkg is
             ret.CHAN_CONFIG_C(0).BYTE_MAP_C    := 0;
 
             -- Input 16
-            ret.CHAN_CONFIG_C(1).THOLD_COUNT_C := 4;
-            ret.CHAN_CONFIG_C(1).IDLE_EN_C     := true;
-            ret.CHAN_CONFIG_C(1).BYTE_MAP_C    := 1;
+            ret.CHAN_CONFIG_C(16).THOLD_COUNT_C := 4;
+            ret.CHAN_CONFIG_C(16).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(16).BYTE_MAP_C    := 1;
+
+         when APP_BCM_TYPE_C =>
+            ret.BYTE_COUNT_C := 4;
+
+            -- Input 0
+            ret.CHAN_CONFIG_C(0).THOLD_COUNT_C := 4;
+            ret.CHAN_CONFIG_C(0).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(0).BYTE_MAP_C    := 0;
+
+            -- Input 16
+            ret.CHAN_CONFIG_C(16).THOLD_COUNT_C := 4;
+            ret.CHAN_CONFIG_C(16).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(16).BYTE_MAP_C    := 1;
+
+            -- Input 5
+            ret.CHAN_CONFIG_C(5).THOLD_COUNT_C := 4;
+            ret.CHAN_CONFIG_C(5).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(5).BYTE_MAP_C    := 2;
+
+            -- Input 21
+            ret.CHAN_CONFIG_C(21).THOLD_COUNT_C := 4;
+            ret.CHAN_CONFIG_C(21).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(21).BYTE_MAP_C    := 3;
 
          when APP_LLRF_TYPE_C =>
             ret.DIGITAL_EN_C := true;
