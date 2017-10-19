@@ -2,7 +2,7 @@
 -- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-09-29
+-- Last update: 2017-10-19
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -51,6 +51,7 @@ entity AppMpsSalt is
       mps625MHzClk    : in  sl;
       mps625MHzRst    : in  sl;
       mpsPllLocked    : in  sl;
+      mpsPllRst       : out sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -85,6 +86,7 @@ architecture mapping of AppMpsSalt is
 
    type RegType is record
       cntRst         : sl;
+      mpsPllRst      : sl;
       mpsPktCnt      : Slv32Array(14 downto 0);
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -93,6 +95,7 @@ architecture mapping of AppMpsSalt is
 
    constant REG_INIT_C : RegType := (
       cntRst         => '1',
+      mpsPllRst      => '0',
       rollOverEn     => (others => '0'),
       mpsPktCnt      => (others => (others => '0')),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
@@ -266,7 +269,8 @@ begin
       v := r;
 
       -- Reset strobe signals
-      v.cntRst := '0';
+      v.cntRst    := '0';
+      v.mpsPllRst := '0';
 
       -- Determine the transaction type
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
@@ -288,6 +292,7 @@ begin
       -- Map the write registers
       axiSlaveRegister(regCon, x"FF0", 0, v.rollOverEn);
       axiSlaveRegister(regCon, x"FF4", 0, v.cntRst);
+      axiSlaveRegister(regCon, x"FF8", 0, v.mpsPllRst);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -326,6 +331,15 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   U_mpsPllRst : entity work.PwrUpRst
+      generic map (
+         TPD_G      => TPD_G,
+         DURATION_G => 125000000)
+      port map (
+         arst   => r.mpsPllRst,
+         clk    => axilClk,
+         rstOut => mpsPllRst);
 
    SyncStatusVec_Inst : entity work.SyncStatusVector
       generic map (
