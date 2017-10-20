@@ -210,6 +210,6 @@ begin
          addrb => axiReadMaster.araddr(5 downto 2),
          doutb => cacheData(31 downto 4));
 
-   cacheData(3 downto 0) <= x"0";
+   cacheData(3 downto 0) <= axiReadMaster.araddr(5 downto 2);
 
 end architecture rtl;
