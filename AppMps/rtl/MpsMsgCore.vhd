@@ -102,7 +102,7 @@ begin
             -- Set ready
             v.ready := '1';
             -- Check for update
-            if mpsMessage.valid = '1' and mpsMessage.msgSize(log2(r.mpsMessage.message'length)-1 downto 0) > 0  then
+            if mpsMessage.valid = '1' and mpsMessage.msgSize > 0 then
                -- Reset ready
                v.ready := '0';
                -- Reset tData
@@ -160,7 +160,7 @@ begin
                v.cnt                          := r.cnt + 1;
                    
                -- Check if lower byte is tLast
-               if v.cnt = r.mpsMessage.msgSize(log2(r.mpsMessage.message'length)-1 downto 0) then
+               if v.cnt = r.mpsMessage.msgSize then
                   -- Reset the counter
                   v.cnt             := 0;
                   -- Set EOF
@@ -173,7 +173,7 @@ begin
                   -- Increment the counter
                   v.cnt                          := v.cnt + 1;
                   -- Check if lower byte is tLast
-                  if v.cnt = r.mpsMessage.msgSize(log2(r.mpsMessage.message'length)-1 downto 0) then
+                  if v.cnt = r.mpsMessage.msgSize then
                      -- Reset the counter
                      v.cnt             := 0;
                      -- Set EOF
