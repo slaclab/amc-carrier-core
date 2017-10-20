@@ -146,7 +146,8 @@ begin
       end loop;
 
       -- Closeout the transaction
-      axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      -- axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_OK_C); -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
 
       -- Synchronous Reset
       if (axilRst = '1') then

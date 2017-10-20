@@ -26,8 +26,8 @@ AppMps: &AppMps
       at:
         offset: 0x00000000
     ##################################################
-   AppMpsThr:
-     <<: *AppMpsThr
-     at:
-       offset: 0x00010000
+    AppMpsThr:
+      <<: *AppMpsThr
+      at:
+        offset: 0x00010000
     ##################################################

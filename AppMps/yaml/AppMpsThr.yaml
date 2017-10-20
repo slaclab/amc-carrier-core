@@ -14,7 +14,7 @@ threshold: &threshold
   class: MMIODev
   configPrio: 1
   description: Threshold duplex
-  size: 0x0F
+  size: 0x10
   children:
     minEn:
       at:
@@ -54,7 +54,7 @@ channel: &channel
   class: MMIODev
   configPrio: 1
   description: threshold channel
-  size: 0x1FF
+  size: 0x200
   children:
     thresholdCount:
       at:
@@ -123,7 +123,7 @@ AppMpsThr: &AppMpsThr
   class: MMIODev
   configPrio: 1
   description: Mps threshold block
-  size: 0xAFFF
+  size: 0x10000
   children:
     mpsAppId:
       at:
