@@ -2,7 +2,7 @@
 -- File       : AppMps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-03-23
+-- Last update: 2017-10-19
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -116,9 +116,10 @@ architecture mapping of AppMps is
    signal mpsPllLocked : sl;
    signal mps100MHzClk : sl;
    signal mps100MHzRst : sl;
+   signal mpsPllRst    : sl;
 
-   signal mpsMaster  : AxiStreamMasterType;
-   signal mpsSlave   : AxiStreamSlaveType;
+   signal mpsMaster : AxiStreamMasterType;
+   signal mpsSlave  : AxiStreamSlaveType;
 
 begin
 
@@ -144,6 +145,7 @@ begin
          mpsTholdClk  => mpsTholdClk,
          mpsTholdRst  => mpsTholdRst,
          mpsPllLocked => mpsPllLocked,
+         mpsPllRst    => mpsPllRst,
          ----------------
          -- Core Ports --
          ----------------   
@@ -176,7 +178,7 @@ begin
    ----------------------------
    -- Encoder Logic
    ----------------------------
-   U_MpsCoreAsync: entity work.AxiLiteAsync
+   U_MpsCoreAsync : entity work.AxiLiteAsync
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
@@ -196,7 +198,7 @@ begin
          mAxiWriteMaster => encWriteMaster,
          mAxiWriteSlave  => encWriteSlave);
 
-   U_AppMpsEncoder: entity work.AppMpsEncoder
+   U_AppMpsEncoder : entity work.AppMpsEncoder
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
@@ -233,6 +235,7 @@ begin
          mps625MHzClk    => mps625MHzClk,
          mps625MHzRst    => mps625MHzRst,
          mpsPllLocked    => mpsPllLocked,
+         mpsPllRst       => mpsPllRst,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
