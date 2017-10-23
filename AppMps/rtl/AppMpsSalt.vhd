@@ -208,9 +208,30 @@ begin
             refClk        => mps625MHzClk,
             refRst        => mps625MHzRst);
 
+      LN_FIFO : entity work.AxiStreamFifoV2
+         generic map (
+            TPD_G               => TPD_G,
+            SLAVE_READY_EN_G    => true,
+            VALID_THOLD_G       => 1,
+            BRAM_EN_G           => true,
+            USE_BUILT_IN_G      => false,
+            GEN_SYNC_FIFO_G     => false,
+            FIFO_ADDR_WIDTH_G   => 9,
+            SLAVE_AXI_CONFIG_G  => MPS_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C) 
+         port map (
+            -- Slave Port
+            sAxisClk    => mpsIbClk,
+            sAxisRst    => mpsIbRst,
+            sAxisMaster => mpsIbMaster,
+            sAxisSlave  => mpsIbSlave,
+            -- Master Port
+            mAxisClk    => axilClk,
+            mAxisRst    => axilRst,
+            mAxisMaster => mpsObMasters(0),
+            mAxisSlave  => mpsObSlaves(0));
+
       mpsTxLinkUp     <= '0';
-      mpsObMasters(0) <= mpsIbMaster;
-      mpsIbSlave      <= mpsObSlaves(0);
 
       U_OBUFDS : OBUFDS
          port map (
