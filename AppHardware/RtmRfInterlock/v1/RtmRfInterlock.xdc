@@ -97,20 +97,21 @@ set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[4]}]
 
 # Clocks
 create_clock -period 2.801 -name rtmAdcDataClk [get_ports {rtmLsP[3]}]
-create_generated_clock -name rtmAdcDataClkDiv2 [get_pins {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/U_BUFGCE_DIV/O}]
-create_generated_clock -name recTimingClkDiv2  [get_pins {U_AppTop/U_AppCore/U_RTM/U_CORE/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
+create_generated_clock -name rtmAdcDataClkDiv2 [get_pins -hier -filter {NAME =~ *U_RTM/U_CORE/U_Ad9229Core/U_BUFGCE_DIV/O}]
+create_generated_clock -name recTimingClkDiv2  [get_pins -hier -filter {NAME =~ *U_RTM/U_CORE/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 
 set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {rtmAdcDataClk}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {rtmAdcDataClk}]
 set_clock_groups -asynchronous -group [get_clocks {recTimingClkDiv2}] -group [get_clocks {rtmAdcDataClk}]
 set_clock_groups -asynchronous -group [get_clocks {recTimingClkDiv2}] -group [get_clocks {rtmAdcDataClkDiv2}]
 set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks {rtmAdcDataClkDiv2}]
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {rtmAdcDataClkDiv2}]
 
 # Adding placement constraints 
-set_property LOC BITSLICE_CONTROL_X0Y1 [get_cells {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/U_IDELAYCTRL}]
-set_property LOC BITSLICE_RX_TX_X0Y114 [get_cells {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/Ad9229Deserializer_INST/U_DELAY}]
-set_property LOC BITSLICE_RX_TX_X0Y123 [get_cells {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/GEN_DATA[0].Ad9229Deserializer_INST/U_DELAY}]
-set_property LOC BITSLICE_RX_TX_X0Y143 [get_cells {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/GEN_DATA[1].Ad9229Deserializer_INST/U_DELAY}]
-set_property LOC BITSLICE_RX_TX_X0Y134 [get_cells {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/GEN_DATA[2].Ad9229Deserializer_INST/U_DELAY}]
-set_property LOC BITSLICE_RX_TX_X0Y112 [get_cells {U_AppTop/U_AppCore/U_RTM/U_CORE/U_Ad9229Core/GEN_DATA[3].Ad9229Deserializer_INST/U_DELAY}]
+set_property LOC BITSLICE_CONTROL_X0Y1 [get_cells -hier -filter {NAME =~ *U_RTM/U_CORE/U_Ad9229Core/U_IDELAYCTRL}]
+set_property LOC BITSLICE_RX_TX_X0Y114 [get_cells -hier -filter {NAME =~ *U_RTM/U_CORE/U_Ad9229Core/Ad9229Deserializer_INST/U_DELAY}]
+set_property LOC BITSLICE_RX_TX_X0Y123 [get_cells -hier -filter {NAME =~ *U_RTM/U_CORE/U_Ad9229Core/GEN_DATA[0].Ad9229Deserializer_INST/U_DELAY}]
+set_property LOC BITSLICE_RX_TX_X0Y143 [get_cells -hier -filter {NAME =~ *U_RTM/U_CORE/U_Ad9229Core/GEN_DATA[1].Ad9229Deserializer_INST/U_DELAY}]
+set_property LOC BITSLICE_RX_TX_X0Y134 [get_cells -hier -filter {NAME =~ *U_RTM/U_CORE/U_Ad9229Core/GEN_DATA[2].Ad9229Deserializer_INST/U_DELAY}]
+set_property LOC BITSLICE_RX_TX_X0Y112 [get_cells -hier -filter {NAME =~ *U_RTM/U_CORE/U_Ad9229Core/GEN_DATA[3].Ad9229Deserializer_INST/U_DELAY}]
 

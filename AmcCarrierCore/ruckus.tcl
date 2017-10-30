@@ -11,23 +11,38 @@ loadSource -path "$::DIR_PATH/ip/SysMonCore.dcp"
 
 # Check for advance build, which bypasses the pre-built .DCP file
 if {  $::env(AMC_ADV_BUILD)  == 1 } {
-   loadSource      -path "$::DIR_PATH/core/AmcCarrierCoreAdv.vhd"
-   loadSource      -path "$::DIR_PATH/dcp/hdl/AmcCarrierCore.vhd"
-   loadSource      -path "$::DIR_PATH/dcp/hdl/AmcCarrierEth.vhd"
-   loadSource      -path "$::DIR_PATH/dcp/hdl/AmcCarrierRssi.vhd"
-   loadSource      -path "$::DIR_PATH/dcp/hdl/AmcCarrierTiming.vhd"
-   loadSource      -path "$::DIR_PATH/dcp/hdl/AmcCarrierBsa.vhd"
-   loadSource      -path "$::DIR_PATH/dcp/hdl/AmcCarrierDdrMem.vhd"
-   loadSource      -path "$::DIR_PATH/ip/MigCore.dcp"
-   # loadIpCore      -path "$::DIR_PATH/ip/MigCore.xci"
+
+   # Check for FSBL
+   if { [info exists ::env(AMC_FSBL)] == 1 }  {
+      loadSource -dir "$::DIR_PATH/fsbl"
+   } else {
+      # NON-FSBL configuration
+      loadSource -path "$::DIR_PATH/core/AmcCarrierCoreAdv.vhd"
+      loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierCore.vhd"
+      loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierEth.vhd"
+      loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierRssi.vhd"   
+   }
+   
+   loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierTiming.vhd"
+   loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierBsa.vhd"
+   loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierDdrMem.vhd"
+   
+   loadSource   -path "$::DIR_PATH/ip/MigCore.dcp"
+   # loadIpCore -path "$::DIR_PATH/ip/MigCore.xci"
+   
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePorts.xdc" 
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreTiming.xdc" 
    
-   # Check if using zone2 or zone3 ETH interface
-   if {  $::env(RTM_ETH)  == 1 } {
-      loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone3Eth.xdc" 
-   } else {
-      loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone2Eth.xdc" 
+   # Check for FSBL
+   if { [info exists ::env(AMC_FSBL)] == 1 }  {
+      loadConstraints -dir "$::DIR_PATH/fsbl"
+   } else {   
+      # Check if using zone2 or zone3 ETH interface
+      if {  $::env(RTM_ETH)  == 1 } {
+         loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone3Eth.xdc" 
+      } else {
+         loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone2Eth.xdc" 
+      }
    }
    
 } else {

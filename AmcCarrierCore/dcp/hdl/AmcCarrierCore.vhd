@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-04-12
+-- Last update: 2017-06-28
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,14 +31,15 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierCore is
    generic (
-      TPD_G                 : time     := 1 ns;
-      ETH_USR_FRAME_LIMIT_G : positive := 4096;   -- 4kB      
-      SIM_SPEEDUP_G         : boolean  := false;  -- false = Normal Operation, true = simulation
-      DISABLE_BSA_G         : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
-      RTM_ETH_G             : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
-      TIME_GEN_APP_G        : boolean  := false;  -- false = normal application, true = timing generator application
-      TIME_GEN_EXTREF_G     : boolean  := false;  -- false = normal application, true = timing generator using external reference
-      FSBL_G                : boolean  := false);  -- false = Normal Operation, true = First Stage Boot loader
+      TPD_G                  : time     := 1 ns;
+      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB   
+      WAVEFORM_TDATA_BYTES_G : positive := 4;
+      SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
+      DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
+      RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
+      TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
+      TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
+      FSBL_G                 : boolean  := false);  -- false = Normal Operation, true = First Stage Boot loader
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -337,49 +338,50 @@ begin
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
-         axilClk          => axilClk,
-         axilRst          => axilRst,
-         axilReadMaster   => timingReadMaster,
-         axilReadSlave    => timingReadSlave,
-         axilWriteMaster  => timingWriteMaster,
-         axilWriteSlave   => timingWriteSlave,
+         axilClk             => axilClk,
+         axilRst             => axilRst,
+         axilReadMaster      => timingReadMaster,
+         axilReadSlave       => timingReadSlave,
+         axilWriteMaster     => timingWriteMaster,
+         axilWriteSlave      => timingWriteSlave,
          ----------------------
          -- Top Level Interface
          ----------------------         
          -- Timing Interface 
-         recTimingClk     => recTimingClk,
-         recTimingRst     => recTimingRst,
-         appTimingClk     => timingClk,
-         appTimingRst     => timingRst,
-         appTimingBus     => timingBusIntf,
-         appTimingPhy     => timingPhy,
-         appTimingPhyClk  => timingPhyClk,
-         appTimingPhyRst  => timingPhyRst,
+         recTimingClk        => recTimingClk,
+         recTimingRst        => recTimingRst,
+         appTimingClk        => timingClk,
+         appTimingRst        => timingRst,
+         appTimingBus        => timingBusIntf,
+         appTimingPhy        => timingPhy,
+         appTimingPhyClk     => timingPhyClk,
+         appTimingPhyRst     => timingPhyRst,
          appTimingRefClk     => timingRefClk,
          appTimingRefClkDiv2 => timingRefClkDiv2,
          ----------------
          -- Core Ports --
          ----------------   
          -- LCLS Timing Ports
-         timingRxP        => timingRxP,
-         timingRxN        => timingRxN,
-         timingTxP        => timingTxP,
-         timingTxN        => timingTxN,
-         timingRefClkInP  => timingRefClkInP,
-         timingRefClkInN  => timingRefClkInN,
-         timingRecClkOutP => timingRecClkOutP,
-         timingRecClkOutN => timingRecClkOutN,
-         timingClkSel     => timingClkSel);
+         timingRxP           => timingRxP,
+         timingRxN           => timingRxN,
+         timingTxP           => timingTxP,
+         timingTxN           => timingTxN,
+         timingRefClkInP     => timingRefClkInP,
+         timingRefClkInN     => timingRefClkInN,
+         timingRecClkOutP    => timingRecClkOutP,
+         timingRecClkOutN    => timingRecClkOutN,
+         timingClkSel        => timingClkSel);
 
    --------------
    -- BSA Core
    --------------
    U_Bsa : entity work.AmcCarrierBsa
       generic map (
-         TPD_G            => TPD_G,
-         FSBL_G           => FSBL_G,
-         DISABLE_BSA_G    => DISABLE_BSA_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
+         TPD_G                  => TPD_G,
+         FSBL_G                 => FSBL_G,
+         DISABLE_BSA_G          => DISABLE_BSA_G,
+         WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
+         AXI_ERROR_RESP_G       => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,

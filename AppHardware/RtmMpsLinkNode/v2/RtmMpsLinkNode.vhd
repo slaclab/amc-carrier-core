@@ -73,9 +73,9 @@ begin
             I => rtmLsN(i+0),
             O => dinL(i+16));
 
-   end generate GEN_VEC;
+   end generate GEN_DIN;
 
-   GEN_VEC :
+   GEN_DOUT :
    for i in 3 downto 0 generate
 
       U_OBUF_P : OBUF

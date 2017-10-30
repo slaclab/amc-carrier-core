@@ -234,7 +234,7 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),-- ETH_AXIS_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of ETH_AXIS_CONFIG_C.TDATA_BYTES_C
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,

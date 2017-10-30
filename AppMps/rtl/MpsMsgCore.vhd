@@ -39,8 +39,11 @@ entity MpsMsgCore is
    port (
       clk        : in  sl;
       rst        : in  sl;
+
+      ready      : out sl; 
       -- Inbound Message Value
       mpsMessage : in  MpsMessageType;
+
       -- Outbound MPS Interface
       mpsMaster  : out AxiStreamMasterType;
       mpsSlave   : in  AxiStreamSlaveType);
@@ -59,6 +62,7 @@ architecture rtl of MpsMsgCore is
       cnt        : natural range 0 to 63;
       mpsMessage : MpsMessageType;
       mpsMaster  : AxiStreamMasterType;
+      ready      : sl;
       state      : StateType;
       stateDly   : StateType;
    end record RegType;
@@ -66,6 +70,7 @@ architecture rtl of MpsMsgCore is
       cnt        => 0,
       mpsMessage => MPS_MESSAGE_INIT_C,
       mpsMaster  => AXI_STREAM_MASTER_INIT_C,
+      ready      => '0',
       state      => IDLE_S,
       stateDly   => IDLE_S);
 
@@ -94,8 +99,12 @@ begin
       case r.state is
          ----------------------------------------------------------------------
          when IDLE_S =>
+            -- Set ready
+            v.ready := '1';
             -- Check for update
-            if mpsMessage.valid = '1' then
+            if mpsMessage.valid = '1' and mpsMessage.msgSize > 0 then
+               -- Reset ready
+               v.ready := '0';
                -- Reset tData
                v.mpsMaster.tData := (others => '0');
                -- Latch the information
@@ -112,7 +121,7 @@ begin
                v.mpsMaster.tData(15)          := '0';  -- Mitigation Message flag has to be '0' (Will be checked at receiving end)
                v.mpsMaster.tData(14)          := r.mpsMessage.lcls;  -- Set the LCLS flag
                v.mpsMaster.tData(13)          := r.mpsMessage.inputType;  -- Set the input type A/D  
-               v.mpsMaster.tData(12 downto 8) := (others => '0');
+               v.mpsMaster.tData(12 downto 8) := r.mpsMessage.version; -- Set the message version
                v.mpsMaster.tData(7 downto 0)  := r.mpsMessage.msgSize+5;  -- Length in units of bytes
                -- Set SOF               
                ssiSetUserSof(MPS_AXIS_CONFIG_C, v.mpsMaster, '1');
@@ -149,6 +158,7 @@ begin
                v.mpsMaster.tData(15 downto 8) := (others => '0');
                -- Increment the counter
                v.cnt                          := r.cnt + 1;
+                   
                -- Check if lower byte is tLast
                if v.cnt = r.mpsMessage.msgSize then
                   -- Reset the counter
@@ -196,6 +206,7 @@ begin
 
       -- Outputs        
       mpsMaster <= r.mpsMaster;
+      ready     <= v.ready;
 
    end process comb;
 

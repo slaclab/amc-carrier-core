@@ -60,10 +60,8 @@ package AmcCarrierPkg is
    constant APP_BPM_STRIPLINE_TYPE_C  : AppType := toSlv(100, AppType'length);
    constant APP_BPM_CAVITY_TYPE_C     : AppType := toSlv(101, AppType'length);
 
-   constant APP_MPS_BLM_TYPE_C        : AppType := toSlv(120, AppType'length);
-   constant APP_MPS_GAP_TYPE_C        : AppType := toSlv(121, AppType'length);
-   constant APP_MPS_BEND_TYPE_C       : AppType := toSlv(122, AppType'length);
-   constant APP_MPS_KICK_TYPE_C       : AppType := toSlv(123, AppType'length);
+   constant APP_MPS_24CH_TYPE_C       : AppType := toSlv(120, AppType'length);
+   constant APP_MPS_6CH_TYPE_C        : AppType := toSlv(121, AppType'length);
 
    -------------------------------------
    -- Common Platform: General Constants
@@ -97,9 +95,6 @@ package AmcCarrierPkg is
    constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data
 
    constant WAVEFORM_STREAMS_C     : integer := 8;
-   constant WAVEFORM_AXIS_CONFIG_C : AxiStreamConfigType :=
-      ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
-
    constant WAVEFORM_TRIGGER_BIT_C : integer := 2;
 
    subtype WaveformMasterType is AxiStreamMasterArray(3 downto 0);

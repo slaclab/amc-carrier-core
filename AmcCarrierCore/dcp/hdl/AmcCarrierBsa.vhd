@@ -34,10 +34,11 @@ use work.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierBsa is
    generic (
-      TPD_G            : time            := 1 ns;
-      FSBL_G           : boolean         := false;
-      DISABLE_BSA_G    : boolean         := false;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G                  : time                   := 1 ns;
+      FSBL_G                 : boolean                := false;
+      DISABLE_BSA_G          : boolean                := false;
+      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4;
+      AXI_ERROR_RESP_G       : slv(1 downto 0)        := AXI_RESP_DECERR_C);
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
@@ -211,9 +212,10 @@ begin
       ibBsaSlaves(BSA_WAVEFORM_DATA_AXIS_INDEX_C)   <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only
       BsaWaveformEngine_0 : entity work.BsaWaveformEngine
          generic map (
-            TPD_G            => TPD_G,
-            AXIL_BASE_ADDR_G => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_0_AXIL_C).baseAddr,
-            AXI_CONFIG_G     => WAVEFORM_AXI_CONFIG_C)
+            TPD_G                  => TPD_G,
+            WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
+            AXIL_BASE_ADDR_G       => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_0_AXIL_C).baseAddr,
+            AXI_CONFIG_G           => WAVEFORM_AXI_CONFIG_C)
          port map (
             waveformClk       => waveformClk,
             waveformRst       => waveformRst,
@@ -242,9 +244,10 @@ begin
 
       BsaWaveformEngine_1 : entity work.BsaWaveformEngine
          generic map (
-            TPD_G            => TPD_G,
-            AXIL_BASE_ADDR_G => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_1_AXIL_C).baseAddr,
-            AXI_CONFIG_G     => WAVEFORM_AXI_CONFIG_C)
+            TPD_G                  => TPD_G,
+            WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
+            AXIL_BASE_ADDR_G       => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_1_AXIL_C).baseAddr,
+            AXI_CONFIG_G           => WAVEFORM_AXI_CONFIG_C)
          port map (
             waveformClk       => waveformClk,
             waveformRst       => waveformRst,

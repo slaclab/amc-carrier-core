@@ -170,7 +170,7 @@ begin
             pllInc          => spareP(1),
             pllDec          => spareP(2),
             pllFrqTbl       => spareP(3),
-            pllDbl2By       => spareP(4),
+            pllBypass       => spareP(4),
             pllRate(0)      => spareP(5),
             pllRate(1)      => spareP(6),
             pllSFout(0)     => spareP(7),
@@ -181,6 +181,8 @@ begin
             pllFrqSel(1)    => spareP(12),
             pllFrqSel(2)    => spareP(13),
             pllFrqSel(3)    => spareP(14),
+            userValueIn     => (others=>'0'),
+            userValueOut    => open,
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,

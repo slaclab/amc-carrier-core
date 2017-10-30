@@ -25,31 +25,29 @@ from LclsTimingCore.EvrV1Isr import *
 
 class AppTopTrig(pr.Device):
     def __init__(   self, 
-                    name         = "AppTopTrig", 
-                    description  = "Common Application Top Level Trigger Module", 
-                    memBase      =  None, 
-                    offset       =  0x0, 
-                    hidden       =  False, 
-                    numTrigPulse =  1,
-                    expand      =  True,
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
+            name         = "AppTopTrig", 
+            description  = "Common Application Top Level Trigger Module", 
+            numTrigPulse =  1,
+            enableEvr    =  True,
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables
         ##############################
 
-        digits = len(str(abs(numTrigPulse-1))) 
-        for i in range(numTrigPulse):
-            self.add(LclsTriggerPulse(
-                                    name         = "LclsTriggerPulse_%.*i" % (digits, i),
-                                    offset       =  0x00000000 + (i * 0x00001000),
-                                ))
-
-        self.add(EvrV1Reg(
-                                offset       =  0x01000000,
-                            ))
-
-        self.add(EvrV1Isr(
-                                offset       =  0x02000000,
-                            ))
+        if ( numTrigPulse > 0 ):
+            for i in range(numTrigPulse):
+                self.add(LclsTriggerPulse(
+                    name   = "TrigPulse[%i]" % (i),
+                    offset = 0x00000000 + (i * 0x00001000),
+                ))        
+        
+        if ( enableEvr ):
+            self.add(EvrV1Reg(
+                offset =  0x01000000,
+            ))
+            self.add(EvrV1Isr(
+                offset =  0x02000000,
+            ))
+  

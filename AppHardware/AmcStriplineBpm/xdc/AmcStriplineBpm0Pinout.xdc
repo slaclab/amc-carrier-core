@@ -133,5 +133,3 @@ set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[0][9]}]; #rfAmpOn 
 # Triggers
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutP[0][6]}]; #extTrigP P11 PIN136
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutN[0][6]}]; #extTrigN P11 PIN135
-
-set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd0_370MHz}]

@@ -17,11 +17,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="947000000000fs"></ZoomStartTime>
-      <ZoomEndTime time="1010600000001fs"></ZoomEndTime>
-      <Cursor1Time time="1000000000000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="391095507fs"></ZoomEndTime>
+      <Cursor1Time time="14455800000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="180" />
+   <column_width_setting>
+      <NameColumnWidth column_width="186"></NameColumnWidth>
+      <ValueColumnWidth column_width="162"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="104" />
    <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/wfClk_i">
       <obj_property name="ElementShortName">wfClk_i</obj_property>
       <obj_property name="ObjectShortName">wfClk_i</obj_property>
@@ -38,88 +42,14 @@
       <obj_property name="ElementShortName">rst_i</obj_property>
       <obj_property name="ObjectShortName">rst_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/dec16or32_i">
-      <obj_property name="ElementShortName">dec16or32_i</obj_property>
-      <obj_property name="ObjectShortName">dec16or32_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/U_DaqTrigger/freeze_o">
-      <obj_property name="ElementShortName">freeze_o</obj_property>
-      <obj_property name="ObjectShortName">freeze_o</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/s_cnt">
-      <obj_property name="ElementShortName">s_cnt[31:0]</obj_property>
-      <obj_property name="ObjectShortName">s_cnt[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/trigHw_i">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/trigHw_i">
       <obj_property name="ElementShortName">trigHw_i</obj_property>
       <obj_property name="ObjectShortName">trigHw_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/trigCasc_i">
-      <obj_property name="ElementShortName">trigCasc_i</obj_property>
-      <obj_property name="ObjectShortName">trigCasc_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/timeStamp_i">
-      <obj_property name="ElementShortName">timeStamp_i[63:0]</obj_property>
-      <obj_property name="ObjectShortName">timeStamp_i[63:0]</obj_property>
    </wvobject>
    <wvobject type="array" fp_name="/DaqMuxV2Tb/sampleDataArr_i">
       <obj_property name="ElementShortName">sampleDataArr_i[1:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">sampleDataArr_i[1:0][31:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/dataValidVec_i">
-      <obj_property name="ElementShortName">dataValidVec_i[1:0]</obj_property>
-      <obj_property name="ObjectShortName">dataValidVec_i[1:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/trigCasc_o">
-      <obj_property name="ElementShortName">trigCasc_o</obj_property>
-      <obj_property name="ObjectShortName">trigCasc_o</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/rxAxisMasterArr_o">
-      <obj_property name="ElementShortName">rxAxisMasterArr_o[1:0]</obj_property>
-      <obj_property name="ObjectShortName">rxAxisMasterArr_o[1:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/rxAxisSlaveArr_i">
-      <obj_property name="ElementShortName">rxAxisSlaveArr_i[1:0]</obj_property>
-      <obj_property name="ObjectShortName">rxAxisSlaveArr_i[1:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/s_rxAxisMasterArr">
-      <obj_property name="ElementShortName">s_rxAxisMasterArr[1:0]</obj_property>
-      <obj_property name="ObjectShortName">s_rxAxisMasterArr[1:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/s_rxAxisMasterArr[1]">
-         <obj_property name="ElementShortName">[1]</obj_property>
-         <obj_property name="ObjectShortName">[1]</obj_property>
-         <obj_property name="isExpanded"></obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/s_rxAxisMasterArr[0]">
-         <obj_property name="ElementShortName">[0]</obj_property>
-         <obj_property name="ObjectShortName">[0]</obj_property>
-         <obj_property name="isExpanded"></obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/s_rxAxisSlaveArr">
-      <obj_property name="ElementShortName">s_rxAxisSlaveArr[1:0]</obj_property>
-      <obj_property name="ObjectShortName">s_rxAxisSlaveArr[1:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/rxAxisCtrlArr_i">
-      <obj_property name="ElementShortName">rxAxisCtrlArr_i[1:0]</obj_property>
-      <obj_property name="ObjectShortName">rxAxisCtrlArr_i[1:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/s_muxSel">
-      <obj_property name="ElementShortName">s_muxSel[1:0][4:0]</obj_property>
-      <obj_property name="ObjectShortName">s_muxSel[1:0][4:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/s_daqStatus">
-      <obj_property name="ElementShortName">s_daqStatus[1:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">s_daqStatus[1:0][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/U_DaqTrigger/trigStatus_o">
-      <obj_property name="ElementShortName">trigStatus_o[5:0]</obj_property>
-      <obj_property name="ObjectShortName">trigStatus_o[5:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider53" type="divider">
       <obj_property name="label">Trigger</obj_property>
@@ -181,10 +111,6 @@
       <obj_property name="ElementShortName">r</obj_property>
       <obj_property name="ObjectShortName">r</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/U_DaqTrigger/rin">
-      <obj_property name="ElementShortName">rin</obj_property>
-      <obj_property name="ObjectShortName">rin</obj_property>
-   </wvobject>
    <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/U_DaqTrigger/s_trigSwRe">
       <obj_property name="ElementShortName">s_trigSwRe</obj_property>
       <obj_property name="ObjectShortName">s_trigSwRe</obj_property>
@@ -205,558 +131,318 @@
       <obj_property name="ElementShortName">s_clearRe</obj_property>
       <obj_property name="ObjectShortName">s_clearRe</obj_property>
    </wvobject>
-   <wvobject fp_name="divider507" type="divider">
-      <obj_property name="label">Decimator1</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/rst">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/test_i">
-      <obj_property name="ElementShortName">test_i</obj_property>
-      <obj_property name="ObjectShortName">test_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/sampleData_i">
-      <obj_property name="ElementShortName">sampleData_i[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sampleData_i[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/decSampData_o">
-      <obj_property name="ElementShortName">decSampData_o[31:0]</obj_property>
-      <obj_property name="ObjectShortName">decSampData_o[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/dec16or32_i">
-      <obj_property name="ElementShortName">dec16or32_i</obj_property>
-      <obj_property name="ObjectShortName">dec16or32_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/averaging_i">
-      <obj_property name="ElementShortName">averaging_i</obj_property>
-      <obj_property name="ObjectShortName">averaging_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/rateDiv_i">
-      <obj_property name="ElementShortName">rateDiv_i[15:0]</obj_property>
-      <obj_property name="ObjectShortName">rateDiv_i[15:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/trig_i">
-      <obj_property name="ElementShortName">trig_i</obj_property>
-      <obj_property name="ObjectShortName">trig_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/rateClk_o">
-      <obj_property name="ElementShortName">rateClk_o</obj_property>
-      <obj_property name="ObjectShortName">rateClk_o</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/r">
-      <obj_property name="ElementShortName">r</obj_property>
-      <obj_property name="ObjectShortName">r</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/rin">
-      <obj_property name="ElementShortName">rin</obj_property>
-      <obj_property name="ObjectShortName">rin</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/s_countPeriod">
-      <obj_property name="ElementShortName">s_countPeriod[15:0]</obj_property>
-      <obj_property name="ObjectShortName">s_countPeriod[15:0]</obj_property>
-   </wvobject>
-   <wvobject type="other" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/TPD_G">
-      <obj_property name="ElementShortName">TPD_G</obj_property>
-      <obj_property name="ObjectShortName">TPD_G</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/Decimator_INST/REG_INIT_C">
-      <obj_property name="ElementShortName">REG_INIT_C</obj_property>
-      <obj_property name="ObjectShortName">REG_INIT_C</obj_property>
-   </wvobject>
    <wvobject fp_name="divider54" type="divider">
-      <obj_property name="label">DAQ1</obj_property>
+      <obj_property name="label">LANE0</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/enable_i">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/enable_i">
       <obj_property name="ElementShortName">enable_i</obj_property>
       <obj_property name="ObjectShortName">enable_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/freeze_i">
-      <obj_property name="ElementShortName">freeze_i</obj_property>
-      <obj_property name="ObjectShortName">freeze_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/test_i">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/test_i">
       <obj_property name="ElementShortName">test_i</obj_property>
       <obj_property name="ObjectShortName">test_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/devClk_i">
-      <obj_property name="ElementShortName">devClk_i</obj_property>
-      <obj_property name="ObjectShortName">devClk_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/devRst_i">
-      <obj_property name="ElementShortName">devRst_i</obj_property>
-      <obj_property name="ObjectShortName">devRst_i</obj_property>
-   </wvobject>
-   <wvobject type="other" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/axiNum_i">
+   <wvobject type="other" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/axiNum_i">
       <obj_property name="ElementShortName">axiNum_i</obj_property>
       <obj_property name="ObjectShortName">axiNum_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/packetSize_i">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/packetSize_i">
       <obj_property name="ElementShortName">packetSize_i[31:0]</obj_property>
       <obj_property name="ObjectShortName">packetSize_i[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/rateDiv_i">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/rateDiv_i">
       <obj_property name="ElementShortName">rateDiv_i[15:0]</obj_property>
       <obj_property name="ObjectShortName">rateDiv_i[15:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/trig_i">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/trig_i">
       <obj_property name="ElementShortName">trig_i</obj_property>
       <obj_property name="ObjectShortName">trig_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/averaging_i">
-      <obj_property name="ElementShortName">averaging_i</obj_property>
-      <obj_property name="ObjectShortName">averaging_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/dec16or32_i">
-      <obj_property name="ElementShortName">dec16or32_i</obj_property>
-      <obj_property name="ObjectShortName">dec16or32_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/timeStamp_i">
-      <obj_property name="ElementShortName">timeStamp_i[63:0]</obj_property>
-      <obj_property name="ObjectShortName">timeStamp_i[63:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/headerEn_i">
-      <obj_property name="ElementShortName">headerEn_i</obj_property>
-      <obj_property name="ObjectShortName">headerEn_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/mode_i">
-      <obj_property name="ElementShortName">mode_i</obj_property>
-      <obj_property name="ObjectShortName">mode_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/rxAxisCtrl_i">
-      <obj_property name="ElementShortName">rxAxisCtrl_i</obj_property>
-      <obj_property name="ObjectShortName">rxAxisCtrl_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/rxAxisSlave_i">
-      <obj_property name="ElementShortName">rxAxisSlave_i</obj_property>
-      <obj_property name="ObjectShortName">rxAxisSlave_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/rxAxisMaster_o">
-      <obj_property name="ElementShortName">rxAxisMaster_o</obj_property>
-      <obj_property name="ObjectShortName">rxAxisMaster_o</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/error_o">
-      <obj_property name="ElementShortName">error_o</obj_property>
-      <obj_property name="ObjectShortName">error_o</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/busy_o">
-      <obj_property name="ElementShortName">busy_o</obj_property>
-      <obj_property name="ObjectShortName">busy_o</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/pctCnt_o">
-      <obj_property name="ElementShortName">pctCnt_o[25:0]</obj_property>
-      <obj_property name="ObjectShortName">pctCnt_o[25:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/sampleData_i">
-      <obj_property name="ElementShortName">sampleData_i[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sampleData_i[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/dataReady_i">
-      <obj_property name="ElementShortName">dataReady_i</obj_property>
-      <obj_property name="ObjectShortName">dataReady_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/r">
-      <obj_property name="ElementShortName">r</obj_property>
-      <obj_property name="ObjectShortName">r</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/rin">
-      <obj_property name="ElementShortName">rin</obj_property>
-      <obj_property name="ObjectShortName">rin</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/s_rateClk">
-      <obj_property name="ElementShortName">s_rateClk</obj_property>
-      <obj_property name="ObjectShortName">s_rateClk</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/s_decSampData">
-      <obj_property name="ElementShortName">s_decSampData[31:0]</obj_property>
-      <obj_property name="ObjectShortName">s_decSampData[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(1)\/AxiStreamDaq_INST/AXI_ERROR_RESP_G">
-      <obj_property name="ElementShortName">AXI_ERROR_RESP_G[1:0]</obj_property>
-      <obj_property name="ObjectShortName">AXI_ERROR_RESP_G[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider54" type="divider">
-      <obj_property name="label">DAQ0</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/enable_i">
-      <obj_property name="ElementShortName">enable_i</obj_property>
-      <obj_property name="ObjectShortName">enable_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/freeze_i">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/freeze_i">
       <obj_property name="ElementShortName">freeze_i</obj_property>
       <obj_property name="ObjectShortName">freeze_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/test_i">
-      <obj_property name="ElementShortName">test_i</obj_property>
-      <obj_property name="ObjectShortName">test_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/devClk_i">
-      <obj_property name="ElementShortName">devClk_i</obj_property>
-      <obj_property name="ObjectShortName">devClk_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/devRst_i">
-      <obj_property name="ElementShortName">devRst_i</obj_property>
-      <obj_property name="ObjectShortName">devRst_i</obj_property>
-   </wvobject>
-   <wvobject type="other" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/axiNum_i">
-      <obj_property name="ElementShortName">axiNum_i</obj_property>
-      <obj_property name="ObjectShortName">axiNum_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/packetSize_i">
-      <obj_property name="ElementShortName">packetSize_i[31:0]</obj_property>
-      <obj_property name="ObjectShortName">packetSize_i[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/rateDiv_i">
-      <obj_property name="ElementShortName">rateDiv_i[15:0]</obj_property>
-      <obj_property name="ObjectShortName">rateDiv_i[15:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/trig_i">
-      <obj_property name="ElementShortName">trig_i</obj_property>
-      <obj_property name="ObjectShortName">trig_i</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/averaging_i">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/averaging_i">
       <obj_property name="ElementShortName">averaging_i</obj_property>
       <obj_property name="ObjectShortName">averaging_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/dec16or32_i">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/dec16or32_i">
       <obj_property name="ElementShortName">dec16or32_i</obj_property>
       <obj_property name="ObjectShortName">dec16or32_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/timeStamp_i">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/timeStamp_i">
       <obj_property name="ElementShortName">timeStamp_i[63:0]</obj_property>
       <obj_property name="ObjectShortName">timeStamp_i[63:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/headerEn_i">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/bsa_i">
+      <obj_property name="ElementShortName">bsa_i[127:0]</obj_property>
+      <obj_property name="ObjectShortName">bsa_i[127:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/dmod_i">
+      <obj_property name="ElementShortName">dmod_i[191:0]</obj_property>
+      <obj_property name="ObjectShortName">dmod_i[191:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/headerEn_i">
       <obj_property name="ElementShortName">headerEn_i</obj_property>
       <obj_property name="ObjectShortName">headerEn_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/mode_i">
-      <obj_property name="ElementShortName">mode_i</obj_property>
-      <obj_property name="ObjectShortName">mode_i</obj_property>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/header_i">
+      <obj_property name="ElementShortName">header_i[7:0]</obj_property>
+      <obj_property name="ObjectShortName">header_i[7:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/signed_i">
-      <obj_property name="ElementShortName">signed_i</obj_property>
-      <obj_property name="ObjectShortName">signed_i</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/sampleData_i">
-      <obj_property name="ElementShortName">sampleData_i[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sampleData_i[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/s_sampDataExt">
-      <obj_property name="ElementShortName">s_sampDataExt[31:0]</obj_property>
-      <obj_property name="ObjectShortName">s_sampDataExt[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/s_decSampData">
-      <obj_property name="ElementShortName">s_decSampData[31:0]</obj_property>
-      <obj_property name="ObjectShortName">s_decSampData[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/s_rateClk">
-      <obj_property name="ElementShortName">s_rateClk</obj_property>
-      <obj_property name="ObjectShortName">s_rateClk</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/signWidth_i">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/signWidth_i">
       <obj_property name="ElementShortName">signWidth_i[4:0]</obj_property>
       <obj_property name="ObjectShortName">signWidth_i[4:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/rxAxisCtrl_i">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/signed_i">
+      <obj_property name="ElementShortName">signed_i</obj_property>
+      <obj_property name="ObjectShortName">signed_i</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/mode_i">
+      <obj_property name="ElementShortName">mode_i</obj_property>
+      <obj_property name="ObjectShortName">mode_i</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/rxAxisCtrl_i">
       <obj_property name="ElementShortName">rxAxisCtrl_i</obj_property>
       <obj_property name="ObjectShortName">rxAxisCtrl_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/rxAxisSlave_i">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/rxAxisSlave_i">
       <obj_property name="ElementShortName">rxAxisSlave_i</obj_property>
       <obj_property name="ObjectShortName">rxAxisSlave_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/rxAxisMaster_o">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/rxAxisMaster_o">
       <obj_property name="ElementShortName">rxAxisMaster_o</obj_property>
       <obj_property name="ObjectShortName">rxAxisMaster_o</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/error_o">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/error_o">
       <obj_property name="ElementShortName">error_o</obj_property>
       <obj_property name="ObjectShortName">error_o</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/busy_o">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/busy_o">
       <obj_property name="ElementShortName">busy_o</obj_property>
       <obj_property name="ObjectShortName">busy_o</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/pctCnt_o">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/pctCnt_o">
       <obj_property name="ElementShortName">pctCnt_o[25:0]</obj_property>
       <obj_property name="ObjectShortName">pctCnt_o[25:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/dataReady_i">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/sampleData_i">
+      <obj_property name="ElementShortName">sampleData_i[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sampleData_i[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/dataReady_i">
       <obj_property name="ElementShortName">dataReady_i</obj_property>
       <obj_property name="ObjectShortName">dataReady_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/r">
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/r">
       <obj_property name="ElementShortName">r</obj_property>
       <obj_property name="ObjectShortName">r</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/AxiStreamDaq_INST/rin">
-      <obj_property name="ElementShortName">rin</obj_property>
-      <obj_property name="ObjectShortName">rin</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/s_rateClk">
+      <obj_property name="ElementShortName">s_rateClk</obj_property>
+      <obj_property name="ObjectShortName">s_rateClk</obj_property>
    </wvobject>
-   <wvobject fp_name="divider994" type="divider">
-      <obj_property name="label">Fifo</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/s_trigDecimator">
+      <obj_property name="ElementShortName">s_trigDecimator</obj_property>
+      <obj_property name="ObjectShortName">s_trigDecimator</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/s_sampleDataReg">
+      <obj_property name="ElementShortName">s_sampleDataReg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_sampleDataReg[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/s_sampDataExt">
+      <obj_property name="ElementShortName">s_sampDataExt[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_sampDataExt[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/s_sampDataTst">
+      <obj_property name="ElementShortName">s_sampDataTst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_sampDataTst[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/s_decSampData">
+      <obj_property name="ElementShortName">s_decSampData[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_decSampData[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="divider54" type="divider">
+      <obj_property name="label">LANE1</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/sAxisClk">
-      <obj_property name="ElementShortName">sAxisClk</obj_property>
-      <obj_property name="ObjectShortName">sAxisClk</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/enable_i">
+      <obj_property name="ElementShortName">enable_i</obj_property>
+      <obj_property name="ObjectShortName">enable_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/sAxisRst">
-      <obj_property name="ElementShortName">sAxisRst</obj_property>
-      <obj_property name="ObjectShortName">sAxisRst</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/test_i">
+      <obj_property name="ElementShortName">test_i</obj_property>
+      <obj_property name="ObjectShortName">test_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/sAxisMaster">
-      <obj_property name="ElementShortName">sAxisMaster</obj_property>
-      <obj_property name="ObjectShortName">sAxisMaster</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/devClk_i">
+      <obj_property name="ElementShortName">devClk_i</obj_property>
+      <obj_property name="ObjectShortName">devClk_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/sAxisSlave">
-      <obj_property name="ElementShortName">sAxisSlave</obj_property>
-      <obj_property name="ObjectShortName">sAxisSlave</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/devRst_i">
+      <obj_property name="ElementShortName">devRst_i</obj_property>
+      <obj_property name="ObjectShortName">devRst_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/sAxisCtrl">
-      <obj_property name="ElementShortName">sAxisCtrl</obj_property>
-      <obj_property name="ObjectShortName">sAxisCtrl</obj_property>
+   <wvobject type="other" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/axiNum_i">
+      <obj_property name="ElementShortName">axiNum_i</obj_property>
+      <obj_property name="ObjectShortName">axiNum_i</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/packetSize_i">
+      <obj_property name="ElementShortName">packetSize_i[31:0]</obj_property>
+      <obj_property name="ObjectShortName">packetSize_i[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/rateDiv_i">
+      <obj_property name="ElementShortName">rateDiv_i[15:0]</obj_property>
+      <obj_property name="ObjectShortName">rateDiv_i[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/freeze_i">
+      <obj_property name="ElementShortName">freeze_i</obj_property>
+      <obj_property name="ObjectShortName">freeze_i</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/averaging_i">
+      <obj_property name="ElementShortName">averaging_i</obj_property>
+      <obj_property name="ObjectShortName">averaging_i</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/dec16or32_i">
+      <obj_property name="ElementShortName">dec16or32_i</obj_property>
+      <obj_property name="ObjectShortName">dec16or32_i</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/timeStamp_i">
+      <obj_property name="ElementShortName">timeStamp_i[63:0]</obj_property>
+      <obj_property name="ObjectShortName">timeStamp_i[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/bsa_i">
+      <obj_property name="ElementShortName">bsa_i[127:0]</obj_property>
+      <obj_property name="ObjectShortName">bsa_i[127:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/dmod_i">
+      <obj_property name="ElementShortName">dmod_i[191:0]</obj_property>
+      <obj_property name="ObjectShortName">dmod_i[191:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/headerEn_i">
+      <obj_property name="ElementShortName">headerEn_i</obj_property>
+      <obj_property name="ObjectShortName">headerEn_i</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/header_i">
+      <obj_property name="ElementShortName">header_i[7:0]</obj_property>
+      <obj_property name="ObjectShortName">header_i[7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/signWidth_i">
+      <obj_property name="ElementShortName">signWidth_i[4:0]</obj_property>
+      <obj_property name="ObjectShortName">signWidth_i[4:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/signed_i">
+      <obj_property name="ElementShortName">signed_i</obj_property>
+      <obj_property name="ObjectShortName">signed_i</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/mode_i">
+      <obj_property name="ElementShortName">mode_i</obj_property>
+      <obj_property name="ObjectShortName">mode_i</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/rxAxisCtrl_i">
+      <obj_property name="ElementShortName">rxAxisCtrl_i</obj_property>
+      <obj_property name="ObjectShortName">rxAxisCtrl_i</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/rxAxisSlave_i">
+      <obj_property name="ElementShortName">rxAxisSlave_i</obj_property>
+      <obj_property name="ObjectShortName">rxAxisSlave_i</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/error_o">
+      <obj_property name="ElementShortName">error_o</obj_property>
+      <obj_property name="ObjectShortName">error_o</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/busy_o">
+      <obj_property name="ElementShortName">busy_o</obj_property>
+      <obj_property name="ObjectShortName">busy_o</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/pctCnt_o">
+      <obj_property name="ElementShortName">pctCnt_o[25:0]</obj_property>
+      <obj_property name="ObjectShortName">pctCnt_o[25:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/trig_i">
+      <obj_property name="ElementShortName">trig_i</obj_property>
+      <obj_property name="ObjectShortName">trig_i</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/sampleData_i">
+      <obj_property name="ElementShortName">sampleData_i[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sampleData_i[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/s_sampleDataReg">
+      <obj_property name="ElementShortName">s_sampleDataReg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_sampleDataReg[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/s_sampDataExt">
+      <obj_property name="ElementShortName">s_sampDataExt[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_sampDataExt[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/s_sampDataTst">
+      <obj_property name="ElementShortName">s_sampDataTst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_sampDataTst[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/s_decSampData">
+      <obj_property name="ElementShortName">s_decSampData[31:0]</obj_property>
+      <obj_property name="ObjectShortName">s_decSampData[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/rxAxisMaster_o">
+      <obj_property name="ElementShortName">rxAxisMaster_o</obj_property>
+      <obj_property name="ObjectShortName">rxAxisMaster_o</obj_property>
       <obj_property name="isExpanded"></obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoPauseThresh">
-      <obj_property name="ElementShortName">fifoPauseThresh[4:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoPauseThresh[4:0]</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/dataReady_i">
+      <obj_property name="ElementShortName">dataReady_i</obj_property>
+      <obj_property name="ObjectShortName">dataReady_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/mAxisClk">
-      <obj_property name="ElementShortName">mAxisClk</obj_property>
-      <obj_property name="ObjectShortName">mAxisClk</obj_property>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/r">
+      <obj_property name="ElementShortName">r</obj_property>
+      <obj_property name="ObjectShortName">r</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/mAxisRst">
-      <obj_property name="ElementShortName">mAxisRst</obj_property>
-      <obj_property name="ObjectShortName">mAxisRst</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/s_rateClk">
+      <obj_property name="ElementShortName">s_rateClk</obj_property>
+      <obj_property name="ObjectShortName">s_rateClk</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/mAxisMaster">
-      <obj_property name="ElementShortName">mAxisMaster</obj_property>
-      <obj_property name="ObjectShortName">mAxisMaster</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(1)\/U_DaqLane/s_trigDecimator">
+      <obj_property name="ElementShortName">s_trigDecimator</obj_property>
+      <obj_property name="ObjectShortName">s_trigDecimator</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/mAxisSlave">
-      <obj_property name="ElementShortName">mAxisSlave</obj_property>
-      <obj_property name="ObjectShortName">mAxisSlave</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/mTLastTUser">
-      <obj_property name="ElementShortName">mTLastTUser[127:0]</obj_property>
-      <obj_property name="ObjectShortName">mTLastTUser[127:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/wrR">
-      <obj_property name="ElementShortName">wrR</obj_property>
-      <obj_property name="ObjectShortName">wrR</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/wrRin">
-      <obj_property name="ElementShortName">wrRin</obj_property>
-      <obj_property name="ObjectShortName">wrRin</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoDin">
-      <obj_property name="ElementShortName">fifoDin[42:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoDin[42:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoWrite">
-      <obj_property name="ElementShortName">fifoWrite</obj_property>
-      <obj_property name="ObjectShortName">fifoWrite</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoWriteLast">
-      <obj_property name="ElementShortName">fifoWriteLast</obj_property>
-      <obj_property name="ObjectShortName">fifoWriteLast</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoWriteUser">
-      <obj_property name="ElementShortName">fifoWriteUser[5:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoWriteUser[5:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoWrCount">
-      <obj_property name="ElementShortName">fifoWrCount[4:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoWrCount[4:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoRdCount">
-      <obj_property name="ElementShortName">fifoRdCount[4:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoRdCount[4:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoAFull">
-      <obj_property name="ElementShortName">fifoAFull</obj_property>
-      <obj_property name="ObjectShortName">fifoAFull</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoReady">
-      <obj_property name="ElementShortName">fifoReady</obj_property>
-      <obj_property name="ObjectShortName">fifoReady</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoPFull">
-      <obj_property name="ElementShortName">fifoPFull</obj_property>
-      <obj_property name="ObjectShortName">fifoPFull</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoPFullVec">
-      <obj_property name="ElementShortName">fifoPFullVec[0:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoPFullVec[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoDout">
-      <obj_property name="ElementShortName">fifoDout[42:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoDout[42:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoRead">
-      <obj_property name="ElementShortName">fifoRead</obj_property>
-      <obj_property name="ObjectShortName">fifoRead</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoReadLast">
-      <obj_property name="ElementShortName">fifoReadLast</obj_property>
-      <obj_property name="ObjectShortName">fifoReadLast</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoReadUser">
-      <obj_property name="ElementShortName">fifoReadUser[5:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoReadUser[5:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoValidInt">
-      <obj_property name="ElementShortName">fifoValidInt</obj_property>
-      <obj_property name="ObjectShortName">fifoValidInt</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoValid">
-      <obj_property name="ElementShortName">fifoValid</obj_property>
-      <obj_property name="ObjectShortName">fifoValid</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoValidLast">
-      <obj_property name="ElementShortName">fifoValidLast</obj_property>
-      <obj_property name="ObjectShortName">fifoValidLast</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/fifoInFrame">
-      <obj_property name="ElementShortName">fifoInFrame</obj_property>
-      <obj_property name="ObjectShortName">fifoInFrame</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/rdR">
-      <obj_property name="ElementShortName">rdR</obj_property>
-      <obj_property name="ObjectShortName">rdR</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/rdRin">
-      <obj_property name="ElementShortName">rdRin</obj_property>
-      <obj_property name="ObjectShortName">rdRin</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/axisMaster">
-      <obj_property name="ElementShortName">axisMaster</obj_property>
-      <obj_property name="ObjectShortName">axisMaster</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/axisSlave">
-      <obj_property name="ElementShortName">axisSlave</obj_property>
-      <obj_property name="ObjectShortName">axisSlave</obj_property>
-   </wvobject>
-   <wvobject fp_name="divider1079" type="divider">
-      <obj_property name="label">Fifo</obj_property>
+   <wvobject fp_name="divider239" type="divider">
+      <obj_property name="label">Test core</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/rst">
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/U_DaqTestSig/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/U_DaqTestSig/rst">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/wr_clk">
-      <obj_property name="ElementShortName">wr_clk</obj_property>
-      <obj_property name="ObjectShortName">wr_clk</obj_property>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/U_DaqTestSig/sampleData_i">
+      <obj_property name="ElementShortName">sampleData_i[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sampleData_i[31:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/wr_en">
-      <obj_property name="ElementShortName">wr_en</obj_property>
-      <obj_property name="ObjectShortName">wr_en</obj_property>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/U_DaqTestSig/sampleData_o">
+      <obj_property name="ElementShortName">sampleData_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sampleData_o[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/din">
-      <obj_property name="ElementShortName">din[42:0]</obj_property>
-      <obj_property name="ObjectShortName">din[42:0]</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/U_DaqTestSig/test_i">
+      <obj_property name="ElementShortName">test_i</obj_property>
+      <obj_property name="ObjectShortName">test_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/wr_data_count">
-      <obj_property name="ElementShortName">wr_data_count[4:0]</obj_property>
-      <obj_property name="ObjectShortName">wr_data_count[4:0]</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/U_DaqTestSig/dec16or32_i">
+      <obj_property name="ElementShortName">dec16or32_i</obj_property>
+      <obj_property name="ObjectShortName">dec16or32_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/wr_ack">
-      <obj_property name="ElementShortName">wr_ack</obj_property>
-      <obj_property name="ObjectShortName">wr_ack</obj_property>
+   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/U_DaqTestSig/trig_i">
+      <obj_property name="ElementShortName">trig_i</obj_property>
+      <obj_property name="ObjectShortName">trig_i</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/overflow">
-      <obj_property name="ElementShortName">overflow</obj_property>
-      <obj_property name="ObjectShortName">overflow</obj_property>
+   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\GEN_OUT_LANES(0)\/U_DaqLane/U_DaqTestSig/r">
+      <obj_property name="ElementShortName">r</obj_property>
+      <obj_property name="ObjectShortName">r</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/prog_full">
-      <obj_property name="ElementShortName">prog_full</obj_property>
-      <obj_property name="ObjectShortName">prog_full</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/almost_full">
-      <obj_property name="ElementShortName">almost_full</obj_property>
-      <obj_property name="ObjectShortName">almost_full</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/full">
-      <obj_property name="ElementShortName">full</obj_property>
-      <obj_property name="ObjectShortName">full</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/not_full">
-      <obj_property name="ElementShortName">not_full</obj_property>
-      <obj_property name="ObjectShortName">not_full</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/progFullVec">
-      <obj_property name="ElementShortName">progFullVec[0:0]</obj_property>
-      <obj_property name="ObjectShortName">progFullVec[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/rd_clk">
-      <obj_property name="ElementShortName">rd_clk</obj_property>
-      <obj_property name="ObjectShortName">rd_clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/rd_en">
-      <obj_property name="ElementShortName">rd_en</obj_property>
-      <obj_property name="ObjectShortName">rd_en</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/dout">
-      <obj_property name="ElementShortName">dout[42:0]</obj_property>
-      <obj_property name="ObjectShortName">dout[42:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/rd_data_count">
-      <obj_property name="ElementShortName">rd_data_count[4:0]</obj_property>
-      <obj_property name="ObjectShortName">rd_data_count[4:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/valid">
-      <obj_property name="ElementShortName">valid</obj_property>
-      <obj_property name="ObjectShortName">valid</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/underflow">
-      <obj_property name="ElementShortName">underflow</obj_property>
-      <obj_property name="ObjectShortName">underflow</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/prog_empty">
-      <obj_property name="ElementShortName">prog_empty</obj_property>
-      <obj_property name="ObjectShortName">prog_empty</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/almost_empty">
-      <obj_property name="ElementShortName">almost_empty</obj_property>
-      <obj_property name="ObjectShortName">almost_empty</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/empty">
-      <obj_property name="ElementShortName">empty</obj_property>
-      <obj_property name="ObjectShortName">empty</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/progFull">
-      <obj_property name="ElementShortName">progFull</obj_property>
-      <obj_property name="ObjectShortName">progFull</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/cascadeClk">
-      <obj_property name="ElementShortName">cascadeClk</obj_property>
-      <obj_property name="ObjectShortName">cascadeClk</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/readJump">
-      <obj_property name="ElementShortName">readJump[0:0]</obj_property>
-      <obj_property name="ObjectShortName">readJump[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/validJump">
-      <obj_property name="ElementShortName">validJump[0:0]</obj_property>
-      <obj_property name="ObjectShortName">validJump[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/AFullJump">
-      <obj_property name="ElementShortName">AFullJump[0:0]</obj_property>
-      <obj_property name="ObjectShortName">AFullJump[0:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/DaqMuxV2Tb/DaqMuxV2_INST/\genAxiStreamLanes(0)\/U_AsyncOutFifo/U_Fifo/dataJump">
-      <obj_property name="ElementShortName">dataJump[0:0][42:0]</obj_property>
-      <obj_property name="ObjectShortName">dataJump[0:0][42:0]</obj_property>
+   <wvobject fp_name="divider507" type="divider">
+      <obj_property name="label">Decimator1</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
    </wvobject>
 </wave_config>

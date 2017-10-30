@@ -2,7 +2,7 @@
 -- File       : AmcMpsSfpHsRepeater.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-28
--- Last update: 2017-02-28
+-- Last update: 2017-07-11
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -22,9 +22,7 @@ use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-
-library unisim;
-use unisim.vcomponents.all;
+use work.I2cPkg.all;
 
 entity AmcMpsSfpHsRepeater is
    generic (
@@ -34,53 +32,77 @@ entity AmcMpsSfpHsRepeater is
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- I2C Interface
-      i2cScl  : inout slv(2 downto 0);
-      i2cSda  : inout slv(2 downto 0);
+      i2cScl          : inout slv(2 downto 0);
+      i2cSda          : inout slv(2 downto 0);
       -- AXI-Lite Interface
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType);
+      axilClk         : in    sl;
+      axilRst         : in    sl;
+      axilReadMaster  : in    AxiLiteReadMasterType;
+      axilReadSlave   : out   AxiLiteReadSlaveType;
+      axilWriteMaster : in    AxiLiteWriteMasterType;
+      axilWriteSlave  : out   AxiLiteWriteSlaveType);
 end AmcMpsSfpHsRepeater;
 
 architecture mapping of AmcMpsSfpHsRepeater is
 
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(2 downto 0) := genAxiLiteConfig(3, AXI_BASE_ADDR_G, 16, 12);
+
+   constant I2C_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
+      0             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1011000",  -- AD[3:0] = 0x0 == Address Bytes = 0xB0 ('industrial standard')
+         dataSize   => 8,
+         addrSize   => 8,
+         endianness => '1'));
+
+   signal axilWriteMasters : AxiLiteWriteMasterArray(2 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(2 downto 0);
+   signal axilReadMasters  : AxiLiteReadMasterArray(2 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(2 downto 0);
+
 begin
+
+   U_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         NUM_SLAVE_SLOTS_G  => 1,
+         NUM_MASTER_SLOTS_G => 3,
+         MASTERS_CONFIG_G   => AXI_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         sAxiWriteMasters(0) => axilWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlave,
+         sAxiReadMasters(0)  => axilReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlave,
+         mAxiWriteMasters    => axilWriteMasters,
+         mAxiWriteSlaves     => axilWriteSlaves,
+         mAxiReadMasters     => axilReadMasters,
+         mAxiReadSlaves      => axilReadSlaves);
 
    GEN_VEC :
    for i in 2 downto 0 generate
 
-      U_i2cScl : IOBUF
+      U_I2C : entity work.AxiI2cRegMaster
+         generic map (
+            TPD_G            => TPD_G,
+            I2C_SCL_FREQ_G   => 100.0E+3,  -- units of Hz
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            DEVICE_MAP_G     => I2C_DEVICE_MAP_C,
+            AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G)
          port map (
-            I  => '0',
-            O  => open,
-            IO => i2cScl(i),
-            T  => '1');
-            
-      U_i2cSda : IOBUF
-         port map (
-            I  => '0',
-            O  => open,
-            IO => i2cSda(i),
-            T  => '1');         
+            -- I2C Ports
+            scl            => i2cScl(i),
+            sda            => i2cSda(i),
+            -- AXI-Lite Register Interface
+            axiReadMaster  => axilReadMasters(i),
+            axiReadSlave   => axilReadSlaves(i),
+            axiWriteMaster => axilWriteMasters(i),
+            axiWriteSlave  => axilWriteSlaves(i),
+            -- Clocks and Resets
+            axiClk         => axilClk,
+            axiRst         => axilRst);
 
-   end generate GEN_VEC;         
-         
-   --------------------------------
-   -- Placeholder for future module
-   --------------------------------
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+   end generate GEN_VEC;
 
 end mapping;

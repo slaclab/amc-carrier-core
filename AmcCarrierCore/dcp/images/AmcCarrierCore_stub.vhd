@@ -1,8 +1,8 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.4 (lin64) Build 1756540 Mon Jan 23 19:11:19 MST 2017
--- Date        : Wed Jun 21 09:47:25 2017
--- Host        : rdsrv222 running 64-bit Red Hat Enterprise Linux Server release 6.9 (Santiago)
+-- Date        : Tue Jul  4 11:03:51 2017
+-- Host        : rdsrv223 running 64-bit Red Hat Enterprise Linux Server release 6.9 (Santiago)
 -- Command     : write_vhdl -force -mode synth_stub
 --               /u/re/ruckman/projects/lcls/amc-carrier-project-template/firmware/submodules/amc-carrier-core/AmcCarrierCore/dcp/images/AmcCarrierCore_stub.vhd
 -- Design      : AmcCarrierCore

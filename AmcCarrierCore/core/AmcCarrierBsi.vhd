@@ -2,9 +2,9 @@
 -- File       : AmcCarrierBsi.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2017-02-05
+-- Last update: 2017-06-21
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: BootStrap Interface (BSI) to the IPMI's controller (IPMC) 
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -61,10 +61,10 @@ end AmcCarrierBsi;
 
 architecture rtl of AmcCarrierBsi is
 
-   constant BUILD_INFO_C       : BuildInfoRetType := toBuildInfo(BUILD_INFO_G);
+   constant BUILD_INFO_C : BuildInfoRetType := toBuildInfo(BUILD_INFO_G);
 
    constant BSI_MAJOR_VERSION_C : slv(7 downto 0) := x"01";
-   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"02";
+   constant BSI_MINOR_VERSION_C : slv(7 downto 0) := x"03";
 
    constant TIMEOUT_1HZ_C : natural := (getTimeRatio(1.0, 6.4E-9) -1);
 
@@ -75,7 +75,7 @@ architecture rtl of AmcCarrierBsi is
    begin
       ret(0) := x"00";
       for i in 0 to 254 loop
-         ret(i+1) := BUILD_INFO_C.buildString(i/4)(8*(i mod 4)+7 downto 8*(i mod 4)); 
+         ret(i+1) := BUILD_INFO_C.buildString(i/4)(8*(i mod 4)+7 downto 8*(i mod 4));
       end loop;
       return ret;
    end function makeStringRom;
@@ -256,8 +256,8 @@ begin
    --------------------- 
    -- AXI Lite Interface
    --------------------- 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrMemError, ddrMemReady, ethLinkUp, r,
-                   ramData, upTimeCnt) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrMemError,
+                   ddrMemReady, ethLinkUp, r, ramData, upTimeCnt) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
       variable i      : natural;
@@ -373,6 +373,29 @@ begin
             when x"E8" =>
                v.we      := '1';
                v.ramData := r.ethUpTimeCnt(7 downto 0);
+            -------------------
+            -- Get the GIT HASH
+            -------------------
+            when x"D0" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(7 downto 0);
+            when x"D1" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(15 downto 8);
+            when x"D2" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(23 downto 16);
+            when x"D3" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(31 downto 24);
+            when x"D4" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(39 downto 32);
+            when x"D5" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(47 downto 40);
+            when x"D6" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(55 downto 48);
+            when x"D7" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(63 downto 56);
+            when x"D8" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(71 downto 64);
+            when x"D9" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(79 downto 72);
+            when x"DA" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(87 downto 80);
+            when x"DB" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(95 downto 88);
+            when x"DC" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(103 downto 96);
+            when x"DD" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(111 downto 104);
+            when x"DE" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(119 downto 112);
+            when x"DF" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(127 downto 120);
+            when x"E0" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(135 downto 128);
+            when x"E1" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(143 downto 136);
+            when x"E2" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(151 downto 144);
+            when x"E3" => v.we := '1'; v.ramData := BUILD_INFO_C.gitHash(159 downto 152);
             ---------------------------------------
             when others =>
                if (index < BSI_MAC_SIZE_C) then

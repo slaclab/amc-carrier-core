@@ -21,48 +21,48 @@ import pyrogue as pr
 
 class AmcCryoCtrl(pr.Device):
     def __init__(   self, 
-                    name        = "AmcCryoCtrl", 
-                    description = "Debugging module", 
-                    memBase     =  None, 
-                    offset      =  0x0, 
-                    hidden      =  False,
-                    expand      =  True,
-                ):
-        super(self.__class__, self).__init__(name, description, memBase, offset, hidden, expand=expand)
+            name        = "AmcCryoCtrl", 
+            description = "Debugging module", 
+            **kwargs):
+        super().__init__(name=name, description=description, **kwargs)
                         
-        self.addVariable(  name         = "txSyncRaw",
-                            description  = "txSyncRaw",
-                            offset       =  0x7F0,
-                            bitSize      =  2,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RO",
-                        )       
+        self.add(pr.RemoteVariable(   
+            name         = "txSyncRaw",
+            description  = "txSyncRaw",
+            offset       =  0x7F0,
+            bitSize      =  2,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+        ))      
 
-        self.addVariable(  name         = "txSync",
-                            description  = "txSync",
-                            offset       =  0x7F4,
-                            bitSize      =  2,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RO",
-                        )        
+        self.add(pr.RemoteVariable(   
+            name         = "txSync",
+            description  = "txSync",
+            offset       =  0x7F4,
+            bitSize      =  2,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+        ))       
 
-        self.addVariable(  name         = "rxSync",
-                            description  = "rxSync",
-                            offset       =  0x7F8,
-                            bitSize      =  1,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RO",
-                        )                                
-                        
-        self.addVariable(  name         = "txSyncMask",
-                            description  = "txSyncMask",
-                            offset       =  0x800,
-                            bitSize      =  2,
-                            bitOffset    =  0,
-                            base         = "hex",
-                            mode         = "RW",
-                        )                            
+        self.add(pr.RemoteVariable(   
+            name         = "rxSync",
+            description  = "rxSync",
+            offset       =  0x7F8,
+            bitSize      =  1,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+        ))                               
+        
+        self.add(pr.RemoteVariable(   
+            name         = "txSyncMask",
+            description  = "txSyncMask",
+            offset       =  0x800,
+            bitSize      =  2,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))                           
                         

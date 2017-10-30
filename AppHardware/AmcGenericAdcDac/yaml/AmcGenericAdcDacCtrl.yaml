@@ -56,7 +56,7 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       name: DacData
       sizeBits: 16
       mode: RO
-      description: DAC Data[3:0]
+      description: DAC Data[1:0]
     #########################################################
     VcoDac:
       at:

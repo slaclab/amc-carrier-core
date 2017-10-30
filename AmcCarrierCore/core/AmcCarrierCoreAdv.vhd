@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-03-23
+-- Last update: 2017-06-28
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ use work.SsiPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiPkg.all;
 use work.TimingPkg.all;
+use work.AppMpsPkg.all;
 use work.AmcCarrierPkg.all;
 
 library unisim;
@@ -31,17 +32,18 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierCoreAdv is
    generic (
-      TPD_G                 : time     := 1 ns;
-      BUILD_INFO_G          : BuildInfoType;
-      SIM_SPEEDUP_G         : boolean  := false;  -- false = Normal Operation, true = simulation
-      DISABLE_BSA_G         : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
-      RTM_ETH_G             : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
-      TIME_GEN_APP_G        : boolean  := false;  -- false = normal application, true = timing generator application
-      TIME_GEN_EXTREF_G     : boolean  := false;  -- false = normal application, true = timing generator using external reference
-      FSBL_G                : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
-      APP_TYPE_G            : AppType;
-      ETH_USR_FRAME_LIMIT_G : positive := 4096;   -- 4kB  
-      MPS_SLOT_G            : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      TPD_G                  : time     := 1 ns;
+      BUILD_INFO_G           : BuildInfoType;
+      SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
+      DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
+      RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
+      TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
+      TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
+      FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
+      APP_TYPE_G             : AppType;
+      WAVEFORM_TDATA_BYTES_G : positive := 4;
+      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB  
+      MPS_SLOT_G             : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -67,6 +69,7 @@ entity AmcCarrierCoreAdv is
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
       diagnosticBus        : in    DiagnosticBusType;
+      mpsCoreReg           : out   MpsCoreRegType;
       --  Waveform Capture interface (waveformClk domain)
       waveformClk          : out   sl;
       waveformRst          : out   sl;
@@ -219,7 +222,13 @@ architecture mapping of AmcCarrierCoreAdv is
 begin
 
    axilClk     <= ref156MHzClk;
-   axilRst     <= ref156MHzRst;
+   U_Rst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => ref156MHzClk,
+         rstIn  => ref156MHzRst,
+         rstOut => axilRst);   
    ipmiBsi     <= bsiBus;
    ethPhyReady <= ethLinkUp;
    timingBus   <= timingBusIntf;
@@ -338,6 +347,7 @@ begin
          diagnosticClk   => diagnosticClk,
          diagnosticRst   => diagnosticRst,
          diagnosticBus   => diagnosticBus,
+         mpsCoreReg      => mpsCoreReg,
          -- MPS Interface
          mpsObMasters    => mpsObMasters,
          mpsObSlaves     => mpsObSlaves,
@@ -357,14 +367,15 @@ begin
    -------------------
    U_Core : entity work.AmcCarrierCore
       generic map (
-         TPD_G                 => TPD_G,
-         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-         SIM_SPEEDUP_G         => SIM_SPEEDUP_G,
-         DISABLE_BSA_G         => DISABLE_BSA_G,
-         RTM_ETH_G             => RTM_ETH_G,
-         TIME_GEN_APP_G        => TIME_GEN_APP_G,
-         TIME_GEN_EXTREF_G     => TIME_GEN_EXTREF_G,
-         FSBL_G                => FSBL_G)
+         TPD_G                  => TPD_G,
+         WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
+         ETH_USR_FRAME_LIMIT_G  => ETH_USR_FRAME_LIMIT_G,
+         SIM_SPEEDUP_G          => SIM_SPEEDUP_G,
+         DISABLE_BSA_G          => DISABLE_BSA_G,
+         RTM_ETH_G              => RTM_ETH_G,
+         TIME_GEN_APP_G         => TIME_GEN_APP_G,
+         TIME_GEN_EXTREF_G      => TIME_GEN_EXTREF_G,
+         FSBL_G                 => FSBL_G)
       port map (
          -----------------------
          -- Core Ports to AppTop
@@ -377,7 +388,7 @@ begin
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,
          timingRefClk         => timingRefClk,
-         timingRefClkDiv2     => timingRefClkDiv2,     
+         timingRefClkDiv2     => timingRefClkDiv2,
          -- Diagnostic Interface (diagnosticClk domain)
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,

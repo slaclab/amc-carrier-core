@@ -81,9 +81,10 @@ begin
       axiSlaveWaitTxn(regEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Top level registers
-      axiSlaveRegister(regEp, x"0000", 0, v.mpsReg.mpsAppId);
-      axiSlaveRegister(regEp, x"0000", 16, v.mpsReg.mpsEnable);
-      axiSlaveRegister(regEp, x"0000", 17, v.mpsReg.lcls1Mode);
+      axiSlaveRegister(regEp, x"0000", 0, v.mpsReg.mpsCore.mpsAppId);
+      axiSlaveRegister(regEp, x"0000", 16, v.mpsReg.mpsCore.mpsEnable);
+      axiSlaveRegister(regEp, x"0000", 17, v.mpsReg.mpsCore.lcls1Mode);
+      axiSlaveRegister(regEp, x"0000", 24, v.mpsReg.mpsCore.mpsVersion);
 
       axiSlaveRegisterR(regEp, x"0004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C,8));
       axiSlaveRegisterR(regEp, x"0004", 8, ite(APP_CONFIG_G.DIGITAL_EN_C,'1','0'));
@@ -98,7 +99,13 @@ begin
 
             -- Offset base + 0x0
             axiSlaveRegisterR(regEp, toSlv(base, 16),  0, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).THOLD_COUNT_C,8));
-            axiSlaveRegisterR(regEp, toSlv(base, 16),  8, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).IDLE_EN_C,'1','0'));
+
+            if APP_CONFIG_G.CHAN_CONFIG_C(chan).IDLE_EN_C then
+               axiSlaveRegister(regEp, toSlv(base, 16),  8, v.mpsReg.mpsChanReg(chan).idleEn);
+            else
+               axiSlaveRegisterR(regEp, toSlv(base, 16),  8, '0');
+            end if;
+
             axiSlaveRegisterR(regEp, toSlv(base, 16),  9, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).ALT_EN_C,'1','0'));
             axiSlaveRegisterR(regEp, toSlv(base, 16), 10, ite(APP_CONFIG_G.CHAN_CONFIG_C(chan).LCLS1_EN_C,'1','0'));
             axiSlaveRegisterR(regEp, toSlv(base, 16), 16, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(chan).BYTE_MAP_C,8));
@@ -122,24 +129,25 @@ begin
             for thold in 0 to (APP_CONFIG_G.CHAN_CONFIG_C(chan).THOLD_COUNT_C-1) loop
 
                -- standard: thold 0 = base + 0x100, thold 1 = base + 0x110, thold 7 = base + 0x170
-               axiSlaveRegister(regEp, toSlv(base + (thold*16) + 0, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).minTholdEn);
-               axiSlaveRegister(regEp, toSlv(base + (thold*16) + 0, 16), 1, v.mpsReg.mpsChanReg(chan).stdTholds(thold).maxTholdEn);
-               axiSlaveRegister(regEp, toSlv(base + (thold*16) + 4, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).minThold);
-               axiSlaveRegister(regEp, toSlv(base + (thold*16) + 8, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).maxThold);
+               axiSlaveRegister(regEp, toSlv(base + 256 + (thold*16) + 0, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).minTholdEn);
+               axiSlaveRegister(regEp, toSlv(base + 256 + (thold*16) + 0, 16), 1, v.mpsReg.mpsChanReg(chan).stdTholds(thold).maxTholdEn);
+               axiSlaveRegister(regEp, toSlv(base + 256 + (thold*16) + 4, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).minThold);
+               axiSlaveRegister(regEp, toSlv(base + 256 + (thold*16) + 8, 16), 0, v.mpsReg.mpsChanReg(chan).stdTholds(thold).maxThold);
 
                -- alt: thold 0 = base + 0x180, thold 1 = base + 0x190, thold 7 = base + 0x1F0
                if APP_CONFIG_G.CHAN_CONFIG_C(chan).ALT_EN_C then
-                  axiSlaveRegister(regEp, toSlv(base + 128 + (thold*16) + 0, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).minTholdEn);
-                  axiSlaveRegister(regEp, toSlv(base + 128 + (thold*16) + 0, 16), 1, v.mpsReg.mpsChanReg(chan).altTholds(thold).maxTholdEn);
-                  axiSlaveRegister(regEp, toSlv(base + 128 + (thold*16) + 4, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).minThold);
-                  axiSlaveRegister(regEp, toSlv(base + 128 + (thold*16) + 8, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).maxThold);
+                  axiSlaveRegister(regEp, toSlv(base + 384 + (thold*16) + 0, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).minTholdEn);
+                  axiSlaveRegister(regEp, toSlv(base + 384 + (thold*16) + 0, 16), 1, v.mpsReg.mpsChanReg(chan).altTholds(thold).maxTholdEn);
+                  axiSlaveRegister(regEp, toSlv(base + 384 + (thold*16) + 4, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).minThold);
+                  axiSlaveRegister(regEp, toSlv(base + 384 + (thold*16) + 8, 16), 0, v.mpsReg.mpsChanReg(chan).altTholds(thold).maxThold);
                end if;
             end loop;
          end if;
       end loop;
 
       -- Closeout the transaction
-      axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      -- axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_OK_C); -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
 
       -- Synchronous Reset
       if (axilRst = '1') then

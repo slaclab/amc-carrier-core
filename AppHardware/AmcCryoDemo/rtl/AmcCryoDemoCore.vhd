@@ -1,24 +1,10 @@
 -------------------------------------------------------------------------------
--- Title      : LCLS-II: DEMO JSED ADC/DAC AMC Card, Version C00.
--------------------------------------------------------------------------------
 -- File       : AmcCryoDemoCore.vhd
--- Author     : Uros Legat <ulegat@slac.stanford.edu>
--- Company    : SLAC National Accelerator Laboratory (Cosylab)
+-- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-09-09
 -- Last update: 2017-03-09
--- Platform   : LCLS2 Common Plaform Carrier
---              AMC ADC/Analog demo
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
--- Description:
---    
---    Configured for 4-byte operation: GT_WORD_SIZE_C=4
---    6 lane JESD receiver ADC
---    2 lane JESD transmitter DAC
---    2 lane Signal generator (For DAC outputs)
---    SPI: 1 LMK chip, 3 ADC chips, and 1 DAC chip
---
---    https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 LLRF Development'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 

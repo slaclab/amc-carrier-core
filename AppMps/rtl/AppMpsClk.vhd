@@ -2,7 +2,7 @@
 -- File       : AppMpsClk.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-02-25
+-- Last update: 2017-10-19
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -36,8 +36,8 @@ entity AppMpsClk is
       SIM_SPEEDUP_G : boolean := false);
    port (
       -- Stable Clock and Reset 
-      axilClk : in sl;
-      axilRst : in sl;
+      axilClk      : in  sl;
+      axilRst      : in  sl;
       -- MPS Clocks and Resets
       mps125MHzClk : out sl;
       mps125MHzRst : out sl;
@@ -45,7 +45,10 @@ entity AppMpsClk is
       mps312MHzRst : out sl;
       mps625MHzClk : out sl;
       mps625MHzRst : out sl;
+      mpsTholdClk  : out sl;
+      mpsTholdRst  : out sl;
       mpsPllLocked : out sl;
+      mpsPllRst    : in  sl;
       ----------------
       -- Core Ports --
       ----------------   
@@ -59,10 +62,10 @@ architecture mapping of AppMpsClk is
    signal mpsRefClk     : sl;
    signal mpsClk        : sl;
    signal mpsRst        : sl;
+   signal mpsReset      : sl;
    signal mpsMmcmClkOut : slv(2 downto 0);
    signal mpsMmcmRstOut : slv(2 downto 0);
    signal locked        : sl;
-
 
 begin
 
@@ -71,8 +74,9 @@ begin
          I => mpsClkIn,
          O => mpsRefClk);
 
-   mpsClk <= axilClk when(MPS_SLOT_G) else mpsRefClk;
-   mpsRst <= axilRst when(MPS_SLOT_G) else '0';
+   mpsClk   <= axilClk when(MPS_SLOT_G) else mpsRefClk;
+   mpsRst   <= axilRst when(MPS_SLOT_G) else '0';
+   mpsReset <= mpsRst or mpsPllRst;
 
    U_ClkManagerMps : entity work.ClockManagerUltraScale
       generic map(
@@ -87,14 +91,14 @@ begin
          CLKIN_PERIOD_G     => ite(MPS_SLOT_G, 6.4, 8.0),
          DIVCLK_DIVIDE_G    => 1,
          CLKFBOUT_MULT_F_G  => ite(MPS_SLOT_G, 8.0, 10.0),  -- 1.25 GHz
-         CLKOUT0_DIVIDE_F_G => 2.0,                         -- 625 MHz = 1.25 GHz/2.0
+         CLKOUT0_DIVIDE_F_G => 2.0,     -- 625 MHz = 1.25 GHz/2.0
          CLKOUT0_RST_HOLD_G => 4,
-         CLKOUT1_DIVIDE_G   => 4,                           -- 312.5 MHz = 1.25 GHz/4
-         CLKOUT2_DIVIDE_G   => 10)                          -- 125 MHz = 1.25 GHz/10
+         CLKOUT1_DIVIDE_G   => 4,       -- 312.5 MHz = 1.25 GHz/4
+         CLKOUT2_DIVIDE_G   => 10)      -- 125 MHz = 1.25 GHz/10
       port map(
          -- Clock Input
          clkIn  => mpsClk,
-         rstIn  => mpsRst,
+         rstIn  => mpsReset,
          -- Clock Outputs
          clkOut => mpsMmcmClkOut,
          -- Reset Outputs
@@ -108,7 +112,7 @@ begin
       port map (
          clk     => axilClk,
          dataIn  => locked,
-         dataOut => mpsPllLocked);            
+         dataOut => mpsPllLocked);
 
    mps125MHzClk <= mpsMmcmClkOut(2);
    mps125MHzRst <= mpsMmcmRstOut(2);
@@ -127,5 +131,27 @@ begin
          outEnL => ite(MPS_SLOT_G, '0', '1'),
          clkIn  => mpsMmcmClkOut(2),
          clkOut => mpsClkOut);
+
+   U_PLL : entity work.ClockManagerUltraScale
+      generic map(
+         TPD_G             => TPD_G,
+         TYPE_G            => "PLL",
+         INPUT_BUFG_G      => false,
+         FB_BUFG_G         => true,
+         RST_IN_POLARITY_G => '1',
+         NUM_CLOCKS_G      => 1,
+         -- MMCM attributes
+         CLKIN_PERIOD_G    => 6.4,      -- 156.25 MHz
+         DIVCLK_DIVIDE_G   => 1,        -- 156.25 MHz/1
+         CLKFBOUT_MULT_G   => 4,        -- 625 MHz = 156.25 MHz x 4
+         CLKOUT0_DIVIDE_G  => 10)       -- 62.5 MHz = 625 MHz/10
+      port map(
+         -- Clock Input
+         clkIn     => axilClk,
+         rstIn     => axilRst,
+         -- Clock Outputs
+         clkOut(0) => mpsTholdClk,      -- Stable clock for register access
+         -- Reset Outputs
+         rstOut(0) => mpsTholdRst);
 
 end mapping;
