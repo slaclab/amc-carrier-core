@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : MicrowaveMuxDualCore.vhd
+-- File       : AmcMicrowaveMuxDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-11
 -- Last update: 2017-06-29
@@ -23,7 +23,7 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.jesd204bpkg.all;
 
-entity MicrowaveMuxDualCore is
+entity AmcMicrowaveMuxDualCore is
    generic (
       TPD_G            : time             := 1 ns;
       AXI_CLK_FREQ_G   : real             := 156.25E+6;
@@ -62,9 +62,9 @@ entity MicrowaveMuxDualCore is
       spareP          : inout Slv16Array(1 downto 0);
       spareN          : inout Slv16Array(1 downto 0)
       );
-end MicrowaveMuxDualCore;
+end AmcMicrowaveMuxDualCore;
 
-architecture mapping of MicrowaveMuxDualCore is
+architecture mapping of AmcMicrowaveMuxDualCore is
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
@@ -103,7 +103,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.MicrowaveMuxCore
+      U_AMC : entity work.AmcMicrowaveMuxCore
          generic map (
             TPD_G            => TPD_G,
             AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,

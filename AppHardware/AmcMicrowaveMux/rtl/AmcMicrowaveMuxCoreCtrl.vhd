@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : MicrowaveMuxCoreCtrl.vhd
+-- File       : AmcMicrowaveMuxCoreCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-14
 -- Last update: 2017-06-14
@@ -24,7 +24,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.jesd204bpkg.all;
 
-entity MicrowaveMuxCoreCtrl is
+entity AmcMicrowaveMuxCoreCtrl is
    generic (
       TPD_G                    : time                   := 1 ns;
       AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C);
@@ -41,9 +41,9 @@ entity MicrowaveMuxCoreCtrl is
       txSyncRaw       : in  slv(1 downto 0);
       txSync          : in  slv(1 downto 0);
       txSyncMask      : out slv(1 downto 0));
-end MicrowaveMuxCoreCtrl;
+end AmcMicrowaveMuxCoreCtrl;
 
-architecture rtl of MicrowaveMuxCoreCtrl is
+architecture rtl of AmcMicrowaveMuxCoreCtrl is
 
    type RegType is record
       txSyncMask     : slv(1 downto 0);

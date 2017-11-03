@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : MicrowaveMuxCore.vhd
+-- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
 -- Last update: 2017-09-07
@@ -27,7 +27,7 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.jesd204bPkg.all;
 
-entity MicrowaveMuxCore is
+entity AmcMicrowaveMuxCore is
    generic (
       TPD_G            : time             := 1 ns;
       AXI_CLK_FREQ_G   : real             := 156.25E+6;
@@ -66,9 +66,9 @@ entity MicrowaveMuxCore is
       spareP          : inout slv(15 downto 0);
       spareN          : inout slv(15 downto 0)
       );
-end MicrowaveMuxCore;
+end AmcMicrowaveMuxCore;
 
-architecture top_level_app of MicrowaveMuxCore is
+architecture top_level_app of AmcMicrowaveMuxCore is
 
    -------------------------------------------------------------------------------------------------
    -- AXI Lite Config and Signals
@@ -301,7 +301,7 @@ begin
    -- Debug Control Module
    ----------------------------------------------------------------            
 
-   U_Ctrl : entity work.MicrowaveMuxCoreCtrl
+   U_Ctrl : entity work.AmcMicrowaveMuxCoreCtrl
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
