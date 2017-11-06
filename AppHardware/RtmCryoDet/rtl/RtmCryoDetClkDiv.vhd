@@ -2,7 +2,7 @@
 -- File       : RtmCryoDetClkDiv.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2017-11-03
+-- Last update: 2017-11-06
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -24,25 +24,26 @@ use work.StdRtlPkg.all;
 
 entity RtmCryoDetClkDiv is
    generic (
-      TPD_G : time := 1 ns);
+      TPD_G       : time     := 1 ns;
+      CNT_WIDTH_G : positive := 8);
    port (
       jesdClk    : in  sl;
       jesdRst    : in  sl;
       jesdClkDiv : out sl;
-      lowCycle   : in  slv(3 downto 0);
-      highCycle  : in  slv(3 downto 0));
+      lowCycle   : in  slv(CNT_WIDTH_G-1 downto 0);
+      highCycle  : in  slv(CNT_WIDTH_G-1 downto 0));
 end RtmCryoDetClkDiv;
 
 architecture rtl of RtmCryoDetClkDiv is
 
    type RegType is record
       clkDiv : sl;
-      cnt    : slv(3 downto 0);
+      cnt    : slv(CNT_WIDTH_G-1 downto 0);
    end record;
 
    constant REG_INIT_C : RegType := (
       clkDiv => '0',
-      cnt    => x"0");
+      cnt    => (others => '0'));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -50,7 +51,7 @@ architecture rtl of RtmCryoDetClkDiv is
 begin
 
    comb : process (highCycle, jesdRst, lowCycle, r) is
-      variable v      : RegType;
+      variable v : RegType;
    begin
       -- Latch the current value
       v := r;

@@ -2,7 +2,7 @@
 -- File       : RtmCryoDetReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2017-11-03
+-- Last update: 2017-11-06
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -26,6 +26,7 @@ use work.AxiLitePkg.all;
 entity RtmCryoDetReg is
    generic (
       TPD_G            : time            := 1 ns;
+      CNT_WIDTH_G      : positive        := 8;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       jesdClk         : in  sl;
@@ -43,23 +44,23 @@ end RtmCryoDetReg;
 architecture rtl of RtmCryoDetReg is
 
    type RegType is record
-      lowCycle       : slv(3 downto 0);
-      highCycle      : slv(3 downto 0);
+      lowCycle       : slv(CNT_WIDTH_G-1 downto 0);
+      highCycle      : slv(CNT_WIDTH_G-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      lowCycle       => x"2",           -- 3 cycles low by default
-      highCycle      => x"2",           -- 3 cycles high by default
+      lowCycle       => toSlv(2, CNT_WIDTH_G),  -- 3 cycles low by default (zero inclusive)
+      highCycle      => toSlv(2, CNT_WIDTH_G),  -- 3 cycles low by default (zero inclusive)
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal lowCycle  : slv(3 downto 0);
-   signal highCycle : slv(3 downto 0);
+   signal lowCycle  : slv(CNT_WIDTH_G-1 downto 0);
+   signal highCycle : slv(CNT_WIDTH_G-1 downto 0);
 
 begin
 
@@ -76,6 +77,7 @@ begin
       -- Map the read only registers
       axiSlaveRegister(regCon, x"0", 0, v.lowCycle);
       axiSlaveRegister(regCon, x"4", 0, v.highCycle);
+      axiSlaveRegisterR(regCon, x"8", 0, toSlv(CNT_WIDTH_G, 32));
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -104,7 +106,7 @@ begin
    Sync_lowCycle : entity work.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 4)
+         WIDTH_G => CNT_WIDTH_G)
       port map (
          clk     => jesdClk,
          dataIn  => r.lowCycle,
@@ -113,7 +115,7 @@ begin
    Sync_highCycle : entity work.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 4)
+         WIDTH_G => CNT_WIDTH_G)
       port map (
          clk     => jesdClk,
          dataIn  => r.highCycle,
@@ -121,7 +123,8 @@ begin
 
    U_ClkDiv : entity work.RtmCryoDetClkDiv
       generic map (
-         TPD_G => TPD_G)
+         TPD_G       => TPD_G,
+         CNT_WIDTH_G => CNT_WIDTH_G)
       port map (
          jesdClk    => jesdClk,
          jesdRst    => jesdRst,
