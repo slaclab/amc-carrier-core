@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
--- File       : MicrowaveMuxCoreCtrl.vhd
+-- File       : RtmCryoDetReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-06-14
--- Last update: 2017-06-14
+-- Created    : 2017-11-03
+-- Last update: 2017-11-06
 -------------------------------------------------------------------------------
--- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -22,47 +22,49 @@ use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-use work.jesd204bpkg.all;
 
-entity MicrowaveMuxCoreCtrl is
+entity RtmCryoDetReg is
    generic (
-      TPD_G                    : time                   := 1 ns;
-      AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C);
+      TPD_G            : time            := 1 ns;
+      CNT_WIDTH_G      : positive        := 8;
+      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
+      jesdClk         : in  sl;
+      jesdRst         : in  sl;
+      jesdClkDiv      : out sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
       axilReadMaster  : in  AxiLiteReadMasterType;
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType;
-      -- AMC Debug Signals
-      rxSync          : in  sl;
-      txSyncRaw       : in  slv(1 downto 0);
-      txSync          : in  slv(1 downto 0);
-      txSyncMask      : out slv(1 downto 0));
-end MicrowaveMuxCoreCtrl;
+      axilWriteSlave  : out AxiLiteWriteSlaveType);
+end RtmCryoDetReg;
 
-architecture rtl of MicrowaveMuxCoreCtrl is
+architecture rtl of RtmCryoDetReg is
 
    type RegType is record
-      txSyncMask     : slv(1 downto 0);
+      lowCycle       : slv(CNT_WIDTH_G-1 downto 0);
+      highCycle      : slv(CNT_WIDTH_G-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      txSyncMask     => (others => '0'),
+      lowCycle       => toSlv(2, CNT_WIDTH_G),  -- 3 cycles low by default (zero inclusive)
+      highCycle      => toSlv(2, CNT_WIDTH_G),  -- 3 cycles low by default (zero inclusive)
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   signal lowCycle  : slv(CNT_WIDTH_G-1 downto 0);
+   signal highCycle : slv(CNT_WIDTH_G-1 downto 0);
+
 begin
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, r, rxSync, txSync,
-                   txSyncRaw) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
@@ -73,12 +75,9 @@ begin
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read only registers
-      axiSlaveRegisterR(regCon, x"7F0", 0, txSyncRaw);
-      axiSlaveRegisterR(regCon, x"7F4", 0, txSync);
-      axiSlaveRegisterR(regCon, x"7F8", 0, rxSync);
-
-      -- Map the read/write registers
-      axiSlaveRegister(regCon, x"800", 0, v.txSyncMask);
+      axiSlaveRegister(regCon, x"0", 0, v.lowCycle);
+      axiSlaveRegister(regCon, x"4", 0, v.highCycle);
+      axiSlaveRegisterR(regCon, x"8", 0, toSlv(CNT_WIDTH_G, 32));
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -94,7 +93,6 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
-      txSyncMask     <= r.txSyncMask;
 
    end process comb;
 
@@ -104,5 +102,34 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   Sync_lowCycle : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => CNT_WIDTH_G)
+      port map (
+         clk     => jesdClk,
+         dataIn  => r.lowCycle,
+         dataOut => lowCycle);
+
+   Sync_highCycle : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => CNT_WIDTH_G)
+      port map (
+         clk     => jesdClk,
+         dataIn  => r.highCycle,
+         dataOut => highCycle);
+
+   U_ClkDiv : entity work.RtmCryoDetClkDiv
+      generic map (
+         TPD_G       => TPD_G,
+         CNT_WIDTH_G => CNT_WIDTH_G)
+      port map (
+         jesdClk    => jesdClk,
+         jesdRst    => jesdRst,
+         jesdClkDiv => jesdClkDiv,
+         lowCycle   => lowCycle,
+         highCycle  => highCycle);
 
 end rtl;
