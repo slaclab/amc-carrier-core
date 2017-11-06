@@ -2,7 +2,7 @@
 -- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2017-11-03
+-- Last update: 2017-11-06
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
 ------------------------------------------------------------------------------
@@ -96,9 +96,12 @@ architecture mapping of RtmCryoDet is
 
 begin
 
-   --------------
-   -- RTM Mapping
-   --------------
+   ------------------------------------------------
+   --               RTM Mapping                  --
+   ------------------------------------------------
+   -- Refer to mapping table on confluence page
+   -- https://confluence.slac.stanford.edu/x/5WV4DQ
+   ------------------------------------------------
    rtmLsN(1)  <= cryoCsL;
    rtmLsP(3)  <= cryoSck;
    rtmLsN(3)  <= cryoSdi;
@@ -178,17 +181,17 @@ begin
    ------------------
    -- CRYO SPI Module
    ------------------
-   CRYO_SPI : entity work.AxiSpiMaster
+   CRYO_SPI : entity work.AxiSpiMaster         -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 15,
-         DATA_SIZE_G       => 8,
-         CPHA_G            => '0',
-         CPOL_G            => '0',
+         ADDRESS_SIZE_G    => 4,               -- A[3:0]
+         DATA_SIZE_G       => 32,              -- D[31:0]
+         CPHA_G            => '0',             -- CPHA = 0
+         CPOL_G            => '0',             -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => 1.0E-6)
+         SPI_SCLK_PERIOD_G => (1.0/100.0E+3))  -- SCLK = 100KHz
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -204,17 +207,17 @@ begin
    ------------------
    -- MAX SPI Module
    ------------------
-   MAX_SPI : entity work.AxiSpiMaster
+   MAX_SPI : entity work.AxiSpiMaster        -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 15,
-         DATA_SIZE_G       => 8,
-         CPHA_G            => '0',
-         CPOL_G            => '0',
+         ADDRESS_SIZE_G    => 8,             -- A[7:0]
+         DATA_SIZE_G       => 24,            -- D[23:0]
+         CPHA_G            => '0',           -- CPHA = 0
+         CPOL_G            => '0',           -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => 1.0E-6)
+         SPI_SCLK_PERIOD_G => (1.0/1.0E+6))  -- SCLK = 1MHz
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -230,17 +233,17 @@ begin
    ----------------
    -- SR SPI Module
    ----------------
-   SR_SPI : entity work.AxiSpiMaster
+   SR_SPI : entity work.AxiSpiMaster         -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 15,
-         DATA_SIZE_G       => 8,
-         CPHA_G            => '0',
-         CPOL_G            => '0',
+         ADDRESS_SIZE_G    => 4,             -- A[3:0]
+         DATA_SIZE_G       => 24,            -- D[23:0]
+         CPHA_G            => '0',           -- CPHA = 0
+         CPOL_G            => '0',           -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => 1.0E-6)
+         SPI_SCLK_PERIOD_G => (1.0/1.0E+6))  -- SCLK = 1MHz
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
