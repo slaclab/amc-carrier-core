@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-08-03
+-- Last update: 2017-11-08
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -197,8 +197,8 @@ architecture mapping of AppTop is
    signal debugValids : Slv4Array(1 downto 0);
    signal debugValues : sampleDataVectorArray(1 downto 0, 3 downto 0);
 
-   signal dataValids : Slv20Array(1 downto 0);
-   signal linkReady  : Slv20Array(1 downto 0);
+   signal dataValids : Slv24Array(1 downto 0);
+   signal linkReady  : Slv24Array(1 downto 0);
 
    signal dacSigCtrl   : DacSigCtrlArray(1 downto 0);
    signal dacSigStatus : DacSigStatusArray(1 downto 0);
@@ -287,7 +287,7 @@ begin
             AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
             DECIMATOR_EN_G         => true,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
-            N_DATA_IN_G            => 20,  -- 2 additional for the 8 lane interface
+            N_DATA_IN_G            => 24,
             N_DATA_OUT_G           => 4)
          port map (
             -- Clocks and Resets
@@ -314,7 +314,7 @@ begin
             axilReadSlave       => axilReadSlaves(DAQ_MUX0_INDEX_C+i),
             axilWriteMaster     => axilWriteMasters(DAQ_MUX0_INDEX_C+i),
             axilWriteSlave      => axilWriteSlaves(DAQ_MUX0_INDEX_C+i),
-            -- Sample data input 
+            -- ADC Input 
             sampleDataArr_i(0)  => adcValues(i, 0),
             sampleDataArr_i(1)  => adcValues(i, 1),
             sampleDataArr_i(2)  => adcValues(i, 2),
@@ -323,18 +323,25 @@ begin
             sampleDataArr_i(5)  => adcValues(i, 5),
             sampleDataArr_i(6)  => adcValues(i, 6),
             sampleDataArr_i(7)  => adcValues(i, 7),
-            sampleDataArr_i(8)  => dacValues(i, 0),
-            sampleDataArr_i(9)  => dacValues(i, 1),
-            sampleDataArr_i(10) => dacValues(i, 2),
-            sampleDataArr_i(11) => dacValues(i, 3),
-            sampleDataArr_i(12) => dacValues(i, 4),
-            sampleDataArr_i(13) => dacValues(i, 5),
-            sampleDataArr_i(14) => dacValues(i, 6),
-            sampleDataArr_i(15) => dacValues(i, 7),
-            sampleDataArr_i(16) => debugValues(i, 0),
-            sampleDataArr_i(17) => debugValues(i, 1),
-            sampleDataArr_i(18) => debugValues(i, 2),
-            sampleDataArr_i(19) => debugValues(i, 3),
+            sampleDataArr_i(8)  => adcValues(i, 8),
+            sampleDataArr_i(9)  => adcValues(i, 9),
+            -- DAC Input 
+            sampleDataArr_i(10) => dacValues(i, 0),
+            sampleDataArr_i(11) => dacValues(i, 1),
+            sampleDataArr_i(12) => dacValues(i, 2),
+            sampleDataArr_i(13) => dacValues(i, 3),
+            sampleDataArr_i(14) => dacValues(i, 4),
+            sampleDataArr_i(15) => dacValues(i, 5),
+            sampleDataArr_i(16) => dacValues(i, 6),
+            sampleDataArr_i(17) => dacValues(i, 7),
+            sampleDataArr_i(18) => dacValues(i, 8),
+            sampleDataArr_i(19) => dacValues(i, 9),
+            -- DBG Input             
+            sampleDataArr_i(20) => debugValues(i, 0),
+            sampleDataArr_i(21) => debugValues(i, 1),
+            sampleDataArr_i(22) => debugValues(i, 2),
+            sampleDataArr_i(23) => debugValues(i, 3),
+            -- MISC Interfaces
             sampleValidVec_i    => dataValids(i),
             linkReadyVec_i      => linkReady(i),
             -- Output AXI Streaming Interface (Has to be synced with waveform clk)
