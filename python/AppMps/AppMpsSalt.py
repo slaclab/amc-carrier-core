@@ -38,6 +38,7 @@ class AppMpsSalt(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
+            pollInterval = 1,
         ))
 
         self.addRemoteVariables( 
@@ -50,6 +51,7 @@ class AppMpsSalt(pr.Device):
             mode         = "RO",
             number       =  14,
             stride       =  4,
+            pollInterval = 1,
         )
         
         self.add(pr.RemoteVariable(    
@@ -60,6 +62,7 @@ class AppMpsSalt(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
+            pollInterval = 1,
         ))
 
         self.addRemoteVariables( 
@@ -72,6 +75,7 @@ class AppMpsSalt(pr.Device):
             mode         = "RO",
             number       =  14,
             stride       =  4,
+            pollInterval = 1,
         )        
 
         self.add(pr.RemoteVariable(    
@@ -82,6 +86,7 @@ class AppMpsSalt(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
+            pollInterval = 1,
         ))
 
         self.add(pr.RemoteVariable(    
@@ -92,6 +97,7 @@ class AppMpsSalt(pr.Device):
             bitOffset    =  0x01,
             base         = pr.UInt,
             mode         = "RO",
+            pollInterval = 1,
         ))
 
         self.add(pr.RemoteVariable(    
@@ -102,6 +108,7 @@ class AppMpsSalt(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
+            pollInterval = 1,
         ))
 
         self.add(pr.RemoteVariable(    
@@ -112,6 +119,7 @@ class AppMpsSalt(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
+            pollInterval = 1,
         ))
 
         self.add(pr.RemoteVariable(    
@@ -122,6 +130,7 @@ class AppMpsSalt(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
+            pollInterval = 1,
         ))
 
         self.add(pr.RemoteVariable(    
@@ -143,6 +152,16 @@ class AppMpsSalt(pr.Device):
             base         = pr.UInt,
             mode         = "WO",
         ))
+        
+        self.add(pr.RemoteVariable(    
+            name         = "PllRst",
+            description  = "PLL Reset",
+            offset       =  0xFF8,
+            bitSize      =  1,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "WO",
+        ))        
 
         ##############################
         # Commands
@@ -150,3 +169,7 @@ class AppMpsSalt(pr.Device):
         @self.command(name="RstCnt", description="Reset all the status counters",)
         def RstCnt():
             self.CntRst.set(1)
+            
+        @self.command(name="RstPll", description="PLL Reset",)
+        def RstPll():
+            self.PllRst.set(1)            
