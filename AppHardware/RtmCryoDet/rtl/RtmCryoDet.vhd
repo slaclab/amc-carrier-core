@@ -212,7 +212,7 @@ begin
          TPD_G             => TPD_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 7,             -- A[6:0]
+         ADDRESS_SIZE_G    => 8,             -- A[7:0]
          DATA_SIZE_G       => 24,            -- D[23:0]
          CPHA_G            => '0',           -- CPHA = 0
          CPOL_G            => '0',           -- CPOL = 0
