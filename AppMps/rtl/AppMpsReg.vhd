@@ -44,6 +44,8 @@ entity AppMpsReg is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
+      -- MPS message monitoring
+      mpsMessage      : in  MpsMessageType;
       -- MPS Configuration Registers
       mpsAppRegisters : out MpsAppRegType);
 
@@ -53,12 +55,16 @@ architecture mapping of AppMpsReg is
 
    type RegType is record
       mpsReg         : MpsAppRegType;
+      mpsMessage     : MpsMessageType;
+      mpsCount       : slv(31 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
       mpsReg         => MPS_APP_REG_INIT_C,
+      mpsMessage     => MPS_MESSAGE_INIT_C,
+      mpsCount       => (others=>'0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -67,7 +73,7 @@ architecture mapping of AppMpsReg is
 
 begin
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, r) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, r, mpsMessage) is
       variable v     : RegType;
       variable regEp : AxiLiteEndPointType;
       variable chan  : natural;
@@ -77,11 +83,17 @@ begin
       -- Latch the current value
       v := r;
 
+      -- MPS message tracking
+      if mpsMessage.valid = '1' then
+         v.mpsMessage := mpsMessage;
+         v.mpsCount   := r.mpsCount + 1;
+      end if;
+
       -- Determine the transaction type
       axiSlaveWaitTxn(regEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Top level registers
-      axiSlaveRegister(regEp, x"0000", 0, v.mpsReg.mpsCore.mpsAppId);
+      axiSlaveRegister(regEp, x"0000",  0, v.mpsReg.mpsCore.mpsAppId);
       axiSlaveRegister(regEp, x"0000", 16, v.mpsReg.mpsCore.mpsEnable);
       axiSlaveRegister(regEp, x"0000", 17, v.mpsReg.mpsCore.lcls1Mode);
       axiSlaveRegister(regEp, x"0000", 24, v.mpsReg.mpsCore.mpsVersion);
@@ -89,8 +101,22 @@ begin
       axiSlaveRegisterR(regEp, x"0004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C,8));
       axiSlaveRegisterR(regEp, x"0004", 8, ite(APP_CONFIG_G.DIGITAL_EN_C,'1','0'));
 
-      axiSlaveRegister(regEp, x"0008", 0, v.mpsReg.beamDestMask);
+      axiSlaveRegister(regEp, x"0008",  0, v.mpsReg.beamDestMask);
       axiSlaveRegister(regEp, x"0008", 16, v.mpsReg.altDestMask);
+
+      axiSlaveRegisterR(regEp, x"0010",  0, r.mpsCount);
+
+      axiSlaveRegisterR(regEp, x"0014",  0, r.mpsMessage.appId(9 downto 0));
+      axiSlaveRegisterR(regEp, x"0014", 10, r.mpsMessage.lcls);
+      axiSlaveRegisterR(regEp, x"0014", 16, r.mpsMessage.timeStamp);
+
+      axiSlaveRegisterR(regEp, x"0018",  0, r.mpsMessage.message(0));
+      axiSlaveRegisterR(regEp, x"0018",  8, r.mpsMessage.message(1));
+      axiSlaveRegisterR(regEp, x"0018", 16, r.mpsMessage.message(2));
+      axiSlaveRegisterR(regEp, x"0018", 24, r.mpsMessage.message(3));
+
+      axiSlaveRegisterR(regEp, x"001C",  0, r.mpsMessage.message(4));
+      axiSlaveRegisterR(regEp, x"001C",  8, r.mpsMessage.message(5));
 
       -- Chan 0 = 0x8000, Chan 1 = 0x8200, Chan 3 = 0x8400 ... Chan 23 = 0xAE00
       for chan in 0 to (MPS_CHAN_COUNT_C-1) loop
