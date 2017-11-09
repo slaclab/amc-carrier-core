@@ -2,7 +2,7 @@
 -- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-10-19
+-- Last update: 2017-11-08
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ use unisim.vcomponents.all;
 entity AppMpsSalt is
    generic (
       TPD_G            : time            := 1 ns;
+      SIMULATION_G     : boolean         := false;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       MPS_SLOT_G       : boolean         := false);
@@ -105,12 +106,17 @@ architecture mapping of AppMpsSalt is
    signal rin : RegType;
 
    signal iDelayCtrlRdy : sl;
-   signal mpsTxLinkUp   : sl;
-   signal mpsTxPktSent  : sl;
-   signal mpsRxLinkUp   : slv(14 downto 1);
-   signal mpsRxPktRcvd  : slv(14 downto 1);
-   signal statusOut     : slv(STATUS_SIZE_C-1 downto 0);
-   signal cntOut        : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
+
+   signal mpsTxLinkUp  : sl;
+   signal txPktSent    : sl;
+   signal mpsTxPktSent : sl;
+
+   signal mpsRxLinkUp  : slv(14 downto 1);
+   signal rxPktRcvd    : slv(14 downto 1);
+   signal mpsRxPktRcvd : slv(14 downto 1);
+
+   signal statusOut : slv(STATUS_SIZE_C-1 downto 0);
+   signal cntOut    : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
 
 begin
 
@@ -150,6 +156,7 @@ begin
       U_SaltUltraScale : entity work.SaltUltraScale
          generic map (
             TPD_G               => TPD_G,
+            SIMULATION_G        => SIMULATION_G,
             TX_ENABLE_G         => true,   -- TX only
             RX_ENABLE_G         => false,  -- Not using RX path
             COMMON_TX_CLK_G     => false,
@@ -170,7 +177,7 @@ begin
             clk625MHz     => mps625MHzClk,
             iDelayCtrlRdy => '1',          -- Not using RX path
             linkUp        => mpsTxLinkUp,
-            txPktSent     => mpsTxPktSent,
+            txPktSent     => txPktSent,
             rxPktRcvd     => open,
             -- Slave Port
             sAxisClk      => mpsIbClk,
@@ -182,6 +189,14 @@ begin
             mAxisRst      => axilRst,
             mAxisMaster   => open,
             mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);
+
+      U_mpsTxPktSent : entity work.SynchronizerOneShot
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => axilClk,
+            dataIn  => txPktSent,
+            dataOut => mpsTxPktSent);
 
       GEN_VEC :
       for i in 14 downto 1 generate
@@ -218,7 +233,7 @@ begin
             GEN_SYNC_FIFO_G     => false,
             FIFO_ADDR_WIDTH_G   => 9,
             SLAVE_AXI_CONFIG_G  => MPS_AXIS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C) 
+            MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C)
          port map (
             -- Slave Port
             sAxisClk    => mpsIbClk,
@@ -231,7 +246,7 @@ begin
             mAxisMaster => mpsObMasters(0),
             mAxisSlave  => mpsObSlaves(0));
 
-      mpsTxLinkUp     <= '0';
+      mpsTxLinkUp <= '0';
 
       U_OBUFDS : OBUFDS
          port map (
@@ -244,6 +259,7 @@ begin
          U_SaltUltraScale : entity work.SaltUltraScale
             generic map (
                TPD_G               => TPD_G,
+               SIMULATION_G        => SIMULATION_G,
                TX_ENABLE_G         => false,
                RX_ENABLE_G         => true,
                COMMON_TX_CLK_G     => false,
@@ -265,7 +281,7 @@ begin
                iDelayCtrlRdy => iDelayCtrlRdy,
                linkUp        => mpsRxLinkUp(i),
                txPktSent     => open,
-               rxPktRcvd     => mpsRxPktRcvd(i),
+               rxPktRcvd     => rxPktRcvd(i),
                -- Slave Port
                sAxisClk      => axilClk,
                sAxisRst      => axilRst,
@@ -276,6 +292,15 @@ begin
                mAxisRst      => axilRst,
                mAxisMaster   => mpsObMasters(i),
                mAxisSlave    => mpsObSlaves(i));
+
+         U_mpsRxPktRcvd : entity work.SynchronizerOneShot
+            generic map (
+               TPD_G => TPD_G)
+            port map (
+               clk     => axilClk,
+               dataIn  => rxPktRcvd(i),
+               dataOut => mpsRxPktRcvd(i));
+
       end generate GEN_VEC;
 
    end generate;
@@ -355,8 +380,9 @@ begin
 
    U_mpsPllRst : entity work.PwrUpRst
       generic map (
-         TPD_G      => TPD_G,
-         DURATION_G => 125000000)
+         TPD_G         => TPD_G,
+         SIM_SPEEDUP_G => SIMULATION_G,
+         DURATION_G    => 125000000)
       port map (
          arst   => r.mpsPllRst,
          clk    => axilClk,

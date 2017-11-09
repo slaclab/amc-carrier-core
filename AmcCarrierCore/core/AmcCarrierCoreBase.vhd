@@ -961,12 +961,12 @@ begin
          axilReadSlave   => mpsReadSlave,
          axilWriteMaster => mpsWriteMaster,
          axilWriteSlave  => mpsWriteSlave,
-         -- System Status
-         bsiBus          => bsiBus,
-         ethLinkUp       => ethLinkUp,
-         timingClk       => timingClk,
-         timingRst       => timingRst,
-         timingBus       => timingBusIntf,
+         -- -- System Status
+         -- bsiBus          => bsiBus,
+         -- ethLinkUp       => ethLinkUp,
+         -- timingClk       => timingClk,
+         -- timingRst       => timingRst,
+         -- timingBus       => timingBusIntf,
          ----------------------
          -- Top Level Interface
          ----------------------

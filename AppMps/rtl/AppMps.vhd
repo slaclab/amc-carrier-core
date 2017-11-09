@@ -2,7 +2,7 @@
 -- File       : AppMps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-10-19
+-- Last update: 2017-11-08
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ use work.TimingPkg.all;
 entity AppMps is
    generic (
       TPD_G            : time            := 1 ns;
-      SIM_SPEEDUP_G    : boolean         := false;
+      SIMULATION_G     : boolean         := false;
       MPS_SLOT_G       : boolean         := false;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
@@ -51,12 +51,12 @@ entity AppMps is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       mpsCoreReg      : out MpsCoreRegType;
-      -- System Status
-      bsiBus          : in  BsiBusType;     -- axilClk domain
-      ethLinkUp       : in  sl;             -- axilClk domain
-      timingClk       : in  sl;
-      timingRst       : in  sl;
-      timingBus       : in  TimingBusType;  -- timingClk domain  
+      -- -- System Status
+      -- bsiBus          : in  BsiBusType;     -- axilClk domain
+      -- ethLinkUp       : in  sl;             -- axilClk domain
+      -- timingClk       : in  sl;
+      -- timingRst       : in  sl;
+      -- timingBus       : in  TimingBusType;  -- timingClk domain  
       ----------------------
       -- Top Level Interface
       ----------------------
@@ -114,8 +114,6 @@ architecture mapping of AppMps is
    signal mpsTholdClk  : sl;
    signal mpsTholdRst  : sl;
    signal mpsPllLocked : sl;
-   signal mps100MHzClk : sl;
-   signal mps100MHzRst : sl;
    signal mpsPllRst    : sl;
 
    signal mpsMaster : AxiStreamMasterType;
@@ -130,7 +128,7 @@ begin
       generic map (
          TPD_G         => TPD_G,
          MPS_SLOT_G    => MPS_SLOT_G,
-         SIM_SPEEDUP_G => SIM_SPEEDUP_G)
+         SIM_SPEEDUP_G => SIMULATION_G)
       port map (
          -- Stable Clock and Reset 
          axilClk      => axilClk,
@@ -223,6 +221,7 @@ begin
    U_Salt : entity work.AppMpsSalt
       generic map (
          TPD_G            => TPD_G,
+         SIMULATION_G     => SIMULATION_G,
          APP_TYPE_G       => APP_TYPE_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          MPS_SLOT_G       => MPS_SLOT_G)
