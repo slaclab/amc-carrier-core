@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #-----------------------------------------------------------------------------
-# Title      : PyRogue MicrowaveMux Amc Core
+# Title      : PyRogue AmcMicrowaveMux Amc Core
 #-----------------------------------------------------------------------------
-# File       : MicrowaveMuxCore.py
+# File       : AmcMicrowaveMuxCore.py
 # Created    : 2017-04-03
 #-----------------------------------------------------------------------------
 # Description:
@@ -24,29 +24,29 @@ from surf.devices.ti._adc32Rf45 import *
 from surf.devices.ti._Dac38J84  import *
 from surf.devices.ti._Lmk04828  import *
 
-from AppHardware.MicrowaveMux._microwaveMuxCtrl import *
-from AppHardware.MicrowaveMux._adf5355 import *
+from AppHardware.AmcMicrowaveMux._amcMicrowaveMuxCtrl import *
+from AppHardware.AmcMicrowaveMux._adf5355 import *
 
-class MicrowaveMuxCore(pr.Device):
+class AmcMicrowaveMuxCore(pr.Device):
     def __init__(   self, 
-            name        = "MicrowaveMuxCore", 
-            description = "MicrowaveMux Board", 
+            name        = "AmcMicrowaveMuxCore", 
+            description = "AmcMicrowaveMux Board", 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
                 
         #########
         # Devices
         #########
-        self.add(MicrowaveMuxCtrl(offset=0x00000000,name='DBG',    expand=False))
-        self.add(Adf5355(         offset=0x00001000,name='PLL[0]', expand=False))
-        self.add(Adf5355(         offset=0x00002000,name='PLL[1]', expand=False))
-        self.add(Adf5355(         offset=0x00003000,name='PLL[2]', expand=False))
-        self.add(Adf5355(         offset=0x00004000,name='PLL[3]', expand=False))        
-        self.add(Lmk04828(        offset=0x00020000,name='LMK',    expand=False))
-        self.add(Dac38J84(        offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
-        self.add(Dac38J84(        offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
-        self.add(Adc32Rf45(       offset=0x00080000,name='ADC[0]', expand=False))
-        self.add(Adc32Rf45(       offset=0x000C0000,name='ADC[1]', expand=False))
+        self.add(AmcMicrowaveMuxCtrl(offset=0x00000000,name='DBG',    expand=False))
+        self.add(Adf5355(           offset=0x00001000,name='PLL[0]', expand=False))
+        self.add(Adf5355(           offset=0x00002000,name='PLL[1]', expand=False))
+        self.add(Adf5355(           offset=0x00003000,name='PLL[2]', expand=False))
+        self.add(Adf5355(           offset=0x00004000,name='PLL[3]', expand=False))        
+        self.add(Lmk04828(          offset=0x00020000,name='LMK',    expand=False))
+        self.add(Dac38J84(          offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
+        self.add(Dac38J84(          offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
+        self.add(Adc32Rf45(         offset=0x00080000,name='ADC[0]', expand=False))
+        self.add(Adc32Rf45(         offset=0x000C0000,name='ADC[1]', expand=False))
 
         ##########
         # Commands
@@ -87,7 +87,7 @@ class MicrowaveMuxCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
         
-        # Note: Requires that MicrowaveMuxCore: enable: 'True' in defaults.yml file
+        # Note: Requires that AmcMicrowaveMuxCore: enable: 'True' in defaults.yml file
         self.enable.set(True)
         self.DBG.enable.set(True)
         self.PLL[0].enable.set(True)

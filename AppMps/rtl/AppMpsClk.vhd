@@ -2,7 +2,7 @@
 -- File       : AppMpsClk.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-10-19
+-- Last update: 2017-11-08
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ begin
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
       port map (
-         outEnL => ite(MPS_SLOT_G, '0', '1'),
+         rstIn  => ite(MPS_SLOT_G, '0', '1'),
          clkIn  => mpsMmcmClkOut(2),
          clkOut => mpsClkOut);
 
