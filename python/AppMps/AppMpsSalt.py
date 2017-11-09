@@ -132,6 +132,17 @@ class AppMpsSalt(pr.Device):
             mode         = "RO",
             pollInterval = 1,
         ))
+        
+        self.add(pr.RemoteVariable(    
+            name         = "DiagnosticStrbCnt",
+            description  = "Counts the diagnostic strobes",
+            offset       =  0x718,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
 
         self.add(pr.RemoteVariable(    
             name         = "RollOverEn",
