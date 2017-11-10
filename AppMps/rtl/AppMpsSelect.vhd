@@ -103,7 +103,7 @@ begin
 
       -- Data
       v.mpsSelect.valid     := diagnosticBus.strobe;
-      v.mpsSelect.timeStamp := diagnosticBus.timingMessage.timeStamp(15 downto 0);
+      v.mpsSelect.timeStamp := diagnosticBus.timingMessage.pulseId(15 downto 0);
       v.mpsSelect.chanData  := diagnosticBus.data(MPS_CHAN_COUNT_C-1 downto 0);
       v.mpsSelect.mpsIgnore := diagnosticBus.mpsIgnore(MPS_CHAN_COUNT_C-1 downto 0);
 
@@ -112,7 +112,7 @@ begin
       end loop;
 
       -- Set beam dest
-      beamDest                                                                    := (others => '0');
+      beamDest := (others => '0');
       beamDest(conv_integer(diagnosticBus.timingMessage.beamRequest(7 downto 4))) := '1';
 
       -- Beam enable decode
