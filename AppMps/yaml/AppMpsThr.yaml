@@ -70,7 +70,7 @@ channel: &channel
       class:        IntField
       sizeBits:     1
       lsBit:        0
-      mode:         RO
+      mode:         RW
       description:  Idle threshold table enable
     altEn:
       at:
@@ -149,6 +149,14 @@ AppMpsThr: &AppMpsThr
       lsBit:        1
       mode:         RW
       description:  True = LCLS1, False = LCLS2 mode
+    mpsVersion:
+      at:
+        offset:     0x03
+      class:        IntField
+      sizeBits:     6
+      lsBit:        0
+      mode:         RW
+      description:  MPS Version
     byteCount:
       at:
         offset:     0x04
@@ -163,7 +171,7 @@ AppMpsThr: &AppMpsThr
       class:        IntField
       sizeBits:     1
       lsBit:        0
-      mode:         RW
+      mode:         RO
       description:  Application generates digital message
     beamDestMask:
       at:
