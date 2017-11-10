@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-----------------------------------------------------------------------------
-# Title      : PyRogue MPS Application Module
+# Title      : PyRogue CRYO RTM: SPI SR
 #-----------------------------------------------------------------------------
-# File       : AppMps.py
-# Created    : 2017-04-04
+# File       : _spiSr.py
+# Created    : 2017-04-03
 #-----------------------------------------------------------------------------
 # Description:
-# PyRogue MPS Application Module
+# PyRogue Cryo Amc Core
 #-----------------------------------------------------------------------------
 # This file is part of the rogue software platform. It is subject to
 # the license terms in the LICENSE.txt file found in the top-level directory
@@ -19,24 +19,10 @@
 
 import pyrogue as pr
 
-from AppMps.AppMpsSalt import *
-from AppMps.AppMpsThr import *
-
-class AppMps(pr.Device):
+class SpiSr(pr.Device):
     def __init__(   self, 
-            name        = "AppMps", 
-            description = "MPS Application", 
+            name        = "SpiSr", 
+            description = "SpiSr module", 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-
-        ##############################
-        # Variables
-        ##############################
-
-        self.add(AppMpsSalt(
-            offset       =  0x00000000,
-        ))
-        
-        self.add(AppMpsThr(
-            offset       =  0x00010000,
-        ))        
+                     

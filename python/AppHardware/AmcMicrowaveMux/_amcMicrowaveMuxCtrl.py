@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #-----------------------------------------------------------------------------
-# Title      : PyRogue MicrowaveMux Amc Core
+# Title      : PyRogue AmcMicrowaveMux Amc Core
 #-----------------------------------------------------------------------------
-# File       : _microwaveMuxCtrl.py
+# File       : _amcMicrowaveMuxCtrl.py
 # Created    : 2017-04-03
 #-----------------------------------------------------------------------------
 # Description:
@@ -19,9 +19,9 @@
 
 import pyrogue as pr
 
-class MicrowaveMuxCtrl(pr.Device):
+class AmcMicrowaveMuxCtrl(pr.Device):
     def __init__(   self, 
-            name        = "MicrowaveMuxCtrl", 
+            name        = "AmcMicrowaveMuxCtrl", 
             description = "Debugging module", 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
