@@ -185,7 +185,7 @@ AppMpsThr: &AppMpsThr
       at:
         offset:     0x0A
       class:        IntField
-      sizeBits:     8
+      sizeBits:     16
       lsBit:        0
       mode:         RW
       description:  One bit per destination for alternative table for altEn=true
