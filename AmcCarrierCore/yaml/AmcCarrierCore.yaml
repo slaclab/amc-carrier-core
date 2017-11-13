@@ -161,8 +161,8 @@ AmcCarrierCore: &AmcCarrierCore
     SwUdpServer:
       <<: *UdpEngineServer
       at:
-        offset: 0x0A000808
-        nelms: 2
+        offset: 0x0A000800
+        nelms: 4
         stride: 8         
       description: "SwUdpServer"       
     ##################################################
