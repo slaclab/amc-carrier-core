@@ -124,6 +124,7 @@ begin
          axilReadSlave   => axilReadSlave,
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave,
+         mpsMessage      => r.mpsMessage,
          mpsAppRegisters => mpsReg);
 
    --------------------------------- 

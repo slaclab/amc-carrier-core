@@ -113,16 +113,16 @@ architecture mapping of AppMpsSalt is
 
    signal iDelayCtrlRdy : sl;
 
-   signal mpsTxLinkUp  : sl;
+   signal mpsTxLinkUp   : sl;
    signal txPktSent    : sl;
-   signal mpsTxPktSent : sl;
+   signal mpsTxPktSent  : sl;
 
-   signal mpsRxLinkUp  : slv(14 downto 1);
+   signal mpsRxLinkUp   : slv(14 downto 1);
    signal rxPktRcvd    : slv(14 downto 1);
-   signal mpsRxPktRcvd : slv(14 downto 1);
+   signal mpsRxPktRcvd  : slv(14 downto 1);
 
-   signal statusOut : slv(STATUS_SIZE_C-1 downto 0);
-   signal cntOut    : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
+   signal statusOut     : slv(STATUS_SIZE_C-1 downto 0);
+   signal cntOut        : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
 
    signal diagnosticstrobe : sl;
 
@@ -249,7 +249,7 @@ begin
             GEN_SYNC_FIFO_G     => false,
             FIFO_ADDR_WIDTH_G   => 9,
             SLAVE_AXI_CONFIG_G  => MPS_AXIS_CONFIG_C,
-            MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C)
+            MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C) 
          port map (
             -- Slave Port
             sAxisClk    => mpsIbClk,
@@ -262,7 +262,7 @@ begin
             mAxisMaster => mpsObMasters(0),
             mAxisSlave  => mpsObSlaves(0));
 
-      mpsTxLinkUp <= '0';
+      mpsTxLinkUp     <= '0';
 
       U_OBUFDS : OBUFDS
          port map (
@@ -401,9 +401,9 @@ begin
 
    U_mpsPllRst : entity work.PwrUpRst
       generic map (
-         TPD_G         => TPD_G,
+         TPD_G      => TPD_G,
          SIM_SPEEDUP_G => SIMULATION_G,
-         DURATION_G    => 125000000)
+         DURATION_G => 125000000)
       port map (
          arst   => r.mpsPllRst,
          clk    => axilClk,
