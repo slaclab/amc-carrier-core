@@ -43,7 +43,8 @@ package AmcCarrierPkg is
    -- 12/05/2016 (0x0000000A): Adding more application types
    -- 03/02/2017 (0x0000000B): Migration to GIT
    -- 11/08/2017 (0x02000400): 2.0.4 release
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_00_04_00";
+   -- 11/14/2017 (0x02000500): 2.0.5 release
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_00_05_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
