@@ -2,7 +2,7 @@
 -- File       : AppMps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-11-08
+-- Last update: 2017-11-09
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -247,6 +247,10 @@ begin
          mpsIbRst        => mpsTholdRst,
          mpsIbMaster     => mpsMaster,
          mpsIbSlave      => mpsSlave,
+         -- Diagnostic Interface (diagnosticClk domain)
+         diagnosticClk   => diagnosticClk,
+         diagnosticRst   => diagnosticRst,
+         diagnosticBus   => diagnosticBus,
          ----------------------
          -- Top Level Interface
          ----------------------

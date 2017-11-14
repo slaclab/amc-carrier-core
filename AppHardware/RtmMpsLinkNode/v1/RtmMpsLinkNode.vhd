@@ -2,7 +2,7 @@
 -- File       : RtmMpsLinkNode.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-02-23
+-- Last update: 2017-11-10
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_07_CXX
 -------------------------------------------------------------------------------
@@ -52,8 +52,14 @@ end RtmMpsLinkNode;
 
 architecture mapping of RtmMpsLinkNode is
 
+   signal rtmDin  : slv(31 downto 0);
+   signal rtmDout : slv(7 downto 0);
+
 begin
-   
+
+   din     <= rtmDin;
+   rtmDout <= dout;
+
    GEN_DIN :
    for i in 31 downto 0 generate
 
@@ -61,31 +67,35 @@ begin
          port map (
             I  => rtmLsP(i+0),
             IB => rtmLsN(i+0),
-            O  => din(i));
+            O  => rtmDin(i));
 
-   end generate GEN_DIN;   
+   end generate GEN_DIN;
 
    GEN_DOUT :
    for i in 7 downto 0 generate
 
       U_OBUFDS : OBUFDS
          port map (
-            I  => dout(i),
+            I  => rtmDout(i),
             O  => rtmLsP(i+32),
             OB => rtmLsN(i+32));
 
    end generate GEN_DOUT;
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+   U_Monitor : entity work.RtmMpsLinkNodeReg
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMaster,
+         axilReadSlave   => axilReadSlave,
+         axilWriteMaster => axilWriteMaster,
+         axilWriteSlave  => axilWriteSlave,
+         -- RTM Interface
+         din             => rtmDin,
+         dout            => rtmDout);
 
 end mapping;

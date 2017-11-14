@@ -70,7 +70,7 @@ channel: &channel
       class:        IntField
       sizeBits:     1
       lsBit:        0
-      mode:         RO
+      mode:         RW
       description:  Idle threshold table enable
     altEn:
       at:
@@ -149,6 +149,14 @@ AppMpsThr: &AppMpsThr
       lsBit:        1
       mode:         RW
       description:  True = LCLS1, False = LCLS2 mode
+    mpsVersion:
+      at:
+        offset:     0x03
+      class:        IntField
+      sizeBits:     6
+      lsBit:        0
+      mode:         RW
+      description:  MPS Version
     byteCount:
       at:
         offset:     0x04
@@ -163,7 +171,7 @@ AppMpsThr: &AppMpsThr
       class:        IntField
       sizeBits:     1
       lsBit:        0
-      mode:         RW
+      mode:         RO
       description:  Application generates digital message
     beamDestMask:
       at:
@@ -177,10 +185,51 @@ AppMpsThr: &AppMpsThr
       at:
         offset:     0x0A
       class:        IntField
-      sizeBits:     8
+      sizeBits:     16
       lsBit:        0
       mode:         RW
       description:  One bit per destination for alternative table for altEn=true
+    mpsMsgCount:
+      at:
+        offset:     0x10
+      class:        IntField
+      sizeBits:     32
+      lsBit:        0
+      mode:         RO
+      description:  Mps message counter
+    lastMsgAppId:
+      at:
+        offset:     0x14
+      class:        IntField
+      sizeBits:     10
+      lsBit:        0
+      mode:         RO
+      description:  APP ID in the last message
+    lastMsgLcls:
+      at:
+        offset:     0x15
+      class:        IntField
+      sizeBits:     1
+      lsBit:        2
+      mode:         RO
+      description:  LCLS flag in the last message
+    lastMsgTimeStamp:
+      at:
+        offset:     0x16
+      class:        IntField
+      sizeBits:     16
+      lsBit:        0
+      mode:         RO
+      description:  Timestamp in the last message
+    lastMsgByte:
+      at:
+        offset:     0x18
+        nelms:      6
+        stride:     1
+      class:        IntField
+      sizeBits:     8
+      mode:         RO
+      description:  Bytes from the last message
     channel:
       <<: *channel
       at:

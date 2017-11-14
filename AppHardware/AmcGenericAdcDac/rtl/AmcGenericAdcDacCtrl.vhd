@@ -2,7 +2,7 @@
 -- File       : AmcGenericAdcDacCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2016-11-14
+-- Last update: 2017-11-10
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -31,6 +31,12 @@ entity AmcGenericAdcDacCtrl is
       AXI_CLK_FREQ_G           : real                   := 156.25E+6;
       AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C);
    port (
+      -- Pass through Interfaces
+      smaTrig         : in  sl;
+      adcCal          : in  sl;
+      lemoDin         : in  slv(1 downto 0);
+      lemoDout        : in  slv(1 downto 0);
+      bcm             : in  sl;
       -- AMC Debug Signals
       clk             : in  sl;
       rst             : in  sl;
@@ -60,7 +66,7 @@ end AmcGenericAdcDacCtrl;
 
 architecture rtl of AmcGenericAdcDacCtrl is
 
-   constant STATUS_SIZE_C : positive := 4;
+   constant STATUS_SIZE_C : positive := 11;
 
    type RegType is record
       cntRst          : sl;
@@ -102,7 +108,7 @@ architecture rtl of AmcGenericAdcDacCtrl is
 
    -- attribute dont_touch               : string;
    -- attribute dont_touch of r          : signal is "TRUE";
-   
+
 begin
 
    GEN_ADC :
@@ -145,19 +151,19 @@ begin
          din    => dacVcoCtrl,
          -- Read Ports (rd_clk domain)
          rd_clk => axilClk,
-         dout   => dacVcoCtrlSync);   
+         dout   => dacVcoCtrlSync);
 
    U_SyncClockFreq : entity work.SyncClockFreq
       generic map (
          TPD_G          => TPD_G,
          REF_CLK_FREQ_G => AXI_CLK_FREQ_G,
          REFRESH_RATE_G => 1.0,         -- 1 Hz
-         CNT_WIDTH_G    => 32) 
+         CNT_WIDTH_G    => 32)
       port map (
          freqOut => amcClkFreq,
          clkIn   => clk,
          locClk  => axilClk,
-         refClk  => axilClk);   
+         refClk  => axilClk);
 
    Sync_Config : entity work.SynchronizerVector
       generic map (
@@ -166,7 +172,7 @@ begin
       port map (
          clk        => clk,
          dataIn(0)  => r.dacVcoEnable,
-         dataOut(0) => dacVcoEnable);    
+         dataOut(0) => dacVcoEnable);
 
    Sync_DacVcoSckConfig : entity work.SynchronizerFifo
       generic map (
@@ -178,7 +184,7 @@ begin
          din    => r.dacVcoSckConfig,
          -- Read Ports (rd_clk domain)
          rd_clk => clk,
-         dout   => dacVcoSckConfig);                   
+         dout   => dacVcoSckConfig);
 
    U_SyncStatusVector : entity work.SyncStatusVector
       generic map (
@@ -186,9 +192,14 @@ begin
          OUT_POLARITY_G => '1',
          CNT_RST_EDGE_G => true,
          CNT_WIDTH_G    => 32,
-         WIDTH_G        => STATUS_SIZE_C)     
+         WIDTH_G        => STATUS_SIZE_C)
       port map (
          -- Input Status bit Signals (wrClk domain)
+         statusIn(10)         => smaTrig,
+         statusIn(9)          => adcCal,
+         statusIn(8)          => bcm,
+         statusIn(7 downto 6) => lemoDin,
+         statusIn(5 downto 4) => lemoDout,
          statusIn(3 downto 0) => adcValids,
          -- Output Status bit Signals (rdClk domain)  
          statusOut            => statusOut,
@@ -198,12 +209,14 @@ begin
          cntOut               => statusCnt,
          -- Clocks and Reset Ports
          wrClk                => clk,
-         rdClk                => axilClk);   
+         rdClk                => axilClk);
 
-   comb : process (adcDataSync, amcClkFreq, axilReadMaster, axilRst, axilWriteMaster, dacDataSync,
-                   dacVcoCtrlSync, lmkStatus, r, statusCnt, statusOut) is
+   comb : process (adcDataSync, amcClkFreq, axilReadMaster, axilRst,
+                   axilWriteMaster, dacDataSync, dacVcoCtrlSync, lmkStatus, r,
+                   statusCnt, statusOut) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
+      variable i      : natural;
    begin
       -- Latch the current value
       v := r;
@@ -215,10 +228,9 @@ begin
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read only registers
-      axiSlaveRegisterR(regCon, x"000", 0, muxSlVectorArray(statusCnt, 0));
-      axiSlaveRegisterR(regCon, x"004", 0, muxSlVectorArray(statusCnt, 1));
-      axiSlaveRegisterR(regCon, x"008", 0, muxSlVectorArray(statusCnt, 2));
-      axiSlaveRegisterR(regCon, x"00C", 0, muxSlVectorArray(statusCnt, 3));
+      for i in STATUS_SIZE_C-1 downto 0 loop
+         axiSlaveRegisterR(regCon, toSlv(4*i, 12), 0, muxSlVectorArray(statusCnt, i));
+      end loop;
       axiSlaveRegisterR(regCon, x"0FC", 0, statusOut);
       axiSlaveRegisterR(regCon, x"100", 0, adcDataSync(0));
       axiSlaveRegisterR(regCon, x"104", 0, adcDataSync(1));
@@ -260,7 +272,7 @@ begin
       lmkRst         <= r.lmkRst;
       lmkSync        <= (others => r.lmkSync);
       lmkMuxSel      <= r.lmkMuxSel;
-      
+
    end process comb;
 
    seq : process (axilClk) is
@@ -269,5 +281,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 end rtl;

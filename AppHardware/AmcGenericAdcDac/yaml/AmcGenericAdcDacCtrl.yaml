@@ -26,6 +26,48 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       mode: RO
       description: ADC Valid Transistion Counter[3:0]
     #########################################################
+    lemoDoutCnt:
+      at:
+        offset: 0x10
+        nelms: 2
+      class: IntField
+      name: lemoDoutCnt
+      mode: RO
+      description: LEMO DOUT Transistion Counter[1:0]      
+    #########################################################
+    lemoDinCnt:
+      at:
+        offset: 0x18
+        nelms: 2
+      class: IntField
+      name: lemoDinCnt
+      mode: RO
+      description: LEMO DIN Transistion Counter[1:0]   
+    #########################################################
+    BcmCnt:
+      at:
+        offset: 0x20
+      class: IntField
+      name: BcmCnt
+      mode: RO
+      description: BCM Transistion Counter    
+    #########################################################
+    AdcCalCnt:
+      at:
+        offset: 0x24
+      class: IntField
+      name: AdcCalCnt
+      mode: RO
+      description: ADC_CAL Transistion Counter 
+    #########################################################
+    SmaTrigCnt:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SmaTrigCnt
+      mode: RO
+      description: SMA_TRIG Transistion Counter
+    #########################################################
     AdcValid:
       at:
         offset: 0x0FC
@@ -35,6 +77,56 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       lsBit: 0
       mode: RO
       description: ADC Valid[3:0]
+    #########################################################
+    lemoDout:
+      at:
+        offset: 0x0FC
+      class: IntField
+      name: lemoDout
+      sizeBits: 2
+      lsBit: 4
+      mode: RO
+      description: LEMO DOUT[1:0]
+    #########################################################
+    lemoDin:
+      at:
+        offset: 0x0FC
+      class: IntField
+      name: lemoDin
+      sizeBits: 2
+      lsBit: 6
+      mode: RO
+      description: LEMO DIN[1:0]
+    #########################################################
+    Bcm:
+      at:
+        offset: 0x0FD
+      class: IntField
+      name: Bcm
+      sizeBits: 1
+      lsBit: 0
+      mode: RO
+      description: BCM
+    #########################################################
+    AdcCal:
+      at:
+        offset: 0x0FD
+      class: IntField
+      name: AdcCal
+      sizeBits: 1
+      lsBit: 1
+      mode: RO
+      description: ADC_CAL
+    #########################################################
+    SmaTrig:
+      at:
+        offset: 0x0FD
+      class: IntField
+      name: SmaTrig
+      sizeBits: 1
+      lsBit: 2
+      mode: RO
+      description: SMA_TRIG
     #########################################################
     AdcData:
       at:
