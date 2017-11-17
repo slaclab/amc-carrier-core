@@ -399,21 +399,29 @@ package body AppMpsPkg is
          when APP_BPM_STRIPLINE_TYPE_C | APP_BPM_CAVITY_TYPE_C =>
             ret.BYTE_COUNT_C := 6;
 
-            for i in 0 to 2 loop
+            for i in 0 to 1 loop
 
-               -- Inputs 1, 2, 3
-               ret.CHAN_CONFIG_C(i+1).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i+1).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i+1).IDLE_EN_C     := ite(i=0,true,false); -- Charge
-               ret.CHAN_CONFIG_C(i+1).ALT_EN_C      := ite(i=1,true,false); -- x position
-               ret.CHAN_CONFIG_C(i+1).BYTE_MAP_C    := i; -- 0, 1, 2
+               -- Inputs 2 & 3 TMIT
+               ret.CHAN_CONFIG_C(2+i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(2+i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(2+i).IDLE_EN_C     := true;
+               ret.CHAN_CONFIG_C(2+i).ALT_EN_C      := false;
+               ret.CHAN_CONFIG_C(2+i).BYTE_MAP_C    := i; -- amc0 = 0 & amc1 = 1
 
-               -- Inputs 5, 6, 7
-               ret.CHAN_CONFIG_C(i+5).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i+5).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i+5).IDLE_EN_C     := ite(i=0,true,false); -- Charge
-               ret.CHAN_CONFIG_C(i+5).ALT_EN_C      := ite(i=1,true,false); -- x position
-               ret.CHAN_CONFIG_C(i+5).BYTE_MAP_C    := i+3; -- 3, 4, 5
+               -- Inputs 4 & 5 X
+               ret.CHAN_CONFIG_C(4+i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(4+i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(4+i).IDLE_EN_C     := false;
+               ret.CHAN_CONFIG_C(4+i).ALT_EN_C      := true;
+               ret.CHAN_CONFIG_C(4+i).BYTE_MAP_C    := i+2; -- amc0 = 2 & amc1 = 3
+
+               -- Inputs 6 & 7 Y
+               ret.CHAN_CONFIG_C(6+i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(6+i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(6+i).IDLE_EN_C     := false;
+               ret.CHAN_CONFIG_C(6+i).ALT_EN_C      := false;
+               ret.CHAN_CONFIG_C(6+i).BYTE_MAP_C    := i+4; -- amc0 = 4 & amc1 = 5
+
             end loop;
 
          when APP_BLEN_TYPE_C =>
