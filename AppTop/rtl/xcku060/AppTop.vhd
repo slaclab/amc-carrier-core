@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-11-08
+-- Last update: 2017-11-28
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -37,6 +37,7 @@ entity AppTop is
       TPD_G                  : time                      := 1 ns;
       SIM_SPEEDUP_G          : boolean                   := false;
       SIMULATION_G           : boolean                   := false;
+      DAQMUX_DECIMATOR_EN_G  : boolean                   := true;
       MR_LCLS_APP_G          : boolean                   := true;
       WAVEFORM_TDATA_BYTES_G : positive                  := 4;
       TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";  -- "AXIL"
@@ -285,7 +286,7 @@ begin
          generic map (
             TPD_G                  => TPD_G,
             AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
-            DECIMATOR_EN_G         => true,
+            DECIMATOR_EN_G         => DAQMUX_DECIMATOR_EN_G,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
             N_DATA_IN_G            => 24,
             N_DATA_OUT_G           => 4)
