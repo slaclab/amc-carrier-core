@@ -38,7 +38,7 @@ entity AppTop is
       SIM_SPEEDUP_G          : boolean                   := false;
       SIMULATION_G           : boolean                   := false;
       DAQMUX_DECIMATOR_EN_G  : boolean                   := true;
-      MR_LCLS_APP_G          : boolean                   := true;
+      MR_LCLS_APP_G          : boolean                   := false;
       WAVEFORM_TDATA_BYTES_G : positive                  := 4;
       TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";  -- "AXIL"
       AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
