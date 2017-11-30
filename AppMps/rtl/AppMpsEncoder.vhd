@@ -103,10 +103,10 @@ architecture mapping of AppMpsEncoder is
 
    signal mpsReg : MpsAppRegType;
 
-   signal mpsCoreRegDin  : slv(MPS_CORE_REG_BITS_C-1 downto 0);
-   signal mpsCoreRegDout : slv(MPS_CORE_REG_BITS_C-1 downto 0);
-
 begin
+
+   -- Output core reg
+   mpsCoreReg <= mpsReg.mpsCore;
 
    --------------------------------- 
    -- Registers
@@ -253,22 +253,6 @@ begin
          mpsMaster  => mpsMaster,
          mpsSlave   => mpsSlave
          );
-
-   --------------------------------- 
-   -- Synchronize core registers to diagnostic clock
-   --------------------------------- 
-   U_MpsRegSync : entity work.SynchronizerVector
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => MPS_CORE_REG_BITS_C)
-      port map (
-         clk     => axilClk,
-         rst     => axilRst,
-         dataIn  => mpsCoreRegDin,
-         dataOut => mpsCoreRegDout);
-
-   mpsCoreRegDin <= toSlv(mpsReg.mpsCore);
-   mpsCoreReg    <= toMpsCoreReg(mpsCoreRegDout);
 
 end mapping;
 
