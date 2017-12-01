@@ -39,6 +39,7 @@ entity RtmCryoDet is
       -- Digital I/O Interface
       startRamp       : out   sl;
       selectRamp      : out   sl;
+      rampCnt         : out   slv(31 downto 0);
       -- AXI-Lite
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -289,6 +290,7 @@ begin
 
       -- Outputs
       startRamp <= r.startRamp;
+      rampCnt   <= r.rampCnt;
 
    end process comb;
 
