@@ -88,7 +88,7 @@ architecture mapping of AppMpsEncoder is
 
       -- Threshold is exceeded. Set current bit and set 8 bit shift vector
       if (thold.maxTholdEn = '1' and signedVal > signedMax) or
-         (thold.minTholdEn = '1' and signedVal > signedMin) then
+         (thold.minTholdEn = '1' and signedVal < signedMin) then
 
          tholdMemOut := (others=>'1');
          mpsMsg.message(config.BYTE_MAP_C)(bitPos) := '1';
