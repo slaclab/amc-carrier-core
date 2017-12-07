@@ -203,9 +203,9 @@ begin
       m := MPS_SELECT_INIT_C;
       m.valid := mpsSelvalid;
 
-      assigRecord(i,mpsSelDout,m.timeStamp);
-      assigRecord(i,mpsSelDout,m.selectIdle);
-      assigRecord(i,mpsSelDout,m.selectAlt);
+      assignRecord(i,mpsSelDout,m.timeStamp);
+      assignRecord(i,mpsSelDout,m.selectIdle);
+      assignRecord(i,mpsSelDout,m.selectAlt);
 
       if APP_CONFIG_G.DIGITAL_EN_C then
          assignRecord(i,mpsSelDout,m.digitalBus);
