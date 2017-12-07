@@ -153,9 +153,10 @@ begin
    -- Thresholds
    --------------------------------- 
    comb : process (axilRst, mpsReg, mpsSelect, r) is
-      variable v     : RegType;
-      variable chan  : integer;
-      variable thold : integer;
+      variable v       : RegType;
+      variable chan    : integer;
+      variable thold   : integer;
+      variable msgData : Slv8Array(APP_CONFIG_C.BYTE_COUNT_C-1 downto 0);
    begin
       -- Latch the current value
       v := r;
@@ -168,13 +169,13 @@ begin
       v.mpsMessage.appId     := resize(mpsReg.mpsCore.mpsAppId,16);
       v.mpsMessage.valid     := mpsSelect.valid and mpsReg.mpsCore.mpsEnable;
 
+      -- Init message data
+      msgData := (others=>(others=>'0'));
+
       -- Digtal Application
       if APP_CONFIG_C.DIGITAL_EN_C = true then
          v.mpsMessage.inputType := '0';
-
-         for i in 0 to APP_CONFIG_C.BYTE_COUNT_C-1 loop
-            v.mpsMessage.message(i) := mpsSelect.digitalBus(i*8+7 downto i*8);
-         end loop;
+         msgData(0) := mpsSelect.digitalBus;
 
       -- Analog Process each enabled channel
       else
@@ -188,7 +189,7 @@ begin
                -- Channel is marked in error, set all bits
                if mpsSelect.mpsError(chan) = '1' then
                   for i in 0 to 7 loop
-                     v.mpsMessage.message(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C)(i) := '1';
+                     msgData(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C)(i) := '1';
                      v.tholdMem(chan,0) := (others=>'1');
                   end loop;
 
@@ -196,13 +197,13 @@ begin
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.mpsCore.lcls1Mode = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 mpsSelect.chanData(chan), 0, r.tholdMem(chan,0), v.tholdMem(chan,0), v.mpsMessage.message);
+                                 mpsSelect.chanData(chan), 0, r.tholdMem(chan,0), v.tholdMem(chan,0), msgData);
 
                -- LCLS2 idle table
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold, 
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 mpsSelect.chanData(chan), 7, r.tholdMem(chan,7), v.tholdMem(chan,7), v.mpsMessage.message);
+                                 mpsSelect.chanData(chan), 7, r.tholdMem(chan,7), v.tholdMem(chan,7), msgData);
 
                -- Multiple thresholds
                else
@@ -212,19 +213,22 @@ begin
                      if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
                         compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold), 
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan,thold), v.tholdMem(chan,thold), v.mpsMessage.message);
+                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan,thold), v.tholdMem(chan,thold), msgData);
 
                      -- Standard table
                      else
                         compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold), 
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan,thold), v.tholdMem(chan,thold), v.mpsMessage.message);
+                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan,thold), v.tholdMem(chan,thold), msgData);
                      end if;
                   end loop;
                end if;
             end if;
          end loop;
       end if;
+
+      -- Update message data
+      v.mpsMessage.message(APP_CONFIG_C.BYTE_COUNT_C-1 downto 0) := msgData;
 
       -- Synchronous Reset
       if (axilRst = '1') then
