@@ -103,10 +103,10 @@ architecture mapping of AppMpsEncoder is
 
    signal mpsReg : MpsAppRegType;
 
-   attribute MARK_DEBUG : string;
-   attribute MARK_DEBUG of r         : signal is "TRUE";
-   attribute MARK_DEBUG of mpsMaster : signal is "TRUE";
-   attribute MARK_DEBUG of mpsSlave  : signal is "TRUE";
+--   attribute MARK_DEBUG : string;
+--   attribute MARK_DEBUG of r         : signal is "TRUE";
+--   attribute MARK_DEBUG of mpsMaster : signal is "TRUE";
+--   attribute MARK_DEBUG of mpsSlave  : signal is "TRUE";
 
 begin
 
