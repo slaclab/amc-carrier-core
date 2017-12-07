@@ -319,7 +319,7 @@ package body AppMpsPkg is
       variable ret : MpsMessageType;
    begin
       ret := MPS_MESSAGE_INIT_C;
-      ret.msgSize = toSlv(msgSize,8);
+      ret.msgSize := toSlv(msgSize,8);
 
       return ret;
    end function;
