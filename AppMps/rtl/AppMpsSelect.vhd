@@ -150,26 +150,26 @@ begin
    ------------------------------------ 
 
    -- Data Input
-   process(mpsSelect) is
+   process(r.mpsSelect) is
       variable i   : integer;
-      variable vec : slv(MPS_SELECT_BITS_C);
+      variable vec : slv(MPS_SELECT_BITS_C-1 downto 0);
    begin
 
       i   := 0;
       vec := (others=>'0');
 
-      assignSlv(i,vec,mpsSelect.timeStamp);
-      assignSlv(i,vec,mpsSelect.selectIdle);
-      assignSlv(i,vec,mpsSelect.selectAlt);
+      assignSlv(i,vec,r.mpsSelect.timeStamp);
+      assignSlv(i,vec,r.mpsSelect.selectIdle);
+      assignSlv(i,vec,r.mpsSelect.selectAlt);
 
-      if APP_CONFIG_C.DIGITAL_EN_C then
-         assignSlv(i,vec,mpsSelect.digitalBus);
+      if APP_CONFIG_G.DIGITAL_EN_C then
+         assignSlv(i,vec,r.mpsSelect.digitalBus);
       else
          for j in 0 to MPS_CHAN_COUNT_C-1 loop
-            if APP_CONFIG_C.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
-               assignSlv(i,vec,mpsSelect.mpsError(j));
-               assignSlv(i,vec,mpsSelect.mpsIgnore(j));
-               assignSlv(i,vec,mpsSelect.chanData(j));
+            if APP_CONFIG_G.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
+               assignSlv(i,vec,r.mpsSelect.mpsError(j));
+               assignSlv(i,vec,r.mpsSelect.mpsIgnore(j));
+               assignSlv(i,vec,r.mpsSelect.chanData(j));
             end if;
          end loop;
       end if;
@@ -207,11 +207,11 @@ begin
       assigRecord(i,mpsSelDout,m.selectIdle);
       assigRecord(i,mpsSelDout,m.selectAlt);
 
-      if APP_CONFIG_C.DIGITAL_EN_C then
+      if APP_CONFIG_G.DIGITAL_EN_C then
          assignRecord(i,mpsSelDout,m.digitalBus);
       else
          for j in 0 to MPS_CHAN_COUNT_C-1 loop
-            if APP_CONFIG_C.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
+            if APP_CONFIG_G.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
                assignRecord(i,mpsSelDout,m.mpsError(j));
                assignRecord(i,mpsSelDout,m.mpsIgnore(j));
                assignRecord(i,mpsSelDout,m.chanData(j));
