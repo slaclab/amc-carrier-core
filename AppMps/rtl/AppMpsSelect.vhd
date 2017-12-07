@@ -171,7 +171,7 @@ begin
                assignSlv(i,vec,mpsSelect.mpsIgnore(j));
                assignSlv(i,vec,mpsSelect.chanData(j));
             end if;
-         end if;
+         end loop;
       end if;
 
       mpsSelDin <= vec;
@@ -216,7 +216,7 @@ begin
                assignRecord(i,mpsSelDout,m.mpsIgnore(j));
                assignRecord(i,mpsSelDout,m.chanData(j));
             end if;
-         end if;
+         end loop;
       end if;
 
       mpsSelect <= m;
