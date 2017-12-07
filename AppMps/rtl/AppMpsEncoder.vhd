@@ -63,7 +63,7 @@ architecture mapping of AppMpsEncoder is
 
    constant REG_INIT_C : RegType := (
       tholdMem   => (others=>(others=>(others=>'0'))),
-      mpsMessage => MPS_MESSAGE_INIT_C);
+      mpsMessage => mpsMessageInit(APP_CONFIG_C.BYTE_COUNT_C));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -161,13 +161,12 @@ begin
       v := r;
 
       -- Init and setup MPS message
-      v.mpsMessage                   := MPS_MESSAGE_INIT_C;
-      v.mpsMessage.version           := mpsReg.mpsCore.mpsVersion;
-      v.mpsMessage.lcls              := mpsReg.mpsCore.lcls1Mode;
-      v.mpsMessage.timeStamp         := mpsSelect.timeStamp;
-      v.mpsMessage.appId(9 downto 0) := mpsReg.mpsCore.mpsAppId;
-      v.mpsMessage.msgSize           := toSlv(APP_CONFIG_C.BYTE_COUNT_C, 8);
-      v.mpsMessage.valid             := mpsSelect.valid and mpsReg.mpsCore.mpsEnable;
+      v.mpsMessage           := mpsMessageInit(APP_CONFIG_C.BYTE_COUNT_C);
+      v.mpsMessage.version   := mpsReg.mpsCore.mpsVersion;
+      v.mpsMessage.lcls      := mpsReg.mpsCore.lcls1Mode;
+      v.mpsMessage.timeStamp := mpsSelect.timeStamp;
+      v.mpsMessage.appId     := resize(mpsReg.mpsCore.mpsAppId,16);
+      v.mpsMessage.valid     := mpsSelect.valid and mpsReg.mpsCore.mpsEnable;
 
       -- Digtal Application
       if APP_CONFIG_C.DIGITAL_EN_C = true then

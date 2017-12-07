@@ -86,6 +86,8 @@ package AppMpsPkg is
    function toSlv (m : MpsMessageType) return slv;
    function toMpsMessage (vec : slv) return MpsMessageType;
 
+   function mpsMessageInit ( msgSize : integer ) return MpsMessageType;
+
    ---------------------------------------------------
    -- MPS Channel Configuration Constants
    ---------------------------------------------------   
@@ -311,6 +313,15 @@ package body AppMpsPkg is
       end loop;
 
       return m;
+   end function;
+
+   function mpsMessageInit ( msgSize : integer ) return MpsMessageType is
+      variable ret : MpsMessageType;
+   begin
+      ret := MPS_MESSAGE_INIT_C;
+      ret.msgSize = toSlv(msgSize,8);
+
+      return ret;
    end function;
 
    ---------------------------------------------------
