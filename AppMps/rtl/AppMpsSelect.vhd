@@ -52,7 +52,7 @@ architecture mapping of AppMpsSelect is
    -- Compute select record size
    -- 16 bits + 8 bits for digital
    -- 16 bits + 34 * byte count for analog
-   constant MPS_SELECT_BITS_C : integer := 16 + ite(APP_CONFIG_G.DIGITAL_EN_C, 8, APP_CONFIG_G.BYTE_COUNT_C*34);
+   constant MPS_SELECT_BITS_C : integer := 18 + ite(APP_CONFIG_G.DIGITAL_EN_C, 8, APP_CONFIG_G.BYTE_COUNT_C*34);
 
    type RegType is record
       mpsSelect  : MpsSelectType;
