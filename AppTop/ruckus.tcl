@@ -21,7 +21,10 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
       #loadIpCore -path "$::DIR_PATH/coregen/xcku040_mpsln/AppTopJesd204bCoregen.xci"
    }
    
-} elseif { $::env(PRJ_PART) == "XCKU060-FFVA1156-2-E" } { 
+} elseif {  $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} ||
+            $::env(PRJ_PART) eq {XCKU060-FFVA1156-3-E} ||
+            $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} ||
+            $::env(PRJ_PART) eq {XCKU095-FFVA1156-3-E} } {
 
    loadSource      -dir  "$::DIR_PATH/rtl/xcku060"
    loadConstraints -path  "$::DIR_PATH/xdc/AppTopXCKU060.xdc"
