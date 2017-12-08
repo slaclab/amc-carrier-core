@@ -62,7 +62,7 @@ entity AmcCarrierCoreBase is
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
       diagnosticBus        : in    DiagnosticBusType;
-      mpsCoreReg           : out   MpsCoreRegType;
+      mpsCoreReg           : out   MpsCoreRegType; -- Async, must be synchronized
       --  Waveform Capture interface (waveformClk domain)
       waveformClk          : out   sl;
       waveformRst          : out   sl;
@@ -961,6 +961,7 @@ begin
          axilReadSlave   => mpsReadSlave,
          axilWriteMaster => mpsWriteMaster,
          axilWriteSlave  => mpsWriteSlave,
+         mpsCoreReg      => mpsCoreReg,
          -- -- System Status
          -- bsiBus          => bsiBus,
          -- ethLinkUp       => ethLinkUp,
@@ -973,7 +974,6 @@ begin
          -- Diagnostic Interface (diagnosticClk domain)
          diagnosticClk   => diagnosticClk,
          diagnosticRst   => diagnosticRst,
-         mpsCoreReg      => mpsCoreReg,
          diagnosticBus   => diagnosticBus,
          -- MPS Interface
          mpsObMasters    => mpsObMasters,

@@ -86,6 +86,8 @@ package AppMpsPkg is
    function toSlv (m : MpsMessageType) return slv;
    function toMpsMessage (vec : slv) return MpsMessageType;
 
+   function mpsMessageInit ( msgSize : integer ) return MpsMessageType;
+
    ---------------------------------------------------
    -- MPS Channel Configuration Constants
    ---------------------------------------------------   
@@ -202,14 +204,12 @@ package AppMpsPkg is
    ---------------------------------------------------
    -- MPS Select Data
    ---------------------------------------------------   
-   constant MPS_SELECT_BITS_C : integer := 82 + (MPS_CHAN_COUNT_C*34);
-
    type MpsSelectType is record
       valid      : sl;
       timeStamp  : slv(15 downto 0);
       selectIdle : sl;
       selectAlt  : sl;
-      digitalBus : slv(63 downto 0);
+      digitalBus : slv(7 downto 0);
       mpsError   : slv(MPS_CHAN_COUNT_C-1 downto 0);
       mpsIgnore  : slv(MPS_CHAN_COUNT_C-1 downto 0);
       chanData   : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
@@ -224,9 +224,6 @@ package AppMpsPkg is
       mpsError   => (others => '0'),
       mpsIgnore  => (others => '0'),
       chanData   => (others => (others => '0')));
-
-   function toSlv (m : MpsSelectType) return slv;
-   function toMpsSelect (vec : slv; valid : sl) return MpsSelectType;
 
    ---------------------------------------------------
    -- MPS Configuration Function
@@ -313,6 +310,15 @@ package body AppMpsPkg is
       return m;
    end function;
 
+   function mpsMessageInit ( msgSize : integer ) return MpsMessageType is
+      variable ret : MpsMessageType;
+   begin
+      ret := MPS_MESSAGE_INIT_C;
+      ret.msgSize := toSlv(msgSize,8);
+
+      return ret;
+   end function;
+
    ---------------------------------------------------
    -- MPS Core Registers
    ---------------------------------------------------   
@@ -338,49 +344,6 @@ package body AppMpsPkg is
       assignRecord(i, vec, m.mpsAppId);
       assignRecord(i, vec, m.mpsVersion);
       assignRecord(i, vec, m.lcls1Mode);
-
-      return m;
-   end function;
-
-   ---------------------------------------------------
-   -- MPS Select Data
-   ---------------------------------------------------   
-   function toSlv (m : MpsSelectType) return slv is
-      variable vector : slv(MPS_SELECT_BITS_C-1 downto 0) := (others => '0');
-      variable i      : integer                           := 0;
-   begin
-
-      assignSlv(i, vector, m.timeStamp);
-      assignSlv(i, vector, m.selectIdle);
-      assignSlv(i, vector, m.selectAlt);
-      assignSlv(i, vector, m.digitalBus);
-      assignSlv(i, vector, m.mpsError);
-      assignSlv(i, vector, m.mpsIgnore);
-
-      for j in 0 to MPS_CHAN_COUNT_C-1 loop
-         assignSlv(i, vector, m.chanData(j));
-      end loop;
-
-      return vector;
-   end function;
-
-   function toMpsSelect (vec : slv; valid : sl) return MpsSelectType is
-      variable m : MpsSelectType;
-      variable i : integer := 0;
-   begin
-
-      assignRecord(i, vec, m.timeStamp);
-      assignRecord(i, vec, m.selectIdle);
-      assignRecord(i, vec, m.selectAlt);
-      assignRecord(i, vec, m.digitalBus);
-      assignRecord(i, vec, m.mpsError);
-      assignRecord(i, vec, m.mpsIgnore);
-
-      for j in 0 to MPS_CHAN_COUNT_C-1 loop
-         assignRecord(i, vec, m.chanData(j));
-      end loop;
-
-      m.valid := valid;
 
       return m;
    end function;
