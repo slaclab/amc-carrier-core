@@ -46,7 +46,8 @@ package AmcCarrierPkg is
    -- 11/14/2017 (0x02000500): 2.0.5 release
    -- 11/17/2017 (0x02000600): 2.0.6 release
    -- 12/04/2017 (0x02000700): 2.0.7 release
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_00_07_00";
+   -- 12/11/2017 (0x02000700): 2.0.8 release
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_00_08_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types

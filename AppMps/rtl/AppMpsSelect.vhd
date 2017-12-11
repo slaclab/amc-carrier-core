@@ -49,23 +49,26 @@ end AppMpsSelect;
 
 architecture mapping of AppMpsSelect is
 
+   -- Compute select record size
+   -- 16 bits + 8 bits for digital
+   -- 16 bits + 34 * byte count for analog
+   constant MPS_SELECT_BITS_C : integer := 18 + ite(APP_CONFIG_G.DIGITAL_EN_C, 8, APP_CONFIG_G.BYTE_COUNT_C*34);
+
    type RegType is record
-      mpsMessage : MpsMessageType;
       mpsSelect  : MpsSelectType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      mpsMessage => MPS_MESSAGE_INIT_C,
       mpsSelect  => MPS_SELECT_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal beamDestInt    : slv(15 downto 0);
-   signal altDestInt     : slv(15 downto 0);
-   signal mpsSelectDin   : slv(MPS_SELECT_BITS_C-1 downto 0);
-   signal mpsSelectDout  : slv(MPS_SELECT_BITS_C-1 downto 0);
-   signal mpsSelectValid : sl;
+   signal beamDestInt : slv(15 downto 0);
+   signal altDestInt  : slv(15 downto 0);
+   signal mpsSelDin   : slv(MPS_SELECT_BITS_C-1 downto 0);
+   signal mpsSelDout  : slv(MPS_SELECT_BITS_C-1 downto 0);
+   signal mpsSelValid : sl;
 
 begin
 
@@ -88,12 +91,12 @@ begin
    -- Thresholds
    --------------------------------- 
    comb : process (altDestInt, beamDestInt, diagnosticBus, diagnosticRst, r) is
-      variable v        : RegType;
-      variable chan     : integer;
-      variable thold    : integer;
-      variable beamEn   : boolean;
-      variable altEn    : boolean;
-      variable beamDest : slv(15 downto 0);
+      variable v         : RegType;
+      variable chan      : integer;
+      variable thold     : integer;
+      variable beamEn    : boolean;
+      variable altEn     : boolean;
+      variable beamDest  : slv(15 downto 0);
    begin
       -- Latch the current value
       v := r;
@@ -122,10 +125,8 @@ begin
       v.mpsSelect.selectAlt := ite(((beamDest and altDestInt) /= 0),'1','0');
       
       -- Digital APP
-      if APP_CONFIG_G.DIGITAL_EN_C then
-         v.mpsSelect.digitalBus(3 downto 0) := diagnosticBus.data(30)(3 downto 0);
-         v.mpsSelect.digitalBus(7 downto 4) := diagnosticBus.data(31)(3 downto 0);
-      end if;
+      v.mpsSelect.digitalBus(3 downto 0) := diagnosticBus.data(30)(3 downto 0);
+      v.mpsSelect.digitalBus(7 downto 4) := diagnosticBus.data(31)(3 downto 0);
 
       -- Synchronous Reset
       if (diagnosticRst = '1') then
@@ -147,6 +148,36 @@ begin
    ------------------------------------ 
    -- Output Synchronization Module
    ------------------------------------ 
+
+   -- Data Input
+   process(r.mpsSelect) is
+      variable i   : integer;
+      variable vec : slv(MPS_SELECT_BITS_C-1 downto 0);
+   begin
+
+      i   := 0;
+      vec := (others=>'0');
+
+      assignSlv(i,vec,r.mpsSelect.timeStamp);
+      assignSlv(i,vec,r.mpsSelect.selectIdle);
+      assignSlv(i,vec,r.mpsSelect.selectAlt);
+
+      if APP_CONFIG_G.DIGITAL_EN_C then
+         assignSlv(i,vec,r.mpsSelect.digitalBus);
+      else
+         for j in 0 to MPS_CHAN_COUNT_C-1 loop
+            if APP_CONFIG_G.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
+               assignSlv(i,vec,r.mpsSelect.mpsError(j));
+               assignSlv(i,vec,r.mpsSelect.mpsIgnore(j));
+               assignSlv(i,vec,r.mpsSelect.chanData(j));
+            end if;
+         end loop;
+      end if;
+
+      mpsSelDin <= vec;
+   end process;
+
+   -- FIFO
    U_SyncFifo : entity work.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
@@ -157,13 +188,39 @@ begin
          -- Write Ports (wr_clk domain)
          wr_clk => diagnosticClk,
          wr_en  => r.mpsSelect.valid,
-         din    => mpsSelectDin,
+         din    => mpsSelDin,
          rd_clk => axilClk,
-         valid  => mpsSelectValid,
-         dout   => mpsSelectDout);
+         valid  => mpsSelValid,
+         dout   => mpsSelDout);
 
-   mpsSelectDin <= toSlv (r.mpsSelect);
-   mpsSelect    <= toMpsSelect (mpsSelectDout, mpsSelectValid);
+   -- Data Output
+   process(mpsSelValid, mpsSelDout) is
+      variable i : integer;
+      variable m : MpsSelectType;
+   begin
+
+      i := 0;
+      m := MPS_SELECT_INIT_C;
+      m.valid := mpsSelvalid;
+
+      assignRecord(i,mpsSelDout,m.timeStamp);
+      assignRecord(i,mpsSelDout,m.selectIdle);
+      assignRecord(i,mpsSelDout,m.selectAlt);
+
+      if APP_CONFIG_G.DIGITAL_EN_C then
+         assignRecord(i,mpsSelDout,m.digitalBus);
+      else
+         for j in 0 to MPS_CHAN_COUNT_C-1 loop
+            if APP_CONFIG_G.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
+               assignRecord(i,mpsSelDout,m.mpsError(j));
+               assignRecord(i,mpsSelDout,m.mpsIgnore(j));
+               assignRecord(i,mpsSelDout,m.chanData(j));
+            end if;
+         end loop;
+      end if;
+
+      mpsSelect <= m;
+   end process;
 
 end mapping;
 
