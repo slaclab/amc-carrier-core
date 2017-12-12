@@ -182,7 +182,6 @@ begin
             TPD_G            => TPD_G,
             EN_WDT_G         => true,
             -- XAUI Configurations
-            XAUI_20GIGE_G    => false,
             REF_CLK_FREQ_G   => AXI_CLK_FREQ_C,
             -- AXI-Lite Configurations
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,

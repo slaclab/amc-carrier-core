@@ -2,12 +2,17 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 ## Check for submodule tagging
-if { [SubmoduleCheck {ruckus}             {1.5.4} ] < 0 } {exit -1}
+if { [SubmoduleCheck {ruckus}             {1.5.5} ] < 0 } {exit -1}
 if { [SubmoduleCheck {surf}               {1.4.8} ] < 0 } {exit -1}
-if { [SubmoduleCheck {lcls-timing-core}   {1.7.3} ] < 0 } {exit -1}
+if { [SubmoduleCheck {lcls-timing-core}   {1.7.4} ] < 0 } {exit -1}
 
 ## Check for version 2016.4 of Vivado
-if { [VersionCheck 2016.4 "mustBeExact"] < 0 } {exit -1}
+if { [VersionCheck 2016.4] < 0 } {
+   ## Check for version 2017.3 of Vivado
+   if { [VersionCheck 2017.3 "mustBeExact"] < 0 } {
+      exit -1
+   }
+}
 
 # Check if required variables exist
 if { [info exists ::env(AMC_ADV_BUILD)] != 1 }  {puts "\n\nERROR: AMC_ADV_BUILD is not defined in $::env(PROJ_DIR)/Makefile\n\n";   exit -1}

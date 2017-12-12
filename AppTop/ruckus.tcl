@@ -21,7 +21,8 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
       #loadIpCore -path "$::DIR_PATH/coregen/xcku040_mpsln/AppTopJesd204bCoregen.xci"
    }
    
-} elseif { $::env(PRJ_PART) == "XCKU060-FFVA1156-2-E" } { 
+} elseif {  $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} ||
+            $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {
 
    loadSource      -dir  "$::DIR_PATH/rtl/xcku060"
    loadConstraints -path  "$::DIR_PATH/xdc/AppTopXCKU060.xdc"
@@ -32,8 +33,16 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
    loadSource  -path "$::DIR_PATH/coregen/xcku060/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.dcp"
    #loadIpCore -path "$::DIR_PATH/coregen/xcku060/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.xci"   
    
+   
+#############################################################
+# Placeholder for future Kintex Ultrascale+ Support         #
+#############################################################
+
+# } elseif {  $::env(PRJ_PART) eq {XCKU11P-FFVA1156-3-E} ||
+            # $::env(PRJ_PART) eq {XCKU15P-FFVA1156-3-E} } {
+   
 } else { 
-   puts "\n\nERROR: PRJ_PART was not defined as 'XCKU040-FFVA1156-2-E' or 'XCKU060-FFVA1156-2-E' in the Makefile\n\n"; exit -1
+   puts "\n\nERROR: Invalid PRJ_PART was defined in the Makefile\n\n"; exit -1
 }
 
 

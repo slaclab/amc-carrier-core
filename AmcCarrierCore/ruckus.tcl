@@ -1,6 +1,9 @@
 # Load RUCKUS environment and library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
+# Get the family type
+set family [getFpgaFamily]
+
 # Load local Source Code and constraints
 loadSource -path "$::DIR_PATH/core/AmcCarrierBsi.vhd"
 loadSource -path "$::DIR_PATH/core/AmcCarrierPkg.vhd"
