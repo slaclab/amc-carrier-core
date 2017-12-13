@@ -78,7 +78,7 @@ architecture mapping of RtmDigitalDebugV1 is
 
 begin
 
-   U_unusedRefClk : IBUFDS_GTE3
+   U_unusedRefClk : entity work.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O

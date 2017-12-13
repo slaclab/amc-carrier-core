@@ -10,6 +10,7 @@ loadSource -path "$::DIR_PATH/core/AmcCarrierPkg.vhd"
 loadSource -path "$::DIR_PATH/core/AmcCarrierSysMon.vhd"
 loadSource -path "$::DIR_PATH/core/AmcCarrierSysReg.vhd"
 loadSource -path "$::DIR_PATH/core/AmcCarrierSysRegPkg.vhd"
+loadSource -dir  "$::DIR_PATH/core/${family}"
 loadSource -path "$::DIR_PATH/ip/SysMonCore.dcp"
 
 # Check for advance build, which bypasses the pre-built .DCP file

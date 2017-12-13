@@ -205,7 +205,7 @@ begin
    --------------------------------
    -- Common Clock and Reset Module
    -------------------------------- 
-   U_IBUFDS : IBUFDS_GTE3
+   U_IBUFDS : entity work.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O

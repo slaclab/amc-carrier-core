@@ -166,7 +166,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Clock Buffers
    -------------------------------------------------------------------------------------------------
-   TIMING_REFCLK_IBUFDS_GTE3 : IBUFDS_GTE3
+   TIMING_REFCLK_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
