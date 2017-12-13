@@ -1,16 +1,28 @@
 # Load RUCKUS environment and library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
-## Check for submodule tagging
+# Get the family type
+set family [getFpgaFamily]
+
+# Check for submodule tagging
 if { [SubmoduleCheck {ruckus}             {1.5.5} ] < 0 } {exit -1}
 if { [SubmoduleCheck {surf}               {1.4.8} ] < 0 } {exit -1}
 if { [SubmoduleCheck {lcls-timing-core}   {1.7.4} ] < 0 } {exit -1}
 
-## Check for version 2016.4 of Vivado
-if { [VersionCheck 2016.4] < 0 } {
+# Check for Kintex Ultrascale+
+if { ${family} == "kintexuplus" } {
    ## Check for version 2017.3 of Vivado
    if { [VersionCheck 2017.3 "mustBeExact"] < 0 } {
       exit -1
+   }
+# Else Kintex Ultrascale
+} else {
+   # Check for version 2016.4 of Vivado
+   if { [VersionCheck 2016.4] < 0 } {
+      ## Check for version 2017.3 of Vivado
+      if { [VersionCheck 2017.3 "mustBeExact"] < 0 } {
+         exit -1
+      }
    }
 }
 

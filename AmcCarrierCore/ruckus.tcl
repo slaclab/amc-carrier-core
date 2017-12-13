@@ -13,8 +13,10 @@ loadSource -path "$::DIR_PATH/core/AmcCarrierSysRegPkg.vhd"
 loadSource -path "$::DIR_PATH/ip/SysMonCore.dcp"
 
 # Check for advance build, which bypasses the pre-built .DCP file
-if {  $::env(AMC_ADV_BUILD)  == 1 } {
-
+if { $::env(AMC_ADV_BUILD)  == 1 ||
+     $::env(RTM_ETH)        == 1 ||
+     ${family} eq {kintexuplus} } {
+     
    # Check for FSBL
    if { [info exists ::env(AMC_FSBL)] == 1 }  {
       loadSource -dir "$::DIR_PATH/fsbl"
@@ -33,7 +35,14 @@ if {  $::env(AMC_ADV_BUILD)  == 1 } {
    loadSource   -path "$::DIR_PATH/ip/MigCore.dcp"
    # loadIpCore -path "$::DIR_PATH/ip/MigCore.xci"
    
-   loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePorts.xdc" 
+   # Check for Kintex Ultrascale+
+   if { ${family} == "kintexuplus" } {
+      loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePorts_gen2.xdc" 
+   # Else Kintex Ultrascale
+   } else {
+      loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePorts_gen1.xdc" 
+   }   
+   
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreTiming.xdc" 
    
    # Check for FSBL
@@ -55,7 +64,14 @@ if {  $::env(AMC_ADV_BUILD)  == 1 } {
 
 # Add application ports and placement constraints
 loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePlacement.xdc" 
-loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierAppPorts.xdc" 
+
+# Check for Kintex Ultrascale+
+if { ${family} == "kintexuplus" } {
+   loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierAppPorts_gen2.xdc" 
+# Else Kintex Ultrascale
+} else {
+   loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierAppPorts_gen1.xdc" 
+}
 
 # Check for Application Microblaze build
 if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {

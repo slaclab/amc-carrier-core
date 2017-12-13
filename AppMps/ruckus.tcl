@@ -9,8 +9,11 @@ if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
 
    if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
       loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu040.xdc"
-   } else {
+   } elseif {  $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} ||
+               $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {
       loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu060.xdc"
+   } else {
+      loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu11p.xdc"
    }
 } else {
    loadConstraints -path "$::DIR_PATH/xdc/MpsLinkNodeSaltSerdes.xdc"
