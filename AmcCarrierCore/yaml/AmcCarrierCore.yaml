@@ -62,6 +62,14 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *AxiSy56040
       at:
         offset: 0x03000000      
+      children:
+        OutputConfig:
+          enums:
+            - { name: RTM_TIMING_IN0, value: 0 }
+            - { name: FPGA_TIMING_IN, value: 1 }
+            - { name: BP_TIMING_IN,   value: 2 }
+            - { name: RTM_TIMING_IN1, value: 3 }
+          description: "Crossbar Mux Selection"
       description: |
         Timing Crossbar:
         -----------------------------------------------------------------
@@ -83,7 +91,7 @@ AmcCarrierCore: &AmcCarrierCore
         OutputConfig[3] = 0x0: Connects Backplane DIST1 to RTM_TIMING_IN0
         OutputConfig[3] = 0x1: Connects Backplane DIST1 to FPGA_TIMING_IN
         OutputConfig[3] = 0x2: Connects Backplane DIST1 to BP_TIMING_IN
-        OutputConfig[3] = 0x3: Connects Backplane DIST1 to RTM_TIMING_IN1         
+        OutputConfig[3] = 0x3: Connects Backplane DIST1 to RTM_TIMING_IN1
         -----------------------------------------------------------------
     ##################################################
     Axi24LC64FT:
@@ -153,8 +161,8 @@ AmcCarrierCore: &AmcCarrierCore
     SwUdpServer:
       <<: *UdpEngineServer
       at:
-        offset: 0x0A000808
-        nelms: 2
+        offset: 0x0A000800
+        nelms: 4
         stride: 8         
       description: "SwUdpServer"       
     ##################################################

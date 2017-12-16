@@ -69,7 +69,7 @@ entity AmcCarrierCoreAdv is
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
       diagnosticBus        : in    DiagnosticBusType;
-      mpsCoreReg           : out   MpsCoreRegType;
+      mpsCoreReg           : out   MpsCoreRegType; -- Async, must be synchronized
       --  Waveform Capture interface (waveformClk domain)
       waveformClk          : out   sl;
       waveformRst          : out   sl;
@@ -334,12 +334,13 @@ begin
          axilReadSlave   => mpsReadSlave,
          axilWriteMaster => mpsWriteMaster,
          axilWriteSlave  => mpsWriteSlave,
-         -- System Status
-         bsiBus          => bsiBus,
-         ethLinkUp       => ethLinkUp,
-         timingClk       => timingClk,
-         timingRst       => timingRst,
-         timingBus       => timingBusIntf,
+         mpsCoreReg      => mpsCoreReg,
+         -- -- System Status
+         -- bsiBus          => bsiBus,
+         -- ethLinkUp       => ethLinkUp,
+         -- timingClk       => timingClk,
+         -- timingRst       => timingRst,
+         -- timingBus       => timingBusIntf,
          ----------------------
          -- Top Level Interface
          ----------------------
@@ -347,7 +348,6 @@ begin
          diagnosticClk   => diagnosticClk,
          diagnosticRst   => diagnosticRst,
          diagnosticBus   => diagnosticBus,
-         mpsCoreReg      => mpsCoreReg,
          -- MPS Interface
          mpsObMasters    => mpsObMasters,
          mpsObSlaves     => mpsObSlaves,

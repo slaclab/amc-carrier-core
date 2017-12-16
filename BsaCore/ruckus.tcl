@@ -8,6 +8,10 @@ loadSource -dir  "$::DIR_PATH/rtl/"
 # Get the family type
 set family [getFpgaFamily]
 
+if { ${family} == "kintexuplus" } {
+   loadSource -path  "$::DIR_PATH/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp"
+}
+
 if { ${family} == "kintexu" } {
    loadSource -path  "$::DIR_PATH/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp"
 }

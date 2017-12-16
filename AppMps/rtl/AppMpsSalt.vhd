@@ -2,7 +2,7 @@
 -- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-10-19
+-- Last update: 2017-11-09
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ use unisim.vcomponents.all;
 entity AppMpsSalt is
    generic (
       TPD_G            : time            := 1 ns;
+      SIMULATION_G     : boolean         := false;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       MPS_SLOT_G       : boolean         := false);
@@ -64,6 +65,10 @@ entity AppMpsSalt is
       mpsIbRst        : in  sl;
       mpsIbMaster     : in  AxiStreamMasterType;
       mpsIbSlave      : out AxiStreamSlaveType;
+      -- Diagnostic Interface (diagnosticClk domain)
+      diagnosticClk   : in  sl;
+      diagnosticRst   : in  sl;
+      diagnosticBus   : in  DiagnosticBusType;
       ----------------------
       -- Top Level Interface
       ----------------------
@@ -88,6 +93,7 @@ architecture mapping of AppMpsSalt is
       cntRst         : sl;
       mpsPllRst      : sl;
       mpsPktCnt      : Slv32Array(14 downto 0);
+      srobeCnt       : slv(31 downto 0);
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
@@ -98,6 +104,7 @@ architecture mapping of AppMpsSalt is
       mpsPllRst      => '0',
       rollOverEn     => (others => '0'),
       mpsPktCnt      => (others => (others => '0')),
+      srobeCnt       => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -105,14 +112,29 @@ architecture mapping of AppMpsSalt is
    signal rin : RegType;
 
    signal iDelayCtrlRdy : sl;
+
    signal mpsTxLinkUp   : sl;
+   signal txPktSent    : sl;
    signal mpsTxPktSent  : sl;
+
    signal mpsRxLinkUp   : slv(14 downto 1);
+   signal rxPktRcvd    : slv(14 downto 1);
    signal mpsRxPktRcvd  : slv(14 downto 1);
+
    signal statusOut     : slv(STATUS_SIZE_C-1 downto 0);
    signal cntOut        : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
 
+   signal diagnosticstrobe : sl;
+
 begin
+
+   U_diagnosticstrobe : entity work.SynchronizerOneShot
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => axilClk,
+         dataIn  => diagnosticBus.strobe,
+         dataOut => diagnosticstrobe);
 
    APP_UNDEFINED : if (APP_TYPE_G = APP_NULL_TYPE_C) generate
 
@@ -150,6 +172,7 @@ begin
       U_SaltUltraScale : entity work.SaltUltraScale
          generic map (
             TPD_G               => TPD_G,
+            SIMULATION_G        => SIMULATION_G,
             TX_ENABLE_G         => true,   -- TX only
             RX_ENABLE_G         => false,  -- Not using RX path
             COMMON_TX_CLK_G     => false,
@@ -170,7 +193,7 @@ begin
             clk625MHz     => mps625MHzClk,
             iDelayCtrlRdy => '1',          -- Not using RX path
             linkUp        => mpsTxLinkUp,
-            txPktSent     => mpsTxPktSent,
+            txPktSent     => txPktSent,
             rxPktRcvd     => open,
             -- Slave Port
             sAxisClk      => mpsIbClk,
@@ -182,6 +205,14 @@ begin
             mAxisRst      => axilRst,
             mAxisMaster   => open,
             mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);
+
+      U_mpsTxPktSent : entity work.SynchronizerOneShot
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => axilClk,
+            dataIn  => txPktSent,
+            dataOut => mpsTxPktSent);
 
       GEN_VEC :
       for i in 14 downto 1 generate
@@ -244,6 +275,7 @@ begin
          U_SaltUltraScale : entity work.SaltUltraScale
             generic map (
                TPD_G               => TPD_G,
+               SIMULATION_G        => SIMULATION_G,
                TX_ENABLE_G         => false,
                RX_ENABLE_G         => true,
                COMMON_TX_CLK_G     => false,
@@ -265,7 +297,7 @@ begin
                iDelayCtrlRdy => iDelayCtrlRdy,
                linkUp        => mpsRxLinkUp(i),
                txPktSent     => open,
-               rxPktRcvd     => mpsRxPktRcvd(i),
+               rxPktRcvd     => rxPktRcvd(i),
                -- Slave Port
                sAxisClk      => axilClk,
                sAxisRst      => axilRst,
@@ -276,12 +308,22 @@ begin
                mAxisRst      => axilRst,
                mAxisMaster   => mpsObMasters(i),
                mAxisSlave    => mpsObSlaves(i));
+
+         U_mpsRxPktRcvd : entity work.SynchronizerOneShot
+            generic map (
+               TPD_G => TPD_G)
+            port map (
+               clk     => axilClk,
+               dataIn  => rxPktRcvd(i),
+               dataOut => mpsRxPktRcvd(i));
+
       end generate GEN_VEC;
 
    end generate;
 
    comb : process (axilReadMaster, axilRst, axilWriteMaster, cntOut,
-                   mpsPllLocked, mpsRxPktRcvd, mpsTxPktSent, r, statusOut) is
+                   diagnosticstrobe, mpsPllLocked, mpsRxPktRcvd, mpsTxPktSent,
+                   r, statusOut) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
       variable i      : natural;
@@ -309,6 +351,7 @@ begin
       axiSlaveRegisterR(regCon, x"704", 0, ite(MPS_SLOT_G, x"00000001", x"00000000"));
       axiSlaveRegisterR(regCon, x"708", 0, APP_TYPE_G);
       axiSlaveRegisterR(regCon, x"714", 0, mpsPllLocked);
+      axiSlaveRegisterR(regCon, x"718", 0, r.srobeCnt);
 
       -- Map the write registers
       axiSlaveRegister(regCon, x"FF0", 0, v.rollOverEn);
@@ -318,9 +361,9 @@ begin
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
 
-
       if (r.cntRst = '1') then
          v.mpsPktCnt := (others => (others => '0'));
+         v.srobeCnt  := (others => '0');
       else
          if (mpsTxPktSent = '1') then
             v.mpsPktCnt(0) := r.mpsPktCnt(0) + 1;
@@ -330,6 +373,9 @@ begin
                v.mpsPktCnt(i) := r.mpsPktCnt(i) + 1;
             end if;
          end loop;
+         if (diagnosticstrobe = '1') then
+            v.srobeCnt := r.srobeCnt + 1;
+         end if;
       end if;
 
       -- Synchronous Reset
@@ -356,6 +402,7 @@ begin
    U_mpsPllRst : entity work.PwrUpRst
       generic map (
          TPD_G      => TPD_G,
+         SIM_SPEEDUP_G => SIMULATION_G,
          DURATION_G => 125000000)
       port map (
          arst   => r.mpsPllRst,

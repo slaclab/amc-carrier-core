@@ -86,6 +86,8 @@ package AppMpsPkg is
    function toSlv (m : MpsMessageType) return slv;
    function toMpsMessage (vec : slv) return MpsMessageType;
 
+   function mpsMessageInit ( msgSize : integer ) return MpsMessageType;
+
    ---------------------------------------------------
    -- MPS Channel Configuration Constants
    ---------------------------------------------------   
@@ -202,14 +204,12 @@ package AppMpsPkg is
    ---------------------------------------------------
    -- MPS Select Data
    ---------------------------------------------------   
-   constant MPS_SELECT_BITS_C : integer := 82 + (MPS_CHAN_COUNT_C*34);
-
    type MpsSelectType is record
       valid      : sl;
       timeStamp  : slv(15 downto 0);
       selectIdle : sl;
       selectAlt  : sl;
-      digitalBus : slv(63 downto 0);
+      digitalBus : slv(7 downto 0);
       mpsError   : slv(MPS_CHAN_COUNT_C-1 downto 0);
       mpsIgnore  : slv(MPS_CHAN_COUNT_C-1 downto 0);
       chanData   : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
@@ -224,9 +224,6 @@ package AppMpsPkg is
       mpsError   => (others => '0'),
       mpsIgnore  => (others => '0'),
       chanData   => (others => (others => '0')));
-
-   function toSlv (m : MpsSelectType) return slv;
-   function toMpsSelect (vec : slv; valid : sl) return MpsSelectType;
 
    ---------------------------------------------------
    -- MPS Configuration Function
@@ -313,6 +310,15 @@ package body AppMpsPkg is
       return m;
    end function;
 
+   function mpsMessageInit ( msgSize : integer ) return MpsMessageType is
+      variable ret : MpsMessageType;
+   begin
+      ret := MPS_MESSAGE_INIT_C;
+      ret.msgSize := toSlv(msgSize,8);
+
+      return ret;
+   end function;
+
    ---------------------------------------------------
    -- MPS Core Registers
    ---------------------------------------------------   
@@ -343,49 +349,6 @@ package body AppMpsPkg is
    end function;
 
    ---------------------------------------------------
-   -- MPS Select Data
-   ---------------------------------------------------   
-   function toSlv (m : MpsSelectType) return slv is
-      variable vector : slv(MPS_SELECT_BITS_C-1 downto 0) := (others => '0');
-      variable i      : integer                           := 0;
-   begin
-
-      assignSlv(i, vector, m.timeStamp);
-      assignSlv(i, vector, m.selectIdle);
-      assignSlv(i, vector, m.selectAlt);
-      assignSlv(i, vector, m.digitalBus);
-      assignSlv(i, vector, m.mpsError);
-      assignSlv(i, vector, m.mpsIgnore);
-
-      for j in 0 to MPS_CHAN_COUNT_C-1 loop
-         assignSlv(i, vector, m.chanData(j));
-      end loop;
-
-      return vector;
-   end function;
-
-   function toMpsSelect (vec : slv; valid : sl) return MpsSelectType is
-      variable m : MpsSelectType;
-      variable i : integer := 0;
-   begin
-
-      assignRecord(i, vec, m.timeStamp);
-      assignRecord(i, vec, m.selectIdle);
-      assignRecord(i, vec, m.selectAlt);
-      assignRecord(i, vec, m.digitalBus);
-      assignRecord(i, vec, m.mpsError);
-      assignRecord(i, vec, m.mpsIgnore);
-
-      for j in 0 to MPS_CHAN_COUNT_C-1 loop
-         assignRecord(i, vec, m.chanData(j));
-      end loop;
-
-      m.valid := valid;
-
-      return m;
-   end function;
-
-   ---------------------------------------------------
    -- MPS Configuration Function
    ---------------------------------------------------   
    -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
@@ -399,21 +362,29 @@ package body AppMpsPkg is
          when APP_BPM_STRIPLINE_TYPE_C | APP_BPM_CAVITY_TYPE_C =>
             ret.BYTE_COUNT_C := 6;
 
-            for i in 0 to 2 loop
+            for i in 0 to 1 loop
 
-               -- Inputs 1, 2, 3
-               ret.CHAN_CONFIG_C(i+1).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i+1).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i+1).IDLE_EN_C     := ite(i=0,true,false); -- Charge
-               ret.CHAN_CONFIG_C(i+1).ALT_EN_C      := ite(i=1,true,false); -- x position
-               ret.CHAN_CONFIG_C(i+1).BYTE_MAP_C    := i; -- 0, 1, 2
+               -- Inputs 2 & 3 TMIT
+               ret.CHAN_CONFIG_C(2+i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(2+i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(2+i).IDLE_EN_C     := true;
+               ret.CHAN_CONFIG_C(2+i).ALT_EN_C      := false;
+               ret.CHAN_CONFIG_C(2+i).BYTE_MAP_C    := i; -- amc0 = 0 & amc1 = 1
 
-               -- Inputs 5, 6, 7
-               ret.CHAN_CONFIG_C(i+5).THOLD_COUNT_C := 4;
-               ret.CHAN_CONFIG_C(i+5).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i+5).IDLE_EN_C     := ite(i=0,true,false); -- Charge
-               ret.CHAN_CONFIG_C(i+5).ALT_EN_C      := ite(i=1,true,false); -- x position
-               ret.CHAN_CONFIG_C(i+5).BYTE_MAP_C    := i+3; -- 3, 4, 5
+               -- Inputs 4 & 5 X
+               ret.CHAN_CONFIG_C(4+i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(4+i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(4+i).IDLE_EN_C     := false;
+               ret.CHAN_CONFIG_C(4+i).ALT_EN_C      := true;
+               ret.CHAN_CONFIG_C(4+i).BYTE_MAP_C    := i+2; -- amc0 = 2 & amc1 = 3
+
+               -- Inputs 6 & 7 Y
+               ret.CHAN_CONFIG_C(6+i).THOLD_COUNT_C := 4;
+               ret.CHAN_CONFIG_C(6+i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(6+i).IDLE_EN_C     := false;
+               ret.CHAN_CONFIG_C(6+i).ALT_EN_C      := false;
+               ret.CHAN_CONFIG_C(6+i).BYTE_MAP_C    := i+4; -- amc0 = 4 & amc1 = 5
+
             end loop;
 
          when APP_BLEN_TYPE_C =>

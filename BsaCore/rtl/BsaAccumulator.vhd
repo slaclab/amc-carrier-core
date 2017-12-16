@@ -2,7 +2,7 @@
 -- File       : BsaAccumulator.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-29
--- Last update: 2017-04-11
+-- Last update: 2017-09-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -90,6 +90,7 @@ architecture rtl of BsaAccumulator is
       varExcepts    : slv       (NUM_ACCUMULATIONS_G-1 downto 0);
       fifoWrEn      : slv(2 downto 0);
       fifoDinP      : slv(2 downto 0);
+      underflow     : sl;
       overflow      : sl;
       tValid        : sl;
       tLast         : sl;
@@ -105,6 +106,7 @@ architecture rtl of BsaAccumulator is
      varExcepts     => (others=>'0'),
      fifoWrEn       => "000",
      fifoDinP       => "000",
+     underflow      => '0',
      overflow       => '0',
      tValid         => '0',
      tLast          => '0',
@@ -148,8 +150,6 @@ architecture rtl of BsaAccumulator is
 begin
 
    -- Maybe pass bsaDone on tUser so that we can track when it gets to ram.
-
-   -- Note: For now, bsaDone must coincide with the last bsaAvgDone
 
    fifoRst <= rst or bsaInit or not r.enabled;
    
@@ -382,7 +382,7 @@ begin
                    resNacc, resSum, resVar, ufSum, ofSum, ofVar, incDiag,
                    bsaInit, bsaActive, bsaAvgDone, bsaDone,
                    enable, accumulateEn, lastEn, fifoDout, axisSlave,
-                   fifoDoutP, fifoFull, fifoEmpty, fifoProgEmpty, fifoProgFull, fifoWrCount, fifoRdCount, r, rst) is
+                   fifoDoutP, fifoFull, fifoEmpty, fifoProgEmpty, fifoProgFull, fifoWrCount, fifoRdCount, fifoRdEn, r, rst) is
       variable v : RegType;
       variable vlast : sl;
    begin
@@ -456,14 +456,15 @@ begin
             v.sumExcepts(NUM_ACCUMULATIONS_G-1) := r.sumExcepts(0) or ufSum or ofSum;
             v.varExcepts(NUM_ACCUMULATIONS_G-1) := r.varExcepts(0) or ofVar(3) or diagnosticExc;
           end if;
-          -- Queue readout for bsaDone      
-          if (lastEn = '1' and bsaDone = '1') then
+          -- Queue readout for bsaDone (unless nothing to read)      
+          if (lastEn = '1' and bsaDone = '1' and fifoEmpty = '0') then
             v.done   := '1';
           end if;
-          -- Clear overflow between records
+          -- Clear under/overflow between records
           if lastEn = '1' then
-            v.overflow := '0';
-            v.enabled  := enable;
+            v.underflow := '0';
+            v.overflow  := '0';
+            v.enabled   := enable;
           end if;
           v.state     := DATA_S;
         when others => NULL;
@@ -476,6 +477,11 @@ begin
         v.enabled  := '0';
       end if;
 
+      if (fifoRdEn = '1' and fifoEmpty = '1') then
+        v.underflow := '1';
+        v.enabled   := '0';
+      end if;
+      
       if (r.tValid = '0' and fifoProgFull = '1') then
          v.tValid := '1';
       end if;
@@ -510,7 +516,7 @@ begin
       axisMaster.tDest              <= toSlv(BSA_NUMBER_G, 8);
       axisMaster.tKeep              <= X"00FF";
       axisMaster.tStrb              <= X"00FF";
-      axisMaster.tUser(14)          <= r.overflow or fifoEmpty;      -- EOFE
+      axisMaster.tUser(14)          <= r.overflow or r.underflow;    -- EOFE
       axisMaster.tUser(15)          <= r.trigger;                    -- TRIGGER
 
       ----------------------------------------------------------------------------------------------

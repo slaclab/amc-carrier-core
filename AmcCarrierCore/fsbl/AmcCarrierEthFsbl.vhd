@@ -142,9 +142,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          EN_WDT_G         => true,
-         -- XAUI Configurations
-         XAUI_20GIGE_G    => false,
-         REF_CLK_FREQ_G   => AXI_CLK_FREQ_C,
          -- AXI-Lite Configurations
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          -- AXI Streaming Configurations
@@ -166,7 +163,7 @@ begin
          -- Transceiver Debug Interface
          gtTxPreCursor  => (others => '0'),  -- 0 dB
          gtTxPostCursor => (others => '0'),  -- 0 dB
-         gtTxDiffCtrl   => x"FFFF",          -- 1.080 V
+         gtTxDiffCtrl   => (others => '1'),  -- 1.080 V
          gtRxPolarity   => x"0",
          gtTxPolarity   => x"0",
          -- MGT Clock Port (156.25 MHz)

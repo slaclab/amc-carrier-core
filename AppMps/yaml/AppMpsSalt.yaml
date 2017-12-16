@@ -108,6 +108,16 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 1
       description: MPS PLL Lock Status
     #########################################################
+    DiagnosticStrbCnt:
+      at:
+        offset: 0x718
+      class: IntField
+      name: MpsPllLocked
+      mode: RO
+      lsBit: 0
+      sizeBits: 32
+      description: Counts the diagnostic strobes     
+    #########################################################
     RollOverEn:
       at:
         offset: 0xFF0

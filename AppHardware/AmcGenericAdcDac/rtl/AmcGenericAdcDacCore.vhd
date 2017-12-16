@@ -2,7 +2,7 @@
 -- File       : AmcGenericAdcDacCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2017-02-02
+-- Last update: 2017-11-10
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -177,6 +177,7 @@ architecture mapping of AmcGenericAdcDacCore is
    signal lemoDinN    : slv(1 downto 0);
    signal lemoDoutP   : slv(1 downto 0);
    signal lemoDoutN   : slv(1 downto 0);
+   signal lemoDinput  : slv(1 downto 0);
    signal bcmL        : sl;
 
 begin
@@ -315,11 +316,13 @@ begin
          port map (
             I  => syncInP(i),
             IB => syncInN(i),
-            O  => lemoDin(i));
+            O  => lemoDinput(i));
 
    end generate GEN_LEMO;
 
-   bcmL <= not(bcm);
+   lemoDin <= lemoDinput;
+
+      bcmL <= not(bcm);
 
    IBUFDS_SysRef : IBUFDS
       port map (
@@ -471,6 +474,12 @@ begin
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
       port map (
+         -- Pass through Interfaces
+         smaTrig         => ite(TRIG_CLK_G, '0', smaTrig),
+         adcCal          => ite(CAL_CLK_G, '0', adcCal),
+         lemoDin         => lemoDinput,
+         lemoDout        => lemoDout,
+         bcm             => bcm,
          -- AMC Debug Signals
          clk             => jesdClk,
          rst             => jesdRst,
