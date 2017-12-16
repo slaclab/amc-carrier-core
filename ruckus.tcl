@@ -6,8 +6,8 @@ set family [getFpgaFamily]
 
 # Check for submodule tagging
 if { [SubmoduleCheck {ruckus}             {1.5.5} ] < 0 } {exit -1}
-if { [SubmoduleCheck {surf}               {1.4.8} ] < 0 } {exit -1}
-if { [SubmoduleCheck {lcls-timing-core}   {1.7.4} ] < 0 } {exit -1}
+if { [SubmoduleCheck {surf}               {1.5.0} ] < 0 } {exit -1}
+if { [SubmoduleCheck {lcls-timing-core}   {1.8.0} ] < 0 } {exit -1}
 
 # Check for Kintex Ultrascale+
 if { ${family} == "kintexuplus" } {
@@ -15,8 +15,8 @@ if { ${family} == "kintexuplus" } {
    if { [VersionCheck 2017.3 "mustBeExact"] < 0 } {
       exit -1
    }
-# Else Kintex Ultrascale
-} else {
+# Check Kintex Ultrascale
+} elseif { ${family} == "kintexu" } {  
    # Check for version 2016.4 of Vivado
    if { [VersionCheck 2016.4] < 0 } {
       ## Check for version 2017.3 of Vivado
@@ -24,6 +24,8 @@ if { ${family} == "kintexuplus" } {
          exit -1
       }
    }
+} else { 
+   puts "\n\nERROR: Invalid PRJ_PART was defined in the Makefile\n\n"; exit -1
 }
 
 # Check if required variables exist

@@ -7,6 +7,7 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+
 #######################
 ## Application Ports ##
 #######################
@@ -17,9 +18,9 @@
 # set_property PACKAGE_PIN A4 [get_ports {rtmHsRxP}]
 # set_property PACKAGE_PIN A3 [get_ports {rtmHsRxN}]
 
-# Spare Clock reference
-set_property PACKAGE_PIN P6 [get_ports {genClkP}]
-set_property PACKAGE_PIN P5 [get_ports {genClkN}]
+# # Spare Clock reference
+# set_property PACKAGE_PIN P6 [get_ports {genClkP}]
+# set_property PACKAGE_PIN P5 [get_ports {genClkN}]
 
 # AMC's JESD Ports
 set_property PACKAGE_PIN AB6 [get_ports {jesdClkP[0][0]}] ; #P11 PIN20

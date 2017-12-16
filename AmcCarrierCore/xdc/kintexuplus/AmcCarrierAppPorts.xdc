@@ -45,28 +45,29 @@ set_property -dict { PACKAGE_PIN AD26 IOSTANDARD LVDS DIFF_TERM_ADV TERM_NONE } 
 set_property -dict { PACKAGE_PIN AE27 IOSTANDARD LVDS } [get_ports {mpsTxP}]
 set_property -dict { PACKAGE_PIN AF27 IOSTANDARD LVDS } [get_ports {mpsTxN}]
 
-set_property -dict { PACKAGE_PIN AL10 IOSTANDARD LVCMOS25 }           [get_ports {mpsClkIn}]
-set_property -dict { PACKAGE_PIN AM10 IOSTANDARD LVCMOS25 SLEW FAST } [get_ports {mpsClkOut}]
+# set_property -dict { PACKAGE_PIN AP9 IOSTANDARD LVCMOS25 }         [get_ports {mpsClkIn}]  ; # BP_CLK1_IN
+set_property -dict { PACKAGE_PIN P24 IOSTANDARD LVCMOS15 }           [get_ports {mpsClkIn}]  ; # BP_CLK1_IN
+set_property -dict { PACKAGE_PIN AF8 IOSTANDARD LVCMOS25 SLEW FAST } [get_ports {mpsClkOut}] ; # BP_CLK1_OUT
 
 # LCLS Timing Ports
-set_property -dict { PACKAGE_PIN AE11 IOSTANDARD LVCMOS25 } [get_ports {timingClkScl}]
-set_property -dict { PACKAGE_PIN AD11 IOSTANDARD LVCMOS25 } [get_ports {timingClkSda}]
+set_property -dict { PACKAGE_PIN AH8 IOSTANDARD LVCMOS25 } [get_ports {timingClkScl}]
+set_property -dict { PACKAGE_PIN AH9 IOSTANDARD LVCMOS25 } [get_ports {timingClkSda}]
 
 # Crossbar Ports
-set_property -dict { PACKAGE_PIN AK13 IOSTANDARD LVCMOS25 } [get_ports {xBarSin[0]}] 
-set_property -dict { PACKAGE_PIN AL13 IOSTANDARD LVCMOS25 } [get_ports {xBarSin[1]}] 
-set_property -dict { PACKAGE_PIN AK12 IOSTANDARD LVCMOS25 } [get_ports {xBarSout[0]}] 
-set_property -dict { PACKAGE_PIN AL12 IOSTANDARD LVCMOS25 } [get_ports {xBarSout[1]}] 
-set_property -dict { PACKAGE_PIN AM12 IOSTANDARD LVCMOS25 } [get_ports {xBarConfig}] 
-set_property -dict { PACKAGE_PIN AN12 IOSTANDARD LVCMOS25 } [get_ports {xBarLoad}] 
+set_property -dict { PACKAGE_PIN AE13 IOSTANDARD LVCMOS25 } [get_ports {xBarSin[0]}] 
+set_property -dict { PACKAGE_PIN AF13 IOSTANDARD LVCMOS25 } [get_ports {xBarSin[1]}] 
+set_property -dict { PACKAGE_PIN AK13 IOSTANDARD LVCMOS25 } [get_ports {xBarSout[0]}] 
+set_property -dict { PACKAGE_PIN AL13 IOSTANDARD LVCMOS25 } [get_ports {xBarSout[1]}] 
+set_property -dict { PACKAGE_PIN AK12 IOSTANDARD LVCMOS25 } [get_ports {xBarConfig}] 
+set_property -dict { PACKAGE_PIN AL12 IOSTANDARD LVCMOS25 } [get_ports {xBarLoad}] 
 
 # IPMC Ports
-set_property -dict { PACKAGE_PIN AE12 IOSTANDARD LVCMOS25 } [get_ports {ipmcScl}]
-set_property -dict { PACKAGE_PIN AF12 IOSTANDARD LVCMOS25 } [get_ports {ipmcSda}]
+set_property -dict { PACKAGE_PIN AD9 IOSTANDARD LVCMOS25 } [get_ports {ipmcScl}]
+set_property -dict { PACKAGE_PIN AD8 IOSTANDARD LVCMOS25 } [get_ports {ipmcSda}]
 
 # Configuration PROM Ports
-set_property -dict { PACKAGE_PIN AM11 IOSTANDARD LVCMOS25 } [get_ports {calScl}]
-set_property -dict { PACKAGE_PIN AN11 IOSTANDARD LVCMOS25 } [get_ports {calSda}]
+set_property -dict { PACKAGE_PIN AM12 IOSTANDARD LVCMOS25 } [get_ports {calScl}]
+set_property -dict { PACKAGE_PIN AN12 IOSTANDARD LVCMOS25 } [get_ports {calSda}]
 
 # DDR3L SO-DIMM Ports
 set_property -dict { PACKAGE_PIN K20 IOSTANDARD LVCMOS15 } [get_ports {ddrScl}] 

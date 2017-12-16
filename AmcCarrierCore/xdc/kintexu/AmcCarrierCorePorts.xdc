@@ -8,6 +8,11 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design] 
+
+set_property CFGBVS         {VCCO} [current_design]
+set_property CONFIG_VOLTAGE {3.3} [current_design]
+
 #######################
 ## Common Core Ports ##
 #######################

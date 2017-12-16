@@ -29,10 +29,10 @@ set_property PACKAGE_PIN R3  [get_ports {ethTxN[3]}]
 set_property PACKAGE_PIN P2  [get_ports {ethRxP[3]}]
 set_property PACKAGE_PIN P1  [get_ports {ethRxN[3]}]
 
-set_property PACKAGE_PIN B6 [get_ports {rtmHsTxP[0]}]
-set_property PACKAGE_PIN B5 [get_ports {rtmHsTxN[0]}]
-set_property PACKAGE_PIN A4 [get_ports {rtmHsRxP[0]}]
-set_property PACKAGE_PIN A3 [get_ports {rtmHsRxN[0]}]
+set_property PACKAGE_PIN B6 [get_ports {rtmHsTxP}]
+set_property PACKAGE_PIN B5 [get_ports {rtmHsTxN}]
+set_property PACKAGE_PIN A4 [get_ports {rtmHsRxP}]
+set_property PACKAGE_PIN A3 [get_ports {rtmHsRxN}]
 
 #############################
 ## Core Timing Constraints ##

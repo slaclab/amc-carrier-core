@@ -15,8 +15,8 @@ loadSource -path "$::DIR_PATH/ip/SysMonCore.dcp"
 
 # Check for advance build, which bypasses the pre-built .DCP file
 if { $::env(AMC_ADV_BUILD)  == 1 ||
-     $::env(RTM_ETH)        == 1 ||
-     ${family} eq {kintexuplus} } {
+     $::env(RTM_ETH)  == 1 ||
+     $::env(PRJ_PART) != "XCKU040-FFVA1156-2-E" } {
      
    # Check for FSBL
    if { [info exists ::env(AMC_FSBL)] == 1 }  {
@@ -36,25 +36,18 @@ if { $::env(AMC_ADV_BUILD)  == 1 ||
    loadSource   -path "$::DIR_PATH/ip/MigCore.dcp"
    # loadIpCore -path "$::DIR_PATH/ip/MigCore.xci"
    
-   # Check for Kintex Ultrascale+
-   if { ${family} == "kintexuplus" } {
-      loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePorts_gen2.xdc" 
-   # Else Kintex Ultrascale
-   } else {
-      loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePorts_gen1.xdc" 
-   }   
-   
+   loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCorePorts.xdc"    
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreTiming.xdc" 
    
    # Check for FSBL
    if { [info exists ::env(AMC_FSBL)] == 1 }  {
-      loadConstraints -dir "$::DIR_PATH/fsbl"
+      loadConstraints -dir "$::DIR_PATH/fsbl/${family}"
    } else {   
       # Check if using zone2 or zone3 ETH interface
       if {  $::env(RTM_ETH)  == 1 } {
-         loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone3Eth.xdc" 
+         loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCoreZone3Eth.xdc" 
       } else {
-         loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone2Eth.xdc" 
+         loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCoreZone2Eth.xdc" 
       }
    }
    
@@ -65,14 +58,7 @@ if { $::env(AMC_ADV_BUILD)  == 1 ||
 
 # Add application ports and placement constraints
 loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePlacement.xdc" 
-
-# Check for Kintex Ultrascale+
-if { ${family} == "kintexuplus" } {
-   loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierAppPorts_gen2.xdc" 
-# Else Kintex Ultrascale
-} else {
-   loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierAppPorts_gen1.xdc" 
-}
+loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierAppPorts.xdc" 
 
 # Check for Application Microblaze build
 if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {

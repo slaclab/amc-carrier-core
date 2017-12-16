@@ -8,6 +8,13 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+set_property BITSTREAM.CONFIG.CONFIGRATE 51.0 [current_design] 
+
+set_property CFGBVS         {GND} [current_design]
+set_property CONFIG_VOLTAGE {1.8} [current_design]
+
+set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets {U_Core/U_AppMps/U_Clk/mpsClk}] 
+
 #######################
 ## Common Core Ports ##
 #######################
@@ -199,9 +206,10 @@ set_property IOSTANDARD DIFF_SSTL15_DCI   [get_ports {ddrCkP[*] ddrCkN[*]}]
 set_property OUTPUT_IMPEDANCE RDRV_40_40  [get_ports {ddrCkP[*] ddrCkN[*]}]
 set_property SLEW FAST                    [get_ports {ddrCkP[*] ddrCkN[*]}]
 
+set_property -dict { PACKAGE_PIN T24 IOSTANDARD SSTL15_DCI OUTPUT_IMPEDANCE RDRV_40_40 SLEW FAST } [get_ports {ddrRasL}] 
+set_property -dict { PACKAGE_PIN T25 IOSTANDARD SSTL15_DCI OUTPUT_IMPEDANCE RDRV_40_40 SLEW FAST } [get_ports {ddrCasL}] 
 set_property -dict { PACKAGE_PIN T27 IOSTANDARD SSTL15_DCI OUTPUT_IMPEDANCE RDRV_40_40 SLEW FAST } [get_ports {ddrWeL}] 
-set_property -dict { PACKAGE_PIN P24 IOSTANDARD SSTL15_DCI OUTPUT_IMPEDANCE RDRV_40_40 SLEW FAST } [get_ports {ddrRasL}] 
-set_property -dict { PACKAGE_PIN P25 IOSTANDARD SSTL15_DCI OUTPUT_IMPEDANCE RDRV_40_40 SLEW FAST } [get_ports {ddrCasL}] 
+
 set_property -dict { PACKAGE_PIN N23 IOSTANDARD SSTL15     OUTPUT_IMPEDANCE RDRV_48_48 SLEW SLOW } [get_ports {ddrRstL}] 
 set_property -dict { PACKAGE_PIN P21 IOSTANDARD LVCMOS15 } [get_ports {ddrPwrEnL}] 
 set_property -dict { PACKAGE_PIN P20 IOSTANDARD LVCMOS15 } [get_ports {ddrAlertL}] 

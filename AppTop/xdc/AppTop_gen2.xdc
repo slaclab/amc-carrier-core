@@ -18,9 +18,9 @@
 # set_property PACKAGE_PIN A4 [get_ports {rtmHsRxP}]
 # set_property PACKAGE_PIN A3 [get_ports {rtmHsRxN}]
 
-# Spare Clock reference
-set_property PACKAGE_PIN P6 [get_ports {genClkP}]
-set_property PACKAGE_PIN P5 [get_ports {genClkN}]
+# # Spare Clock reference
+# set_property PACKAGE_PIN P6 [get_ports {genClkP}]
+# set_property PACKAGE_PIN P5 [get_ports {genClkN}]
 
 # AMC's JESD Ports
 set_property PACKAGE_PIN AB6 [get_ports {jesdClkP[0][0]}] ; #P11 PIN20
@@ -51,19 +51,19 @@ set_property -dict { PACKAGE_PIN AN8  IOSTANDARD LVCMOS25 } [get_ports {jtagSec[
 set_property -dict { PACKAGE_PIN AP8  IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][1]}] ; #P12 PIN166 TMS
 set_property -dict { PACKAGE_PIN AK10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][2]}] ; #P12 PIN167 TRST
 set_property -dict { PACKAGE_PIN AL9  IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][3]}] ; #P12 PIN168 TDO
-set_property -dict { PACKAGE_PIN AD10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][4]}] ; #P12 PIN169 TDI
+set_property -dict { PACKAGE_PIN AF10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][4]}] ; #P12 PIN169 TDI
                                                                                           
-set_property -dict { PACKAGE_PIN AE10 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][0]}] ; #P13 PIN165 TCK
-set_property -dict { PACKAGE_PIN AE8  IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][1]}] ; #P13 PIN166 TMS
-set_property -dict { PACKAGE_PIN AF8  IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][2]}] ; #P13 PIN167 TRST
-set_property -dict { PACKAGE_PIN AF9  IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][3]}] ; #P13 PIN168 TDO
-set_property -dict { PACKAGE_PIN AG9  IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][4]}] ; #P13 PIN169 TDI
+set_property -dict { PACKAGE_PIN AG10 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][0]}] ; #P13 PIN165 TCK
+set_property -dict { PACKAGE_PIN AG11 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][1]}] ; #P13 PIN166 TMS
+set_property -dict { PACKAGE_PIN AH11 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][2]}] ; #P13 PIN167 TRST
+set_property -dict { PACKAGE_PIN AG12 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][3]}] ; #P13 PIN168 TDO
+set_property -dict { PACKAGE_PIN AH12 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][4]}] ; #P13 PIN169 TDI
                                                                                          
-set_property -dict { PACKAGE_PIN AF10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][0]}] ; #P14 PIN165 TCK
-set_property -dict { PACKAGE_PIN AG10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][1]}] ; #P14 PIN166 TMS
-set_property -dict { PACKAGE_PIN AG11 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][2]}] ; #P14 PIN167 TRST
-set_property -dict { PACKAGE_PIN AH11 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][3]}] ; #P14 PIN168 TDO
-set_property -dict { PACKAGE_PIN AG12 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][4]}] ; #P14 PIN169 TDI
+set_property -dict { PACKAGE_PIN AD11 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][0]}] ; #P14 PIN165 TCK
+set_property -dict { PACKAGE_PIN AE11 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][1]}] ; #P14 PIN166 TMS
+set_property -dict { PACKAGE_PIN AE12 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][2]}] ; #P14 PIN167 TRST
+set_property -dict { PACKAGE_PIN AF12 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][3]}] ; #P14 PIN168 TDO
+set_property -dict { PACKAGE_PIN AP10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][4]}] ; #P14 PIN169 TDI
   
 # AMC's FPGA Clock Ports
 set_property -dict { PACKAGE_PIN V33 IOSTANDARD LVCMOS18 } [get_ports {fpgaClkP[0][0]}] ; #P11 PIN74
@@ -314,6 +314,16 @@ set_clock_groups -asynchronous \
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {mpsClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {ddrClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]
+
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk00}] -group [get_clocks -include_generated_clocks {fabClk}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk01}] -group [get_clocks -include_generated_clocks {fabClk}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk02}] -group [get_clocks -include_generated_clocks {fabClk}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk03}] -group [get_clocks -include_generated_clocks {fabClk}]
+
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk10}] -group [get_clocks -include_generated_clocks {fabClk}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk11}] -group [get_clocks -include_generated_clocks {fabClk}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk12}] -group [get_clocks -include_generated_clocks {fabClk}]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk13}] -group [get_clocks -include_generated_clocks {fabClk}]
 
 ##########################
 ## Misc. Configurations ##

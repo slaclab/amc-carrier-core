@@ -72,23 +72,7 @@ architecture mapping of RtmDigitalDebugV1 is
    signal doutReg  : slv(15 downto 0);
    signal doutComb : slv(15 downto 0);
 
-   signal unusedRefClk                  : sl;
-   attribute dont_touch                 : string;
-   attribute dont_touch of unusedRefClk : signal is "TRUE";   
-
 begin
-
-   U_unusedRefClk : entity work.AmcCarrierIbufGt
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => genClkP,
-         IB    => genClkN,
-         CEB   => '0',
-         ODIV2 => open,
-         O     => unusedRefClk);
 
    GEN_VEC :
    for i in 15 downto 0 generate

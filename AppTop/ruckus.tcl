@@ -37,14 +37,14 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
 } elseif {  $::env(PRJ_PART) eq {XCKU11P-FFVA1156-3-E} ||
             $::env(PRJ_PART) eq {XCKU15P-FFVA1156-3-E} } {
             
-   loadSource      -dir  "$::DIR_PATH/rtl/xcku060"
+   loadSource      -dir  "$::DIR_PATH/rtl/xcku11p"
    loadConstraints -path "$::DIR_PATH/xdc/AppTop_gen2.xdc"
    
-   loadSource  -path "$::DIR_PATH/coregen/xcku060/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.dcp"
-   #loadIpCore -path "$::DIR_PATH/coregen/xcku060/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.xci"
+   loadSource  -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.dcp"
+   # loadIpCore -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.xci"
    
-   loadSource  -path "$::DIR_PATH/coregen/xcku060/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.dcp"
-   #loadIpCore -path "$::DIR_PATH/coregen/xcku060/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.xci"      
+   loadSource  -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.dcp"
+   # loadIpCore -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.xci"      
    
 } else { 
    puts "\n\nERROR: Invalid PRJ_PART was defined in the Makefile\n\n"; exit -1
