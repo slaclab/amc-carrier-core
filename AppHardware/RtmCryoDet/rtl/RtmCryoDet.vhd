@@ -2,7 +2,7 @@
 -- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2017-11-06
+-- Last update: 2017-11-27
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
 ------------------------------------------------------------------------------
@@ -37,11 +37,9 @@ entity RtmCryoDet is
       jesdClk         : in    sl;
       jesdRst         : in    sl;
       -- Digital I/O Interface
-      kRelay          : out   slv(1 downto 0);
-      startRamp       : in    sl;
-      selectRamp      : in    sl;
-      lemo1           : out   sl;
-      lemo2           : in    sl;
+      startRamp       : out   sl;
+      selectRamp      : out   sl;
+      rampCnt         : out   slv(31 downto 0);
       -- AXI-Lite
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -76,6 +74,32 @@ architecture mapping of RtmCryoDet is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
+   type RegType is record
+      startRamp         : sl;
+      startRampInt      : sl;
+      startRampExtPulse : sl;
+      startRampExt      : sl;
+      startRampPulse    : sl;
+      cnt               : slv(15 downto 0);
+      pulseCnt          : slv(15 downto 0);
+      rampMaxCnt        : slv(31 downto 0);
+      rampCnt           : slv(31 downto 0);
+   end record;
+
+   constant REG_INIT_C : RegType := (
+      startRamp         => '0',
+      startRampInt      => '0',
+      startRampExtPulse => '0',
+      startRampExt      => '0',
+      startRampPulse    => '0',
+      cnt               => (others => '0'),
+      pulseCnt          => (others => '0'),
+      rampMaxCnt        => (others => '0'),
+      rampCnt           => (others => '0'));
+
+   signal r   : RegType := REG_INIT_C;
+   signal rin : RegType;
+
    signal cryoCsL : sl;
    signal cryoSck : sl;
    signal cryoSdi : sl;
@@ -93,8 +117,20 @@ architecture mapping of RtmCryoDet is
 
    signal jesdClkDiv    : sl;
    signal jesdClkDivReg : sl;
-   
+
+   signal extTrig       : sl;
+   signal extTrigSync   : sl;
+   signal selRamp       : sl;
+   signal enableRamp    : sl;
+   signal rampStartMode : sl;
+   signal kRelay        : slv(1 downto 0);
+   signal pulseWidth    : slv(15 downto 0);
+   signal debounceWidth : slv(15 downto 0);
+   signal rampMaxCnt    : slv(31 downto 0);
+
 begin
+
+   selectRamp <= selRamp;
 
    ------------------------------------------------
    --               RTM Mapping                  --
@@ -105,12 +141,12 @@ begin
    rtmLsN(1)  <= cryoCsL;
    rtmLsP(3)  <= cryoSck;
    rtmLsN(3)  <= cryoSdi;
-   lemo1      <= rtmLsP(7);
-   rtmLsN(7)  <= lemo2;
+   extTrig    <= rtmLsP(7);             -- LEMO1
+   rtmLsN(7)  <= r.startRampPulse;      -- LEMO2
    cryoSdo    <= rtmLsP(11);
    kRelay(0)  <= rtmLsN(11);
-   rtmLsP(12) <= startRamp;
-   rtmLsN(12) <= selectRamp;
+   rtmLsP(12) <= r.startRampPulse;
+   rtmLsN(12) <= selRamp;
    kRelay(1)  <= rtmLsP(13);
    rtmLsN(13) <= maxCsL;
    rtmLsN(14) <= maxSdi;
@@ -136,6 +172,134 @@ begin
    rtmLsN(18) <= srSck;
    rtmLsP(19) <= srSdi;
    rtmLsN(19) <= srCsL;
+
+   U_extTrig : entity work.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => jesdClk,
+         dataIn  => extTrig,
+         dataOut => extTrigSync);
+
+   ------
+   -- FSM
+   ------
+   comb : process (debounceWidth, enableRamp, extTrigSync, jesdRst, pulseWidth,
+                   r, rampMaxCnt, rampStartMode) is
+      variable v      : RegType;
+      variable regCon : AxiLiteEndPointType;
+   begin
+      -- Latch the current value
+      v := r;
+
+      -- Reset the strobe
+      v.startRamp         := '0';
+      v.startRampInt      := '0';
+      v.startRampExtPulse := '0';
+
+      ------------------------------------------------------------
+      -- Internal Ramp Generation
+      ------------------------------------------------------------
+
+      -- Update the registered values
+      v.rampMaxCnt := rampMaxCnt;
+
+      -- Check for change in configurations
+      if (r.rampMaxCnt /= rampMaxCnt) then
+         -- Reset the counter
+         v.rampCnt := (others => '0');
+      -- Check the counter
+      elsif (r.rampMaxCnt = r.rampCnt) then
+         -- Reset the counter
+         v.rampCnt      := (others => '0');
+         -- Set the flag
+         v.startRampInt := '1';
+      else
+         -- Increment the counter
+         v.rampCnt := r.rampCnt + 1;
+      end if;
+
+      ------------------------------------------------------------
+      -- Debouncing External Triggering
+      ------------------------------------------------------------ 
+
+      -- Check if external trigger has changed
+      if (extTrigSync /= r.startRampExt) then
+         -- Check counter
+         if (r.cnt = debounceWidth) then
+            -- Reset the counter
+            v.cnt               := (others => '0');
+            -- Toggle the trigger
+            v.startRampExt      := not(r.startRampExt);
+            -- Generate a one-shot pulse
+            v.startRampExtPulse := v.startRampExt;
+         else
+            -- Increment the counter
+            v.cnt := r.cnt + 1;
+         end if;
+      else
+         -- Reset the counter
+         v.cnt := (others => '0');
+      end if;
+
+      ------------------------------------------------------------
+      -- Mux the triggers together
+      ------------------------------------------------------------ 
+
+      -- Check if enabled
+      if (enableRamp = '1') then
+         -- Check ramp mode
+         if (rampStartMode = '0') then
+            -- Select internal mode
+            v.startRamp := r.startRampInt;
+         else
+            -- Select external mode
+            v.startRamp := r.startRampExtPulse;
+         end if;
+      end if;
+
+      ------------------------------------------------------------
+      -- Pulse Stretching
+      ------------------------------------------------------------       
+
+      -- Check if pulse stretching 
+      if (r.startRamp = '1') or (r.pulseCnt /= 0) then
+         -- Check the counter
+         if (r.pulseCnt = pulseWidth) then
+            -- Reset the counter
+            v.pulseCnt       := (others => '0');
+            -- Clear the flag
+            v.startRampPulse := '0';
+         else
+            -- Increment the counter
+            v.pulseCnt       := r.pulseCnt + 1;
+            -- Set the flag
+            v.startRampPulse := '1';
+         end if;
+      end if;
+
+      ------------------------------------------------------------       
+      -- Synchronous Reset
+      ------------------------------------------------------------       
+      if (jesdRst = '1') then
+         v := REG_INIT_C;
+      end if;
+
+      -- Register the variable for next clock cycle
+      rin <= v;
+
+      -- Outputs
+      startRamp <= r.startRamp;
+      rampCnt   <= r.rampCnt;
+
+   end process comb;
+
+   seq : process (jesdClk) is
+   begin
+      if (rising_edge(jesdClk)) then
+         r <= rin after TPD_G;
+      end if;
+   end process seq;
 
    ---------------------
    -- AXI-Lite Crossbar
@@ -170,6 +334,13 @@ begin
          jesdClk         => jesdClk,
          jesdRst         => jesdRst,
          jesdClkDiv      => jesdClkDiv,
+         kRelay          => kRelay,
+         rampMaxCnt      => rampMaxCnt,
+         selRamp         => selRamp,
+         enableRamp      => enableRamp,
+         rampStartMode   => rampStartMode,
+         pulseWidth      => pulseWidth,
+         debounceWidth   => debounceWidth,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -212,8 +383,8 @@ begin
          TPD_G             => TPD_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 7,             -- A[6:0]
-         DATA_SIZE_G       => 24,            -- D[23:0]
+         ADDRESS_SIZE_G    => 11,            -- A[10:0]
+         DATA_SIZE_G       => 20,            -- D[19:0]
          CPHA_G            => '0',           -- CPHA = 0
          CPOL_G            => '0',           -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -238,8 +409,8 @@ begin
          TPD_G             => TPD_G,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 7,             -- A[6:0]
-         DATA_SIZE_G       => 24,            -- D[23:0]
+         ADDRESS_SIZE_G    => 11,            -- A[10:0]
+         DATA_SIZE_G       => 20,            -- D[19:0]
          CPHA_G            => '0',           -- CPHA = 0
          CPOL_G            => '0',           -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
