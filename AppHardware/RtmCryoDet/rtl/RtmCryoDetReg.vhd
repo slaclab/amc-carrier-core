@@ -2,7 +2,7 @@
 -- File       : RtmCryoDetReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2017-11-06
+-- Last update: 2017-11-27
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -32,6 +32,13 @@ entity RtmCryoDetReg is
       jesdClk         : in  sl;
       jesdRst         : in  sl;
       jesdClkDiv      : out sl;
+      kRelay          : in  slv(1 downto 0);
+      rampMaxCnt      : out slv(31 downto 0);
+      enableRamp      : out sl;
+      rampStartMode   : out sl;
+      selRamp         : out sl;
+      pulseWidth      : out slv(15 downto 0);
+      debounceWidth   : out slv(15 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -46,6 +53,12 @@ architecture rtl of RtmCryoDetReg is
    type RegType is record
       lowCycle       : slv(CNT_WIDTH_G-1 downto 0);
       highCycle      : slv(CNT_WIDTH_G-1 downto 0);
+      rampMaxCnt     : slv(31 downto 0);
+      enableRamp     : sl;
+      rampStartMode  : sl;
+      selRamp        : sl;
+      pulseWidth     : slv(15 downto 0);
+      debounceWidth  : slv(15 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -53,18 +66,25 @@ architecture rtl of RtmCryoDetReg is
    constant REG_INIT_C : RegType := (
       lowCycle       => toSlv(2, CNT_WIDTH_G),  -- 3 cycles low by default (zero inclusive)
       highCycle      => toSlv(2, CNT_WIDTH_G),  -- 3 cycles low by default (zero inclusive)
+      rampMaxCnt     => (others => '0'),
+      enableRamp     => '0',
+      rampStartMode  => '0',
+      selRamp        => '0',
+      pulseWidth     => (others => '0'),
+      debounceWidth  => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal lowCycle  : slv(CNT_WIDTH_G-1 downto 0);
-   signal highCycle : slv(CNT_WIDTH_G-1 downto 0);
+   signal kRelaySync : slv(1 downto 0);
+   signal lowCycle   : slv(CNT_WIDTH_G-1 downto 0);
+   signal highCycle  : slv(CNT_WIDTH_G-1 downto 0);
 
 begin
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, r) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, kRelaySync, r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
@@ -75,9 +95,17 @@ begin
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read only registers
-      axiSlaveRegister(regCon, x"0", 0, v.lowCycle);
-      axiSlaveRegister(regCon, x"4", 0, v.highCycle);
-      axiSlaveRegisterR(regCon, x"8", 0, toSlv(CNT_WIDTH_G, 32));
+      axiSlaveRegister(regCon, x"00", 0, v.lowCycle);
+      axiSlaveRegister(regCon, x"04", 0, v.highCycle);
+      axiSlaveRegisterR(regCon, x"08", 0, toSlv(CNT_WIDTH_G, 32));
+      axiSlaveRegisterR(regCon, x"0C", 0, kRelaySync);
+
+      axiSlaveRegister(regCon, x"10", 0, v.rampMaxCnt);
+      axiSlaveRegister(regCon, x"14", 0, v.selRamp);
+      axiSlaveRegister(regCon, x"14", 1, v.enableRamp);
+      axiSlaveRegister(regCon, x"14", 2, v.rampStartMode);
+      axiSlaveRegister(regCon, x"18", 0, v.pulseWidth);
+      axiSlaveRegister(regCon, x"1C", 0, v.debounceWidth);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -102,6 +130,55 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   Sync_selRamp : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 3)
+      port map (
+         clk        => jesdClk,
+         dataIn(0)  => r.enableRamp,
+         dataIn(1)  => r.rampStartMode,
+         dataIn(2)  => r.selRamp,
+         dataOut(0) => enableRamp,
+         dataOut(1) => rampStartMode,
+         dataOut(2) => selRamp);
+
+   Sync_rampMaxCnt : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 32)
+      port map (
+         clk     => jesdClk,
+         dataIn  => r.rampMaxCnt,
+         dataOut => rampMaxCnt);
+
+   Sync_pulseWidth : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 16)
+      port map (
+         clk     => jesdClk,
+         dataIn  => r.pulseWidth,
+         dataOut => pulseWidth);
+
+   Sync_debounceWidth : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 16)
+      port map (
+         clk     => jesdClk,
+         dataIn  => r.debounceWidth,
+         dataOut => debounceWidth);
+
+   Sync_kRelaySync : entity work.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
+      port map (
+         clk     => jesdClk,
+         dataIn  => kRelay,
+         dataOut => kRelaySync);
 
    Sync_lowCycle : entity work.SynchronizerVector
       generic map (
