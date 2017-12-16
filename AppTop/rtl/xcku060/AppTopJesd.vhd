@@ -173,7 +173,7 @@ begin
    ----------------
 
    -- Left column reference
-   U_IBUFDS_GTE3 : IBUFDS_GTE3
+   U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
@@ -188,7 +188,7 @@ begin
    -- Choose Right coulumn reference
    GEN_GTH_R_CLK : for i in 2 downto 0 generate
 
-      U_IBUFDS_GTE3 : IBUFDS_GTE3
+      U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
          generic map (
             REFCLK_EN_TX_PATH  => '0',
             REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
@@ -335,7 +335,7 @@ begin
          gtRxN           => jesdRxN,
          -- SYSREF for subclass 1 fixed latency
          sysRef_i        => jesdSysRef,
-         -- Synchronisation output combined from all receivers to be connected to ADC chips
+         -- Synchronization output combined from all receivers to be connected to ADC chips
          nSync_o         => jesdRxSync,
          nSync_i         => jesdTxSync);
 

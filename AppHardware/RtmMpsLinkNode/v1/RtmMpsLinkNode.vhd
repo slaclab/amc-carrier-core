@@ -56,7 +56,7 @@ architecture mapping of RtmMpsLinkNode is
    signal rtmDout : slv(7 downto 0);
 
 begin
-
+         
    din     <= rtmDin;
    rtmDout <= dout;
 

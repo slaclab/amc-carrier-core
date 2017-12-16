@@ -8,14 +8,12 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-set_property -dict { PACKAGE_PIN V12 IOSTANDARD ANALOG } [get_ports {vPIn}]
+################################
+## Area/Placement Constraints ##
+################################
 
-set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes [current_design]
-set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 1     [current_design]
-set_property BITSTREAM.CONFIG.SPI_FALL_EDGE No   [current_design]
-set_property BITSTREAM.GENERAL.COMPRESS TRUE     [current_design]
 
-set_property SEVERITY {Warning} [get_drc_checks {NSTD-1}]
-set_property SEVERITY {Warning} [get_drc_checks {UCIO-1}]
+##########################
+## Misc. Configurations ##
+##########################
 
-set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports {ddrPg}]

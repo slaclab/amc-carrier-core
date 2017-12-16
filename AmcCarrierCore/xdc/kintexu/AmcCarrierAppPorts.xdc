@@ -45,8 +45,8 @@ set_property -dict { PACKAGE_PIN AP18 IOSTANDARD LVDS DIFF_TERM_ADV TERM_NONE } 
 set_property -dict { PACKAGE_PIN AP11 IOSTANDARD LVDS_25 } [get_ports {mpsTxP}]
 set_property -dict { PACKAGE_PIN AP10 IOSTANDARD LVDS_25 } [get_ports {mpsTxN}]
 
-set_property -dict { PACKAGE_PIN AF10 IOSTANDARD LVCMOS25 }           [get_ports {mpsClkIn}]
-set_property -dict { PACKAGE_PIN AG10 IOSTANDARD LVCMOS25 SLEW FAST } [get_ports {mpsClkOut}]
+set_property -dict { PACKAGE_PIN AF10 IOSTANDARD LVCMOS25 }           [get_ports {mpsClkIn}]  ; # BP_CLK1_IN
+set_property -dict { PACKAGE_PIN AG10 IOSTANDARD LVCMOS25 SLEW FAST } [get_ports {mpsClkOut}] ; # BP_CLK1_OUT
 
 # LCLS Timing Ports
 set_property -dict { PACKAGE_PIN AE11 IOSTANDARD LVCMOS25 } [get_ports {timingClkScl}]

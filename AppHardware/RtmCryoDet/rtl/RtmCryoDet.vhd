@@ -93,7 +93,7 @@ architecture mapping of RtmCryoDet is
 
    signal jesdClkDiv    : sl;
    signal jesdClkDivReg : sl;
-
+   
 begin
 
    ------------------------------------------------
