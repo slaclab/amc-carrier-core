@@ -2,7 +2,7 @@
 -- File       : AppMpsEncoder.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-04-01
--- Last update: 2017-04-13
+-- Last update: 2017-12-21
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,9 +31,10 @@ use unisim.vcomponents.all;
 
 entity AppMpsEncoder is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
-      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C);
+      TPD_G            : time             := 1 ns;
+      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0');
+      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
+      APP_TYPE_G       : AppType          := APP_NULL_TYPE_C);
    port (
       -- Clock & Reset
       axilClk         : in  sl;
@@ -57,12 +58,12 @@ architecture mapping of AppMpsEncoder is
    constant APP_CONFIG_C : MpsAppConfigType := getMpsAppConfig(APP_TYPE_G);
 
    type RegType is record
-      tholdMem   : Slv8VectorArray(MPS_CHAN_COUNT_C-1 downto 0,7 downto 0);
+      tholdMem   : Slv8VectorArray(MPS_CHAN_COUNT_C-1 downto 0, 7 downto 0);
       mpsMessage : MpsMessageType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      tholdMem   => (others=>(others=>(others=>'0'))),
+      tholdMem   => (others => (others => (others => '0'))),
       mpsMessage => mpsMessageInit(APP_CONFIG_C.BYTE_COUNT_C));
 
    signal r   : RegType := REG_INIT_C;
@@ -90,13 +91,13 @@ architecture mapping of AppMpsEncoder is
       if (thold.maxTholdEn = '1' and signedVal > signedMax) or
          (thold.minTholdEn = '1' and signedVal < signedMin) then
 
-         tholdMemOut := (others=>'1');
+         tholdMemOut                        := (others => '1');
          message(config.BYTE_MAP_C)(bitPos) := '1';
 
       -- Threhold was exceeded within the last 8 clocks
       elsif tholdMemIn /= 0 then
-         tholdMemOut(7 downto 1) := tholdMemIn(6 downto 0);
-         tholdMemOut(0)          := '0';
+         tholdMemOut(7 downto 1)            := tholdMemIn(6 downto 0);
+         tholdMemOut(0)                     := '0';
          message(config.BYTE_MAP_C)(bitPos) := '1';
       end if;
    end procedure;
@@ -120,7 +121,8 @@ begin
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         AXI_BASE_ADDR_G  => AXI_BASE_ADDR_G,
+         AXI_ERROR_RESP_G => AXI_RESP_OK_C,  -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
          APP_CONFIG_G     => APP_CONFIG_C)
       port map (
          axilClk         => axilClk,
@@ -166,16 +168,16 @@ begin
       v.mpsMessage.version   := mpsReg.mpsCore.mpsVersion;
       v.mpsMessage.lcls      := mpsReg.mpsCore.lcls1Mode;
       v.mpsMessage.timeStamp := mpsSelect.timeStamp;
-      v.mpsMessage.appId     := resize(mpsReg.mpsCore.mpsAppId,16);
+      v.mpsMessage.appId     := resize(mpsReg.mpsCore.mpsAppId, 16);
       v.mpsMessage.valid     := mpsSelect.valid and mpsReg.mpsCore.mpsEnable;
 
       -- Init message data
-      msgData := (others=>(others=>'0'));
+      msgData := (others => (others => '0'));
 
       -- Digtal Application
       if APP_CONFIG_C.DIGITAL_EN_C = true then
          v.mpsMessage.inputType := '0';
-         msgData(0) := mpsSelect.digitalBus;
+         msgData(0)             := mpsSelect.digitalBus;
 
       -- Analog Process each enabled channel
       else
@@ -190,20 +192,20 @@ begin
                if mpsSelect.mpsError(chan) = '1' then
                   for i in 0 to 7 loop
                      msgData(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C)(i) := '1';
-                     v.tholdMem(chan,0) := (others=>'1');
+                     v.tholdMem(chan, 0)                                     := (others => '1');
                   end loop;
 
                -- LCLS1 Mode
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.mpsCore.lcls1Mode = '1' then
-                  compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold, 
-                                 APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 mpsSelect.chanData(chan), 0, r.tholdMem(chan,0), v.tholdMem(chan,0), msgData);
+                  compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold,
+                                 APP_CONFIG_C.CHAN_CONFIG_C(chan),
+                                 mpsSelect.chanData(chan), 0, r.tholdMem(chan, 0), v.tholdMem(chan, 0), msgData);
 
                -- LCLS2 idle table
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
-                  compareTholds (mpsReg.mpsChanReg(chan).idleThold, 
-                                 APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                 mpsSelect.chanData(chan), 7, r.tholdMem(chan,7), v.tholdMem(chan,7), msgData);
+                  compareTholds (mpsReg.mpsChanReg(chan).idleThold,
+                                 APP_CONFIG_C.CHAN_CONFIG_C(chan),
+                                 mpsSelect.chanData(chan), 7, r.tholdMem(chan, 7), v.tholdMem(chan, 7), msgData);
 
                -- Multiple thresholds
                else
@@ -211,15 +213,15 @@ begin
 
                      -- Alternate table
                      if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
-                        compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold), 
-                                       APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan,thold), v.tholdMem(chan,thold), msgData);
+                        compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold),
+                                       APP_CONFIG_C.CHAN_CONFIG_C(chan),
+                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
 
                      -- Standard table
                      else
-                        compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold), 
-                                       APP_CONFIG_C.CHAN_CONFIG_C(chan), 
-                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan,thold), v.tholdMem(chan,thold), msgData);
+                        compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold),
+                                       APP_CONFIG_C.CHAN_CONFIG_C(chan),
+                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
                      end if;
                   end loop;
                end if;

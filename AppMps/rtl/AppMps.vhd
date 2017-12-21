@@ -2,7 +2,7 @@
 -- File       : AppMps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-11-09
+-- Last update: 2017-12-21
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -199,6 +199,7 @@ begin
    U_AppMpsEncoder : entity work.AppMpsEncoder
       generic map (
          TPD_G            => TPD_G,
+         AXI_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(ENCODER_INDEX_C).baseAddr,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          APP_TYPE_G       => APP_TYPE_G)
       port map (
