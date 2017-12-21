@@ -288,6 +288,7 @@ set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_cl
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {mpsClk312MHz}]
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {mpsClk125MHz}]
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {axilClk}]
+set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {recTimingClk}]
 
 create_generated_clock -name jesd0_185MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 create_generated_clock -name jesd0_370MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
@@ -324,6 +325,14 @@ set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jes
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk11}] -group [get_clocks -include_generated_clocks {fabClk}]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk12}] -group [get_clocks -include_generated_clocks {fabClk}]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {jesdClk13}] -group [get_clocks -include_generated_clocks {fabClk}]
+
+set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks -of_objects [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_Jesd/U_Coregen_Left/inst/gen_gtwizard_gtye4_top.JesdCryoCoreLeftColumn_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[3].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[0].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
+set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks -of_objects [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_Jesd/U_Coregen_Left/inst/gen_gtwizard_gtye4_top.JesdCryoCoreLeftColumn_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[3].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[1].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
+set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks -of_objects [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_Jesd/U_Coregen_Left/inst/gen_gtwizard_gtye4_top.JesdCryoCoreLeftColumn_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[3].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[2].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
+
+set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks -of_objects [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_Jesd/U_Coregen_Left/inst/gen_gtwizard_gtye4_top.JesdCryoCoreLeftColumn_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[3].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[0].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
+set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks -of_objects [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_Jesd/U_Coregen_Left/inst/gen_gtwizard_gtye4_top.JesdCryoCoreLeftColumn_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[3].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[1].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
+set_clock_groups -asynchronous -group [get_clocks {jesd1_185MHz}] -group [get_clocks -of_objects [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_Jesd/U_Coregen_Left/inst/gen_gtwizard_gtye4_top.JesdCryoCoreLeftColumn_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[3].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[2].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
 
 ##########################
 ## Misc. Configurations ##
