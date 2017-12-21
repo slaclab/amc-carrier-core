@@ -288,6 +288,7 @@ set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_cl
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {mpsClk312MHz}]
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {mpsClk125MHz}]
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {axilClk}]
+set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {recTimingClk}]
 
 create_generated_clock -name jesd0_185MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 create_generated_clock -name jesd0_370MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
