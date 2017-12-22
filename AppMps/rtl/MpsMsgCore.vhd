@@ -105,8 +105,6 @@ begin
             if mpsMessage.valid = '1' and mpsMessage.msgSize > 0 then
                -- Reset ready
                v.ready := '0';
-               -- Reset tData
-               v.mpsMaster.tData := (others => '0');
                -- Latch the information
                v.mpsMessage      := mpsMessage;
                -- Next state
@@ -116,6 +114,8 @@ begin
          when HEADER_S =>
             -- Check if ready to move data
             if v.mpsMaster.tValid = '0' then
+               -- Reset tData
+               v.mpsMaster.tData := (others => '0');
                -- Send the header
                v.mpsMaster.tValid             := '1';
                v.mpsMaster.tData(15)          := '0';  -- Mitigation Message flag has to be '0' (Will be checked at receiving end)
