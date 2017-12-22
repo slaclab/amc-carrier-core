@@ -133,6 +133,3 @@ set_property LOC BITSLICE_RX_TX_X0Y55  [get_cells -hier -filter {name =~ U_Core/
 ##########################
 ## Misc. Configurations ##
 ##########################
-
-set_clock_groups -asynchronous -group [get_clocks mpsClk250] -group [get_clocks -of_objects [get_pins U_AppTop/U_AppCore/U_LinkNode/U_GigEth/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0]]
-set_clock_groups -asynchronous -group [get_clocks mpsClk250] -group [get_clocks mpsClkThresh]
