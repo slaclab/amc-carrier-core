@@ -19,14 +19,16 @@ set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_cl
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {mpsClk312MHz}]
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {mpsClk125MHz}]
 
-create_generated_clock -name jesd0Clk1x [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
-create_generated_clock -name jesd0Clk2x [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {mpsClk125MHz}] 
 
-create_generated_clock -name jesd1Clk1x [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
-create_generated_clock -name jesd1Clk2x [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
+create_generated_clock -name jesd0_185MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
+create_generated_clock -name jesd0_370MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
 
-set_clock_groups -asynchronous -group [get_clocks {jesd0Clk1x}]  -group [get_clocks {jesd1Clk1x}] 
-set_clock_groups -asynchronous -group [get_clocks {jesd0Clk2x}]  -group [get_clocks {jesd1Clk2x}] 
+create_generated_clock -name jesd1_185MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
+create_generated_clock -name jesd1_370MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
+
+set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}]  -group [get_clocks {jesd1_185MHz}] 
+set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}]  -group [get_clocks {jesd1_370MHz}] 
 
 set_clock_groups -asynchronous \
    -group [get_clocks -include_generated_clocks {fabClk}] \

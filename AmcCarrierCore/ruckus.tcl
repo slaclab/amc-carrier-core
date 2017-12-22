@@ -54,6 +54,10 @@ if { $::env(AMC_ADV_BUILD)  == 1 ||
 } else {
    loadSource -path "$::DIR_PATH/core/AmcCarrierCoreBase.vhd"
    loadSource -path "$::DIR_PATH/dcp/images/AmcCarrierCore.dcp"
+   # After Vivado 2016.4, DCP don't contain .XDCs anymore
+   if { $::env(VIVADO_VERSION) > 2016.4 } {   
+      loadConstraints -path "$::DIR_PATH/dcp/hdl/AmcCarrierCore.xdc" 
+   }
 }
 
 # Add application ports and placement constraints
