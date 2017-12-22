@@ -2,7 +2,7 @@
 -- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2017-12-15
+-- Last update: 2017-12-22
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -48,7 +48,8 @@ package AmcCarrierPkg is
    -- 12/04/2017 (0x02000700): 2.0.7 release
    -- 12/11/2017 (0x02000700): 2.0.8 release
    -- 12/15/2017 (0x02010000): 2.1.0 release
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_01_00_00";
+   -- 12/22/2017 (0x02010100): 2.1.1 release
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_01_01_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types

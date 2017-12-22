@@ -189,6 +189,14 @@ AppMpsThr: &AppMpsThr
       lsBit:        0
       mode:         RW
       description:  One bit per destination for alternative table for altEn=true
+    mpsMsgDropCnt:
+      at:
+        offset:     0x0C
+      class:        IntField
+      sizeBits:     32
+      lsBit:        0
+      mode:         RO
+      description:  Mps drop message counter
     mpsMsgCount:
       at:
         offset:     0x10

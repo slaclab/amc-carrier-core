@@ -7,7 +7,8 @@ loadSource -sim_only -dir  "$::DIR_PATH/tb/"
 
 # Check for valid FPGA 
 if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
-   loadConstraints -path "$::DIR_PATH/xdc/AppTop_gen1.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/kintexu/AppTopPinout.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/AppTopTiming.xdc"
 
    if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
       loadSource      -dir  "$::DIR_PATH/rtl/xcku040"
@@ -25,8 +26,9 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
             $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {
 
    loadSource      -dir  "$::DIR_PATH/rtl/xcku060"
-   loadConstraints -path "$::DIR_PATH/xdc/AppTop_gen1.xdc"
-   loadConstraints -path "$::DIR_PATH/xdc/AppTopXCKU060.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/kintexu/AppTopPinout.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/kintexu/AppTopXCKU060.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/AppTopTiming.xdc"
    
    loadSource  -path "$::DIR_PATH/coregen/xcku060/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.dcp"
    #loadIpCore -path "$::DIR_PATH/coregen/xcku060/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.xci"
@@ -38,7 +40,8 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
             $::env(PRJ_PART) eq {XCKU15P-FFVA1156-3-E} } {
             
    loadSource      -dir  "$::DIR_PATH/rtl/xcku11p"
-   loadConstraints -path "$::DIR_PATH/xdc/AppTop_gen2.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/kintexuplus/AppTopPinout.xdc"
+   loadConstraints -path "$::DIR_PATH/xdc/AppTopTiming.xdc"
    
    loadSource  -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.dcp"
    # loadIpCore -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.xci"
