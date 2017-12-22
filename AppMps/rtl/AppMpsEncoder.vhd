@@ -102,7 +102,8 @@ architecture mapping of AppMpsEncoder is
       end if;
    end procedure;
 
-   signal mpsReg : MpsAppRegType;
+   signal mpsReg     : MpsAppRegType;
+   signal mpsMsgDrop : sl;
 
 --   attribute MARK_DEBUG : string;
 --   attribute MARK_DEBUG of r         : signal is "TRUE";
@@ -132,6 +133,7 @@ begin
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave,
          mpsMessage      => r.mpsMessage,
+         mpsMsgDrop      => mpsMsgDrop,
          mpsAppRegisters => mpsReg);
 
    --------------------------------- 
@@ -260,9 +262,9 @@ begin
          clk        => axilClk,
          rst        => axilRst,
          mpsMessage => r.mpsMessage,
+         mpsMsgDrop => mpsMsgDrop,
          mpsMaster  => mpsMaster,
-         mpsSlave   => mpsSlave
-         );
+         mpsSlave   => mpsSlave);
 
 end mapping;
 

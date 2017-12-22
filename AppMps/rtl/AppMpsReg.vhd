@@ -2,7 +2,7 @@
 -- File       : AppMpsReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-04-01
--- Last update: 2017-12-21
+-- Last update: 2017-12-22
 -------------------------------------------------------------------------------
 -- Description: 
 -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
@@ -44,6 +44,7 @@ entity AppMpsReg is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- MPS message monitoring
       mpsMessage      : in  MpsMessageType;
+      mpsMsgDrop      : in  sl;
       -- MPS Configuration Registers
       mpsAppRegisters : out MpsAppRegType);
 end AppMpsReg;
@@ -102,6 +103,7 @@ begin
       port map (
          -- MPS message monitoring
          mpsMessage      => mpsMessage,
+         mpsMsgDrop      => mpsMsgDrop,
          -- MPS Configuration Registers
          mpsCore         => mpsAppRegisters.mpsCore,
          beamDestMask    => mpsAppRegisters.beamDestMask,
@@ -138,10 +140,8 @@ begin
       U_ChanReg : entity work.AppMpsRegAppCh
          generic map (
             TPD_G            => TPD_G,
-            CHAN_G           => i,
-            APP_TYPE_G       => APP_TYPE_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            APP_CONFIG_G     => APP_CONFIG_G)
+            CHAN_CONFIG_G    => APP_CONFIG_G.CHAN_CONFIG_C(i),
+            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
          port map (
             -- MPS Configuration Registers
             mpsChanReg      => mpsAppRegisters.mpsChanReg(i),

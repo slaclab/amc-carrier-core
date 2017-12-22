@@ -2,7 +2,7 @@
 -- File       : AppMpsRegBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-04-01
--- Last update: 2017-12-21
+-- Last update: 2017-12-22
 -------------------------------------------------------------------------------
 -- Description: 
 -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
@@ -39,6 +39,7 @@ entity AppMpsRegBase is
    port (
       -- MPS message monitoring
       mpsMessage      : in  MpsMessageType;
+      mpsMsgDrop      : in  sl;
       -- MPS Configuration Registers
       mpsCore         : out MpsCoreRegType;
       beamDestMask    : out slv(15 downto 0);
@@ -61,6 +62,7 @@ architecture mapping of AppMpsRegBase is
       altDestMask    : slv(15 downto 0);
       mpsMessage     : MpsMessageType;
       mpsCount       : slv(31 downto 0);
+      mpsMsgDropCnt  : slv(31 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -71,6 +73,7 @@ architecture mapping of AppMpsRegBase is
       altDestMask    => (others => '0'),
       mpsMessage     => MPS_MESSAGE_INIT_C,
       mpsCount       => (others => '0'),
+      mpsMsgDropCnt  => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -79,7 +82,8 @@ architecture mapping of AppMpsRegBase is
 
 begin
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, mpsMessage, r) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, mpsMessage,
+                   mpsMsgDrop, r) is
       variable v     : RegType;
       variable regEp : AxiLiteEndPointType;
    begin
@@ -90,6 +94,11 @@ begin
       if mpsMessage.valid = '1' then
          v.mpsMessage := mpsMessage;
          v.mpsCount   := r.mpsCount + 1;
+      end if;
+
+      -- MPS dropped message
+      if mpsMsgDrop = '1' then
+         v.mpsMsgDropCnt := r.mpsMsgDropCnt + 1;
       end if;
 
       -- Determine the transaction type
@@ -107,6 +116,7 @@ begin
       axiSlaveRegister(regEp, x"0008", 0, v.beamDestMask);
       axiSlaveRegister(regEp, x"0008", 16, v.altDestMask);
 
+      axiSlaveRegisterR(regEp, x"000C", 0, r.mpsMsgDropCnt);
       axiSlaveRegisterR(regEp, x"0010", 0, r.mpsCount);
 
       axiSlaveRegisterR(regEp, x"0014", 0, r.mpsMessage.appId(9 downto 0));

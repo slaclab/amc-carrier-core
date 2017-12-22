@@ -2,7 +2,7 @@
 -- File       : AppMpsRegAppCh.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-04-01
--- Last update: 2017-12-21
+-- Last update: 2017-12-22
 -------------------------------------------------------------------------------
 -- Description: 
 -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
@@ -32,11 +32,9 @@ use unisim.vcomponents.all;
 
 entity AppMpsRegAppCh is
    generic (
-      TPD_G            : time             := 1 ns;
-      CHAN_G           : natural          := 0;
-      APP_TYPE_G       : AppType          := APP_NULL_TYPE_C;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      APP_CONFIG_G     : MpsAppConfigType := MPS_APP_CONFIG_INIT_C);
+      TPD_G            : time              := 1 ns;
+      CHAN_CONFIG_G    : MpsChanConfigType := MPS_CHAN_CONFIG_INIT_C;
+      AXI_ERROR_RESP_G : slv(1 downto 0)   := AXI_RESP_DECERR_C);
    port (
       -- MPS Configuration Registers
       mpsChanReg      : out MpsChanRegType;
@@ -78,23 +76,23 @@ begin
       -- Determine the transaction type
       axiSlaveWaitTxn(regEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
-      if APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).THOLD_COUNT_C > 0 then
+      if CHAN_CONFIG_G.THOLD_COUNT_C > 0 then
 
          -- Offset 0x0
-         axiSlaveRegisterR(regEp, toSlv(0, 9), 0, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).THOLD_COUNT_C, 8));
+         axiSlaveRegisterR(regEp, toSlv(0, 9), 0, toSlv(CHAN_CONFIG_G.THOLD_COUNT_C, 8));
 
-         if APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).IDLE_EN_C then
+         if CHAN_CONFIG_G.IDLE_EN_C then
             axiSlaveRegister(regEp, toSlv(0, 9), 8, v.mpsChanReg.idleEn);
          else
             axiSlaveRegisterR(regEp, toSlv(0, 9), 8, '0');
          end if;
 
-         axiSlaveRegisterR(regEp, toSlv(0, 9), 9, ite(APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).ALT_EN_C, '1', '0'));
-         axiSlaveRegisterR(regEp, toSlv(0, 9), 10, ite(APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).LCLS1_EN_C, '1', '0'));
-         axiSlaveRegisterR(regEp, toSlv(0, 9), 16, toSlv(APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).BYTE_MAP_C, 8));
+         axiSlaveRegisterR(regEp, toSlv(0, 9), 9, ite(CHAN_CONFIG_G.ALT_EN_C, '1', '0'));
+         axiSlaveRegisterR(regEp, toSlv(0, 9), 10, ite(CHAN_CONFIG_G.LCLS1_EN_C, '1', '0'));
+         axiSlaveRegisterR(regEp, toSlv(0, 9), 16, toSlv(CHAN_CONFIG_G.BYTE_MAP_C, 8));
 
          -- Offset 0x10, 0x14, 0x18
-         if APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).LCLS1_EN_C then
+         if CHAN_CONFIG_G.LCLS1_EN_C then
             axiSlaveRegister(regEp, toSlv(16, 9), 0, v.mpsChanReg.lcls1Thold.minTholdEn);
             axiSlaveRegister(regEp, toSlv(16, 9), 1, v.mpsChanReg.lcls1Thold.maxTholdEn);
             axiSlaveRegister(regEp, toSlv(20, 9), 0, v.mpsChanReg.lcls1Thold.minThold);
@@ -102,14 +100,14 @@ begin
          end if;
 
          -- Offset 0x20, 0x24, 0x28
-         if APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).IDLE_EN_C then
+         if CHAN_CONFIG_G.IDLE_EN_C then
             axiSlaveRegister(regEp, toSlv(32, 9), 0, v.mpsChanReg.idleThold.minTholdEn);
             axiSlaveRegister(regEp, toSlv(32, 9), 1, v.mpsChanReg.idleThold.maxTholdEn);
             axiSlaveRegister(regEp, toSlv(36, 9), 0, v.mpsChanReg.idleThold.minThold);
             axiSlaveRegister(regEp, toSlv(40, 9), 0, v.mpsChanReg.idleThold.maxThold);
          end if;
 
-         for thold in 0 to (APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).THOLD_COUNT_C-1) loop
+         for thold in 0 to (CHAN_CONFIG_G.THOLD_COUNT_C-1) loop
 
             -- standard: thold 0 = 0x100, thold 1 = 0x110, thold 7 = 0x170
             axiSlaveRegister(regEp, toSlv(256 + (thold*16) + 0, 9), 0, v.mpsChanReg.stdTholds(thold).minTholdEn);
@@ -118,7 +116,7 @@ begin
             axiSlaveRegister(regEp, toSlv(256 + (thold*16) + 8, 9), 0, v.mpsChanReg.stdTholds(thold).maxThold);
 
             -- alt: thold 0 = 0x180, thold 1 = 0x190, thold 7 = 0x1F0
-            if APP_CONFIG_G.CHAN_CONFIG_C(CHAN_G).ALT_EN_C then
+            if CHAN_CONFIG_G.ALT_EN_C then
                axiSlaveRegister(regEp, toSlv(384 + (thold*16) + 0, 9), 0, v.mpsChanReg.altTholds(thold).minTholdEn);
                axiSlaveRegister(regEp, toSlv(384 + (thold*16) + 0, 9), 1, v.mpsChanReg.altTholds(thold).maxTholdEn);
                axiSlaveRegister(regEp, toSlv(384 + (thold*16) + 4, 9), 0, v.mpsChanReg.altTholds(thold).minThold);
