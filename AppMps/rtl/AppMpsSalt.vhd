@@ -2,7 +2,7 @@
 -- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-12-20
+-- Last update: 2017-12-22
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -119,6 +119,9 @@ architecture mapping of AppMpsSalt is
    signal txPktSent    : sl;
    signal mpsTxPktSent : sl;
 
+   signal txEofeSent    : sl;
+   signal mpsTxEofeSent : sl;
+
    signal mpsRxLinkUp : slv(14 downto 1);
 
    signal rxPktRcvd    : slv(14 downto 1);
@@ -200,6 +203,7 @@ begin
             iDelayCtrlRdy => '1',          -- Not using RX path
             linkUp        => mpsTxLinkUp,
             txPktSent     => txPktSent,
+            txEofeSent    => txEofeSent,
             rxPktRcvd     => open,
             rxErrDet      => open,
             -- Slave Port
@@ -220,6 +224,14 @@ begin
             clk     => axilClk,
             dataIn  => txPktSent,
             dataOut => mpsTxPktSent);
+
+      U_mpsTxEofeSent : entity work.SynchronizerOneShot
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => axilClk,
+            dataIn  => txEofeSent,
+            dataOut => mpsTxEofeSent);
 
       GEN_VEC :
       for i in 14 downto 1 generate
@@ -304,6 +316,7 @@ begin
                iDelayCtrlRdy => iDelayCtrlRdy,
                linkUp        => mpsRxLinkUp(i),
                txPktSent     => open,
+               txEofeSent    => open,
                rxPktRcvd     => rxPktRcvd(i),
                rxErrDet      => rxErrDet(i),
                -- Slave Port
@@ -339,7 +352,7 @@ begin
 
    comb : process (axilReadMaster, axilRst, axilWriteMaster, cntOut,
                    diagnosticstrobe, mpsPllLocked, mpsRxErrDet, mpsRxPktRcvd,
-                   mpsTxPktSent, r, statusOut) is
+                   mpsTxEofeSent, mpsTxPktSent, r, statusOut) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
       variable i      : natural;
@@ -382,6 +395,9 @@ begin
       else
          if (mpsTxPktSent = '1') then
             v.mpsPktCnt(0) := r.mpsPktCnt(0) + 1;
+         end if;
+         if (mpsTxEofeSent = '1') then
+            v.mpsErrCnt(0) := r.mpsErrCnt(0) + 1;
          end if;
          for i in STATUS_SIZE_C-1 downto 1 loop
             if (mpsRxPktRcvd(i) = '1') then

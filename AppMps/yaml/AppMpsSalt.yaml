@@ -58,6 +58,15 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 32
       description: MPS RX Packet Received Counter[13:0]  
     #########################################################
+    MpsTxEofeSentCnt:
+      at:
+        offset: 0x100
+      class: IntField
+      name: MpsTxEofeSentCnt
+      mode: RO
+      sizeBits: 32
+      description: MPS TX EOFE Sent Counter    
+    #########################################################
     MpsRxErrDetCnt:
       at:
         offset: 0x104
