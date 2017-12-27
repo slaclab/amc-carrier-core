@@ -111,19 +111,10 @@ architecture mapping of AmcCarrierEth is
          connectivity => X"FFFF"));
 
    type SofRegType is record
-      txMaster : AxiStreamMasterType;
+      sof : sl;
    end record SofRegType;
 
-   function SofInit return AxiStreamMasterType is
-      variable v : AxiStreamMasterType;
-   begin
-      v := AXI_STREAM_MASTER_INIT_C;
-      ssiSetUserSof(EMAC_AXIS_CONFIG_C, v, '1');
-      return v;
-   end function SofInit;
-
-   constant SOF_REG_INIT_C : SofRegType := (
-      txMaster => SofInit);
+   constant SOF_REG_INIT_C : SofRegType := ( sof => '1' );
 
    signal rSof             : SofRegType := SOF_REG_INIT_C;
    signal rinSof           : SofRegType;
@@ -154,6 +145,8 @@ architecture mapping of AmcCarrierEth is
       return retConf;
    end function;
 
+   signal mXvcServerTdo   : AxiStreamMasterType;
+
    signal ibMacMaster : AxiStreamMasterType;
    signal ibMacSlave  : AxiStreamSlaveType;
    signal obMacMaster : AxiStreamMasterType;
@@ -175,6 +168,8 @@ architecture mapping of AmcCarrierEth is
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
    signal phyReady : sl;
+
+   signal 
 
 begin
 
@@ -442,12 +437,12 @@ begin
    ----------------------------
    -- 'XVC' Server @2542 (modified protocol to work over UDP)
    ----------------------------
-   P_SOF_COMB : process(rSof, obServerSlaves(XVC_SRV_IDX_C)) is
+   P_SOF_COMB : process(rSof, mXvcServerTdo, ibServerSlaves(XVC_SRV_IDX_C)) is
       variable v : SofRegType;
    begin
       v := rSof;
-      if ( (rSof.txMaster.tValid and obServerSlaves(XVC_SRV_IDX_C).tReady) = '1' ) then
-         ssiSetUserSof(EMAC_AXIS_CONFIG_C, v.txMaster, rSof.txMaster.tLast);
+      if ( (mXvcServerTdo.tValid and ibServerSlaves(XVC_SRV_IDX_C).tReady) = '1' ) then
+         v.sof := mXvcServerTdo.tLast;
       end if;
       rinSof <= v;
    end process P_SOF_COMB;
@@ -462,6 +457,15 @@ begin
          end if;
       end if;
    end process P_SOF_SEQ;
+
+   -- splice in the SOF bit
+   P_SOF_SPLICE : process(rSof, mXvcServerTdo) is
+      variable v : AxiStreamMasterType;
+   begin
+      v := mXvcServerTdo;
+      ssiSetUserSof(EMAC_AXIS_CONFIG_C, v, rSof.sof);
+      ibServerMasters(XVC_SRV_IDX_C) <= v;
+   end process P_SOF_SPLICE;
 
    U_XvcServer : entity work.AxisDebugBridge
       generic map (
@@ -478,7 +482,7 @@ begin
          mAxisReq            => obServerMasters(XVC_SRV_IDX_C),
          sAxisReq            => obServerSlaves(XVC_SRV_IDX_C),
 
-         mAxisTdo            => ibServerMasters(XVC_SRV_IDX_C),
+         mAxisTdo            => mXvcServerTdo,
          sAxisTdo            => ibServerSlaves(XVC_SRV_IDX_C));
 
    ----------------------------
