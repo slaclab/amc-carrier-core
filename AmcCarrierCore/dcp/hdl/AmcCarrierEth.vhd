@@ -169,8 +169,6 @@ architecture mapping of AmcCarrierEth is
 
    signal phyReady : sl;
 
-   signal 
-
 begin
 
    --------------------------
