@@ -87,7 +87,12 @@ end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
-   constant SERVER_SIZE_C : positive := 4;
+   constant SERVER_SIZE_C : positive := 5;
+   constant XVC_SRV_IDX_C : positive := 4;
+   constant XVC_SRV_PRT_C : positive := 2542;
+   constant XVC_MEM_SIZ_C : natural  := 1450/2; -- non-jumbo MTU; mem must hold max. reply = max request/2
+   constant TCLK_FREQ_C   : real     := 15.0E+6;
+
    constant CLIENT_SIZE_C : positive := 1;
 
    constant NUM_AXI_MASTERS_C : natural := 2;
@@ -105,13 +110,35 @@ architecture mapping of AmcCarrierEth is
          addrBits     => 16,
          connectivity => X"FFFF"));
 
+   type SofRegType is record
+      txMaster : AxiStreamMasterType;
+   end record SofRegType;
+
+   function SofInit return AxiStreamMasterType is
+      variable v : AxiStreamMasterType;
+   begin
+      v := AXI_STREAM_MASTER_INIT_C;
+      ssiSetUserSof(EMAC_AXIS_CONFIG_C, v, '1');
+      return v;
+   end function SofInit;
+
+   constant SOF_REG_INIT_C : SofRegType := (
+      txMaster => SofInit);
+
+   signal rSof             : SofRegType := SOF_REG_INIT_C;
+   signal rinSof           : SofRegType;
+
    function ServerPorts return PositiveArray is
       variable retConf   : PositiveArray(SERVER_SIZE_C-1 downto 0);
       variable baseIndex : positive;
    begin
       baseIndex := 8192;
       for i in SERVER_SIZE_C-1 downto 0 loop
-         retConf(i) := baseIndex+i;
+         if ( i = XVC_SRV_IDX_C ) then
+            retConf(i) := XVC_SRV_PRT_C;
+         else
+            retConf(i) := baseIndex+i;
+         end if;
       end loop;
       return retConf;
    end function;
@@ -411,6 +438,48 @@ begin
          mAxisRst    => axilRst,
          mAxisMaster => ibServerMasters(3),
          mAxisSlave  => ibServerSlaves(3));
+
+   ----------------------------
+   -- 'XVC' Server @2542 (modified protocol to work over UDP)
+   ----------------------------
+   P_SOF_COMB : process(rSof, obServerSlaves(XVC_SRV_IDX_C)) is
+      variable v : SofRegType;
+   begin
+      v := rSof;
+      if ( (rSof.txMaster.tValid and obServerSlaves(XVC_SRV_IDX_C).tReady) = '1' ) then
+         ssiSetUserSof(EMAC_AXIS_CONFIG_C, v.txMaster, rSof.txMaster.tLast);
+      end if;
+      rinSof <= v;
+   end process P_SOF_COMB;
+
+   P_SOF_SEQ : process(axilClk) is
+   begin
+      if ( rising_edge( axilClk ) ) then
+         if ( axilRst = '1' ) then
+            rSof <= SOF_REG_INIT_C after TPD_G;
+         else
+            rSof <= rinSof after TPD_G;
+         end if;
+      end if;
+   end process P_SOF_SEQ;
+
+   U_XvcServer : entity work.AxisDebugBridge
+      generic map (
+         TPD_G               => TPD_G,
+         AXIS_FREQ_G         => AXI_CLK_FREQ_C,
+         CLK_DIV2_G          => positive( ieee.math_real.round( AXI_CLK_FREQ_C/TCLK_FREQ_C/2.0 ) ),
+         AXIS_WIDTH_G        => EMAC_AXIS_CONFIG_C.TDATA_BYTES_C,
+         MEM_DEPTH_G         => XVC_MEM_SIZ_C/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C,
+         MEM_STYLE_G         => "auto")
+      port map (
+         axisClk             => axilClk,
+         axisRst             => axilRst,
+
+         mAxisReq            => obServerMasters(XVC_SRV_IDX_C),
+         sAxisReq            => obServerSlaves(XVC_SRV_IDX_C),
+
+         mAxisTdo            => ibServerMasters(XVC_SRV_IDX_C),
+         sAxisTdo            => ibServerSlaves(XVC_SRV_IDX_C));
 
    ----------------------------
    -- BP Messenger Network@8196
