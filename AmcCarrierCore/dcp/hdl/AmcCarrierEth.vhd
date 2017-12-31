@@ -90,8 +90,6 @@ architecture mapping of AmcCarrierEth is
    constant SERVER_SIZE_C : positive := 5;
    constant XVC_SRV_IDX_C : positive := 4;
    constant XVC_SRV_PRT_C : positive := 2542;
-   constant XVC_MEM_SIZ_C : natural  := 1450/2; -- non-jumbo MTU; mem must hold max. reply = max request/2
-   constant TCLK_FREQ_C   : real     := 15.0E+6;
 
    constant CLIENT_SIZE_C : positive := 1;
 
@@ -144,6 +142,40 @@ architecture mapping of AmcCarrierEth is
       end loop;
       return retConf;
    end function;
+
+   component AxisDebugBridge is
+   generic (
+      TPD_G            : time                       := 1 ns;
+      AXIS_FREQ_G      : real                       := 0.0;   -- Hz (for computing TCK period)
+      AXIS_WIDTH_G     : positive range 4 to 16     := 4;     -- bytes
+      CLK_DIV2_G       : positive                   := 4;     -- half-period of TCK in axisClk cycles
+      MEM_DEPTH_G      : natural  range 0 to 65535  := 4;     -- size of buffer memory (0 for none)
+      MEM_STYLE_G      : string                     := "auto" -- 'auto', 'block' or 'distributed'
+   );
+      port (
+         axisClk          : in  sl;
+         axisRst          : in  sl;
+   
+       \mAxisReq[tValid]\ : in  sl;
+       \mAxisReq[tData]\  : in  slv ( 127 downto 0 );
+       \mAxisReq[tStrb]\  : in  slv (  15 downto 0 );
+       \mAxisReq[tKeep]\  : in  slv (  15 downto 0 );
+       \mAxisReq[tLast]\  : in  sl;
+       \mAxisReq[tDest]\  : in  slv (   7 downto 0 );
+       \mAxisReq[tId]\    : in  slv (   7 downto 0 );
+       \mAxisReq[tUser]\  : in  slv ( 127 downto 0 );
+       \sAxisReq[tReady]\ : out sl;
+       \mAxisTdo[tValid]\ : out sl;
+       \mAxisTdo[tData]\  : out slv ( 127 downto 0 );
+       \mAxisTdo[tStrb]\  : out slv (  15 downto 0 );
+       \mAxisTdo[tKeep]\  : out slv (  15 downto 0 );
+       \mAxisTdo[tLast]\  : out sl;
+       \mAxisTdo[tDest]\  : out slv (   7 downto 0 );
+       \mAxisTdo[tId]\    : out slv (   7 downto 0 );
+       \mAxisTdo[tUser]\  : out slv ( 127 downto 0 );
+       \sAxisTdo[tReady]\ : in  sl
+   );
+   end component AxisDebugBridge;
 
    signal mXvcServerTdo   : AxiStreamMasterType;
 
@@ -466,22 +498,29 @@ begin
    end process P_SOF_SPLICE;
 
    U_XvcServer : entity work.AxisDebugBridge
-      generic map (
-         TPD_G               => TPD_G,
-         AXIS_FREQ_G         => AXI_CLK_FREQ_C,
-         CLK_DIV2_G          => positive( ieee.math_real.round( AXI_CLK_FREQ_C/TCLK_FREQ_C/2.0 ) ),
-         AXIS_WIDTH_G        => EMAC_AXIS_CONFIG_C.TDATA_BYTES_C,
-         MEM_DEPTH_G         => XVC_MEM_SIZ_C/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C,
-         MEM_STYLE_G         => "auto")
       port map (
          axisClk             => axilClk,
          axisRst             => axilRst,
 
-         mAxisReq            => obServerMasters(XVC_SRV_IDX_C),
-         sAxisReq            => obServerSlaves(XVC_SRV_IDX_C),
-
-         mAxisTdo            => mXvcServerTdo,
-         sAxisTdo            => ibServerSlaves(XVC_SRV_IDX_C));
+         \mAxisReq[tValid]\  => obServerMasters(XVC_SRV_IDX_C).tValid,
+         \mAxisReq[tData]\   => obServerMasters(XVC_SRV_IDX_C).tData,
+         \mAxisReq[tStrb]\   => obServerMasters(XVC_SRV_IDX_C).tStrb,
+         \mAxisReq[tKeep]\   => obServerMasters(XVC_SRV_IDX_C).tKeep,
+         \mAxisReq[tLast]\   => obServerMasters(XVC_SRV_IDX_C).tLast,
+         \mAxisReq[tDest]\   => obServerMasters(XVC_SRV_IDX_C).tDest,
+         \mAxisReq[tId]\     => obServerMasters(XVC_SRV_IDX_C).tId,
+         \mAxisReq[tUser]\   => obServerMasters(XVC_SRV_IDX_C).tUser,
+         \sAxisReq[tReady]\  => obServerSlaves(XVC_SRV_IDX_C).tReady,
+         \mAxisTdo[tValid]\  => mXvcServerTdo.tValid,
+         \mAxisTdo[tData]\   => mXvcServerTdo.tData,
+         \mAxisTdo[tStrb]\   => mXvcServerTdo.tStrb,
+         \mAxisTdo[tKeep]\   => mXvcServerTdo.tKeep,
+         \mAxisTdo[tLast]\   => mXvcServerTdo.tLast,
+         \mAxisTdo[tDest]\   => mXvcServerTdo.tDest,
+         \mAxisTdo[tId]\     => mXvcServerTdo.tId,
+         \mAxisTdo[tUser]\   => mXvcServerTdo.tUser,
+         \sAxisTdo[tReady]\  => ibServerSlaves(XVC_SRV_IDX_C).tReady
+         );
 
    ----------------------------
    -- BP Messenger Network@8196
