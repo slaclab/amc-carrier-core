@@ -143,15 +143,7 @@ architecture mapping of AmcCarrierEth is
       return retConf;
    end function;
 
-   component AxisDebugBridge is
-   generic (
-      TPD_G            : time                       := 1 ns;
-      AXIS_FREQ_G      : real                       := 0.0;   -- Hz (for computing TCK period)
-      AXIS_WIDTH_G     : positive range 4 to 16     := 4;     -- bytes
-      CLK_DIV2_G       : positive                   := 4;     -- half-period of TCK in axisClk cycles
-      MEM_DEPTH_G      : natural  range 0 to 65535  := 4;     -- size of buffer memory (0 for none)
-      MEM_STYLE_G      : string                     := "auto" -- 'auto', 'block' or 'distributed'
-   );
+   component UdpDebugBridge is
       port (
          axisClk          : in  sl;
          axisRst          : in  sl;
@@ -175,7 +167,7 @@ architecture mapping of AmcCarrierEth is
        \mAxisTdo[tUser]\  : out slv ( 127 downto 0 );
        \sAxisTdo[tReady]\ : in  sl
    );
-   end component AxisDebugBridge;
+   end component UdpDebugBridge;
 
    signal mXvcServerTdo   : AxiStreamMasterType;
 
@@ -497,7 +489,7 @@ begin
       ibServerMasters(XVC_SRV_IDX_C) <= v;
    end process P_SOF_SPLICE;
 
-   U_XvcServer : entity work.AxisDebugBridge
+   U_XvcServer : component UdpDebugBridge
       port map (
          axisClk             => axilClk,
          axisRst             => axilRst,
