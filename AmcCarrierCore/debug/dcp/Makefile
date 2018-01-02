@@ -10,7 +10,7 @@ Stub@%:
 else
 
 VALID_VARIANTS=Impl Stub
-ifeq ($(filter,$(VALID_VARIANTS),$(VARIANT)),)
+ifeq ($(filter $(VALID_VARIANTS),$(VARIANT)),)
   $(error "Invalid variant '$(VARIANT)' -- valid variants are: $(VALID_VARIANTS)")
 endif
 
