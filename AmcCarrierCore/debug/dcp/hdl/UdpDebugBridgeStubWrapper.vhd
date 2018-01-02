@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Title      : XVC Debug Bridge Support
 -------------------------------------------------------------------------------
--- File       : UdpDebugBridgeWrapper.vhd
+-- File       : UdpDebugBridgeStubWrapper.vhd
 -- Author     : Till Straumann <strauman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-12-05
@@ -26,12 +26,11 @@ use ieee.numeric_std.all;
 
 use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
-use work.AmcCarrierPkg.all;
-use work.EthMacPkg.all;
+use work.UdpDebugBridgePkg.all;
 
 -- AxisDebugBridge Configured for AmcCarrierCore
 
-entity UdpDebugBridgeWrapper is
+entity UdpDebugBridge is
    port (
       axisClk          : in sl;
       axisRst          : in sl;
@@ -42,43 +41,18 @@ entity UdpDebugBridgeWrapper is
       mAxisTdo         : out AxiStreamMasterType;
       sAxisTdo         : in  AxiStreamSlaveType
    );
-end entity UdpDebugBridgeWrapper;
+end entity UdpDebugBridge;
 
-architecture UdpDebugBridgeWrapperImpl of UdpDebugBridgeWrapper is
-
-   constant XVC_MEM_SIZ_C : natural  := 1450/2; -- non-jumbo MTU; mem must hold max. reply = max request/2
-   constant TCLK_FREQ_C   : real     := 15.0E+6;
-
-   component AxisDebugBridge is
-      generic (
-         TPD_G            : time                       := 1 ns;
-         AXIS_FREQ_G      : real                       := 0.0;   -- Hz (for computing TCK period)
-         AXIS_WIDTH_G     : positive range 4 to 16     := 4;     -- bytes
-         CLK_DIV2_G       : positive                   := 4;     -- half-period of TCK in axisClk cycles
-         MEM_DEPTH_G      : natural  range 0 to 65535  := 4;     -- size of buffer memory (0 for none)
-         MEM_STYLE_G      : string                     := "auto" -- 'auto', 'block' or 'distributed'
-      );
-      port (
-         axisClk          : in sl;
-         axisRst          : in sl;
-
-         mAxisReq         : in  AxiStreamMasterType;
-         sAxisReq         : out AxiStreamSlaveType;
-
-         mAxisTdo         : out AxiStreamMasterType;
-         sAxisTdo         : in  AxiStreamSlaveType
-      );
-   end component AxisDebugBridge;
-
+architecture UdpDebugBridgeImpl of UdpDebugBridge is
 begin
 
-   U_AxisDebugBridge : component AxisDebugBridge
+   U_AxisDebugBridge : entity work.AxisDebugBridge(AxisDebugBridgeStub)
       generic map (
-         AXIS_FREQ_G         => AXI_CLK_FREQ_C,
-         CLK_DIV2_G          => positive( ieee.math_real.round( AXI_CLK_FREQ_C/TCLK_FREQ_C/2.0 ) ),
-         AXIS_WIDTH_G        => EMAC_AXIS_CONFIG_C.TDATA_BYTES_C,
-         MEM_DEPTH_G         => XVC_MEM_SIZ_C/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C,
-         MEM_STYLE_G         => "auto"
+         AXIS_FREQ_G         => XVC_ACLK_FREQ_C,
+         CLK_DIV2_G          => XVC_TCLK_DIV2_C,
+         AXIS_WIDTH_G        => XVC_AXIS_WIDTH_C,
+         MEM_DEPTH_G         => XVC_MEM_DEPTH_C,
+         MEM_STYLE_G         => XVC_MEM_STYLE_C
       )
       port map (
          axisClk             => axisClk,
@@ -91,4 +65,4 @@ begin
          sAxisTdo            => sAxisTdo
       );
 
-end architecture UdpDebugBridgeWrapperImpl;
+end architecture UdpDebugBridgeImpl;
