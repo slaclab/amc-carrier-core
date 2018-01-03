@@ -1,7 +1,7 @@
-// Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.
+// Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
-// Tool Version: Vivado v.2017.3 (lin64) Build 2018833 Wed Oct  4 19:58:07 MDT 2017
-// Date        : Sun Dec 31 14:00:57 2017
+// Tool Version: Vivado v.2016.4 (lin64) Build 1756540 Mon Jan 23 19:11:19 MST 2017
+// Date        : Tue Jan  2 10:43:11 2018
 // Host        : rdsrv221 running 64-bit Red Hat Enterprise Linux Server release 6.9 (Santiago)
 // Command     : write_verilog -force -mode synth_stub
 //               /u1/strauman/amc-carrier-project-template/firmware/submodules/amc-carrier-core/AmcCarrierCore/dcp/images/AmcCarrierCore_stub.v
