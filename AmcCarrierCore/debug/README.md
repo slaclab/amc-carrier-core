@@ -2,10 +2,11 @@ XVC Debugging with the AMC Carrier Core
 =======================================
 
 The AMC Carrier Core FW instantiates a Debug Bridge (`AxisDebugBridge`)
-*component* from the SURF library (see surf/protocols/jtag/README.md) and
+component from the SURF library (see surf/protocols/jtag/README.md) and
 connects it to a UDP server at port 2542.
-The binding to an actual entity is deferred to the application (for both,
-the 'advanced' and the 'base' workflow with a pre-synthesized DCP).
+Note, however, that the binding to an actual entity is deferred to the
+application (for both, the 'advanced' and the 'base' workflow with a
+pre-synthesized DCP).
 
 The Carrier Core library provides two DCP modules which the application
 can 'plug' into the debug bridge instantiation:
@@ -19,7 +20,7 @@ can 'plug' into the debug bridge instantiation:
      |________________________|
 
 - A stub module which does not actually instantiate a debug bridge.
-  It merely terminates the AXI Stream and replies to QUERY requests
+  It merely terminates the AXI Stream and replies to QUERY commands
   with an error code.
 
 - A 'true' Axis Debug Bridge.
