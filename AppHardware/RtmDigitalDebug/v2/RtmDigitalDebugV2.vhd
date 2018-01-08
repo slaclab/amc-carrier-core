@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebugV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-07-27
+-- Last update: 2018-01-08
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ architecture mapping of RtmDigitalDebugV2 is
 
    signal clk          : slv(1 downto 0);
    signal rst          : slv(1 downto 0);
-   signal userValueIn  : slv(31 downto 0) := (others => '0');
+   signal userValueIn  : slv(31 downto 0);
    signal userValueOut : slv(31 downto 0);
    signal doutP        : slv(7 downto 0);
    signal doutN        : slv(7 downto 0);
@@ -109,6 +109,8 @@ begin
          clkOut => clk,
          rstOut => rst,
          locked => userValueIn(0));
+
+   userValueIn(31 downto 1) <= (others => '0');
 
    U_CLK : entity work.ClkOutBufDiff
       generic map (

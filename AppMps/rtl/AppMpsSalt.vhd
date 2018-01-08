@@ -2,7 +2,7 @@
 -- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-12-22
+-- Last update: 2018-01-08
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -147,12 +147,14 @@ begin
 
    APP_UNDEFINED : if (APP_TYPE_G = APP_NULL_TYPE_C) generate
 
-      mpsTxLinkUp  <= '0';
-      mpsTxPktSent <= '0';
-      mpsRxLinkUp  <= (others => '0');
-      mpsRxPktRcvd <= (others => '0');
-      mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
-      mpsIbSlave   <= AXI_STREAM_SLAVE_FORCE_C;
+      mpsTxLinkUp   <= '0';
+      mpsTxPktSent  <= '0';
+      mpsTxEofeSent <= '0';
+      mpsRxLinkUp   <= (others => '0');
+      mpsRxPktRcvd  <= (others => '0');
+      mpsRxErrDet   <= (others => '0');
+      mpsObMasters  <= (others => AXI_STREAM_MASTER_INIT_C);
+      mpsIbSlave    <= AXI_STREAM_SLAVE_FORCE_C;
 
       U_OBUFDS : OBUFDS
          port map (
@@ -176,6 +178,8 @@ begin
    APP_SLOT : if (MPS_SLOT_G = false) and (APP_TYPE_G /= APP_NULL_TYPE_C) generate
 
       mpsRxLinkUp  <= (others => '0');
+      mpsRxPktRcvd <= (others => '0');
+      mpsRxErrDet  <= (others => '0');
       mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
 
       U_SaltUltraScale : entity work.SaltUltraScale
@@ -281,7 +285,9 @@ begin
             mAxisMaster => mpsObMasters(0),
             mAxisSlave  => mpsObSlaves(0));
 
-      mpsTxLinkUp <= '0';
+      mpsTxLinkUp   <= '0';
+      mpsTxPktSent  <= '0';
+      mpsTxEofeSent <= '0';
 
       U_OBUFDS : OBUFDS
          port map (
