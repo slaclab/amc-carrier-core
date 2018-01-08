@@ -43,3 +43,6 @@ set_clock_groups -asynchronous \
    -group [get_clocks -include_generated_clocks {jesdClk10}] \
    -group [get_clocks -include_generated_clocks {jesdClk11}] \
    -group [get_clocks -include_generated_clocks {jesdClk12}]
+
+set_clock_groups -asynchronous -group [get_clocks mpsClkThresh] -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_AmcCorePll/PllGen.U_Pll/CLKOUT0]]
+   

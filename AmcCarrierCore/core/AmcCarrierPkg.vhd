@@ -2,9 +2,9 @@
 -- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2017-12-15
+-- Last update: 2018-01-08
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: Common AMC Carrier Core VHDL package
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -42,13 +42,16 @@ package AmcCarrierPkg is
    -- 09/01/2016 (0x00000009): Backing up to 1.2 TAG
    -- 12/05/2016 (0x0000000A): Adding more application types
    -- 03/02/2017 (0x0000000B): Migration to GIT
-   -- 11/08/2017 (0x02000400): 2.0.4 release
-   -- 11/14/2017 (0x02000500): 2.0.5 release
-   -- 11/17/2017 (0x02000600): 2.0.6 release
-   -- 12/04/2017 (0x02000700): 2.0.7 release
-   -- 12/11/2017 (0x02000700): 2.0.8 release
-   -- 12/15/2017 (0x02010000): 2.1.0 release
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_01_00_00";
+   -- 11/08/2017 (0x02000400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.4
+   -- 11/14/2017 (0x02000500): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.5
+   -- 11/17/2017 (0x02000600): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.6
+   -- 12/04/2017 (0x02000700): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.7
+   -- 12/11/2017 (0x02000700): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.8
+   -- 12/15/2017 (0x02010000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.0
+   -- 12/22/2017 (0x02010100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.1
+   -- 12/23/2017 (0x02010200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.2
+   -- 01/08/2018 (0x02010300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.3
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_01_03_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
