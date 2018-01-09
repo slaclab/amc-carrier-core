@@ -1,7 +1,7 @@
 XVC Debugging with the AMC Carrier Core
 =======================================
 
-The AMC Carrier Core FW instantiates a Debug Bridge (`AxisDebugBridge`)
+The AMC Carrier Core FW instantiates a Debug Bridge (`AxisJtagDebugBridge`)
 component from the SURF library (see surf/protocols/jtag/README.md) and
 connects it to a UDP server at port 2542.
 Note, however, that the binding to an actual entity is deferred to the
