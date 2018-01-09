@@ -56,7 +56,27 @@ AppMpsSalt: &AppMpsSalt
       name: MpsRxPktRcvdSentCnt
       mode: RO
       sizeBits: 32
-      description: MPS RX Packet Received Counter[13:0]      
+      description: MPS RX Packet Received Counter[13:0]  
+    #########################################################
+    MpsTxEofeSentCnt:
+      at:
+        offset: 0x100
+      class: IntField
+      name: MpsTxEofeSentCnt
+      mode: RO
+      sizeBits: 32
+      description: MPS TX EOFE Sent Counter    
+    #########################################################
+    MpsRxErrDetCnt:
+      at:
+        offset: 0x104
+        stride: 4
+        nelms: 14
+      class: IntField
+      name: MpsRxErrDetCnt
+      mode: RO
+      sizeBits: 32
+      description: MPS RX Error Detected Counter[13:0]        
     #########################################################
     MpsTxLinkUP:
       at:
@@ -107,6 +127,16 @@ AppMpsSalt: &AppMpsSalt
       lsBit: 0
       sizeBits: 1
       description: MPS PLL Lock Status
+    #########################################################
+    DiagnosticStrbCnt:
+      at:
+        offset: 0x718
+      class: IntField
+      name: MpsPllLocked
+      mode: RO
+      lsBit: 0
+      sizeBits: 32
+      description: Counts the diagnostic strobes     
     #########################################################
     RollOverEn:
       at:

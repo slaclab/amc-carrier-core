@@ -205,7 +205,7 @@ begin
    --------------------------------
    -- Common Clock and Reset Module
    -------------------------------- 
-   U_IBUFDS : IBUFDS_GTE3
+   U_IBUFDS : entity work.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
@@ -247,8 +247,8 @@ begin
          BANDWIDTH_G       => "OPTIMIZED",
          CLKIN_PERIOD_G    => 6.4,
          DIVCLK_DIVIDE_G   => 1,
-         CLKFBOUT_MULT_G   => 4,
-         CLKOUT0_DIVIDE_G  => 4)
+         CLKFBOUT_MULT_G   => 8,
+         CLKOUT0_DIVIDE_G  => 8)
       port map(
          -- Clock Input
          clkIn     => fabClk,

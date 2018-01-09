@@ -93,11 +93,12 @@ architecture mapping of AmcCarrierTiming is
          addrBits     => 23,
          connectivity => x"FFFF"));
 
-   signal timingRefClk     : sl;
-   signal timingRefClkDiv2 : sl;
-   signal timingRecClkGt   : sl;
-   signal timingRecClk     : sl;
-   signal timingClockSel   : sl;
+   signal timingRefClk   : sl;
+   signal timingRefDiv2   : sl;
+   signal timingRefClkDiv2   : sl;
+   signal timingRecClkGt : sl;
+   signal timingRecClk   : sl;
+   signal timingClockSel : sl;
 
    -- Rx ports
    signal rxReset        : sl;
@@ -174,7 +175,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Clock Buffers
    -------------------------------------------------------------------------------------------------
-   TIMING_REFCLK_IBUFDS_GTE3 : IBUFDS_GTE3
+   TIMING_REFCLK_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
@@ -183,21 +184,22 @@ begin
          I     => timingRefClkInP,
          IB    => timingRefClkInN,
          CEB   => '0',
-         ODIV2 => timingRefClkDiv2,
+         ODIV2 => timingRefDiv2,
          O     => timingRefClk);
 
    U_BUFG_GT_DIV2 : BUFG_GT
       port map (
-         I       => timingRefClkDiv2,
+         I       => timingRefDiv2,
          CE      => '1',
          CEMASK  => '1',
          CLR     => '0',
          CLRMASK => '1',
          DIV     => "000",              -- Divide by 1
-         O       => appTimingRefClkDiv2);
-
-   appTimingRefClk <= timingRefClk;
-
+         O       => timingRefClkDiv2);         
+         
+   appTimingRefClk     <= timingRefClk;
+   appTimingRefClkDiv2 <= timingRefClkDiv2;
+         
    -------------------------------------------------------------------------------------------------
    -- GTH Timing Receiver
    -------------------------------------------------------------------------------------------------
@@ -215,6 +217,7 @@ begin
          axilWriteSlave  => axilWriteSlaves(1),
          stableClk       => axilClk,
          gtRefClk        => timingRefClk,
+         gtRefClkDiv2    => timingRefClkDiv2,
          gtRxP           => timingRxP,
          gtRxN           => timingRxN,
          gtTxP           => timingTxP,
@@ -254,8 +257,8 @@ begin
             BANDWIDTH_G        => "OPTIMIZED",
             CLKIN_PERIOD_G     => 5.355,
             DIVCLK_DIVIDE_G    => 1,
-            CLKFBOUT_MULT_F_G  => 5.375,
-            CLKOUT0_DIVIDE_F_G => 5.375)
+            CLKFBOUT_MULT_F_G  => 6.500,
+            CLKOUT0_DIVIDE_F_G => 6.500)
          port map(
             clkIn     => timingRecClkGt,
             rstIn     => rxStatus.resetDone,

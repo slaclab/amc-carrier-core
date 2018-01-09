@@ -2,9 +2,9 @@
 -- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2017-04-07
+-- Last update: 2018-01-08
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: Common AMC Carrier Core VHDL package
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -42,26 +42,35 @@ package AmcCarrierPkg is
    -- 09/01/2016 (0x00000009): Backing up to 1.2 TAG
    -- 12/05/2016 (0x0000000A): Adding more application types
    -- 03/02/2017 (0x0000000B): Migration to GIT
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"0000000B";
+   -- 11/08/2017 (0x02000400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.4
+   -- 11/14/2017 (0x02000500): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.5
+   -- 11/17/2017 (0x02000600): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.6
+   -- 12/04/2017 (0x02000700): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.7
+   -- 12/11/2017 (0x02000700): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.8
+   -- 12/15/2017 (0x02010000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.0
+   -- 12/22/2017 (0x02010100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.1
+   -- 12/23/2017 (0x02010200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.2
+   -- 01/08/2018 (0x02010300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.3
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_01_03_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
    -----------------------------------------------------------
    subtype AppType is slv(6 downto 0);  -- Max. Size is 7-bits
 
-   constant APP_NULL_TYPE_C           : AppType := toSlv(0, AppType'length);
-   constant APP_DEBUG_TYPE_C          : AppType := toSlv(1, AppType'length);
-   constant APP_TIME_GEN_TYPE_C       : AppType := toSlv(10, AppType'length);  --Timing Generator with local reference
-   constant APP_BCM_TYPE_C            : AppType := toSlv(11, AppType'length);
-   constant APP_BLEN_TYPE_C           : AppType := toSlv(12, AppType'length);
-   constant APP_LLRF_TYPE_C           : AppType := toSlv(13, AppType'length);
-   constant APP_EXTREF_GEN_TYPE_C     : AppType := toSlv(14, AppType'length);  --Timing Generator with external reference
+   constant APP_NULL_TYPE_C       : AppType := toSlv(0, AppType'length);
+   constant APP_DEBUG_TYPE_C      : AppType := toSlv(1, AppType'length);
+   constant APP_TIME_GEN_TYPE_C   : AppType := toSlv(10, AppType'length);  --Timing Generator with local reference
+   constant APP_BCM_TYPE_C        : AppType := toSlv(11, AppType'length);
+   constant APP_BLEN_TYPE_C       : AppType := toSlv(12, AppType'length);
+   constant APP_LLRF_TYPE_C       : AppType := toSlv(13, AppType'length);
+   constant APP_EXTREF_GEN_TYPE_C : AppType := toSlv(14, AppType'length);  --Timing Generator with external reference
 
-   constant APP_BPM_STRIPLINE_TYPE_C  : AppType := toSlv(100, AppType'length);
-   constant APP_BPM_CAVITY_TYPE_C     : AppType := toSlv(101, AppType'length);
+   constant APP_BPM_STRIPLINE_TYPE_C : AppType := toSlv(100, AppType'length);
+   constant APP_BPM_CAVITY_TYPE_C    : AppType := toSlv(101, AppType'length);
 
-   constant APP_MPS_24CH_TYPE_C       : AppType := toSlv(120, AppType'length);
-   constant APP_MPS_6CH_TYPE_C        : AppType := toSlv(121, AppType'length);
+   constant APP_MPS_24CH_TYPE_C : AppType := toSlv(120, AppType'length);
+   constant APP_MPS_6CH_TYPE_C  : AppType := toSlv(121, AppType'length);
 
    -------------------------------------
    -- Common Platform: General Constants
@@ -70,9 +79,9 @@ package AmcCarrierPkg is
    constant TIMING_MODE_186MHZ_C : boolean := true;  -- true = LCLS-II timing
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
 
-   constant AXI_CLK_FREQ_C   : real := 156.25E+6;                        -- In units of Hz
+   constant AXI_CLK_FREQ_C   : real := 156.25E+6;             -- In units of Hz
    constant AXI_CLK_PERIOD_C : real := (1.0/AXI_CLK_FREQ_C);  -- In units of seconds      
-   
+
    constant APP_REG_BASE_ADDR_C : slv(31 downto 0) := x"80000000";
 
    -------------------------------------------------------------------------------------------------
@@ -113,11 +122,11 @@ package AmcCarrierPkg is
       slave => AXI_STREAM_SLAVE_INIT_C,
       ctrl  => AXI_STREAM_CTRL_INIT_C);
    constant WAVEFORM_SLAVE_ARRAY_INIT_C : WaveformSlaveArrayType := (others => (others => WAVEFORM_SLAVE_REC_INIT_C));
-   
+
    constant WAVEFORM_SLAVE_REC_FORCE_C : WaveformSlaveRecType := (
       slave => AXI_STREAM_SLAVE_FORCE_C,
       ctrl  => AXI_STREAM_CTRL_UNUSED_C);
-   constant WAVEFORM_SLAVE_ARRAY_FORCE_C : WaveformSlaveArrayType := (others => (others => WAVEFORM_SLAVE_REC_FORCE_C));   
+   constant WAVEFORM_SLAVE_ARRAY_FORCE_C : WaveformSlaveArrayType := (others => (others => WAVEFORM_SLAVE_REC_FORCE_C));
 
    ---------------------------------------------------
    -- BSI: Configurations, Constants and Records Types
@@ -137,9 +146,9 @@ package AmcCarrierPkg is
    type DiagnosticBusType is record
       strobe        : sl;
       data          : Slv32Array(31 downto 0);
-      sevr          : Slv2Array (31 downto 0); -- (0=NONE, 1=MINOR, 2=MAJOR, 3=INVALID)
-      fixed         : slv       (31 downto 0); -- do not add/average (static)
-      mpsIgnore     : slv       (31 downto 0); -- MPS ignores value
+      sevr          : Slv2Array (31 downto 0);  -- (0=NONE, 1=MINOR, 2=MAJOR, 3=INVALID)
+      fixed         : slv (31 downto 0);        -- do not add/average (static)
+      mpsIgnore     : slv (31 downto 0);        -- MPS ignores value
       timingMessage : TimingMessageType;
    end record;
    type DiagnosticBusArray is array (natural range <>) of DiagnosticBusType;
@@ -167,9 +176,9 @@ package body AmcCarrierPkg is
       vector(TIMING_MESSAGE_BITS_C-1 downto 0) := toSlv(b.timingMessage);
       i                                        := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
-         assignSlv(i, vector, b.data     (j));
-         assignSlv(i, vector, b.sevr     (j));
-         assignSlv(i, vector, b.fixed    (j));
+         assignSlv(i, vector, b.data (j));
+         assignSlv(i, vector, b.sevr (j));
+         assignSlv(i, vector, b.fixed (j));
          assignSlv(i, vector, b.mpsIgnore(j));
       end loop;
       assignSlv(i, vector, b.strobe);
@@ -183,13 +192,13 @@ package body AmcCarrierPkg is
       b.timingMessage := toTimingMessageType(vec(TIMING_MESSAGE_BITS_C-1 downto 0));
       i               := TIMING_MESSAGE_BITS_C;
       for j in 0 to 31 loop
-         assignRecord(i, vec, b.data     (j));
-         assignRecord(i, vec, b.sevr     (j));
-         assignRecord(i, vec, b.fixed    (j));
+         assignRecord(i, vec, b.data (j));
+         assignRecord(i, vec, b.sevr (j));
+         assignRecord(i, vec, b.fixed (j));
          assignRecord(i, vec, b.mpsIgnore(j));
       end loop;
       assignRecord(i, vec, b.strobe);
       return b;
    end function;
-  
+
 end package body AmcCarrierPkg;

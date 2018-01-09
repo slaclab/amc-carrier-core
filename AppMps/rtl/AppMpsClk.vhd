@@ -2,7 +2,7 @@
 -- File       : AppMpsClk.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-10-19
+-- Last update: 2017-12-15
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -74,15 +74,39 @@ begin
          I => mpsClkIn,
          O => mpsRefClk);
 
-   mpsClk   <= axilClk when(MPS_SLOT_G) else mpsRefClk;
-   mpsRst   <= axilRst when(MPS_SLOT_G) else '0';
+   GEN_MPS_SLOT : if (MPS_SLOT_G = true) generate
+
+      mpsClk <= axilClk;
+      mpsRst <= axilRst;
+
+      U_ClkOutBufSingle : entity work.ClkOutBufSingle
+         generic map(
+            TPD_G        => TPD_G,
+            XIL_DEVICE_G => "ULTRASCALE")
+         port map (
+            clkIn  => mpsMmcmClkOut(2),
+            clkOut => mpsClkOut);
+
+   end generate;
+
+   GEN_APP_SLOT : if (MPS_SLOT_G = false) generate
+
+      U_Bufg : BUFG
+         port map (
+            I => mpsRefClk,
+            O => mpsClk);
+      mpsRst    <= '0';
+      mpsClkOut <= '0';
+
+   end generate;
+
    mpsReset <= mpsRst or mpsPllRst;
 
    U_ClkManagerMps : entity work.ClockManagerUltraScale
       generic map(
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => ite(MPS_SLOT_G, false, true),
+         INPUT_BUFG_G       => false,
          FB_BUFG_G          => true,
          RST_IN_POLARITY_G  => '1',
          NUM_CLOCKS_G       => 3,
@@ -123,15 +147,6 @@ begin
    mps625MHzClk <= mpsMmcmClkOut(0);
    mps625MHzRst <= mpsMmcmRstOut(0);
 
-   U_ClkOutBufSingle : entity work.ClkOutBufSingle
-      generic map(
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => "ULTRASCALE")
-      port map (
-         outEnL => ite(MPS_SLOT_G, '0', '1'),
-         clkIn  => mpsMmcmClkOut(2),
-         clkOut => mpsClkOut);
-
    U_PLL : entity work.ClockManagerUltraScale
       generic map(
          TPD_G             => TPD_G,
@@ -143,8 +158,8 @@ begin
          -- MMCM attributes
          CLKIN_PERIOD_G    => 6.4,      -- 156.25 MHz
          DIVCLK_DIVIDE_G   => 1,        -- 156.25 MHz/1
-         CLKFBOUT_MULT_G   => 4,        -- 625 MHz = 156.25 MHz x 4
-         CLKOUT0_DIVIDE_G  => 10)       -- 62.5 MHz = 625 MHz/10
+         CLKFBOUT_MULT_G   => 8,        -- 1.25 GHz = 156.25 MHz x 8
+         CLKOUT0_DIVIDE_G  => 20)       -- 62.5 MHz = 1.25 GHz/20
       port map(
          -- Clock Input
          clkIn     => axilClk,

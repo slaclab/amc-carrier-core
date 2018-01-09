@@ -1,17 +1,23 @@
 # Load RUCKUS environment and library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
+# Get the family type
+set family [getFpgaFamily]
+
 # Load local Source Code and constraints
 loadSource -path "$::DIR_PATH/core/AmcCarrierBsi.vhd"
 loadSource -path "$::DIR_PATH/core/AmcCarrierPkg.vhd"
 loadSource -path "$::DIR_PATH/core/AmcCarrierSysMon.vhd"
 loadSource -path "$::DIR_PATH/core/AmcCarrierSysReg.vhd"
 loadSource -path "$::DIR_PATH/core/AmcCarrierSysRegPkg.vhd"
+loadSource -dir  "$::DIR_PATH/core/${family}"
 loadSource -path "$::DIR_PATH/ip/SysMonCore.dcp"
 
 # Check for advance build, which bypasses the pre-built .DCP file
-if {  $::env(AMC_ADV_BUILD)  == 1 } {
-
+if { $::env(AMC_ADV_BUILD)  == 1 ||
+     $::env(RTM_ETH)  == 1 ||
+     $::env(PRJ_PART) != "XCKU040-FFVA1156-2-E" } {
+     
    # Check for FSBL
    if { [info exists ::env(AMC_FSBL)] == 1 }  {
       loadSource -dir "$::DIR_PATH/fsbl"
@@ -30,29 +36,33 @@ if {  $::env(AMC_ADV_BUILD)  == 1 } {
    loadSource   -path "$::DIR_PATH/ip/MigCore.dcp"
    # loadIpCore -path "$::DIR_PATH/ip/MigCore.xci"
    
-   loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePorts.xdc" 
+   loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCorePorts.xdc"    
    loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreTiming.xdc" 
    
    # Check for FSBL
    if { [info exists ::env(AMC_FSBL)] == 1 }  {
-      loadConstraints -dir "$::DIR_PATH/fsbl"
+      loadConstraints -dir "$::DIR_PATH/fsbl/${family}"
    } else {   
       # Check if using zone2 or zone3 ETH interface
       if {  $::env(RTM_ETH)  == 1 } {
-         loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone3Eth.xdc" 
+         loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCoreZone3Eth.xdc" 
       } else {
-         loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreZone2Eth.xdc" 
+         loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCoreZone2Eth.xdc" 
       }
    }
    
 } else {
    loadSource -path "$::DIR_PATH/core/AmcCarrierCoreBase.vhd"
    loadSource -path "$::DIR_PATH/dcp/images/AmcCarrierCore.dcp"
+   # After Vivado 2016.4, DCP don't contain .XDCs anymore
+   if { $::env(VIVADO_VERSION) > 2016.4 } {   
+      loadConstraints -path "$::DIR_PATH/dcp/hdl/AmcCarrierCore.xdc" 
+   }
 }
 
 # Add application ports and placement constraints
 loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCorePlacement.xdc" 
-loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierAppPorts.xdc" 
+loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierAppPorts.xdc" 
 
 # Check for Application Microblaze build
 if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {

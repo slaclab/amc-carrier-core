@@ -93,7 +93,11 @@ class AppTop(pr.Device):
                 ))
                 
         @self.command(description  = "JESD Reset")        
-        def JesdReset():   
+        def JesdReset():
+            for i in range(2):
+                if (self._numRxLanes[i] > 0):
+                    v = getattr(self, 'AppTopJesd[%i]'%i)
+                    v.JesdRx.LinkErrMask.set(0x3F)            
             lmkDevices = self.find(typ=Lmk04828)
             for lmk in lmkDevices: 
                 lmk.PwrDwnSysRef()
@@ -106,14 +110,15 @@ class AppTop(pr.Device):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
                     v.JesdTx.CmdResetGTs()
             self.checkBlocks(recurse=True)
-            time.sleep(0.5)
+            time.sleep(1.0)
             for lmk in lmkDevices: 
                 lmk.PwrUpSysRef()            
-            time.sleep(0.5)
+            time.sleep(1.0)
             for i in range(2):
                 if (self._numRxLanes[i] > 0):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
                     v.JesdRx.CmdClearErrors()
+                    v.JesdRx.LinkErrMask.set(0x38) # Work around for DEC2017 demo, plan to remove this line when we receive C07 revision of the AMC carrier. 
                 if (self._numTxLanes[i] > 0):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
                     v.JesdTx.CmdClearErrors()        

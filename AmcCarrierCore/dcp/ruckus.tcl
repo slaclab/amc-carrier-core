@@ -11,6 +11,7 @@ loadSource      -dir  "$::DIR_PATH/hdl/"
 loadConstraints -dir  "$::DIR_PATH/hdl/"
 loadSource      -path "$::DIR_PATH/../core/AmcCarrierPkg.vhd"
 loadSource      -path "$::DIR_PATH/../core/AmcCarrierSysRegPkg.vhd"
+loadSource      -dir  "$::DIR_PATH/../core/kintexu"
 
 loadSource -path "$::DIR_PATH/../ip/MigCore.dcp"
 #loadIpCore  -path "$::DIR_PATH/../ip/MigCore.xci" 

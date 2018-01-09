@@ -9,10 +9,26 @@ if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
 
    if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
       loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu040.xdc"
-   } else {
+   } elseif {  $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} ||
+               $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {
       loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu060.xdc"
+   } else {
+      loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu11p.xdc"
+   }
+   
+   if { $::env(VIVADO_VERSION) >= 2017.3 } {
+      loadConstraints -path "$::env(MODULES)/surf/protocols/salt/xilinxUltraScale/xdc/SaltUltraScaleTxOnly.xdc"
+      set_property PROCESSING_ORDER {EARLY}                [get_files {SaltUltraScaleTxOnly.xdc}]
+      set_property SCOPED_TO_REF    {SaltUltraScaleTxOnly} [get_files {SaltUltraScaleTxOnly.xdc}]
+      set_property SCOPED_TO_CELLS  {U0}                   [get_files {SaltUltraScaleTxOnly.xdc}]     
    }
 } else {
    loadConstraints -path "$::DIR_PATH/xdc/MpsLinkNodeSaltSerdes.xdc"
-   # set_property strategy Performance_ExplorePostRoutePhysOpt [get_runs impl_1]
+   
+   if { $::env(VIVADO_VERSION) >= 2017.3 } {
+      loadConstraints -path "$::env(MODULES)/surf/protocols/salt/xilinxUltraScale/xdc/SaltUltraScaleRxOnly.xdc"
+      set_property PROCESSING_ORDER {EARLY}                [get_files {SaltUltraScaleRxOnly.xdc}]
+      set_property SCOPED_TO_REF    {SaltUltraScaleRxOnly} [get_files {SaltUltraScaleRxOnly.xdc}]
+      set_property SCOPED_TO_CELLS  {U0}                   [get_files {SaltUltraScaleRxOnly.xdc}]     
+   }
 }
