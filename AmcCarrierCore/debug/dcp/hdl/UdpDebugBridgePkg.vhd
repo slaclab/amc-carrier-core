@@ -28,7 +28,7 @@ use work.StdRtlPkg.all;
 use work.AmcCarrierPkg.all;
 use work.EthMacPkg.all;
 
--- Configuration constants (used for generics) for AxisDebugBridge
+-- Configuration constants (used for generics) for AxisJtagDebugBridge
 
 -- Instantiating two variants (stub and real implementation) of the
 -- module could be elegantly done with vhdl configurations but alas

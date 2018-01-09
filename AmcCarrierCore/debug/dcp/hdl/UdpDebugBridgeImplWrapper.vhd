@@ -28,7 +28,7 @@ use work.StdRtlPkg.all;
 use work.AxiStreamPkg.all;
 use work.UdpDebugBridgePkg.all;
 
--- AxisDebugBridge Configured for AmcCarrierCore
+-- AxisJtagDebugBridge Configured for AmcCarrierCore
 
 entity UdpDebugBridge is
    port (
@@ -46,7 +46,7 @@ end entity UdpDebugBridge;
 architecture UdpDebugBridgeImpl of UdpDebugBridge is
 begin
 
-   U_AxisDebugBridge : entity work.AxisDebugBridge(AxisDebugBridgeImpl)
+   U_AxisJtagDebugBridge : entity work.AxisJtagDebugBridge(AxisJtagDebugBridgeImpl)
       generic map (
          AXIS_FREQ_G         => XVC_ACLK_FREQ_C,
          CLK_DIV2_G          => XVC_TCLK_DIV2_C,
