@@ -2,7 +2,7 @@
 -- File       : AmcCarrierEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2017-02-24
+-- Last update: 2017-11-03
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -36,59 +36,64 @@ entity AmcCarrierEth is
       AXI_ERROR_RESP_G      : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration and status
-      localMac            : in  slv(47 downto 0);  --  big-Endian configuration
-      localIp             : in  slv(31 downto 0);  --  big-Endian configuration   
-      ethPhyReady         : out sl;
+      localMac             : in  slv(47 downto 0);  --  big-Endian configuration
+      localIp              : in  slv(31 downto 0);  --  big-Endian configuration   
+      ethPhyReady          : out sl;
       -- Master AXI-Lite Interface
-      mAxilReadMasters    : out AxiLiteReadMasterArray(1 downto 0);
-      mAxilReadSlaves     : in  AxiLiteReadSlaveArray(1 downto 0);
-      mAxilWriteMasters   : out AxiLiteWriteMasterArray(1 downto 0);
-      mAxilWriteSlaves    : in  AxiLiteWriteSlaveArray(1 downto 0);
+      mAxilReadMasters     : out AxiLiteReadMasterArray(1 downto 0);
+      mAxilReadSlaves      : in  AxiLiteReadSlaveArray(1 downto 0);
+      mAxilWriteMasters    : out AxiLiteWriteMasterArray(1 downto 0);
+      mAxilWriteSlaves     : in  AxiLiteWriteSlaveArray(1 downto 0);
       -- AXI-Lite Interface
-      axilClk             : in  sl;
-      axilRst             : in  sl;
-      axilReadMaster      : in  AxiLiteReadMasterType;
-      axilReadSlave       : out AxiLiteReadSlaveType;
-      axilWriteMaster     : in  AxiLiteWriteMasterType;
-      axilWriteSlave      : out AxiLiteWriteSlaveType;
+      axilClk              : in  sl;
+      axilRst              : in  sl;
+      axilReadMaster       : in  AxiLiteReadMasterType;
+      axilReadSlave        : out AxiLiteReadSlaveType;
+      axilWriteMaster      : in  AxiLiteWriteMasterType;
+      axilWriteSlave       : out AxiLiteWriteSlaveType;
       -- BSA Ethernet Interface
-      obBsaMasters        : in  AxiStreamMasterArray(3 downto 0);
-      obBsaSlaves         : out AxiStreamSlaveArray(3 downto 0);
-      ibBsaMasters        : out AxiStreamMasterArray(3 downto 0);
-      ibBsaSlaves         : in  AxiStreamSlaveArray(3 downto 0);
+      obBsaMasters         : in  AxiStreamMasterArray(3 downto 0);
+      obBsaSlaves          : out AxiStreamSlaveArray(3 downto 0);
+      ibBsaMasters         : out AxiStreamMasterArray(3 downto 0);
+      ibBsaSlaves          : in  AxiStreamSlaveArray(3 downto 0);
+      -- Timing ETH MSG Interface
+      obTimingEthMsgMaster : in  AxiStreamMasterType;
+      obTimingEthMsgSlave  : out AxiStreamSlaveType;
+      ibTimingEthMsgMaster : out AxiStreamMasterType;
+      ibTimingEthMsgSlave  : in  AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
       ----------------------
       -- Application Debug Interface
-      obAppDebugMaster    : in  AxiStreamMasterType;
-      obAppDebugSlave     : out AxiStreamSlaveType;
-      ibAppDebugMaster    : out AxiStreamMasterType;
-      ibAppDebugSlave     : in  AxiStreamSlaveType;
+      obAppDebugMaster     : in  AxiStreamMasterType;
+      obAppDebugSlave      : out AxiStreamSlaveType;
+      ibAppDebugMaster     : out AxiStreamMasterType;
+      ibAppDebugSlave      : in  AxiStreamSlaveType;
       -- Backplane Messaging Interface
-      obBpMsgClientMaster : in  AxiStreamMasterType;
-      obBpMsgClientSlave  : out AxiStreamSlaveType;
-      ibBpMsgClientMaster : out AxiStreamMasterType;
-      ibBpMsgClientSlave  : in  AxiStreamSlaveType;
-      obBpMsgServerMaster : in  AxiStreamMasterType;
-      obBpMsgServerSlave  : out AxiStreamSlaveType;
-      ibBpMsgServerMaster : out AxiStreamMasterType;
-      ibBpMsgServerSlave  : in  AxiStreamSlaveType;
+      obBpMsgClientMaster  : in  AxiStreamMasterType;
+      obBpMsgClientSlave   : out AxiStreamSlaveType;
+      ibBpMsgClientMaster  : out AxiStreamMasterType;
+      ibBpMsgClientSlave   : in  AxiStreamSlaveType;
+      obBpMsgServerMaster  : in  AxiStreamMasterType;
+      obBpMsgServerSlave   : out AxiStreamSlaveType;
+      ibBpMsgServerMaster  : out AxiStreamMasterType;
+      ibBpMsgServerSlave   : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
       ----------------   
       -- ETH Ports
-      ethRxP              : in  slv(3 downto 0);
-      ethRxN              : in  slv(3 downto 0);
-      ethTxP              : out slv(3 downto 0);
-      ethTxN              : out slv(3 downto 0);
-      ethClkP             : in  sl;
-      ethClkN             : in  sl);
+      ethRxP               : in  slv(3 downto 0);
+      ethRxN               : in  slv(3 downto 0);
+      ethTxP               : out slv(3 downto 0);
+      ethTxN               : out slv(3 downto 0);
+      ethClkP              : in  sl;
+      ethClkN              : in  sl);
 end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
    constant SERVER_SIZE_C : positive := 4;
-   constant CLIENT_SIZE_C : positive := 1;
+   constant CLIENT_SIZE_C : positive := 2;
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
@@ -440,5 +445,13 @@ begin
          mAxisRst    => axilRst,
          mAxisMaster => ibClientMasters(0),
          mAxisSlave  => ibClientSlaves(0));
+
+   -----------------------
+   -- Timing ETH MSG @8197
+   -----------------------
+   ibClientMasters(1)   <= obTimingEthMsgMaster;
+   obTimingEthMsgSlave  <= ibClientSlaves(1);
+   ibTimingEthMsgMaster <= obClientMasters(1);
+   obClientSlaves(1)    <= ibTimingEthMsgSlave;
 
 end mapping;
