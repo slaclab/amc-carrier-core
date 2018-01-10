@@ -13,6 +13,16 @@ loadSource -path "$::DIR_PATH/core/AmcCarrierSysRegPkg.vhd"
 loadSource -dir  "$::DIR_PATH/core/${family}"
 loadSource -path "$::DIR_PATH/ip/SysMonCore.dcp"
 
+if { [info exists ::env(USE_XVC_DEBUG)] != 1 || $::env(USE_XVC_DEBUG) == 0 } {
+	loadSource -path "$::DIR_PATH/debug/dcp/Stub/images/UdpDebugBridge.dcp"
+    set_property IS_GLOBAL_INCLUDE {1} [get_files UdpDebugBridge.dcp]
+} elseif { $::env(USE_XVC_DEBUG) == -1 } {
+# Load nothing - user provides
+} else {
+	loadSource -path "$::DIR_PATH/debug/dcp/Impl/images/UdpDebugBridge.dcp"
+    set_property IS_GLOBAL_INCLUDE {1} [get_files UdpDebugBridge.dcp]
+}
+
 # Check for advance build, which bypasses the pre-built .DCP file
 if { $::env(AMC_ADV_BUILD)  == 1 ||
      $::env(RTM_ETH)  == 1 ||

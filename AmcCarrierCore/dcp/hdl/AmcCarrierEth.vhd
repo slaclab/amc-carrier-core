@@ -87,7 +87,10 @@ end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
-   constant SERVER_SIZE_C : positive := 4;
+   constant SERVER_SIZE_C : positive := 5;
+   constant XVC_SRV_IDX_C : positive := 4;
+   constant XVC_SRV_PRT_C : positive := 2542;
+
    constant CLIENT_SIZE_C : positive := 1;
 
    constant NUM_AXI_MASTERS_C : natural := 2;
@@ -105,13 +108,26 @@ architecture mapping of AmcCarrierEth is
          addrBits     => 16,
          connectivity => X"FFFF"));
 
+   type SofRegType is record
+      sof : sl;
+   end record SofRegType;
+
+   constant SOF_REG_INIT_C : SofRegType := ( sof => '1' );
+
+   signal rSof             : SofRegType := SOF_REG_INIT_C;
+   signal rinSof           : SofRegType;
+
    function ServerPorts return PositiveArray is
       variable retConf   : PositiveArray(SERVER_SIZE_C-1 downto 0);
       variable baseIndex : positive;
    begin
       baseIndex := 8192;
       for i in SERVER_SIZE_C-1 downto 0 loop
-         retConf(i) := baseIndex+i;
+         if ( i = XVC_SRV_IDX_C ) then
+            retConf(i) := XVC_SRV_PRT_C;
+         else
+            retConf(i) := baseIndex+i;
+         end if;
       end loop;
       return retConf;
    end function;
@@ -126,6 +142,34 @@ architecture mapping of AmcCarrierEth is
       end loop;
       return retConf;
    end function;
+
+   component UdpDebugBridge is
+      port (
+         axisClk          : in  sl;
+         axisRst          : in  sl;
+   
+       \mAxisReq[tValid]\ : in  sl;
+       \mAxisReq[tData]\  : in  slv ( 127 downto 0 );
+       \mAxisReq[tStrb]\  : in  slv (  15 downto 0 );
+       \mAxisReq[tKeep]\  : in  slv (  15 downto 0 );
+       \mAxisReq[tLast]\  : in  sl;
+       \mAxisReq[tDest]\  : in  slv (   7 downto 0 );
+       \mAxisReq[tId]\    : in  slv (   7 downto 0 );
+       \mAxisReq[tUser]\  : in  slv ( 127 downto 0 );
+       \sAxisReq[tReady]\ : out sl;
+       \mAxisTdo[tValid]\ : out sl;
+       \mAxisTdo[tData]\  : out slv ( 127 downto 0 );
+       \mAxisTdo[tStrb]\  : out slv (  15 downto 0 );
+       \mAxisTdo[tKeep]\  : out slv (  15 downto 0 );
+       \mAxisTdo[tLast]\  : out sl;
+       \mAxisTdo[tDest]\  : out slv (   7 downto 0 );
+       \mAxisTdo[tId]\    : out slv (   7 downto 0 );
+       \mAxisTdo[tUser]\  : out slv ( 127 downto 0 );
+       \sAxisTdo[tReady]\ : in  sl
+   );
+   end component UdpDebugBridge;
+
+   signal mXvcServerTdo   : AxiStreamMasterType;
 
    signal ibMacMaster : AxiStreamMasterType;
    signal ibMacSlave  : AxiStreamSlaveType;
@@ -411,6 +455,64 @@ begin
          mAxisRst    => axilRst,
          mAxisMaster => ibServerMasters(3),
          mAxisSlave  => ibServerSlaves(3));
+
+   ----------------------------
+   -- 'XVC' Server @2542 (modified protocol to work over UDP)
+   ----------------------------
+   P_SOF_COMB : process(rSof, mXvcServerTdo, ibServerSlaves(XVC_SRV_IDX_C)) is
+      variable v : SofRegType;
+   begin
+      v := rSof;
+      if ( (mXvcServerTdo.tValid and ibServerSlaves(XVC_SRV_IDX_C).tReady) = '1' ) then
+         v.sof := mXvcServerTdo.tLast;
+      end if;
+      rinSof <= v;
+   end process P_SOF_COMB;
+
+   P_SOF_SEQ : process(axilClk) is
+   begin
+      if ( rising_edge( axilClk ) ) then
+         if ( axilRst = '1' ) then
+            rSof <= SOF_REG_INIT_C after TPD_G;
+         else
+            rSof <= rinSof after TPD_G;
+         end if;
+      end if;
+   end process P_SOF_SEQ;
+
+   -- splice in the SOF bit
+   P_SOF_SPLICE : process(rSof, mXvcServerTdo) is
+      variable v : AxiStreamMasterType;
+   begin
+      v := mXvcServerTdo;
+      ssiSetUserSof(EMAC_AXIS_CONFIG_C, v, rSof.sof);
+      ibServerMasters(XVC_SRV_IDX_C) <= v;
+   end process P_SOF_SPLICE;
+
+   U_XvcServer : component UdpDebugBridge
+      port map (
+         axisClk             => axilClk,
+         axisRst             => axilRst,
+
+         \mAxisReq[tValid]\  => obServerMasters(XVC_SRV_IDX_C).tValid,
+         \mAxisReq[tData]\   => obServerMasters(XVC_SRV_IDX_C).tData,
+         \mAxisReq[tStrb]\   => obServerMasters(XVC_SRV_IDX_C).tStrb,
+         \mAxisReq[tKeep]\   => obServerMasters(XVC_SRV_IDX_C).tKeep,
+         \mAxisReq[tLast]\   => obServerMasters(XVC_SRV_IDX_C).tLast,
+         \mAxisReq[tDest]\   => obServerMasters(XVC_SRV_IDX_C).tDest,
+         \mAxisReq[tId]\     => obServerMasters(XVC_SRV_IDX_C).tId,
+         \mAxisReq[tUser]\   => obServerMasters(XVC_SRV_IDX_C).tUser,
+         \sAxisReq[tReady]\  => obServerSlaves(XVC_SRV_IDX_C).tReady,
+         \mAxisTdo[tValid]\  => mXvcServerTdo.tValid,
+         \mAxisTdo[tData]\   => mXvcServerTdo.tData,
+         \mAxisTdo[tStrb]\   => mXvcServerTdo.tStrb,
+         \mAxisTdo[tKeep]\   => mXvcServerTdo.tKeep,
+         \mAxisTdo[tLast]\   => mXvcServerTdo.tLast,
+         \mAxisTdo[tDest]\   => mXvcServerTdo.tDest,
+         \mAxisTdo[tId]\     => mXvcServerTdo.tId,
+         \mAxisTdo[tUser]\   => mXvcServerTdo.tUser,
+         \sAxisTdo[tReady]\  => ibServerSlaves(XVC_SRV_IDX_C).tReady
+         );
 
    ----------------------------
    -- BP Messenger Network@8196
