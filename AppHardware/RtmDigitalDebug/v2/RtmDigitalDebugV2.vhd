@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebugV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2018-01-08
+-- Last update: 2018-01-10
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -36,8 +36,8 @@ entity RtmDigitalDebugV2 is
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Digital I/O Interface
-      din             : out   slv(7 downto 0);  -- digital inputs  from the RTM 
-      dout            : in    slv(7 downto 0);  -- digital outputs to the RTM
+      din             : out   slv(7 downto 0);  -- digital inputs from the RTM: ASYNC (not registered in FPGA or RTM)  
+      dout            : in    slv(7 downto 0);  -- digital outputs to the RTM: If REG_DOUT_MODE_G[x] = '0', then dout[x] SYNC to recClkOut(1) domain else DOUT driven as clock output.
       cout            : in    slv(7 downto 0);  -- clock outputs to the RTM (REG_DOUT_EN_G(x) = '1' and REG_DOUT_MODE_G(x) = '1')
       -- Clock Jitter Cleaner Interface
       recClkIn        : in    sl;
