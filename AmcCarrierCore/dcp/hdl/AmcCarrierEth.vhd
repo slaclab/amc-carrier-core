@@ -96,7 +96,7 @@ architecture mapping of AmcCarrierEth is
    constant XVC_SRV_IDX_C : positive := 4;
    constant XVC_SRV_PRT_C : positive := 2542;
 
-   constant CLIENT_SIZE_C : positive := 1;
+   constant CLIENT_SIZE_C : positive := 2;
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
