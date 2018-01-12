@@ -8,7 +8,8 @@ loadRuckusTcl $::env(PROJ_DIR)/../../BsaCore
 
 # Load target's source code and constraints
 loadSource      -dir  "$::DIR_PATH/hdl/"
-loadConstraints -dir  "$::DIR_PATH/hdl/"
+loadConstraints -path "$::DIR_PATH/hdl/AmcCarrierCore.xdc"
+set_property PROCESSING_ORDER EARLY [get_files "$::DIR_PATH/hdl/AmcCarrierCore.xdc"]
 loadSource      -path "$::DIR_PATH/../core/AmcCarrierPkg.vhd"
 loadSource      -path "$::DIR_PATH/../core/AmcCarrierSysRegPkg.vhd"
 loadSource      -dir  "$::DIR_PATH/../core/kintexu"

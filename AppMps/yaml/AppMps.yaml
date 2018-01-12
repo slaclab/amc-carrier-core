@@ -10,7 +10,8 @@
 #schemaversion 3.0.0
 #once AppMps.yaml
 #include AppMpsSalt.yaml
-#include AppMpsThr.yaml
+#include AppMpsRegBase.yaml
+#include AppMpsRegAppCh.yaml
 
 AppMps: &AppMps
   name: AppMps
@@ -26,8 +27,13 @@ AppMps: &AppMps
       at:
         offset: 0x00000000
     ##################################################
-    AppMpsThr:
-      <<: *AppMpsThr
+    AppMpsRegBase:
+      <<: *AppMpsRegBase
       at:
         offset: 0x00010000
+    ##################################################
+    AppMpsRegAppCh:
+      <<: *AppMpsRegAppCh
+      at:
+        offset: 0x00018000
     ##################################################
