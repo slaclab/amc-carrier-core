@@ -43,6 +43,13 @@ AmcCarrierCore: &AmcCarrierCore
       mode: RO
       description: AMC Carrier Core Version Number
     ##################################################
+    CPSW_TARBALL_ADDR_C:
+      at:
+        offset: 0x00000404
+      class: IntField
+      mode: RO
+      description: PROM MCS CPSW tarball base address
+    ##################################################
     AxiVersion:
       <<: *AxiVersion
       at:

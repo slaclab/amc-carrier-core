@@ -86,6 +86,20 @@ if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {
    set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/U0} [get_files -all -of_objects [get_fileset sources_1] {MigCoreMicroblazeCalibration.bmm}]
 }
 
+# Load the FpgaTypePkg.vhd
+if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU040.vhd"
+} elseif { $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} } {
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU060.vhd"
+} elseif { $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {            
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU095.vhd"
+} elseif { $::env(PRJ_PART) eq {XCKU11P-FFVA1156-3-E} } {  
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU11P.vhd"
+} elseif { $::env(PRJ_PART) eq {XCKU15P-FFVA1156-3-E} } {              
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU15P.vhd"
+} else { 
+}
+
 ## Place and Route strategies 
 set_property strategy Performance_Explore [get_runs impl_1]
 set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE Explore [get_runs impl_1]
