@@ -2,7 +2,7 @@
 -- File       : AmcCarrierEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2017-02-24
+-- Last update: 2017-11-03
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -36,59 +36,67 @@ entity AmcCarrierEth is
       AXI_ERROR_RESP_G      : slv(1 downto 0) := AXI_RESP_DECERR_C);
    port (
       -- Local Configuration and status
-      localMac            : in  slv(47 downto 0);  --  big-Endian configuration
-      localIp             : in  slv(31 downto 0);  --  big-Endian configuration   
-      ethPhyReady         : out sl;
+      localMac             : in  slv(47 downto 0);  --  big-Endian configuration
+      localIp              : in  slv(31 downto 0);  --  big-Endian configuration   
+      ethPhyReady          : out sl;
       -- Master AXI-Lite Interface
-      mAxilReadMasters    : out AxiLiteReadMasterArray(1 downto 0);
-      mAxilReadSlaves     : in  AxiLiteReadSlaveArray(1 downto 0);
-      mAxilWriteMasters   : out AxiLiteWriteMasterArray(1 downto 0);
-      mAxilWriteSlaves    : in  AxiLiteWriteSlaveArray(1 downto 0);
+      mAxilReadMasters     : out AxiLiteReadMasterArray(1 downto 0);
+      mAxilReadSlaves      : in  AxiLiteReadSlaveArray(1 downto 0);
+      mAxilWriteMasters    : out AxiLiteWriteMasterArray(1 downto 0);
+      mAxilWriteSlaves     : in  AxiLiteWriteSlaveArray(1 downto 0);
       -- AXI-Lite Interface
-      axilClk             : in  sl;
-      axilRst             : in  sl;
-      axilReadMaster      : in  AxiLiteReadMasterType;
-      axilReadSlave       : out AxiLiteReadSlaveType;
-      axilWriteMaster     : in  AxiLiteWriteMasterType;
-      axilWriteSlave      : out AxiLiteWriteSlaveType;
+      axilClk              : in  sl;
+      axilRst              : in  sl;
+      axilReadMaster       : in  AxiLiteReadMasterType;
+      axilReadSlave        : out AxiLiteReadSlaveType;
+      axilWriteMaster      : in  AxiLiteWriteMasterType;
+      axilWriteSlave       : out AxiLiteWriteSlaveType;
       -- BSA Ethernet Interface
-      obBsaMasters        : in  AxiStreamMasterArray(3 downto 0);
-      obBsaSlaves         : out AxiStreamSlaveArray(3 downto 0);
-      ibBsaMasters        : out AxiStreamMasterArray(3 downto 0);
-      ibBsaSlaves         : in  AxiStreamSlaveArray(3 downto 0);
+      obBsaMasters         : in  AxiStreamMasterArray(3 downto 0);
+      obBsaSlaves          : out AxiStreamSlaveArray(3 downto 0);
+      ibBsaMasters         : out AxiStreamMasterArray(3 downto 0);
+      ibBsaSlaves          : in  AxiStreamSlaveArray(3 downto 0);
+      -- Timing ETH MSG Interface
+      obTimingEthMsgMaster : in  AxiStreamMasterType;
+      obTimingEthMsgSlave  : out AxiStreamSlaveType;
+      ibTimingEthMsgMaster : out AxiStreamMasterType;
+      ibTimingEthMsgSlave  : in  AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
       ----------------------
       -- Application Debug Interface
-      obAppDebugMaster    : in  AxiStreamMasterType;
-      obAppDebugSlave     : out AxiStreamSlaveType;
-      ibAppDebugMaster    : out AxiStreamMasterType;
-      ibAppDebugSlave     : in  AxiStreamSlaveType;
+      obAppDebugMaster     : in  AxiStreamMasterType;
+      obAppDebugSlave      : out AxiStreamSlaveType;
+      ibAppDebugMaster     : out AxiStreamMasterType;
+      ibAppDebugSlave      : in  AxiStreamSlaveType;
       -- Backplane Messaging Interface
-      obBpMsgClientMaster : in  AxiStreamMasterType;
-      obBpMsgClientSlave  : out AxiStreamSlaveType;
-      ibBpMsgClientMaster : out AxiStreamMasterType;
-      ibBpMsgClientSlave  : in  AxiStreamSlaveType;
-      obBpMsgServerMaster : in  AxiStreamMasterType;
-      obBpMsgServerSlave  : out AxiStreamSlaveType;
-      ibBpMsgServerMaster : out AxiStreamMasterType;
-      ibBpMsgServerSlave  : in  AxiStreamSlaveType;
+      obBpMsgClientMaster  : in  AxiStreamMasterType;
+      obBpMsgClientSlave   : out AxiStreamSlaveType;
+      ibBpMsgClientMaster  : out AxiStreamMasterType;
+      ibBpMsgClientSlave   : in  AxiStreamSlaveType;
+      obBpMsgServerMaster  : in  AxiStreamMasterType;
+      obBpMsgServerSlave   : out AxiStreamSlaveType;
+      ibBpMsgServerMaster  : out AxiStreamMasterType;
+      ibBpMsgServerSlave   : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
       ----------------   
       -- ETH Ports
-      ethRxP              : in  slv(3 downto 0);
-      ethRxN              : in  slv(3 downto 0);
-      ethTxP              : out slv(3 downto 0);
-      ethTxN              : out slv(3 downto 0);
-      ethClkP             : in  sl;
-      ethClkN             : in  sl);
+      ethRxP               : in  slv(3 downto 0);
+      ethRxN               : in  slv(3 downto 0);
+      ethTxP               : out slv(3 downto 0);
+      ethTxN               : out slv(3 downto 0);
+      ethClkP              : in  sl;
+      ethClkN              : in  sl);
 end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
-   constant SERVER_SIZE_C : positive := 4;
-   constant CLIENT_SIZE_C : positive := 1;
+   constant SERVER_SIZE_C : positive := 5;
+   constant XVC_SRV_IDX_C : positive := 4;
+   constant XVC_SRV_PRT_C : positive := 2542;
+
+   constant CLIENT_SIZE_C : positive := 2;
 
    constant NUM_AXI_MASTERS_C : natural := 2;
 
@@ -105,13 +113,26 @@ architecture mapping of AmcCarrierEth is
          addrBits     => 16,
          connectivity => X"FFFF"));
 
+   type SofRegType is record
+      sof : sl;
+   end record SofRegType;
+
+   constant SOF_REG_INIT_C : SofRegType := ( sof => '1' );
+
+   signal rSof             : SofRegType := SOF_REG_INIT_C;
+   signal rinSof           : SofRegType;
+
    function ServerPorts return PositiveArray is
       variable retConf   : PositiveArray(SERVER_SIZE_C-1 downto 0);
       variable baseIndex : positive;
    begin
       baseIndex := 8192;
       for i in SERVER_SIZE_C-1 downto 0 loop
-         retConf(i) := baseIndex+i;
+         if ( i = XVC_SRV_IDX_C ) then
+            retConf(i) := XVC_SRV_PRT_C;
+         else
+            retConf(i) := baseIndex+i;
+         end if;
       end loop;
       return retConf;
    end function;
@@ -126,6 +147,34 @@ architecture mapping of AmcCarrierEth is
       end loop;
       return retConf;
    end function;
+
+   component UdpDebugBridge is
+      port (
+         axisClk          : in  sl;
+         axisRst          : in  sl;
+   
+       \mAxisReq[tValid]\ : in  sl;
+       \mAxisReq[tData]\  : in  slv ( 127 downto 0 );
+       \mAxisReq[tStrb]\  : in  slv (  15 downto 0 );
+       \mAxisReq[tKeep]\  : in  slv (  15 downto 0 );
+       \mAxisReq[tLast]\  : in  sl;
+       \mAxisReq[tDest]\  : in  slv (   7 downto 0 );
+       \mAxisReq[tId]\    : in  slv (   7 downto 0 );
+       \mAxisReq[tUser]\  : in  slv ( 127 downto 0 );
+       \sAxisReq[tReady]\ : out sl;
+       \mAxisTdo[tValid]\ : out sl;
+       \mAxisTdo[tData]\  : out slv ( 127 downto 0 );
+       \mAxisTdo[tStrb]\  : out slv (  15 downto 0 );
+       \mAxisTdo[tKeep]\  : out slv (  15 downto 0 );
+       \mAxisTdo[tLast]\  : out sl;
+       \mAxisTdo[tDest]\  : out slv (   7 downto 0 );
+       \mAxisTdo[tId]\    : out slv (   7 downto 0 );
+       \mAxisTdo[tUser]\  : out slv ( 127 downto 0 );
+       \sAxisTdo[tReady]\ : in  sl
+   );
+   end component UdpDebugBridge;
+
+   signal mXvcServerTdo   : AxiStreamMasterType;
 
    signal ibMacMaster : AxiStreamMasterType;
    signal ibMacSlave  : AxiStreamSlaveType;
@@ -413,6 +462,64 @@ begin
          mAxisSlave  => ibServerSlaves(3));
 
    ----------------------------
+   -- 'XVC' Server @2542 (modified protocol to work over UDP)
+   ----------------------------
+   P_SOF_COMB : process(rSof, mXvcServerTdo, ibServerSlaves(XVC_SRV_IDX_C)) is
+      variable v : SofRegType;
+   begin
+      v := rSof;
+      if ( (mXvcServerTdo.tValid and ibServerSlaves(XVC_SRV_IDX_C).tReady) = '1' ) then
+         v.sof := mXvcServerTdo.tLast;
+      end if;
+      rinSof <= v;
+   end process P_SOF_COMB;
+
+   P_SOF_SEQ : process(axilClk) is
+   begin
+      if ( rising_edge( axilClk ) ) then
+         if ( axilRst = '1' ) then
+            rSof <= SOF_REG_INIT_C after TPD_G;
+         else
+            rSof <= rinSof after TPD_G;
+         end if;
+      end if;
+   end process P_SOF_SEQ;
+
+   -- splice in the SOF bit
+   P_SOF_SPLICE : process(rSof, mXvcServerTdo) is
+      variable v : AxiStreamMasterType;
+   begin
+      v := mXvcServerTdo;
+      ssiSetUserSof(EMAC_AXIS_CONFIG_C, v, rSof.sof);
+      ibServerMasters(XVC_SRV_IDX_C) <= v;
+   end process P_SOF_SPLICE;
+
+   U_XvcServer : component UdpDebugBridge
+      port map (
+         axisClk             => axilClk,
+         axisRst             => axilRst,
+
+         \mAxisReq[tValid]\  => obServerMasters(XVC_SRV_IDX_C).tValid,
+         \mAxisReq[tData]\   => obServerMasters(XVC_SRV_IDX_C).tData,
+         \mAxisReq[tStrb]\   => obServerMasters(XVC_SRV_IDX_C).tStrb,
+         \mAxisReq[tKeep]\   => obServerMasters(XVC_SRV_IDX_C).tKeep,
+         \mAxisReq[tLast]\   => obServerMasters(XVC_SRV_IDX_C).tLast,
+         \mAxisReq[tDest]\   => obServerMasters(XVC_SRV_IDX_C).tDest,
+         \mAxisReq[tId]\     => obServerMasters(XVC_SRV_IDX_C).tId,
+         \mAxisReq[tUser]\   => obServerMasters(XVC_SRV_IDX_C).tUser,
+         \sAxisReq[tReady]\  => obServerSlaves(XVC_SRV_IDX_C).tReady,
+         \mAxisTdo[tValid]\  => mXvcServerTdo.tValid,
+         \mAxisTdo[tData]\   => mXvcServerTdo.tData,
+         \mAxisTdo[tStrb]\   => mXvcServerTdo.tStrb,
+         \mAxisTdo[tKeep]\   => mXvcServerTdo.tKeep,
+         \mAxisTdo[tLast]\   => mXvcServerTdo.tLast,
+         \mAxisTdo[tDest]\   => mXvcServerTdo.tDest,
+         \mAxisTdo[tId]\     => mXvcServerTdo.tId,
+         \mAxisTdo[tUser]\   => mXvcServerTdo.tUser,
+         \sAxisTdo[tReady]\  => ibServerSlaves(XVC_SRV_IDX_C).tReady
+         );
+
+   ----------------------------
    -- BP Messenger Network@8196
    ----------------------------
    ibBpMsgClientMaster <= obClientMasters(0);
@@ -440,5 +547,13 @@ begin
          mAxisRst    => axilRst,
          mAxisMaster => ibClientMasters(0),
          mAxisSlave  => ibClientSlaves(0));
+
+   -----------------------
+   -- Timing ETH MSG @8197
+   -----------------------
+   ibClientMasters(1)   <= obTimingEthMsgMaster;
+   obTimingEthMsgSlave  <= ibClientSlaves(1);
+   ibTimingEthMsgMaster <= obClientMasters(1);
+   obClientSlaves(1)    <= ibTimingEthMsgSlave;
 
 end mapping;

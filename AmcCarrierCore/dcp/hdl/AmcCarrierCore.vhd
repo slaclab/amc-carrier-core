@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-06-28
+-- Last update: 2017-11-03
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -179,6 +179,11 @@ architecture mapping of AmcCarrierCore is
    signal ibBsaMasters : AxiStreamMasterArray(3 downto 0);
    signal ibBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
 
+   signal obTimingEthMsgMaster : AxiStreamMasterType;
+   signal obTimingEthMsgSlave  : AxiStreamSlaveType;
+   signal ibTimingEthMsgMaster : AxiStreamMasterType;
+   signal ibTimingEthMsgSlave  : AxiStreamSlaveType;
+
    signal gtClk   : sl;
    signal fabClk  : sl;
    signal fabRst  : sl;
@@ -279,53 +284,58 @@ begin
          AXI_ERROR_RESP_G      => AXI_ERROR_RESP_C)
       port map (
          -- Local Configuration
-         localMac            => localMac,
-         localIp             => localIp,
-         ethPhyReady         => ethLinkUp,
+         localMac             => localMac,
+         localIp              => localIp,
+         ethPhyReady          => ethLinkUp,
          -- Master AXI-Lite Interface
-         mAxilReadMasters    => axilReadMasters,
-         mAxilReadSlaves     => axilReadSlaves,
-         mAxilWriteMasters   => axilWriteMasters,
-         mAxilWriteSlaves    => axilWriteSlaves,
+         mAxilReadMasters     => axilReadMasters,
+         mAxilReadSlaves      => axilReadSlaves,
+         mAxilWriteMasters    => axilWriteMasters,
+         mAxilWriteSlaves     => axilWriteSlaves,
          -- AXI-Lite Interface
-         axilClk             => axilClk,
-         axilRst             => axilRst,
-         axilReadMaster      => ethReadMaster,
-         axilReadSlave       => ethReadSlave,
-         axilWriteMaster     => ethWriteMaster,
-         axilWriteSlave      => ethWriteSlave,
+         axilClk              => axilClk,
+         axilRst              => axilRst,
+         axilReadMaster       => ethReadMaster,
+         axilReadSlave        => ethReadSlave,
+         axilWriteMaster      => ethWriteMaster,
+         axilWriteSlave       => ethWriteSlave,
          -- BSA Ethernet Interface
-         obBsaMasters        => obBsaMasters,
-         obBsaSlaves         => obBsaSlaves,
-         ibBsaMasters        => ibBsaMasters,
-         ibBsaSlaves         => ibBsaSlaves,
+         obBsaMasters         => obBsaMasters,
+         obBsaSlaves          => obBsaSlaves,
+         ibBsaMasters         => ibBsaMasters,
+         ibBsaSlaves          => ibBsaSlaves,
+         -- Timing ETH MSG Interface
+         obTimingEthMsgMaster => obTimingEthMsgMaster,
+         obTimingEthMsgSlave  => obTimingEthMsgSlave,
+         ibTimingEthMsgMaster => ibTimingEthMsgMaster,
+         ibTimingEthMsgSlave  => ibTimingEthMsgSlave,
          ----------------------
          -- Top Level Interface
          ----------------------
          -- Application Debug Interface
-         obAppDebugMaster    => obAppDebugMaster,
-         obAppDebugSlave     => obAppDebugSlave,
-         ibAppDebugMaster    => ibAppDebugMaster,
-         ibAppDebugSlave     => ibAppDebugSlave,
+         obAppDebugMaster     => obAppDebugMaster,
+         obAppDebugSlave      => obAppDebugSlave,
+         ibAppDebugMaster     => ibAppDebugMaster,
+         ibAppDebugSlave      => ibAppDebugSlave,
          -- Backplane Messaging Interface
-         obBpMsgClientMaster => obBpMsgClientMaster,
-         obBpMsgClientSlave  => obBpMsgClientSlave,
-         ibBpMsgClientMaster => ibBpMsgClientMaster,
-         ibBpMsgClientSlave  => ibBpMsgClientSlave,
-         obBpMsgServerMaster => obBpMsgServerMaster,
-         obBpMsgServerSlave  => obBpMsgServerSlave,
-         ibBpMsgServerMaster => ibBpMsgServerMaster,
-         ibBpMsgServerSlave  => ibBpMsgServerSlave,
+         obBpMsgClientMaster  => obBpMsgClientMaster,
+         obBpMsgClientSlave   => obBpMsgClientSlave,
+         ibBpMsgClientMaster  => ibBpMsgClientMaster,
+         ibBpMsgClientSlave   => ibBpMsgClientSlave,
+         obBpMsgServerMaster  => obBpMsgServerMaster,
+         obBpMsgServerSlave   => obBpMsgServerSlave,
+         ibBpMsgServerMaster  => ibBpMsgServerMaster,
+         ibBpMsgServerSlave   => ibBpMsgServerSlave,
          ----------------
          -- Core Ports --
          ----------------   
          -- ETH Ports
-         ethRxP              => ethRxP,
-         ethRxN              => ethRxN,
-         ethTxP              => ethTxP,
-         ethTxN              => ethTxN,
-         ethClkP             => ethClkP,
-         ethClkN             => ethClkN);
+         ethRxP               => ethRxP,
+         ethRxN               => ethRxN,
+         ethTxP               => ethTxP,
+         ethTxN               => ethTxN,
+         ethClkP              => ethClkP,
+         ethClkN              => ethClkN);
 
    --------------
    -- Timing Core
@@ -338,39 +348,44 @@ begin
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
-         axilClk             => axilClk,
-         axilRst             => axilRst,
-         axilReadMaster      => timingReadMaster,
-         axilReadSlave       => timingReadSlave,
-         axilWriteMaster     => timingWriteMaster,
-         axilWriteSlave      => timingWriteSlave,
+         axilClk              => axilClk,
+         axilRst              => axilRst,
+         axilReadMaster       => timingReadMaster,
+         axilReadSlave        => timingReadSlave,
+         axilWriteMaster      => timingWriteMaster,
+         axilWriteSlave       => timingWriteSlave,
+         -- Timing ETH MSG Interface (axilClk domain)
+         obTimingEthMsgMaster => obTimingEthMsgMaster,
+         obTimingEthMsgSlave  => obTimingEthMsgSlave,
+         ibTimingEthMsgMaster => ibTimingEthMsgMaster,
+         ibTimingEthMsgSlave  => ibTimingEthMsgSlave,
          ----------------------
          -- Top Level Interface
          ----------------------         
          -- Timing Interface 
-         recTimingClk        => recTimingClk,
-         recTimingRst        => recTimingRst,
-         appTimingClk        => timingClk,
-         appTimingRst        => timingRst,
-         appTimingBus        => timingBusIntf,
-         appTimingPhy        => timingPhy,
-         appTimingPhyClk     => timingPhyClk,
-         appTimingPhyRst     => timingPhyRst,
-         appTimingRefClk     => timingRefClk,
-         appTimingRefClkDiv2 => timingRefClkDiv2,
+         recTimingClk         => recTimingClk,
+         recTimingRst         => recTimingRst,
+         appTimingClk         => timingClk,
+         appTimingRst         => timingRst,
+         appTimingBus         => timingBusIntf,
+         appTimingPhy         => timingPhy,
+         appTimingPhyClk      => timingPhyClk,
+         appTimingPhyRst      => timingPhyRst,
+         appTimingRefClk      => timingRefClk,
+         appTimingRefClkDiv2  => timingRefClkDiv2,
          ----------------
          -- Core Ports --
          ----------------   
          -- LCLS Timing Ports
-         timingRxP           => timingRxP,
-         timingRxN           => timingRxN,
-         timingTxP           => timingTxP,
-         timingTxN           => timingTxN,
-         timingRefClkInP     => timingRefClkInP,
-         timingRefClkInN     => timingRefClkInN,
-         timingRecClkOutP    => timingRecClkOutP,
-         timingRecClkOutN    => timingRecClkOutN,
-         timingClkSel        => timingClkSel);
+         timingRxP            => timingRxP,
+         timingRxN            => timingRxN,
+         timingTxP            => timingTxP,
+         timingTxN            => timingTxN,
+         timingRefClkInP      => timingRefClkInP,
+         timingRefClkInN      => timingRefClkInN,
+         timingRecClkOutP     => timingRecClkOutP,
+         timingRecClkOutN     => timingRecClkOutN,
+         timingClkSel         => timingClkSel);
 
    --------------
    -- BSA Core

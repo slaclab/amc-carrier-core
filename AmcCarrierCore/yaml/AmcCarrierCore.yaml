@@ -134,35 +134,37 @@ AmcCarrierCore: &AmcCarrierCore
     AmcCarrierBsi:
       <<: *AmcCarrierBsi
       at:
-        offset: 0x07000000      
+        offset: 0x07000000
     ##################################################  
     AmcCarrierTiming:
       <<: *AmcCarrierTiming
       at:
-        offset: 0x08000000      
+        offset: 0x08000000
     ##################################################
     AmcCarrierBsa:
       <<: *AmcCarrierBsa
       at:
-        offset: 0x09000000    
+        offset: 0x09000000
     ##################################################
     BpUdpClient:
       <<: *UdpEngineClient
       at:
         offset: 0x0A000000
+        nelms: 2
+        stride: 8
       description: "BpUdpClient"
     ##################################################
     BpUdpServer:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000818
-      description: "BpUdpServer" 
+      description: "BpUdpServer"
     ##################################################
     SwUdpServer:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000800
-        nelms: 4
+        nelms: 5
         stride: 8         
       description: "SwUdpServer"       
     ##################################################
