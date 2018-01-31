@@ -2,7 +2,7 @@
 -- File       : AmcCarrierSysReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-01-17
+-- Last update: 2018-01-31
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -282,9 +282,9 @@ begin
          axiWriteSlave  => mAxilWriteSlaves(VERSION_INDEX_C));
 
 
-   userValues(0)           <= AMC_CARRIER_CORE_VERSION_C;
-   userValues(1)           <= CPSW_TARBALL_ADDR_C;
-   userValues(63 downto 2) <= (others => x"00000000");
+   userValues(0)       <= AMC_CARRIER_CORE_VERSION_C;
+   userValues(1)       <= CPSW_TARBALL_ADDR_C;
+   userValues(2 to 63) <= (others => x"00000000");
 
    bootRdy <= ddrMemReady and not(ddrMemError);
 
