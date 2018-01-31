@@ -228,7 +228,7 @@ architecture mapping of AmcCarrierSysReg is
    signal bootAddr  : slv(31 downto 0);
    signal upTimeCnt : slv(31 downto 0);
 
-   signal userValues : Slv32Array(63 downto 0) := (others => x"00000000");
+   signal userValues : Slv32Array(0 to 63) := (others => x"00000000");
 
 begin
 
