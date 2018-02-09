@@ -37,6 +37,8 @@ if { $::env(AMC_ADV_BUILD)  == 1 ||
       loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierCore.vhd"
       loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierEth.vhd"
       loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierRssi.vhd"   
+      loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierRssiInterleave.vhd"   
+      loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierXvcDebug.vhd"   
    }
    
    loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierTiming.vhd"
