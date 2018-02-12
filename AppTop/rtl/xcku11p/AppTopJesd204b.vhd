@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-12-13
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -38,8 +38,7 @@ entity AppTopJesd204b is
       JESD_TX_LANE_G     : natural range 0 to 10 := 8;
       GT_LANE_G          : natural range 0 to 10 := 8;
       JESD_RX_POLARITY_G : slv(9 downto 0)       := "0000000000";
-      JESD_TX_POLARITY_G : slv(9 downto 0)       := "0000000000";
-      AXI_ERROR_RESP_G   : slv(1 downto 0)       := AXI_RESP_SLVERR_C);
+      JESD_TX_POLARITY_G : slv(9 downto 0)       := "0000000000");
    port (
       -- DRP Interface
       drpClk          : in  slv(GT_LANE_G-1 downto 0);
@@ -73,7 +72,7 @@ entity AppTopJesd204b is
       refClkR         : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer Right
       refClkL         : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer Left 
       devClk_i        : in  sl;         -- Device clock also rxUsrClkIn for MGT
-      devClk2_i       : in  sl;  -- Device clock divided by 2 also rxUsrClk2In for MGT       
+      devClk2_i       : in  sl;         -- Device clock divided by 2 also rxUsrClk2In for MGT       
       devRst_i        : in  sl;         -- 
       devClkActive_i  : in  sl := '1';  -- devClk_i MCMM locked      
       -- GTH Ports
@@ -294,11 +293,10 @@ begin
    EN_RX_CORE : if (JESD_RX_LANE_G /= 0) generate
       U_Jesd204bRx : entity work.Jesd204bRx
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            F_G              => 2,
-            K_G              => 32,
-            L_G              => JESD_RX_LANE_G)
+            TPD_G => TPD_G,
+            F_G   => 2,
+            K_G   => 32,
+            L_G   => JESD_RX_LANE_G)
          port map (
             axiClk          => axilClk,
             axiRst          => axilRst,
@@ -325,18 +323,9 @@ begin
    end generate;
 
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => rxReadMaster,
-            axiReadSlave   => rxReadSlave,
-            axiWriteMaster => rxWriteMaster,
-            axiWriteSlave  => rxWriteSlave);
-      s_gtRxReset <= devRst_i;
+      rxReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      rxWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
+      s_gtRxReset  <= devRst_i;
    end generate;
 
    ---------------
@@ -345,13 +334,12 @@ begin
    EN_TX_CORE : if (JESD_TX_LANE_G /= 0) generate
       U_Jesd204bTx : entity work.Jesd204bTx
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            INPUT_REG_G      => true,
-            OUTPUT_REG_G     => true,
-            F_G              => 2,
-            K_G              => 32,
-            L_G              => JESD_TX_LANE_G)
+            TPD_G        => TPD_G,
+            INPUT_REG_G  => true,
+            OUTPUT_REG_G => true,
+            F_G          => 2,
+            K_G          => 32,
+            L_G          => JESD_TX_LANE_G)
          port map (
             axiClk               => axilClk,
             axiRst               => axilRst,
@@ -377,18 +365,9 @@ begin
    end generate;
 
    BYP_TX_CORE : if (JESD_TX_LANE_G = 0) generate
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => txReadMaster,
-            axiReadSlave   => txReadSlave,
-            axiWriteMaster => txWriteMaster,
-            axiWriteSlave  => txWriteSlave);
-      s_gtTxReset <= devRst_i;
+      txReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      txWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
+      s_gtTxReset  <= devRst_i;
    end generate;
 
    -------------------------------------------

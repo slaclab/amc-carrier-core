@@ -2,7 +2,7 @@
 -- File       : RtmRfInterlockCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-17
--- Last update: 2017-03-30
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_CXX
 ------------------------------------------------------------------------------
@@ -31,8 +31,7 @@ entity RtmRfInterlockCore is
    generic (
       TPD_G            : time             := 1 ns;
       IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";
-      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C);
+      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- Recovered EVR clock
       recClk          : in  sl;
@@ -180,7 +179,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -269,7 +267,6 @@ begin
    U_cpldSpi : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
          ADDRESS_SIZE_G    => 7,
          DATA_SIZE_G       => 16,
@@ -297,11 +294,10 @@ begin
          generic map (
             TPD_G             => TPD_G,
             MODE_G            => "WO",
-            AXI_ERROR_RESP_G  => AXI_RESP_OK_C,  -- always return OK response for WO operations
             ADDRESS_SIZE_G    => 7,
             DATA_SIZE_G       => 8,
             CLK_PERIOD_G      => 6.4E-9,
-            SPI_SCLK_PERIOD_G => 3.0E-6)         -- 1 MHz
+            SPI_SCLK_PERIOD_G => 3.0E-6)  -- 1 MHz
          port map (
             axiClk         => axilClk,
             axiRst         => axilRst,
@@ -335,12 +331,11 @@ begin
    U_AdcSpi : entity work.AxiSpiAd7682
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          DATA_SIZE_G       => 16,
          CLK_PERIOD_G      => 6.4E-9,
          SPI_SCLK_PERIOD_G => 1.0E-6,
          N_INPUTS_G        => 4,        -- 4-AD7682, 8-AD7689
-         N_SPI_CYCLES_G    => 32)  -- Number of SPI clock cycles between two acquisitions      
+         N_SPI_CYCLES_G    => 32)       -- Number of SPI clock cycles between two acquisitions      
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -358,8 +353,7 @@ begin
    ----------------
    U_RtmLlrfMpsReg : entity work.RtmRfInterlockReg
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G => TPD_G)
       port map (
          axiClk_i        => axilClk,
          axiRst_i        => axilRst,
@@ -417,8 +411,7 @@ begin
          generic map (
             TPD_G            => TPD_G,
             DATA_WIDTH_G     => BUFFER_WIDTH_C,
-            RAM_ADDR_WIDTH_G => BUFFER_ADDR_SIZE_C,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            RAM_ADDR_WIDTH_G => BUFFER_ADDR_SIZE_C)
          port map (
             dataClk         => recClk,
             dataRst         => recRst,

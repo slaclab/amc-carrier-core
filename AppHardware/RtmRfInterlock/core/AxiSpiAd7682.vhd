@@ -3,7 +3,7 @@
 -- Author     : Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-12
--- Last update: 2015-11-04
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description:   
 --    The acquisition is continuous. Conversion time is defined by N_SPI_CYCLES_G. 
@@ -35,7 +35,6 @@ use work.AxiLitePkg.all;
 entity AxiSpiAd7682 is
    generic (
       TPD_G                : time            := 1 ns;
-      AXI_ERROR_RESP_G     : slv(1 downto 0) := AXI_RESP_DECERR_C;
       DATA_SIZE_G          : natural         := 16;
       CLK_PERIOD_G         : real            := 6.4E-9;
       SPI_SCLK_PERIOD_G    : real            := 100.0E-6;
@@ -110,7 +109,6 @@ begin
    U_AxiSpiAd7682Reg: entity work.AxiSpiAd7682Reg
    generic map (
       TPD_G             => TPD_G,
-      AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
       AXIL_ADDR_WIDTH_G => 8,
       N_INPUTS_G        => N_INPUTS_G)
    port map (

@@ -2,7 +2,7 @@
 -- File       : AmcStriplineBpmCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-28
--- Last update: 2017-02-23
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
@@ -30,10 +30,9 @@ use unisim.vcomponents.all;
 
 entity AmcStriplineBpmCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_CLK_FREQ_G  : real             := 156.25E+6;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- Analog Control Ports 
       attn1A          : in    slv(4 downto 0);
@@ -156,7 +155,7 @@ architecture mapping of AmcStriplineBpmCore is
    signal dacCsLVec       : slv(1 downto 0);
    signal dacVcoEnable    : sl;
    signal dacVcoSckConfig : slv(15 downto 0);
-   
+
    signal lemoTrigger : sl;
 
 begin
@@ -267,7 +266,7 @@ begin
          I  => syncOutP(6),
          IB => syncOutN(6),
          O  => lemoTrigger);
-         
+
    lemoTrig <= lemoTrigger;
 
    ---------------------
@@ -276,7 +275,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -298,7 +296,6 @@ begin
    SPI_LMK : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          ADDRESS_SIZE_G    => 15,
          DATA_SIZE_G       => 8,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -346,7 +343,6 @@ begin
       SPI_DAC : entity work.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
-            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
             ADDRESS_SIZE_G    => 15,
             DATA_SIZE_G       => 8,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -382,7 +378,6 @@ begin
    SPI_DAC_0 : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          ADDRESS_SIZE_G    => 7,
          DATA_SIZE_G       => 16,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -422,9 +417,8 @@ begin
    ---------------------
    U_AmcBpmCtrl : entity work.AmcBpmCtrl
       generic map (
-         TPD_G            => TPD_G,
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G          => TPD_G,
+         AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)
       port map (
          -- Debug Signals
          amcClk          => jesdClk,

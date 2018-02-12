@@ -2,7 +2,7 @@
 -- File       : AmcStriplineBpmDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-28
--- Last update: 2016-07-12
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
@@ -25,62 +25,61 @@ use work.jesd204bpkg.all;
 
 entity AmcStriplineBpmDualCore is
    generic (
-      TPD_G                    : time                   := 1 ns;
-      AXI_CLK_FREQ_G           : real                   := 156.25E+6;
-      AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G          : slv(31 downto 0)       := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_CLK_FREQ_G  : real             := 156.25E+6;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- Analog Control Ports 
-      attn1A          : in Slv5Array(1 downto 0);
-      attn1B          : in Slv5Array(1 downto 0);
-      attn2A          : in Slv5Array(1 downto 0);
-      attn2B          : in Slv5Array(1 downto 0);
-      attn3A          : in Slv5Array(1 downto 0);
-      attn3B          : in Slv5Array(1 downto 0);
-      attn4A          : in Slv5Array(1 downto 0);
-      attn4B          : in Slv5Array(1 downto 0);
-      attn5A          : in Slv5Array(1 downto 0);
+      attn1A          : in    Slv5Array(1 downto 0);
+      attn1B          : in    Slv5Array(1 downto 0);
+      attn2A          : in    Slv5Array(1 downto 0);
+      attn2B          : in    Slv5Array(1 downto 0);
+      attn3A          : in    Slv5Array(1 downto 0);
+      attn3B          : in    Slv5Array(1 downto 0);
+      attn4A          : in    Slv5Array(1 downto 0);
+      attn4B          : in    Slv5Array(1 downto 0);
+      attn5A          : in    Slv5Array(1 downto 0);
       -- Calibration Ports
-      clSw            : in Slv6Array(1 downto 0);
-      clClkOe         : in slv(1 downto 0);
-      rfAmpOn         : in slv(1 downto 0);     
-      lemoTrig        : out slv(1 downto 0);     
+      clSw            : in    Slv6Array(1 downto 0);
+      clClkOe         : in    slv(1 downto 0);
+      rfAmpOn         : in    slv(1 downto 0);
+      lemoTrig        : out   slv(1 downto 0);
       -- ADC/DAC Interface (jesdClk domain)
       adcValids       : in    Slv7Array(1 downto 0);
       adcValues       : in    sampleDataVectorArray(1 downto 0, 6 downto 0);
-      dacVcoCtrl      : in   Slv16Array(1 downto 0);
+      dacVcoCtrl      : in    Slv16Array(1 downto 0);
       -- JESD SYNC Interface
       jesdClk         : in    slv(1 downto 0);
       jesdRst         : in    slv(1 downto 0);
       jesdSysRef      : out   slv(1 downto 0);
-      jesdRxSync      : in    slv(1 downto 0);          
+      jesdRxSync      : in    slv(1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
       axilReadMaster  : in    AxiLiteReadMasterType;
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
-      axilWriteSlave  : out   AxiLiteWriteSlaveType;      
+      axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
       -----------------------
       -- AMC's JTAG Ports
-      jtagPri          : inout Slv5Array(1 downto 0);
-      jtagSec          : inout Slv5Array(1 downto 0);
+      jtagPri         : inout Slv5Array(1 downto 0);
+      jtagSec         : inout Slv5Array(1 downto 0);
       -- AMC's FPGA Clock Ports
-      fpgaClkP         : inout Slv2Array(1 downto 0);
-      fpgaClkN         : inout Slv2Array(1 downto 0);
+      fpgaClkP        : inout Slv2Array(1 downto 0);
+      fpgaClkN        : inout Slv2Array(1 downto 0);
       -- AMC's System Reference Ports
-      sysRefP          : inout Slv4Array(1 downto 0);
-      sysRefN          : inout Slv4Array(1 downto 0);
+      sysRefP         : inout Slv4Array(1 downto 0);
+      sysRefN         : inout Slv4Array(1 downto 0);
       -- AMC's Sync Ports
-      syncInP          : inout Slv4Array(1 downto 0);
-      syncInN          : inout Slv4Array(1 downto 0);
-      syncOutP         : inout Slv10Array(1 downto 0);
-      syncOutN         : inout Slv10Array(1 downto 0);
+      syncInP         : inout Slv4Array(1 downto 0);
+      syncInN         : inout Slv4Array(1 downto 0);
+      syncOutP        : inout Slv10Array(1 downto 0);
+      syncOutN        : inout Slv10Array(1 downto 0);
       -- AMC's Spare Ports
-      spareP           : inout Slv16Array(1 downto 0);
-      spareN           : inout Slv16Array(1 downto 0));
+      spareP          : inout Slv16Array(1 downto 0);
+      spareN          : inout Slv16Array(1 downto 0));
 end AmcStriplineBpmDualCore;
 
 architecture mapping of AmcStriplineBpmDualCore is
@@ -93,7 +92,7 @@ architecture mapping of AmcStriplineBpmDualCore is
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   
+
 begin
 
    ---------------------
@@ -102,7 +101,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -124,10 +122,9 @@ begin
    GEN_AMC : for i in 1 downto 0 generate
       U_AMC : entity work.AmcStriplineBpmCore
          generic map (
-            TPD_G                    => TPD_G,
-            AXI_CLK_FREQ_G           => AXI_CLK_FREQ_G,
-            AXI_ERROR_RESP_G         => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G          => AXI_CONFIG_C(i).baseAddr)
+            TPD_G           => TPD_G,
+            AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,
+            AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map(
             -- Analog Control Ports 
             attn1A          => attn1A(i),
@@ -185,7 +182,7 @@ begin
             syncOutN        => syncOutN(i),
             -- AMC's Spare Ports
             spareP          => spareP(i),
-            spareN          => spareN(i));  
+            spareN          => spareN(i));
    end generate GEN_AMC;
 
 end mapping;

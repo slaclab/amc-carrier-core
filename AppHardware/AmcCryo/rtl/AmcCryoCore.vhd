@@ -2,7 +2,7 @@
 -- File       : AmcCryoCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
--- Last update: 2017-06-29
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_23_C00
 -------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ entity AmcCryoCore is
    generic (
       TPD_G            : time             := 1 ns;
       AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Interface
@@ -232,7 +231,6 @@ begin
    U_XBAR0 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
@@ -250,8 +248,7 @@ begin
 
    U_Ctrl : entity work.AmcCryoCoreCtrl
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G            => TPD_G)
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,
@@ -315,7 +312,6 @@ begin
       U_ADC : entity work.adc32rf45
          generic map (
             TPD_G             => TPD_G,
-            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
             -- SPI_SCLK_PERIOD_G => (1.0/100.0E+3))
             SPI_SCLK_PERIOD_G => (1.0/1.0E+6))
@@ -401,7 +397,6 @@ begin
    U_LMK : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          ADDRESS_SIZE_G    => 15,
          DATA_SIZE_G       => 8,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),

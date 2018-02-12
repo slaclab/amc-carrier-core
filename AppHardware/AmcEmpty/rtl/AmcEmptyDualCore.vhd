@@ -2,7 +2,7 @@
 -- File       : AmcEmptyDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-06
--- Last update: 2017-03-09
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: Module to terminate a dual empty AMC bay
 -------------------------------------------------------------------------------
@@ -23,16 +23,15 @@ use work.AxiLitePkg.all;
 
 entity AmcEmptyDualCore is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G : time := 1 ns);
    port (
       -- AXI-Lite Interface
       axilClk         : in    sl                     := '0';
       axilRst         : in    sl                     := '0';
       axilReadMaster  : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
-      axilReadSlave   : out   AxiLiteReadSlaveType;
+      axilReadSlave   : out   AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
       axilWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-      axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      axilWriteSlave  : out   AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
       -----------------------
       -- Application Ports --
       -----------------------
@@ -58,56 +57,5 @@ end AmcEmptyDualCore;
 architecture mapping of AmcEmptyDualCore is
 
 begin
-
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
-
-   -----------
-   -- AMC Core
-   -----------
-   GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcEmptyCore
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-         port map(
-
-            -- AXI-Lite Interface
-            axilClk         => '0',
-            axilRst         => '0',
-            axilReadMaster  => AXI_LITE_READ_MASTER_INIT_C,
-            axilReadSlave   => open,
-            axilWriteMaster => AXI_LITE_WRITE_MASTER_INIT_C,
-            axilWriteSlave  => open,
-            -----------------------
-            -- Application Ports --
-            -----------------------
-            -- AMC's JTAG Ports
-            jtagPri         => jtagPri(i),
-            jtagSec         => jtagSec(i),
-            -- AMC's FPGA Clock Ports
-            fpgaClkP        => fpgaClkP(i),
-            fpgaClkN        => fpgaClkN(i),
-            -- AMC's System Reference Ports
-            sysRefP         => sysRefP(i),
-            sysRefN         => sysRefN(i),
-            -- AMC's Sync Ports
-            syncInP         => syncInP(i),
-            syncInN         => syncInN(i),
-            syncOutP        => syncOutP(i),
-            syncOutN        => syncOutN(i),
-            -- AMC's Spare Ports
-            spareP          => spareP(i),
-            spareN          => spareN(i));
-   end generate GEN_AMC;
 
 end mapping;

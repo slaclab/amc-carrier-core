@@ -2,7 +2,7 @@
 -- File       : AmcCarrierSysReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-01-31
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -36,7 +36,6 @@ entity AmcCarrierSysReg is
    generic (
       TPD_G            : time            := 1 ns;
       BUILD_INFO_G     : BuildInfoType;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
       MPS_SLOT_G       : boolean         := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
       FSBL_G           : boolean         := false);
@@ -238,7 +237,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 2,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
@@ -261,7 +259,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          BUILD_INFO_G     => BUILD_INFO_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          CLK_PERIOD_G     => 6.4E-9,
          XIL_DEVICE_G     => "ULTRASCALE",
          EN_DEVICE_DNA_G  => true,
@@ -329,8 +326,7 @@ begin
    --------------------------
    U_SysMon : entity work.AmcCarrierSysMon
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G            => TPD_G)
       port map (
          -- SYSMON Ports
          vPIn            => vPIn,
@@ -350,7 +346,6 @@ begin
    U_BootProm : entity work.AxiMicronN25QCore
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          MEM_ADDR_MASK_G  => x"00000000",  -- Using hardware write protection
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C,        -- units of Hz
          SPI_CLK_FREQ_G   => (AXI_CLK_FREQ_C/4.0))  -- units of Hz
@@ -402,7 +397,6 @@ begin
    U_Sy56040 : entity work.AxiSy56040Reg
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          XBAR_DEFAULT_G   => xbarDefault(APP_TYPE_G, MPS_SLOT_G),
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
@@ -429,7 +423,6 @@ begin
          ADDR_WIDTH_G     => 13,
          I2C_ADDR_G       => "1010000",
          I2C_SCL_FREQ_G   => 400.0E+3,  -- units of Hz
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
          -- I2C Ports
@@ -450,7 +443,6 @@ begin
    AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          I2C_SCL_FREQ_G   => 100.0E+3,  -- units of Hz
          DEVICE_MAP_G     => TIME_DEVICE_MAP_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
@@ -474,7 +466,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          I2C_SCL_FREQ_G   => 400.0E+3,  -- units of Hz
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          DEVICE_MAP_G     => DDR_DEVICE_MAP_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
@@ -496,8 +487,7 @@ begin
    U_Bsi : entity work.AmcCarrierBsi
       generic map (
          TPD_G            => TPD_G,
-         BUILD_INFO_G     => BUILD_INFO_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         BUILD_INFO_G     => BUILD_INFO_G)
       port map (
          -- DDR Memory Status
          ddrMemReady     => ddrMemReady,

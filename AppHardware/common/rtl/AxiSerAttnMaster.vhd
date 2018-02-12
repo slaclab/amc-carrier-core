@@ -2,7 +2,7 @@
 -- File       : AxiSerAttnMaster.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-12
--- Last update: 2015-11-04
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description:   This module handles SPI chips with only one setting (non addressable or readable over SPI)
 --                Write only access to SPI
@@ -41,7 +41,6 @@ use work.AxiLitePkg.all;
 entity AxiSerAttnMaster is
    generic (
       TPD_G             : time            := 1 ns;
-      AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C;
       DATA_SIZE_G       : natural         := 6;
       CLK_PERIOD_G      : real            := 10.0E-6;
       SPI_SCLK_PERIOD_G : real            := 100.0E-6

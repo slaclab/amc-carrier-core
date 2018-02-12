@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-09
+-- Last update: 2018-02-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -33,7 +33,6 @@ use unisim.vcomponents.all;
 entity AmcCarrierDdrMem is
    generic (
       TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       FSBL_G           : boolean         := false;
       SIM_SPEEDUP_G    : boolean         := false);
    port (
@@ -399,7 +398,7 @@ begin
          axiSlaveRegister(regCon, x"3FC", 0, v.ddrReset);
 
          -- Closeout the transaction
-         axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+         axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
          -- Latch the values from Synchronizers
          v.memReady := done;

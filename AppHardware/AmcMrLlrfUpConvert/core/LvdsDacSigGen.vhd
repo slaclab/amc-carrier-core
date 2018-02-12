@@ -2,7 +2,7 @@
 -- File       : LvdsDacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-14
--- Last update: 2017-04-19
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: Signal generator top module.
 --     Arbitrary signal generator
@@ -32,10 +32,9 @@ use work.AmcCarrierPkg.all;
 
 entity LvdsDacSigGen is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0');
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
-      ADDR_WIDTH_G     : positive         := 10);
+      TPD_G           : time             := 1 ns;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
+      ADDR_WIDTH_G    : positive         := 10);
    port (
       -- devClk2x Reference
       devClk2x_i      : in  sl;
@@ -99,7 +98,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
@@ -120,9 +118,8 @@ begin
    ---------------------------------
    U_REG : entity work.LvdsDacRegItf
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         ADDR_WIDTH_G     => ADDR_WIDTH_G)
+         TPD_G        => TPD_G,
+         ADDR_WIDTH_G => ADDR_WIDTH_G)
       port map (
          -- devClk2x Reference (devClk2x_i domain)
          devClk2x_i      => devClk2x_i,

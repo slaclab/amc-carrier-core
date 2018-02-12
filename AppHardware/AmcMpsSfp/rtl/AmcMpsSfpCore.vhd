@@ -2,7 +2,7 @@
 -- File       : AmcMpsSfpCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-28
--- Last update: 2017-05-01
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_09_C00
 -------------------------------------------------------------------------------
@@ -29,7 +29,6 @@ entity AmcMpsSfpCore is
       EN_PLL_G         : boolean          := false;
       EN_HS_REPEATER_G : boolean          := false;
       AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- PLL Interface
@@ -94,7 +93,7 @@ architecture mapping of AmcMpsSfpCore is
 
    signal los : sl;
    signal lol : sl;
-   
+
 begin
 
    --------------------
@@ -115,7 +114,6 @@ begin
    U_XBAR0 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -136,17 +134,8 @@ begin
       pllLos <= '0';
       pllLol <= '0';
 
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(PLL_INDEX_C),
-            axiReadSlave   => axilReadSlaves(PLL_INDEX_C),
-            axiWriteMaster => axilWriteMasters(PLL_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(PLL_INDEX_C));
+      axilReadSlaves(PLL_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      axilWriteSlaves(PLL_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
    end generate;
 
@@ -154,18 +143,17 @@ begin
 
       lol <= syncInP(0);
       los <= syncInP(1);
-      
+
       pllLol <= lol;
       pllLos <= los;
 
       U_PLL : entity work.Si5317a
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            TPD_G => TPD_G)
          port map(
             -- PLL Parallel Interface
             pllLos          => los,
-            pllLol          => lol,            
+            pllLol          => lol,
             pllRstL         => spareP(0),
             pllInc          => spareP(1),
             pllDec          => spareP(2),
@@ -181,7 +169,7 @@ begin
             pllFrqSel(1)    => spareP(12),
             pllFrqSel(2)    => spareP(13),
             pllFrqSel(3)    => spareP(14),
-            userValueIn     => (others=>'0'),
+            userValueIn     => (others => '0'),
             userValueOut    => open,
             -- AXI-Lite Interface
             axilClk         => axilClk,
@@ -195,17 +183,8 @@ begin
 
    BYP_HSR : if (EN_HS_REPEATER_G = false) generate
 
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(HS_REPEATER_INDEX_C),
-            axiReadSlave   => axilReadSlaves(HS_REPEATER_INDEX_C),
-            axiWriteMaster => axilWriteMasters(HS_REPEATER_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(HS_REPEATER_INDEX_C));
+      axilWriteSlaves(HS_REPEATER_INDEX_C) <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      axilReadSlaves(HS_REPEATER_INDEX_C)  <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
    end generate;
 
@@ -216,10 +195,9 @@ begin
 
       U_HSR : entity work.AmcMpsSfpHsRepeater
          generic map (
-            TPD_G            => TPD_G,
-            AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G  => AXI_CONFIG_C(HS_REPEATER_INDEX_C).baseAddr)
+            TPD_G           => TPD_G,
+            AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,
+            AXI_BASE_ADDR_G => AXI_CONFIG_C(HS_REPEATER_INDEX_C).baseAddr)
          port map(
             -- I2C Interface
             i2cScl(0)       => jtagSec(0),
@@ -240,10 +218,9 @@ begin
 
    U_SfpMon : entity work.AmcMpsSfpMon
       generic map (
-         TPD_G            => TPD_G,
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(SFP_I2C_INDEX_C).baseAddr)
+         TPD_G           => TPD_G,
+         AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(SFP_I2C_INDEX_C).baseAddr)
       port map(
          -- I2C Interface
          i2cScl          => jtagPri(0),

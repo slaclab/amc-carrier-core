@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-09-29
+-- Last update: 2018-02-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,8 +37,7 @@ entity AmcCarrierBsa is
       TPD_G                  : time                   := 1 ns;
       FSBL_G                 : boolean                := false;
       DISABLE_BSA_G          : boolean                := false;
-      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4;
-      AXI_ERROR_RESP_G       : slv(1 downto 0)        := AXI_RESP_DECERR_C);
+      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
@@ -161,18 +160,8 @@ begin
 
    -- FSBL build has no BSA logic.
    FSBL_GEN : if (FSBL_G) generate
-      U_AxiLiteEmpty_1 : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- Don't respond with error
-         port map (
-            axiClk         => axilClk,          -- [in]
-            axiClkRst      => axilRst,          -- [in]
-            axiReadMaster  => axilReadMaster,   -- [in]
-            axiReadSlave   => axilReadSlave,    -- [out]
-            axiWriteMaster => axilWriteMaster,  -- [in]
-            axiWriteSlave  => axilWriteSlave);  -- [out]
-
+      axilReadSlave       <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+      axilWriteSlave      <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
       axiWriteMaster      <= AXI_WRITE_MASTER_INIT_C;
       axiReadMaster       <= AXI_READ_MASTER_INIT_C;
       obBsaMasters        <= (others => AXI_STREAM_MASTER_INIT_C);
@@ -345,19 +334,9 @@ begin
       end generate BSA_EN_GEN;
 
       BSA_DISABLE_GEN : if (DISABLE_BSA_G) generate
-         U_AxiLiteEmpty_2 : entity work.AxiLiteEmpty
-            generic map (
-               TPD_G            => TPD_G,
-               AXI_ERROR_RESP_G => AXI_RESP_OK_C)
-            port map (
-               axiClk         => axilClk,                                 -- [in]
-               axiClkRst      => axilRst,                                 -- [in]
-               axiReadMaster  => locAxilReadMasters(BSA_BUFFER_AXIL_C),   -- [in]
-               axiReadSlave   => locAxilReadSlaves(BSA_BUFFER_AXIL_C),    -- [out]
-               axiWriteMaster => locAxilWriteMasters(BSA_BUFFER_AXIL_C),  -- [in]
-               axiWriteSlave  => locAxilWriteSlaves(BSA_BUFFER_AXIL_C));  -- [out]
-
-         bsaAxiWriteMaster <= AXI_WRITE_MASTER_INIT_C;
+         locAxilReadSlaves(BSA_BUFFER_AXIL_C)      <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+         locAxilWriteSlaves(BSA_BUFFER_AXIL_C)     <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
+         bsaAxiWriteMaster                         <= AXI_WRITE_MASTER_INIT_C;
          obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
       end generate BSA_DISABLE_GEN;
 
@@ -369,7 +348,7 @@ begin
             TPD_G               => TPD_G,
             PIPE_STAGES_G       => 1,
             FIFO_PAUSE_THRESH_G => 128,
-            TX_VALID_THOLD_G    => 256,-- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
+            TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
             SLAVE_READY_EN_G    => true,
             GEN_SYNC_FIFO_G     => false,
             AXI_CLK_FREQ_G      => 200.0E+6,
@@ -383,17 +362,17 @@ begin
             WRITE_EN_G          => true,
             READ_EN_G           => true)
          port map (
-            sAxisClk       => axilClk,                             -- [in]
-            sAxisRst       => axilRst,                             -- [in]
+            sAxisClk       => axilClk,  -- [in]
+            sAxisRst       => axilRst,  -- [in]
             sAxisMaster    => ibBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [in]
             sAxisSlave     => ibBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [out]
-            sAxisCtrl      => open,                                -- [out]
-            mAxisClk       => axilClk,                             -- [in]
-            mAxisRst       => axilRst,                             -- [in]
+            sAxisCtrl      => open,     -- [out]
+            mAxisClk       => axilClk,  -- [in]
+            mAxisRst       => axilRst,  -- [in]
             mAxisMaster    => obBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [out]
             mAxisSlave     => obBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [in]
-            axiClk         => axiClk,                              -- [in]
-            axiRst         => axiRst,                              -- [in]
+            axiClk         => axiClk,   -- [in]
+            axiRst         => axiRst,   -- [in]
             axiWriteMaster => memAxiWriteMaster,                   -- [out]
             axiWriteSlave  => memAxiWriteSlave,                    -- [in]
             axiReadMaster  => memAxiReadMaster,                    -- [out]

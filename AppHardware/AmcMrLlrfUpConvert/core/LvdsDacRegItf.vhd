@@ -2,7 +2,7 @@
 -- File       : LvdsDacRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
--- Last update: 2017-04-19
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for Signal generator
 --               0x00 (RW)- Control Register
@@ -36,9 +36,8 @@ use work.AxiLitePkg.all;
 entity LvdsDacRegItf is
    generic (
       -- General Configurations
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
-      ADDR_WIDTH_G     : positive        := 9);
+      TPD_G        : time     := 1 ns;
+      ADDR_WIDTH_G : positive := 9);
    port (
       -- devClk2x Reference (devClk2x_i domain)
       devClk2x_i      : in  sl;
@@ -112,7 +111,7 @@ begin
       axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axilStatus);
 
       if (axilStatus.writeEnable = '1') then
-         axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
+         axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
          case (s_WrAddr) is
             when 16#00# =>              -- ADDR (0)
                v.control := axilWriteMaster.wdata(0 downto 0);
@@ -129,13 +128,13 @@ begin
                   end if;
                end loop;
             when others =>
-               axilWriteResp := AXI_ERROR_RESP_G;
+               axilWriteResp := AXI_RESP_DECERR_C;
          end case;
          axiSlaveWriteResponse(v.axilWriteSlave);
       end if;
 
       if (axilStatus.readEnable = '1') then
-         axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
+         axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
          v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0)
@@ -159,7 +158,7 @@ begin
                   end if;
                end loop;
             when others =>
-               axilReadResp := AXI_ERROR_RESP_G;
+               axilReadResp := AXI_RESP_DECERR_C;
          end case;
          axiSlaveReadResponse(v.axilReadSlave);
       end if;

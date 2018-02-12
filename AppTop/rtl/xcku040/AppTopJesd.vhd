@@ -2,7 +2,7 @@
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-06-30
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -34,7 +34,6 @@ entity AppTopJesd is
       TPD_G              : time                 := 1 ns;
       SIM_SPEEDUP_G      : boolean              := false;
       SIMULATION_G       : boolean              := false;
-      AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
       JESD_DRP_EN_G      : boolean              := true;
       JESD_RX_LANE_G     : natural range 0 to 7 := 7;
@@ -149,7 +148,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -260,8 +258,7 @@ begin
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
          JESD_TX_LANE_G     => JESD_TX_LANE_G,
          JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
-         JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)
+         JESD_TX_POLARITY_G => JESD_TX_POLARITY_G)
       port map (
          -- DRP Interface
          drpClk          => drpClk,
@@ -316,7 +313,6 @@ begin
       U_XBAR : entity work.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
-            DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
             NUM_SLAVE_SLOTS_G  => 1,
             NUM_MASTER_SLOTS_G => JESD_LANE_C,
             MASTERS_CONFIG_G   => GTH_CONFIG_C)
@@ -336,7 +332,6 @@ begin
          U_AxiLiteToDrp : entity work.AxiLiteToDrp
             generic map (
                TPD_G            => TPD_G,
-               AXI_ERROR_RESP_G => AXI_RESP_DECERR_C,
                COMMON_CLK_G     => true,
                EN_ARBITRATION_G => false,
                TIMEOUT_G        => 4096,
