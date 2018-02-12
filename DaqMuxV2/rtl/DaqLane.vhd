@@ -2,7 +2,7 @@
 -- File       : DaqLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-02
--- Last update: 2017-10-16
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description:   This module sends sample data to a single Lane.
 --                In non-continuous mode
@@ -49,7 +49,6 @@ entity DaqLane is
    generic (
       -- General Configurations
       TPD_G                : time            := 1 ns;
-      AXI_ERROR_RESP_G     : slv(1 downto 0) := AXI_RESP_SLVERR_C;
       DECIMATOR_EN_G       : boolean         := true;  -- Include or exclude decimator
       FRAME_BWIDTH_G       : positive        := 10;  -- Dafault 10: 4096 byte frames
       FREZE_BUFFER_TUSER_G : integer         := 2

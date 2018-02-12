@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfDownConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-07
--- Last update: 2017-02-27
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_16_C02
 -------------------------------------------------------------------------------
@@ -30,10 +30,9 @@ use unisim.vcomponents.all;
 
 entity AmcMrLlrfDownConvertCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      BUFGCE_DIVIDE_G  : positive         := 3;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      BUFGCE_DIVIDE_G : positive         := 3;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD SYNC Interface
       jesdClk         : in    sl;
@@ -52,7 +51,7 @@ entity AmcMrLlrfDownConvertCore is
       -- Spare LMK Clock References
       lmkDclk10       : out   sl;
       lmkDclk12       : out   sl;
-      bufgCe          : in    sl := '1';      
+      bufgCe          : in    sl := '1';
       bufgClr         : in    sl := '0';
       -----------------------
       -- Application Ports --
@@ -195,8 +194,8 @@ architecture mapping of AmcMrLlrfDownConvertCore is
    signal dacSclk_o : sl;
    signal dacSdi_o  : sl;
    signal dacCsL_o  : slv(2 downto 0);
-   
-   signal lmkDclk  : slv(1 downto 0);
+
+   signal lmkDclk : slv(1 downto 0);
 
 begin
 
@@ -260,23 +259,23 @@ begin
    spareN(12) <= dacCsL_o(0);
    spareP(12) <= dacCsL_o(1);
    spareN(13) <= dacCsL_o(2);
-   
+
    U_lmkDclk10 : IBUFDS
       generic map (
          DIFF_TERM => true)
       port map (
          I  => syncInP(2),
          IB => syncInN(2),
-         O  => lmkDclk(0));     
-   
+         O  => lmkDclk(0));
+
    U_lmkDclk12 : IBUFDS
       generic map (
          DIFF_TERM => true)
       port map (
          I  => fpgaClkP(0),
          IB => fpgaClkN(0),
-         O  => lmkDclk(1)); 
-         
+         O  => lmkDclk(1));
+
    U_LMK10 : BUFGCE_DIV
       generic map (
          BUFGCE_DIVIDE => BUFGCE_DIVIDE_G)
@@ -285,7 +284,7 @@ begin
          CLR => bufgClr,
          CE  => bufgCe,
          O   => lmkDclk10);
-         
+
    U_LMK12 : BUFGCE_DIV
       generic map (
          BUFGCE_DIVIDE => BUFGCE_DIVIDE_G)
@@ -293,15 +292,14 @@ begin
          I   => lmkDclk(1),
          CLR => bufgClr,
          CE  => bufgCe,
-         O   => lmkDclk12);            
-         
+         O   => lmkDclk12);
+
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
    U_XBAR0 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -372,7 +370,6 @@ begin
       U_Attn : entity work.AxiSerAttnMaster
          generic map (
             TPD_G             => TPD_G,
-            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
             DATA_SIZE_G       => 6,
             CLK_PERIOD_G      => 6.4E-9,
             SPI_SCLK_PERIOD_G => 1.0E-6)  -- 1MHz
@@ -421,7 +418,6 @@ begin
       AxiSerAttnMaster_INST : entity work.AxiSerAttnMaster
          generic map (
             TPD_G             => TPD_G,
-            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
             DATA_SIZE_G       => 16,
             CLK_PERIOD_G      => 6.4E-9,
             SPI_SCLK_PERIOD_G => 1.0E-6)  -- 1MHz
@@ -454,8 +450,7 @@ begin
 
    U_Dac : entity work.AmcMrLlrfDownConvertDacMux
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G => TPD_G)
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,

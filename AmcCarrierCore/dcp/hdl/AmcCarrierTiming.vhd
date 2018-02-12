@@ -2,7 +2,7 @@
 -- File       : AmcCarrierTiming.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-11-03
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -37,7 +37,6 @@ entity AmcCarrierTiming is
       TPD_G             : time            := 1 ns;
       TIME_GEN_APP_G    : boolean         := false;
       TIME_GEN_EXTREF_G : boolean         := false;
-      AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C;
       RX_CLK_MMCM_G     : boolean         := false);
    port (
       -- AXI-Lite Interface (axilClk domain)
@@ -137,7 +136,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => 2,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)

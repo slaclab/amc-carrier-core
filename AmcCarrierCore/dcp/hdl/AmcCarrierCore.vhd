@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-11-03
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -167,8 +167,6 @@ end AmcCarrierCore;
 
 architecture mapping of AmcCarrierCore is
 
-   constant AXI_ERROR_RESP_C : slv(1 downto 0) := AXI_RESP_DECERR_C;
-
    signal axiWriteMaster : AxiWriteMasterType;
    signal axiWriteSlave  : AxiWriteSlaveType;
    signal axiReadMaster  : AxiReadMasterType;
@@ -280,8 +278,7 @@ begin
       generic map (
          TPD_G                 => TPD_G,
          RTM_ETH_G             => RTM_ETH_G,
-         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-         AXI_ERROR_RESP_G      => AXI_ERROR_RESP_C)
+         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G)
       port map (
          -- Local Configuration
          localMac             => localMac,
@@ -344,8 +341,7 @@ begin
       generic map (
          TPD_G             => TPD_G,
          TIME_GEN_APP_G    => TIME_GEN_APP_G,
-         TIME_GEN_EXTREF_G => TIME_GEN_EXTREF_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
+         TIME_GEN_EXTREF_G => TIME_GEN_EXTREF_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
@@ -395,8 +391,7 @@ begin
          TPD_G                  => TPD_G,
          FSBL_G                 => FSBL_G,
          DISABLE_BSA_G          => DISABLE_BSA_G,
-         WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
-         AXI_ERROR_RESP_G       => AXI_ERROR_RESP_C)
+         WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
@@ -436,7 +431,6 @@ begin
    U_DdrMem : entity work.AmcCarrierDdrMem
       generic map (
          TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          FSBL_G           => FSBL_G,
          SIM_SPEEDUP_G    => SIM_SPEEDUP_G)
       port map (

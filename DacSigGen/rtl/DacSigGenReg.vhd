@@ -2,7 +2,7 @@
 -- File       : AxiLiteGenRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
--- Last update: 2017-10-27
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for Signal generator
 --               0x00      (RW)- Enable channels. Example: 0x7F enables all 7 channels (also used to align the lane) (NUM_SIG_GEN_G-1 downto 0)
@@ -37,7 +37,6 @@ use work.Jesd204bPkg.all;
 entity DacSigGenReg is
    generic (
       TPD_G            : time                       := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)            := AXI_RESP_SLVERR_C;
       AXI_ADDR_WIDTH_G : positive                   := 9;
       ADDR_WIDTH_G     : integer range 1 to (2**24) := 9;
       -- Number of channels 
@@ -139,7 +138,7 @@ begin
       axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axilStatus);
 
       if (axilStatus.writeEnable = '1') then
-         axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
+         axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
          case (s_WrAddr) is
             when 16#00# =>              -- ADDR (0x0)
                v.enable := axilWriteMaster.wdata(NUM_SIG_GEN_G-1 downto 0);
@@ -158,13 +157,13 @@ begin
                   end if;
                end loop;
             when others =>
-               axilWriteResp := AXI_ERROR_RESP_G;
+               axilWriteResp := AXI_RESP_DECERR_C;
          end case;
          axiSlaveWriteResponse(v.axilWriteSlave);
       end if;
 
       if (axilStatus.readEnable = '1') then
-         axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
+         axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
          v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0x0)
@@ -192,7 +191,7 @@ begin
                   end if;
                end loop;
             when others =>
-               axilReadResp := AXI_ERROR_RESP_G;
+               axilReadResp := AXI_RESP_DECERR_C;
          end case;
          axiSlaveReadResponse(v.axilReadSlave);
       end if;

@@ -2,7 +2,7 @@
 -- File       : AppMpsReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-04-01
--- Last update: 2017-12-22
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
@@ -32,7 +32,6 @@ entity AppMpsReg is
       TPD_G            : time             := 1 ns;
       APP_TYPE_G       : AppType          := APP_NULL_TYPE_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0');
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       APP_CONFIG_G     : MpsAppConfigType := MPS_APP_CONFIG_INIT_C);
    port (
       -- AXI-Lite Interface
@@ -78,7 +77,6 @@ begin
    U_XBAR_0 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => 2,
          MASTERS_CONFIG_G   => XBAR0_CONFIG_C)
@@ -98,7 +96,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          APP_CONFIG_G     => APP_CONFIG_G)
       port map (
          -- MPS message monitoring
@@ -119,7 +116,7 @@ begin
    U_XBAR_1 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
+         DEC_ERROR_RESP_G   => AXI_RESP_OK_C,  -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => MPS_CHAN_COUNT_C,
          MASTERS_CONFIG_G   => XBAR1_CONFIG_C)
@@ -140,8 +137,7 @@ begin
       U_ChanReg : entity work.AppMpsRegAppCh
          generic map (
             TPD_G            => TPD_G,
-            CHAN_CONFIG_G    => APP_CONFIG_G.CHAN_CONFIG_C(i),
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            CHAN_CONFIG_G    => APP_CONFIG_G.CHAN_CONFIG_C(i))
          port map (
             -- MPS Configuration Registers
             mpsChanReg      => mpsAppRegisters.mpsChanReg(i),

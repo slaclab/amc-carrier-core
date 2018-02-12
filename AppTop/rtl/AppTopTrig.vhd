@@ -2,7 +2,7 @@
 -- File       : AppTopTrig.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-03-06
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ entity AppTopTrig is
       TPD_G              : time                   := 1 ns;
       MR_LCLS_APP_G      : boolean                := true;
       AXIL_BASE_ADDR_G   : slv(31 downto 0)       := (others => '0');
-      AXI_ERROR_RESP_G   : slv(1 downto 0)        := AXI_RESP_SLVERR_C;
       TRIG_SIZE_G        : positive range 1 to 16 := 3;    -- Unused
       TRIG_DELAY_WIDTH_G : positive range 1 to 32 := 32;   -- Unused
       TRIG_PULSE_WIDTH_G : positive range 1 to 32 := 32);  -- Unused
@@ -109,7 +108,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 2,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -136,7 +134,6 @@ begin
       generic map (
          TPD_G                => TPD_G,
          AXIL_BASE_ADDR_G     => AXI_CONFIG_C(TRIG_CORE_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G     => AXI_ERROR_RESP_G,
          NUM_OF_TRIG_PULSES_G => TRIG_SIZE_G,
          DELAY_WIDTH_G        => TRIG_DELAY_WIDTH_G,
          PULSE_WIDTH_G        => TRIG_PULSE_WIDTH_G)
@@ -210,7 +207,6 @@ begin
             BRAM_EN_G             => true,
             FIFO_ADDR_WIDTH_G     => 9,
             REM_BASE_ADDR_G       => AXI_CONFIG_C(EVR_CORE_INDEX_C).baseAddr,  -- remote base address offset
-            AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
             AXIS_CONFIG_G         => EMAC_AXIS_CONFIG_C)
          port map (
             -- AXI-Lite and AXIS Interfaces

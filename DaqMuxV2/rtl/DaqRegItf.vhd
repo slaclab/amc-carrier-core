@@ -2,7 +2,7 @@
 -- File       : DaqRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
--- Last update: 2017-08-08
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for DAQ
 --
@@ -29,7 +29,6 @@ entity DaqRegItf is
    generic (
       -- General Configurations
       TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C;
       AXI_ADDR_WIDTH_G : positive        := 10;
       N_DATA_IN_G      : positive        := 16;
       N_DATA_OUT_G     : positive        := 8
@@ -186,7 +185,7 @@ begin
       axiSlaveWaitTxn(axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave, axilStatus);
 
       if (axilStatus.writeEnable = '1') then
-         axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
+         axilWriteResp := ite(axilWriteMaster.awaddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
          case (s_WrAddr) is
             when 16#00# =>              -- ADDR (0)
                v.control := axilWriteMaster.wdata(r.control'range);
@@ -207,13 +206,13 @@ begin
                   end if;
                end loop;
             when others =>
-               axilWriteResp := AXI_ERROR_RESP_G;
+               axilWriteResp := AXI_RESP_DECERR_C;
          end case;
          axiSlaveWriteResponse(v.axilWriteSlave);
       end if;
 
       if (axilStatus.readEnable = '1') then
-         axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_ERROR_RESP_G);
+         axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
          v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0x0)
@@ -263,7 +262,7 @@ begin
                   end if;
                end loop;
             when others =>
-               axilReadResp := AXI_ERROR_RESP_G;
+               axilReadResp := AXI_RESP_DECERR_C;
          end case;
          axiSlaveReadResponse(v.axilReadSlave);
       end if;

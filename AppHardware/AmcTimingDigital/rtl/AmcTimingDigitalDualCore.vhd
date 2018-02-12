@@ -2,7 +2,7 @@
 -- File       : AmcTimingDigitalDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-28
--- Last update: 2017-02-28
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -24,8 +24,7 @@ use work.AxiStreamPkg.all;
 
 entity AmcTimingDigitalDualCore is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G : time := 1 ns);
    port (
       -- Digital I/O Interface
       smaDin          : out   slv(1 downto 0);
@@ -36,9 +35,9 @@ entity AmcTimingDigitalDualCore is
       axilClk         : in    sl                     := '0';
       axilRst         : in    sl                     := '0';
       axilReadMaster  : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
-      axilReadSlave   : out   AxiLiteReadSlaveType;
+      axilReadSlave   : out   AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
       axilWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-      axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      axilWriteSlave  : out   AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
       -----------------------
       -- Application Ports --
       -----------------------
@@ -65,26 +64,13 @@ architecture mapping of AmcTimingDigitalDualCore is
 
 begin
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
-
    -----------
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
       U_AMC : entity work.AmcTimingDigitalCore
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            TPD_G => TPD_G)
          port map(
             -- Digital I/O Interface
             smaDin          => smaDin(i),

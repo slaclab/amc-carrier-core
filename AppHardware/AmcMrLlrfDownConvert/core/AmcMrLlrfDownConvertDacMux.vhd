@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfDownConvertDacMux.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-27
--- Last update: 2016-03-11
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -28,8 +28,7 @@ use unisim.vcomponents.all;
 
 entity AmcMrLlrfDownConvertDacMux is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);      
+      TPD_G : time := 1 ns);
    port (
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -57,29 +56,29 @@ architecture rtl of AmcMrLlrfDownConvertDacMux is
       IDLE_S,
       SCK_LO_S,
       SCK_HI_S,
-      CS_HIGH_S);    
+      CS_HIGH_S);
 
    type RegType is record
-      csL         : slv(2 downto 0);
-      sck         : sl;
-      din         : sl;
-      chIndex     : natural range 0 to 2;
-      shift   : slv(15 downto 0);
-      dacValues   : Slv16Array(2 downto 0);
-      cnt         : slv(15 downto 0);
-      bitCnt      : slv(3 downto 0);
-      state       : StateType;
+      csL       : slv(2 downto 0);
+      sck       : sl;
+      din       : sl;
+      chIndex   : natural range 0 to 2;
+      shift     : slv(15 downto 0);
+      dacValues : Slv16Array(2 downto 0);
+      cnt       : slv(15 downto 0);
+      bitCnt    : slv(3 downto 0);
+      state     : StateType;
    end record;
    constant REG_INIT_C : RegType := (
-      csL         => (others => '1'),
-      sck         => '0',
-      din         => '0',
-      chIndex     => 0,
-      shift   => (others => '0'),
-      dacValues   => (others =>(others => '0')),
-      cnt         => (others => '0'),
-      bitCnt      => (others => '0'),
-      state       => IDLE_S);      
+      csL       => (others => '1'),
+      sck       => '0',
+      din       => '0',
+      chIndex   => 0,
+      shift     => (others => '0'),
+      dacValues => (others => (others => '0')),
+      cnt       => (others => '0'),
+      bitCnt    => (others => '0'),
+      state     => IDLE_S);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -89,7 +88,7 @@ architecture rtl of AmcMrLlrfDownConvertDacMux is
 
    -- attribute dont_touch               : string;
    -- attribute dont_touch of r          : signal is "TRUE";
-   
+
 begin
 
    dacCsL_o  <= dacCsL_i  when(enable = '0') else r.csL;
@@ -98,8 +97,7 @@ begin
 
    U_Reg : entity work.AmcMrLlrfDownConvertDacMuxReg
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G => TPD_G)
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,
@@ -111,7 +109,7 @@ begin
          -- JESD Interface
          clk             => clk,
          enable          => enable,
-         halfPeriod      => halfPeriod); 
+         halfPeriod      => halfPeriod);
 
    comb : process (dacValues, enable, halfPeriod, r, rst) is
       variable v : RegType;
@@ -130,16 +128,16 @@ begin
             if (enable = '1') then
                -- Set flags and latch values only if the values are different
                -- from previously written
-               if (r.dacValues(r.chIndex)/=dacValues(r.chIndex)) then
+               if (r.dacValues(r.chIndex) /= dacValues(r.chIndex)) then
                   v.csL(r.chIndex) := '0';
-                  
+
                   -- Latch the value with respect to channel index
                   -- Latch the value to be shifter in and the value for 
                   -- comparison
-                  v.shift                 := dacValues(r.chIndex);
-                  v.dacValues(r.chIndex)  := dacValues(r.chIndex);
+                  v.shift                := dacValues(r.chIndex);
+                  v.dacValues(r.chIndex) := dacValues(r.chIndex);
                end if;
-               
+
                -- Next state
                v.state := SCK_LO_S;
             end if;
@@ -167,11 +165,11 @@ begin
             -- Check the counter
             if r.cnt = halfPeriod then
                -- Reset the counter
-               v.cnt      := (others => '0');
+               v.cnt    := (others => '0');
                -- Shift the data bus
-               v.shift := r.shift(14 downto 0) & '0';
+               v.shift  := r.shift(14 downto 0) & '0';
                -- Increment the counter
-               v.bitCnt   := r.bitCnt + 1;
+               v.bitCnt := r.bitCnt + 1;
                -- Check the counter
                if r.bitCnt = x"F" then
                   -- Reset the counter
@@ -192,7 +190,7 @@ begin
             v.cnt := r.cnt + 1;
             -- Check the counter
             if r.cnt = halfPeriod then
-              -- Increment the channel index
+               -- Increment the channel index
                if r.chIndex = 2 then
                   v.chIndex := 0;
                else
@@ -216,7 +214,7 @@ begin
 
       -- Register the variable for next clock cycle
       rin <= v;
-      
+
    end process comb;
 
    seq : process (clk) is
@@ -225,5 +223,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 end rtl;

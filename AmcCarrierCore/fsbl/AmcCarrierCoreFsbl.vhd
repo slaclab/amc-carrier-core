@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreFsbl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-12-13
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -170,8 +170,6 @@ end AmcCarrierCoreFsbl;
 
 architecture mapping of AmcCarrierCoreFsbl is
 
-   constant AXI_ERROR_RESP_C : slv(1 downto 0) := AXI_RESP_DECERR_C;
-
    -- AXI-Lite Master bus
    signal axilReadMasters   : AxiLiteReadMasterArray(1 downto 0);
    signal axilReadSlaves    : AxiLiteReadSlaveArray(1 downto 0);
@@ -228,7 +226,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          BUILD_INFO_G     => BUILD_INFO_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          APP_TYPE_G       => APP_NULL_TYPE_C,
          MPS_SLOT_G       => false,
          FSBL_G           => true)
@@ -312,7 +309,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_NULL_TYPE_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          MPS_SLOT_G       => false)
       port map (
          -- AXI-Lite Interface

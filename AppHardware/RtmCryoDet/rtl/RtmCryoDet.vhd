@@ -2,7 +2,7 @@
 -- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2017-11-27
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
 ------------------------------------------------------------------------------
@@ -28,10 +28,9 @@ use unisim.vcomponents.all;
 
 entity RtmCryoDet is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0');
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C);
+      TPD_G           : time             := 1 ns;
+      AXI_CLK_FREQ_G  : real             := 156.25E+6;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Clock Reference
       jesdClk         : in    sl;
@@ -307,7 +306,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -328,8 +326,7 @@ begin
    --------------------------
    U_Reg : entity work.RtmCryoDetReg
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G => TPD_G)
       port map (
          jesdClk         => jesdClk,
          jesdRst         => jesdRst,
@@ -355,7 +352,6 @@ begin
    CRYO_SPI : entity work.AxiSpiMaster         -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
          ADDRESS_SIZE_G    => 7,               -- A[6:0]
          DATA_SIZE_G       => 32,              -- D[31:0]
@@ -381,7 +377,6 @@ begin
    MAX_SPI : entity work.AxiSpiMaster        -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
          ADDRESS_SIZE_G    => 11,            -- A[10:0]
          DATA_SIZE_G       => 20,            -- D[19:0]
@@ -407,7 +402,6 @@ begin
    SR_SPI : entity work.AxiSpiMaster         -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          MODE_G            => "RW",
          ADDRESS_SIZE_G    => 11,            -- A[10:0]
          DATA_SIZE_G       => 20,            -- D[19:0]

@@ -2,7 +2,7 @@
 -- File       : RtmRfInterlock.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-06-17
--- Last update: 2017-04-04
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C00
 ------------------------------------------------------------------------------
@@ -30,8 +30,7 @@ entity RtmRfInterlock is
    generic (
       TPD_G            : time             := 1 ns;
       IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";
-      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C);
+      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- Recovered EVR clock
       recClk          : in    sl;
@@ -298,8 +297,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          IODELAY_GROUP_G  => IODELAY_GROUP_G,
-         AXIL_BASE_ADDR_G => AXIL_BASE_ADDR_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         AXIL_BASE_ADDR_G => AXIL_BASE_ADDR_G)
       port map (
          -- Recovered EVR clock
          recClk          => recClk,

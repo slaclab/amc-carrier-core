@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-08-03
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -40,7 +40,6 @@ entity AppTop is
       MR_LCLS_APP_G          : boolean                   := true;
       WAVEFORM_TDATA_BYTES_G : positive                  := 4;
       TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";  -- "AXIL"
-      AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
       JESD_DRP_EN_G          : boolean                   := false;
       JESD_RX_LANE_G         : NaturalArray(1 downto 0)  := (others => 8);
@@ -222,7 +221,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -246,7 +244,6 @@ begin
          TPD_G              => TPD_G,
          MR_LCLS_APP_G      => MR_LCLS_APP_G,
          AXIL_BASE_ADDR_G   => AXI_CONFIG_C(TIMING_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          TRIG_SIZE_G        => TRIG_SIZE_G,
          TRIG_DELAY_WIDTH_G => TRIG_DELAY_WIDTH_G,
          TRIG_PULSE_WIDTH_G => TRIG_PULSE_WIDTH_G)
@@ -284,7 +281,6 @@ begin
       U_DaqMuxV2 : entity work.DaqMuxV2
          generic map (
             TPD_G                  => TPD_G,
-            AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
             DECIMATOR_EN_G         => true,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
             N_DATA_IN_G            => 20,  -- 2 additional for the 8 lane interface
@@ -362,7 +358,6 @@ begin
             SIM_SPEEDUP_G      => SIM_SPEEDUP_G,
             SIMULATION_G       => SIMULATION_G,
             AXI_BASE_ADDR_G    => AXI_CONFIG_C(JESD0_INDEX_C+i).baseAddr,
-            AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
             JESD_DRP_EN_G      => JESD_DRP_EN_G,
             JESD_RX_LANE_G     => JESD_RX_LANE_G(i),
             JESD_TX_LANE_G     => JESD_TX_LANE_G(i),
@@ -428,7 +423,6 @@ begin
          generic map (
             TPD_G                => TPD_G,
             AXI_BASE_ADDR_G      => AXI_CONFIG_C(SIG_GEN0_INDEX_C+i).baseAddr,
-            AXI_ERROR_RESP_G     => AXI_ERROR_RESP_G,
             SIG_GEN_SIZE_G       => SIG_GEN_SIZE_G(i),
             SIG_GEN_ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G(i),
             SIG_GEN_LANE_MODE_G  => SIG_GEN_LANE_MODE_G(i),
@@ -470,8 +464,7 @@ begin
          TPD_G            => TPD_G,
          SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
          SIMULATION_G     => SIMULATION_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         AXI_BASE_ADDR_G  => AXI_CONFIG_C(CORE_INDEX_C).baseAddr)
       port map (
          -- Clocks and resets   
          jesdClk             => jesdClk,

@@ -2,7 +2,7 @@
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-06-30
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -34,7 +34,6 @@ entity AppTopJesd is
       TPD_G              : time                 := 1 ns;
       SIM_SPEEDUP_G      : boolean              := false;
       SIMULATION_G       : boolean              := false;
-      AXI_ERROR_RESP_G   : slv(1 downto 0)      := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G    : slv(31 downto 0)     := (others => '0');
       JESD_DRP_EN_G      : boolean              := true;
       JESD_RX_LANE_G     : natural range 0 to 5 := 5;
@@ -120,13 +119,13 @@ architecture mapping of AppTopJesd is
    signal rstOut : slv(2 downto 0);
    signal locked : sl;
 
-   signal drpClk  : slv(4 downto 0)   := (others => '0');
-   signal drpRdy  : slv(4 downto 0)   := (others => '0');
-   signal drpEn   : slv(4 downto 0)   := (others => '0');
-   signal drpWe   : slv(4 downto 0)   := (others => '0');
-   signal drpAddr : slv(44 downto 0)  := (others => '0');
-   signal drpDi   : slv(79 downto 0)  := (others => '0');
-   signal drpDo   : slv(79 downto 0)  := (others => '0');
+   signal drpClk  : slv(4 downto 0)  := (others => '0');
+   signal drpRdy  : slv(4 downto 0)  := (others => '0');
+   signal drpEn   : slv(4 downto 0)  := (others => '0');
+   signal drpWe   : slv(4 downto 0)  := (others => '0');
+   signal drpAddr : slv(44 downto 0) := (others => '0');
+   signal drpDi   : slv(79 downto 0) := (others => '0');
+   signal drpDo   : slv(79 downto 0) := (others => '0');
 
    signal adcEn : slv(4 downto 0)             := (others => '0');
    signal adc   : sampleDataArray(4 downto 0) := (others => (others => '0'));
@@ -149,7 +148,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -179,8 +177,8 @@ begin
             I     => jesdClkP(i),
             IB    => jesdClkN(i),
             CEB   => '0',
-            ODIV2 => refClkDiv2Vec(i),  -- 185 MHz, Frequency the same as jesdRefClk
-            O     => refClkVec(i));     -- 185 MHz     
+            ODIV2 => refClkDiv2Vec(i),   -- 185 MHz, Frequency the same as jesdRefClk
+            O     => refClkVec(i));      -- 185 MHz     
 
       U_BUFG_GT : BUFG_GT
          port map (
@@ -260,8 +258,7 @@ begin
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
          JESD_TX_LANE_G     => JESD_TX_LANE_G,
          JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
-         JESD_TX_POLARITY_G => JESD_TX_POLARITY_G,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G)
+         JESD_TX_POLARITY_G => JESD_TX_POLARITY_G)
       port map (
          -- DRP Interface
          drpClk          => drpClk,
@@ -316,7 +313,6 @@ begin
       U_XBAR : entity work.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
-            DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
             NUM_SLAVE_SLOTS_G  => 1,
             NUM_MASTER_SLOTS_G => JESD_LANE_C,
             MASTERS_CONFIG_G   => GTH_CONFIG_C)
@@ -336,7 +332,6 @@ begin
          U_AxiLiteToDrp : entity work.AxiLiteToDrp
             generic map (
                TPD_G            => TPD_G,
-               AXI_ERROR_RESP_G => AXI_RESP_DECERR_C,
                COMMON_CLK_G     => true,
                EN_ARBITRATION_G => false,
                TIMEOUT_G        => 4096,

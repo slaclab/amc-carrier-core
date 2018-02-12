@@ -2,7 +2,7 @@
 -- File       : AppMpsEncoder.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-04-01
--- Last update: 2017-12-21
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -33,7 +33,6 @@ entity AppMpsEncoder is
    generic (
       TPD_G            : time             := 1 ns;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0');
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_SLVERR_C;
       APP_TYPE_G       : AppType          := APP_NULL_TYPE_C);
    port (
       -- Clock & Reset
@@ -123,7 +122,6 @@ begin
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
          AXI_BASE_ADDR_G  => AXI_BASE_ADDR_G,
-         AXI_ERROR_RESP_G => AXI_RESP_OK_C,  -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
          APP_CONFIG_G     => APP_CONFIG_C)
       port map (
          axilClk         => axilClk,
