@@ -352,7 +352,6 @@ begin
       generic map (
          TPD_G                 => TPD_G,
          ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-         AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
          AXI_BASE_ADDR_G       => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr)
       port map (
          -- Slave AXI-Lite Interface
