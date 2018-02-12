@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebugV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2018-01-08
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -32,8 +32,7 @@ entity RtmDigitalDebugV2 is
       DIVCLK_DIVIDE_G  : positive        := 1;
       CLKFBOUT_MULT_G  : positive        := 6;
       CLKOUT0_DIVIDE_G : positive        := 6;
-      CLKOUT1_DIVIDE_G : positive        := 3;  -- drives the RTM's jitter clean input clock port
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      CLKOUT1_DIVIDE_G : positive        := 3);  -- drives the RTM's jitter clean input clock port
    port (
       -- Digital I/O Interface
       din             : out   slv(7 downto 0);  -- digital inputs  from the RTM 
@@ -117,7 +116,7 @@ begin
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
       port map (
-         clkIn   => clk(1),  -- drives the RTM's jitter clean input clock port
+         clkIn   => clk(1),             -- drives the RTM's jitter clean input clock port
          clkOutP => rtmLsP(0),
          clkOutN => rtmLsN(0));
 
@@ -186,8 +185,7 @@ begin
    ---------------------
    U_REG : entity work.Si5317a
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G => TPD_G)
       port map(
          -- PLL Parallel Interface
          pllLol          => rtmLsP(18),

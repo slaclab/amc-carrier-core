@@ -2,7 +2,7 @@
 -- File       : AmcCarrierRssi.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2017-02-24
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ entity AmcCarrierRssi is
    generic (
       TPD_G                 : time             := 1 ns;
       ETH_USR_FRAME_LIMIT_G : positive         := 4096;  -- 4kB
-      AXI_ERROR_RESP_G      : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G       : slv(31 downto 0) := (others => '0'));
    port (
       -- Slave AXI-Lite Interface
@@ -107,7 +106,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)

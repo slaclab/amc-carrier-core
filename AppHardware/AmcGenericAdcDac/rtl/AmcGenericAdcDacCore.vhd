@@ -2,7 +2,7 @@
 -- File       : AmcGenericAdcDacCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2017-11-10
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -30,14 +30,13 @@ use unisim.vcomponents.all;
 
 entity AmcGenericAdcDacCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      SIM_SPEEDUP_G    : boolean          := false;
-      SIMULATION_G     : boolean          := false;
-      TRIG_CLK_G       : boolean          := false;
-      CAL_CLK_G        : boolean          := false;
-      AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      SIM_SPEEDUP_G   : boolean          := false;
+      SIMULATION_G    : boolean          := false;
+      TRIG_CLK_G      : boolean          := false;
+      CAL_CLK_G       : boolean          := false;
+      AXI_CLK_FREQ_G  : real             := 156.25E+6;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD SYNC Interface
       jesdClk         : in    sl;
@@ -322,7 +321,7 @@ begin
 
    lemoDin <= lemoDinput;
 
-      bcmL <= not(bcm);
+   bcmL <= not(bcm);
 
    IBUFDS_SysRef : IBUFDS
       port map (
@@ -351,7 +350,6 @@ begin
    U_XBAR0 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -373,7 +371,6 @@ begin
    SPI_LMK : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          ADDRESS_SIZE_G    => 15,
          DATA_SIZE_G       => 8,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -404,7 +401,6 @@ begin
       FAST_ADC_SPI : entity work.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
-            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
             ADDRESS_SIZE_G    => 15,
             DATA_SIZE_G       => 8,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -428,7 +424,6 @@ begin
    FAST_SPI_DAC : entity work.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
          ADDRESS_SIZE_G    => 7,
          DATA_SIZE_G       => 16,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -470,9 +465,8 @@ begin
    ----------------------- 
    U_Ctrl : entity work.AmcGenericAdcDacCtrl
       generic map (
-         TPD_G            => TPD_G,
-         AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G          => TPD_G,
+         AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)
       port map (
          -- Pass through Interfaces
          smaTrig         => ite(TRIG_CLK_G, '0', smaTrig),

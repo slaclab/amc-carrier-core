@@ -2,7 +2,7 @@
 -- File       : DacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-08-24
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -27,7 +27,6 @@ entity DacSigGen is
    generic (
       TPD_G                : time                            := 1 ns;
       AXI_BASE_ADDR_G      : slv(31 downto 0)                := (others => '0');
-      AXI_ERROR_RESP_G     : slv(1 downto 0)                 := AXI_RESP_DECERR_C;
       SIG_GEN_SIZE_G       : natural range 0 to 10           := 0;  -- 0 = Disabled
       SIG_GEN_ADDR_WIDTH_G : positive range 1 to 24          := 9;
       SIG_GEN_LANE_MODE_G  : slv(DAC_SIG_WIDTH_C-1 downto 0) := (others => '0');  -- '0': 32 bit, '1': 16 bit
@@ -102,7 +101,6 @@ begin
       U_XBAR : entity work.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
-            DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
             NUM_SLAVE_SLOTS_G  => 1,
             NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
             MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -122,7 +120,6 @@ begin
       U_DacSigGenReg : entity work.DacSigGenReg
          generic map (
             TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             ADDR_WIDTH_G     => SIG_GEN_ADDR_WIDTH_G,
             NUM_SIG_GEN_G    => SIG_GEN_SIZE_G)
          port map (

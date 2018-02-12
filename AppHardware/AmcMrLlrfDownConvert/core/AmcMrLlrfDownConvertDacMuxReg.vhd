@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfDownConvertDacMuxReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-27
--- Last update: 2016-03-11
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -28,8 +28,7 @@ use unisim.vcomponents.all;
 
 entity AmcMrLlrfDownConvertDacMuxReg is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);      
+      TPD_G            : time            := 1 ns);
    port (
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -89,7 +88,7 @@ begin
       axiSlaveRegister(regCon, x"4", 0, v.halfPeriod);
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       -- Synchronous Reset
       if (axilRst = '1') then

@@ -2,7 +2,7 @@
 -- File       : AmcCarrierBsi.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2017-06-21
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: BootStrap Interface (BSI) to the IPMI's controller (IPMC) 
 -------------------------------------------------------------------------------
@@ -31,8 +31,7 @@ use unisim.vcomponents.all;
 entity AmcCarrierBsi is
    generic (
       TPD_G            : time            := 1 ns;
-      BUILD_INFO_G     : BuildInfoType;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      BUILD_INFO_G     : BuildInfoType);
    port (
       -- DDR Memory Status
       ddrMemReady     : in    sl;
@@ -433,7 +432,7 @@ begin
       axiSlaveRegisterR(regCon, x"94", 0, r.ethUpTimeCnt);
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       --------------------------
       -- Ethernet Uptime counter

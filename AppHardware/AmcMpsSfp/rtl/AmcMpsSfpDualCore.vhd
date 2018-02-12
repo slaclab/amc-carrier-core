@@ -2,7 +2,7 @@
 -- File       : AmcMpsSfpDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-28
--- Last update: 2017-02-28
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_09_C00
 -------------------------------------------------------------------------------
@@ -27,13 +27,12 @@ entity AmcMpsSfpDualCore is
       EN_PLL_G         : boolean          := false;
       EN_HS_REPEATER_G : boolean          := false;
       AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
    port (
       -- PLL Interface
       pllClk          : in    slv(1 downto 0) := "00";
       pllLos          : out   slv(1 downto 0);
-      pllLol          : out   slv(1 downto 0);   
+      pllLol          : out   slv(1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -82,7 +81,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -108,7 +106,6 @@ begin
             EN_PLL_G         => EN_PLL_G,
             EN_HS_REPEATER_G => EN_HS_REPEATER_G,
             AXI_CLK_FREQ_G   => AXI_CLK_FREQ_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             AXI_BASE_ADDR_G  => AXI_CONFIG_C(i).baseAddr)
          port map(
             -- PLL Interface

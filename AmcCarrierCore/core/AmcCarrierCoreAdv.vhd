@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-06-28
+-- Last update: 2018-02-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -176,8 +176,6 @@ end AmcCarrierCoreAdv;
 
 architecture mapping of AmcCarrierCoreAdv is
 
-   constant AXI_ERROR_RESP_C : slv(1 downto 0) := AXI_RESP_DECERR_C;
-
    -- AXI-Lite Master bus
    signal axilReadMasters   : AxiLiteReadMasterArray(1 downto 0);
    signal axilReadSlaves    : AxiLiteReadSlaveArray(1 downto 0);
@@ -240,7 +238,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          BUILD_INFO_G     => BUILD_INFO_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          APP_TYPE_G       => APP_TYPE_G,
          MPS_SLOT_G       => MPS_SLOT_G,
          FSBL_G           => false)
@@ -324,7 +321,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          MPS_SLOT_G       => MPS_SLOT_G)
       port map (
          -- AXI-Lite Interface
