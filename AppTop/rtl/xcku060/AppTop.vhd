@@ -287,6 +287,7 @@ begin
             AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
             DECIMATOR_EN_G         => true,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
+            BAY_INDEX_G            => ite((i=0),'0','1'),
             N_DATA_IN_G            => 20,  -- 2 additional for the 8 lane interface
             N_DATA_OUT_G           => 4)
          port map (
