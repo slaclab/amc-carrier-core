@@ -6,7 +6,7 @@ set family [getFpgaFamily]
 
 # Check for submodule tagging
 if { [SubmoduleCheck {ruckus}             {1.5.8} ] < 0 } {exit -1}
-if { [SubmoduleCheck {surf}               {1.6.5} ] < 0 } {exit -1}
+if { [SubmoduleCheck {surf}               {1.6.6} ] < 0 } {exit -1}
 if { [SubmoduleCheck {lcls-timing-core}   {1.8.0} ] < 0 } {exit -1}
 
 # Check for Kintex Ultrascale+
