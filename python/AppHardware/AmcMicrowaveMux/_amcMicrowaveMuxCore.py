@@ -69,7 +69,7 @@ class AmcMicrowaveMuxCore(pr.Device):
         def CmdDisLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x0)             
 
-    def writeBlocks(self, force=False, recurse=True, variable=None):
+    def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """
         Write all of the blocks held by this Device to memory
         """
@@ -77,11 +77,13 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         # Process local blocks.
         if variable is not None:
+            #variable._block.startTransaction(rogue.interfaces.memory.Write, check=checkEach)  # > 2.4.0
             variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
         else:
             for block in self._blocks:
                 if force or block.stale:
                     if block.bulkEn:
+                        #block.startTransaction(rogue.interfaces.memory.Write, check=checkEach)  # > 2.4.0
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
         # Retire any in-flight transactions before starting
@@ -100,18 +102,28 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.ADC[0].enable.set(True)
         self.ADC[1].enable.set(True)       
         
+        #self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.PLL[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[0].writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.PLL[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.PLL[2].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[2].writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.PLL[3].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[3].writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
         self.InitAmcCard()
         
+        #self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
         
         self._root.checkBlocks(recurse=True)

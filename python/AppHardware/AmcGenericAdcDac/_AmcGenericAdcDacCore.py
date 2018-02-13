@@ -49,7 +49,7 @@ class AmcGenericAdcDacCore(pr.Device):
             self.DAC.Init()        
             self.checkBlocks(recurse=True)  
            
-    def writeBlocks(self, force=False, recurse=True, variable=None):
+    def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """
         Write all of the blocks held by this Device to memory
         """
@@ -57,11 +57,13 @@ class AmcGenericAdcDacCore(pr.Device):
 
         # Process local blocks.
         if variable is not None:
+            #variable._block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
             variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
         else:
             for block in self._blocks:
                 if force or block.stale:
                     if block.bulkEn:
+                        #block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
         # Retire any in-flight transactions before starting
@@ -77,10 +79,15 @@ class AmcGenericAdcDacCore(pr.Device):
 
         self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
         
+        #self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
+        #self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
         self.InitAmcCard()
