@@ -2,7 +2,7 @@
 -- File       : AmcCarrierEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2018-02-09
+-- Last update: 2018-02-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -109,14 +109,15 @@ architecture mapping of AmcCarrierEth is
    --     UDP Server Configurations        --
    ------------------------------------------   
 
-   constant SERVER_SIZE_C : positive := 6;
+   constant SERVER_SIZE_C : positive := 7;
 
    constant UDP_SRV_XVC_IDX_C         : natural := 0;
    constant UDP_SRV_SRPV0_IDX_C       : natural := 1;
    constant UDP_SRV_RSSI0_IDX_C       : natural := 2;
    constant UDP_SRV_RSSI1_IDX_C       : natural := 3;
    constant UDP_SRV_BP_MGS_IDX_C      : natural := 4;
-   constant UDP_SRV_RSSI_ILEAVE_IDX_C : natural := 5;
+   constant UDP_SRV_TIMING_IDX_C      : natural := 5;
+   constant UDP_SRV_RSSI_ILEAVE_IDX_C : natural := 6;
 
    constant SERVER_PORTS_C : PositiveArray(SERVER_SIZE_C-1 downto 0) := (
       UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC 
@@ -124,20 +125,19 @@ architecture mapping of AmcCarrierEth is
       UDP_SRV_RSSI0_IDX_C       => 8193,  -- Legacy Non-interleaved RSSI for Register access and ASYNC messages
       UDP_SRV_RSSI1_IDX_C       => 8194,  -- Legacy Non-interleaved RSSI for bulk data transfer
       UDP_SRV_BP_MGS_IDX_C      => 8195,  -- Backplane Messaging
+      UDP_SRV_TIMING_IDX_C      => 8197,  -- Timing ASYNC Messaging
       UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI 
 
    ------------------------------------------
    --     UDP Client Configurations        --
    ------------------------------------------  
 
-   constant CLIENT_SIZE_C : positive := 2;
+   constant CLIENT_SIZE_C : positive := 1;
 
    constant UDP_CLT_BP_MGS_IDX_C : natural := 0;
-   constant UDP_CLT_TIMING_IDX_C : natural := 1;
 
-   constant CLIENT_PORTS_C : PositiveArray(CLIENT_SIZE_C-1 downto 0) := ( 
-      UDP_CLT_BP_MGS_IDX_C => 8196,     -- Backplane Messaging
-      UDP_CLT_TIMING_IDX_C => 8197);    -- Timing ASYNC Messaging
+   constant CLIENT_PORTS_C : PositiveArray(CLIENT_SIZE_C-1 downto 0) := (
+      UDP_CLT_BP_MGS_IDX_C => 8196);    -- Backplane Messaging
 
    ------------------------------------------
    --                Signals               -- 
@@ -521,7 +521,15 @@ begin
          mAxisRst    => axilRst,
          mAxisMaster => ibServerMasters(UDP_SRV_BP_MGS_IDX_C),
          mAxisSlave  => ibServerSlaves(UDP_SRV_BP_MGS_IDX_C));
-
+         
+   --------------------
+   -- Timing MSG Server
+   --------------------
+   ibClientMasters(UDP_SRV_TIMING_IDX_C) <= obTimingEthMsgMaster;
+   obTimingEthMsgSlave                   <= ibClientSlaves(UDP_SRV_TIMING_IDX_C);
+   ibTimingEthMsgMaster                  <= obClientMasters(UDP_SRV_TIMING_IDX_C);
+   obClientSlaves(UDP_SRV_TIMING_IDX_C)  <= ibTimingEthMsgSlave;
+   
    ----------------------
    -- BP Messenger Client
    ----------------------
@@ -550,13 +558,5 @@ begin
          mAxisRst    => axilRst,
          mAxisMaster => ibClientMasters(UDP_CLT_BP_MGS_IDX_C),
          mAxisSlave  => ibClientSlaves(UDP_CLT_BP_MGS_IDX_C));
-
-   --------------------
-   -- Timing MSG Client
-   --------------------
-   ibClientMasters(UDP_CLT_TIMING_IDX_C) <= obTimingEthMsgMaster;
-   obTimingEthMsgSlave                   <= ibClientSlaves(UDP_CLT_TIMING_IDX_C);
-   ibTimingEthMsgMaster                  <= obClientMasters(UDP_CLT_TIMING_IDX_C);
-   obClientSlaves(UDP_CLT_TIMING_IDX_C)  <= ibTimingEthMsgSlave;
 
 end mapping;
