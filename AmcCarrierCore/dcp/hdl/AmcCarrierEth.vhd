@@ -525,10 +525,10 @@ begin
    --------------------
    -- Timing MSG Server
    --------------------
-   ibClientMasters(UDP_SRV_TIMING_IDX_C) <= obTimingEthMsgMaster;
-   obTimingEthMsgSlave                   <= ibClientSlaves(UDP_SRV_TIMING_IDX_C);
-   ibTimingEthMsgMaster                  <= obClientMasters(UDP_SRV_TIMING_IDX_C);
-   obClientSlaves(UDP_SRV_TIMING_IDX_C)  <= ibTimingEthMsgSlave;
+   ibServerMasters(UDP_SRV_TIMING_IDX_C) <= obTimingEthMsgMaster;
+   obTimingEthMsgSlave                   <= ibServerSlaves(UDP_SRV_TIMING_IDX_C);
+   ibTimingEthMsgMaster                  <= obServerMasters(UDP_SRV_TIMING_IDX_C);
+   obServerSlaves(UDP_SRV_TIMING_IDX_C)  <= ibTimingEthMsgSlave;
    
    ----------------------
    -- BP Messenger Client
