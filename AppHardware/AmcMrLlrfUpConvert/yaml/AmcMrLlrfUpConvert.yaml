@@ -11,6 +11,7 @@
 #once AmcMrLlrfUpConvert.yaml
 #include Lmk04828.yaml
 #include Adc16Dx370.yaml
+#include Adt7420.yaml
 #include AttHMC624.yaml
 #include DacLtc2000.yaml
 #include LvdsSigGen.yaml
@@ -32,6 +33,14 @@ AmcMrLlrfUpConvert: &AmcMrLlrfUpConvert
         offset: 0x00000000 
         nelms: 4
         stride: 0x10
+    ##################################################
+    Adt7420:
+      <<: *Adt7420
+      name: "Adt7420"
+      at:
+        offset: 0x00010000 
+        nelms:  4
+        stride: 0x00000200 
     ##################################################     
     Adc16Dx370:
       <<: *Adc16Dx370

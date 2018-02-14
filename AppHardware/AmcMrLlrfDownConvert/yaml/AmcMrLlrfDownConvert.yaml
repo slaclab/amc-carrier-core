@@ -11,6 +11,7 @@
 #once AmcMrLlrfDownConvert.yaml
 #include Lmk04828.yaml
 #include Adc16Dx370.yaml
+#include Adt7420.yaml
 #include AttHMC624.yaml
 #include DacAD5541.yaml
 #include DacAD5541Mux.yaml
@@ -44,13 +45,21 @@ AmcMrLlrfDownConvert: &AmcMrLlrfDownConvert
       at:
         offset: 0x00000090
     ##################################################     
+    Adt7420:
+      <<: *Adt7420
+      name: "Adt7420"
+      at:
+        offset: 0x00010000 
+        nelms:  4
+        stride: 0x00000200 
+    ##################################################     
     Adc16Dx370:
       <<: *Adc16Dx370
       name: "Adc16Dx370"
       at:
         offset: 0x00020000 
         nelms:  3
-        stride: 0x00020000 
+        stride: 0x00020000         
     ##################################################     
     Lmk04828:
       <<: *Lmk04828
