@@ -93,7 +93,7 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
-         -- APP_ILEAVE_EN_G     => true,    -- true = AxiStreamPacketizer2 (waiting for https://github.com/slaclab/surf/pull/161 )
+         APP_ILEAVE_EN_G     => true,    -- true = AxiStreamPacketizer2
          APP_STREAMS_G       => APP_STREAMS_C,
          APP_STREAM_ROUTES_G => (
             SRP_IDX_C        => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
