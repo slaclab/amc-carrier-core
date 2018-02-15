@@ -2,7 +2,7 @@
 -- File       : AmcCarrierTiming.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-01-09
+-- Last update: 2017-11-03
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -41,39 +41,44 @@ entity AmcCarrierTiming is
       RX_CLK_MMCM_G     : boolean         := false);
    port (
       -- AXI-Lite Interface (axilClk domain)
-      axilClk             : in  sl;
-      axilRst             : in  sl;
-      axilReadMaster      : in  AxiLiteReadMasterType;
-      axilReadSlave       : out AxiLiteReadSlaveType;
-      axilWriteMaster     : in  AxiLiteWriteMasterType;
-      axilWriteSlave      : out AxiLiteWriteSlaveType;
+      axilClk              : in  sl;
+      axilRst              : in  sl;
+      axilReadMaster       : in  AxiLiteReadMasterType;
+      axilReadSlave        : out AxiLiteReadSlaveType;
+      axilWriteMaster      : in  AxiLiteWriteMasterType;
+      axilWriteSlave       : out AxiLiteWriteSlaveType;
+      -- Timing ETH MSG Interface (axilClk domain)
+      obTimingEthMsgMaster : in  AxiStreamMasterType;
+      obTimingEthMsgSlave  : out AxiStreamSlaveType;
+      ibTimingEthMsgMaster : out AxiStreamMasterType;
+      ibTimingEthMsgSlave  : in  AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
       ----------------------      
       -- Timing Interface 
-      recTimingClk        : out sl;
-      recTimingRst        : out sl;
-      appTimingClk        : in  sl;
-      appTimingRst        : in  sl;
-      appTimingBus        : out TimingBusType;
-      appTimingPhy        : in  TimingPhyType;  -- Input for timing generator only
-      appTimingPhyClk     : out sl;
-      appTimingPhyRst     : out sl;
-      appTimingRefClk     : out sl;
-      appTimingRefClkDiv2 : out sl;
+      recTimingClk         : out sl;
+      recTimingRst         : out sl;
+      appTimingClk         : in  sl;
+      appTimingRst         : in  sl;
+      appTimingBus         : out TimingBusType;
+      appTimingPhy         : in  TimingPhyType;  -- Input for timing generator only
+      appTimingPhyClk      : out sl;
+      appTimingPhyRst      : out sl;
+      appTimingRefClk      : out sl;
+      appTimingRefClkDiv2  : out sl;
       ----------------
       -- Core Ports --
       ----------------   
       -- LCLS Timing Ports
-      timingRxP           : in  sl;
-      timingRxN           : in  sl;
-      timingTxP           : out sl;
-      timingTxN           : out sl;
-      timingRefClkInP     : in  sl;
-      timingRefClkInN     : in  sl;
-      timingRecClkOutP    : out sl;
-      timingRecClkOutN    : out sl;
-      timingClkSel        : out sl);
+      timingRxP            : in  sl;
+      timingRxN            : in  sl;
+      timingTxP            : out sl;
+      timingTxN            : out sl;
+      timingRefClkInP      : in  sl;
+      timingRefClkInN      : in  sl;
+      timingRecClkOutP     : out sl;
+      timingRecClkOutN     : out sl;
+      timingClkSel         : out sl);
 end AmcCarrierTiming;
 
 architecture mapping of AmcCarrierTiming is
@@ -88,12 +93,12 @@ architecture mapping of AmcCarrierTiming is
          addrBits     => 23,
          connectivity => x"FFFF"));
 
-   signal timingRefClk     : sl;
-   signal timingRefDiv2    : sl;
-   signal timingRefClkDiv2 : sl;
-   signal timingRecClkGt   : sl;
-   signal timingRecClk     : sl;
-   signal timingClockSel   : sl;
+   signal timingRefClk   : sl;
+   signal timingRefDiv2   : sl;
+   signal timingRefClkDiv2   : sl;
+   signal timingRecClkGt : sl;
+   signal timingRecClk   : sl;
+   signal timingClockSel : sl;
 
    -- Rx ports
    signal rxReset        : sl;
@@ -102,15 +107,10 @@ architecture mapping of AmcCarrierTiming is
    signal rxStatus       : TimingPhyStatusType;
    signal rxControl      : TimingPhyControlType;
    signal rxUsrClk       : sl;
-   signal gtRxData       : slv(15 downto 0);
-   signal gtRxDataK      : slv(1 downto 0);
-   signal gtRxDispErr    : slv(1 downto 0);
-   signal gtRxDecErr     : slv(1 downto 0);
    signal rxData         : slv(15 downto 0);
    signal rxDataK        : slv(1 downto 0);
    signal rxDispErr      : slv(1 downto 0);
    signal rxDecErr       : slv(1 downto 0);
-
    signal txUsrClk       : sl;
    signal txUsrRst       : sl;
    signal txUsrClkActive : sl;
@@ -127,6 +127,9 @@ architecture mapping of AmcCarrierTiming is
    signal axilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
 
 begin
+
+   obTimingEthMsgSlave  <= AXI_STREAM_SLAVE_FORCE_C;
+   ibTimingEthMsgMaster <= AXI_STREAM_MASTER_INIT_C;
 
    --------------------------
    -- AXI-Lite: Crossbar Core
@@ -192,11 +195,11 @@ begin
          CLR     => '0',
          CLRMASK => '1',
          DIV     => "000",              -- Divide by 1
-         O       => timingRefClkDiv2);
-
+         O       => timingRefClkDiv2);         
+         
    appTimingRefClk     <= timingRefClk;
    appTimingRefClkDiv2 <= timingRefClkDiv2;
-
+         
    -------------------------------------------------------------------------------------------------
    -- GTH Timing Receiver
    -------------------------------------------------------------------------------------------------
@@ -295,10 +298,10 @@ begin
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,
          gtRxRecClk      => timingRecClk,
-         gtRxData        => gtRxData,
-         gtRxDataK       => gtRxDataK,
-         gtRxDispErr     => gtRxDispErr,
-         gtRxDecErr      => gtRxDecErr,
+         gtRxData        => rxData,
+         gtRxDataK       => rxDataK,
+         gtRxDispErr     => rxDispErr,
+         gtRxDecErr      => rxDecErr,
          gtRxControl     => rxControl,
          gtRxStatus      => rxStatus,
          gtLoopback      => loopback,
@@ -313,17 +316,6 @@ begin
          axilReadSlave   => axilReadSlaves(0),
          axilWriteMaster => axilWriteMasters(0),
          axilWriteSlave  => axilWriteSlaves(0));
-
-   process(timingRecClk)
-   begin
-      if rising_edge(timingRecClk) then
-         -- Help meet timing
-         rxData    <= gtRxData    after TPD_G;
-         rxDataK   <= gtRxDataK   after TPD_G;
-         rxDispErr <= gtRxDispErr after TPD_G;
-         rxDecErr  <= gtRxDecErr  after TPD_G;
-      end if;
-   end process;
 
    process(appTimingClk)
    begin
