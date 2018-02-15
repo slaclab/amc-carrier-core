@@ -47,13 +47,13 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 32
       description: MPS TX Packet Sent Counter
     #########################################################
-    MpsRxPktRcvdSentCnt:
+    MpsRxPktRcvdCnt:
       at:
         offset: 0x084
         stride: 4
         nelms: 14
       class: IntField
-      name: MpsRxPktRcvdSentCnt
+      name: MpsRxPktRcvdCnt
       mode: RO
       sizeBits: 32
       description: MPS RX Packet Received Counter[13:0]  

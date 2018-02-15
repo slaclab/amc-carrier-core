@@ -37,3 +37,5 @@ set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[14]}] ; # dout[6]
 
 set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[15]}] ; # dout[7]
 set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[15]}] ; # dout[7]
+
+set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks -of_objects [get_pins -hier -filter {NAME =~ */U_RTM/U_PLL/PllGen.U_Pll/CLKOUT1}]]

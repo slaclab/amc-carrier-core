@@ -123,7 +123,7 @@ class AppTop(pr.Device):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
                     v.JesdTx.CmdClearErrors()        
         
-    def writeBlocks(self, force=False, recurse=True, variable=None):
+    def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """
         Write all of the blocks held by this Device to memory
         """
@@ -131,17 +131,20 @@ class AppTop(pr.Device):
 
         # Process local blocks.
         if variable is not None:
+            #variable._block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
             variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
         else:
             for block in self._blocks:
                 if force or block.stale:
                     if block.bulkEn:
+                        #block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
         # Process rest of tree
         if recurse:
             for key,value in self.devices.items():
-                value.writeBlocks(force=force, recurse=True)                        
+                #value.writeBlocks(force=force, recurse=True, checkEach=checkEach) # > 2.4.0
+                value.writeBlocks(force=force, recurse=True)
                         
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)

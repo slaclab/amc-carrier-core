@@ -423,18 +423,23 @@ begin
             v.state := IDLE_S;
 
       end case;
+      
+      -- Combinatorial outputs before the reset
+      rdDmaAxisSlave  <= v.rdDmaAxisSlave;
+      sFifoAxisSlave  <= v.sFifoAxisSlave;
 
+      -- Reset
       if (axiRst = '1') then
          v := REG_INIT_C;
       end if;
 
+      -- Register the variable for next clock cycle
       rin <= v;
 
+      -- Registered Outputs
       rdDmaReq        <= r.rdDmaReq;
       wrDmaReq        <= r.wrDmaReq;
-      rdDmaAxisSlave  <= v.rdDmaAxisSlave;
       wrDmaAxisMaster <= r.wrDmaAxisMaster;
-      sFifoAxisSlave  <= v.sFifoAxisSlave;
       mFifoAxisMaster <= r.mFifoAxisMaster;
 
    end process comb;
@@ -446,7 +451,4 @@ begin
       end if;
    end process seq;
 
-
-
 end rtl;
-

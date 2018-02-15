@@ -285,6 +285,7 @@ begin
          generic map (
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+            BAY_INDEX_G      => ite((i=0),'0','1'),
             N_DATA_IN_G      => 18,
             N_DATA_OUT_G     => 4)
          port map (

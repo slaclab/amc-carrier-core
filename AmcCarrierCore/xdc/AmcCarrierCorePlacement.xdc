@@ -13,7 +13,6 @@ set_property -dict { PACKAGE_PIN V12 IOSTANDARD ANALOG } [get_ports {vPIn}]
 set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes [current_design]
 set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 1     [current_design]
 set_property BITSTREAM.CONFIG.SPI_FALL_EDGE No   [current_design]
-set_property BITSTREAM.GENERAL.COMPRESS TRUE     [current_design]
 
 set_property SEVERITY {Warning} [get_drc_checks {NSTD-1}]
 set_property SEVERITY {Warning} [get_drc_checks {UCIO-1}]

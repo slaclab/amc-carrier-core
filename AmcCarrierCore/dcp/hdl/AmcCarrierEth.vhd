@@ -2,7 +2,7 @@
 -- File       : AmcCarrierEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2017-11-03
+-- Last update: 2018-02-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ use work.AmcCarrierSysRegPkg.all;
 entity AmcCarrierEth is
    generic (
       TPD_G                 : time            := 1 ns;
+      RSSI_ILEAVE_EN_G      : boolean         := false;
       RTM_ETH_G             : boolean         := false;
       ETH_USR_FRAME_LIMIT_G : positive        := 4096;  -- 4kB
       AXI_ERROR_RESP_G      : slv(1 downto 0) := AXI_RESP_DECERR_C);
@@ -92,45 +93,55 @@ end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
 
-   constant SERVER_SIZE_C : positive := 4;
-   constant CLIENT_SIZE_C : positive := 2;
+   ------------------------------------------
+   --     AXI-Lite Configurations          --
+   ------------------------------------------
 
-   constant NUM_AXI_MASTERS_C : natural := 2;
+   constant NUM_AXI_MASTERS_C : natural := 3;
 
-   constant UDP_INDEX_C  : natural := 0;
-   constant RSSI_INDEX_C : natural := 1;
+   constant AXI_UDP_INDEX_C              : natural := 0;
+   constant AXI_RSSI_NONE_ILEAVE_INDEX_C : natural := 1;
+   constant AXI_RSSI_ILEAVE_INDEX_C      : natural := 2;
 
-   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      UDP_INDEX_C     => (
-         baseAddr     => (ETH_ADDR_C + x"00000000"),
-         addrBits     => 16,
-         connectivity => X"FFFF"),
-      RSSI_INDEX_C    => (
-         baseAddr     => (ETH_ADDR_C + x"00010000"),
-         addrBits     => 16,
-         connectivity => X"FFFF"));
+   constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, ETH_ADDR_C, 20, 16);
 
-   function ServerPorts return PositiveArray is
-      variable retConf   : PositiveArray(SERVER_SIZE_C-1 downto 0);
-      variable baseIndex : positive;
-   begin
-      baseIndex := 8192;
-      for i in SERVER_SIZE_C-1 downto 0 loop
-         retConf(i) := baseIndex+i;
-      end loop;
-      return retConf;
-   end function;
+   ------------------------------------------
+   --     UDP Server Configurations        --
+   ------------------------------------------   
 
-   function ClientPorts return PositiveArray is
-      variable retConf   : PositiveArray(CLIENT_SIZE_C-1 downto 0);
-      variable baseIndex : positive;
-   begin
-      baseIndex := 8192+SERVER_SIZE_C;
-      for i in CLIENT_SIZE_C-1 downto 0 loop
-         retConf(i) := baseIndex+i;
-      end loop;
-      return retConf;
-   end function;
+   constant SERVER_SIZE_C : positive := 7;
+
+   constant UDP_SRV_XVC_IDX_C         : natural := 0;
+   constant UDP_SRV_SRPV0_IDX_C       : natural := 1;
+   constant UDP_SRV_RSSI0_IDX_C       : natural := 2;
+   constant UDP_SRV_RSSI1_IDX_C       : natural := 3;
+   constant UDP_SRV_BP_MGS_IDX_C      : natural := 4;
+   constant UDP_SRV_TIMING_IDX_C      : natural := 5;
+   constant UDP_SRV_RSSI_ILEAVE_IDX_C : natural := 6;
+
+   constant SERVER_PORTS_C : PositiveArray(SERVER_SIZE_C-1 downto 0) := (
+      UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC 
+      UDP_SRV_SRPV0_IDX_C       => 8192,  -- Legacy SRPv0 register access (still used for remote FPGA reprogramming)
+      UDP_SRV_RSSI0_IDX_C       => 8193,  -- Legacy Non-interleaved RSSI for Register access and ASYNC messages
+      UDP_SRV_RSSI1_IDX_C       => 8194,  -- Legacy Non-interleaved RSSI for bulk data transfer
+      UDP_SRV_BP_MGS_IDX_C      => 8195,  -- Backplane Messaging
+      UDP_SRV_TIMING_IDX_C      => 8197,  -- Timing ASYNC Messaging
+      UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI 
+
+   ------------------------------------------
+   --     UDP Client Configurations        --
+   ------------------------------------------  
+
+   constant CLIENT_SIZE_C : positive := 1;
+
+   constant UDP_CLT_BP_MGS_IDX_C : natural := 0;
+
+   constant CLIENT_PORTS_C : PositiveArray(CLIENT_SIZE_C-1 downto 0) := (
+      UDP_CLT_BP_MGS_IDX_C => 8196);    -- Backplane Messaging
+
+   ------------------------------------------
+   --                Signals               -- 
+   ------------------------------------------ 
 
    signal ibMacMaster : AxiStreamMasterType;
    signal ibMacSlave  : AxiStreamSlaveType;
@@ -281,11 +292,11 @@ begin
          -- UDP Server Generics
          SERVER_EN_G      => true,
          SERVER_SIZE_G    => SERVER_SIZE_C,
-         SERVER_PORTS_G   => ServerPorts,
+         SERVER_PORTS_G   => SERVER_PORTS_C,
          -- UDP Client Generics
          CLIENT_EN_G      => true,
          CLIENT_SIZE_G    => CLIENT_SIZE_C,
-         CLIENT_PORTS_G   => ClientPorts,
+         CLIENT_PORTS_G   => CLIENT_PORTS_C,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          -- IPv4/ARP Generics
          CLK_FREQ_G       => AXI_CLK_FREQ_C,  -- In units of Hz
@@ -312,17 +323,33 @@ begin
          ibClientMasters => ibClientMasters,
          ibClientSlaves  => ibClientSlaves,
          -- AXI-Lite Interface
-         axilReadMaster  => axilReadMasters(UDP_INDEX_C),
-         axilReadSlave   => axilReadSlaves(UDP_INDEX_C),
-         axilWriteMaster => axilWriteMasters(UDP_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(UDP_INDEX_C),
+         axilReadMaster  => axilReadMasters(AXI_UDP_INDEX_C),
+         axilReadSlave   => axilReadSlaves(AXI_UDP_INDEX_C),
+         axilWriteMaster => axilWriteMasters(AXI_UDP_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(AXI_UDP_INDEX_C),
          -- Clock and Reset
          clk             => axilClk,
          rst             => axilRst);
 
-   --------------------------------------------------
-   -- Legacy AXI-Lite Master without RSSI Server@8192
-   --------------------------------------------------
+   -------------
+   -- Xilinx XVC
+   -------------
+   U_Debug : entity work.AmcCarrierXvcDebug
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         -- Clock and Reset
+         axilClk        => axilClk,
+         axilRst        => axilRst,
+         -- UDP XVC Interface
+         obServerMaster => obServerMasters(UDP_SRV_XVC_IDX_C),
+         obServerSlave  => obServerSlaves(UDP_SRV_XVC_IDX_C),
+         ibServerMaster => ibServerMasters(UDP_SRV_XVC_IDX_C),
+         ibServerSlave  => ibServerSlaves(UDP_SRV_XVC_IDX_C));
+
+   --------------------------------------
+   -- Legacy AXI-Lite Master without RSSI
+   --------------------------------------
    U_SRPv0 : entity work.SrpV0AxiLite
       generic map (
          TPD_G               => TPD_G,
@@ -335,13 +362,13 @@ begin
          -- Streaming Slave (Rx) Interface (sAxisClk domain) 
          sAxisClk            => axilClk,
          sAxisRst            => axilRst,
-         sAxisMaster         => obServerMasters(0),
-         sAxisSlave          => obServerSlaves(0),
+         sAxisMaster         => obServerMasters(UDP_SRV_SRPV0_IDX_C),
+         sAxisSlave          => obServerSlaves(UDP_SRV_SRPV0_IDX_C),
          -- Streaming Master (Tx) Data Interface (mAxisClk domain)
          mAxisClk            => axilClk,
          mAxisRst            => axilRst,
-         mAxisMaster         => ibServerMasters(0),
-         mAxisSlave          => ibServerSlaves(0),
+         mAxisMaster         => ibServerMasters(UDP_SRV_SRPV0_IDX_C),
+         mAxisSlave          => ibServerSlaves(UDP_SRV_SRPV0_IDX_C),
          -- AXI Lite Bus (axiLiteClk domain)
          axiLiteClk          => axilClk,
          axiLiteRst          => axilRst,
@@ -350,49 +377,127 @@ begin
          mAxiLiteWriteMaster => mAxilWriteMasters(0),
          mAxiLiteWriteSlave  => mAxilWriteSlaves(0));
 
-   -----------------------------------------------
-   -- Software's RSSI Server Interface@[8194:8193]
-   -----------------------------------------------
-   U_RssiServer : entity work.AmcCarrierRssi
-      generic map (
-         TPD_G                 => TPD_G,
-         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-         AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
-         AXI_BASE_ADDR_G       => AXI_CONFIG_C(RSSI_INDEX_C).baseAddr)
-      port map (
-         -- Slave AXI-Lite Interface
-         axilClk          => axilClk,
-         axilRst          => axilRst,
-         axilReadMaster   => axilReadMasters(RSSI_INDEX_C),
-         axilReadSlave    => axilReadSlaves(RSSI_INDEX_C),
-         axilWriteMaster  => axilWriteMasters(RSSI_INDEX_C),
-         axilWriteSlave   => axilWriteSlaves(RSSI_INDEX_C),
-         -- Master AXI-Lite Interface
-         mAxilReadMaster  => mAxilReadMasters(1),
-         mAxilReadSlave   => mAxilReadSlaves(1),
-         mAxilWriteMaster => mAxilWriteMasters(1),
-         mAxilWriteSlave  => mAxilWriteSlaves(1),
-         -- Application Debug Interface
-         obAppDebugMaster => obAppDebugMaster,
-         obAppDebugSlave  => obAppDebugSlave,
-         ibAppDebugMaster => ibAppDebugMaster,
-         ibAppDebugSlave  => ibAppDebugSlave,
-         -- BSA Ethernet Interface
-         obBsaMasters     => obBsaMasters,
-         obBsaSlaves      => obBsaSlaves,
-         ibBsaMasters     => ibBsaMasters,
-         ibBsaSlaves      => ibBsaSlaves,
-         -- Interface to UDP Server engines
-         obServerMasters  => obServerMasters(2 downto 1),
-         obServerSlaves   => obServerSlaves(2 downto 1),
-         ibServerMasters  => ibServerMasters(2 downto 1),
-         ibServerSlaves   => ibServerSlaves(2 downto 1));
+   -----------------------------------
+   -- Software's RSSI Server Interface
+   -----------------------------------
+   NONE_ILEAVE : if (RSSI_ILEAVE_EN_G = false) generate
 
-   ----------------------------
-   -- BP Messenger Network@8195
-   ----------------------------
-   ibBpMsgServerMaster <= obServerMasters(3);
-   obServerSlaves(3)   <= ibBpMsgServerSlave;
+      U_RssiServer : entity work.AmcCarrierRssi
+         generic map (
+            TPD_G                 => TPD_G,
+            ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
+            AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
+            AXI_BASE_ADDR_G       => AXI_CONFIG_C(AXI_RSSI_NONE_ILEAVE_INDEX_C).baseAddr)
+         port map (
+            -- Slave AXI-Lite Interface
+            axilClk            => axilClk,
+            axilRst            => axilRst,
+            axilReadMaster     => axilReadMasters(AXI_RSSI_NONE_ILEAVE_INDEX_C),
+            axilReadSlave      => axilReadSlaves(AXI_RSSI_NONE_ILEAVE_INDEX_C),
+            axilWriteMaster    => axilWriteMasters(AXI_RSSI_NONE_ILEAVE_INDEX_C),
+            axilWriteSlave     => axilWriteSlaves(AXI_RSSI_NONE_ILEAVE_INDEX_C),
+            -- Master AXI-Lite Interface
+            mAxilReadMaster    => mAxilReadMasters(1),
+            mAxilReadSlave     => mAxilReadSlaves(1),
+            mAxilWriteMaster   => mAxilWriteMasters(1),
+            mAxilWriteSlave    => mAxilWriteSlaves(1),
+            -- Application Debug Interface
+            obAppDebugMaster   => obAppDebugMaster,
+            obAppDebugSlave    => obAppDebugSlave,
+            ibAppDebugMaster   => ibAppDebugMaster,
+            ibAppDebugSlave    => ibAppDebugSlave,
+            -- BSA Ethernet Interface
+            obBsaMasters       => obBsaMasters,
+            obBsaSlaves        => obBsaSlaves,
+            ibBsaMasters       => ibBsaMasters,
+            ibBsaSlaves        => ibBsaSlaves,
+            -- Interface to UDP Server engines
+            obServerMasters(0) => obServerMasters(UDP_SRV_RSSI0_IDX_C),
+            obServerMasters(1) => obServerMasters(UDP_SRV_RSSI1_IDX_C),
+            obServerSlaves(0)  => obServerSlaves(UDP_SRV_RSSI0_IDX_C),
+            obServerSlaves(1)  => obServerSlaves(UDP_SRV_RSSI1_IDX_C),
+            ibServerMasters(0) => ibServerMasters(UDP_SRV_RSSI0_IDX_C),
+            ibServerMasters(1) => ibServerMasters(UDP_SRV_RSSI1_IDX_C),
+            ibServerSlaves(0)  => ibServerSlaves(UDP_SRV_RSSI0_IDX_C),
+            ibServerSlaves(1)  => ibServerSlaves(UDP_SRV_RSSI1_IDX_C));
+
+      U_AxiLiteEmpty : entity work.AxiLiteEmpty
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            axiClk         => axilClk,
+            axiClkRst      => axilRst,
+            axiReadMaster  => axilReadMasters(AXI_RSSI_ILEAVE_INDEX_C),
+            axiReadSlave   => axilReadSlaves(AXI_RSSI_ILEAVE_INDEX_C),
+            axiWriteMaster => axilWriteMasters(AXI_RSSI_ILEAVE_INDEX_C),
+            axiWriteSlave  => axilWriteSlaves(AXI_RSSI_ILEAVE_INDEX_C));
+
+      obServerSlaves(UDP_SRV_RSSI_ILEAVE_IDX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
+      ibServerMasters(UDP_SRV_RSSI_ILEAVE_IDX_C) <= AXI_STREAM_MASTER_INIT_C;
+
+   end generate;
+
+   RSSI_ILEAVE : if (RSSI_ILEAVE_EN_G = true) generate
+
+      U_RssiServer : entity work.AmcCarrierRssiInterleave
+         generic map (
+            TPD_G                 => TPD_G,
+            ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
+            AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
+            AXI_BASE_ADDR_G       => AXI_CONFIG_C(AXI_RSSI_ILEAVE_INDEX_C).baseAddr)
+         port map (
+            -- Slave AXI-Lite Interface
+            axilClk          => axilClk,
+            axilRst          => axilRst,
+            axilReadMaster   => axilReadMasters(AXI_RSSI_ILEAVE_INDEX_C),
+            axilReadSlave    => axilReadSlaves(AXI_RSSI_ILEAVE_INDEX_C),
+            axilWriteMaster  => axilWriteMasters(AXI_RSSI_ILEAVE_INDEX_C),
+            axilWriteSlave   => axilWriteSlaves(AXI_RSSI_ILEAVE_INDEX_C),
+            -- Master AXI-Lite Interface
+            mAxilReadMaster  => mAxilReadMasters(1),
+            mAxilReadSlave   => mAxilReadSlaves(1),
+            mAxilWriteMaster => mAxilWriteMasters(1),
+            mAxilWriteSlave  => mAxilWriteSlaves(1),
+            -- Application Debug Interface
+            obAppDebugMaster => obAppDebugMaster,
+            obAppDebugSlave  => obAppDebugSlave,
+            ibAppDebugMaster => ibAppDebugMaster,
+            ibAppDebugSlave  => ibAppDebugSlave,
+            -- BSA Ethernet Interface
+            obBsaMasters     => obBsaMasters,
+            obBsaSlaves      => obBsaSlaves,
+            ibBsaMasters     => ibBsaMasters,
+            ibBsaSlaves      => ibBsaSlaves,
+            -- Interface to UDP Server engines
+            obServerMaster   => obServerMasters(UDP_SRV_RSSI_ILEAVE_IDX_C),
+            obServerSlave    => obServerSlaves(UDP_SRV_RSSI_ILEAVE_IDX_C),
+            ibServerMaster   => ibServerMasters(UDP_SRV_RSSI_ILEAVE_IDX_C),
+            ibServerSlave    => ibServerSlaves(UDP_SRV_RSSI_ILEAVE_IDX_C));
+
+      U_AxiLiteEmpty : entity work.AxiLiteEmpty
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            axiClk         => axilClk,
+            axiClkRst      => axilRst,
+            axiReadMaster  => axilReadMasters(AXI_RSSI_NONE_ILEAVE_INDEX_C),
+            axiReadSlave   => axilReadSlaves(AXI_RSSI_NONE_ILEAVE_INDEX_C),
+            axiWriteMaster => axilWriteMasters(AXI_RSSI_NONE_ILEAVE_INDEX_C),
+            axiWriteSlave  => axilWriteSlaves(AXI_RSSI_NONE_ILEAVE_INDEX_C));
+
+      obServerSlaves(UDP_SRV_RSSI0_IDX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
+      ibServerMasters(UDP_SRV_RSSI0_IDX_C) <= AXI_STREAM_MASTER_INIT_C;
+
+      obServerSlaves(UDP_SRV_RSSI1_IDX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
+      ibServerMasters(UDP_SRV_RSSI1_IDX_C) <= AXI_STREAM_MASTER_INIT_C;
+
+   end generate;
+
+   ----------------------
+   -- BP Messenger Server
+   ----------------------
+   ibBpMsgServerMaster                  <= obServerMasters(UDP_SRV_BP_MGS_IDX_C);
+   obServerSlaves(UDP_SRV_BP_MGS_IDX_C) <= ibBpMsgServerSlave;
    U_ServerLimiter : entity work.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
@@ -414,14 +519,22 @@ begin
          -- Master Port
          mAxisClk    => axilClk,
          mAxisRst    => axilRst,
-         mAxisMaster => ibServerMasters(3),
-         mAxisSlave  => ibServerSlaves(3));
-
-   ----------------------------
-   -- BP Messenger Network@8196
-   ----------------------------
-   ibBpMsgClientMaster <= obClientMasters(0);
-   obClientSlaves(0)   <= ibBpMsgClientSlave;
+         mAxisMaster => ibServerMasters(UDP_SRV_BP_MGS_IDX_C),
+         mAxisSlave  => ibServerSlaves(UDP_SRV_BP_MGS_IDX_C));
+         
+   --------------------
+   -- Timing MSG Server
+   --------------------
+   ibServerMasters(UDP_SRV_TIMING_IDX_C) <= obTimingEthMsgMaster;
+   obTimingEthMsgSlave                   <= ibServerSlaves(UDP_SRV_TIMING_IDX_C);
+   ibTimingEthMsgMaster                  <= obServerMasters(UDP_SRV_TIMING_IDX_C);
+   obServerSlaves(UDP_SRV_TIMING_IDX_C)  <= ibTimingEthMsgSlave;
+   
+   ----------------------
+   -- BP Messenger Client
+   ----------------------
+   ibBpMsgClientMaster                  <= obClientMasters(UDP_CLT_BP_MGS_IDX_C);
+   obClientSlaves(UDP_CLT_BP_MGS_IDX_C) <= ibBpMsgClientSlave;
    U_ClientLimiter : entity work.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
@@ -443,15 +556,7 @@ begin
          -- Master Port
          mAxisClk    => axilClk,
          mAxisRst    => axilRst,
-         mAxisMaster => ibClientMasters(0),
-         mAxisSlave  => ibClientSlaves(0));
-
-   -----------------------
-   -- Timing ETH MSG @8197
-   -----------------------
-   ibClientMasters(1)   <= obTimingEthMsgMaster;
-   obTimingEthMsgSlave  <= ibClientSlaves(1);
-   ibTimingEthMsgMaster <= obClientMasters(1);
-   obClientSlaves(1)    <= ibTimingEthMsgSlave;
+         mAxisMaster => ibClientMasters(UDP_CLT_BP_MGS_IDX_C),
+         mAxisSlave  => ibClientSlaves(UDP_CLT_BP_MGS_IDX_C));
 
 end mapping;

@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfDownConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-07
--- Last update: 2017-02-27
+-- Last update: 2018-02-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_16_C02
 -------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.jesd204bpkg.all;
+use work.I2cPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -52,7 +53,7 @@ entity AmcMrLlrfDownConvertCore is
       -- Spare LMK Clock References
       lmkDclk10       : out   sl;
       lmkDclk12       : out   sl;
-      bufgCe          : in    sl := '1';      
+      bufgCe          : in    sl := '1';
       bufgClr         : in    sl := '0';
       -----------------------
       -- Application Ports --
@@ -78,83 +79,110 @@ end AmcMrLlrfDownConvertCore;
 
 architecture mapping of AmcMrLlrfDownConvertCore is
 
-   constant NUM_AXI_MASTERS_C      : natural  := 14;
+   constant I2C_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 3) := (
+      0             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1001000",       -- ADT7420: A1=GND,A0=GND
+         dataSize   => 8,               -- in units of bits
+         addrSize   => 8,               -- in units of bits
+         endianness => '1'),            -- Big endian
+      1             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1001001",       -- ADT7420: A1=GND,A0=VDD
+         dataSize   => 8,               -- in units of bits
+         addrSize   => 8,               -- in units of bits
+         endianness => '1'),            -- Big endian
+      2             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1001010",       -- ADT7420: A1=VDD,A0=GND
+         dataSize   => 8,               -- in units of bits
+         addrSize   => 8,               -- in units of bits
+         endianness => '1'),            -- Big endian
+      3             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1001011",       -- ADT7420: A1=VDD,A0=VDD
+         dataSize   => 8,               -- in units of bits
+         addrSize   => 8,               -- in units of bits
+         endianness => '1'));           -- Big endian         
+
+   constant NUM_AXI_MASTERS_C      : natural  := 15;
    constant NUM_COMMON_SPI_CHIPS_C : positive := 4;
    constant NUM_DAC_CHIPS_C        : positive := 3;
    constant NUM_ATTN_CHIPS_C       : positive := 6;
 
-   constant ATT_0_INDEX_C   : natural := 0;
-   constant ATT_1_INDEX_C   : natural := 1;
-   constant ATT_2_INDEX_C   : natural := 2;
-   constant ATT_3_INDEX_C   : natural := 3;
-   constant ATT_4_INDEX_C   : natural := 4;
-   constant ATT_5_INDEX_C   : natural := 5;
-   constant DAC_0_INDEX_C   : natural := 6;
-   constant DAC_1_INDEX_C   : natural := 7;
-   constant DAC_2_INDEX_C   : natural := 8;
-   constant DAC_MUX_INDEX_C : natural := 9;
-   constant ADC_0_INDEX_C   : natural := 10;
-   constant ADC_1_INDEX_C   : natural := 11;
-   constant ADC_2_INDEX_C   : natural := 12;
-   constant LMK_INDEX_C     : natural := 13;
+   constant ATT_0_INDEX_C    : natural := 0;
+   constant ATT_1_INDEX_C    : natural := 1;
+   constant ATT_2_INDEX_C    : natural := 2;
+   constant ATT_3_INDEX_C    : natural := 3;
+   constant ATT_4_INDEX_C    : natural := 4;
+   constant ATT_5_INDEX_C    : natural := 5;
+   constant DAC_0_INDEX_C    : natural := 6;
+   constant DAC_1_INDEX_C    : natural := 7;
+   constant DAC_2_INDEX_C    : natural := 8;
+   constant DAC_MUX_INDEX_C  : natural := 9;
+   constant TEMP_I2C_INDEX_C : natural := 10;
+   constant ADC_0_INDEX_C    : natural := 11;
+   constant ADC_1_INDEX_C    : natural := 12;
+   constant ADC_2_INDEX_C    : natural := 13;
+   constant LMK_INDEX_C      : natural := 14;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      ATT_0_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0000"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ATT_1_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0010"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ATT_2_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0020"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ATT_3_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0030"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ATT_4_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0040"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ATT_5_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0050"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      DAC_0_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0060"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      DAC_1_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0070"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      DAC_2_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0080"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      DAC_MUX_INDEX_C => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0090"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ADC_0_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0002_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"),
-      ADC_1_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0004_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"),
-      ADC_2_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0006_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"),
-      LMK_INDEX_C     => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0008_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"));
+      ATT_0_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0000"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      ATT_1_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0010"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      ATT_2_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0020"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      ATT_3_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0030"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      ATT_4_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0040"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      ATT_5_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0050"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      DAC_0_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0060"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      DAC_1_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0070"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      DAC_2_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0080"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      DAC_MUX_INDEX_C  => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0090"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      TEMP_I2C_INDEX_C => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0001_0000"),
+         addrBits      => 16,
+         connectivity  => X"FFFF"),
+      ADC_0_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0002_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"),
+      ADC_1_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0004_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"),
+      ADC_2_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0006_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"),
+      LMK_INDEX_C      => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0008_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"));
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -195,8 +223,11 @@ architecture mapping of AmcMrLlrfDownConvertCore is
    signal dacSclk_o : sl;
    signal dacSdi_o  : sl;
    signal dacCsL_o  : slv(2 downto 0);
-   
-   signal lmkDclk  : slv(1 downto 0);
+
+   signal lmkDclk : slv(1 downto 0);
+
+   signal i2cScl : sl;
+   signal i2cSda : sl;
 
 begin
 
@@ -260,23 +291,23 @@ begin
    spareN(12) <= dacCsL_o(0);
    spareP(12) <= dacCsL_o(1);
    spareN(13) <= dacCsL_o(2);
-   
+
    U_lmkDclk10 : IBUFDS
       generic map (
          DIFF_TERM => true)
       port map (
          I  => syncInP(2),
          IB => syncInN(2),
-         O  => lmkDclk(0));     
-   
+         O  => lmkDclk(0));
+
    U_lmkDclk12 : IBUFDS
       generic map (
          DIFF_TERM => true)
       port map (
          I  => fpgaClkP(0),
          IB => fpgaClkN(0),
-         O  => lmkDclk(1)); 
-         
+         O  => lmkDclk(1));
+
    U_LMK10 : BUFGCE_DIV
       generic map (
          BUFGCE_DIVIDE => BUFGCE_DIVIDE_G)
@@ -285,7 +316,7 @@ begin
          CLR => bufgClr,
          CE  => bufgCe,
          O   => lmkDclk10);
-         
+
    U_LMK12 : BUFGCE_DIV
       generic map (
          BUFGCE_DIVIDE => BUFGCE_DIVIDE_G)
@@ -293,7 +324,10 @@ begin
          I   => lmkDclk(1),
          CLR => bufgClr,
          CE  => bufgCe,
-         O   => lmkDclk12);            
+         O   => lmkDclk12);
+
+   i2cScl <= spareN(1);
+   i2cSda <= spareN(0);
          
    ---------------------
    -- AXI-Lite Crossbars
@@ -316,6 +350,28 @@ begin
          mAxiWriteSlaves     => axilWriteSlaves,
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
+
+   --------------------------
+   -- I2C Temperature Sensors
+   --------------------------
+   U_I2C : entity work.AxiI2cRegMaster
+      generic map (
+         TPD_G          => TPD_G,
+         I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
+         DEVICE_MAP_G   => I2C_DEVICE_MAP_C,
+         AXI_CLK_FREQ_G => 156.25E+6)
+      port map (
+         -- I2C Ports
+         scl            => i2cScl,
+         sda            => i2cSda,
+         -- AXI-Lite Register Interface
+         axiReadMaster  => axilReadMasters(TEMP_I2C_INDEX_C),
+         axiReadSlave   => axilReadSlaves(TEMP_I2C_INDEX_C),
+         axiWriteMaster => axilWriteMasters(TEMP_I2C_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(TEMP_I2C_INDEX_C),
+         -- Clocks and Resets
+         axiClk         => axilClk,
+         axiRst         => axilRst);
 
    -----------------------------
    -- SPI interface ADCs and LMK 

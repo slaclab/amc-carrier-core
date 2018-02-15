@@ -43,6 +43,13 @@ AmcCarrierCore: &AmcCarrierCore
       mode: RO
       description: AMC Carrier Core Version Number
     ##################################################
+    CPSW_TARBALL_ADDR_C:
+      at:
+        offset: 0x00000404
+      class: IntField
+      mode: RO
+      description: PROM MCS CPSW tarball base address
+    ##################################################
     AxiVersion:
       <<: *AxiVersion
       at:
@@ -150,7 +157,7 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *UdpEngineClient
       at:
         offset: 0x0A000000
-        nelms: 2
+        nelms: 1
         stride: 8
       description: "BpUdpClient"
     ##################################################
@@ -164,7 +171,7 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *UdpEngineServer
       at:
         offset: 0x0A000800
-        nelms: 4
+        nelms: 7
         stride: 8         
       description: "SwUdpServer"       
     ##################################################
