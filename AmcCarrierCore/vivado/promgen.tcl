@@ -21,7 +21,7 @@ set LCLS_II_BIT "0x04000000"
 set BIT_PATH   "$::env(IMPL_DIR)/$::env(PROJECT).bit"
 
 # Define the CPSW tarball path
-set DATA_PATH  "$::env(IMAGES_DIR)/$::env(IMAGENAME).cpsw.tar.gz"
+set DATA_PATH  "$::env(IMPL_DIR)/$::env(IMAGENAME).cpsw.tar.gz"
 
 # Defined the CPSW.TAR.GZ file base address locations
 if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
