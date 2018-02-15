@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfUpConvertMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-03-30
--- Last update: 2017-04-04
+-- Last update: 2018-02-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -49,6 +49,8 @@ entity AmcMrLlrfUpConvertMapping is
       jesdRst       : in    sl;
       timingTrig    : in    sl;
       fpgaInterlock : in    sl;
+      i2cScl        : inout sl;
+      i2cSda        : inout sl;
       -- Recovered EVR clock
       recClk        : in    sl;
       recRst        : in    sl;
@@ -168,6 +170,9 @@ begin
    U_DOUT4 : OBUFDS port map (I => s_dacDataDly(4), O => spareP(13), OB => spareN(13));
    U_DOUT5 : OBUFDS port map (I => s_dacDataDly(5), O => spareP(14), OB => spareN(14));
    U_DOUT6 : OBUFDS port map (I => s_dacDataDly(6), O => spareP(15), OB => spareN(15));
+
+   i2cScl <= spareN(1);
+   i2cSda <= spareN(0);
 
    ----------------------------
    -- Version1 Specific Mapping 

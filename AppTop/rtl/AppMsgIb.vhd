@@ -253,6 +253,9 @@ begin
       ----------------------------------------------------------------------
       end case;
 
+      -- Combinatorial outputs before the reset   
+      rxSlave <= v.rxSlave;
+
       -- Reset
       if (axilRst = '1') then
          v := REG_INIT_C;
@@ -260,9 +263,6 @@ begin
 
       -- Register the variable for next clock cycle
       rin <= v;
-
-      -- Outputs        
-      rxSlave <= v.rxSlave;
 
    end process comb;
 

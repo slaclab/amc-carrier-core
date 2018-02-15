@@ -34,6 +34,7 @@ entity AmcCarrierCore is
       TPD_G                  : time     := 1 ns;
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB   
       WAVEFORM_TDATA_BYTES_G : positive := 4;
+      RSSI_ILEAVE_EN_G       : boolean  := false;
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
@@ -279,6 +280,7 @@ begin
    U_Eth : entity work.AmcCarrierEth
       generic map (
          TPD_G                 => TPD_G,
+         RSSI_ILEAVE_EN_G      => RSSI_ILEAVE_EN_G,
          RTM_ETH_G             => RTM_ETH_G,
          ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
          AXI_ERROR_RESP_G      => AXI_ERROR_RESP_C)

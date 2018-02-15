@@ -37,6 +37,8 @@ if { $::env(AMC_ADV_BUILD)  == 1 ||
       loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierCore.vhd"
       loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierEth.vhd"
       loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierRssi.vhd"   
+      loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierRssiInterleave.vhd"   
+      loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierXvcDebug.vhd"   
    }
    
    loadSource -path "$::DIR_PATH/dcp/hdl/AmcCarrierTiming.vhd"
@@ -84,6 +86,20 @@ if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {
    add_files -norecurse $::DIR_PATH/ip/MigCoreMicroblazeCalibration.bmm
    set_property SCOPED_TO_REF   {MigCore}                                     [get_files -all -of_objects [get_fileset sources_1] {MigCoreMicroblazeCalibration.bmm}]
    set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/U0} [get_files -all -of_objects [get_fileset sources_1] {MigCoreMicroblazeCalibration.bmm}]
+}
+
+# Load the FpgaTypePkg.vhd
+if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU040.vhd"
+} elseif { $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} } {
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU060.vhd"
+} elseif { $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {            
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU095.vhd"
+} elseif { $::env(PRJ_PART) eq {XCKU11P-FFVA1156-3-E} } {  
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU11P.vhd"
+} elseif { $::env(PRJ_PART) eq {XCKU15P-FFVA1156-3-E} } {              
+   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU15P.vhd"
+} else { 
 }
 
 ## Place and Route strategies 

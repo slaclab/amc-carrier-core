@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfUpConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-07
--- Last update: 2017-04-19
+-- Last update: 2018-02-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.jesd204bpkg.all;
+use work.I2cPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -82,62 +83,89 @@ end AmcMrLlrfUpConvertCore;
 
 architecture mapping of AmcMrLlrfUpConvertCore is
 
-   constant NUM_AXI_MASTERS_C      : natural               := 10;
+   constant I2C_DEVICE_MAP_C : I2cAxiLiteDevArray(3 downto 0) := (
+      0             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1001000",       -- ADT7420: A1=GND,A0=GND
+         dataSize   => 8,               -- in units of bits
+         addrSize   => 8,               -- in units of bits
+         endianness => '1'),            -- Big endian
+      1             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1001001",       -- ADT7420: A1=GND,A0=VDD
+         dataSize   => 8,               -- in units of bits
+         addrSize   => 8,               -- in units of bits
+         endianness => '1'),            -- Big endian
+      2             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1001010",       -- ADT7420: A1=VDD,A0=GND
+         dataSize   => 8,               -- in units of bits
+         addrSize   => 8,               -- in units of bits
+         endianness => '1'),            -- Big endian
+      3             => MakeI2cAxiLiteDevType(
+         i2cAddress => "1001011",       -- ADT7420: A1=VDD,A0=VDD
+         dataSize   => 8,               -- in units of bits
+         addrSize   => 8,               -- in units of bits
+         endianness => '1'));           -- Big endian   
+
+   constant NUM_AXI_MASTERS_C      : natural               := 11;
    constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 5;
    constant NUM_ATTN_CHIPS_C       : positive range 1 to 8 := 4;
 
-   constant ATT_0_INDEX_C   : natural := 0;
-   constant ATT_1_INDEX_C   : natural := 1;
-   constant ATT_2_INDEX_C   : natural := 2;
-   constant ATT_3_INDEX_C   : natural := 3;
-   constant ADC_0_INDEX_C   : natural := 4;
-   constant ADC_1_INDEX_C   : natural := 5;
-   constant ADC_2_INDEX_C   : natural := 6;
-   constant LMK_INDEX_C     : natural := 7;
-   constant DAC_INDEX_C     : natural := 8;
-   constant SIG_GEN_INDEX_C : natural := 9;
+   constant ATT_0_INDEX_C    : natural := 0;
+   constant ATT_1_INDEX_C    : natural := 1;
+   constant ATT_2_INDEX_C    : natural := 2;
+   constant ATT_3_INDEX_C    : natural := 3;
+   constant TEMP_I2C_INDEX_C : natural := 4;
+   constant ADC_0_INDEX_C    : natural := 5;
+   constant ADC_1_INDEX_C    : natural := 6;
+   constant ADC_2_INDEX_C    : natural := 7;
+   constant LMK_INDEX_C      : natural := 8;
+   constant DAC_INDEX_C      : natural := 9;
+   constant SIG_GEN_INDEX_C  : natural := 10;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      ATT_0_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0000"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ATT_1_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0010"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ATT_2_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0020"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ATT_3_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0000_0030"),
-         addrBits     => 4,
-         connectivity => X"FFFF"),
-      ADC_0_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0002_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"),
-      ADC_1_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0004_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"),
-      ADC_2_INDEX_C   => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0006_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"),
-      LMK_INDEX_C     => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"0008_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"),
-      DAC_INDEX_C     => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"000A_0000"),
-         addrBits     => 17,
-         connectivity => X"0001"),
-      SIG_GEN_INDEX_C => (
-         baseAddr     => (AXI_BASE_ADDR_G + x"000C_0000"),
-         addrBits     => 17,
-         connectivity => X"FFFF"));
+      ATT_0_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0000"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      ATT_1_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0010"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      ATT_2_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0020"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      ATT_3_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_0030"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      TEMP_I2C_INDEX_C => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0001_0000"),
+         addrBits      => 16,
+         connectivity  => X"FFFF"),
+      ADC_0_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0002_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"),
+      ADC_1_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0004_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"),
+      ADC_2_INDEX_C    => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0006_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"),
+      LMK_INDEX_C      => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0008_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"),
+      DAC_INDEX_C      => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"000A_0000"),
+         addrBits      => 17,
+         connectivity  => X"0001"),
+      SIG_GEN_INDEX_C  => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"000C_0000"),
+         addrBits      => 17,
+         connectivity  => X"FFFF"));
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -177,6 +205,9 @@ architecture mapping of AmcMrLlrfUpConvertCore is
    signal attSdi_o     : sl;
    signal attLatchEn_o : slv(3 downto 0);
 
+   signal i2cScl : sl;
+   signal i2cSda : sl;
+
 begin
 
    U_AmcMapping : entity work.AmcMrLlrfUpConvertMapping
@@ -200,6 +231,8 @@ begin
          jesdRst       => jesdRst,
          timingTrig    => timingTrig,
          fpgaInterlock => fpgaInterlock,
+         i2cScl        => i2cScl,
+         i2cSda        => i2cSda,
          -- Recovered EVR clock
          recClk        => recClk,
          recRst        => recRst,
@@ -245,6 +278,28 @@ begin
          mAxiWriteSlaves     => axilWriteSlaves,
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
+
+   --------------------------
+   -- I2C Temperature Sensors
+   --------------------------
+   U_I2C : entity work.AxiI2cRegMaster
+      generic map (
+         TPD_G          => TPD_G,
+         I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
+         DEVICE_MAP_G   => I2C_DEVICE_MAP_C,
+         AXI_CLK_FREQ_G => 156.25E+6)
+      port map (
+         -- I2C Ports
+         scl            => i2cScl,
+         sda            => i2cSda,
+         -- AXI-Lite Register Interface
+         axiReadMaster  => axilReadMasters(TEMP_I2C_INDEX_C),
+         axiReadSlave   => axilReadSlaves(TEMP_I2C_INDEX_C),
+         axiWriteMaster => axilWriteMasters(TEMP_I2C_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(TEMP_I2C_INDEX_C),
+         -- Clocks and Resets
+         axiClk         => axilClk,
+         axiRst         => axilRst);
 
    ----------------------------------------------------------------
    -- SPI interface ADCs and LMK

@@ -33,5 +33,14 @@ RtmMpsLinkNode: &RtmMpsLinkNode
       name: RtmDout
       sizeBits: 8
       mode: RO
-      description: Digital Outputs         
+      description: Digital Outputs    
+    #########################################################
+    RtmDoutMask:
+      at:
+        offset: 0x8
+      class: IntField
+      name: RtmDoutMask
+      sizeBits: 8
+      mode: RW
+      description: Digital Outputs Mask          
     #########################################################
