@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-08-03
+-- Last update: 2017-11-28
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -35,31 +35,33 @@ use work.AppMpsPkg.all;
 entity AppTop is
    generic (
       -- General Generics
-      TPD_G                : time                      := 1 ns;
-      SIM_SPEEDUP_G        : boolean                   := false;
-      SIMULATION_G         : boolean                   := false;
-      MR_LCLS_APP_G        : boolean                   := true;
-      TIMING_BUS_DOMAIN_G  : string                    := "REC_CLK";  -- "AXIL"
-      AXI_ERROR_RESP_G     : slv(1 downto 0)           := AXI_RESP_DECERR_C;
+      TPD_G                  : time                      := 1 ns;
+      SIM_SPEEDUP_G          : boolean                   := false;
+      SIMULATION_G           : boolean                   := false;
+      DAQMUX_DECIMATOR_EN_G  : boolean                   := true;
+      MR_LCLS_APP_G          : boolean                   := false;
+      WAVEFORM_TDATA_BYTES_G : positive                  := 4;
+      TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";  -- "AXIL"
+      AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
-      JESD_DRP_EN_G        : boolean                   := false;
-      JESD_RX_LANE_G       : NaturalArray(1 downto 0)  := (others => 0);
-      JESD_TX_LANE_G       : NaturalArray(1 downto 0)  := (others => 0);
-      JESD_RX_POLARITY_G   : Slv5Array(1 downto 0)     := (others => "00000");
-      JESD_TX_POLARITY_G   : Slv5Array(1 downto 0)     := (others => "00000");
-      JESD_RX_ROUTES_G     : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
-      JESD_TX_ROUTES_G     : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
-      JESD_REF_SEL_G       : Slv2Array(1 downto 0)     := (others => DEV_CLK2_SEL_C);
-      JESD_USR_DIV_G       : natural                   := 4;
+      JESD_DRP_EN_G          : boolean                   := false;
+      JESD_RX_LANE_G         : NaturalArray(1 downto 0)  := (others => 0);
+      JESD_TX_LANE_G         : NaturalArray(1 downto 0)  := (others => 0);
+      JESD_RX_POLARITY_G     : Slv5Array(1 downto 0)     := (others => "00000");
+      JESD_TX_POLARITY_G     : Slv5Array(1 downto 0)     := (others => "00000");
+      JESD_RX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
+      JESD_TX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
+      JESD_REF_SEL_G         : Slv2Array(1 downto 0)     := (others => DEV_CLK2_SEL_C);
+      JESD_USR_DIV_G         : natural                   := 4;
       -- Signal Generator Generics
-      SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 0);
-      SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0) := (others => 9);
-      SIG_GEN_LANE_MODE_G  : Slv7Array(1 downto 0)     := (others => "0000000");
-      SIG_GEN_RAM_CLK_G    : Slv7Array(1 downto 0)     := (others => "0000000");
+      SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 0);
+      SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
+      SIG_GEN_LANE_MODE_G    : Slv7Array(1 downto 0)     := (others => "0000000");
+      SIG_GEN_RAM_CLK_G      : Slv7Array(1 downto 0)     := (others => "0000000");
       -- Triggering Generics
-      TRIG_SIZE_G          : positive range 1 to 16    := 3;
-      TRIG_DELAY_WIDTH_G   : integer range 1 to 32     := 32;
-      TRIG_PULSE_WIDTH_G   : integer range 1 to 32     := 32);
+      TRIG_SIZE_G            : positive range 1 to 16    := 3;
+      TRIG_DELAY_WIDTH_G     : integer range 1 to 32     := 32;
+      TRIG_PULSE_WIDTH_G     : integer range 1 to 32     := 32);
    port (
       ----------------------
       -- Top Level Interface
@@ -290,11 +292,13 @@ begin
       ------------------
       U_DaqMuxV2 : entity work.DaqMuxV2
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            BAY_INDEX_G      => ite((i=0),'0','1'),
-            N_DATA_IN_G      => 18,
-            N_DATA_OUT_G     => 4)
+            TPD_G                  => TPD_G,
+            AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
+            DECIMATOR_EN_G         => DAQMUX_DECIMATOR_EN_G,
+            WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
+            BAY_INDEX_G            => ite((i = 0), '0', '1'),
+            N_DATA_IN_G            => 18,
+            N_DATA_OUT_G           => 4)
          port map (
             -- Clocks and Resets
             axiClk              => axilClk,
@@ -419,9 +423,9 @@ begin
             jesdClkP        => jesdClkP(i),
             jesdClkN        => jesdClkN(i));
 
-      adcValids(i)(6 downto 5) <= (others=>'0');
-      adcValues(i,6) <= (others=>'0');
-      adcValues(i,5) <= (others=>'0');
+      adcValids(i)(6 downto 5) <= (others => '0');
+      adcValues(i, 6)          <= (others => '0');
+      adcValues(i, 5)          <= (others => '0');
 
       intRxP(i) <= jesdRxP(i)(4 downto 0);
       intRxN(i) <= jesdRxN(i)(4 downto 0);
