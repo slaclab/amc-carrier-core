@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-07-20
+-- Last update: 2018-01-08
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -425,10 +425,10 @@ begin
          end if;
       end process;
 
-      s_gtTxReady(i)                   <= s_txDone(0) when (i < 7) else s_txDone(1);
-      gtTxDiffCtrl(i*4-1 downto i*4)   <= txDiffCtrl(i)(3 downto 0);
-      gtTxPostCursor(i*5-1 downto i*5) <= txPostCursor(i)(4 downto 0);
-      gtTxPreCursor(i*5-1 downto i*5)  <= txPreCursor(i)(4 downto 0);
+      s_gtTxReady(i)                     <= s_txDone(0) when (i < 7) else s_txDone(1);
+      gtTxDiffCtrl((i*4)+3 downto i*4)   <= txDiffCtrl(i)(3 downto 0);
+      gtTxPostCursor((i*5)+4 downto i*5) <= txPostCursor(i)(4 downto 0);
+      gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
 
    end generate TX_LANES_GEN;
 

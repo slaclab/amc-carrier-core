@@ -2,7 +2,7 @@
 -- File       : AppMps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-11-09
+-- Last update: 2018-01-08
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ begin
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          COMMON_CLK_G     => false,
-         NUM_ADDR_BITS_G  => 16)
+         NUM_ADDR_BITS_G  => 16)  -- Note encReadMaster/encWriteMaster upper 16-bits of address set to zero
       port map (
          sAxiClk         => axilClk,
          sAxiClkRst      => axilRst,
@@ -199,6 +199,7 @@ begin
    U_AppMpsEncoder : entity work.AppMpsEncoder
       generic map (
          TPD_G            => TPD_G,
+         AXI_BASE_ADDR_G  => (others => '0'),  -- Only lower 16-bits of address are passed through the AxiLiteAsync
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          APP_TYPE_G       => APP_TYPE_G)
       port map (

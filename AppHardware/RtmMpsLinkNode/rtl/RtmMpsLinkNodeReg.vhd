@@ -2,7 +2,7 @@
 -- File       : RtmMpsLinkNodeReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-10
--- Last update: 2017-11-10
+-- Last update: 2018-02-13
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_07_CXX
 -------------------------------------------------------------------------------
@@ -37,17 +37,20 @@ entity RtmMpsLinkNodeReg is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -- RTM Interface
       din             : in  slv(31 downto 0);
-      dout            : in  slv(7 downto 0));
+      dout            : in  slv(7 downto 0);
+      doutMask        : out slv(7 downto 0));
 end RtmMpsLinkNodeReg;
 
 architecture rtl of RtmMpsLinkNodeReg is
 
    type RegType is record
+      doutMask       : slv(7 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
+      doutMask       => x"00",
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -91,6 +94,7 @@ begin
       -- Map the read only registers
       axiSlaveRegisterR(regCon, x"0", 0, rtmDin);
       axiSlaveRegisterR(regCon, x"4", 0, rtmDout);
+      axiSlaveRegister(regCon, x"8", 0, v.doutMask);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
@@ -106,6 +110,7 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
+      doutMask       <= r.doutMask;
 
    end process comb;
 

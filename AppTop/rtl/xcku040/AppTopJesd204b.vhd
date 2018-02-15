@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-07-20
+-- Last update: 2018-01-08
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -330,12 +330,12 @@ begin
    -- GTH TX signals
    -----------------   
    TX_LANES_GEN : for i in 6 downto 0 generate
-      s_txData((i*32)+31 downto (i*32)) <= r_jesdGtTxArr(i).data;
-      s_txDataK((i*8)+7 downto (i*8))   <= x"0" & r_jesdGtTxArr(i).dataK;
-      s_gtTxReady(i)                    <= s_txDone;
-      gtTxDiffCtrl(i*4-1 downto i*4)    <= txDiffCtrl(i)(3 downto 0);
-      gtTxPostCursor(i*5-1 downto i*5)  <= txPostCursor(i)(4 downto 0);
-      gtTxPreCursor(i*5-1 downto i*5)   <= txPreCursor(i)(4 downto 0);
+      s_txData((i*32)+31 downto (i*32))  <= r_jesdGtTxArr(i).data;
+      s_txDataK((i*8)+7 downto (i*8))    <= x"0" & r_jesdGtTxArr(i).dataK;
+      s_gtTxReady(i)                     <= s_txDone;
+      gtTxDiffCtrl((i*4)+3 downto i*4)   <= txDiffCtrl(i)(3 downto 0);
+      gtTxPostCursor((i*5)+4 downto i*5) <= txPostCursor(i)(4 downto 0);
+      gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
    end generate TX_LANES_GEN;
 
    -----------------

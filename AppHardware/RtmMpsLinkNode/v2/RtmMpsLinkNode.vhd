@@ -2,7 +2,7 @@
 -- File       : RtmMpsLinkNode.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-11-10
+-- Last update: 2018-02-13
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_07_CXX
 -------------------------------------------------------------------------------
@@ -55,13 +55,14 @@ architecture mapping of RtmMpsLinkNode is
    signal doutL : slv(7 downto 0);
    signal dinL  : slv(31 downto 0);
 
-   signal rtmDin  : slv(31 downto 0);
-   signal rtmDout : slv(7 downto 0);
+   signal rtmDin      : slv(31 downto 0);
+   signal rtmDout     : slv(7 downto 0);
+   signal rtmDoutMask : slv(7 downto 0);
 
 begin
 
    din     <= rtmDin;
-   rtmDout <= dout;
+   rtmDout <= dout or rtmDoutMask;
 
    rtmDin <= not(dinL);
    doutL  <= not(rtmDout);
@@ -110,6 +111,7 @@ begin
          axilWriteSlave  => axilWriteSlave,
          -- RTM Interface
          din             => rtmDin,
-         dout            => rtmDout);
+         dout            => rtmDout,
+         doutMask        => rtmDoutMask);
 
 end mapping;

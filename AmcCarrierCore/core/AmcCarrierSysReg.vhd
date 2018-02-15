@@ -2,7 +2,7 @@
 -- File       : AmcCarrierSysReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-02-10
+-- Last update: 2018-01-31
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -27,13 +27,14 @@ use work.AxiLitePkg.all;
 use work.I2cPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
+use work.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
 entity AmcCarrierSysReg is
    generic (
-      TPD_G            : time    := 1 ns;
+      TPD_G            : time            := 1 ns;
       BUILD_INFO_G     : BuildInfoType;
       AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
       APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
@@ -227,6 +228,8 @@ architecture mapping of AmcCarrierSysReg is
    signal bootAddr  : slv(31 downto 0);
    signal upTimeCnt : slv(31 downto 0);
 
+   signal userValues : Slv32Array(0 to 63) := (others => x"00000000");
+
 begin
 
    --------------------------
@@ -272,11 +275,16 @@ begin
          axiClk         => axilClk,
          axiRst         => axilRst,
          upTimeCnt      => upTimeCnt,
-         userValues     => (others => AMC_CARRIER_CORE_VERSION_C),
+         userValues     => userValues,
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),
          axiWriteSlave  => mAxilWriteSlaves(VERSION_INDEX_C));
+
+
+   userValues(0)       <= AMC_CARRIER_CORE_VERSION_C;
+   userValues(1)       <= CPSW_TARBALL_ADDR_C;
+   userValues(2 to 63) <= (others => x"00000000");
 
    bootRdy <= ddrMemReady and not(ddrMemError);
 
@@ -420,7 +428,7 @@ begin
          TPD_G            => TPD_G,
          ADDR_WIDTH_G     => 13,
          I2C_ADDR_G       => "1010000",
-         I2C_SCL_FREQ_G   => 400.0E+3,   -- units of Hz
+         I2C_SCL_FREQ_G   => 400.0E+3,  -- units of Hz
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
@@ -443,7 +451,7 @@ begin
       generic map (
          TPD_G            => TPD_G,
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         I2C_SCL_FREQ_G   => 100.0E+3,   -- units of Hz
+         I2C_SCL_FREQ_G   => 100.0E+3,  -- units of Hz
          DEVICE_MAP_G     => TIME_DEVICE_MAP_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)
       port map (
@@ -465,7 +473,7 @@ begin
    AxiI2cRegMaster_2 : entity work.AxiI2cRegMaster
       generic map (
          TPD_G            => TPD_G,
-         I2C_SCL_FREQ_G   => 400.0E+3,   -- units of Hz
+         I2C_SCL_FREQ_G   => 400.0E+3,  -- units of Hz
          AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
          DEVICE_MAP_G     => DDR_DEVICE_MAP_C,
          AXI_CLK_FREQ_G   => AXI_CLK_FREQ_C)

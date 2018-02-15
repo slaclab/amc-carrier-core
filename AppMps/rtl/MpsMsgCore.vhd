@@ -2,7 +2,7 @@
 -- File       : MpsMsgCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2017-04-13
+-- Last update: 2017-12-22
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -37,16 +37,17 @@ entity MpsMsgCore is
       TPD_G            : time    := 1 ns;
       SIM_ERROR_HALT_G : boolean := false);
    port (
-      clk        : in  sl;
-      rst        : in  sl;
+      clk : in sl;
+      rst : in sl;
 
-      ready      : out sl; 
+      ready      : out sl;
+      mpsMsgDrop : out sl;
       -- Inbound Message Value
       mpsMessage : in  MpsMessageType;
 
       -- Outbound MPS Interface
-      mpsMaster  : out AxiStreamMasterType;
-      mpsSlave   : in  AxiStreamSlaveType);
+      mpsMaster : out AxiStreamMasterType;
+      mpsSlave  : in  AxiStreamSlaveType);
 end MpsMsgCore;
 
 architecture rtl of MpsMsgCore is
@@ -63,6 +64,7 @@ architecture rtl of MpsMsgCore is
       mpsMessage : MpsMessageType;
       mpsMaster  : AxiStreamMasterType;
       ready      : sl;
+      mpsMsgDrop : sl;
       state      : StateType;
       stateDly   : StateType;
    end record RegType;
@@ -71,6 +73,7 @@ architecture rtl of MpsMsgCore is
       mpsMessage => MPS_MESSAGE_INIT_C,
       mpsMaster  => AXI_STREAM_MASTER_INIT_C,
       ready      => '0',
+      mpsMsgDrop => '0',
       state      => IDLE_S,
       stateDly   => IDLE_S);
 
@@ -89,6 +92,7 @@ begin
       v := r;
 
       -- Reset the flags
+      v.mpsMsgDrop := '0';
       if mpsSlave.tReady = '1' then
          v.mpsMaster.tValid := '0';
          v.mpsMaster.tLast  := '0';
@@ -104,13 +108,11 @@ begin
             -- Check for update
             if mpsMessage.valid = '1' and mpsMessage.msgSize > 0 then
                -- Reset ready
-               v.ready := '0';
-               -- Reset tData
-               v.mpsMaster.tData := (others => '0');
+               v.ready      := '0';
                -- Latch the information
-               v.mpsMessage      := mpsMessage;
+               v.mpsMessage := mpsMessage;
                -- Next state
-               v.state           := HEADER_S;
+               v.state      := HEADER_S;
             end if;
          ----------------------------------------------------------------------
          when HEADER_S =>
@@ -121,7 +123,7 @@ begin
                v.mpsMaster.tData(15)          := '0';  -- Mitigation Message flag has to be '0' (Will be checked at receiving end)
                v.mpsMaster.tData(14)          := r.mpsMessage.lcls;  -- Set the LCLS flag
                v.mpsMaster.tData(13)          := r.mpsMessage.inputType;  -- Set the input type A/D  
-               v.mpsMaster.tData(12 downto 8) := r.mpsMessage.version; -- Set the message version
+               v.mpsMaster.tData(12 downto 8) := r.mpsMessage.version;  -- Set the message version
                v.mpsMaster.tData(7 downto 0)  := r.mpsMessage.msgSize+5;  -- Length in units of bytes
                -- Set SOF               
                ssiSetUserSof(MPS_AXIS_CONFIG_C, v.mpsMaster, '1');
@@ -158,7 +160,7 @@ begin
                v.mpsMaster.tData(15 downto 8) := (others => '0');
                -- Increment the counter
                v.cnt                          := r.cnt + 1;
-                   
+
                -- Check if lower byte is tLast
                if v.cnt = r.mpsMessage.msgSize then
                   -- Reset the counter
@@ -186,11 +188,17 @@ begin
       ----------------------------------------------------------------------
       end case;
 
-      -- Check for error condition
-      v.stateDly := r.state;
-      if (mpsMessage.valid = '1') and (r.stateDly /= IDLE_S) then
-         -- Check the simulation error printing
-         if SIM_ERROR_HALT_G then
+      -- Check for error conditions (real-time monitoring)
+      if (mpsMessage.valid = '1') and (mpsMessage.msgSize > 0) and (r.state /= IDLE_S) then
+         -- Strobe the error flag
+         v.mpsMsgDrop := '1';
+      end if;
+
+      -- Check for error conditions (simulation monitoring)
+      if SIM_ERROR_HALT_G then
+         v.stateDly := r.state;  -- 1 cycle delay to make it easer to see in simulation GUI
+         if (mpsMessage.valid = '1') and (mpsMessage.msgSize > 0) and (r.stateDly /= IDLE_S) then
+            -- Check the simulation error printing
             report "AmcCarrierMpsMsg: Simulation Overflow Detected ...";
             report "APP ID = " & integer'image(conv_integer(mpsMessage.appId)) severity failure;
          end if;
@@ -205,8 +213,9 @@ begin
       rin <= v;
 
       -- Outputs        
-      mpsMaster <= r.mpsMaster;
-      ready     <= v.ready;
+      mpsMaster  <= r.mpsMaster;
+      ready      <= v.ready;
+      mpsMsgDrop <= r.mpsMsgDrop;
 
    end process comb;
 

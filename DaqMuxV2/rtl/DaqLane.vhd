@@ -22,7 +22,7 @@
 --                HeaderWord 0: timeStamp_i(63:32)
 --                HeaderWord 1: timeStamp_i(31:0)
 --                HeaderWord 2: packetSize_i
---                HeaderWord 3: header_i & dec16or32_i & averaging_i & test_i & '0' & axiNum_i & rateDiv_i
+--                HeaderWord 3: header_i & dec16or32_i & averaging_i & test_i & BAY_INDEX_G & axiNum_i & rateDiv_i
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -50,6 +50,7 @@ entity DaqLane is
       -- General Configurations
       TPD_G                : time            := 1 ns;
       AXI_ERROR_RESP_G     : slv(1 downto 0) := AXI_RESP_SLVERR_C;
+      BAY_INDEX_G          : sl;
       DECIMATOR_EN_G       : boolean         := true;  -- Include or exclude decimator
       FRAME_BWIDTH_G       : positive        := 10;  -- Dafault 10: 4096 byte frames
       FREZE_BUFFER_TUSER_G : integer         := 2
@@ -333,7 +334,7 @@ begin
                      when toSlv(12, 32) =>
                         v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := r.packetSize;
                      when toSlv(13, 32) =>
-                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & r.dec16or32 & r.averaging & test_i & '0' & toSlv(axiNum_i, 4) & r.rateDiv;
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & r.dec16or32 & r.averaging & test_i & BAY_INDEX_G & toSlv(axiNum_i, 4) & r.rateDiv;
                      when others =>
                         v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := (others => '0');
                   end case;

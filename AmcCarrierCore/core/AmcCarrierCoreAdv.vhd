@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-06-28
+-- Last update: 2018-02-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -34,6 +34,7 @@ entity AmcCarrierCoreAdv is
    generic (
       TPD_G                  : time     := 1 ns;
       BUILD_INFO_G           : BuildInfoType;
+      RSSI_ILEAVE_EN_G       : boolean  := false;
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
@@ -69,7 +70,7 @@ entity AmcCarrierCoreAdv is
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
       diagnosticBus        : in    DiagnosticBusType;
-      mpsCoreReg           : out   MpsCoreRegType; -- Async, must be synchronized
+      mpsCoreReg           : out   MpsCoreRegType;  -- Async, must be synchronized
       --  Waveform Capture interface (waveformClk domain)
       waveformClk          : out   sl;
       waveformRst          : out   sl;
@@ -221,14 +222,14 @@ architecture mapping of AmcCarrierCoreAdv is
 
 begin
 
-   axilClk     <= ref156MHzClk;
+   axilClk <= ref156MHzClk;
    U_Rst : entity work.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
          clk    => ref156MHzClk,
          rstIn  => ref156MHzRst,
-         rstOut => axilRst);   
+         rstOut => axilRst);
    ipmiBsi     <= bsiBus;
    ethPhyReady <= ethLinkUp;
    timingBus   <= timingBusIntf;
@@ -370,6 +371,7 @@ begin
          TPD_G                  => TPD_G,
          WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
          ETH_USR_FRAME_LIMIT_G  => ETH_USR_FRAME_LIMIT_G,
+         RSSI_ILEAVE_EN_G       => RSSI_ILEAVE_EN_G,
          SIM_SPEEDUP_G          => SIM_SPEEDUP_G,
          DISABLE_BSA_G          => DISABLE_BSA_G,
          RTM_ETH_G              => RTM_ETH_G,
