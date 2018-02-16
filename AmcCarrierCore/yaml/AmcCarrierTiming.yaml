@@ -11,6 +11,7 @@
 #once AmcCarrierTiming.yaml
 #include TimingFrameRx.yaml
 #include TPGMiniCore.yaml
+#include EvrV2CoreTriggers.yaml
 #include GthRxAlignCheck.yaml
 #include Gthe3Channel.yaml
 
@@ -32,6 +33,11 @@ AmcCarrierTiming: &AmcCarrierTiming
       <<: *TPGMiniCore
       at:
         offset: 0x00030000
+    ##################################################
+    EvrV2CoreTriggers:
+      <<: *EvrV2CoreTriggers
+      at:
+        offset: 0x00040000
     ##################################################
     GthRxAlignCheck:
       <<: *GthRxAlignCheck
