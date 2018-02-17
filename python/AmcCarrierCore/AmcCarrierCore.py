@@ -1,16 +1,15 @@
 import pyrogue as pr
 
 # Modules from surf
-from surf.axi import *
-from surf.devices.microchip import *
-from surf.devices.ti import *
-from surf.devices.micron import *
-from surf.ethernet import *
-from surf.misc import *
-from surf.protocols import *
-from surf.xilinx import *
-from surf.ethernet.udp import *
-from surf.protocols.rssi import *
+import pyrogue as pr
+import surf.axi as axi
+import surf.devices.micron as micron
+import surf.devices.microchip as microchip
+import surf.devices.ti as ti
+import surf.ethernet.udp as udp
+import surf.misc as misc
+import surf.protocols.rssi as rssi
+import surf.xilinx as xilinx
 
 # Modules from AmcCarrierCore
 from AmcCarrierCore import *
@@ -31,17 +30,25 @@ class AmcCarrierCore(pr.Device):
         ##############################
         # Variables
         ##############################                        
-        self.add(AxiVersion(            
+        self.add(axi.AxiVersion(            
             offset       =  0x00000000, 
             expand       =  False
         ))
 
-        self.add(AxiSysMonUltraScale(   
+        self.add(xilinx.AxiSysMonUltraScale(   
             offset       =  0x01000000, 
             expand       =  False
         ))
+        
+        self.add(micron.AxiMicronN25Q(
+            name         = "MicronN25Q",
+            offset       = 0x2000000,
+            addrMode     = True,                                    
+            expand       = False,                                    
+            hidden       = True,                                    
+        ))        
 
-        self.add(AxiSy56040(    
+        self.add(microchip.AxiSy56040(    
             offset       =  0x03000000, 
             expand       =  False,
             description  = "\n\
@@ -69,7 +76,7 @@ class AmcCarrierCore(pr.Device):
                 -----------------------------------------------------------------\n"\
             ))
                             
-        self.add(AxiCdcm6208(     
+        self.add(ti.AxiCdcm6208(     
             offset       =  0x05000000, 
             expand       =  False,
         ))
@@ -90,14 +97,14 @@ class AmcCarrierCore(pr.Device):
             expand       =  False,
         ))
                             
-        self.add(UdpEngineClient(
+        self.add(udp.UdpEngineClient(
             name         = "BpUdpClient",
             offset       =  0x0A000000,
             description  = "BpUdpClient",
             expand       =  False,
         ))
 
-        self.add(UdpEngineServer(
+        self.add(udp.UdpEngineServer(
             name         = "BpUdpServer",
             offset       =  0x0A000818,
             description  = "BpUdpServer",
@@ -106,7 +113,7 @@ class AmcCarrierCore(pr.Device):
 
 
         for i in range(2):                                       
-            self.add(UdpEngineServer(
+            self.add(udp.UdpEngineServer(
                 name         = "SwUdpServer[%i]" % (i),
                 offset       =  0x0A000808 + (i * 0x08),
                 description  = "SwUdpServer. Server: %i" % (i),  
@@ -114,7 +121,7 @@ class AmcCarrierCore(pr.Device):
             ))
             
         for i in range(2):
-            self.add(RssiCore(
+            self.add(rssi.RssiCore(
                 name         = "SwRssiServer[%i]" % (i),
                 offset       =  0x0A010000 + (i * 0x1000),
                 description  = "SwRssiServer. Server: %i" % (i),                                
