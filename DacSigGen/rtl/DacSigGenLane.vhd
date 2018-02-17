@@ -2,7 +2,7 @@
 -- File       : DacSigGenLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-16
--- Last update: 2017-08-24
+-- Last update: 2018-02-16
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
 --               The module contains a AXI-Lite accessible block RAM where the 
@@ -20,6 +20,18 @@
 --               When disabled is outputs signal ZERO data according to sign format (sign_i)
 --                      Sign: '0' - Signed 2's complement, '1' - Offset binary
 --               INTERFACE_G defines the JESD DAC 32-bit interface vs. LVDS DAC 16-bit interface
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- |  INTERFACE_G |  RAM_CLK_G   |           BRAM           | Output
+-------------------------------------------------------------------------------
+-- |     '0'      |     '0'      | 16-bit mode in jesdClk2x | 32-bit mode in jesdClk
+-------------------------------------------------------------------------------
+-- |     '1'      |     '0'      | 16-bit mode in jesdClk2x | 16-bit mode in jesdClk2x
+-------------------------------------------------------------------------------
+-- |     'X'      |     '1'      | 32-bit mode in jesdClk   | 32-bit mode in jesdClk
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
