@@ -2,7 +2,7 @@
 -- File       : AmcCarrierTiming.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-02-15
+-- Last update: 2018-02-17
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -26,6 +26,7 @@ use work.SsiPkg.all;
 use work.AxiPkg.all;
 use work.AxiLitePkg.all;
 use work.TimingPkg.all;
+use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
 
@@ -303,6 +304,8 @@ begin
       generic map (
          TPD_G             => TPD_G,
          TPGEN_G           => TIME_GEN_APP_G,
+         STREAM_L1_G       => STREAM_L1_G,
+         ETHMSG_AXIS_CFG_G => EMAC_AXIS_CONFIG_C,
          AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr,
          AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
       port map (

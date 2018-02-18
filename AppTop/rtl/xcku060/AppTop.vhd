@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-02-16
+-- Last update: 2018-02-17
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -274,11 +274,8 @@ begin
             freezeHw_i          => freezeHw(i),
             -- Time-stamp and bsa (if enabled it will be added to start of data)
             timeStamp_i         => timingTrig.timeStamp,
-            bsa_i(127 downto 96)=> timingBus.stream.dbuff.edefAvgDn,
-            bsa_i( 95 downto 64)=> timingBus.stream.dbuff.edefMinor,
-            bsa_i( 63 downto 32)=> timingBus.stream.dbuff.edefMajor,
-            bsa_i( 31 downto  0)=> timingBus.stream.dbuff.edefInit,
-            dmod_i              => timingBus.stream.dbuff.dmod,
+            bsa_i               => timingTrig.bsa,
+            dmod_i              => timingTrig.dmod,
             -- AXI-Lite Register Interface
             axilReadMaster      => axilReadMasters(DAQ_MUX0_INDEX_C+i),
             axilReadSlave       => axilReadSlaves(DAQ_MUX0_INDEX_C+i),
