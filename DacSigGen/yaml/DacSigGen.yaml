@@ -19,6 +19,7 @@ DacSigGen: &DacSigGen
   size: 0x10000000
   metadata:
     numOfChs: &numOfChs 2
+    ramWidth: &ramWidth 16
     buffSize: &buffSize 0x200
   #########             
   children:
@@ -123,11 +124,11 @@ DacSigGen: &DacSigGen
         stride: 0x01000000
         nelms: *numOfChs
       size: 0x01000000       
-      description: "Waveform data 16-bit samples."     
+      description: "Waveform Lookup Table"     
       children:
         MemoryArray:
           <<: *MemoryArray
-          sizeBits: 16
+          sizeBits: *ramWidth
           mode: RW
           at:
             offset: 0x0
