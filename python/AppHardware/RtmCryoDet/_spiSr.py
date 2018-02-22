@@ -126,7 +126,7 @@ class SpiSr(pr.Device):
         ))        
 
         self.add(pr.RemoteVariable(    
-            name         = "Slow Step Size",
+            name         = "Fast/Slow Step Size",
             description  = "FluxRamp_Control_Reg5",
             offset       =  0x24,
             bitSize      =  20,
@@ -136,7 +136,7 @@ class SpiSr(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(    
-            name         = "Slow Rst Value",
+            name         = "Fast/Slow Rst Value",
             description  = "FluxRamp_Control_Reg6",
             offset       =  0x28,
             bitSize      =  20,
@@ -146,29 +146,9 @@ class SpiSr(pr.Device):
         ))
          
         self.add(pr.RemoteVariable(    
-            name         = "Fast Step Size",
+            name         = "LTC1668 Raw DAC Data",
             description  = "FluxRamp_Control_Reg7",
             offset       =  0x2C,
-            bitSize      =  20,
-            bitOffset    =  0x00,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-
-        self.add(pr.RemoteVariable(    
-            name         = "Fast Rst Value",
-            description  = "FluxRamp_Control_Reg8",
-            offset       =  0x30,
-            bitSize      =  20,
-            bitOffset    =  0x00,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
-        self.add(pr.RemoteVariable(    
-            name         = "LTC1668 Raw DAC Data",
-            description  = "FluxRamp_Control_Reg9",
-            offset       =  0x34,
             bitSize      =  20,
             bitOffset    =  0x00,
             base         = pr.UInt,

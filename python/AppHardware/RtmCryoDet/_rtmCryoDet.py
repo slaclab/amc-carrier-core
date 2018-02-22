@@ -94,8 +94,8 @@ class RtmCryoDet(pr.Device):
         )) 
 
         self.add(pr.RemoteVariable(    
-            name         = "EnableRamp",
-            description  = "Enables the Start Ramp pulses",
+            name         = "EnableRampTrigger",
+            description  = "Enables the Start Ramp Trigger pulses",
             offset       = 0x14,
             bitSize      = 1,
             bitOffset    = 1,
