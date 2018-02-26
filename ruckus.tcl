@@ -1,6 +1,26 @@
 # Load RUCKUS environment and library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
+proc MyVersionCheck { } {
+   # Get the Vivado version
+   set VersionNumber [version -short]
+   # Generate error message
+   set errMsg "\n\n*********************************************************\n"
+   set errMsg "${errMsg}Your Vivado Version Vivado   = ${VersionNumber}\n"
+   set errMsg "${errMsg}However, Vivado Version Lock = 2016.4 or 2017.3\n"
+   set errMsg "${errMsg}You need to change your Vivado software to Version 2016.4 or 2017.3\n"
+   set errMsg "${errMsg}*********************************************************\n\n"  
+   
+   if { ${VersionNumber} == "2016.4" } {
+      return 0
+   } elseif { ${VersionNumber} == "2017.3" } {
+      return 0
+   } else {
+      puts ${errMsg}
+      return -1
+   }
+}
+
 # Get the family type
 set family [getFpgaFamily]
 
@@ -17,12 +37,8 @@ if { ${family} == "kintexuplus" } {
    }
 # Check Kintex Ultrascale
 } elseif { ${family} == "kintexu" } {  
-   # Check for version 2016.4 of Vivado
-   if { [VersionCheck 2016.4] < 0 } {
-      ## Check for version 2017.3 of Vivado
-      if { [VersionCheck 2017.3 "mustBeExact"] < 0 } {
-         exit -1
-      }
+   if { [MyVersionCheck] < 0 } {
+      exit -1
    }
 } else { 
    puts "\n\nERROR: Invalid PRJ_PART was defined in the Makefile\n\n"; exit -1
