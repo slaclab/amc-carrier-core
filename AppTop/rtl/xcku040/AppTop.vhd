@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-02-15
+-- Last update: 2018-02-17
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -56,11 +56,7 @@ entity AppTop is
       SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 0);
       SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
       SIG_GEN_LANE_MODE_G    : Slv7Array(1 downto 0)     := (others => "0000000");
-      SIG_GEN_RAM_CLK_G      : Slv7Array(1 downto 0)     := (others => "0000000");
-      -- Triggering Generics
-      TRIG_SIZE_G            : positive range 1 to 16    := 3;
-      TRIG_DELAY_WIDTH_G     : integer range 1 to 32     := 32;
-      TRIG_PULSE_WIDTH_G     : integer range 1 to 32     := 32);
+      SIG_GEN_RAM_CLK_G      : Slv7Array(1 downto 0)     := (others => "0000000") );
    port (
       ----------------------
       -- Top Level Interface
@@ -79,6 +75,7 @@ entity AppTop is
       timingPhy            : out   TimingPhyType;
       timingPhyClk         : in    sl;
       timingPhyRst         : in    sl;
+      timingTrig           : in    TimingTrigType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : out   sl;
       diagnosticRst        : out   sl;
@@ -174,7 +171,6 @@ architecture mapping of AppTop is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal evrTrig     : AppTopTrigType;
    signal trigCascBay : slv(2 downto 0);
    signal armCascBay  : slv(2 downto 0);
    signal trigHw      : slv(1 downto 0);
@@ -241,38 +237,6 @@ begin
          mAxiReadSlaves      => axilReadSlaves);
 
    ---------------
-   -- Trigger Core
-   ---------------
-   U_Trig : entity work.AppTopTrig
-      generic map (
-         TPD_G              => TPD_G,
-         MR_LCLS_APP_G      => MR_LCLS_APP_G,
-         AXIL_BASE_ADDR_G   => AXI_CONFIG_C(TIMING_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         TRIG_SIZE_G        => TRIG_SIZE_G,
-         TRIG_DELAY_WIDTH_G => TRIG_DELAY_WIDTH_G,
-         TRIG_PULSE_WIDTH_G => TRIG_PULSE_WIDTH_G)
-      port map (
-         -- AXI-Lite Interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(TIMING_INDEX_C),
-         axilReadSlave   => axilReadSlaves(TIMING_INDEX_C),
-         axilWriteMaster => axilWriteMasters(TIMING_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(TIMING_INDEX_C),
-         -- Application Debug Interface (axilClk domain)
-         sAxisMaster     => obAppDbgMaster,
-         sAxisSlave      => obAppDbgSlave,
-         mAxisMaster     => obAppDebugMaster,
-         mAxisSlave      => obAppDebugSlave,
-         -- Timing Interface
-         recClk          => recTimingClk,
-         recRst          => recTimingRst,
-         timingBus_i     => timingBus,
-         -- Trigger pulse outputs (recClk domain)
-         evrTrig         => evrTrig);
-
-   ---------------
    -- DAQ MUX Core
    ---------------            
    trigCascBay(2) <= trigCascBay(0);    -- to make cross and use generate
@@ -309,9 +273,9 @@ begin
             -- Freeze buffers
             freezeHw_i          => freezeHw(i),
             -- Time-stamp and bsa (if enabled it will be added to start of data)
-            timeStamp_i         => evrTrig.timeStamp,
-            bsa_i               => evrTrig.bsa,
-            dmod_i              => evrTrig.dmod,
+            timeStamp_i         => timingTrig.timeStamp,
+            bsa_i               => timingTrig.bsa,
+            dmod_i              => timingTrig.dmod,
             -- AXI-Lite Register Interface
             axilReadMaster      => axilReadMasters(DAQ_MUX0_INDEX_C+i),
             axilReadSlave       => axilReadSlaves(DAQ_MUX0_INDEX_C+i),
@@ -476,7 +440,7 @@ begin
          jesdUsrRst          => jesdUsrRst,
          -- DaqMux/Trig Interface (timingClk domain) 
          freezeHw            => freezeHw,
-         evrTrig             => evrTrig,
+         timingTrig          => timingTrig,
          trigHw              => trigHw,
          trigCascBay         => trigCascBay(1 downto 0),
          -- JESD SYNC Interface (jesdClk[1:0] domain)

@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2016-09-29
+-- Last update: 2018-02-15
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ entity AmcCarrierBsa is
       TPD_G                  : time                   := 1 ns;
       FSBL_G                 : boolean                := false;
       DISABLE_BSA_G          : boolean                := false;
+      DISABLE_BLD_G          : boolean                := false;
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4;
       AXI_ERROR_RESP_G       : slv(1 downto 0)        := AXI_RESP_DECERR_C);
    port (
@@ -71,7 +72,13 @@ entity AmcCarrierBsa is
       waveformClk          : in  sl;
       waveformRst          : in  sl;
       obAppWaveformMasters : in  WaveformMasterArrayType;
-      obAppWaveformSlaves  : out WaveformSlaveArrayType);
+      obAppWaveformSlaves  : out WaveformSlaveArrayType;
+
+      -- Timing ETH MSG Interface (axilClk domain)
+      ibEthMsgMaster  : in  AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
+      ibEthMsgSlave   : out AxiStreamSlaveType;
+      obEthMsgMaster  : out AxiStreamMasterType;
+      obEthMsgSlave   : in  AxiStreamSlaveType := AXI_STREAM_SLAVE_INIT_C );
 
 
 end AmcCarrierBsa;
@@ -93,11 +100,12 @@ architecture mapping of AmcCarrierBsa is
    -------------------------------------------------------------------------------------------------
    -- AXI Lite
    -------------------------------------------------------------------------------------------------
-   constant AXIL_MASTERS_C : integer := 3;
+   constant AXIL_MASTERS_C : integer := ite(DISABLE_BLD_G, 3, 4);
 
    constant BSA_BUFFER_AXIL_C : integer := 0;
    constant WAVEFORM_0_AXIL_C : integer := 1;
    constant WAVEFORM_1_AXIL_C : integer := 2;
+   constant BLD_AXIL_C        : integer := 3;
 
    constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
       genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, 20, 16);
@@ -157,6 +165,9 @@ architecture mapping of AmcCarrierBsa is
    signal waveform1AxiReadMaster  : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
    signal waveform1AxiReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
 
+   signal intEthMsgMaster : AxiStreamMasterType;
+   signal intEthMsgSlave  : AxiStreamSlaveType;
+   
 begin
 
    -- FSBL build has no BSA logic.
@@ -430,4 +441,31 @@ begin
 
    end generate BSA_GEN;
 
+   BLD_ENABLE_GEN : if not DISABLE_BLD_G generate
+     U_BLD : entity work.BldAxiStream
+       generic map ( TPD_G             => TPD_G,
+                     AXIL_ERROR_RESP_G => AXI_ERROR_RESP_G )
+       port map ( -- Diagnostic data interface
+         diagnosticClk   => diagnosticClk,
+         diagnosticRst   => diagnosticRst,
+         diagnosticBus   => diagnosticBus,
+         -- AXI Lite interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => locAxilReadMasters (BLD_AXIL_C),
+         axilReadSlave   => locAxilReadSlaves  (BLD_AXIL_C),
+         axilWriteMaster => locAxilWriteMasters(BLD_AXIL_C),
+         axilWriteSlave  => locAxilWriteSlaves (BLD_AXIL_C),
+         -- Timing ETH MSG Interface (axilClk domain)
+         ibEthMsgMaster  => ibEthMsgMaster,
+         ibEthMsgSlave   => ibEthMsgSlave,
+         obEthMsgMaster  => obEthMsgMaster,
+         obEthMsgSlave   => obEthMsgSlave );
+   end generate;
+
+   BLD_DISABLE_GEN : if DISABLE_BLD_G generate
+     obEthMsgMaster <= ibEthMsgMaster;
+     ibEthMsgSlave  <= obEthMsgSlave;
+   end generate;
+   
 end mapping;
