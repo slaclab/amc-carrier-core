@@ -170,7 +170,6 @@ architecture mapping of AppTop is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal evrTrig     : AppTopTrigType;
    signal trigCascBay : slv(2 downto 0);
    signal armCascBay  : slv(2 downto 0);
    signal trigHw      : slv(1 downto 0);

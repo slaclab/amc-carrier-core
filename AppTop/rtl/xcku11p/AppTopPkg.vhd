@@ -56,14 +56,6 @@ package AppTopPkg is
       8 => 9,
       9 => 8);
 
-   type AppTopTrigType is record
-      trigPulse : slv(15 downto 0);
-      timeStamp : slv(63 downto 0);
-      pulseId   : slv(31 downto 0);
-      bsa       : slv(127 downto 0);
-      dmod      : slv(191 downto 0);
-   end record;
-
    type DacSigCtrlType is record
       start : slv(9 downto 0);
    end record;
