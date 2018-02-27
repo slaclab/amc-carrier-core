@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-02-14
+-- Last update: 2018-02-15
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -37,9 +37,11 @@ entity AmcCarrierCoreAdv is
       RSSI_ILEAVE_EN_G       : boolean  := false;
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
+      DISABLE_BLD_G          : boolean  := false;  -- false = includes BLD engine, true = doesn't build the BLD engine
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
       TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
+      CORE_TRIGGERS_G        : integer  := 0;
       FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G             : AppType;
       WAVEFORM_TDATA_BYTES_G : positive := 4;
@@ -61,6 +63,7 @@ entity AmcCarrierCoreAdv is
       timingClk            : in    sl;
       timingRst            : in    sl;
       timingBus            : out   TimingBusType;
+      timingTrig           : out   TimingTrigType;
       timingPhy            : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
@@ -374,9 +377,11 @@ begin
          RSSI_ILEAVE_EN_G       => RSSI_ILEAVE_EN_G,
          SIM_SPEEDUP_G          => SIM_SPEEDUP_G,
          DISABLE_BSA_G          => DISABLE_BSA_G,
+         DISABLE_BLD_G          => DISABLE_BLD_G,
          RTM_ETH_G              => RTM_ETH_G,
          TIME_GEN_APP_G         => TIME_GEN_APP_G,
          TIME_GEN_EXTREF_G      => TIME_GEN_EXTREF_G,
+         CORE_TRIGGERS_G        => CORE_TRIGGERS_G,
          FSBL_G                 => FSBL_G)
       port map (
          -----------------------

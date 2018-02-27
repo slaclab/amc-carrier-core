@@ -175,6 +175,12 @@ AmcCarrierCore: &AmcCarrierCore
         stride: 8         
       description: "SwUdpServer"       
     ##################################################
+    TimingUdpServer:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x0A000820
+      description: "TimingUdpServer"       
+    ##################################################
     SwRssiServer:
       <<: *RssiCore
       at:

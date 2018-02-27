@@ -11,13 +11,14 @@
 #once AmcCarrierBsa.yaml
 #include BsaBufferControl.yaml
 #include BsaWaveformEngine.yaml
+#include BldAxiStream.yaml
 
 AmcCarrierBsa: &AmcCarrierBsa 
   name: AmcCarrierBsa
   class: MMIODev
   configPrio: 1
   description: AmcCarrier BSA Module
-  size: 0x30000
+  size: 0x40000
   #########
   children:
     BsaBufferControl:
@@ -30,3 +31,7 @@ AmcCarrierBsa: &AmcCarrierBsa
         offset: 0x00010000
         nelms: 2
         stride: 0x00010000
+    BldAxiStream:
+      <<: *BldAxiStream
+      at:
+        offset: 0x00030000

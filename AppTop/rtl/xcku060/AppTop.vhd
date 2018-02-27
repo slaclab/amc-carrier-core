@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-08-03
+-- Last update: 2018-02-17
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -37,7 +37,8 @@ entity AppTop is
       TPD_G                  : time                      := 1 ns;
       SIM_SPEEDUP_G          : boolean                   := false;
       SIMULATION_G           : boolean                   := false;
-      MR_LCLS_APP_G          : boolean                   := true;
+      DAQMUX_DECIMATOR_EN_G  : boolean                   := true;
+      MR_LCLS_APP_G          : boolean                   := false;
       WAVEFORM_TDATA_BYTES_G : positive                  := 4;
       TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";  -- "AXIL"
       AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
@@ -54,11 +55,7 @@ entity AppTop is
       SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 8);
       SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
       SIG_GEN_LANE_MODE_G    : Slv10Array(1 downto 0)    := (others => "0000000000");
-      SIG_GEN_RAM_CLK_G      : Slv10Array(1 downto 0)    := (others => "0000000000");
-      -- Triggering Generics
-      TRIG_SIZE_G            : positive range 1 to 16    := 3;
-      TRIG_DELAY_WIDTH_G     : integer range 1 to 32     := 32;
-      TRIG_PULSE_WIDTH_G     : integer range 1 to 32     := 32);
+      SIG_GEN_RAM_CLK_G      : Slv10Array(1 downto 0)    := (others => "0000000000") );
    port (
       ----------------------
       -- Top Level Interface
@@ -77,6 +74,7 @@ entity AppTop is
       timingPhy            : out   TimingPhyType;
       timingPhyClk         : in    sl;
       timingPhyRst         : in    sl;
+      timingTrig           : in    TimingTrigType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : out   sl;
       diagnosticRst        : out   sl;
@@ -197,8 +195,8 @@ architecture mapping of AppTop is
    signal debugValids : Slv4Array(1 downto 0);
    signal debugValues : sampleDataVectorArray(1 downto 0, 3 downto 0);
 
-   signal dataValids : Slv20Array(1 downto 0);
-   signal linkReady  : Slv20Array(1 downto 0);
+   signal dataValids : Slv24Array(1 downto 0);
+   signal linkReady  : Slv24Array(1 downto 0);
 
    signal dacSigCtrl   : DacSigCtrlArray(1 downto 0);
    signal dacSigStatus : DacSigStatusArray(1 downto 0);
@@ -239,38 +237,6 @@ begin
          mAxiReadSlaves      => axilReadSlaves);
 
    ---------------
-   -- Trigger Core
-   ---------------
-   U_Trig : entity work.AppTopTrig
-      generic map (
-         TPD_G              => TPD_G,
-         MR_LCLS_APP_G      => MR_LCLS_APP_G,
-         AXIL_BASE_ADDR_G   => AXI_CONFIG_C(TIMING_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         TRIG_SIZE_G        => TRIG_SIZE_G,
-         TRIG_DELAY_WIDTH_G => TRIG_DELAY_WIDTH_G,
-         TRIG_PULSE_WIDTH_G => TRIG_PULSE_WIDTH_G)
-      port map (
-         -- AXI-Lite Interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(TIMING_INDEX_C),
-         axilReadSlave   => axilReadSlaves(TIMING_INDEX_C),
-         axilWriteMaster => axilWriteMasters(TIMING_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(TIMING_INDEX_C),
-         -- Application Debug Interface (axilClk domain)
-         sAxisMaster     => obAppDbgMaster,
-         sAxisSlave      => obAppDbgSlave,
-         mAxisMaster     => obAppDebugMaster,
-         mAxisSlave      => obAppDebugSlave,
-         -- Timing Interface
-         recClk          => recTimingClk,
-         recRst          => recTimingRst,
-         timingBus_i     => timingBus,
-         -- Trigger pulse outputs (recClk domain)
-         evrTrig         => evrTrig);
-
-   ---------------
    -- DAQ MUX Core
    ---------------            
    trigCascBay(2) <= trigCascBay(0);    -- to make cross and use generate
@@ -285,10 +251,10 @@ begin
          generic map (
             TPD_G                  => TPD_G,
             AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
-            DECIMATOR_EN_G         => true,
+            DECIMATOR_EN_G         => DAQMUX_DECIMATOR_EN_G,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
-            BAY_INDEX_G            => ite((i=0),'0','1'),
-            N_DATA_IN_G            => 20,  -- 2 additional for the 8 lane interface
+            BAY_INDEX_G            => ite((i = 0), '0', '1'),
+            N_DATA_IN_G            => 24,
             N_DATA_OUT_G           => 4)
          port map (
             -- Clocks and Resets
@@ -307,15 +273,15 @@ begin
             -- Freeze buffers
             freezeHw_i          => freezeHw(i),
             -- Time-stamp and bsa (if enabled it will be added to start of data)
-            timeStamp_i         => evrTrig.timeStamp,
-            bsa_i               => evrTrig.bsa,
-            dmod_i              => evrTrig.dmod,
+            timeStamp_i         => timingTrig.timeStamp,
+            bsa_i               => timingTrig.bsa,
+            dmod_i              => timingTrig.dmod,
             -- AXI-Lite Register Interface
             axilReadMaster      => axilReadMasters(DAQ_MUX0_INDEX_C+i),
             axilReadSlave       => axilReadSlaves(DAQ_MUX0_INDEX_C+i),
             axilWriteMaster     => axilWriteMasters(DAQ_MUX0_INDEX_C+i),
             axilWriteSlave      => axilWriteSlaves(DAQ_MUX0_INDEX_C+i),
-            -- Sample data input 
+            -- ADC Input 
             sampleDataArr_i(0)  => adcValues(i, 0),
             sampleDataArr_i(1)  => adcValues(i, 1),
             sampleDataArr_i(2)  => adcValues(i, 2),
@@ -324,18 +290,25 @@ begin
             sampleDataArr_i(5)  => adcValues(i, 5),
             sampleDataArr_i(6)  => adcValues(i, 6),
             sampleDataArr_i(7)  => adcValues(i, 7),
-            sampleDataArr_i(8)  => dacValues(i, 0),
-            sampleDataArr_i(9)  => dacValues(i, 1),
-            sampleDataArr_i(10) => dacValues(i, 2),
-            sampleDataArr_i(11) => dacValues(i, 3),
-            sampleDataArr_i(12) => dacValues(i, 4),
-            sampleDataArr_i(13) => dacValues(i, 5),
-            sampleDataArr_i(14) => dacValues(i, 6),
-            sampleDataArr_i(15) => dacValues(i, 7),
-            sampleDataArr_i(16) => debugValues(i, 0),
-            sampleDataArr_i(17) => debugValues(i, 1),
-            sampleDataArr_i(18) => debugValues(i, 2),
-            sampleDataArr_i(19) => debugValues(i, 3),
+            sampleDataArr_i(8)  => adcValues(i, 8),
+            sampleDataArr_i(9)  => adcValues(i, 9),
+            -- DAC Input 
+            sampleDataArr_i(10) => dacValues(i, 0),
+            sampleDataArr_i(11) => dacValues(i, 1),
+            sampleDataArr_i(12) => dacValues(i, 2),
+            sampleDataArr_i(13) => dacValues(i, 3),
+            sampleDataArr_i(14) => dacValues(i, 4),
+            sampleDataArr_i(15) => dacValues(i, 5),
+            sampleDataArr_i(16) => dacValues(i, 6),
+            sampleDataArr_i(17) => dacValues(i, 7),
+            sampleDataArr_i(18) => dacValues(i, 8),
+            sampleDataArr_i(19) => dacValues(i, 9),
+            -- DBG Input             
+            sampleDataArr_i(20) => debugValues(i, 0),
+            sampleDataArr_i(21) => debugValues(i, 1),
+            sampleDataArr_i(22) => debugValues(i, 2),
+            sampleDataArr_i(23) => debugValues(i, 3),
+            -- MISC Interfaces
             sampleValidVec_i    => dataValids(i),
             linkReadyVec_i      => linkReady(i),
             -- Output AXI Streaming Interface (Has to be synced with waveform clk)
@@ -483,7 +456,7 @@ begin
          jesdUsrRst          => jesdUsrRst,
          -- DaqMux/Trig Interface (timingClk domain) 
          freezeHw            => freezeHw,
-         evrTrig             => evrTrig,
+         timingTrig          => timingTrig,
          trigHw              => trigHw,
          trigCascBay         => trigCascBay(1 downto 0),
          -- JESD SYNC Interface (jesdClk[1:0] domain)

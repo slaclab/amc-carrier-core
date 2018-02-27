@@ -2,7 +2,7 @@
 -- File       : AxiLiteGenRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-15
--- Last update: 2017-10-27
+-- Last update: 2018-02-20
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for Signal generator
 --               0x00      (RW)- Enable channels. Example: 0x7F enables all 7 channels (also used to align the lane) (NUM_SIG_GEN_G-1 downto 0)
@@ -33,15 +33,17 @@ use ieee.std_logic_arith.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.Jesd204bPkg.all;
+use work.AppTopPkg.all;
 
 entity DacSigGenReg is
    generic (
-      TPD_G            : time                       := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0)            := AXI_RESP_SLVERR_C;
-      AXI_ADDR_WIDTH_G : positive                   := 9;
-      ADDR_WIDTH_G     : integer range 1 to (2**24) := 9;
+      TPD_G            : time                            := 1 ns;
+      AXI_ERROR_RESP_G : slv(1 downto 0)                 := AXI_RESP_SLVERR_C;
+      AXI_ADDR_WIDTH_G : positive                        := 9;
+      ADDR_WIDTH_G     : integer range 1 to (2**24)      := 9;
+      RAM_CLK_G        : slv(DAC_SIG_WIDTH_C-1 downto 0) := (others => '0');  -- '0': jesdClk2x, '1': jesdClk
       -- Number of channels 
-      NUM_SIG_GEN_G    : natural range 1 to 10      := 6  -- 0 - Disabled
+      NUM_SIG_GEN_G    : natural range 1 to 10           := 6  -- 0 - Disabled
       );
    port (
       -- AXI Clk
@@ -54,9 +56,11 @@ entity DacSigGenReg is
       axilWriteMaster : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
 
-      -- JESD devClk
-      devClk_i : in sl;
-      devRst_i : in sl;
+      -- JESD Clocks and Resets
+      jesdClk   : in sl;
+      jesdRst   : in sl;
+      jesdClk2x : in sl;
+      jesdRst2x : in sl;
 
       -- Registers   
       enable_o    : out slv(NUM_SIG_GEN_G-1 downto 0);
@@ -116,6 +120,8 @@ architecture rtl of DacSigGenReg is
    signal s_overflowSync  : slv(NUM_SIG_GEN_G-1 downto 0);
    signal s_runningSync   : slv(NUM_SIG_GEN_G-1 downto 0);
 
+   signal devClk : slv(NUM_SIG_GEN_G-1 downto 0);
+   signal devRst : slv(NUM_SIG_GEN_G-1 downto 0);
 
 begin
 
@@ -247,60 +253,60 @@ begin
          dataOut => s_overflowSync);
 
    -- Output assignment and synchronization
-   Sync_OUT1 : entity work.SynchronizerVector
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => NUM_SIG_GEN_G)
-      port map (
-         clk     => devClk_i,
-         dataIn  => r.enable,
-         dataOut => enable_o);
+   GEN_VEC : for i in NUM_SIG_GEN_G-1 downto 0 generate
 
-   Sync_OUT2 : entity work.SynchronizerVector
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => NUM_SIG_GEN_G)
-      port map (
-         clk     => devClk_i,
-         dataIn  => r.mode,
-         dataOut => mode_o);
+      devClk(i) <= jesdClk2x when(RAM_CLK_G(i) = '0') else jesdClk;
+      devRst(i) <= jesdRst2x when(RAM_CLK_G(i) = '0') else jesdRst;
 
-   Sync_OUT3 : entity work.SynchronizerVector
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => NUM_SIG_GEN_G)
-      port map (
-         clk     => devClk_i,
-         dataIn  => r.sign,
-         dataOut => sign_o);
+      Sync_OUT1 : entity work.Synchronizer
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => devClk(i),
+            dataIn  => r.enable(i),
+            dataOut => enable_o(i));
 
-   Sync_OUT4 : entity work.SynchronizerVector
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => NUM_SIG_GEN_G)
-      port map (
-         clk     => devClk_i,
-         dataIn  => r.trigSw,
-         dataOut => trigSw_o);
+      Sync_OUT2 : entity work.Synchronizer
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => devClk(i),
+            dataIn  => r.mode(i),
+            dataOut => mode_o(i));
 
-   GEN_PERIOD_OUT : for i in NUM_SIG_GEN_G-1 downto 0 generate
+      Sync_OUT3 : entity work.Synchronizer
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => devClk(i),
+            dataIn  => r.sign(i),
+            dataOut => sign_o(i));
+
+      Sync_OUT4 : entity work.Synchronizer
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => devClk(i),
+            dataIn  => r.trigSw(i),
+            dataOut => trigSw_o(i));
+
       Sync_OUT5 : entity work.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 32)
          port map (
-            clk     => devClk_i,
+            clk     => devClk(i),
             dataIn  => r.period(i),
             dataOut => period_o(i));
-   end generate GEN_PERIOD_OUT;
 
-   Sync_OUT6 : entity work.SynchronizerVector
-      generic map (
-         TPD_G   => TPD_G,
-         WIDTH_G => NUM_SIG_GEN_G)
-      port map (
-         clk     => devClk_i,
-         dataIn  => r.holdLast,
-         dataOut => holdLast_o);
+      Sync_OUT6 : entity work.Synchronizer
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => devClk(i),
+            dataIn  => r.holdLast(i),
+            dataOut => holdLast_o(i));
+
+   end generate GEN_VEC;
 
 end rtl;
