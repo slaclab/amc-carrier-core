@@ -41,7 +41,7 @@ entity AmcCarrierCoreAdv is
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
       TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
-      CORE_TRIGGERS_G        : integer  := 0;
+      CORE_TRIGGERS_G        : integer  := 16;
       FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G             : AppType;
       WAVEFORM_TDATA_BYTES_G : positive := 4;

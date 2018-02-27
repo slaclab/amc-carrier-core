@@ -10,7 +10,6 @@
 #schemaversion 3.0.0
 #once AppTop.yaml
 #include AppCore.yaml
-#include AppTopTrig.yaml
 #include DaqMuxV2.yaml
 #include AppTopJesd.yaml
 #include DacSigGen.yaml
@@ -28,11 +27,6 @@ AppTop: &AppTop
       <<: *AppCore
       at:
         offset: 0x00000000  
-    ##################################################     
-    AppTopTrig:
-      <<: *AppTopTrig
-      at:
-        offset: 0x10000000 
     ##################################################     
     DaqMuxV2:
       <<: *DaqMuxV2

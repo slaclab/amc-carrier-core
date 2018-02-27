@@ -19,7 +19,6 @@
 
 import pyrogue as pr
 
-from AppTop.AppTopTrig import *
 from AppTop.AppTopJesd import *
 from DacSigGen.DacSigGen import *
 from DaqMuxV2.DaqMuxV2 import *
@@ -36,8 +35,6 @@ class AppTop(pr.Device):
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
-            numTrigPulse   = 0,
-            enableEvr      = True,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
@@ -55,13 +52,6 @@ class AppTop(pr.Device):
             numRxLanes   =  numRxLanes,
             numTxLanes   =  numTxLanes,
             expand       =  True,
-        ))
-
-        self.add(AppTopTrig(
-            offset       =  0x10000000, 
-            numTrigPulse =  numTrigPulse,
-            enableEvr    =  enableEvr,
-            expand       =  False,
         ))
 
         for i in range(2):

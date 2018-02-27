@@ -25,7 +25,7 @@ proc MyVersionCheck { } {
 set family [getFpgaFamily]
 
 # Check for submodule tagging
-if { [SubmoduleCheck {ruckus}             {1.5.11} ] < 0 } {exit -1}
+if { [SubmoduleCheck {ruckus}             {1.5.12} ] < 0 } {exit -1}
 if { [SubmoduleCheck {surf}               {1.6.7}  ] < 0 } {exit -1}
 if { [SubmoduleCheck {lcls-timing-core}   {1.9.0}  ] < 0 } {exit -1}
 

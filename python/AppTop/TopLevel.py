@@ -27,19 +27,18 @@ from AppTop import *
 
 class TopLevel(pr.Device):
     def __init__(   self, 
-            name         = "FpgaTopLevel", 
-            description  = "FPGA Top-Level", 
-            simGui       = False,
-            ipAddr       = "10.0.1.101",
-            numRxLanes   = [0,0],
-            numTxLanes   = [0,0],
-            numSigGen    = [0,0],
-            sizeSigGen   = [0,0],
-            modeSigGen   = [False,False],
-            numTrigPulse = 0,
-            enableBsa    = False,
-            enableMps    = False,
-            enableEvr    = False,
+            name            = "FpgaTopLevel", 
+            description     = "FPGA Top-Level", 
+            simGui          = False,
+            ipAddr          = "10.0.1.101",
+            numRxLanes      = [0,0],
+            numTxLanes      = [0,0],
+            numSigGen       = [0,0],
+            sizeSigGen      = [0,0],
+            modeSigGen      = [False,False],
+            enableBsa       = False,
+            enableMps       = False,
+            interleaveRSSI  = False,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
@@ -55,21 +54,36 @@ class TopLevel(pr.Device):
             dataWriter = pyrogue.utilities.fileio.StreamWriter(name='dataWriter')
             self.add(dataWriter)
             
-            # Create SRP/ASYNC_MSG interface
-            #  - This system uses UDP(port 8193, size 1500) + RSSI + Pack and SRP v3
+            # Create SRPv3 module
             srp = rogue.protocols.srp.SrpV3()
-            udp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1500 )
             
-            # Connect the SRPv3 to tDest = 0x0
-            pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
+            # Check for interleaving
+            if (interleaveRSSI):
+                
+                # Create Interleaved RSSI interface
+                rudp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1024, packVer = 2)              
+                    
+                # Connect the SRPv3 to tDest = 0x0
+                pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )                    
+                 
+                # Add data streams
+                for i in range(8):
+                    pyrogue.streamConnect(rudp.application(0x80 + i), dataWriter.getChannel(i))   
+                 
+            else:
+            
+                # Create SRP/ASYNC_MSG interface
+                udp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1024, packVer = 1)
+                
+                # Connect the SRPv3 to tDest = 0x0
+                pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
 
-            # Create stream interface
-            # - This system uses UDP(port 8194, size 1500) + RSSI + Pack
-            udpStream = self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1500 )
+                # Create stream interface
+                udpStream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1024, packVer = 1)
             
-            # Add data streams
-            for i in range(8):
-                pyrogue.streamConnect(udpStream.application(0x80 + i), dataWriter.getChannel(i))            
+                # Add data streams
+                for i in range(8):
+                    pyrogue.streamConnect(udpStream.application(0x80 + i), dataWriter.getChannel(i))            
         
         # Add devices
         self.add(AmcCarrierCore(    
@@ -86,8 +100,6 @@ class TopLevel(pr.Device):
             numSigGen    =  numSigGen,
             sizeSigGen   =  sizeSigGen,
             modeSigGen   =  modeSigGen,
-            numTrigPulse =  numTrigPulse,
-            enableEvr    =  enableEvr,
         ))
 
         # Define SW trigger command
