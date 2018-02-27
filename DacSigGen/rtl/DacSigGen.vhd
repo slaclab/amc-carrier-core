@@ -2,7 +2,7 @@
 -- File       : DacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2017-08-24
+-- Last update: 2018-02-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -124,12 +124,15 @@ begin
             TPD_G            => TPD_G,
             AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             ADDR_WIDTH_G     => SIG_GEN_ADDR_WIDTH_G,
+            RAM_CLK_G        => SIG_GEN_RAM_CLK_G,
             NUM_SIG_GEN_G    => SIG_GEN_SIZE_G)
          port map (
             axiClk_i        => axilClk,
             axiRst_i        => axilRst,
-            devClk_i        => jesdClk2x,
-            devRst_i        => jesdRst2x,
+            jesdClk         => jesdClk,
+            jesdRst         => jesdRst,
+            jesdClk2x       => jesdClk2x,
+            jesdRst2x       => jesdRst2x,
             axilReadMaster  => axilReadMasters(0),
             axilReadSlave   => axilReadSlaves(0),
             axilWriteMaster => axilWriteMasters(0),

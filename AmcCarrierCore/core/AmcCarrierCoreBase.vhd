@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-06-22
+-- Last update: 2018-02-15
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -53,6 +53,7 @@ entity AmcCarrierCoreBase is
       timingClk            : in    sl;
       timingRst            : in    sl;
       timingBus            : out   TimingBusType;
+      timingTrig           : out   TimingTrigType;
       timingPhy            : in    TimingPhyType                    := TIMING_PHY_INIT_C;  -- Input for timing generator only
       timingPhyClk         : out   sl;
       timingPhyRst         : out   sl;
@@ -249,6 +250,7 @@ architecture mapping of AmcCarrierCoreBase is
          \timingBusIntf[v1][gtRxDispErr]\                 : out   std_logic_vector (1 downto 0);
          \timingBusIntf[v1][gtRxDecErr]\                  : out   std_logic_vector (1 downto 0);
          \timingBusIntf[v2][linkUp]\                      : out   std_logic;
+         timingTrig                                       : out   std_logic_vector (15 downto 0); --placeholder
          \timingPhy[dataK]\                               : in    std_logic_vector (1 downto 0);
          \timingPhy[data]\                                : in    std_logic_vector (15 downto 0);
          \timingPhy[control][reset]\                      : in    std_logic;
