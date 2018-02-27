@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-02-17
+-- Last update: 2018-02-27
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -55,7 +55,7 @@ entity AppTop is
       SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 8);
       SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
       SIG_GEN_LANE_MODE_G    : Slv10Array(1 downto 0)    := (others => "0000000000");
-      SIG_GEN_RAM_CLK_G      : Slv10Array(1 downto 0)    := (others => "0000000000") );
+      SIG_GEN_RAM_CLK_G      : Slv10Array(1 downto 0)    := (others => "0000000000"));
    port (
       ----------------------
       -- Top Level Interface
@@ -213,6 +213,21 @@ begin
    --------------------------
    timingClk <= recTimingClk when(TIMING_BUS_DOMAIN_G = "REC_CLK") else axilClk;
    timingRst <= recTimingRst when(TIMING_BUS_DOMAIN_G = "REC_CLK") else axilRst;
+
+   -------------------------------
+   -- Terminating legacy interface
+   -------------------------------
+   U_AxiLiteEmpty : entity work.AxiLiteEmpty
+      generic map (
+         TPD_G            => TPD_G,
+         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+      port map (
+         axiClk         => axilClk,
+         axiClkRst      => axilRst,
+         axiReadMaster  => axilReadMasters(TIMING_INDEX_C),
+         axiReadSlave   => axilReadSlaves(TIMING_INDEX_C),
+         axiWriteMaster => axilWriteMasters(TIMING_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(TIMING_INDEX_C));
 
    ---------------------
    -- AXI-Lite Crossbar
