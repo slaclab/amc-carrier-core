@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-11-03
+-- Last update: 2018-02-15
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -37,9 +37,11 @@ entity AmcCarrierCore is
       RSSI_ILEAVE_EN_G       : boolean  := false;
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
+      DISABLE_BLD_G          : boolean  := false;  -- false = includes BLD engine, true = doesn't build the BLD engine
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
       TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
+      CORE_TRIGGERS_G        : integer  := 0;
       FSBL_G                 : boolean  := false);  -- false = Normal Operation, true = First Stage Boot loader
    port (
       -----------------------
@@ -54,6 +56,7 @@ entity AmcCarrierCore is
       timingPhyRst         : out   sl;
       timingRefClk         : out   sl;
       timingRefClkDiv2     : out   sl;
+      timingTrig           : out   TimingTrigType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -184,6 +187,8 @@ architecture mapping of AmcCarrierCore is
    signal obTimingEthMsgSlave  : AxiStreamSlaveType;
    signal ibTimingEthMsgMaster : AxiStreamMasterType;
    signal ibTimingEthMsgSlave  : AxiStreamSlaveType;
+   signal intTimingEthMsgMaster : AxiStreamMasterType;
+   signal intTimingEthMsgSlave  : AxiStreamSlaveType;
 
    signal gtClk   : sl;
    signal fabClk  : sl;
@@ -347,6 +352,8 @@ begin
          TPD_G             => TPD_G,
          TIME_GEN_APP_G    => TIME_GEN_APP_G,
          TIME_GEN_EXTREF_G => TIME_GEN_EXTREF_G,
+         NTRIGGERS_G       => CORE_TRIGGERS_G,
+         STREAM_L1_G       => true,
          AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
       port map (
          -- AXI-Lite Interface (axilClk domain)
@@ -357,8 +364,8 @@ begin
          axilWriteMaster      => timingWriteMaster,
          axilWriteSlave       => timingWriteSlave,
          -- Timing ETH MSG Interface (axilClk domain)
-         obTimingEthMsgMaster => obTimingEthMsgMaster,
-         obTimingEthMsgSlave  => obTimingEthMsgSlave,
+         obTimingEthMsgMaster => intTimingEthMsgMaster,
+         obTimingEthMsgSlave  => intTimingEthMsgSlave,
          ibTimingEthMsgMaster => ibTimingEthMsgMaster,
          ibTimingEthMsgSlave  => ibTimingEthMsgSlave,
          ----------------------
@@ -370,6 +377,7 @@ begin
          appTimingClk         => timingClk,
          appTimingRst         => timingRst,
          appTimingBus         => timingBusIntf,
+         appTimingTrig        => timingTrig,
          appTimingPhy         => timingPhy,
          appTimingPhyClk      => timingPhyClk,
          appTimingPhyRst      => timingPhyRst,
@@ -397,6 +405,7 @@ begin
          TPD_G                  => TPD_G,
          FSBL_G                 => FSBL_G,
          DISABLE_BSA_G          => DISABLE_BSA_G,
+         DISABLE_BLD_G          => DISABLE_BLD_G,
          WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
          AXI_ERROR_RESP_G       => AXI_ERROR_RESP_C)
       port map (
@@ -430,7 +439,12 @@ begin
          waveformClk          => axiClk,
          waveformRst          => axiRst,
          obAppWaveformMasters => obAppWaveformMasters,
-         obAppWaveformSlaves  => obAppWaveformSlaves);
+         obAppWaveformSlaves  => obAppWaveformSlaves,
+         -- Timing ETH MSG Interface (axilClk domain)
+         ibEthMsgMaster       => intTimingEthMsgMaster,
+         ibEthMsgSlave        => intTimingEthMsgSlave,
+         obEthMsgMaster       => obTimingEthMsgMaster,
+         obEthMsgSlave        => obTimingEthMsgSlave );
 
    ------------------
    -- DDR Memory Core

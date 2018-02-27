@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2017-08-03
+-- Last update: 2018-02-17
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -34,31 +34,29 @@ use work.AppTopPkg.all;
 entity AppTop is
    generic (
       -- General Generics
-      TPD_G                : time                      := 1 ns;
-      SIM_SPEEDUP_G        : boolean                   := false;
-      SIMULATION_G         : boolean                   := false;
-      MR_LCLS_APP_G        : boolean                   := true;
-      TIMING_BUS_DOMAIN_G  : string                    := "REC_CLK";  -- "AXIL"
-      AXI_ERROR_RESP_G     : slv(1 downto 0)           := AXI_RESP_DECERR_C;
+      TPD_G                  : time                      := 1 ns;
+      SIM_SPEEDUP_G          : boolean                   := false;
+      SIMULATION_G           : boolean                   := false;
+      DAQMUX_DECIMATOR_EN_G  : boolean                   := true;
+      MR_LCLS_APP_G          : boolean                   := false;
+      WAVEFORM_TDATA_BYTES_G : positive                  := 4;
+      TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";  -- "AXIL"
+      AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
-      JESD_DRP_EN_G        : boolean                   := false;
-      JESD_RX_LANE_G       : NaturalArray(1 downto 0)  := (others => 0);
-      JESD_TX_LANE_G       : NaturalArray(1 downto 0)  := (others => 0);
-      JESD_RX_POLARITY_G   : Slv7Array(1 downto 0)     := (others => "0000000");
-      JESD_TX_POLARITY_G   : Slv7Array(1 downto 0)     := (others => "0000000");
-      JESD_RX_ROUTES_G     : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
-      JESD_TX_ROUTES_G     : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
-      JESD_REF_SEL_G       : Slv2Array(1 downto 0)     := (others => DEV_CLK2_SEL_C);
-      JESD_USR_DIV_G       : natural                   := 4;
+      JESD_DRP_EN_G          : boolean                   := false;
+      JESD_RX_LANE_G         : NaturalArray(1 downto 0)  := (others => 0);
+      JESD_TX_LANE_G         : NaturalArray(1 downto 0)  := (others => 0);
+      JESD_RX_POLARITY_G     : Slv7Array(1 downto 0)     := (others => "0000000");
+      JESD_TX_POLARITY_G     : Slv7Array(1 downto 0)     := (others => "0000000");
+      JESD_RX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
+      JESD_TX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
+      JESD_REF_SEL_G         : Slv2Array(1 downto 0)     := (others => DEV_CLK2_SEL_C);
+      JESD_USR_DIV_G         : natural                   := 4;
       -- Signal Generator Generics
-      SIG_GEN_SIZE_G       : NaturalArray(1 downto 0)  := (others => 0);
-      SIG_GEN_ADDR_WIDTH_G : PositiveArray(1 downto 0) := (others => 9);
-      SIG_GEN_LANE_MODE_G  : Slv7Array(1 downto 0)     := (others => "0000000");
-      SIG_GEN_RAM_CLK_G    : Slv7Array(1 downto 0)     := (others => "0000000");
-      -- Triggering Generics
-      TRIG_SIZE_G          : positive range 1 to 16    := 3;
-      TRIG_DELAY_WIDTH_G   : integer range 1 to 32     := 32;
-      TRIG_PULSE_WIDTH_G   : integer range 1 to 32     := 32);
+      SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 0);
+      SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
+      SIG_GEN_LANE_MODE_G    : Slv7Array(1 downto 0)     := (others => "0000000");
+      SIG_GEN_RAM_CLK_G      : Slv7Array(1 downto 0)     := (others => "0000000") );
    port (
       ----------------------
       -- Top Level Interface
@@ -77,6 +75,7 @@ entity AppTop is
       timingPhy            : out   TimingPhyType;
       timingPhyClk         : in    sl;
       timingPhyRst         : in    sl;
+      timingTrig           : in    TimingTrigType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : out   sl;
       diagnosticRst        : out   sl;
@@ -172,7 +171,6 @@ architecture mapping of AppTop is
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   signal evrTrig     : AppTopTrigType;
    signal trigCascBay : slv(2 downto 0);
    signal armCascBay  : slv(2 downto 0);
    signal trigHw      : slv(1 downto 0);
@@ -239,38 +237,6 @@ begin
          mAxiReadSlaves      => axilReadSlaves);
 
    ---------------
-   -- Trigger Core
-   ---------------
-   U_Trig : entity work.AppTopTrig
-      generic map (
-         TPD_G              => TPD_G,
-         MR_LCLS_APP_G      => MR_LCLS_APP_G,
-         AXIL_BASE_ADDR_G   => AXI_CONFIG_C(TIMING_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
-         TRIG_SIZE_G        => TRIG_SIZE_G,
-         TRIG_DELAY_WIDTH_G => TRIG_DELAY_WIDTH_G,
-         TRIG_PULSE_WIDTH_G => TRIG_PULSE_WIDTH_G)
-      port map (
-         -- AXI-Lite Interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(TIMING_INDEX_C),
-         axilReadSlave   => axilReadSlaves(TIMING_INDEX_C),
-         axilWriteMaster => axilWriteMasters(TIMING_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(TIMING_INDEX_C),
-         -- Application Debug Interface (axilClk domain)
-         sAxisMaster     => obAppDbgMaster,
-         sAxisSlave      => obAppDbgSlave,
-         mAxisMaster     => obAppDebugMaster,
-         mAxisSlave      => obAppDebugSlave,
-         -- Timing Interface
-         recClk          => recTimingClk,
-         recRst          => recTimingRst,
-         timingBus_i     => timingBus,
-         -- Trigger pulse outputs (recClk domain)
-         evrTrig         => evrTrig);
-
-   ---------------
    -- DAQ MUX Core
    ---------------            
    trigCascBay(2) <= trigCascBay(0);    -- to make cross and use generate
@@ -283,11 +249,13 @@ begin
       ------------------
       U_DaqMuxV2 : entity work.DaqMuxV2
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            BAY_INDEX_G      => ite((i=0),'0','1'),
-            N_DATA_IN_G      => 18,
-            N_DATA_OUT_G     => 4)
+            TPD_G                  => TPD_G,
+            AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
+            DECIMATOR_EN_G         => DAQMUX_DECIMATOR_EN_G,
+            WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
+            BAY_INDEX_G            => ite((i = 0), '0', '1'),
+            N_DATA_IN_G            => 18,
+            N_DATA_OUT_G           => 4)
          port map (
             -- Clocks and Resets
             axiClk              => axilClk,
@@ -305,9 +273,9 @@ begin
             -- Freeze buffers
             freezeHw_i          => freezeHw(i),
             -- Time-stamp and bsa (if enabled it will be added to start of data)
-            timeStamp_i         => evrTrig.timeStamp,
-            bsa_i               => evrTrig.bsa,
-            dmod_i              => evrTrig.dmod,
+            timeStamp_i         => timingTrig.timeStamp,
+            bsa_i               => timingTrig.bsa,
+            dmod_i              => timingTrig.dmod,
             -- AXI-Lite Register Interface
             axilReadMaster      => axilReadMasters(DAQ_MUX0_INDEX_C+i),
             axilReadSlave       => axilReadSlaves(DAQ_MUX0_INDEX_C+i),
@@ -472,7 +440,7 @@ begin
          jesdUsrRst          => jesdUsrRst,
          -- DaqMux/Trig Interface (timingClk domain) 
          freezeHw            => freezeHw,
-         evrTrig             => evrTrig,
+         timingTrig          => timingTrig,
          trigHw              => trigHw,
          trigCascBay         => trigCascBay(1 downto 0),
          -- JESD SYNC Interface (jesdClk[1:0] domain)

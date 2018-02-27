@@ -2,7 +2,7 @@
 -- File       : AmcCarrierTiming.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-11-03
+-- Last update: 2018-02-17
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -26,6 +26,7 @@ use work.SsiPkg.all;
 use work.AxiPkg.all;
 use work.AxiLitePkg.all;
 use work.TimingPkg.all;
+use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
 
@@ -37,6 +38,8 @@ entity AmcCarrierTiming is
       TPD_G             : time            := 1 ns;
       TIME_GEN_APP_G    : boolean         := false;
       TIME_GEN_EXTREF_G : boolean         := false;
+      NTRIGGERS_G       : integer         := 4;
+      STREAM_L1_G       : boolean         := true;
       AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C;
       RX_CLK_MMCM_G     : boolean         := false);
    port (
@@ -48,10 +51,10 @@ entity AmcCarrierTiming is
       axilWriteMaster      : in  AxiLiteWriteMasterType;
       axilWriteSlave       : out AxiLiteWriteSlaveType;
       -- Timing ETH MSG Interface (axilClk domain)
-      obTimingEthMsgMaster : in  AxiStreamMasterType;
-      obTimingEthMsgSlave  : out AxiStreamSlaveType;
-      ibTimingEthMsgMaster : out AxiStreamMasterType;
-      ibTimingEthMsgSlave  : in  AxiStreamSlaveType;
+      ibTimingEthMsgMaster : in  AxiStreamMasterType;
+      ibTimingEthMsgSlave  : out AxiStreamSlaveType;
+      obTimingEthMsgMaster : out AxiStreamMasterType;
+      obTimingEthMsgSlave  : in  AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
       ----------------------      
@@ -66,6 +69,7 @@ entity AmcCarrierTiming is
       appTimingPhyRst      : out sl;
       appTimingRefClk      : out sl;
       appTimingRefClkDiv2  : out sl;
+      appTimingTrig        : out TimingTrigType;
       ----------------
       -- Core Ports --
       ----------------   
@@ -83,15 +87,24 @@ end AmcCarrierTiming;
 
 architecture mapping of AmcCarrierTiming is
 
-   constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(1 downto 0) := (
+   constant AXIL_CORE_INDEX_C : integer := 0;
+   constant AXIL_GTH_INDEX_C  : integer := 1;
+   constant AXIL_TRIG_INDEX_C : integer := 2;
+   constant NUM_AXIL_MASTERS_C : integer := ite(NTRIGGERS_G>0, 3, 2);
+   
+   constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(2 downto 0) := (
       0               => (
          baseAddr     => (TIMING_ADDR_C+x"00000000"),
-         addrBits     => 23,
+         addrBits     => 18,
          connectivity => x"FFFF"),
       1               => (
          baseAddr     => (TIMING_ADDR_C+x"00800000"),
          addrBits     => 23,
-         connectivity => x"FFFF"));
+         connectivity => x"FFFF"),
+      2               => (
+         baseAddr     => (TIMING_ADDR_C+x"00040000"),
+         addrBits     => 18,
+         connectivity => X"FFFF") );
 
    signal timingRefClk   : sl;
    signal timingRefDiv2   : sl;
@@ -120,16 +133,15 @@ architecture mapping of AmcCarrierTiming is
    signal loopback       : slv(2 downto 0);
    signal refclksel      : slv(2 downto 0);
    signal appBus         : TimingBusType;
+   signal appExptBus     : ExptBusType;
+   signal appTimingMode  : sl;
 
-   signal axilWriteMasters : AxiLiteWriteMasterArray(1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(1 downto 0);
-   signal axilReadMasters  : AxiLiteReadMasterArray(1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
+   signal axilWriteMasters : AxiLiteWriteMasterArray(2 downto 0) := (others=>AXI_LITE_WRITE_MASTER_INIT_C);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray (2 downto 0) := (others=>AXI_LITE_WRITE_SLAVE_INIT_C);
+   signal axilReadMasters  : AxiLiteReadMasterArray (2 downto 0) := (others=>AXI_LITE_READ_MASTER_INIT_C);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray  (2 downto 0) := (others=>AXI_LITE_READ_SLAVE_INIT_C);
 
 begin
-
-   obTimingEthMsgSlave  <= AXI_STREAM_SLAVE_FORCE_C;
-   ibTimingEthMsgMaster <= AXI_STREAM_MASTER_INIT_C;
 
    --------------------------
    -- AXI-Lite: Crossbar Core
@@ -139,8 +151,8 @@ begin
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 2,
-         MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
+         NUM_MASTER_SLOTS_G => NUM_AXIL_MASTERS_C,
+         MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C(NUM_AXIL_MASTERS_C-1 downto 0))
       port map (
          axiClk              => axilClk,
          axiClkRst           => axilRst,
@@ -148,10 +160,10 @@ begin
          sAxiWriteSlaves(0)  => axilWriteSlave,
          sAxiReadMasters(0)  => axilReadMaster,
          sAxiReadSlaves(0)   => axilReadSlave,
-         mAxiWriteMasters    => axilWriteMasters,
-         mAxiWriteSlaves     => axilWriteSlaves,
-         mAxiReadMasters     => axilReadMasters,
-         mAxiReadSlaves      => axilReadSlaves);
+         mAxiWriteMasters    => axilWriteMasters(NUM_AXIL_MASTERS_C-1 downto 0),
+         mAxiWriteSlaves     => axilWriteSlaves (NUM_AXIL_MASTERS_C-1 downto 0),
+         mAxiReadMasters     => axilReadMasters (NUM_AXIL_MASTERS_C-1 downto 0),
+         mAxiReadSlaves      => axilReadSlaves  (NUM_AXIL_MASTERS_C-1 downto 0));
 
    recTimingClk <= timingRecClk;
    recTimingRst <= not(rxStatus.resetDone);
@@ -206,15 +218,15 @@ begin
    TimingGthCoreWrapper_1 : entity work.TimingGthCoreWrapper
       generic map (
          TPD_G            => TPD_G,
-         AXIL_BASE_ADDR_G => AXI_CROSSBAR_MASTERS_CONFIG_C(1).baseAddr,
+         AXIL_BASE_ADDR_G => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_GTH_INDEX_C).baseAddr,
          EXTREF_G         => TIME_GEN_EXTREF_G)
       port map (
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(1),
-         axilReadSlave   => axilReadSlaves(1),
-         axilWriteMaster => axilWriteMasters(1),
-         axilWriteSlave  => axilWriteSlaves(1),
+         axilReadMaster  => axilReadMasters (AXIL_GTH_INDEX_C),
+         axilReadSlave   => axilReadSlaves  (AXIL_GTH_INDEX_C),
+         axilWriteMaster => axilWriteMasters(AXIL_GTH_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves (AXIL_GTH_INDEX_C),
          stableClk       => axilClk,
          gtRefClk        => timingRefClk,
          gtRefClkDiv2    => timingRefClkDiv2,
@@ -292,7 +304,9 @@ begin
       generic map (
          TPD_G             => TPD_G,
          TPGEN_G           => TIME_GEN_APP_G,
-         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(0).baseAddr,
+         STREAM_L1_G       => STREAM_L1_G,
+         ETHMSG_AXIS_CFG_G => EMAC_AXIS_CONFIG_C,
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr,
          AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
       port map (
          gtTxUsrClk      => txUsrClk,
@@ -307,15 +321,21 @@ begin
          gtLoopback      => loopback,
          appTimingClk    => appTimingClk,
          appTimingRst    => appTimingRst,
+         appTimingMode   => appTimingMode,
          appTimingBus    => appBus,
+         exptBus         => appExptBus,
          timingPhy       => coreTimingPhy,
          timingClkSel    => timingClockSel,
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters(0),
-         axilReadSlave   => axilReadSlaves(0),
-         axilWriteMaster => axilWriteMasters(0),
-         axilWriteSlave  => axilWriteSlaves(0));
+         axilReadMaster  => axilReadMasters (AXIL_CORE_INDEX_C),
+         axilReadSlave   => axilReadSlaves  (AXIL_CORE_INDEX_C),
+         axilWriteMaster => axilWriteMasters(AXIL_CORE_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves (AXIL_CORE_INDEX_C),
+         obEthMsgMaster  => obTimingEthMsgMaster,
+         obEthMsgSlave   => obTimingEthMsgSlave,
+         ibEthMsgMaster  => ibTimingEthMsgMaster,
+         ibEthMsgSlave   => ibTimingEthMsgSlave );
 
    process(appTimingClk)
    begin
@@ -335,5 +355,31 @@ begin
          I => timingClockSel,
          O => timingClkSel);
 
+   --
+   --  Core Triggers
+   --
+   GEN_CORETRIG : if NTRIGGERS_G > 0 generate
+     U_CoreTrig : entity work.EvrV2CoreTriggers
+       generic map ( TPD_G           => TPD_G,
+                     NCHANNELS_G     => NTRIGGERS_G,
+                     NTRIGGERS_G     => NTRIGGERS_G,
+                     TRIG_DEPTH_G    => 19,  -- bitSize(125MHz/360Hz)
+                     COMMON_CLK_G    => false,
+                     AXIL_BASEADDR_G => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_TRIG_INDEX_C).baseAddr )
+       port map ( axilClk          => axilClk,
+                  axilRst          => axilRst,
+                  axilWriteMaster  => axilWriteMasters(AXIL_TRIG_INDEX_C),
+                  axilWriteSlave   => axilWriteSlaves (AXIL_TRIG_INDEX_C),
+                  axilReadMaster   => axilReadMasters (AXIL_TRIG_INDEX_C),
+                  axilReadSlave    => axilReadSlaves  (AXIL_TRIG_INDEX_C),
+                  evrClk           => appTimingClk,
+                  evrRst           => appTimingRst,
+                  evrBus           => appBus,
+                  exptBus          => appExptBus,
+                  trigOut          => appTimingTrig,
+                  evrModeSel       => appTimingMode );
+   end generate;
+     
+   
 
 end mapping;
