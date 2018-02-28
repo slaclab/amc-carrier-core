@@ -61,7 +61,7 @@ class TopLevel(pr.Device):
             if (interleaveRSSI):
                 
                 # Create Interleaved RSSI interface
-                rudp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1024, packVer = 2)              
+                rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1024, packVer = 2)              
                     
                 # Connect the SRPv3 to tDest = 0x0
                 pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )                    
@@ -79,7 +79,7 @@ class TopLevel(pr.Device):
                 pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
 
                 # Create stream interface
-                udpStream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1024)
+                udpStream = self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1024)
             
                 # Add data streams
                 for i in range(8):
