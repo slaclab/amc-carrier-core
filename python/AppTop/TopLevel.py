@@ -73,13 +73,13 @@ class TopLevel(pr.Device):
             else:
             
                 # Create SRP/ASYNC_MSG interface
-                udp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1024, packVer = 1)
+                udp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1024)
                 
                 # Connect the SRPv3 to tDest = 0x0
                 pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
 
                 # Create stream interface
-                udpStream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1024, packVer = 1)
+                udpStream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1024)
             
                 # Add data streams
                 for i in range(8):
