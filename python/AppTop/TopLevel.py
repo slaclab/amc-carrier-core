@@ -32,9 +32,8 @@ class TopLevel(pr.Device):
             description     = "Container for FPGA Top-Level", 
             # Communication Parameters
             simGui          = False,
-            commType        = "eth",
+            commType        = "eth-rssi-non-interleaved",
             ipAddr          = "10.0.1.101",
-            interleave      = False,
             pcieRssiLink    = 0,
             # JESD Parameters
             numRxLanes      = [0,0],
@@ -65,36 +64,33 @@ class TopLevel(pr.Device):
             srp = rogue.protocols.srp.SrpV3()
 
             # Determine if ETH or PCIe communication:
-            if (commType=="eth"):
+            if ( commType=="eth-rssi-non-interleaved" ):
+            
+                # Create SRP/ASYNC_MSG interface
+                udp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1400)
 
-                # Check for interleaving
-                if (interleave):
+                # Connect the SRPv3 to tDest = 0x0
+                pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
 
-                    # Create Interleaved RSSI interface
-                    rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1400, packVer = 2)
+                # Create stream interface
+                udpStream = self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1400)
 
-                    # Connect the SRPv3 to tDest = 0x0
-                    pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
+                # Add data streams
+                for i in range(8):
+                    pyrogue.streamConnect(udpStream.application(0x80 + i), dataWriter.getChannel(i))            
+            
+            elif ( commType=="eth-rssi-interleaved" ):
 
-                    # Add data streams
-                    for i in range(8):
-                        pyrogue.streamConnect(rudp.application(0x80 + i), dataWriter.getChannel(i))
+                # Create Interleaved RSSI interface
+                rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1400, packVer = 2)
 
-                else:
+                # Connect the SRPv3 to tDest = 0x0
+                pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
 
-                    # Create SRP/ASYNC_MSG interface
-                    udp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1400)
-
-                    # Connect the SRPv3 to tDest = 0x0
-                    pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
-
-                    # Create stream interface
-                    udpStream = self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1400)
-
-                    # Add data streams
-                    for i in range(8):
-                        pyrogue.streamConnect(udpStream.application(0x80 + i), dataWriter.getChannel(i))
-
+                # Add data streams
+                for i in range(8):
+                    pyrogue.streamConnect(rudp.application(0x80 + i), dataWriter.getChannel(i))
+                    
             elif ( commType == 'pcie' ):
 
                 #########################################################################################
