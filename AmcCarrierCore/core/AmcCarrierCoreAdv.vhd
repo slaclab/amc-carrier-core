@@ -396,6 +396,7 @@ begin
          timingPhyRst         => timingPhyRst,
          timingRefClk         => timingRefClk,
          timingRefClkDiv2     => timingRefClkDiv2,
+         timingTrig           => timingTrig,
          -- Diagnostic Interface (diagnosticClk domain)
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
