@@ -128,6 +128,10 @@ set_property -dict { IOSTANDARD LVDS} [get_ports {syncInN[1][0]}] ; # dacDckN[1]
 set_property -dict { IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][0]}] ; # timingTrig[1]
 set_property -dict { IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][4]}] ; # fpgaInterlock[1]
 
+# I2C Temp Sensors
+set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports { spareN[1][1] }] ; # SCL @ P13.PIN150
+set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports { spareN[1][0] }] ; # SDA @ P13.PIN147
+
 # Adding placement constraints on the LVDS DAC's ODDRE1 & ODELAYE3 module
 set_property LOC BITSLICE_RX_TX_X0Y229 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[0].OutputTapDelay_INST/U_ODELAYE3}]
 set_property LOC BITSLICE_RX_TX_X0Y166 [get_cells {U_AppTop/U_AppCore/U_AMC1/GEN_DLY_OUT[1].OutputTapDelay_INST/U_ODELAYE3}]
