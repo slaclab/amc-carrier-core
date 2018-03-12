@@ -51,7 +51,7 @@ AmcMrLlrfDownConvert: &AmcMrLlrfDownConvert
       at:
         offset: 0x00010000 
         nelms:  4
-        stride: 0x00000200 
+        stride: 0x00000400 
     ##################################################     
     Adc16Dx370:
       <<: *Adc16Dx370

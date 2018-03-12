@@ -80,6 +80,10 @@ set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareN[0][12]}] ; # dacCsL
 set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareP[0][12]}] ; # dacCsL_o[0][1]
 set_property -dict { IOSTANDARD LVCMOS18} [get_ports {spareN[0][13]}] ; # dacCsL_o[0][2]
 
+# I2C Temp Sensors
+set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports { spareN[0][1] }] ; # SCL @ P11.PIN150
+set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports { spareN[0][0] }] ; # SDA @ P11.PIN147
+
 # Spare LMK clocks
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncInP[0][2]}] ; # lmkDclk10P[0]
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncInN[0][2]}] ; # lmkDclk10N[0]
