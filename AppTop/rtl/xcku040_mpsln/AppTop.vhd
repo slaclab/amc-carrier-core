@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-02-27
+-- Last update: 2018-03-08
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -41,7 +41,7 @@ entity AppTop is
       DAQMUX_DECIMATOR_EN_G  : boolean                   := true;
       MR_LCLS_APP_G          : boolean                   := false;
       WAVEFORM_TDATA_BYTES_G : positive                  := 4;
-      TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";  -- "AXIL"
+      TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";
       AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
       JESD_DRP_EN_G          : boolean                   := false;
@@ -215,11 +215,59 @@ architecture mapping of AppTop is
 
 begin
 
+   assert ((TIMING_BUS_DOMAIN_G = "REC_CLK") or
+           (TIMING_BUS_DOMAIN_G = "JESD_CLK0") or
+           (TIMING_BUS_DOMAIN_G = "JESD_CLK1") or
+           (TIMING_BUS_DOMAIN_G = "JESD_2xCLK0") or
+           (TIMING_BUS_DOMAIN_G = "JESD_2xCLK1") or
+           (TIMING_BUS_DOMAIN_G = "JESD_UsrCLK0") or
+           (TIMING_BUS_DOMAIN_G = "JESD_UsrCLK1") or
+           (TIMING_BUS_DOMAIN_G = "AXI_LITE"))
+      report "TIMING_BUS_DOMAIN_G be either [REC_CLK,AXI_LITE,JESD_CLK0,JESD_CLK1,JESD_2xCLK0,JESD_2xCLK1,JESD_UsrCLK0,JESD_UsrCLK1]" severity error;
+
    --------------------------
    -- Clock and reset mapping
    --------------------------
-   timingClk <= recTimingClk when(TIMING_BUS_DOMAIN_G = "REC_CLK") else axilClk;
-   timingRst <= recTimingRst when(TIMING_BUS_DOMAIN_G = "REC_CLK") else axilRst;
+   process(axilClk, axilRst, jesdClk, jesdClk2x, jesdRst, jesdRst2x,
+           jesdUsrClk, jesdUsrRst, recTimingClk, recTimingRst)
+   begin
+      case TIMING_BUS_DOMAIN_G is
+         ------------------------------
+         when "REC_CLK" =>
+            timingClk <= recTimingClk;
+            timingRst <= recTimingRst;
+         ------------------------------
+         when "JESD_CLK0" =>
+            timingClk <= jesdClk(0);
+            timingRst <= jesdRst(0);
+         ------------------------------
+         when "JESD_CLK1" =>
+            timingClk <= jesdClk(1);
+            timingRst <= jesdRst(1);
+         ------------------------------
+         when "JESD_2xCLK0" =>
+            timingClk <= jesdClk2x(0);
+            timingRst <= jesdRst2x(0);
+         ------------------------------
+         when "JESD_2xCLK1" =>
+            timingClk <= jesdClk2x(1);
+            timingRst <= jesdRst2x(1);
+         ------------------------------
+         when "JESD_UsrCLK0" =>
+            timingClk <= jesdUsrClk(0);
+            timingRst <= jesdUsrRst(0);
+         ------------------------------
+         when "JESD_UsrCLK1" =>
+            timingClk <= jesdUsrClk(1);
+            timingRst <= jesdUsrRst(1);
+         ------------------------------
+         when others =>
+            -- (TIMING_BUS_DOMAIN_G = "AXI-LITE")
+            timingClk <= axilClk;
+            timingRst <= axilRst;
+      ------------------------------
+      end case;
+   end process;
 
    -------------------------------
    -- Terminating legacy interface
