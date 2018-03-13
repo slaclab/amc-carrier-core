@@ -56,10 +56,6 @@ class TopLevel(pr.Device):
             srp=pyrogue.simulation.MemEmulate()
         else:
 
-            # File writer
-            dataWriter = pyrogue.utilities.fileio.StreamWriter(name='dataWriter')
-            self.add(dataWriter)
-
             # Create SRPv3 module
             srp = rogue.protocols.srp.SrpV3()
 
@@ -73,11 +69,11 @@ class TopLevel(pr.Device):
                 pr.streamConnectBiDir( srp, udp.application(dest=0x0) )
 
                 # Create stream interface
-                udpStream = self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1400)
+                self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1400)
 
-                # Add data streams
-                for i in range(8):
-                    pyrogue.streamConnect(udpStream.application(0x80 + i), dataWriter.getChannel(i))            
+                # Stream connection is application specific. 
+                # For example, to connect them to a data writer:
+                #    pyrogue.streamConnect(self.stream.application(0x80 + i), dataWriter.getChannel(i))            
             
             elif ( commType=="eth-rssi-interleaved" ):
 
@@ -87,9 +83,9 @@ class TopLevel(pr.Device):
                 # Connect the SRPv3 to tDest = 0x0
                 pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
 
-                # Add data streams
-                for i in range(8):
-                    pyrogue.streamConnect(rudp.application(0x80 + i), dataWriter.getChannel(i))
+                # Stream connection is application specific.
+                # For example, to connect them to a data writer:
+                #    pyrogue.streamConnect(rudp.application(0x80 + i), dataWriter.getChannel(i))
                     
             elif ( commType == 'pcie' ):
 
@@ -122,12 +118,14 @@ class TopLevel(pr.Device):
                 pr.streamConnectBiDir( srp, vc0Srp )   
 
                 # Create the Raw Data stream interface
-                vc1RawData = self.stream = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+1)
-                pyrogue.streamConnect(vc1RawData, dataWriter.getChannel(0))
+                self.stream_vc1 = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+1)
 
                 # Create the Raw Data stream interface
-                vc2AppData = self.stream = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+2)
-                pyrogue.streamConnect(vc2AppData, dataWriter.getChannel(1))
+                self.stream_vc2 = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+2)
+
+               # Stream connection is application specific.
+               # For example, to connect them to a data writer:
+               #    pyrogue.streamConnect(self.stream_vc1,  dataWriter.getChannel(0))
 
             # Undefined device type
             else:
