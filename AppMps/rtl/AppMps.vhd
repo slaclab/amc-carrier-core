@@ -2,7 +2,7 @@
 -- File       : AppMps.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2018-01-08
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -37,11 +37,10 @@ use work.TimingPkg.all;
 
 entity AppMps is
    generic (
-      TPD_G            : time            := 1 ns;
-      SIMULATION_G     : boolean         := false;
-      MPS_SLOT_G       : boolean         := false;
-      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G        : time    := 1 ns;
+      SIMULATION_G : boolean := false;
+      MPS_SLOT_G   : boolean := false;
+      APP_TYPE_G   : AppType := APP_NULL_TYPE_C);
    port (
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -157,7 +156,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
@@ -178,10 +176,9 @@ begin
    ----------------------------
    U_MpsCoreAsync : entity work.AxiLiteAsync
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         COMMON_CLK_G     => false,
-         NUM_ADDR_BITS_G  => 16)  -- Note encReadMaster/encWriteMaster upper 16-bits of address set to zero
+         TPD_G           => TPD_G,
+         COMMON_CLK_G    => false,
+         NUM_ADDR_BITS_G => 16)  -- Note encReadMaster/encWriteMaster upper 16-bits of address set to zero
       port map (
          sAxiClk         => axilClk,
          sAxiClkRst      => axilRst,
@@ -198,10 +195,9 @@ begin
 
    U_AppMpsEncoder : entity work.AppMpsEncoder
       generic map (
-         TPD_G            => TPD_G,
-         AXI_BASE_ADDR_G  => (others => '0'),  -- Only lower 16-bits of address are passed through the AxiLiteAsync
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         APP_TYPE_G       => APP_TYPE_G)
+         TPD_G           => TPD_G,
+         AXI_BASE_ADDR_G => (others => '0'),  -- Only lower 16-bits of address are passed through the AxiLiteAsync
+         APP_TYPE_G      => APP_TYPE_G)
       port map (
          axilClk         => mpsTholdClk,
          axilRst         => mpsTholdRst,
@@ -221,11 +217,10 @@ begin
    ---------------------------------         
    U_Salt : entity work.AppMpsSalt
       generic map (
-         TPD_G            => TPD_G,
-         SIMULATION_G     => SIMULATION_G,
-         APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         MPS_SLOT_G       => MPS_SLOT_G)
+         TPD_G        => TPD_G,
+         SIMULATION_G => SIMULATION_G,
+         APP_TYPE_G   => APP_TYPE_G,
+         MPS_SLOT_G   => MPS_SLOT_G)
       port map (
          -- SALT Reference clocks
          mps125MHzClk    => mps125MHzClk,

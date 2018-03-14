@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-02-15
+-- Last update: 2018-03-14
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,8 +38,7 @@ entity AmcCarrierBsa is
       FSBL_G                 : boolean                := false;
       DISABLE_BSA_G          : boolean                := false;
       DISABLE_BLD_G          : boolean                := false;
-      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4;
-      AXI_ERROR_RESP_G       : slv(1 downto 0)        := AXI_RESP_DECERR_C);
+      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
@@ -75,10 +74,10 @@ entity AmcCarrierBsa is
       obAppWaveformSlaves  : out WaveformSlaveArrayType;
 
       -- Timing ETH MSG Interface (axilClk domain)
-      ibEthMsgMaster  : in  AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
-      ibEthMsgSlave   : out AxiStreamSlaveType;
-      obEthMsgMaster  : out AxiStreamMasterType;
-      obEthMsgSlave   : in  AxiStreamSlaveType := AXI_STREAM_SLAVE_INIT_C );
+      ibEthMsgMaster : in  AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
+      ibEthMsgSlave  : out AxiStreamSlaveType;
+      obEthMsgMaster : out AxiStreamMasterType;
+      obEthMsgSlave  : in  AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C);
 
 
 end AmcCarrierBsa;
@@ -167,7 +166,7 @@ architecture mapping of AmcCarrierBsa is
 
    signal intEthMsgMaster : AxiStreamMasterType;
    signal intEthMsgSlave  : AxiStreamSlaveType;
-   
+
 begin
 
    -- FSBL build has no BSA logic.
@@ -230,28 +229,28 @@ begin
          port map (
             waveformClk       => waveformClk,
             waveformRst       => waveformRst,
-            ibWaveformMasters => obAppWaveformMasters(0),                         -- [in]
-            ibWaveformSlaves  => obAppWaveformSlaves(0),                          -- [out]
-            axilClk           => axilClk,                                         -- [in]
-            axilRst           => axilRst,                                         -- [in]
-            axilWriteMaster   => locAxilWriteMasters(WAVEFORM_0_AXIL_C),          -- [out]
-            axilWriteSlave    => locAxilWriteSlaves(WAVEFORM_0_AXIL_C),           -- [in]
-            axilReadMaster    => locAxilReadMasters(WAVEFORM_0_AXIL_C),           -- [out]
-            axilReadSlave     => locAxilReadSlaves(WAVEFORM_0_AXIL_C),            -- [in]
-            axisStatusClk     => axilClk,                                         -- [in]
-            axisStatusRst     => axilRst,                                         -- [in]
-            axisStatusMaster  => waveformStatusMasters(0),                        -- [out]
-            axisStatusSlave   => waveformStatusSlaves(0),                         -- [in]
-            axisDataClk       => axilClk,                                         -- [in]
-            axisDataRst       => axilRst,                                         -- [in]
-            axisDataMaster    => waveformDataMasters(0),                          -- [out]
-            axisDataSlave     => waveformDataSlaves(0),                           -- [in]
-            axiClk            => axiClk,                                          -- [in]
-            axiRst            => axiRst,                                          -- [in]
-            axiWriteMaster    => waveform0AxiWriteMaster,                         -- [out]
-            axiWriteSlave     => waveform0AxiWriteSlave,                          -- [in]
-            axiReadMaster     => waveform0AxiReadMaster,                          -- [out]
-            axiReadSlave      => waveform0AxiReadSlave);                          -- [in]
+            ibWaveformMasters => obAppWaveformMasters(0),   -- [in]
+            ibWaveformSlaves  => obAppWaveformSlaves(0),    -- [out]
+            axilClk           => axilClk,                   -- [in]
+            axilRst           => axilRst,                   -- [in]
+            axilWriteMaster   => locAxilWriteMasters(WAVEFORM_0_AXIL_C),  -- [out]
+            axilWriteSlave    => locAxilWriteSlaves(WAVEFORM_0_AXIL_C),  -- [in]
+            axilReadMaster    => locAxilReadMasters(WAVEFORM_0_AXIL_C),  -- [out]
+            axilReadSlave     => locAxilReadSlaves(WAVEFORM_0_AXIL_C),  -- [in]
+            axisStatusClk     => axilClk,                   -- [in]
+            axisStatusRst     => axilRst,                   -- [in]
+            axisStatusMaster  => waveformStatusMasters(0),  -- [out]
+            axisStatusSlave   => waveformStatusSlaves(0),   -- [in]
+            axisDataClk       => axilClk,                   -- [in]
+            axisDataRst       => axilRst,                   -- [in]
+            axisDataMaster    => waveformDataMasters(0),    -- [out]
+            axisDataSlave     => waveformDataSlaves(0),     -- [in]
+            axiClk            => axiClk,                    -- [in]
+            axiRst            => axiRst,                    -- [in]
+            axiWriteMaster    => waveform0AxiWriteMaster,   -- [out]
+            axiWriteSlave     => waveform0AxiWriteSlave,    -- [in]
+            axiReadMaster     => waveform0AxiReadMaster,    -- [out]
+            axiReadSlave      => waveform0AxiReadSlave);    -- [in]
 
       BsaWaveformEngine_1 : entity work.BsaWaveformEngine
          generic map (
@@ -262,28 +261,28 @@ begin
          port map (
             waveformClk       => waveformClk,
             waveformRst       => waveformRst,
-            ibWaveformMasters => obAppWaveformMasters(1),                 -- [in]
-            ibWaveformSlaves  => obAppWaveformSlaves(1),                  -- [out]
-            axilClk           => axilClk,                                 -- [in]
-            axilRst           => axilRst,                                 -- [in]
+            ibWaveformMasters => obAppWaveformMasters(1),   -- [in]
+            ibWaveformSlaves  => obAppWaveformSlaves(1),    -- [out]
+            axilClk           => axilClk,                   -- [in]
+            axilRst           => axilRst,                   -- [in]
             axilWriteMaster   => locAxilWriteMasters(WAVEFORM_1_AXIL_C),  -- [out]
-            axilWriteSlave    => locAxilWriteSlaves(WAVEFORM_1_AXIL_C),   -- [in]
-            axilReadMaster    => locAxilReadMasters(WAVEFORM_1_AXIL_C),   -- [out]
-            axilReadSlave     => locAxilReadSlaves(WAVEFORM_1_AXIL_C),    -- [in]
-            axisStatusClk     => axilClk,                                 -- [in]
-            axisStatusRst     => axilRst,                                 -- [in]
-            axisStatusMaster  => waveformStatusMasters(1),                -- [out]
-            axisStatusSlave   => waveformStatusSlaves(1),                 -- [in]
-            axisDataClk       => axilClk,                                 -- [in]
-            axisDataRst       => axilRst,                                 -- [in]
-            axisDataMaster    => waveformDataMasters(1),                  -- [out]
-            axisDataSlave     => waveformDataSlaves(1),                   -- [in]
-            axiClk            => axiClk,                                  -- [in]
-            axiRst            => axiRst,                                  -- [in]
-            axiWriteMaster    => waveform1AxiWriteMaster,                 -- [out]
-            axiWriteSlave     => waveform1AxiWriteSlave,                  -- [in]
-            axiReadMaster     => waveform1AxiReadMaster,                  -- [out]
-            axiReadSlave      => waveform1AxiReadSlave);                  -- [in]
+            axilWriteSlave    => locAxilWriteSlaves(WAVEFORM_1_AXIL_C),  -- [in]
+            axilReadMaster    => locAxilReadMasters(WAVEFORM_1_AXIL_C),  -- [out]
+            axilReadSlave     => locAxilReadSlaves(WAVEFORM_1_AXIL_C),  -- [in]
+            axisStatusClk     => axilClk,                   -- [in]
+            axisStatusRst     => axilRst,                   -- [in]
+            axisStatusMaster  => waveformStatusMasters(1),  -- [out]
+            axisStatusSlave   => waveformStatusSlaves(1),   -- [in]
+            axisDataClk       => axilClk,                   -- [in]
+            axisDataRst       => axilRst,                   -- [in]
+            axisDataMaster    => waveformDataMasters(1),    -- [out]
+            axisDataSlave     => waveformDataSlaves(1),     -- [in]
+            axiClk            => axiClk,                    -- [in]
+            axiRst            => axiRst,                    -- [in]
+            axiWriteMaster    => waveform1AxiWriteMaster,   -- [out]
+            axiWriteSlave     => waveform1AxiWriteSlave,    -- [in]
+            axiReadMaster     => waveform1AxiReadMaster,    -- [out]
+            axiReadSlave      => waveform1AxiReadSlave);    -- [in]
 
       U_AxiStreamMux_WaveformStatus : entity work.AxiStreamMux
          generic map (
@@ -296,12 +295,12 @@ begin
             PIPE_STAGES_G  => 1,
             TDEST_LOW_G    => 0)
          port map (
-            sAxisMasters => waveformStatusMasters,                           -- [in]
-            sAxisSlaves  => waveformStatusSlaves,                            -- [out]
+            sAxisMasters => waveformStatusMasters,  -- [in]
+            sAxisSlaves  => waveformStatusSlaves,   -- [out]
             mAxisMaster  => obBsaMasters(BSA_WAVEFORM_STATUS_AXIS_INDEX_C),  -- [out]
-            mAxisSlave   => obBsaSlaves(BSA_WAVEFORM_STATUS_AXIS_INDEX_C),   -- [in]
-            axisClk      => axilClk,                                         -- [in]
-            axisRst      => axilRst);                                        -- [in]
+            mAxisSlave   => obBsaSlaves(BSA_WAVEFORM_STATUS_AXIS_INDEX_C),  -- [in]
+            axisClk      => axilClk,    -- [in]
+            axisRst      => axilRst);   -- [in]
 
       U_AxiStreamMux_WaveformData : entity work.AxiStreamMux
          generic map (
@@ -314,12 +313,12 @@ begin
             PIPE_STAGES_G  => 1,
             TDEST_LOW_G    => 0)
          port map (
-            sAxisMasters => waveformDataMasters,                           -- [in]
-            sAxisSlaves  => waveformDataSlaves,                            -- [out]
+            sAxisMasters => waveformDataMasters,  -- [in]
+            sAxisSlaves  => waveformDataSlaves,   -- [out]
             mAxisMaster  => obBsaMasters(BSA_WAVEFORM_DATA_AXIS_INDEX_C),  -- [out]
-            mAxisSlave   => obBsaSlaves(BSA_WAVEFORM_DATA_AXIS_INDEX_C),   -- [in]
-            axisClk      => axilClk,                                       -- [in]
-            axisRst      => axilRst);                                      -- [in]
+            mAxisSlave   => obBsaSlaves(BSA_WAVEFORM_DATA_AXIS_INDEX_C),  -- [in]
+            axisClk      => axilClk,    -- [in]
+            axisRst      => axilRst);   -- [in]
 
       -------------------------------------------------------------------------------------------------
       -- BSA buffers
@@ -359,16 +358,16 @@ begin
          U_AxiLiteEmpty_2 : entity work.AxiLiteEmpty
             generic map (
                TPD_G            => TPD_G,
-               AXI_ERROR_RESP_G => AXI_RESP_OK_C)
+               AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- -- Don't respond with error
             port map (
-               axiClk         => axilClk,                                 -- [in]
-               axiClkRst      => axilRst,                                 -- [in]
-               axiReadMaster  => locAxilReadMasters(BSA_BUFFER_AXIL_C),   -- [in]
-               axiReadSlave   => locAxilReadSlaves(BSA_BUFFER_AXIL_C),    -- [out]
+               axiClk         => axilClk,          -- [in]
+               axiClkRst      => axilRst,          -- [in]
+               axiReadMaster  => locAxilReadMasters(BSA_BUFFER_AXIL_C),  -- [in]
+               axiReadSlave   => locAxilReadSlaves(BSA_BUFFER_AXIL_C),  -- [out]
                axiWriteMaster => locAxilWriteMasters(BSA_BUFFER_AXIL_C),  -- [in]
                axiWriteSlave  => locAxilWriteSlaves(BSA_BUFFER_AXIL_C));  -- [out]
 
-         bsaAxiWriteMaster <= AXI_WRITE_MASTER_INIT_C;
+         bsaAxiWriteMaster                         <= AXI_WRITE_MASTER_INIT_C;
          obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
       end generate BSA_DISABLE_GEN;
 
@@ -380,7 +379,7 @@ begin
             TPD_G               => TPD_G,
             PIPE_STAGES_G       => 1,
             FIFO_PAUSE_THRESH_G => 128,
-            TX_VALID_THOLD_G    => 256,-- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
+            TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
             SLAVE_READY_EN_G    => true,
             GEN_SYNC_FIFO_G     => false,
             AXI_CLK_FREQ_G      => 200.0E+6,
@@ -394,17 +393,17 @@ begin
             WRITE_EN_G          => true,
             READ_EN_G           => true)
          port map (
-            sAxisClk       => axilClk,                             -- [in]
-            sAxisRst       => axilRst,                             -- [in]
+            sAxisClk       => axilClk,  -- [in]
+            sAxisRst       => axilRst,  -- [in]
             sAxisMaster    => ibBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [in]
             sAxisSlave     => ibBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [out]
-            sAxisCtrl      => open,                                -- [out]
-            mAxisClk       => axilClk,                             -- [in]
-            mAxisRst       => axilRst,                             -- [in]
+            sAxisCtrl      => open,     -- [out]
+            mAxisClk       => axilClk,  -- [in]
+            mAxisRst       => axilRst,  -- [in]
             mAxisMaster    => obBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [out]
             mAxisSlave     => obBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [in]
-            axiClk         => axiClk,                              -- [in]
-            axiRst         => axiRst,                              -- [in]
+            axiClk         => axiClk,   -- [in]
+            axiRst         => axiRst,   -- [in]
             axiWriteMaster => memAxiWriteMaster,                   -- [out]
             axiWriteSlave  => memAxiWriteSlave,                    -- [in]
             axiReadMaster  => memAxiReadMaster,                    -- [out]
@@ -416,56 +415,57 @@ begin
       ------------------------------------------------------------------------------------------------
       U_BsaAxiInterconnectWrapper_1 : entity work.BsaAxiInterconnectWrapper
          port map (
-            axiClk              => axiClk,                   -- [in]
-            axiRst              => axiRst,                   -- [in]
-            sAxiWriteMasters(0) => memAxiWriteMaster,        -- [in]
-            sAxiWriteMasters(1) => bsaAxiWriteMaster,        -- [in]
+            axiClk              => axiClk,                  -- [in]
+            axiRst              => axiRst,                  -- [in]
+            sAxiWriteMasters(0) => memAxiWriteMaster,       -- [in]
+            sAxiWriteMasters(1) => bsaAxiWriteMaster,       -- [in]
             sAxiWriteMasters(2) => waveform0AxiWriteMaster,  -- [in]
             sAxiWriteMasters(3) => waveform1AxiWriteMaster,  -- [in]            
-            sAxiWriteSlaves(0)  => memAxiWriteSlave,         -- [out]
-            sAxiWriteSlaves(1)  => bsaAxiWriteSlave,         -- [out]
-            sAxiWriteSlaves(2)  => waveform0AxiWriteSlave,   -- [out]
-            sAxiWriteSlaves(3)  => waveform1AxiWriteSlave,   -- [out]            
-            sAxiReadMasters(0)  => memAxiReadMaster,         -- [in]
-            sAxiReadMasters(1)  => AXI_READ_MASTER_INIT_C,   -- [in]         
-            sAxiReadMasters(2)  => waveform0AxiReadMaster,   -- [in]
-            sAxiReadMasters(3)  => waveform1AxiReadMaster,   -- [in]
-            sAxiReadSlaves(0)   => memAxiReadSlave,          -- [out]
-            sAxiReadSlaves(1)   => bsaAxiReadSlave,          -- [out]         
-            sAxiReadSlaves(2)   => waveform0AxiReadSlave,    -- [out]         
-            sAxiReadSlaves(3)   => waveform1AxiReadSlave,    -- [out]         
-            mAxiWriteMasters    => axiWriteMaster,           -- [out]
-            mAxiWriteSlaves     => axiWriteSlave,            -- [in]
-            mAxiReadMasters     => axiReadMaster,            -- [out]
-            mAxiReadSlaves      => axiReadSlave);            -- [in]
+            sAxiWriteSlaves(0)  => memAxiWriteSlave,        -- [out]
+            sAxiWriteSlaves(1)  => bsaAxiWriteSlave,        -- [out]
+            sAxiWriteSlaves(2)  => waveform0AxiWriteSlave,  -- [out]
+            sAxiWriteSlaves(3)  => waveform1AxiWriteSlave,  -- [out]            
+            sAxiReadMasters(0)  => memAxiReadMaster,        -- [in]
+            sAxiReadMasters(1)  => AXI_READ_MASTER_INIT_C,  -- [in]         
+            sAxiReadMasters(2)  => waveform0AxiReadMaster,  -- [in]
+            sAxiReadMasters(3)  => waveform1AxiReadMaster,  -- [in]
+            sAxiReadSlaves(0)   => memAxiReadSlave,         -- [out]
+            sAxiReadSlaves(1)   => bsaAxiReadSlave,         -- [out]         
+            sAxiReadSlaves(2)   => waveform0AxiReadSlave,   -- [out]         
+            sAxiReadSlaves(3)   => waveform1AxiReadSlave,   -- [out]         
+            mAxiWriteMasters    => axiWriteMaster,          -- [out]
+            mAxiWriteSlaves     => axiWriteSlave,           -- [in]
+            mAxiReadMasters     => axiReadMaster,           -- [out]
+            mAxiReadSlaves      => axiReadSlave);           -- [in]
 
    end generate BSA_GEN;
 
    BLD_ENABLE_GEN : if not DISABLE_BLD_G generate
-     U_BLD : entity work.BldAxiStream
-       generic map ( TPD_G             => TPD_G,
-                     AXIL_ERROR_RESP_G => AXI_ERROR_RESP_G )
-       port map ( -- Diagnostic data interface
-         diagnosticClk   => diagnosticClk,
-         diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBus,
-         -- AXI Lite interface
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => locAxilReadMasters (BLD_AXIL_C),
-         axilReadSlave   => locAxilReadSlaves  (BLD_AXIL_C),
-         axilWriteMaster => locAxilWriteMasters(BLD_AXIL_C),
-         axilWriteSlave  => locAxilWriteSlaves (BLD_AXIL_C),
-         -- Timing ETH MSG Interface (axilClk domain)
-         ibEthMsgMaster  => ibEthMsgMaster,
-         ibEthMsgSlave   => ibEthMsgSlave,
-         obEthMsgMaster  => obEthMsgMaster,
-         obEthMsgSlave   => obEthMsgSlave );
+      U_BLD : entity work.BldAxiStream
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            -- Diagnostic data interface
+            diagnosticClk   => diagnosticClk,
+            diagnosticRst   => diagnosticRst,
+            diagnosticBus   => diagnosticBus,
+            -- AXI Lite interface
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilReadMaster  => locAxilReadMasters (BLD_AXIL_C),
+            axilReadSlave   => locAxilReadSlaves (BLD_AXIL_C),
+            axilWriteMaster => locAxilWriteMasters(BLD_AXIL_C),
+            axilWriteSlave  => locAxilWriteSlaves (BLD_AXIL_C),
+            -- Timing ETH MSG Interface (axilClk domain)
+            ibEthMsgMaster  => ibEthMsgMaster,
+            ibEthMsgSlave   => ibEthMsgSlave,
+            obEthMsgMaster  => obEthMsgMaster,
+            obEthMsgSlave   => obEthMsgSlave);
    end generate;
 
    BLD_DISABLE_GEN : if DISABLE_BLD_G generate
-     obEthMsgMaster <= ibEthMsgMaster;
-     ibEthMsgSlave  <= obEthMsgSlave;
+      obEthMsgMaster <= ibEthMsgMaster;
+      ibEthMsgSlave  <= obEthMsgSlave;
    end generate;
-   
+
 end mapping;

@@ -2,7 +2,7 @@
 -- File       : AmcMicrowaveMuxCoreCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-14
--- Last update: 2017-06-14
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -26,8 +26,7 @@ use work.jesd204bpkg.all;
 
 entity AmcMicrowaveMuxCoreCtrl is
    generic (
-      TPD_G                    : time                   := 1 ns;
-      AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C);
+      TPD_G : time := 1 ns);
    port (
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -81,7 +80,7 @@ begin
       axiSlaveRegister(regCon, x"800", 0, v.txSyncMask);
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       -- Synchronous Reset
       if (axilRst = '1') then

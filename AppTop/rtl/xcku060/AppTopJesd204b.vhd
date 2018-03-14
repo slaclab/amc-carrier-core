@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2018-01-08
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -38,8 +38,7 @@ entity AppTopJesd204b is
       JESD_TX_LANE_G     : natural range 0 to 10 := 8;
       GT_LANE_G          : natural range 0 to 10 := 8;
       JESD_RX_POLARITY_G : slv(9 downto 0)       := "0000000000";
-      JESD_TX_POLARITY_G : slv(9 downto 0)       := "0000000000";
-      AXI_ERROR_RESP_G   : slv(1 downto 0)       := AXI_RESP_SLVERR_C);
+      JESD_TX_POLARITY_G : slv(9 downto 0)       := "0000000000");
    port (
       -- DRP Interface
       drpClk          : in  slv(GT_LANE_G-1 downto 0);
@@ -290,11 +289,10 @@ begin
    EN_RX_CORE : if (JESD_RX_LANE_G /= 0) generate
       U_Jesd204bRx : entity work.Jesd204bRx
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            F_G              => 2,
-            K_G              => 32,
-            L_G              => JESD_RX_LANE_G)
+            TPD_G => TPD_G,
+            F_G   => 2,
+            K_G   => 32,
+            L_G   => JESD_RX_LANE_G)
          port map (
             axiClk          => axilClk,
             axiRst          => axilRst,
@@ -323,8 +321,7 @@ begin
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            TPD_G => TPD_G)
          port map (
             axiClk         => axilClk,
             axiClkRst      => axilRst,
@@ -342,13 +339,12 @@ begin
    EN_TX_CORE : if (JESD_TX_LANE_G /= 0) generate
       U_Jesd204bTx : entity work.Jesd204bTx
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            INPUT_REG_G      => true,
-            OUTPUT_REG_G     => true,
-            F_G              => 2,
-            K_G              => 32,
-            L_G              => JESD_TX_LANE_G)
+            TPD_G        => TPD_G,
+            INPUT_REG_G  => true,
+            OUTPUT_REG_G => true,
+            F_G          => 2,
+            K_G          => 32,
+            L_G          => JESD_TX_LANE_G)
          port map (
             axiClk               => axilClk,
             axiRst               => axilRst,
@@ -376,8 +372,7 @@ begin
    BYP_TX_CORE : if (JESD_TX_LANE_G = 0) generate
       U_AxiLiteEmpty : entity work.AxiLiteEmpty
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+            TPD_G => TPD_G)
          port map (
             axiClk         => axilClk,
             axiClkRst      => axilRst,

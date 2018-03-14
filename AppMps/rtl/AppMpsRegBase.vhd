@@ -2,7 +2,7 @@
 -- File       : AppMpsRegBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-04-01
--- Last update: 2017-12-22
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
@@ -32,10 +32,9 @@ use unisim.vcomponents.all;
 
 entity AppMpsRegBase is
    generic (
-      TPD_G            : time             := 1 ns;
-      APP_TYPE_G       : AppType          := APP_NULL_TYPE_C;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      APP_CONFIG_G     : MpsAppConfigType := MPS_APP_CONFIG_INIT_C);
+      TPD_G        : time             := 1 ns;
+      APP_TYPE_G   : AppType          := APP_NULL_TYPE_C;
+      APP_CONFIG_G : MpsAppConfigType := MPS_APP_CONFIG_INIT_C);
    port (
       -- MPS message monitoring
       mpsMessage      : in  MpsMessageType;
@@ -132,7 +131,7 @@ begin
       axiSlaveRegisterR(regEp, x"001C", 8, r.mpsMessage.message(5));
 
       -- Closeout the transaction
-      axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       -- Synchronous Reset
       if (axilRst = '1') then

@@ -2,7 +2,7 @@
 -- File       : AmcCarrierEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2018-02-14
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -30,11 +30,10 @@ use work.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierEth is
    generic (
-      TPD_G                 : time            := 1 ns;
-      RSSI_ILEAVE_EN_G      : boolean         := false;
-      RTM_ETH_G             : boolean         := false;
-      ETH_USR_FRAME_LIMIT_G : positive        := 4096;  -- 4kB
-      AXI_ERROR_RESP_G      : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G                 : time     := 1 ns;
+      RSSI_ILEAVE_EN_G      : boolean  := false;
+      RTM_ETH_G             : boolean  := false;
+      ETH_USR_FRAME_LIMIT_G : positive := 4096);    -- 4kB
    port (
       -- Local Configuration and status
       localMac             : in  slv(47 downto 0);  --  big-Endian configuration
@@ -173,7 +172,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -195,12 +193,11 @@ begin
    ETH_ZONE2 : if (RTM_ETH_G = false) generate
       U_Xaui : entity work.XauiGthUltraScaleWrapper
          generic map (
-            TPD_G            => TPD_G,
-            EN_WDT_G         => true,
+            TPD_G         => TPD_G,
+            EN_WDT_G      => true,
             -- AXI-Lite Configurations
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
             -- AXI Streaming Configurations
-            AXIS_CONFIG_G    => EMAC_AXIS_CONFIG_C)
+            AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
          port map (
             -- Local Configurations
             localMac       => localMac,
@@ -288,21 +285,20 @@ begin
    U_UdpEngineWrapper : entity work.UdpEngineWrapper
       generic map (
          -- Simulation Generics
-         TPD_G            => TPD_G,
+         TPD_G          => TPD_G,
          -- UDP Server Generics
-         SERVER_EN_G      => true,
-         SERVER_SIZE_G    => SERVER_SIZE_C,
-         SERVER_PORTS_G   => SERVER_PORTS_C,
+         SERVER_EN_G    => true,
+         SERVER_SIZE_G  => SERVER_SIZE_C,
+         SERVER_PORTS_G => SERVER_PORTS_C,
          -- UDP Client Generics
-         CLIENT_EN_G      => true,
-         CLIENT_SIZE_G    => CLIENT_SIZE_C,
-         CLIENT_PORTS_G   => CLIENT_PORTS_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         CLIENT_EN_G    => true,
+         CLIENT_SIZE_G  => CLIENT_SIZE_C,
+         CLIENT_PORTS_G => CLIENT_PORTS_C,
          -- IPv4/ARP Generics
-         CLK_FREQ_G       => AXI_CLK_FREQ_C,  -- In units of Hz
-         COMM_TIMEOUT_G   => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
-         VLAN_G           => false,     -- no VLAN       
-         DHCP_G           => false)     -- no DHCP       
+         CLK_FREQ_G     => AXI_CLK_FREQ_C,  -- In units of Hz
+         COMM_TIMEOUT_G => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
+         VLAN_G         => false,       -- no VLAN       
+         DHCP_G         => false)       -- no DHCP       
       port map (
          -- Local Configurations
          localMac        => localMac,
@@ -386,7 +382,6 @@ begin
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-            AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
             AXI_BASE_ADDR_G       => AXI_CONFIG_C(AXI_RSSI_NONE_ILEAVE_INDEX_C).baseAddr)
          port map (
             -- Slave AXI-Lite Interface
@@ -443,7 +438,6 @@ begin
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-            AXI_ERROR_RESP_G      => AXI_ERROR_RESP_G,
             AXI_BASE_ADDR_G       => AXI_CONFIG_C(AXI_RSSI_ILEAVE_INDEX_C).baseAddr)
          port map (
             -- Slave AXI-Lite Interface
@@ -521,7 +515,7 @@ begin
          mAxisRst    => axilRst,
          mAxisMaster => ibServerMasters(UDP_SRV_BP_MGS_IDX_C),
          mAxisSlave  => ibServerSlaves(UDP_SRV_BP_MGS_IDX_C));
-         
+
    --------------------
    -- Timing MSG Server
    --------------------
@@ -529,7 +523,7 @@ begin
    obTimingEthMsgSlave                   <= ibServerSlaves(UDP_SRV_TIMING_IDX_C);
    ibTimingEthMsgMaster                  <= obServerMasters(UDP_SRV_TIMING_IDX_C);
    obServerSlaves(UDP_SRV_TIMING_IDX_C)  <= ibTimingEthMsgSlave;
-   
+
    ----------------------
    -- BP Messenger Client
    ----------------------

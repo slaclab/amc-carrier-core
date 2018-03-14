@@ -2,7 +2,7 @@
 -- File       : AmcCarrierEthFsbl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2017-08-14
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -30,8 +30,7 @@ use work.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierEthFsbl is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G : time := 1 ns);
    port (
       -- Local Configuration and status
       localMac            : in  slv(47 downto 0);  --  big-Endian configuration
@@ -111,8 +110,7 @@ begin
    -- AXI-Lite Interface
    U_AxiLiteEmpty : entity work.AxiLiteEmpty
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G => TPD_G)
       port map (
          axiClk         => axilClk,
          axiClkRst      => axilRst,
@@ -140,12 +138,10 @@ begin
    -----------------------
    U_Xaui : entity work.XauiGthUltraScaleWrapper
       generic map (
-         TPD_G            => TPD_G,
-         EN_WDT_G         => true,
-         -- AXI-Lite Configurations
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
+         TPD_G         => TPD_G,
+         EN_WDT_G      => true,
          -- AXI Streaming Configurations
-         AXIS_CONFIG_G    => EMAC_AXIS_CONFIG_C)
+         AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Local Configurations
          localMac       => localMac,

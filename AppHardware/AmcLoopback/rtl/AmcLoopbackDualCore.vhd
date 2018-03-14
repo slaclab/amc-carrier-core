@@ -23,8 +23,7 @@ use work.AxiLitePkg.all;
 
 entity AmcLoopbackDualCore is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G            : time            := 1 ns);
    port (
       -- Loopback Interface
       loopbackIn      : in    Slv24Array(1 downto 0);
@@ -64,8 +63,7 @@ begin
 
    U_AxiLiteEmpty : entity work.AxiLiteEmpty
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G            => TPD_G)
       port map (
          axiClk         => axilClk,
          axiClkRst      => axilRst,

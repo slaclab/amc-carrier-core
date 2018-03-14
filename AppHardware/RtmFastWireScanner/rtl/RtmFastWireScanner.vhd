@@ -2,7 +2,7 @@
 -- File       : RtmFastWireScanner.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-07
--- Last update: 2018-02-07
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/BBBODQ  
 ------------------------------------------------------------------------------
@@ -28,8 +28,7 @@ use unisim.vcomponents.all;
 
 entity RtmFastWireScanner is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_SLVERR_C);
+      TPD_G : time := 1 ns);
    port (
       -- Digital I/O Interface      
       encAmadIn       : in    slv(3 downto 0);
@@ -188,8 +187,7 @@ begin
    --------------------------------
    U_AxiLiteEmpty : entity work.AxiLiteEmpty
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G => TPD_G)
       port map (
          axiClk         => axilClk,
          axiClkRst      => axilRst,

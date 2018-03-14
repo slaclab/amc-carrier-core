@@ -2,7 +2,7 @@
 -- File       : AppMpsRegAppCh.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-04-01
--- Last update: 2017-12-22
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
@@ -32,9 +32,8 @@ use unisim.vcomponents.all;
 
 entity AppMpsRegAppCh is
    generic (
-      TPD_G            : time              := 1 ns;
-      CHAN_CONFIG_G    : MpsChanConfigType := MPS_CHAN_CONFIG_INIT_C;
-      AXI_ERROR_RESP_G : slv(1 downto 0)   := AXI_RESP_DECERR_C);
+      TPD_G         : time              := 1 ns;
+      CHAN_CONFIG_G : MpsChanConfigType := MPS_CHAN_CONFIG_INIT_C);
    port (
       -- MPS Configuration Registers
       mpsChanReg      : out MpsChanRegType;
@@ -126,7 +125,7 @@ begin
       end if;
 
       -- Closeout the transaction
-      axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_OK_C);  -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
 
       -- Synchronous Reset
       if (axilRst = '1') then

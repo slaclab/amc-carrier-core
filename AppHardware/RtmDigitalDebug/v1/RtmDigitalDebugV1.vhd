@@ -2,7 +2,7 @@
 -- File       : RtmDigitalDebugV1.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-23
--- Last update: 2017-07-26
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -26,10 +26,9 @@ use unisim.vcomponents.all;
 
 entity RtmDigitalDebugV1 is
    generic (
-      TPD_G            : time             := 1 ns;
-      REG_DOUT_EN_G    : slv(15 downto 0) := x"0000";  -- '1' = registered, '0' = unregistered
-      REG_DOUT_MODE_G  : slv(15 downto 0) := x"0000";  -- If registered enabled, '1' = clk output, '0' = data output
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C);
+      TPD_G           : time             := 1 ns;
+      REG_DOUT_EN_G   : slv(15 downto 0) := x"0000";  -- '1' = registered, '0' = unregistered
+      REG_DOUT_MODE_G : slv(15 downto 0) := x"0000");  -- If registered enabled, '1' = clk output, '0' = data output
    port (
       -- Digital I/O Interface
       dout            : in    slv(15 downto 0);
@@ -145,7 +144,7 @@ begin
       axiSlaveRegisterR(axilEp, x"8", 0, x"00000000");  -- Added this register to be forward compatible with v2
 
       -- Closeout the transaction
-      axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(axilEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       -- Synchronous Reset
       if (axilRst = '1') then

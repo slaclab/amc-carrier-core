@@ -2,7 +2,7 @@
 -- File       : AmcCarrierRssi.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-23
--- Last update: 2017-02-24
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ entity AmcCarrierRssi is
    generic (
       TPD_G                 : time             := 1 ns;
       ETH_USR_FRAME_LIMIT_G : positive         := 4096;  -- 4kB
-      AXI_ERROR_RESP_G      : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G       : slv(31 downto 0) := (others => '0'));
    port (
       -- Slave AXI-Lite Interface
@@ -107,7 +106,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -180,7 +178,7 @@ begin
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
-         TX_VALID_THOLD_G    => 256,-- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
+         TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
          AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)
@@ -234,7 +232,7 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),-- ETH_AXIS_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of ETH_AXIS_CONFIG_C.TDATA_BYTES_C
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- ETH_AXIS_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of ETH_AXIS_CONFIG_C.TDATA_BYTES_C
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,

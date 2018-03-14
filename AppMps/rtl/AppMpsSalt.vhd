@@ -2,7 +2,7 @@
 -- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-04
--- Last update: 2018-01-08
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -38,11 +38,10 @@ use unisim.vcomponents.all;
 
 entity AppMpsSalt is
    generic (
-      TPD_G            : time            := 1 ns;
-      SIMULATION_G     : boolean         := false;
-      APP_TYPE_G       : AppType         := APP_NULL_TYPE_C;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      MPS_SLOT_G       : boolean         := false);
+      TPD_G        : time    := 1 ns;
+      SIMULATION_G : boolean := false;
+      APP_TYPE_G   : AppType := APP_NULL_TYPE_C;
+      MPS_SLOT_G   : boolean := false);
    port (
       -- SALT Reference clocks
       mps125MHzClk    : in  sl;
@@ -392,7 +391,7 @@ begin
       axiSlaveRegister(regCon, x"FF8", 0, v.mpsPllRst);
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       if (r.cntRst = '1') then
          v.mpsPktCnt := (others => (others => '0'));

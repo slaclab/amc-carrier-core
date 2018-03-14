@@ -2,7 +2,7 @@
 -- File       : AmcCryoDemoCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-09-09
--- Last update: 2017-03-09
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
 -------------------------------------------------------------------------------
@@ -29,89 +29,88 @@ use work.jesd204bPkg.all;
 
 entity AmcCryoDemoCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      AXI_CLK_FREQ_G   : real             := 156.25E+6;
-      AXI_ERROR_RESP_G : slv(1 downto 0)  := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G  : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_CLK_FREQ_G  : real             := 156.25E+6;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- Internal ports
-      amcTrigHw       : out   sl;
-   
+      amcTrigHw : out sl;
+
       -- JESD Interface
-      jesdSysRef      : out   sl;
-      jesdRxSync      : in    sl;
-      jesdTxSync      : out   sl;
+      jesdSysRef : out sl;
+      jesdRxSync : in  sl;
+      jesdTxSync : out sl;
 
       -- AXI-Lite Interface
-      axilClk         : in    sl;
-      axilRst         : in    sl;
-      axilReadMaster  : in    AxiLiteReadMasterType;
-      axilReadSlave   : out   AxiLiteReadSlaveType;
-      axilWriteMaster : in    AxiLiteWriteMasterType;
-      axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      axilClk         : in  sl;
+      axilRst         : in  sl;
+      axilReadMaster  : in  AxiLiteReadMasterType;
+      axilReadSlave   : out AxiLiteReadSlaveType;
+      axilWriteMaster : in  AxiLiteWriteMasterType;
+      axilWriteSlave  : out AxiLiteWriteSlaveType;
 
       -----------------------
       -- Application Ports --
       -----------------------      
       -- AMC's JTAG Ports
-      jtagPri         : inout slv(4 downto 0);
-      jtagSec         : inout slv(4 downto 0);
+      jtagPri  : inout slv(4 downto 0);
+      jtagSec  : inout slv(4 downto 0);
       -- AMC's FPGA Clock Ports
-      fpgaClkP        : inout slv(1 downto 0);
-      fpgaClkN        : inout slv(1 downto 0);
+      fpgaClkP : inout slv(1 downto 0);
+      fpgaClkN : inout slv(1 downto 0);
       -- AMC's System Reference Ports
-      sysRefP         : inout slv(3 downto 0);
-      sysRefN         : inout slv(3 downto 0);
+      sysRefP  : inout slv(3 downto 0);
+      sysRefN  : inout slv(3 downto 0);
       -- AMC's Sync Ports
-      syncInP         : inout slv(3 downto 0);
-      syncInN         : inout slv(3 downto 0);
-      syncOutP        : inout slv(9 downto 0);
-      syncOutN        : inout slv(9 downto 0);
+      syncInP  : inout slv(3 downto 0);
+      syncInN  : inout slv(3 downto 0);
+      syncOutP : inout slv(9 downto 0);
+      syncOutN : inout slv(9 downto 0);
       -- AMC's Spare Ports
-      spareP          : inout slv(15 downto 0);
-      spareN          : inout slv(15 downto 0));
+      spareP   : inout slv(15 downto 0);
+      spareN   : inout slv(15 downto 0));
 end AmcCryoDemoCore;
 
 architecture top_level_app of AmcCryoDemoCore is
-   
+
    -------------------------------------------------------------------------------------------------
    -- AXI Lite Config and Signals
    -------------------------------------------------------------------------------------------------
    constant NUM_AXI_MASTERS_C : natural := 5;
 
-   constant ADC_0_INDEX_C        : natural := 0;
-   constant ADC_1_INDEX_C        : natural := 1;
-   constant ADC_2_INDEX_C        : natural := 2;
-   constant LMK_INDEX_C          : natural := 3;
-   constant DAC_INDEX_C          : natural := 4;
+   constant ADC_0_INDEX_C : natural := 0;
+   constant ADC_1_INDEX_C : natural := 1;
+   constant ADC_2_INDEX_C : natural := 2;
+   constant LMK_INDEX_C   : natural := 3;
+   constant DAC_INDEX_C   : natural := 4;
 
-   constant ADC_0_BASE_ADDR_C        : slv(31 downto 0) := X"0002_0000" + AXI_BASE_ADDR_G;
-   constant ADC_1_BASE_ADDR_C        : slv(31 downto 0) := X"0004_0000" + AXI_BASE_ADDR_G;
-   constant ADC_2_BASE_ADDR_C        : slv(31 downto 0) := X"0006_0000" + AXI_BASE_ADDR_G;
-   constant LMK_BASE_ADDR_C          : slv(31 downto 0) := X"0008_0000" + AXI_BASE_ADDR_G;
-   constant DAC_BASE_ADDR_C          : slv(31 downto 0) := X"000A_0000" + AXI_BASE_ADDR_G;
-   
+   constant ADC_0_BASE_ADDR_C : slv(31 downto 0) := X"0002_0000" + AXI_BASE_ADDR_G;
+   constant ADC_1_BASE_ADDR_C : slv(31 downto 0) := X"0004_0000" + AXI_BASE_ADDR_G;
+   constant ADC_2_BASE_ADDR_C : slv(31 downto 0) := X"0006_0000" + AXI_BASE_ADDR_G;
+   constant LMK_BASE_ADDR_C   : slv(31 downto 0) := X"0008_0000" + AXI_BASE_ADDR_G;
+   constant DAC_BASE_ADDR_C   : slv(31 downto 0) := X"000A_0000" + AXI_BASE_ADDR_G;
+
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
-      ADC_0_INDEX_C        => (
-         baseAddr          => ADC_0_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      ADC_1_INDEX_C        => (
-         baseAddr          => ADC_1_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      ADC_2_INDEX_C        => (
-         baseAddr          => ADC_2_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      LMK_INDEX_C          => (
-         baseAddr          => LMK_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"),
-      DAC_INDEX_C          => (
-         baseAddr          => DAC_BASE_ADDR_C,
-         addrBits          => 17,
-         connectivity      => X"FFFF"));
+      ADC_0_INDEX_C   => (
+         baseAddr     => ADC_0_BASE_ADDR_C,
+         addrBits     => 17,
+         connectivity => X"FFFF"),
+      ADC_1_INDEX_C   => (
+         baseAddr     => ADC_1_BASE_ADDR_C,
+         addrBits     => 17,
+         connectivity => X"FFFF"),
+      ADC_2_INDEX_C   => (
+         baseAddr     => ADC_2_BASE_ADDR_C,
+         addrBits     => 17,
+         connectivity => X"FFFF"),
+      LMK_INDEX_C     => (
+         baseAddr     => LMK_BASE_ADDR_C,
+         addrBits     => 17,
+         connectivity => X"FFFF"),
+      DAC_INDEX_C     => (
+         baseAddr     => DAC_BASE_ADDR_C,
+         addrBits     => 17,
+         connectivity => X"FFFF"));
 
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -137,7 +136,7 @@ architecture top_level_app of AmcCryoDemoCore is
    -------------------------------------------------------------------------------------------------
    -- SPI
    -------------------------------------------------------------------------------------------------   
-   
+
    -- ADC and LMK SPI config interface   
    constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 4;
    signal coreSclk                 : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
@@ -149,21 +148,21 @@ architecture top_level_app of AmcCryoDemoCore is
    signal muxSDout : sl;
 
    signal lmkSDin : sl;
-   
+
    signal spiSclk : sl;
    signal spiSdi  : sl;
    signal spiSdo  : sl;
    signal spiSdio : sl;
-   signal spiCsL  : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);   
+   signal spiCsL  : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
 
    -- Fast DAC's SPI Ports
    signal spiSDinDac  : sl;
    signal spiSDoutDac : sl;
-   
+
    signal spiSclkDac : sl;
    signal spiSdioDac : sl;
-   signal spiCsLDac  : sl;   
-   
+   signal spiCsLDac  : sl;
+
 begin
    -----------------------
    -- Generalized Mapping 
@@ -179,36 +178,35 @@ begin
    syncOutP(0) <= jesdRxSyncP(1);
    syncOutN(0) <= jesdRxSyncN(1);
    syncInP(1)  <= jesdRxSyncP(2);
-   syncInN(1)  <= jesdRxSyncN(2);  
-   
+   syncInN(1)  <= jesdRxSyncN(2);
+
    jesdTxSyncP <= syncInP(0);
    jesdTxSyncN <= syncInN(0);
-   
+
    -- SPI 
-   jtagPri(0) <= spiSdio;   
-   jtagPri(1) <= spiSclk;   
+   jtagPri(0) <= spiSdio;
+   jtagPri(1) <= spiSclk;
    jtagPri(2) <= spiSdi;
    spiSdo     <= jtagPri(3);
-   
+
    jtagPri(4) <= spiCsL(0);
-   spareP(3)  <= spiCsL(1); 
-   spareN(3)  <= spiCsL(2);   
-   spareP(2)  <= spiCsL(3); 
-   
+   spareP(3)  <= spiCsL(1);
+   spareN(3)  <= spiCsL(2);
+   spareP(2)  <= spiCsL(3);
+
    spareP(0) <= spiSclkDac;
-   spareN(0) <= spiCsLDac;   
+   spareN(0) <= spiCsLDac;
    spareP(1) <= spiSdioDac;
-   
+
    -- Trigger remapping
-   amcTrigHw <= spareN(1); 
-   
+   amcTrigHw <= spareN(1);
+
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
    -------------------------------------------------------------------------------------------------
    U_XBAR0 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CROSSBAR_MASTERS_CONFIG_C)
@@ -223,7 +221,7 @@ begin
          mAxiWriteSlaves     => locAxilWriteSlaves,
          mAxiReadMasters     => locAxilReadMasters,
          mAxiReadSlaves      => locAxilReadSlaves);
-         
+
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
@@ -232,7 +230,7 @@ begin
          I  => jesdSysRefP,
          IB => jesdSysRefN,
          O  => jesdSysRef);
-         
+
    GEN_RX_SYNC :
    for i in 2 downto 0 generate
       OBUFDS_RxSync : OBUFDS
@@ -282,7 +280,7 @@ begin
       coreSclk(2)            when "1011",
       coreSclk(3)            when "0111",
       '0'                    when others;
-   
+
    with coreCsb select
       muxSDout <= coreSDout(0) when "1110",
       coreSDout(1)             when "1101",
@@ -331,6 +329,6 @@ begin
          I  => '0',
          O  => spiSDinDac,
          IO => spiSdioDac,
-         T  => spiSDoutDac);   
+         T  => spiSDoutDac);
 -----------------------------------
 end top_level_app;
