@@ -62,3 +62,76 @@ class RtmCryoDet(pr.Device):
             units        = "1/(307MHz)",
         ))
         
+        self.add(pr.RemoteVariable(    
+            name         = "KRelay",
+            description  = "kRelay bus from CPLD",
+            offset       = 0xC,
+            bitSize      = 2,
+            bitOffset    = 0,
+            base         = pr.UInt,
+            mode         = "RO",
+        ))        
+        
+        self.add(pr.RemoteVariable(    
+            name         = "RampMaxCnt",
+            description  = "Internal Ramp's maximum count",
+            offset       = 0x10,
+            bitSize      = 32,
+            bitOffset    = 0,
+            base         = pr.UInt,
+            mode         = "RW",
+            units        = "1/(307MHz)",
+        )) 
+        
+        self.add(pr.RemoteVariable(    
+            name         = "SelectRamp",
+            description  = "Select Ramp to the CPLD",
+            offset       = 0x14,
+            bitSize      = 1,
+            bitOffset    = 0,
+            base         = pr.UInt,
+            mode         = "RW",
+        )) 
+
+        self.add(pr.RemoteVariable(    
+            name         = "EnableRampTrigger",
+            description  = "Enables the Start Ramp Trigger pulses",
+            offset       = 0x14,
+            bitSize      = 1,
+            bitOffset    = 1,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))  
+
+        self.add(pr.RemoteVariable(    
+            name         = "RampStartMode",
+            description  = "0x0 = internal start ramp pulses, 0x1 = external start ramp pulses",
+            offset       = 0x14,
+            bitSize      = 1,
+            bitOffset    = 2,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))
+
+        self.add(pr.RemoteVariable(    
+            name         = "PulseWidth",
+            description  = "Start Ramp Pulse width to the CPLD",
+            offset       = 0x18,
+            bitSize      = 16,
+            bitOffset    = 0,
+            base         = pr.UInt,
+            mode         = "RW",
+            units        = "1/(307MHz)",
+        ))  
+
+        self.add(pr.RemoteVariable(    
+            name         = "DebounceWidth",
+            description  = "Debounce width from the LEMO[1]",
+            offset       = 0x1C,
+            bitSize      = 16,
+            bitOffset    = 0,
+            base         = pr.UInt,
+            mode         = "RW",
+            units        = "1/(307MHz)",
+        ))   
+        
