@@ -171,18 +171,8 @@ begin
 
    -- FSBL build has no BSA logic.
    FSBL_GEN : if (FSBL_G) generate
-      U_AxiLiteEmpty_1 : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- Don't respond with error
-         port map (
-            axiClk         => axilClk,          -- [in]
-            axiClkRst      => axilRst,          -- [in]
-            axiReadMaster  => axilReadMaster,   -- [in]
-            axiReadSlave   => axilReadSlave,    -- [out]
-            axiWriteMaster => axilWriteMaster,  -- [in]
-            axiWriteSlave  => axilWriteSlave);  -- [out]
-
+      axilReadSlave       <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+      axilWriteSlave      <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
       axiWriteMaster      <= AXI_WRITE_MASTER_INIT_C;
       axiReadMaster       <= AXI_READ_MASTER_INIT_C;
       obBsaMasters        <= (others => AXI_STREAM_MASTER_INIT_C);
@@ -355,18 +345,8 @@ begin
       end generate BSA_EN_GEN;
 
       BSA_DISABLE_GEN : if (DISABLE_BSA_G) generate
-         U_AxiLiteEmpty_2 : entity work.AxiLiteEmpty
-            generic map (
-               TPD_G            => TPD_G,
-               AXI_ERROR_RESP_G => AXI_RESP_OK_C)  -- -- Don't respond with error
-            port map (
-               axiClk         => axilClk,          -- [in]
-               axiClkRst      => axilRst,          -- [in]
-               axiReadMaster  => locAxilReadMasters(BSA_BUFFER_AXIL_C),  -- [in]
-               axiReadSlave   => locAxilReadSlaves(BSA_BUFFER_AXIL_C),  -- [out]
-               axiWriteMaster => locAxilWriteMasters(BSA_BUFFER_AXIL_C),  -- [in]
-               axiWriteSlave  => locAxilWriteSlaves(BSA_BUFFER_AXIL_C));  -- [out]
-
+         locAxilReadSlaves(BSA_BUFFER_AXIL_C)      <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+         locAxilWriteSlaves(BSA_BUFFER_AXIL_C)     <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
          bsaAxiWriteMaster                         <= AXI_WRITE_MASTER_INIT_C;
          obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
       end generate BSA_DISABLE_GEN;

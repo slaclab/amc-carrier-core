@@ -237,17 +237,9 @@ begin
    end generate;
 
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => rxReadMaster,
-            axiReadSlave   => rxReadSlave,
-            axiWriteMaster => rxWriteMaster,
-            axiWriteSlave  => rxWriteSlave);
-      s_gtRxReset <= devRst_i;
+      rxReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      rxWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
+      s_gtRxReset  <= devRst_i;
    end generate;
 
    ---------------
@@ -284,17 +276,9 @@ begin
    end generate;
 
    BYP_TX_CORE : if (JESD_TX_LANE_G = 0) generate
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => txReadMaster,
-            axiReadSlave   => txReadSlave,
-            axiWriteMaster => txWriteMaster,
-            axiWriteSlave  => txWriteSlave);
-      s_gtTxReset <= devRst_i;
+      txReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      txWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
+      s_gtTxReset  <= devRst_i;
    end generate;
 
 --   -------------------------------------------

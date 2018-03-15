@@ -81,17 +81,9 @@ begin
       dacSigValids <= (others => '0');
       dacSigValues <= (others => x"0000_0000");
 
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            -- AXI-Lite Bus
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMaster,
-            axiReadSlave   => axilReadSlave,
-            axiWriteMaster => axilWriteMaster,
-            axiWriteSlave  => axilWriteSlave);
+      axilReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      axilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
+
    end generate GEN_EMPTY;
 
    GEN_SIGGEN : if SIG_GEN_SIZE_G /= 0 generate

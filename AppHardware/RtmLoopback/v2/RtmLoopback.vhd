@@ -70,15 +70,7 @@ begin
 
    end generate GEN_VEC;
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+   axilReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+   axilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
 end mapping;

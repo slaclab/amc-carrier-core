@@ -134,16 +134,8 @@ begin
       pllLos <= '0';
       pllLol <= '0';
 
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(PLL_INDEX_C),
-            axiReadSlave   => axilReadSlaves(PLL_INDEX_C),
-            axiWriteMaster => axilWriteMasters(PLL_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(PLL_INDEX_C));
+      axilReadSlaves(PLL_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      axilWriteSlaves(PLL_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
    end generate;
 
@@ -191,16 +183,8 @@ begin
 
    BYP_HSR : if (EN_HS_REPEATER_G = false) generate
 
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(HS_REPEATER_INDEX_C),
-            axiReadSlave   => axilReadSlaves(HS_REPEATER_INDEX_C),
-            axiWriteMaster => axilWriteMasters(HS_REPEATER_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(HS_REPEATER_INDEX_C));
+      axilReadSlaves(HS_REPEATER_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      axilWriteSlaves(HS_REPEATER_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
    end generate;
 

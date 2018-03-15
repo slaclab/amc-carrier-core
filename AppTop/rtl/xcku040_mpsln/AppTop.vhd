@@ -271,16 +271,8 @@ begin
    -------------------------------
    -- Terminating legacy interface
    -------------------------------
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMasters(TIMING_INDEX_C),
-         axiReadSlave   => axilReadSlaves(TIMING_INDEX_C),
-         axiWriteMaster => axilWriteMasters(TIMING_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(TIMING_INDEX_C));
+   axilReadSlaves(TIMING_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+   axilWriteSlaves(TIMING_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
    ---------------------
    -- AXI-Lite Crossbar

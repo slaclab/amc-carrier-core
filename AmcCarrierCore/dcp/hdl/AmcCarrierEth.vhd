@@ -416,16 +416,8 @@ begin
             ibServerSlaves(0)  => ibServerSlaves(UDP_SRV_RSSI0_IDX_C),
             ibServerSlaves(1)  => ibServerSlaves(UDP_SRV_RSSI1_IDX_C));
 
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(AXI_RSSI_ILEAVE_INDEX_C),
-            axiReadSlave   => axilReadSlaves(AXI_RSSI_ILEAVE_INDEX_C),
-            axiWriteMaster => axilWriteMasters(AXI_RSSI_ILEAVE_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(AXI_RSSI_ILEAVE_INDEX_C));
+      axilReadSlaves(AXI_RSSI_ILEAVE_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      axilWriteSlaves(AXI_RSSI_ILEAVE_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
       obServerSlaves(UDP_SRV_RSSI_ILEAVE_IDX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
       ibServerMasters(UDP_SRV_RSSI_ILEAVE_IDX_C) <= AXI_STREAM_MASTER_INIT_C;
@@ -468,16 +460,8 @@ begin
             ibServerMaster   => ibServerMasters(UDP_SRV_RSSI_ILEAVE_IDX_C),
             ibServerSlave    => ibServerSlaves(UDP_SRV_RSSI_ILEAVE_IDX_C));
 
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMasters(AXI_RSSI_NONE_ILEAVE_INDEX_C),
-            axiReadSlave   => axilReadSlaves(AXI_RSSI_NONE_ILEAVE_INDEX_C),
-            axiWriteMaster => axilWriteMasters(AXI_RSSI_NONE_ILEAVE_INDEX_C),
-            axiWriteSlave  => axilWriteSlaves(AXI_RSSI_NONE_ILEAVE_INDEX_C));
+      axilReadSlaves(AXI_RSSI_NONE_ILEAVE_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      axilWriteSlaves(AXI_RSSI_NONE_ILEAVE_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
       obServerSlaves(UDP_SRV_RSSI0_IDX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
       ibServerMasters(UDP_SRV_RSSI0_IDX_C) <= AXI_STREAM_MASTER_INIT_C;
