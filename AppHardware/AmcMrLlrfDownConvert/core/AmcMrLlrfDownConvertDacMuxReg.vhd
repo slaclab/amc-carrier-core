@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfDownConvertDacMuxReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-02-27
--- Last update: 2016-03-11
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -28,8 +28,7 @@ use unisim.vcomponents.all;
 
 entity AmcMrLlrfDownConvertDacMuxReg is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);      
+      TPD_G : time := 1 ns);
    port (
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -56,11 +55,11 @@ architecture rtl of AmcMrLlrfDownConvertDacMuxReg is
       enable         => '1',
       halfPeriod     => (others => '1'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
-      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);      
+      axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
-   
+
 begin
 
    U_Sync : entity work.SynchronizerVector
@@ -89,7 +88,7 @@ begin
       axiSlaveRegister(regCon, x"4", 0, v.halfPeriod);
 
       -- Closeout the transaction
-      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_ERROR_RESP_G);
+      axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
       -- Synchronous Reset
       if (axilRst = '1') then
@@ -102,7 +101,7 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
-      
+
    end process comb;
 
    seq : process (axilClk) is
@@ -111,5 +110,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 end rtl;

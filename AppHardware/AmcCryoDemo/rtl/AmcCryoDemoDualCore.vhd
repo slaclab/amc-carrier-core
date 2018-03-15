@@ -2,7 +2,7 @@
 -- File       : AmcCryoDemoDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-28
--- Last update: 2016-07-12
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
 -------------------------------------------------------------------------------
@@ -25,46 +25,45 @@ use work.jesd204bpkg.all;
 
 entity AmcCryoDemoDualCore is
    generic (
-      TPD_G                    : time                   := 1 ns;
-      AXI_CLK_FREQ_G           : real                   := 156.25E+6;
-      AXI_ERROR_RESP_G         : slv(1 downto 0)        := AXI_RESP_DECERR_C;
-      AXI_BASE_ADDR_G          : slv(31 downto 0)       := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_CLK_FREQ_G  : real             := 156.25E+6;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- Internal ports
-      amcTrigHw       : out   slv(1 downto 0);
-   
+      amcTrigHw : out slv(1 downto 0);
+
       -- JESD Interface
-      jesdSysRef      : out   slv(1 downto 0);
-      jesdRxSync      : in    slv(1 downto 0);
-      jesdTxSync      : out   slv(1 downto 0);
-      
+      jesdSysRef : out slv(1 downto 0);
+      jesdRxSync : in  slv(1 downto 0);
+      jesdTxSync : out slv(1 downto 0);
+
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
       axilReadMaster  : in    AxiLiteReadMasterType;
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
-      axilWriteSlave  : out   AxiLiteWriteSlaveType;      
+      axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
       -----------------------
       -- AMC's JTAG Ports
-      jtagPri          : inout Slv5Array(1 downto 0);
-      jtagSec          : inout Slv5Array(1 downto 0);
+      jtagPri         : inout Slv5Array(1 downto 0);
+      jtagSec         : inout Slv5Array(1 downto 0);
       -- AMC's FPGA Clock Ports
-      fpgaClkP         : inout Slv2Array(1 downto 0);
-      fpgaClkN         : inout Slv2Array(1 downto 0);
+      fpgaClkP        : inout Slv2Array(1 downto 0);
+      fpgaClkN        : inout Slv2Array(1 downto 0);
       -- AMC's System Reference Ports
-      sysRefP          : inout Slv4Array(1 downto 0);
-      sysRefN          : inout Slv4Array(1 downto 0);
+      sysRefP         : inout Slv4Array(1 downto 0);
+      sysRefN         : inout Slv4Array(1 downto 0);
       -- AMC's Sync Ports
-      syncInP          : inout Slv4Array(1 downto 0);
-      syncInN          : inout Slv4Array(1 downto 0);
-      syncOutP         : inout Slv10Array(1 downto 0);
-      syncOutN         : inout Slv10Array(1 downto 0);
+      syncInP         : inout Slv4Array(1 downto 0);
+      syncInN         : inout Slv4Array(1 downto 0);
+      syncOutP        : inout Slv10Array(1 downto 0);
+      syncOutN        : inout Slv10Array(1 downto 0);
       -- AMC's Spare Ports
-      spareP           : inout Slv16Array(1 downto 0);
-      spareN           : inout Slv16Array(1 downto 0));
+      spareP          : inout Slv16Array(1 downto 0);
+      spareN          : inout Slv16Array(1 downto 0));
 end AmcCryoDemoDualCore;
 
 architecture mapping of AmcCryoDemoDualCore is
@@ -77,7 +76,7 @@ architecture mapping of AmcCryoDemoDualCore is
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
-   
+
 begin
 
    ---------------------
@@ -86,7 +85,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -108,19 +106,18 @@ begin
    GEN_AMC : for i in 1 downto 0 generate
       U_AMC : entity work.AmcCryoDemoCore
          generic map (
-            TPD_G                    => TPD_G,
-            AXI_CLK_FREQ_G           => AXI_CLK_FREQ_G,
-            AXI_ERROR_RESP_G         => AXI_ERROR_RESP_G,
-            AXI_BASE_ADDR_G          => AXI_CONFIG_C(i).baseAddr)
+            TPD_G           => TPD_G,
+            AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,
+            AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map(
             -- Internal ports
-            amcTrigHw       => amcTrigHw(i),
+            amcTrigHw => amcTrigHw(i),
 
             -- JESD SYNC Interface
-            jesdSysRef      => jesdSysRef(i),
-            jesdRxSync      => jesdRxSync(i),
-            jesdTxSync      => jesdTxSync(i),
-            
+            jesdSysRef => jesdSysRef(i),
+            jesdRxSync => jesdRxSync(i),
+            jesdTxSync => jesdTxSync(i),
+
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
@@ -147,7 +144,7 @@ begin
             syncOutN        => syncOutN(i),
             -- AMC's Spare Ports
             spareP          => spareP(i),
-            spareN          => spareN(i));  
+            spareN          => spareN(i));
    end generate GEN_AMC;
 
 end mapping;

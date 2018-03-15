@@ -2,7 +2,7 @@
 -- File       : AxiSerAttnMaster.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-12
--- Last update: 2015-11-04
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:   This module handles SPI chips with only one setting (non addressable or readable over SPI)
 --                Write only access to SPI
@@ -36,15 +36,13 @@ use unisim.vcomponents.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
---use work.I2cPkg.all;
 
 entity AxiSerAttnMaster is
    generic (
-      TPD_G             : time            := 1 ns;
-      AXI_ERROR_RESP_G  : slv(1 downto 0) := AXI_RESP_DECERR_C;
-      DATA_SIZE_G       : natural         := 6;
-      CLK_PERIOD_G      : real            := 10.0E-6;
-      SPI_SCLK_PERIOD_G : real            := 100.0E-6
+      TPD_G             : time    := 1 ns;
+      DATA_SIZE_G       : natural := 6;
+      CLK_PERIOD_G      : real    := 10.0E-6;
+      SPI_SCLK_PERIOD_G : real    := 100.0E-6
       );
    port (
       axiClk : in sl;
@@ -68,7 +66,7 @@ architecture rtl of AxiSerAttnMaster is
    -- Constants
    constant SPI_CLK_PERIOD_CYCLES_C : integer := integer((SPI_SCLK_PERIOD_G * 20.0)/CLK_PERIOD_G);
 
-   signal rdEn   : sl;
+   signal rdEn : sl;
 
    type StateType is (WAIT_AXI_TXN_S, WAIT_CYCLE_S, WAIT_SPI_TXN_DONE_S, HOLD_LATCH_1SPICC_S);
 
@@ -77,34 +75,34 @@ architecture rtl of AxiSerAttnMaster is
       state         : StateType;
       axiReadSlave  : AxiLiteReadSlaveType;
       axiWriteSlave : AxiLiteWriteSlaveType;
-      
+
       -- Adc Core Inputs
-      wrData        : slv(DATA_SIZE_G-1 downto 0);
-      wrEn          : sl;
-      
+      wrData : slv(DATA_SIZE_G-1 downto 0);
+      wrEn   : sl;
+
       -- Latch enable
-      latchEn       : sl;
-      perCnt        : integer range 0 to SPI_CLK_PERIOD_CYCLES_C+1;      
+      latchEn : sl;
+      perCnt  : integer range 0 to SPI_CLK_PERIOD_CYCLES_C+1;
    end record RegType;
 
    constant REG_INIT_C : RegType := (
       state         => WAIT_AXI_TXN_S,
       axiReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axiWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C,
-      
+
       -- Adc Core Inputs
-      wrData        => (others => '0'),
-      wrEn          => '0',
-      
+      wrData => (others => '0'),
+      wrEn   => '0',
+
       -- Latch enable
-      latchEn       => '0',
-      perCnt        => 0
-   );
+      latchEn => '0',
+      perCnt  => 0
+      );
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
-   
-   
+
+
 begin
 
    comb : process (axiReadMaster, axiRst, axiWriteMaster, r, rdEn) is
@@ -125,42 +123,42 @@ begin
                v.axiReadSlave.rdata                         := (others => '0');
                v.axiReadSlave.rdata(DATA_SIZE_G-1 downto 0) := r.wrData;
                axiSlaveReadResponse(v.axiReadSlave);
-               
-               v.wrEn     := '0';
-               v.state    := WAIT_AXI_TXN_S;
+
+               v.wrEn  := '0';
+               v.state := WAIT_AXI_TXN_S;
             end if;
-            
-            if (axiStatus.writeEnable = '1') then          
+
+            if (axiStatus.writeEnable = '1') then
                -- Write data to Attn chip 
-               v.wrData  := axiWriteMaster.wdata(DATA_SIZE_G-1 downto 0);
-               v.wrEn    := '1';
-               v.state   := WAIT_CYCLE_S;
+               v.wrData := axiWriteMaster.wdata(DATA_SIZE_G-1 downto 0);
+               v.wrEn   := '1';
+               v.state  := WAIT_CYCLE_S;
             end if;
 
          when WAIT_CYCLE_S =>
             v.perCnt  := 0;
             v.latchEn := '0';
-            
+
             -- Wait 1 cycle for rdEn to drop
             v.wrEn  := '0';
             v.state := WAIT_SPI_TXN_DONE_S;
 
          when WAIT_SPI_TXN_DONE_S =>
             v.perCnt := 0;
-            
+
             if (rdEn = '1') then
-               v.latchEn := '1';            
+               v.latchEn := '1';
                v.state   := HOLD_LATCH_1SPICC_S;
             end if;
          when HOLD_LATCH_1SPICC_S =>
             v.latchEn := '1';
             v.perCnt  := r.perCnt + 1;
-            if (r.perCnt >= SPI_CLK_PERIOD_CYCLES_C) then   
+            if (r.perCnt >= SPI_CLK_PERIOD_CYCLES_C) then
                v.state := WAIT_AXI_TXN_S;
-               
+
                -- Finish write
-               axiSlaveWriteResponse(v.axiWriteSlave);               
-            end if;               
+               axiSlaveWriteResponse(v.axiWriteSlave);
+            end if;
          when others => null;
       end case;
 
@@ -169,12 +167,12 @@ begin
       end if;
 
       rin <= v;
-      
+
       -- Outputs
       axiWriteSlave <= r.axiWriteSlave;
       axiReadSlave  <= r.axiReadSlave;
       coreLEn       <= r.latchEn;
-      
+
    end process comb;
 
    seq : process (axiClk) is
@@ -189,8 +187,8 @@ begin
          TPD_G             => TPD_G,
          NUM_CHIPS_G       => 1,
          DATA_SIZE_G       => DATA_SIZE_G,
-         CPHA_G            => '0',                -- Sample on leading edge
-         CPOL_G            => '0',                -- Sample on rising edge
+         CPHA_G            => '0',      -- Sample on leading edge
+         CPOL_G            => '0',      -- Sample on rising edge
          CLK_PERIOD_G      => CLK_PERIOD_G,       -- 8.0E-9,
          SPI_SCLK_PERIOD_G => SPI_SCLK_PERIOD_G)  --ite(SIMULATION_G, 100.0E-9, 100.0E-6))
       port map (

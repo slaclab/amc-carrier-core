@@ -2,7 +2,7 @@
 -- File       : DacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2018-02-20
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -27,7 +27,6 @@ entity DacSigGen is
    generic (
       TPD_G                : time                            := 1 ns;
       AXI_BASE_ADDR_G      : slv(31 downto 0)                := (others => '0');
-      AXI_ERROR_RESP_G     : slv(1 downto 0)                 := AXI_RESP_DECERR_C;
       SIG_GEN_SIZE_G       : natural range 0 to 10           := 0;  -- 0 = Disabled
       SIG_GEN_ADDR_WIDTH_G : positive range 1 to 24          := 9;
       SIG_GEN_LANE_MODE_G  : slv(DAC_SIG_WIDTH_C-1 downto 0) := (others => '0');  -- '0': 32 bit, '1': 16 bit
@@ -82,17 +81,9 @@ begin
       dacSigValids <= (others => '0');
       dacSigValues <= (others => x"0000_0000");
 
-      U_AxiLiteEmpty : entity work.AxiLiteEmpty
-         generic map (
-            TPD_G => TPD_G)
-         port map (
-            -- AXI-Lite Bus
-            axiClk         => axilClk,
-            axiClkRst      => axilRst,
-            axiReadMaster  => axilReadMaster,
-            axiReadSlave   => axilReadSlave,
-            axiWriteMaster => axilWriteMaster,
-            axiWriteSlave  => axilWriteSlave);
+      axilReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+      axilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
+
    end generate GEN_EMPTY;
 
    GEN_SIGGEN : if SIG_GEN_SIZE_G /= 0 generate
@@ -102,7 +93,6 @@ begin
       U_XBAR : entity work.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
-            DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
             NUM_SLAVE_SLOTS_G  => 1,
             NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
             MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -121,11 +111,10 @@ begin
       -- DAQ control register interface
       U_DacSigGenReg : entity work.DacSigGenReg
          generic map (
-            TPD_G            => TPD_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            ADDR_WIDTH_G     => SIG_GEN_ADDR_WIDTH_G,
-            RAM_CLK_G        => SIG_GEN_RAM_CLK_G,
-            NUM_SIG_GEN_G    => SIG_GEN_SIZE_G)
+            TPD_G         => TPD_G,
+            ADDR_WIDTH_G  => SIG_GEN_ADDR_WIDTH_G,
+            RAM_CLK_G     => SIG_GEN_RAM_CLK_G,
+            NUM_SIG_GEN_G => SIG_GEN_SIZE_G)
          port map (
             axiClk_i        => axilClk,
             axiRst_i        => axilRst,

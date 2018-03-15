@@ -2,7 +2,7 @@
 -- File       : RtmEmptyCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-06
--- Last update: 2017-02-06
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -26,8 +26,7 @@ use unisim.vcomponents.all;
 
 entity RtmEmptyCore is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G : time := 1 ns);
    port (
       -- AXI-Lite Interface
       axilClk         : in    sl                     := '0';
@@ -51,16 +50,7 @@ architecture mapping of RtmEmptyCore is
 
 begin
 
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave);
+   axilReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+   axilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
 end mapping;

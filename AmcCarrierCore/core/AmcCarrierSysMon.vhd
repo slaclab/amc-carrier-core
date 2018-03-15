@@ -2,7 +2,7 @@
 -- File       : AmcCarrierSysMon.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-09
--- Last update: 2015-09-10
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -23,8 +23,7 @@ use work.AxiLitePkg.all;
 
 entity AmcCarrierSysMon is
    generic (
-      TPD_G            : time            := 1 ns;
-      AXI_ERROR_RESP_G : slv(1 downto 0) := AXI_RESP_DECERR_C);
+      TPD_G : time := 1 ns);
    port (
       -- SYSMON Ports
       vPIn            : in  sl;
@@ -106,6 +105,6 @@ begin
          eoc_out       => open,
          alarm_out     => open,
          eos_out       => open,
-         busy_out      => open);  
+         busy_out      => open);
 
 end architecture mapping;

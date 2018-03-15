@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-03-08
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -869,12 +869,11 @@ begin
    ----------------------------------   
    U_SysReg : entity work.AmcCarrierSysReg
       generic map (
-         TPD_G            => TPD_G,
-         BUILD_INFO_G     => BUILD_INFO_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         APP_TYPE_G       => APP_TYPE_G,
-         MPS_SLOT_G       => MPS_SLOT_G,
-         FSBL_G           => false)
+         TPD_G        => TPD_G,
+         BUILD_INFO_G => BUILD_INFO_G,
+         APP_TYPE_G   => APP_TYPE_G,
+         MPS_SLOT_G   => MPS_SLOT_G,
+         FSBL_G       => false)
       port map (
          -- Primary AXI-Lite Interface
          axilClk           => ref156MHzClk,
@@ -953,10 +952,9 @@ begin
    ------------------
    U_AppMps : entity work.AppMps
       generic map (
-         TPD_G            => TPD_G,
-         APP_TYPE_G       => APP_TYPE_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         MPS_SLOT_G       => MPS_SLOT_G)
+         TPD_G      => TPD_G,
+         APP_TYPE_G => APP_TYPE_G,
+         MPS_SLOT_G => MPS_SLOT_G)
       port map (
          -- AXI-Lite Interface
          axilClk         => ref156MHzClk,
