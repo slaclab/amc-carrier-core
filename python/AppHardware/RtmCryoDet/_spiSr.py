@@ -21,7 +21,7 @@ import pyrogue as pr
 
 class SpiSr(pr.Device):
     def __init__(   self, 
-        name        = "C_RtmSpiSr", 
+        name        = "RtmSpiSr", 
         description = "RTM Flux Ramp SPI Interface", 
         memBase     =  None,
         offset      =  0x00,
@@ -45,7 +45,7 @@ class SpiSr(pr.Device):
         ##############################
         
         self.add(pr.RemoteVariable(    
-            name         = "AD5790_NOP_Reg",
+            name         = "AD5790NopReg",
             description  = "FluxRamp_Reg0",
             offset       =  0x00,
             bitSize      =  20,
@@ -55,7 +55,7 @@ class SpiSr(pr.Device):
         ))
         
         self.add(pr.RemoteVariable(    
-            name         = "AD5790_Data_Reg",
+            name         = "AD5790DataReg",
             description  = "FluxRamp_Reg1",
             offset       =  0x04,
             bitSize      =  20,
@@ -65,7 +65,7 @@ class SpiSr(pr.Device):
         ))
         
         self.add(pr.RemoteVariable(    
-            name         = "AD5790_Ctrl_Reg",
+            name         = "AD5790CtrlReg",
             description  = "FluxRamp_Reg2",
             offset       =  0x08,
             bitSize      =  20,
@@ -75,7 +75,7 @@ class SpiSr(pr.Device):
         ))
         
         self.add(pr.RemoteVariable(    
-            name         = "AD5790_ClrCode_Reg",
+            name         = "AD5790ClrCodeReg",
             description  = "FluxRamp_Reg3",
             offset       =  0x0C,
             bitSize      =  20,
@@ -86,7 +86,7 @@ class SpiSr(pr.Device):
 
         #--entire control register
         self.add(pr.RemoteVariable(    
-            name         = "Config_Reg",
+            name         = "ConfigReg",
             description  = "FluxRamp_Reg4",
             offset       =  0x20,
             bitSize      =  20,
@@ -97,7 +97,7 @@ class SpiSr(pr.Device):
 
         #--Ctrl Reg0_[0]
         self.add(pr.RemoteVariable(   
-            name         = "Cfg_Reg_Ena Bit",
+            name         = "CfgRegEnaBit",
             description  = "FluxRamp_Reg4_0",
             offset       =  0x20,
             bitSize      =  1,
@@ -107,7 +107,7 @@ class SpiSr(pr.Device):
         
         #--Ctrl Reg0_[2]
         self.add(pr.RemoteVariable(   
-            name         = "Ramp Slope",
+            name         = "RampSlope",
             description  = "FluxRamp_Reg4_1",
             offset       =  0x20,
             bitSize      =  1,
@@ -117,7 +117,7 @@ class SpiSr(pr.Device):
         
         #--Ctrl Reg0_[3]
         self.add(pr.RemoteVariable(   
-            name         = "Mode Control",
+            name         = "ModeControl",
             description  = "FluxRamp_Reg4_3",
             offset       =  0x20,
             bitSize      =  1,
@@ -126,7 +126,7 @@ class SpiSr(pr.Device):
         ))        
 
         self.add(pr.RemoteVariable(    
-            name         = "Slow Step Size",
+            name         = "FastSlowStepSize",
             description  = "FluxRamp_Control_Reg5",
             offset       =  0x24,
             bitSize      =  20,
@@ -136,7 +136,7 @@ class SpiSr(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(    
-            name         = "Slow Rst Value",
+            name         = "FastSlowRstValue",
             description  = "FluxRamp_Control_Reg6",
             offset       =  0x28,
             bitSize      =  20,
@@ -146,29 +146,9 @@ class SpiSr(pr.Device):
         ))
          
         self.add(pr.RemoteVariable(    
-            name         = "Fast Step Size",
+            name         = "LTC1668RawDacData",
             description  = "FluxRamp_Control_Reg7",
             offset       =  0x2C,
-            bitSize      =  20,
-            bitOffset    =  0x00,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-
-        self.add(pr.RemoteVariable(    
-            name         = "Fast Rst Value",
-            description  = "FluxRamp_Control_Reg8",
-            offset       =  0x30,
-            bitSize      =  20,
-            bitOffset    =  0x00,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
-        self.add(pr.RemoteVariable(    
-            name         = "LTC1668 Raw DAC Data",
-            description  = "FluxRamp_Control_Reg9",
-            offset       =  0x34,
             bitSize      =  20,
             bitOffset    =  0x00,
             base         = pr.UInt,
