@@ -21,7 +21,7 @@ import pyrogue as pr
 
 class SpiMax(pr.Device):
     def __init__(   self, 
-        name        = "C_RtmSpiMax", 
+        name        = "RtmSpiMax", 
         description = "RTM Bias DAC SPI Interface", 
         memBase     =  None,
         offset      =  0x00,
@@ -47,13 +47,13 @@ class SpiMax(pr.Device):
         for i in range(0,225,32):
             if i/32 < 7: 
                 j = i/32+1
-                str1 = "TesBias "
+                str1 = "TesBias"
             else: 
                 j = 33
-                str1 = "HemtBias "
+                str1 = "HemtBias"
                          
             self.add(pr.RemoteVariable(
-                name         = str1 + "DacNopReg Ch %d" % (j),
+                name         = str1 + "DacNopRegCh%d" % (j),
                 description  = "BiasDac_Reg0",
                 #offset       =  hex(i), #--this does not work
                 offset       =  0x00 + i,
@@ -64,7 +64,7 @@ class SpiMax(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(    
-                name         = str1 + "DacDataReg Ch %d" % (j),
+                name         = str1 + "DacDataRegCh%d" % (j),
                 description  = "BiasDac_Reg1",
                 offset       =  0x00 + (i+4),
                 bitSize      =  20,
@@ -74,7 +74,7 @@ class SpiMax(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(    
-                name         = str1 + "DacCtrlReg Ch %d" % (j),
+                name         = str1 + "DacCtrlRegCh%d" % (j),
                 description  = "BiasDac_Reg2",
                 offset       =  0x00 + (i+8),
                 bitSize      =  20,
@@ -84,7 +84,7 @@ class SpiMax(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(    
-                name         = str1 + "DacClrCReg Ch %d" % (j),
+                name         = str1 + "DacClrCRegCh%d" % (j),
                 description  = "BiasDac_Reg3",
                 offset       =  0x00 + (i+12),
                 bitSize      =  20,
