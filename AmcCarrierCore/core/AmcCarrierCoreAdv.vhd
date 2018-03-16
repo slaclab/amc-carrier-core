@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-03-14
+-- Last update: 2018-03-16
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -41,7 +41,8 @@ entity AmcCarrierCoreAdv is
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
       TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
-      CORE_TRIGGERS_G        : integer  := 16;
+      CORE_TRIGGERS_G        : positive := 16;
+      TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
       FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G             : AppType;
       WAVEFORM_TDATA_BYTES_G : positive := 4;
@@ -380,6 +381,7 @@ begin
          TIME_GEN_APP_G         => TIME_GEN_APP_G,
          TIME_GEN_EXTREF_G      => TIME_GEN_EXTREF_G,
          CORE_TRIGGERS_G        => CORE_TRIGGERS_G,
+         TRIG_PIPE_G            => TRIG_PIPE_G,
          FSBL_G                 => FSBL_G)
       port map (
          -----------------------
