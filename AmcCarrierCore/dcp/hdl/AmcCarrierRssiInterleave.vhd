@@ -2,7 +2,7 @@
 -- File       : AmcCarrierRssiInterleave.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-09
--- Last update: 2018-02-09
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ entity AmcCarrierRssiInterleave is
    generic (
       TPD_G                 : time             := 1 ns;
       ETH_USR_FRAME_LIMIT_G : positive         := 4096;  -- 4kB
-      AXI_ERROR_RESP_G      : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G       : slv(31 downto 0) := (others => '0'));
    port (
       -- Slave AXI-Lite Interface
@@ -93,7 +92,7 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
-         APP_ILEAVE_EN_G     => true,    -- true = AxiStreamPacketizer2
+         APP_ILEAVE_EN_G     => true,   -- true = AxiStreamPacketizer2
          APP_STREAMS_G       => APP_STREAMS_C,
          APP_STREAM_ROUTES_G => (
             SRP_IDX_C        => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)

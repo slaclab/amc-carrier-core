@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-03-08
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -41,7 +41,6 @@ entity AppTop is
       MR_LCLS_APP_G          : boolean                   := false;
       WAVEFORM_TDATA_BYTES_G : positive                  := 4;
       TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";
-      AXI_ERROR_RESP_G       : slv(1 downto 0)           := AXI_RESP_DECERR_C;
       -- JESD Generics
       JESD_DRP_EN_G          : boolean                   := false;
       JESD_RX_LANE_G         : NaturalArray(1 downto 0)  := (others => 0);
@@ -265,17 +264,8 @@ begin
    -------------------------------
    -- Terminating legacy interface
    -------------------------------
-   U_AxiLiteEmpty : entity work.AxiLiteEmpty
-      generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
-      port map (
-         axiClk         => axilClk,
-         axiClkRst      => axilRst,
-         axiReadMaster  => axilReadMasters(TIMING_INDEX_C),
-         axiReadSlave   => axilReadSlaves(TIMING_INDEX_C),
-         axiWriteMaster => axilWriteMasters(TIMING_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(TIMING_INDEX_C));
+   axilReadSlaves(TIMING_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+   axilWriteSlaves(TIMING_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
    ---------------------
    -- AXI-Lite Crossbar
@@ -283,7 +273,6 @@ begin
    U_XBAR : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -313,7 +302,6 @@ begin
       U_DaqMuxV2 : entity work.DaqMuxV2
          generic map (
             TPD_G                  => TPD_G,
-            AXI_ERROR_RESP_G       => AXI_ERROR_RESP_G,
             DECIMATOR_EN_G         => DAQMUX_DECIMATOR_EN_G,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
             BAY_INDEX_G            => ite((i = 0), '0', '1'),
@@ -390,7 +378,6 @@ begin
             SIM_SPEEDUP_G      => SIM_SPEEDUP_G,
             SIMULATION_G       => SIMULATION_G,
             AXI_BASE_ADDR_G    => AXI_CONFIG_C(JESD0_INDEX_C+i).baseAddr,
-            AXI_ERROR_RESP_G   => AXI_ERROR_RESP_G,
             JESD_DRP_EN_G      => JESD_DRP_EN_G,
             JESD_RX_LANE_G     => JESD_RX_LANE_G(i),
             JESD_TX_LANE_G     => JESD_TX_LANE_G(i),
@@ -451,7 +438,6 @@ begin
          generic map (
             TPD_G                => TPD_G,
             AXI_BASE_ADDR_G      => AXI_CONFIG_C(SIG_GEN0_INDEX_C+i).baseAddr,
-            AXI_ERROR_RESP_G     => AXI_ERROR_RESP_G,
             SIG_GEN_SIZE_G       => SIG_GEN_SIZE_G(i),
             SIG_GEN_ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G(i),
             SIG_GEN_LANE_MODE_G  => SIG_GEN_LANE_MODE_G(i),
@@ -487,12 +473,11 @@ begin
    -------------------
    U_AppCore : entity work.AppCore
       generic map (
-         TPD_G            => TPD_G,
-         SIM_SPEEDUP_G    => SIM_SPEEDUP_G,
-         SIMULATION_G     => SIMULATION_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         JESD_USR_DIV_G   => JESD_USR_DIV_G)
+         TPD_G           => TPD_G,
+         SIM_SPEEDUP_G   => SIM_SPEEDUP_G,
+         SIMULATION_G    => SIMULATION_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
+         JESD_USR_DIV_G  => JESD_USR_DIV_G)
       port map (
          -- Clocks and resets   
          jesdClk             => jesdClk,

@@ -2,7 +2,7 @@
 -- File       : AmcCarrierFsbl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-08-14
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -269,8 +269,7 @@ begin
    ------------------
    U_Eth : entity work.AmcCarrierEthFsbl
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C)
+         TPD_G => TPD_G)
       port map (
          -- Local Configuration
          localMac            => localMac,
@@ -332,8 +331,7 @@ begin
       generic map (
          TPD_G             => TPD_G,
          TIME_GEN_APP_G    => false,
-         TIME_GEN_EXTREF_G => false,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
+         TIME_GEN_EXTREF_G => false)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk             => axilClk,
@@ -378,8 +376,7 @@ begin
          TPD_G                  => TPD_G,
          FSBL_G                 => true,
          DISABLE_BSA_G          => true,
-         WAVEFORM_TDATA_BYTES_G => 4,
-         AXI_ERROR_RESP_G       => AXI_ERROR_RESP_C)
+         WAVEFORM_TDATA_BYTES_G => 4)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
@@ -418,10 +415,9 @@ begin
    ------------------
    U_DdrMem : entity work.AmcCarrierDdrMem
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         FSBL_G           => true,
-         SIM_SPEEDUP_G    => false)
+         TPD_G         => TPD_G,
+         FSBL_G        => true,
+         SIM_SPEEDUP_G => false)
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,

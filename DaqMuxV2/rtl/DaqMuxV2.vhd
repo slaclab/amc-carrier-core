@@ -2,7 +2,7 @@
 -- File       : DaqMuxV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-07-12
--- Last update: 2017-08-08
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: Data acquisition top module:
 --              https://confluence.slac.stanford.edu/display/ppareg/AmcAxisDaqV2+Requirements
@@ -31,7 +31,6 @@ entity DaqMuxV2 is
       DECIMATOR_EN_G         : boolean               := true;
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 8 := 4;
       FRAME_BWIDTH_G         : positive              := 10;  -- Axi stream frame size Dafault 10: 4096 byte frames
-      AXI_ERROR_RESP_G       : slv(1 downto 0)       := AXI_RESP_SLVERR_C;
       BAY_INDEX_G            : sl;
       -- Number of data lanes
       N_DATA_IN_G            : positive              := 16;
@@ -188,10 +187,9 @@ begin
    -- axiLite register interface
    U_DaqRegItf : entity work.DaqRegItf
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-         N_DATA_IN_G      => N_DATA_IN_G,
-         N_DATA_OUT_G     => N_DATA_OUT_G)
+         TPD_G        => TPD_G,
+         N_DATA_IN_G  => N_DATA_IN_G,
+         N_DATA_OUT_G => N_DATA_OUT_G)
       port map (
          axiClk_i => axiClk,
          axiRst_i => axiRst,
@@ -309,11 +307,10 @@ begin
    GEN_OUT_LANES : for i in N_DATA_OUT_G-1 downto 0 generate
       U_DaqLane : entity work.DaqLane
          generic map (
-            TPD_G            => TPD_G,
-            BAY_INDEX_G      => BAY_INDEX_G,
-            AXI_ERROR_RESP_G => AXI_ERROR_RESP_G,
-            DECIMATOR_EN_G   => DECIMATOR_EN_G,
-            FRAME_BWIDTH_G   => FRAME_BWIDTH_G)
+            TPD_G          => TPD_G,
+            BAY_INDEX_G    => BAY_INDEX_G,
+            DECIMATOR_EN_G => DECIMATOR_EN_G,
+            FRAME_BWIDTH_G => FRAME_BWIDTH_G)
          port map (
 
             devClk_i => devClk_i,

@@ -2,7 +2,7 @@
 -- File       : AmcMrLlrfUpConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-07
--- Last update: 2018-02-14
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -34,7 +34,6 @@ entity AmcMrLlrfUpConvertCore is
       TPD_G              : time             := 1 ns;
       TIMING_TRIG_MODE_G : boolean          := false;  -- false = data output, true = clock output
       IODELAY_GROUP_G    : string           := "AMC_DELAY_GROUP";
-      AXI_ERROR_RESP_G   : slv(1 downto 0)  := AXI_RESP_DECERR_C;
       AXI_BASE_ADDR_G    : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD SYNC Interface
@@ -263,7 +262,6 @@ begin
    U_XBAR0 : entity work.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
-         DEC_ERROR_RESP_G   => AXI_ERROR_RESP_G,
          NUM_SLAVE_SLOTS_G  => 1,
          NUM_MASTER_SLOTS_G => NUM_AXI_MASTERS_C,
          MASTERS_CONFIG_G   => AXI_CONFIG_C)
@@ -380,7 +378,6 @@ begin
       U_Attn : entity work.AxiSerAttnMaster
          generic map (
             TPD_G             => TPD_G,
-            AXI_ERROR_RESP_G  => AXI_ERROR_RESP_G,
             DATA_SIZE_G       => 6,
             CLK_PERIOD_G      => 6.4E-9,
             SPI_SCLK_PERIOD_G => 1.0E-6)  -- 10KHz
@@ -424,9 +421,8 @@ begin
    ----------------------------
    U_DAC_SIG_GEN : entity work.LvdsDacSigGen
       generic map (
-         TPD_G            => TPD_G,
-         AXI_BASE_ADDR_G  => AXI_CONFIG_C(SIG_GEN_INDEX_C).baseAddr,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_G)
+         TPD_G           => TPD_G,
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(SIG_GEN_INDEX_C).baseAddr)
       port map (
          -- devClk2x Reference
          devClk2x_i      => jesdClk2x,

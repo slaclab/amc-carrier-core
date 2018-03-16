@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-02-15
+-- Last update: 2018-03-16
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -41,7 +41,8 @@ entity AmcCarrierCore is
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
       TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
-      CORE_TRIGGERS_G        : integer  := 16;
+      CORE_TRIGGERS_G        : positive := 16;
+      TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
       FSBL_G                 : boolean  := false);  -- false = Normal Operation, true = First Stage Boot loader
    port (
       -----------------------
@@ -183,10 +184,10 @@ architecture mapping of AmcCarrierCore is
    signal ibBsaMasters : AxiStreamMasterArray(3 downto 0);
    signal ibBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
 
-   signal obTimingEthMsgMaster : AxiStreamMasterType;
-   signal obTimingEthMsgSlave  : AxiStreamSlaveType;
-   signal ibTimingEthMsgMaster : AxiStreamMasterType;
-   signal ibTimingEthMsgSlave  : AxiStreamSlaveType;
+   signal obTimingEthMsgMaster  : AxiStreamMasterType;
+   signal obTimingEthMsgSlave   : AxiStreamSlaveType;
+   signal ibTimingEthMsgMaster  : AxiStreamMasterType;
+   signal ibTimingEthMsgSlave   : AxiStreamSlaveType;
    signal intTimingEthMsgMaster : AxiStreamMasterType;
    signal intTimingEthMsgSlave  : AxiStreamSlaveType;
 
@@ -287,8 +288,7 @@ begin
          TPD_G                 => TPD_G,
          RSSI_ILEAVE_EN_G      => RSSI_ILEAVE_EN_G,
          RTM_ETH_G             => RTM_ETH_G,
-         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-         AXI_ERROR_RESP_G      => AXI_ERROR_RESP_C)
+         ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G)
       port map (
          -- Local Configuration
          localMac             => localMac,
@@ -352,9 +352,9 @@ begin
          TPD_G             => TPD_G,
          TIME_GEN_APP_G    => TIME_GEN_APP_G,
          TIME_GEN_EXTREF_G => TIME_GEN_EXTREF_G,
-         NTRIGGERS_G       => CORE_TRIGGERS_G,
-         STREAM_L1_G       => true,
-         AXI_ERROR_RESP_G  => AXI_ERROR_RESP_C)
+         CORE_TRIGGERS_G   => CORE_TRIGGERS_G,
+         TRIG_PIPE_G       => TRIG_PIPE_G,
+         STREAM_L1_G       => true)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
@@ -406,8 +406,7 @@ begin
          FSBL_G                 => FSBL_G,
          DISABLE_BSA_G          => DISABLE_BSA_G,
          DISABLE_BLD_G          => DISABLE_BLD_G,
-         WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
-         AXI_ERROR_RESP_G       => AXI_ERROR_RESP_C)
+         WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
@@ -444,17 +443,16 @@ begin
          ibEthMsgMaster       => intTimingEthMsgMaster,
          ibEthMsgSlave        => intTimingEthMsgSlave,
          obEthMsgMaster       => obTimingEthMsgMaster,
-         obEthMsgSlave        => obTimingEthMsgSlave );
+         obEthMsgSlave        => obTimingEthMsgSlave);
 
    ------------------
    -- DDR Memory Core
    ------------------
    U_DdrMem : entity work.AmcCarrierDdrMem
       generic map (
-         TPD_G            => TPD_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
-         FSBL_G           => FSBL_G,
-         SIM_SPEEDUP_G    => SIM_SPEEDUP_G)
+         TPD_G         => TPD_G,
+         FSBL_G        => FSBL_G,
+         SIM_SPEEDUP_G => SIM_SPEEDUP_G)
       port map (
          -- AXI-Lite Interface
          axilClk         => axilClk,

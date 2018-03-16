@@ -228,7 +228,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          BUILD_INFO_G     => BUILD_INFO_G,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          APP_TYPE_G       => APP_NULL_TYPE_C,
          MPS_SLOT_G       => false,
          FSBL_G           => true)
@@ -312,7 +311,6 @@ begin
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_NULL_TYPE_C,
-         AXI_ERROR_RESP_G => AXI_ERROR_RESP_C,
          MPS_SLOT_G       => false)
       port map (
          -- AXI-Lite Interface

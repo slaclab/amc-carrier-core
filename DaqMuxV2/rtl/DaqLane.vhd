@@ -2,7 +2,7 @@
 -- File       : DaqLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-02
--- Last update: 2017-10-16
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:   This module sends sample data to a single Lane.
 --                In non-continuous mode
@@ -48,12 +48,11 @@ use work.Jesd204bPkg.all;
 entity DaqLane is
    generic (
       -- General Configurations
-      TPD_G                : time            := 1 ns;
-      AXI_ERROR_RESP_G     : slv(1 downto 0) := AXI_RESP_SLVERR_C;
+      TPD_G                : time     := 1 ns;
       BAY_INDEX_G          : sl;
-      DECIMATOR_EN_G       : boolean         := true;  -- Include or exclude decimator
-      FRAME_BWIDTH_G       : positive        := 10;  -- Dafault 10: 4096 byte frames
-      FREZE_BUFFER_TUSER_G : integer         := 2
+      DECIMATOR_EN_G       : boolean  := true;  -- Include or exclude decimator
+      FRAME_BWIDTH_G       : positive := 10;    -- Dafault 10: 4096 byte frames
+      FREZE_BUFFER_TUSER_G : integer  := 2
       );
    port (
       enable_i : in sl;
@@ -118,6 +117,7 @@ architecture rtl of DaqLane is
       dataCnt      : slv(packetSize_i'range);
       txAxisMaster : AxiStreamMasterType;
       error        : sl;
+      compCheck    : sl;
       freeze       : sl;
       busy         : sl;
       sof          : sl;
@@ -138,6 +138,7 @@ architecture rtl of DaqLane is
       dataCnt      => (others => '0'),
       txAxisMaster => AXI_STREAM_MASTER_INIT_C,
       error        => '0',
+      compCheck    => '0',
       freeze       => '0',
       busy         => '0',
       sof          => '1',
@@ -159,8 +160,7 @@ architecture rtl of DaqLane is
    signal s_sampDataTst   : slv((GT_WORD_SIZE_C*8)-1 downto 0);
    signal s_decSampData   : slv((GT_WORD_SIZE_C*8)-1 downto 0);
 
-   signal packetSizeVar : slv(31 downto 0);
-   signal compCheck     : sl;
+   signal compCheck : sl;
 
 begin
    -- Do not trigger decimator when busy
@@ -219,7 +219,7 @@ begin
          WIDTH_G => 32)
       port map (
          clk  => devClk_i,
-         ain  => packetSizeVar,
+         ain  => r.packetSize,
          bin  => toSlv(HEADER_SIZE_C, 32),
          lsEq => compCheck);  -- less than or equal to (a <= b) --- (r.packetSize <= HEADER_SIZE_C)  
 
@@ -237,7 +237,8 @@ begin
       v := r;
 
       -- Register trigger
-      v.trigSh := r.trigSh(2 downto 0) & trig_i;
+      v.trigSh    := r.trigSh(2 downto 0) & trig_i;
+      v.compCheck := compCheck;
 
       -- Reset strobing signals
       v.txAxisMaster.tValid := '0';
@@ -300,11 +301,8 @@ begin
                -- Set the SOF bit
                ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, r.sof);
                v.sof                 := '0';
-               -- Check the counter
-               if (r.dataCnt /= r.maxSize) then
-                  -- Increment the counter
-                  v.dataCnt := r.dataCnt + 1;
-               end if;
+               -- Increment the counter
+               v.dataCnt             := r.dataCnt + 1;
                -- Insert header words depending on which it is
                if (r.headerEn = '1') then
                   case (r.dataCnt) is
@@ -344,7 +342,7 @@ begin
                   v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
                end if;
                -- Check if packet length error
-               if (r.dataCnt = (HEADER_SIZE_C-1)) and (compCheck = '1') then
+               if (r.dataCnt = (HEADER_SIZE_C-1)) and (r.compCheck = '1') then
                   -- Set the EOF bit
                   v.txAxisMaster.tLast := '1';
                   -- Set the EOFE bit
@@ -431,7 +429,6 @@ begin
       rin <= v;
 
       -- Output assignment
-      packetSizeVar  <= v.packetSize;
       rxAxisMaster_o <= r.txAxisMaster;
       error_o        <= r.error;
       pctCnt_o       <= r.pctCnt;
