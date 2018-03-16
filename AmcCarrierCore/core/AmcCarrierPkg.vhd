@@ -57,7 +57,7 @@ package AmcCarrierPkg is
    -- 03/02/2018 (0x02020200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.2
    -- 03/08/2018 (0x02020300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.3
    -- 03/11/2018 (0x02020400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.4
-   -- 03/15/2018 (0x02030000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.3.0
+   -- 03/16/2018 (0x02030000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.3.0
    constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_03_00_00";
 
    -----------------------------------------------------------
