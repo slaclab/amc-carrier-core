@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-08
--- Last update: 2018-03-11
 -------------------------------------------------------------------------------
 -- Description: Common AMC Carrier Core VHDL package
 -------------------------------------------------------------------------------
@@ -59,7 +57,8 @@ package AmcCarrierPkg is
    -- 03/02/2018 (0x02020200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.2
    -- 03/08/2018 (0x02020300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.3
    -- 03/11/2018 (0x02020400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.4
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_02_04_00";
+   -- 03/15/2018 (0x02030000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.3.0
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_03_00_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
