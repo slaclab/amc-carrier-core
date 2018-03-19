@@ -2,7 +2,7 @@
 -- File       : AmcCarrierTiming.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-03-14
+-- Last update: 2018-03-16
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -35,12 +35,13 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierTiming is
    generic (
-      TPD_G             : time    := 1 ns;
-      TIME_GEN_APP_G    : boolean := false;
-      TIME_GEN_EXTREF_G : boolean := false;
-      NTRIGGERS_G       : integer := 4;
-      STREAM_L1_G       : boolean := true;
-      RX_CLK_MMCM_G     : boolean := false);
+      TPD_G             : time     := 1 ns;
+      TIME_GEN_APP_G    : boolean  := false;
+      TIME_GEN_EXTREF_G : boolean  := false;
+      CORE_TRIGGERS_G   : positive := 16;
+      TRIG_PIPE_G       : natural  := 0;
+      STREAM_L1_G       : boolean  := true;
+      RX_CLK_MMCM_G     : boolean  := false);
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk              : in  sl;
@@ -89,7 +90,7 @@ architecture mapping of AmcCarrierTiming is
    constant AXIL_CORE_INDEX_C  : integer := 0;
    constant AXIL_GTH_INDEX_C   : integer := 1;
    constant AXIL_TRIG_INDEX_C  : integer := 2;
-   constant NUM_AXIL_MASTERS_C : integer := ite(NTRIGGERS_G > 0, 3, 2);
+   constant NUM_AXIL_MASTERS_C : integer := ite(CORE_TRIGGERS_G > 0, 3, 2);
 
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(2 downto 0) := (
       0               => (
@@ -342,42 +343,45 @@ begin
          appTimingBus.valid  <= appBus.valid  after TPD_G;  -- Pipeline for register replication during impl_1
       end if;
    end process;
+
    -- No pipelining: message, V1, and V2 only updated during strobe's HIGH cycle
    appTimingBus.message <= appBus.message;
    appTimingBus.stream  <= appBus.stream;
    appTimingBus.v1      <= appBus.v1;
    appTimingBus.v2      <= appBus.v2;
 
+   -- Declaring the primitive because it's DCP output
    U_timingClkSel : OBUF
       port map (
          I => timingClockSel,
          O => timingClkSel);
 
-   --
+   -----------------
    --  Core Triggers
-   --
-   GEN_CORETRIG : if NTRIGGERS_G > 0 generate
+   -----------------
+   GEN_CORETRIG : if CORE_TRIGGERS_G > 0 generate
       U_CoreTrig : entity work.EvrV2CoreTriggers
-         generic map (TPD_G           => TPD_G,
-                      NCHANNELS_G     => NTRIGGERS_G,
-                      NTRIGGERS_G     => NTRIGGERS_G,
-                      TRIG_DEPTH_G    => 19,  -- bitSize(125MHz/360Hz)
-                      COMMON_CLK_G    => false,
-                      AXIL_BASEADDR_G => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_TRIG_INDEX_C).baseAddr)
-         port map (axilClk         => axilClk,
-                   axilRst         => axilRst,
-                   axilWriteMaster => axilWriteMasters(AXIL_TRIG_INDEX_C),
-                   axilWriteSlave  => axilWriteSlaves (AXIL_TRIG_INDEX_C),
-                   axilReadMaster  => axilReadMasters (AXIL_TRIG_INDEX_C),
-                   axilReadSlave   => axilReadSlaves (AXIL_TRIG_INDEX_C),
-                   evrClk          => appTimingClk,
-                   evrRst          => appTimingRst,
-                   evrBus          => appBus,
-                   exptBus         => appExptBus,
-                   trigOut         => appTimingTrig,
-                   evrModeSel      => appTimingMode);
+         generic map (
+            TPD_G           => TPD_G,
+            NCHANNELS_G     => CORE_TRIGGERS_G,
+            NTRIGGERS_G     => CORE_TRIGGERS_G,
+            TRIG_DEPTH_G    => 19,      -- bitSize(125MHz/360Hz)
+            TRIG_PIPE_G     => TRIG_PIPE_G,
+            COMMON_CLK_G    => false,
+            AXIL_BASEADDR_G => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_TRIG_INDEX_C).baseAddr)
+         port map (
+            axilClk         => axilClk,
+            axilRst         => axilRst,
+            axilWriteMaster => axilWriteMasters(AXIL_TRIG_INDEX_C),
+            axilWriteSlave  => axilWriteSlaves (AXIL_TRIG_INDEX_C),
+            axilReadMaster  => axilReadMasters (AXIL_TRIG_INDEX_C),
+            axilReadSlave   => axilReadSlaves (AXIL_TRIG_INDEX_C),
+            evrClk          => appTimingClk,
+            evrRst          => appTimingRst,
+            evrBus          => appBus,
+            exptBus         => appExptBus,
+            trigOut         => appTimingTrig,
+            evrModeSel      => appTimingMode);
    end generate;
-
-
 
 end mapping;

@@ -34,9 +34,16 @@ proc MyVersionCheck { } {
 set family [getFpgaFamily]
 
 # Check for submodule tagging
-if { [SubmoduleCheck {ruckus}             {1.5.12} ] < 0 } {exit -1}
-if { [SubmoduleCheck {surf}               {1.7.1}  ] < 0 } {exit -1}
-if { [SubmoduleCheck {lcls-timing-core}   {1.9.1}  ] < 0 } {exit -1}
+if { [info exists ::env(OVERRIDE_SUBMODULE_LOCKS)] != 1 || $::env(OVERRIDE_SUBMODULE_LOCKS) == 0 } {
+   if { [SubmoduleCheck {ruckus}           {1.6.0}  "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {surf}             {1.7.2}  "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {lcls-timing-core} {1.10.0} "mustBeExact" ] < 0 } {exit -1}
+} else {
+   puts "\n\n*********************************************************"
+   puts "OVERRIDE_SUBMODULE_LOCKS != 0"
+   puts "Ignoring the submodule locks in amc-carrier-core/ruckus.tcl"
+   puts "*********************************************************\n\n"
+}
 
 # Check for Kintex Ultrascale+
 if { ${family} == "kintexuplus" } {
