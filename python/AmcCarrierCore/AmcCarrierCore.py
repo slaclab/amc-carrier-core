@@ -19,11 +19,13 @@ from AppMps.AppMps import *
 
 class AmcCarrierCore(pr.Device):
     def __init__(   self, 
-            name        = "AmcCarrierCore", 
-            description = "AmcCarrierCore", 
-            enableBsa   = True,
-            enableMps   = True,
-            expand	    = False,
+            name                = "AmcCarrierCore", 
+            description         = "AmcCarrierCore", 
+            rssiNotInterlaved   = True,
+            rssiInterlaved      = False,            
+            enableBsa           = True,
+            enableMps           = True,
+            expand	            = False,
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)  
 
@@ -111,7 +113,6 @@ class AmcCarrierCore(pr.Device):
             expand       =  False,
         ))
 
-
         for i in range(2):                                       
             self.add(udp.UdpEngineServer(
                 name         = "SwUdpServer[%i]" % (i),
@@ -119,15 +120,24 @@ class AmcCarrierCore(pr.Device):
                 description  = "SwUdpServer. Server: %i" % (i),  
                 expand       =  False,                                    
             ))
-            
-        for i in range(2):
+
+        if (rssiNotInterlaved):
+            for i in range(2):
+                self.add(rssi.RssiCore(
+                    name         = "SwRssiServer[%i]" % (i),
+                    offset       =  0x0A010000 + (i * 0x1000),
+                    description  = "SwRssiServer Server: %i" % (i),                                
+                    expand       =  False,                                    
+                ))
+                
+        if (rssiInterlaved):
             self.add(rssi.RssiCore(
-                name         = "SwRssiServer[%i]" % (i),
-                offset       =  0x0A010000 + (i * 0x1000),
-                description  = "SwRssiServer. Server: %i" % (i),                                
+                name         = "SwRssiServer",
+                offset       =  0x0A020000,
+                description  = "SwRssiServer Server",                                
                 expand       =  False,                                    
             ))
-                                
+
         if (enableMps):
             self.add(AppMps(      
                 offset =  0x0C000000, 

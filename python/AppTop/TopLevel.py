@@ -51,6 +51,9 @@ class TopLevel(pr.Device):
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
         
+        rssiInterlaved    = False
+        rssiNotInterlaved = False       
+        
         # Check for valid link range
         if (pcieRssiLink<0) or (pcieRssiLink>6):
             raise ValueError("Invalid pcieRssiLink (%d)" % (pcieRssiLink) )        
@@ -80,6 +83,9 @@ class TopLevel(pr.Device):
                 pyrogue.streamConnectBiDir( srp, udp )           
             
             elif ( commType=="eth-rssi-non-interleaved" ):
+                
+                # Update the flag
+                rssiNotInterlaved = True
             
                 # Create SRP/ASYNC_MSG interface
                 rudp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, packVer = 1)  
@@ -92,6 +98,9 @@ class TopLevel(pr.Device):
                 self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, packVer = 1)       
             
             elif ( commType=="eth-rssi-interleaved" ):
+            
+                # Update the flag
+                rssiInterlaved = True            
 
                 # Create Interleaved RSSI interface
                 rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8198, packVer = 2)
@@ -108,6 +117,9 @@ class TopLevel(pr.Device):
                 pr.streamConnectBiDir( srp, vc0Srp )          
                     
             elif ( commType == 'pcie-rssi-interleaved' ):
+            
+                # Update the flag
+                rssiInterlaved = True               
 
                 #########################################################################################
                 # Assumes this PCIe card Configuration:
@@ -146,19 +158,21 @@ class TopLevel(pr.Device):
 
         # Add devices
         self.add(AmcCarrierCore(
-            memBase    =  srp,
-            offset     =  0x00000000,
-            enableBsa  =  enableBsa,
-            enableMps  =  enableMps,
+            memBase           = srp,
+            offset            = 0x00000000,
+            rssiInterlaved    = rssiInterlaved,
+            rssiNotInterlaved = rssiNotInterlaved,
+            enableBsa         = enableBsa,
+            enableMps         = enableMps,
         ))
         self.add(AppTop(
-            memBase      =  srp,
-            offset       =  0x80000000,
-            numRxLanes   =  numRxLanes,
-            numTxLanes   =  numTxLanes,
-            numSigGen    =  numSigGen,
-            sizeSigGen   =  sizeSigGen,
-            modeSigGen   =  modeSigGen,
+            memBase      = srp,
+            offset       = 0x80000000,
+            numRxLanes   = numRxLanes,
+            numTxLanes   = numTxLanes,
+            numSigGen    = numSigGen,
+            sizeSigGen   = sizeSigGen,
+            modeSigGen   = modeSigGen,
         ))
 
         # Define SW trigger command
