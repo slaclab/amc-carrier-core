@@ -18,7 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import pyrogue.simulation
+import pyrogue.interfaces.simulation
 import pyrogue.protocols
 import pyrogue.utilities.fileio
 import rogue.hardware.data
@@ -73,7 +73,7 @@ class TopLevel(pr.Device):
             if ( commType=="eth-fsbl" ):
             
                 # UDP only
-                udp = rogue.protocols.udp.Client(  ip, 8192, 1500 )
+                udp = rogue.protocols.udp.Client(  host=ip, port=8192, jumbo=false )
             
                 # Connect the SRPv0 to RAW UDP
                 srp = rogue.protocols.srp.SrpV0()
@@ -82,19 +82,19 @@ class TopLevel(pr.Device):
             elif ( commType=="eth-rssi-non-interleaved" ):
             
                 # Create SRP/ASYNC_MSG interface
-                rudp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1400)
+                rudp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, packVer = 1)  
 
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
 
                 # Create stream interface
-                self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1400)         
+                self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, packVer = 1)       
             
             elif ( commType=="eth-rssi-interleaved" ):
 
                 # Create Interleaved RSSI interface
-                rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8198, size=1400, packVer = 2)
+                rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8198, packVer = 2)
 
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
