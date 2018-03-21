@@ -69,7 +69,7 @@ class SpiMax(pr.Device):
                 offset       =  0x00 + (i+4),
                 bitSize      =  20,
                 bitOffset    =  0x00,
-                base         = pr.UInt,
+                base         = pr.Int,
                 mode         = "WO",
             ))
             
