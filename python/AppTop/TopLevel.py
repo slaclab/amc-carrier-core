@@ -21,19 +21,20 @@ import pyrogue as pr
 import pyrogue.interfaces.simulation
 import pyrogue.protocols
 import pyrogue.utilities.fileio
-import rogue.hardware.data
+import rogue.hardware.axi
 
 from AmcCarrierCore import *
 from AppTop import *
 
 class TopLevel(pr.Device):
     def __init__(   self, 
-            name            = "FpgaTopLevel", 
-            description     = "Container for FPGA Top-Level", 
+            name            = 'FpgaTopLevel',
+            description     = 'Container for FPGA Top-Level', 
             # Communication Parameters
             simGui          = False,
-            commType        = "eth-rssi-non-interleaved",
-            ipAddr          = "10.0.1.101",
+            commType        = 'eth-rssi-non-interleaved',
+            ipAddr          = '10.0.1.101',
+            pcieDev         = '/dev/datadev_0',
             pcieRssiLink    = 0,
             # JESD Parameters
             numRxLanes      = [0,0],
@@ -76,7 +77,7 @@ class TopLevel(pr.Device):
             if ( commType=="eth-fsbl" ):
             
                 # UDP only
-                udp = rogue.protocols.udp.Client(  host=ip, port=8192, jumbo=false )
+                udp = rogue.protocols.udp.Client(ipAddr,8192,0)
             
                 # Connect the SRPv0 to RAW UDP
                 srp = rogue.protocols.srp.SrpV0()
@@ -112,7 +113,7 @@ class TopLevel(pr.Device):
             elif ( commType == 'pcie-fsbl' ):
             
                 # Connect the SRPv0 to tDest = 0x0
-                vc0Srp  = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+0)
+                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*4)+0,1)
                 srp = rogue.protocols.srp.SrpV0()              
                 pr.streamConnectBiDir( srp, vc0Srp )          
                     
@@ -142,15 +143,15 @@ class TopLevel(pr.Device):
                 #########################################################################################
             
                 # Connect the SRPv3 to tDest = 0x0
-                vc0Srp  = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+0)
+                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*4)+0,1)
                 srp = rogue.protocols.srp.SrpV3()                
                 pr.streamConnectBiDir( srp, vc0Srp )   
 
                 # Create the Raw Data stream interface
-                self.stream_vc1 = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+1)
+                self.stream_vc1 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*4)+1,1)
 
                 # Create the Raw Data stream interface
-                self.stream_vc2 = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+2)
+                self.stream_vc2 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*4)+2,1)
 
             # Undefined device type
             else:
@@ -165,15 +166,15 @@ class TopLevel(pr.Device):
             enableBsa         = enableBsa,
             enableMps         = enableMps,
         ))
-        self.add(AppTop(
-            memBase      = srp,
-            offset       = 0x80000000,
-            numRxLanes   = numRxLanes,
-            numTxLanes   = numTxLanes,
-            numSigGen    = numSigGen,
-            sizeSigGen   = sizeSigGen,
-            modeSigGen   = modeSigGen,
-        ))
+        # self.add(AppTop(
+            # memBase      = srp,
+            # offset       = 0x80000000,
+            # numRxLanes   = numRxLanes,
+            # numTxLanes   = numTxLanes,
+            # numSigGen    = numSigGen,
+            # sizeSigGen   = sizeSigGen,
+            # modeSigGen   = modeSigGen,
+        # ))
 
         # Define SW trigger command
         @self.command(description="Software Trigger for DAQ MUX",)

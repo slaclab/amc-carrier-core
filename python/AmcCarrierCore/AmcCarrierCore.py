@@ -100,43 +100,95 @@ class AmcCarrierCore(pr.Device):
         ))
                             
         self.add(udp.UdpEngineClient(
-            name         = "BpUdpClient",
+            name         = "BpUdpCltApp",
             offset       =  0x0A000000,
-            description  = "BpUdpClient",
+            description  = "Backplane UDP Client for Application ASYNC Messaging",
             expand       =  False,
         ))
 
         self.add(udp.UdpEngineServer(
-            name         = "BpUdpServer",
-            offset       =  0x0A000818,
-            description  = "BpUdpServer",
+            name         = "BpUdpSrvXvc",
+            offset       =  0x0A000800,
+            description  = "Backplane UDP Server: Xilinx XVC",
             expand       =  False,
         ))
+        
+        self.add(udp.UdpEngineServer(
+            name         = "BpUdpSrvFsbl",
+            offset       =  0x0A000808,
+            description  = "Backplane UDP Server: FSBL Legacy SRPv0 register access",
+            expand       =  False,
+        )) 
 
-        for i in range(2):                                       
-            self.add(udp.UdpEngineServer(
-                name         = "SwUdpServer[%i]" % (i),
-                offset       =  0x0A000808 + (i * 0x08),
-                description  = "SwUdpServer. Server: %i" % (i),  
-                expand       =  False,                                    
-            ))
+        self.add(udp.UdpEngineServer(
+            name         = "BpUdpSrvRssi[0]",
+            offset       =  0x0A000810,
+            description  = "Backplane UDP Server: Legacy Non-interleaved RSSI for Register access and ASYNC messages",
+            expand       =  False,
+        )) 
 
-        if (rssiNotInterlaved):
-            for i in range(2):
-                self.add(rssi.RssiCore(
-                    name         = "SwRssiServer[%i]" % (i),
-                    offset       =  0x0A010000 + (i * 0x1000),
-                    description  = "SwRssiServer Server: %i" % (i),                                
-                    expand       =  False,                                    
-                ))
+        self.add(udp.UdpEngineServer(
+            name         = "BpUdpSrvRssi[1]",
+            offset       =  0x0A000818,
+            description  = "Backplane UDP Server: Legacy Non-interleaved RSSI for bulk data transfer",
+            expand       =  False,
+        ))         
+        
+        self.add(udp.UdpEngineServer(
+            name         = "BpUdpSrvApp",
+            offset       =  0x0A000820,
+            description  = "Backplane UDP Server for Application ASYNC Messaging",
+            expand       =  False,
+        ))  
+
+        self.add(udp.UdpEngineServer(
+            name         = "BpUdpSrvTiming",
+            offset       =  0x0A000828,
+            description  = "Backplane UDP Server for Timing ASYNC Messaging",
+            expand       =  False,
+        ))          
+        
+        self.add(udp.UdpEngineServer(
+            name         = "BpUdpSrvRssi[2]",
+            offset       =  0x0A000830,
+            description  = "Backplane UDP Server: Interleaved RSSI",
+            expand       =  False,
+        ))              
+        
+        # if (rssiNotInterlaved):
+            # for i in range(2):
+                # self.add(rssi.RssiCore(
+                    # name         = "SwRssiServer[%i]" % (i),
+                    # offset       =  0x0A010000 + (i * 0x1000),
+                    # description  = "SwRssiServer Server: %i" % (i),                                
+                    # expand       =  False,                                    
+                # ))
                 
-        if (rssiInterlaved):
-            self.add(rssi.RssiCore(
-                name         = "SwRssiServer",
-                offset       =  0x0A020000,
-                description  = "SwRssiServer Server",                                
-                expand       =  False,                                    
-            ))
+        # if (rssiInterlaved):
+            # self.add(rssi.RssiCore(
+                # name         = "SwRssiServer",
+                # offset       =  0x0A020000,
+                # description  = "SwRssiServer Server",                                
+                # expand       =  False,                                    
+            # ))
+            
+            
+            
+            
+        # for i in range(2):
+            # self.add(rssi.RssiCore(
+                # name         = "SwRssiServer[%i]" % (i),
+                # offset       =  0x0A010000 + (i * 0x1000),
+                # description  = "SwRssiServer Server: %i" % (i),                                
+                # expand       =  False,                                    
+            # ))       
+            
+        self.add(rssi.RssiCore(
+            name         = "SwRssiServer[2]",
+            offset       =  0x0A020000,
+            description  = "SwRssiServer Server",                                
+            expand       =  False,                                    
+        ))            
 
         if (enableMps):
             self.add(AppMps(      
