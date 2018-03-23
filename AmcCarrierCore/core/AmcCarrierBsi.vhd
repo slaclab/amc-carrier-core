@@ -2,7 +2,7 @@
 -- File       : AmcCarrierBsi.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-08-03
--- Last update: 2018-03-14
+-- Last update: 2018-03-23
 -------------------------------------------------------------------------------
 -- Description: BootStrap Interface (BSI) to the IPMI's controller (IPMC) 
 -------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ architecture rtl of AmcCarrierBsi is
       we             => '0',
       ramData        => x"00",
       bootReq        => '0',
-      bootAddr       => x"00000000",
+      bootAddr       => x"04000000",    -- Default to 2nd stage boot 
       slotNumber     => x"00",
       crateId        => x"0000",
       macAddress     => (others => (others => '0')),
