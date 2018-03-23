@@ -88,16 +88,16 @@ class AmcCarrierCore(pr.Device):
             expand       =  False,
         ))
 
-        self.add(AmcCarrierTiming(
-            offset       =  0x08000000, 
-            expand       =  False,
-        ))
+        # self.add(AmcCarrierTiming(
+            # offset       =  0x08000000, 
+            # expand       =  False,
+        # ))
 
-        self.add(AmcCarrierBsa(   
-            offset       =  0x09000000, 
-            enableBsa    =  enableBsa,
-            expand       =  False,
-        ))
+        # self.add(AmcCarrierBsa(   
+            # offset       =  0x09000000, 
+            # enableBsa    =  enableBsa,
+            # expand       =  False,
+        # ))
                             
         self.add(udp.UdpEngineClient(
             name         = "BpUdpCltApp",
@@ -135,6 +135,13 @@ class AmcCarrierCore(pr.Device):
         ))         
         
         self.add(udp.UdpEngineServer(
+            name         = "BpUdpSrvRssi[2]",
+            offset       =  0x0A000830,
+            description  = "Backplane UDP Server: Interleaved RSSI",
+            expand       =  False,
+        ))             
+        
+        self.add(udp.UdpEngineServer(
             name         = "BpUdpSrvApp",
             offset       =  0x0A000820,
             description  = "Backplane UDP Server for Application ASYNC Messaging",
@@ -148,40 +155,13 @@ class AmcCarrierCore(pr.Device):
             expand       =  False,
         ))          
         
-        self.add(udp.UdpEngineServer(
-            name         = "BpUdpSrvRssi[2]",
-            offset       =  0x0A000830,
-            description  = "Backplane UDP Server: Interleaved RSSI",
-            expand       =  False,
-        ))              
-        
-        # if (rssiNotInterlaved):
-            # for i in range(2):
-                # self.add(rssi.RssiCore(
-                    # name         = "SwRssiServer[%i]" % (i),
-                    # offset       =  0x0A010000 + (i * 0x1000),
-                    # description  = "SwRssiServer Server: %i" % (i),                                
-                    # expand       =  False,                                    
-                # ))
-                
-        # if (rssiInterlaved):
-            # self.add(rssi.RssiCore(
-                # name         = "SwRssiServer",
-                # offset       =  0x0A020000,
-                # description  = "SwRssiServer Server",                                
-                # expand       =  False,                                    
-            # ))
-            
-            
-            
-            
-        # for i in range(2):
-            # self.add(rssi.RssiCore(
-                # name         = "SwRssiServer[%i]" % (i),
-                # offset       =  0x0A010000 + (i * 0x1000),
-                # description  = "SwRssiServer Server: %i" % (i),                                
-                # expand       =  False,                                    
-            # ))       
+        for i in range(2):
+            self.add(rssi.RssiCore(
+                name         = "SwRssiServer[%i]" % (i),
+                offset       =  0x0A010000 + (i * 0x1000),
+                description  = "SwRssiServer Server: %i" % (i),                                
+                expand       =  False,                                    
+            ))       
             
         self.add(rssi.RssiCore(
             name         = "SwRssiServer[2]",
@@ -194,7 +174,7 @@ class AmcCarrierCore(pr.Device):
             self.add(AppMps(      
                 offset =  0x0C000000, 
                 expand =  False
-            ))
+            ))            
 
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """

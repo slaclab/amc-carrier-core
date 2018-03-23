@@ -166,15 +166,15 @@ class TopLevel(pr.Device):
             enableBsa         = enableBsa,
             enableMps         = enableMps,
         ))
-        # self.add(AppTop(
-            # memBase      = srp,
-            # offset       = 0x80000000,
-            # numRxLanes   = numRxLanes,
-            # numTxLanes   = numTxLanes,
-            # numSigGen    = numSigGen,
-            # sizeSigGen   = sizeSigGen,
-            # modeSigGen   = modeSigGen,
-        # ))
+        self.add(AppTop(
+            memBase      = srp,
+            offset       = 0x80000000,
+            numRxLanes   = numRxLanes,
+            numTxLanes   = numTxLanes,
+            numSigGen    = numSigGen,
+            sizeSigGen   = sizeSigGen,
+            modeSigGen   = modeSigGen,
+        ))
 
         # Define SW trigger command
         @self.command(description="Software Trigger for DAQ MUX",)
