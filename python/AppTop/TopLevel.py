@@ -56,7 +56,7 @@ class TopLevel(pr.Device):
         rssiNotInterlaved = False       
         
         # Check for valid link range
-        if (pcieRssiLink<0) or (pcieRssiLink>6):
+        if (pcieRssiLink<0) or (pcieRssiLink>5):
             raise ValueError("Invalid pcieRssiLink (%d)" % (pcieRssiLink) )        
 
         if (simGui):
@@ -113,7 +113,7 @@ class TopLevel(pr.Device):
             elif ( commType == 'pcie-fsbl' ):
             
                 # Connect the SRPv0 to tDest = 0x0
-                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*4)+0,1)
+                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+0,1)
                 srp = rogue.protocols.srp.SrpV0()              
                 pr.streamConnectBiDir( srp, vc0Srp )          
                     
@@ -143,15 +143,15 @@ class TopLevel(pr.Device):
                 #########################################################################################
             
                 # Connect the SRPv3 to tDest = 0x0
-                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*4)+0,1)
+                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+0,1)
                 srp = rogue.protocols.srp.SrpV3()                
                 pr.streamConnectBiDir( srp, vc0Srp )   
 
                 # Create the Raw Data stream interface
-                self.stream_vc1 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*4)+1,1)
+                self.stream_vc1 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
 
                 # Create the Raw Data stream interface
-                self.stream_vc2 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*4)+2,1)
+                self.stream_vc2 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+2,1)
 
             # Undefined device type
             else:
