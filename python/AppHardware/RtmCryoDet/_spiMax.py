@@ -53,7 +53,7 @@ class SpiMax(pr.Device):
                 str1 = "HemtBias"
                          
             self.add(pr.RemoteVariable(
-                name         = str1 + "DacNopRegCh%d" % (j),
+                name         = str1 + "DacNopRegCh[%d]" % (j),
                 description  = "BiasDac_Reg0",
                 #offset       =  hex(i), #--this does not work
                 offset       =  0x00 + i,
@@ -64,17 +64,17 @@ class SpiMax(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(    
-                name         = str1 + "DacDataRegCh%d" % (j),
+                name         = str1 + "DacDataRegCh[%d]" % (j),
                 description  = "BiasDac_Reg1",
                 offset       =  0x00 + (i+4),
                 bitSize      =  20,
                 bitOffset    =  0x00,
-                base         = pr.UInt,
+                base         = pr.Int,
                 mode         = "WO",
             ))
             
             self.add(pr.RemoteVariable(    
-                name         = str1 + "DacCtrlRegCh%d" % (j),
+                name         = str1 + "DacCtrlRegCh[%d]" % (j),
                 description  = "BiasDac_Reg2",
                 offset       =  0x00 + (i+8),
                 bitSize      =  20,
@@ -84,7 +84,7 @@ class SpiMax(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(    
-                name         = str1 + "DacClrCRegCh%d" % (j),
+                name         = str1 + "DacClrCRegCh[%d]" % (j),
                 description  = "BiasDac_Reg3",
                 offset       =  0x00 + (i+12),
                 bitSize      =  20,

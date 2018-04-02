@@ -2,7 +2,7 @@
 -- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2018-03-14
+-- Last update: 2018-03-26
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
 ------------------------------------------------------------------------------
@@ -127,6 +127,8 @@ architecture mapping of RtmCryoDet is
    signal debounceWidth : slv(15 downto 0);
    signal rampMaxCnt    : slv(31 downto 0);
 
+   signal startRampPulseReg : slv(1 downto 0);
+
 begin
 
    selectRamp <= selRamp;
@@ -137,14 +139,45 @@ begin
    -- Refer to mapping table on confluence page
    -- https://confluence.slac.stanford.edu/x/5WV4DQ
    ------------------------------------------------
-   rtmLsN(1)  <= cryoCsL;
-   rtmLsP(3)  <= cryoSck;
-   rtmLsN(3)  <= cryoSdi;
-   extTrig    <= rtmLsP(7);             -- LEMO1
-   rtmLsN(7)  <= r.startRampPulse;      -- LEMO2
-   cryoSdo    <= rtmLsP(11);
-   kRelay(0)  <= rtmLsN(11);
-   rtmLsP(12) <= r.startRampPulse;
+   rtmLsN(1) <= cryoCsL;
+   rtmLsP(3) <= cryoSck;
+   rtmLsN(3) <= cryoSdi;
+
+   extTrig <= rtmLsP(7);                -- LEMO1
+
+   ---------------------------------------------
+   U_OREG_startRampPulse0 : ODDRE1
+      port map (
+         C  => jesdClk,
+         Q  => startRampPulseReg(0),
+         D1 => r.startRampPulse,
+         D2 => r.startRampPulse,
+         SR => '0');
+
+   U_OBUFDS_startRampPulse0 : OBUF
+      port map (
+         I => startRampPulseReg(0),
+         O => rtmLsN(7));               -- LEMO2
+   ---------------------------------------------
+
+   cryoSdo   <= rtmLsP(11);
+   kRelay(0) <= rtmLsN(11);
+
+   ---------------------------------------------
+   U_OREG_startRampPulse1 : ODDRE1
+      port map (
+         C  => jesdClk,
+         Q  => startRampPulseReg(1),
+         D1 => r.startRampPulse,
+         D2 => r.startRampPulse,
+         SR => '0');
+
+   U_OBUFDS_startRampPulse1 : OBUF
+      port map (
+         I => startRampPulseReg(1),
+         O => rtmLsP(12));
+   ---------------------------------------------
+
    rtmLsN(12) <= selRamp;
    kRelay(1)  <= rtmLsP(13);
    rtmLsN(13) <= maxCsL;
@@ -153,7 +186,8 @@ begin
    maxSdo     <= rtmLsN(15);
    rtmLsN(16) <= not(jesdRst);
 
-   U_ODDRE1 : ODDRE1
+   ---------------------------------------------
+   U_OREG_jesdClkDiv : ODDRE1
       port map (
          C  => jesdClk,
          Q  => jesdClkDivReg,
@@ -161,11 +195,12 @@ begin
          D2 => jesdClkDiv,
          SR => '0');
 
-   U_OBUFDS : OBUFDS
+   U_OBUFDS_jesdClkDiv : OBUFDS
       port map (
          I  => jesdClkDivReg,
          O  => rtmLsP(17),
          OB => rtmLsN(17));
+   ---------------------------------------------
 
    srSdo      <= rtmLsP(18);
    rtmLsN(18) <= srSck;

@@ -195,7 +195,7 @@ class DacSigGen(pr.Device):
                     # Increment the counter
                     cnt  += 1                
                 # User friendly print message
-                click.secho( ('LoadCsvFile(): %d samples per chanel found' % idx ), fg='green')
+                click.secho( ('LoadCsvFile(): %d samples per channel found' % idx ), fg='green')
                 if ( cnt>idx ): 
                     click.secho( ('\tHowever %d of samples detected in the CSV file' % cnt ), fg='red')
                     click.secho( ('\tCSV data dropped because firmware only support up to %d samples' % idx ), fg='red')

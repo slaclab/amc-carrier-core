@@ -18,22 +18,23 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import pyrogue.simulation
+import pyrogue.interfaces.simulation
 import pyrogue.protocols
 import pyrogue.utilities.fileio
-import rogue.hardware.data
+import rogue.hardware.axi
 
 from AmcCarrierCore import *
 from AppTop import *
 
 class TopLevel(pr.Device):
     def __init__(   self, 
-            name            = "FpgaTopLevel", 
-            description     = "Container for FPGA Top-Level", 
+            name            = 'FpgaTopLevel',
+            description     = 'Container for FPGA Top-Level', 
             # Communication Parameters
             simGui          = False,
-            commType        = "eth-rssi-non-interleaved",
-            ipAddr          = "10.0.1.101",
+            commType        = 'eth-rssi-non-interleaved',
+            ipAddr          = '10.0.1.101',
+            pcieDev         = '/dev/datadev_0',
             pcieRssiLink    = 0,
             # JESD Parameters
             numRxLanes      = [0,0],
@@ -51,8 +52,11 @@ class TopLevel(pr.Device):
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
         
+        rssiInterlaved    = False
+        rssiNotInterlaved = False       
+        
         # Check for valid link range
-        if (pcieRssiLink<0) or (pcieRssiLink>6):
+        if (pcieRssiLink<0) or (pcieRssiLink>5):
             raise ValueError("Invalid pcieRssiLink (%d)" % (pcieRssiLink) )        
 
         if (simGui):
@@ -73,28 +77,34 @@ class TopLevel(pr.Device):
             if ( commType=="eth-fsbl" ):
             
                 # UDP only
-                udp = rogue.protocols.udp.Client(  ip, 8192, 1500 )
+                udp = rogue.protocols.udp.Client(ipAddr,8192,0)
             
                 # Connect the SRPv0 to RAW UDP
                 srp = rogue.protocols.srp.SrpV0()
                 pyrogue.streamConnectBiDir( srp, udp )           
             
             elif ( commType=="eth-rssi-non-interleaved" ):
+                
+                # Update the flag
+                rssiNotInterlaved = True
             
                 # Create SRP/ASYNC_MSG interface
-                rudp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, size=1400)
+                rudp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8193, packVer = 1)  
 
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
 
                 # Create stream interface
-                self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, size=1400)         
+                self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, packVer = 1)       
             
             elif ( commType=="eth-rssi-interleaved" ):
+            
+                # Update the flag
+                rssiInterlaved = True            
 
                 # Create Interleaved RSSI interface
-                rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8198, size=1400, packVer = 2)
+                rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8198, packVer = 2)
 
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
@@ -103,11 +113,14 @@ class TopLevel(pr.Device):
             elif ( commType == 'pcie-fsbl' ):
             
                 # Connect the SRPv0 to tDest = 0x0
-                vc0Srp  = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+0)
+                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+0,1)
                 srp = rogue.protocols.srp.SrpV0()              
                 pr.streamConnectBiDir( srp, vc0Srp )          
                     
             elif ( commType == 'pcie-rssi-interleaved' ):
+            
+                # Update the flag
+                rssiInterlaved = True               
 
                 #########################################################################################
                 # Assumes this PCIe card Configuration:
@@ -130,15 +143,15 @@ class TopLevel(pr.Device):
                 #########################################################################################
             
                 # Connect the SRPv3 to tDest = 0x0
-                vc0Srp  = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+0)
+                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+0,1)
                 srp = rogue.protocols.srp.SrpV3()                
                 pr.streamConnectBiDir( srp, vc0Srp )   
 
                 # Create the Raw Data stream interface
-                self.stream_vc1 = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+1)
+                self.stream_vc1 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
 
                 # Create the Raw Data stream interface
-                self.stream_vc2 = rogue.hardware.data.DataCard('/dev/datadev_0',(pcieRssiLink*4)+2)
+                self.stream_vc2 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+2,1)
 
             # Undefined device type
             else:
@@ -146,19 +159,21 @@ class TopLevel(pr.Device):
 
         # Add devices
         self.add(AmcCarrierCore(
-            memBase    =  srp,
-            offset     =  0x00000000,
-            enableBsa  =  enableBsa,
-            enableMps  =  enableMps,
+            memBase           = srp,
+            offset            = 0x00000000,
+            rssiInterlaved    = rssiInterlaved,
+            rssiNotInterlaved = rssiNotInterlaved,
+            enableBsa         = enableBsa,
+            enableMps         = enableMps,
         ))
         self.add(AppTop(
-            memBase      =  srp,
-            offset       =  0x80000000,
-            numRxLanes   =  numRxLanes,
-            numTxLanes   =  numTxLanes,
-            numSigGen    =  numSigGen,
-            sizeSigGen   =  sizeSigGen,
-            modeSigGen   =  modeSigGen,
+            memBase      = srp,
+            offset       = 0x80000000,
+            numRxLanes   = numRxLanes,
+            numTxLanes   = numTxLanes,
+            numSigGen    = numSigGen,
+            sizeSigGen   = sizeSigGen,
+            modeSigGen   = modeSigGen,
         ))
 
         # Define SW trigger command
