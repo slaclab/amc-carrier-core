@@ -203,9 +203,6 @@ architecture mapping of AppTop is
    signal dacSigValids : Slv7Array(1 downto 0);
    signal dacSigValues : sampleDataVectorArray(1 downto 0, 6 downto 0);
 
-   signal obAppDbgMaster : AxiStreamMasterType;
-   signal obAppDbgSlave  : AxiStreamSlaveType;
-
 begin
 
    --------------------------
@@ -507,8 +504,8 @@ begin
          ibBpMsgServerMaster => ibBpMsgServerMaster,
          ibBpMsgServerSlave  => ibBpMsgServerSlave,
          -- Application Debug Interface (axilClk domain)
-         obAppDebugMaster    => obAppDbgMaster,
-         obAppDebugSlave     => obAppDbgSlave,
+         obAppDebugMaster    => obAppDebugMaster,
+         obAppDebugSlave     => obAppDebugSlave,
          ibAppDebugMaster    => ibAppDebugMaster,
          ibAppDebugSlave     => ibAppDebugSlave,
          -- MPS Concentrator Interface (axilClk domain)
