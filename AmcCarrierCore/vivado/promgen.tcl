@@ -28,9 +28,9 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
    set LCLS_II_TARBALL "0x05701DEC"
 } elseif { $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {            
    set LCLS_II_TARBALL "0x0622ED24"
-} elseif { $::env(PRJ_PART) eq {XCKU11P-FFVA1156-3-E} } {  
+} elseif { $::env(PRJ_PART) eq {XCKU11P-FFVA1156-2-E} } {  
    set LCLS_II_TARBALL "0x0567D0EC"
-} elseif { $::env(PRJ_PART) eq {XCKU15P-FFVA1156-3-E} } {              
+} elseif { $::env(PRJ_PART) eq {XCKU15P-FFVA1156-2-E} } {              
    set LCLS_II_TARBALL "0x062A8D48"
 } else { 
    puts "\n\nERROR: Invalid PRJ_PART was defined in the Makefile\n\n"; exit -1
