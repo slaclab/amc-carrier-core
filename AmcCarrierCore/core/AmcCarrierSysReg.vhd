@@ -2,7 +2,7 @@
 -- File       : AmcCarrierSysReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-03-14
+-- Last update: 2018-03-23
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -220,6 +220,7 @@ architecture mapping of AmcCarrierSysReg is
    signal do       : slv(3 downto 0);
 
    signal axilRstL  : sl;
+   signal bootCmd   : sl;
    signal bootRdy   : sl;
    signal bootArmed : sl;
    signal bootstart : sl;
@@ -273,6 +274,7 @@ begin
          axiRst         => axilRst,
          upTimeCnt      => upTimeCnt,
          userValues     => userValues,
+         fpgaReload     => bootCmd,
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),
@@ -295,11 +297,16 @@ begin
          else
             -- Reset the flag
             bootstart <= '0' after TPD_G;
-            -- Check for boot request
-            if bootReq = '1' then
+            -- Check for IPMI boot request
+            if (bootReq = '1')then
                bootArmed <= '1' after TPD_G;
+            end if;
+            -- Check for Application boot request
+            if (FSBL_G = false) and (bootCmd = '1') then
+               bootArmed <= '1' after TPD_G;
+            end if;
             -- Check if DDR passed and armed
-            elsif (bootRdy = '1') and (bootArmed = '1') then
+            if (bootRdy = '1') and (bootArmed = '1') then
                -- Set the flag
                bootstart <= '1' after TPD_G;
                -- Reset the flag

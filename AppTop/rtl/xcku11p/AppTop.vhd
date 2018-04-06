@@ -201,9 +201,6 @@ architecture mapping of AppTop is
    signal dacSigValids : Slv10Array(1 downto 0);
    signal dacSigValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
-   signal obAppDbgMaster : AxiStreamMasterType;
-   signal obAppDbgSlave  : AxiStreamSlaveType;
-
 begin
 
    assert ((TIMING_BUS_DOMAIN_G = "REC_CLK") or
@@ -555,8 +552,8 @@ begin
          ibBpMsgServerMaster => ibBpMsgServerMaster,
          ibBpMsgServerSlave  => ibBpMsgServerSlave,
          -- Application Debug Interface (axilClk domain)
-         obAppDebugMaster    => obAppDbgMaster,
-         obAppDebugSlave     => obAppDbgSlave,
+         obAppDebugMaster    => obAppDebugMaster,
+         obAppDebugSlave     => obAppDebugSlave,
          ibAppDebugMaster    => ibAppDebugMaster,
          ibAppDebugSlave     => ibAppDebugSlave,
          -- MPS Concentrator Interface (axilClk domain)
