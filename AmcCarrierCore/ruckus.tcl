@@ -95,9 +95,9 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
    loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU060.vhd"
 } elseif { $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {            
    loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU095.vhd"
-} elseif { $::env(PRJ_PART) eq {XCKU11P-FFVA1156-3-E} } {  
+} elseif { $::env(PRJ_PART) eq {XCKU11P-FFVA1156-2-E} } {  
    loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU11P.vhd"
-} elseif { $::env(PRJ_PART) eq {XCKU15P-FFVA1156-3-E} } {              
+} elseif { $::env(PRJ_PART) eq {XCKU15P-FFVA1156-2-E} } {              
    loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU15P.vhd"
 } else { 
 }
