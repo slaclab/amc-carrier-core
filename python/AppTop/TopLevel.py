@@ -61,7 +61,7 @@ class TopLevel(pr.Device):
 
         if (simGui):
             # Create simulation srp interface
-            srp=pyrogue.simulation.MemEmulate()
+            srp=pyrogue.interfaces.simulation.MemEmulate()
         else:
         
             ################################################################################################################
