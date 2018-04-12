@@ -76,7 +76,7 @@ architecture mapping of AxisBramFlashBufferRdFsm is
       ack        : sl;
       rdLatecy   : natural range 0 to 3;
       idx        : natural range 0 to NUM_CH_G-1;
-      eventId     : slv(47 downto 0);
+      eventId    : slv(47 downto 0);
       rdAddr     : slv(BUFFER_WIDTH_G-1 downto 0);
       axisMaster : AxiStreamMasterType;
       state      : StateType;
@@ -86,7 +86,7 @@ architecture mapping of AxisBramFlashBufferRdFsm is
       ack        => '0',
       rdLatecy   => 0,
       idx        => 0,
-      eventId     => (others => '0'),
+      eventId    => (others => '0'),
       rdAddr     => (others => '0'),
       axisMaster => AXI_STREAM_MASTER_INIT_C,
       state      => IDLE_S);
@@ -114,9 +114,8 @@ begin
       end if;
 
       -- Decrement the counter
-      v.rdLatecy := r.rdLatecy - 1;
-      if (v.rdLatecy = 0) then
-         v.rdLatecy := 0;
+      if (r.rdLatecy /= 0) then
+         v.rdLatecy := r.rdLatecy - 1;
       end if;
 
       -- State Machine
@@ -126,12 +125,12 @@ begin
             -- Wait for request
             if (req = '1') then
                -- Reset the counter
-               v.idx    := 0;
-               v.rdAddr := (others => '0');
+               v.idx     := 0;
+               v.rdAddr  := (others => '0');
                -- Increment the counter
                v.eventId := r.eventId + 1;
                -- Next state
-               v.state  := HDR_S;
+               v.state   := HDR_S;
             end if;
          ----------------------------------------------------------------------
          when HDR_S =>
@@ -139,7 +138,7 @@ begin
             if (v.axisMaster.tValid = '0') then
                -- Move data
                v.axisMaster.tValid               := valid(r.idx);
-               v.axisMaster.tData(7 downto 0)    := x"00";     -- Version = 0x0
+               v.axisMaster.tData(7 downto 0)    := x"00";  -- Version = 0x0
                v.axisMaster.tData(15 downto 8)   := toSlv(r.idx, 8);  -- Channel Index
                v.axisMaster.tData(63 downto 16)  := r.eventId;  -- Event ID
                v.axisMaster.tData(127 downto 64) := timestamp;

@@ -143,7 +143,7 @@ begin
             -- Write the data
             v.wrEn   := '1';
             -- Increment the counter
-            v.wrAddr := r.wrAddr;
+            v.wrAddr := r.wrAddr + 1;
             -- Check the valid flags
             for i in NUM_CH_G-1 downto 0 loop
                -- Check for valid missing gap
@@ -157,7 +157,7 @@ begin
                -- Set the request flag
                v.req   := '1';
                -- Next state
-               v.state := WRITE_RAM_S;
+               v.state := HAND_SHAKE_S;
             end if;
          ----------------------------------------------------------------------
          when HAND_SHAKE_S =>
