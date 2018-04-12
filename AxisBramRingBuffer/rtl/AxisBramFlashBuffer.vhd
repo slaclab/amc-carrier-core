@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- File       : AxisBramRingBuffer.vhd
+-- File       : AxisBramFlashBuffer.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-10
--- Last update: 2018-04-10
+-- Last update: 2018-04-11
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -21,19 +21,25 @@ use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
+use work.AxiLitePkg.all;
+use work.AxiStreamPkg.all;
 
-entity AxisBramRingBuffer is
+entity AxisBramFlashBuffer is
    generic (
       TPD_G          : time     := 1 ns;
-      PIPE_STAGES_G  : natural  := 0;
-      NUM_CH_G       : positive := 1;
-      BUFFER_WIDTH_G : positive := 10);
+      NUM_CH_G       : positive := 12;
+      BUFFER_WIDTH_G : positive := 12);  -- DEPTH_G = 2**WIDTH_G
    port (
       -- Input Data Interface (appClk domain)
       appClk          : in  sl;
       appRst          : in  sl;
+      apptrig         : in  sl;
       appValid        : in  slv(NUM_CH_G-1 downto 0);
       appData         : in  Slv32Array(NUM_CH_G-1 downto 0);
+      -- Input timing interface (timingClk domain)
+      timingClk       : in  sl;
+      timingRst       : in  sl;
+      timingTimestamp : in  slv(63 downto 0);
       -- Output AXIS Interface (axisClk domain)
       axisClk         : in  sl;
       axisRst         : in  sl;
@@ -46,20 +52,22 @@ entity AxisBramRingBuffer is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType);
-end AxisBramRingBuffer;
+end AxisBramFlashBuffer;
 
-architecture mapping of AxisBramRingBuffer is
+architecture mapping of AxisBramFlashBuffer is
 
    constant TDEST_ROUTES_C : Slv8Array(NUM_CH_G-1 downto 0) := (others => "--------");
 
    type RegType is record
-      swTrig : sl;
-      tDest  : slv(NUM_CH_G-1 downto 0)
-         axilReadSlave : AxiLiteReadSlaveType;
+      enable         : sl;
+      swTrig         : sl;
+      tDest          : Slv8Array(NUM_CH_G-1 downto 0);
+      axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
+      enable         => '0',
       swTrig         => '0',
       tDest          => (others => x"FF"),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
@@ -68,38 +76,56 @@ architecture mapping of AxisBramRingBuffer is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal axisMasters : AxiStreamMasterArray(NUM_CH_G-1 downto 0);
-   signal axisSlaves  : AxiStreamSlaveType(NUM_CH_G-1 downto 0);
-
-   signal req : sl;
-   signal ack : sl;
-
    signal wrEn   : sl;
    signal wrAddr : slv(BUFFER_WIDTH_G-1 downto 0);
    signal rdAddr : slv(BUFFER_WIDTH_G-1 downto 0);
+   signal wrData : Slv32Array(NUM_CH_G-1 downto 0);
    signal rdData : Slv32Array(NUM_CH_G-1 downto 0);
 
-   signal swTrig : sl;
-   signal tDest  : slv(NUM_CH_G-1 downto 0)
+   signal req       : sl;
+   signal ack       : sl;
+   signal valid     : slv(NUM_CH_G-1 downto 0);
+   signal timestamp : slv(63 downto 0);
 
 begin
+
+   assert (BUFFER_WIDTH_G >= 8) report "BUFFER_WIDTH_G must be >= 8" severity failure;
 
    -----------------
    -- BRAM Write FSM
    -----------------
-   U_WriteFsm : entity work.AxisBramRingBufferWrFsm
+   U_WriteFsm : entity work.AxisBramFlashBufferWrFsm
       generic map (
          TPD_G          => TPD_G,
          NUM_CH_G       => NUM_CH_G,
          BUFFER_WIDTH_G => BUFFER_WIDTH_G)
       port map (
-         clk    => appClk,
-         rst    => appRst,
-         valid  => appValid,
-         wrEn   => wrEn,
-         wrAddr => wrAddr,
-         req    => req,
-         ack    => ack);
+         -- Input Data Interface (appClk domain)
+         appClk          => appClk,
+         appRst          => appRst,
+         apptrig         => apptrig,
+         appValid        => appValid,
+         appData         => appData,
+         -- Input timing interface (timingClk domain)
+         timingClk       => timingClk,
+         timingRst       => timingRst,
+         timingTimestamp => timingTimestamp,
+         -- Ram Interface (appClk domain)
+         wrEn            => wrEn,
+         wrAddr          => wrAddr,
+         wrData          => wrData,
+         -- Software Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         enable          => r.enable,
+         swtrig          => r.swtrig,
+         -- Read FSM Interface (axisClk domain)
+         axisClk         => axisClk,
+         axisRst         => axisRst,
+         req             => req,
+         valid           => valid,
+         timestamp       => timestamp,
+         ack             => ack);
 
    ---------------
    -- BRAM Buffers
@@ -109,7 +135,7 @@ begin
          generic map (
             TPD_G        => TPD_G,
             BRAM_EN_G    => true,
-            DOB_REG_G    => true,
+            DOB_REG_G    => true,       -- 2 cycle latency
             DATA_WIDTH_G => 32,
             ADDR_WIDTH_G => BUFFER_WIDTH_G)
          port map (
@@ -117,7 +143,7 @@ begin
             clka  => appClk,
             wea   => wrEn,
             addra => wrAddr,
-            dina  => appData(i),
+            dina  => wrData(i),
             -- Port B
             clkb  => axisClk,
             rstb  => axisRst,
@@ -128,42 +154,29 @@ begin
    -----------------
    -- BRAM Read FSM
    -----------------
-   U_ReadFsm : entity work.AxisBramRingBufferRdFsm
+   U_ReadFsm : entity work.AxisBramFlashBufferRdFsm
       generic map (
          TPD_G          => TPD_G,
          NUM_CH_G       => NUM_CH_G,
          BUFFER_WIDTH_G => BUFFER_WIDTH_G)
       port map (
-         clk         => axisClk,
-         rst         => axisRst,
-         rdAddr      => rdAddr,
-         rdData      => rdData,
-         tDest       => tDest,
-         axisMasters => axisMasters,
-         axisSlaves  => axisSlaves,
-         req         => req,
-         ack         => ack);
-
-   -----------------
-   -- AXI stream MUX
-   -----------------
-   U_AxiStreamMux : entity work.AxiStreamMux
-      generic map (
-         TPD_G          => TPD_G,
-         PIPE_STAGES_G  => PIPE_STAGES_G,
-         NUM_SLAVES_G   => NUM_CH_G,
-         MODE_G         => "ROUTED",
-         TDEST_ROUTES_G => TDEST_ROUTES_C)
-      port map (
-         -- Clock and reset
-         axisClk      => axisClk,
-         axisRst      => axisRst,
-         -- Slaves
-         sAxisMasters => axisMasters,
-         sAxisSlaves  => axisSlaves,
-         -- Master
-         mAxisMaster  => axisMaster,
-         mAxisSlave   => axisSlave);
+         -- Write FSM Interface (axisClk domain)
+         req        => req,
+         valid      => valid,
+         timestamp  => timestamp,
+         ack        => ack,
+         -- Ram Interface (axisClk domain)
+         rdAddr     => rdAddr,
+         rdData     => rdData,
+         -- Software Interface (axilClk domain)
+         axilClk    => axilClk,
+         axilRst    => axilRst,
+         tDest      => r.tDest,
+         -- AXI Stream Interface (axisClk domain)
+         axisClk    => axisClk,
+         axisRst    => axisRst,
+         axisMaster => axisMaster,
+         axisSlave  => axisSlave);
 
    --------------------- 
    -- AXI Lite Interface
@@ -183,9 +196,10 @@ begin
 
       -- Map the read registers
       for i in NUM_CH_G-1 downto 0 loop
-         axiSlaveRegister(regCon, toSlv(8*i, 8), 0, r.tDest(i));
+         axiSlaveRegister(regCon, toSlv(8*i, 8), 0, v.tDest(i));
       end loop;
-      axiSlaveRegister(regCon, x"FC", 0, v.swTrig);
+      axiSlaveRegister(regCon, x"F8", 0, v.swTrig);
+      axiSlaveRegister(regCon, x"FC", 0, v.enable);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
@@ -210,24 +224,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-
-   U_SyncSwTrig : entity work.SynchronizerOneShot
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk     => axisClk,
-         dataIn  => r.swTrig,
-         dataOut => swTrig);
-
-   GEN_SYNC : for i in NUM_CH_G-1 downto 0 generate
-      U_SyncTdest : entity work.SynchronizerVector
-         generic map (
-            TPD_G   => TPD_G,
-            WIDTH_G => 8)
-         port map (
-            clk     => axisClk,
-            dataIn  => r.tDest(i),
-            dataOut => tDest(i));
-   end generate GEN_SYNC;
 
 end mapping;
