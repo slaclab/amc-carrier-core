@@ -2,9 +2,22 @@
 -- File       : AxisBramFlashBufferRdFsm.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-10
--- Last update: 2018-04-11
+-- Last update: 2018-04-12
 -------------------------------------------------------------------------------
--- Description: 
+-- Data Format:
+--    DATA[0].BIT[7:0]    = protocol version (0x0)
+--    DATA[0].BIT[15:8]   = channel index
+--    DATA[0].BIT[63:15]  = event id
+--    DATA[0].BIT[127:64] = timestamp
+--    DATA[1] = BRAM[3] & BRAM[2] & BRAM[1] & BRAM[0];
+--    DATA[2] = BRAM[7] & BRAM[6] & BRAM[5] & BRAM[4];
+--    ................................................
+--    ................................................
+--    ................................................
+--    DATA[1+N/4] = BRAM[N-1] & BRAM[N-2] & BRAM[N-3] & BRAM[N-4];
+--
+--       where N = 2**BUFFER_WIDTH_G
+--
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -28,8 +41,8 @@ use work.EthMacPkg.all;
 entity AxisBramFlashBufferRdFsm is
    generic (
       TPD_G          : time     := 1 ns;
-      NUM_CH_G       : positive := 12;
-      BUFFER_WIDTH_G : positive := 12);
+      NUM_CH_G       : positive := 1;
+      BUFFER_WIDTH_G : positive := 8);
    port (
       -- Write FSM Interface (axisClk domain)
       req        : in  sl;
@@ -63,7 +76,7 @@ architecture mapping of AxisBramFlashBufferRdFsm is
       ack        : sl;
       rdLatecy   : natural range 0 to 3;
       idx        : natural range 0 to NUM_CH_G-1;
-      seqCnt     : slv(15 downto 0);
+      eventId     : slv(47 downto 0);
       rdAddr     : slv(BUFFER_WIDTH_G-1 downto 0);
       axisMaster : AxiStreamMasterType;
       state      : StateType;
@@ -73,7 +86,7 @@ architecture mapping of AxisBramFlashBufferRdFsm is
       ack        => '0',
       rdLatecy   => 0,
       idx        => 0,
-      seqCnt     => (others => '0'),
+      eventId     => (others => '0'),
       rdAddr     => (others => '0'),
       axisMaster => AXI_STREAM_MASTER_INIT_C,
       state      => IDLE_S);
@@ -116,7 +129,7 @@ begin
                v.idx    := 0;
                v.rdAddr := (others => '0');
                -- Increment the counter
-               v.seqCnt := r.seqCnt + 1;
+               v.eventId := r.eventId + 1;
                -- Next state
                v.state  := HDR_S;
             end if;
@@ -128,7 +141,7 @@ begin
                v.axisMaster.tValid               := valid(r.idx);
                v.axisMaster.tData(7 downto 0)    := x"00";     -- Version = 0x0
                v.axisMaster.tData(15 downto 8)   := toSlv(r.idx, 8);  -- Channel Index
-               v.axisMaster.tData(31 downto 16)  := r.seqCnt;  -- sequence counter
+               v.axisMaster.tData(63 downto 16)  := r.eventId;  -- Event ID
                v.axisMaster.tData(127 downto 64) := timestamp;
                -- Set the tDest field
                v.axisMaster.tDest                := tDestSync(r.idx);

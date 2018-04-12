@@ -2,9 +2,22 @@
 -- File       : AxisBramFlashBuffer.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-10
--- Last update: 2018-04-11
+-- Last update: 2018-04-12
 -------------------------------------------------------------------------------
--- Description: 
+-- Data Format:
+--    DATA[0].BIT[7:0]    = protocol version (0x0)
+--    DATA[0].BIT[15:8]   = channel index
+--    DATA[0].BIT[63:15]  = event id
+--    DATA[0].BIT[127:64] = timestamp
+--    DATA[1] = BRAM[3] & BRAM[2] & BRAM[1] & BRAM[0];
+--    DATA[2] = BRAM[7] & BRAM[6] & BRAM[5] & BRAM[4];
+--    ................................................
+--    ................................................
+--    ................................................
+--    DATA[1+N/4] = BRAM[N-1] & BRAM[N-2] & BRAM[N-3] & BRAM[N-4];
+--
+--       where N = 2**BUFFER_WIDTH_G
+--
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -27,8 +40,8 @@ use work.AxiStreamPkg.all;
 entity AxisBramFlashBuffer is
    generic (
       TPD_G          : time     := 1 ns;
-      NUM_CH_G       : positive := 12;
-      BUFFER_WIDTH_G : positive := 12);  -- DEPTH_G = 2**WIDTH_G
+      NUM_CH_G       : positive := 1;
+      BUFFER_WIDTH_G : positive := 8);  -- DEPTH_G = 2**WIDTH_G
    port (
       -- Input Data Interface (appClk domain)
       appClk          : in  sl;
@@ -196,7 +209,7 @@ begin
 
       -- Map the read registers
       for i in NUM_CH_G-1 downto 0 loop
-         axiSlaveRegister(regCon, toSlv(8*i, 8), 0, v.tDest(i));
+         axiSlaveRegister(regCon, toSlv(4*i, 8), 0, v.tDest(i));
       end loop;
       axiSlaveRegister(regCon, x"F8", 0, v.swTrig);
       axiSlaveRegister(regCon, x"FC", 0, v.enable);

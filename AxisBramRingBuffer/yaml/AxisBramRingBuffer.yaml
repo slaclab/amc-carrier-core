@@ -16,70 +16,52 @@ AxisBramRingBuffer: &AxisBramRingBuffer
   class: MMIODev
   configPrio: 1
   size: 0x100
+  metadata:
+    numAppCh: &numAppCh 1
+  #########
   children:
-    #########################################################
-    MAC:
+  #########  
+    #########################################################      
+    TDEST:        
       at:
-        offset: 0x00
-        nelms: 4
-        stride: 8
+        offset: 0x0
+        stride: 4
+        nelms: *numAppCh
       class: IntField
-      name: MAC
-      sizeBits: 48
-      mode: RO
-      description: MAC Address[3:0]
-    #########################################################
-    CrateId:
-      at:
-        offset: 0x80
-      class: IntField
-      name: CrateId
-      mode: RO
-      sizeBits: 16
-      description: ATCA Crate ID
-    #########################################################
-    SlotNumber:
-      at:
-        offset: 0x84
-      class: IntField
-      name: SlotNumber
-      mode: RO
-      sizeBits: 4
-      description: ATCA Logical Slot Number
-    #########################################################
-    BootStartAddress:
-      at:
-        offset: 0x88
-      class: IntField
-      name: BootStartAddress
-      mode: RO
-      description: Bootloader Start Address
-    #########################################################
-    VersionMinor:
-      at:
-        offset: 0x8C
-      class: IntField
-      name: VersionMinor
-      mode: RO
+      name: TDEST
       sizeBits: 8
-      description: BSI's Minor Version Number
-    #########################################################
-    VersionMajor:
+      lsBit: 0
+      mode: RW
+      description: "AXI stream TDEST"
+    #########################################################          
+    SwTrig:
       at:
-        offset: 0x91
+        offset: 0xF8
       class: IntField
-      name: VersionMajor
-      mode: RO
-      sizeBits: 8
-      description: BSI's Major Version Number
-    #########################################################
-    EthUpTime:
+      name: SwTrig
+      sizeBits: 1
+      lsBit: 0
+      mode: WO
+      description: "Software Trigger"      
+    #########################################################          
+    Enable:
       at:
-        offset: 0x94
+        offset: 0xFC
       class: IntField
-      name: EthUpTime
-      mode: RO
-      sizeBits: 32
-      description: ETH Uptime (units of sec)     
+      name: Enable
+      sizeBits: 1
+      lsBit: 0
+      mode: RW
+      description: "Enable for triggers"
+    #########################################################
+    CmdSwTrig:
+      name: CmdSwTrig
+      class: SequenceCommand
+      at:
+        offset: 0x0
+      description: "Command for Software Trigger"
+      sequence:
+      - entry: SwTrig
+        value: 0x1
     #########################################################
     
