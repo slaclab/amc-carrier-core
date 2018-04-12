@@ -7,7 +7,7 @@
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
 --    DATA[0].BIT[15:8]   = channel index
---    DATA[0].BIT[63:15]  = event id
+--    DATA[0].BIT[63:16]  = event id
 --    DATA[0].BIT[127:64] = timestamp
 --    DATA[1] = BRAM[3] & BRAM[2] & BRAM[1] & BRAM[0];
 --    DATA[2] = BRAM[7] & BRAM[6] & BRAM[5] & BRAM[4];
