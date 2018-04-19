@@ -157,37 +157,67 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *UdpEngineClient
       at:
         offset: 0x0A000000
-        nelms: 1
-        stride: 8
-      description: "BpUdpClient"
+      description: "Backplane UDP Client for Application ASYNC Messaging"
+    ##################################################
+    BpUdpSrvXvc:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x0A000800
+      description: "Backplane UDP Server: Xilinx XVC"  
+    ##################################################
+    BpUdpSrvFsbl:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x0A000808
+      description: "Backplane UDP Server: FSBL Legacy SRPv0 register access"    
+    ##################################################
+    BpUdpSrvRssi[0]:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x0A000810
+      description: "Backplane UDP Server: Legacy Non-interleaved RSSI for Register access and ASYNC messages"          
+    ##################################################
+    BpUdpSrvRssi[1]:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x0A000818
+      description: "Backplane UDP Server: Legacy Non-interleaved RSSI for bulk data transfer"          
+    ##################################################
+    BpUdpSrvRssi[2]:
+      <<: *UdpEngineServer
+      at:
+        offset: 0x0A000830
+      description: "Backplane UDP Server: Interleaved RSSI"
     ##################################################
     BpUdpServer:
       <<: *UdpEngineServer
       at:
-        offset: 0x0A000818
-      description: "BpUdpServer"
-    ##################################################
-    SwUdpServer:
-      <<: *UdpEngineServer
-      at:
-        offset: 0x0A000800
-        nelms: 7
-        stride: 8         
-      description: "SwUdpServer"       
+        offset: 0x0A000820
+      description: "Backplane UDP Server for Application ASYNC Messaging"    
     ##################################################
     TimingUdpServer:
       <<: *UdpEngineServer
       at:
-        offset: 0x0A000820
-      description: "TimingUdpServer"       
+        offset: 0x0A000828
+      description: "Backplane UDP Server for Timing ASYNC Messaging"       
     ##################################################
-    SwRssiServer:
+    SwRssiServer[0]:
       <<: *RssiCore
       at:
         offset: 0x0A010000 
-        nelms: 2
-        stride: 0x1000   
-      description: SwRssiServer
+      description: "SwRssiServer[0]"
+    ##################################################
+    SwRssiServer[1]:
+      <<: *RssiCore
+      at:
+        offset: 0x0A011000 
+      description: "SwRssiServer[1]" 
+    ##################################################
+    SwRssiServer[2]:
+      <<: *RssiCore
+      at:
+        offset: 0x0A020000 
+      description: "SwRssiServer[2]"       
     ##################################################
     AxiMemTester:
       <<: *AxiMemTester
