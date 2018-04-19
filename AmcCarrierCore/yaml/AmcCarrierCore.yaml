@@ -171,19 +171,19 @@ AmcCarrierCore: &AmcCarrierCore
         offset: 0x0A000808
       description: "Backplane UDP Server: FSBL Legacy SRPv0 register access"    
     ##################################################
-    BpUdpSrvRssi0:
+    BpUdpSrvRssiAsyncMsg:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000810
       description: "Backplane UDP Server: Legacy Non-interleaved RSSI for Register access and ASYNC messages"          
     ##################################################
-    BpUdpSrvRssi1:
+    BpUdpSrvRssiData:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000818
       description: "Backplane UDP Server: Legacy Non-interleaved RSSI for bulk data transfer"          
     ##################################################
-    BpUdpSrvRssi2:
+    BpUdpSrvRssiInterleaved:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000830
@@ -201,19 +201,19 @@ AmcCarrierCore: &AmcCarrierCore
         offset: 0x0A000828
       description: "Backplane UDP Server for Timing ASYNC Messaging"       
     ##################################################
-    RssiServer0:
+    RssiServerAsyncMsg:
       <<: *RssiCore
       at:
         offset: 0x0A010000 
       description: "Backplane UDP Server: Legacy Non-interleaved RSSI for Register access and ASYNC messages"      
     ##################################################
-    RssiServer1:
+    RssiServerData:
       <<: *RssiCore
       at:
         offset: 0x0A011000 
       description: "Backplane UDP Server: Legacy Non-interleaved RSSI for bulk data transfer"      
     ##################################################
-    RssiServer2:
+    RssiServerInterleaved:
       <<: *RssiCore
       at:
         offset: 0x0A020000 
