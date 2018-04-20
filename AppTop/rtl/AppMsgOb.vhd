@@ -2,7 +2,7 @@
 -- File       : AppMsgOb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-03-01
--- Last update: 2017-03-01
+-- Last update: 2018-04-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -27,12 +27,13 @@ use work.EthMacPkg.all;
 
 entity AppMsgOb is
    generic (
-      TPD_G             : time            := 1 ns;
-      HDR_SIZE_G        : positive        := 1;
-      DATA_SIZE_G       : positive        := 1;
-      EN_CRC_G          : boolean         := true;
-      BRAM_EN_G         : boolean         := true;
-      FIFO_ADDR_WIDTH_G : positive        := 9);
+      TPD_G              : time     := 1 ns;
+      HDR_SIZE_G         : positive := 1;
+      DATA_SIZE_G        : positive := 1;
+      EN_CRC_G           : boolean  := true;
+      BRAM_EN_G          : boolean  := true;
+      AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes
+      FIFO_ADDR_WIDTH_G  : positive := 9);  -- units of bits
    port (
       -- Application Messaging Interface (clk domain)      
       clk         : in  sl;
@@ -51,9 +52,10 @@ end AppMsgOb;
 
 architecture rtl of AppMsgOb is
 
-   constant SIZE_C        : positive            := (2+HDR_SIZE_G+DATA_SIZE_G);  -- 64-bit timestamp + header + data
-   constant DATA_WIDTH_G  : positive            := (32*SIZE_C)+8;  -- 32-bit words + 8-bit tdest
-   constant AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(4);
+   constant SIZE_C              : positive            := (2+HDR_SIZE_G+DATA_SIZE_G);  -- 64-bit timestamp + header + data
+   constant DATA_WIDTH_G        : positive            := (32*SIZE_C)+8;  -- 32-bit words + 8-bit tdest
+   constant AXIS_CONFIG_C       : AxiStreamConfigType := ssiAxiStreamConfig(4, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);
+   constant MASTER_AXI_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(AXIS_TDATA_WIDTH_G, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);
 
    function toSlv (
       hdr   : Slv32Array(HDR_SIZE_G-1 downto 0);
@@ -85,11 +87,11 @@ architecture rtl of AppMsgOb is
          retVar((idx*32)+31 downto (idx*32)) := msg(i);
          idx                                 := idx + 1;
       end loop;
-      
+
       -- Load the tDest 
       retVar((idx*32)+7 downto (idx*32)) := tdest;
-      idx                                := idx + 1;      
-      
+      idx                                := idx + 1;
+
       return retVar;
    end function;
 
@@ -174,9 +176,9 @@ begin
             -- Check for new data and ready to send
             if (valid = '1') and (v.txMaster.tValid = '0') then
                -- Update the tDest
-               v.txMaster.tDest  := fifoDout((32*SIZE_C)+7 downto (32*SIZE_C));
+               v.txMaster.tDest := fifoDout((32*SIZE_C)+7 downto (32*SIZE_C));
                -- Next state
-               v.state := DATA_S;
+               v.state          := DATA_S;
             end if;
          ----------------------------------------------------------------------
          when DATA_S =>
@@ -282,7 +284,7 @@ begin
          FIFO_ADDR_WIDTH_G   => FIFO_ADDR_WIDTH_G,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+         MASTER_AXI_CONFIG_G => MASTER_AXI_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
