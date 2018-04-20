@@ -2,7 +2,7 @@
 -- File       : AxisBramFlashBufferRdFsm.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-10
--- Last update: 2018-04-12
+-- Last update: 2018-04-20
 -------------------------------------------------------------------------------
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
@@ -40,9 +40,10 @@ use work.EthMacPkg.all;
 
 entity AxisBramFlashBufferRdFsm is
    generic (
-      TPD_G          : time     := 1 ns;
-      NUM_CH_G       : positive := 1;
-      BUFFER_WIDTH_G : positive := 8);
+      TPD_G              : time     := 1 ns;
+      NUM_CH_G           : positive := 1;
+      AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes      
+      BUFFER_WIDTH_G     : positive := 8);  -- units of bits
    port (
       -- Write FSM Interface (axisClk domain)
       req        : in  sl;
@@ -65,6 +66,9 @@ end AxisBramFlashBufferRdFsm;
 
 architecture mapping of AxisBramFlashBufferRdFsm is
 
+   constant SLAVE_AXI_CONFIG_C  : AxiStreamConfigType := ssiAxiStreamConfig(16, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);
+   constant MASTER_AXI_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(AXIS_TDATA_WIDTH_G, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);
+
    constant MAX_CNT_C : slv(BUFFER_WIDTH_G-1 downto 0) := (others => '1');
 
    type StateType is (
@@ -73,32 +77,34 @@ architecture mapping of AxisBramFlashBufferRdFsm is
       PAYLOAD_S);
 
    type RegType is record
-      ack        : sl;
-      rdLatecy   : natural range 0 to 3;
-      idx        : natural range 0 to NUM_CH_G-1;
-      eventId    : slv(47 downto 0);
-      rdAddr     : slv(BUFFER_WIDTH_G-1 downto 0);
-      axisMaster : AxiStreamMasterType;
-      state      : StateType;
+      ack      : sl;
+      rdLatecy : natural range 0 to 3;
+      idx      : natural range 0 to NUM_CH_G-1;
+      eventId  : slv(47 downto 0);
+      rdAddr   : slv(BUFFER_WIDTH_G-1 downto 0);
+      txMaster : AxiStreamMasterType;
+      state    : StateType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      ack        => '0',
-      rdLatecy   => 0,
-      idx        => 0,
-      eventId    => (others => '0'),
-      rdAddr     => (others => '0'),
-      axisMaster => AXI_STREAM_MASTER_INIT_C,
-      state      => IDLE_S);
+      ack      => '0',
+      rdLatecy => 0,
+      idx      => 0,
+      eventId  => (others => '0'),
+      rdAddr   => (others => '0'),
+      txMaster => AXI_STREAM_MASTER_INIT_C,
+      state    => IDLE_S);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
+
+   signal txSlave : AxiStreamSlaveType;
 
    signal tDestSync : Slv8Array(NUM_CH_G-1 downto 0);
 
 begin
 
-   comb : process (axisRst, axisSlave, r, rdData, req, tDestSync, timestamp,
+   comb : process (axisRst, r, rdData, req, tDestSync, timestamp, txSlave,
                    valid) is
       variable v : RegType;
    begin
@@ -107,10 +113,10 @@ begin
 
       -- Reset strobes
       v.ack := '0';
-      if axisSlave.tReady = '1' then
-         v.axisMaster.tValid := '0';
-         v.axisMaster.tLast  := '0';
-         v.axisMaster.tUser  := (others => '0');
+      if txSlave.tReady = '1' then
+         v.txMaster.tValid := '0';
+         v.txMaster.tLast  := '0';
+         v.txMaster.tUser  := (others => '0');
       end if;
 
       -- Decrement the counter
@@ -135,45 +141,45 @@ begin
          ----------------------------------------------------------------------
          when HDR_S =>
             -- Check if ready to move data
-            if (v.axisMaster.tValid = '0') then
+            if (v.txMaster.tValid = '0') then
                -- Move data
-               v.axisMaster.tValid               := valid(r.idx);
-               v.axisMaster.tData(7 downto 0)    := x"00";  -- Version = 0x0
-               v.axisMaster.tData(15 downto 8)   := toSlv(r.idx, 8);  -- Channel Index
-               v.axisMaster.tData(63 downto 16)  := r.eventId;  -- Event ID
-               v.axisMaster.tData(127 downto 64) := timestamp;
+               v.txMaster.tValid               := valid(r.idx);
+               v.txMaster.tData(7 downto 0)    := x"00";  -- Version = 0x0
+               v.txMaster.tData(15 downto 8)   := toSlv(r.idx, 8);  -- Channel Index
+               v.txMaster.tData(63 downto 16)  := r.eventId;        -- Event ID
+               v.txMaster.tData(127 downto 64) := timestamp;
                -- Set the tDest field
-               v.axisMaster.tDest                := tDestSync(r.idx);
+               v.txMaster.tDest                := tDestSync(r.idx);
                -- Set SOF bit
-               ssiSetUserSof(EMAC_AXIS_CONFIG_C, v.axisMaster, '1');
+               ssiSetUserSof(SLAVE_AXI_CONFIG_C, v.txMaster, '1');
                -- Next state
-               v.state                           := PAYLOAD_S;
+               v.state                         := PAYLOAD_S;
             end if;
          ----------------------------------------------------------------------
          when PAYLOAD_S =>
             -- Check if ready to move data
-            if (v.axisMaster.tValid = '0') and (v.rdLatecy = 0) then
+            if (v.txMaster.tValid = '0') and (v.rdLatecy = 0) then
                -- Increment the counter
                v.rdAddr := r.rdAddr + 1;
                -- Check the counter               
                if v.rdAddr(1 downto 0) = "00" then
                   -- Update the data bus
-                  v.axisMaster.tData(31 downto 0) := rdData(r.idx);
+                  v.txMaster.tData(31 downto 0) := rdData(r.idx);
                elsif v.rdAddr(1 downto 0) = "01" then
                   -- Update the data bus
-                  v.axisMaster.tData(63 downto 32) := rdData(r.idx);
+                  v.txMaster.tData(63 downto 32) := rdData(r.idx);
                elsif v.rdAddr(1 downto 0) = "10" then
                   -- Update the data bus
-                  v.axisMaster.tData(95 downto 64) := rdData(r.idx);
+                  v.txMaster.tData(95 downto 64) := rdData(r.idx);
                else
                   -- Update the data bus
-                  v.axisMaster.tData(95 downto 64) := rdData(r.idx);
+                  v.txMaster.tData(95 downto 64) := rdData(r.idx);
                   -- Move data
-                  v.axisMaster.tValid              := valid(r.idx);
+                  v.txMaster.tValid              := valid(r.idx);
                   -- Check for max. count
                   if (v.rdAddr = MAX_CNT_C) then
                      -- Set the EOF bit
-                     v.axisMaster.tLast := '1';
+                     v.txMaster.tLast := '1';
                      -- Check for last channel 
                      if (r.idx = (NUM_CH_G-1)) then
                         -- Set the request flag
@@ -206,9 +212,8 @@ begin
       rin <= v;
 
       -- Outputs
-      ack        <= r.ack;
-      rdAddr     <= r.rdAddr;
-      axisMaster <= r.axisMaster;
+      ack    <= r.ack;
+      rdAddr <= r.rdAddr;
 
    end process comb;
 
@@ -229,5 +234,30 @@ begin
             dataIn  => tDest(i),
             dataOut => tDestSync(i));
    end generate GEN_SYNC;
+
+   GEN_RESIZE : if (AXIS_TDATA_WIDTH_G /= 16) generate
+      U_Resize : entity work.AxiStreamResize
+         generic map (
+            TPD_G               => TPD_G,
+            READY_EN_G          => true,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => SLAVE_AXI_CONFIG_C,
+            MASTER_AXI_CONFIG_G => MASTER_AXI_CONFIG_C)
+         port map (
+            -- Clock and reset
+            axisClk     => axisClk,
+            axisRst     => axisRst,
+            -- Slave Port
+            sAxisMaster => r.txMaster,
+            sAxisSlave  => txSlave,
+            -- Master Port
+            mAxisMaster => axisMaster,
+            mAxisSlave  => axisSlave);
+   end generate;
+
+   BYP_RESIZE : if (AXIS_TDATA_WIDTH_G = 16) generate
+      axisMaster <= r.txMaster;
+      txSlave    <= axisSlave;
+   end generate;
 
 end mapping;
