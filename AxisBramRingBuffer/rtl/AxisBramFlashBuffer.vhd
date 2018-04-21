@@ -2,7 +2,7 @@
 -- File       : AxisBramFlashBuffer.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-10
--- Last update: 2018-04-12
+-- Last update: 2018-04-20
 -------------------------------------------------------------------------------
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
@@ -39,9 +39,10 @@ use work.AxiStreamPkg.all;
 
 entity AxisBramFlashBuffer is
    generic (
-      TPD_G          : time     := 1 ns;
-      NUM_CH_G       : positive := 1;
-      BUFFER_WIDTH_G : positive := 8);  -- DEPTH_G = 2**WIDTH_G
+      TPD_G              : time     := 1 ns;
+      NUM_CH_G           : positive := 1;
+      AXIS_TDATA_WIDTH_G : positive := 8;   -- units of bytes            
+      BUFFER_WIDTH_G     : positive := 8);  -- DEPTH_G = 2**WIDTH_G
    port (
       -- Input Data Interface (appClk domain)
       appClk          : in  sl;
@@ -68,8 +69,6 @@ entity AxisBramFlashBuffer is
 end AxisBramFlashBuffer;
 
 architecture mapping of AxisBramFlashBuffer is
-
-   constant TDEST_ROUTES_C : Slv8Array(NUM_CH_G-1 downto 0) := (others => "--------");
 
    type RegType is record
       enable         : sl;
@@ -169,9 +168,10 @@ begin
    -----------------
    U_ReadFsm : entity work.AxisBramFlashBufferRdFsm
       generic map (
-         TPD_G          => TPD_G,
-         NUM_CH_G       => NUM_CH_G,
-         BUFFER_WIDTH_G => BUFFER_WIDTH_G)
+         TPD_G              => TPD_G,
+         NUM_CH_G           => NUM_CH_G,
+         AXIS_TDATA_WIDTH_G => AXIS_TDATA_WIDTH_G,
+         BUFFER_WIDTH_G     => BUFFER_WIDTH_G)
       port map (
          -- Write FSM Interface (axisClk domain)
          req        => req,
