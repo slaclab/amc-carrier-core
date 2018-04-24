@@ -201,17 +201,13 @@ AmcCarrierCore: &AmcCarrierCore
         offset: 0x0A000828
       description: "Backplane UDP Server for Timing ASYNC Messaging"       
     ##################################################
-    RssiServerAsyncMsg:
+    SwRssiServer:
       <<: *RssiCore
       at:
         offset: 0x0A010000 
-      description: "Backplane UDP Server: Legacy Non-interleaved RSSI for Register access and ASYNC messages"      
-    ##################################################
-    RssiServerData:
-      <<: *RssiCore
-      at:
-        offset: 0x0A011000 
-      description: "Backplane UDP Server: Legacy Non-interleaved RSSI for bulk data transfer"      
+        nelms: 2
+        stride: 0x1000   
+      description: Backplane UDP Server: Legacy Non-interleaved RSSI  
     ##################################################
     RssiServerInterleaved:
       <<: *RssiCore
