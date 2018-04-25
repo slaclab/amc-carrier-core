@@ -207,7 +207,7 @@ AmcCarrierCore: &AmcCarrierCore
         offset: 0x0A010000 
         nelms: 2
         stride: 0x1000   
-      description: Backplane UDP Server: Legacy Non-interleaved RSSI  
+      description: "Backplane UDP Server: Legacy Non-interleaved RSSI"
     ##################################################
     RssiServerInterleaved:
       <<: *RssiCore

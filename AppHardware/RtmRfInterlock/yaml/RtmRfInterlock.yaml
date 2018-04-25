@@ -74,48 +74,60 @@ RtmRfInterlock: &RtmRfInterlock
       class: IntField
       at:
         offset: 0x404
-      sizeBits: 8
-      mode: RW
+      # sizeBits: 8
+      mode: WO
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32     
       description: "Write Wiper Register A"
     #########################################################
     KlyWiperRegB:
       class: IntField
       at:
         offset: 0x408
-      sizeBits: 8
-      mode: RW
+      # sizeBits: 8
+      mode: WO
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32   
       description: "Write Wiper Register B"
     #########################################################
-    # KlyWiperRegAB:
-      # class: IntField
-      # at:
-        # offset: 0x40C
-      # sizeBits: 8
-      # mode: RW
-      # description: "Write Wiper Register A and B"
-    #########################################################
-    KlyNVRegA:
+    KlyWiperRegAB:
       class: IntField
       at:
-        offset: 0x444
-      sizeBits: 8
-      mode: RW
-      description: "Write NV Register A"
+        offset: 0x40C
+      # sizeBits: 8
+      mode: WO
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32   
+      description: "Write Wiper Register A and B"
+    #########################################################
+    # KlyNVRegA:
+      # class: IntField
+      # at:
+        # offset: 0x444
+      # # sizeBits: 8
+      # mode: WO
+      # # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      # sizeBits: 32   
+      # description: "Write NV Register A"
     #########################################################
     KlyNVRegB:
       class: IntField
       at:
         offset: 0x448
-      sizeBits: 8
-      mode: RW
+      # sizeBits: 8
+      mode: WO
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32   
       description: "Write NV Register B"
     #########################################################
     # KlyNVRegAB:
       # class: IntField
       # at:
         # offset: 0x44C
-      # sizeBits: 8
-      # mode: RW
+      # # sizeBits: 8
+      # mode: WO
+      # # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      # sizeBits: 32   
       # description: "Write NV Register A and B"
     #########################################################
     #    MOD THRESHOLD TPL0202
@@ -124,48 +136,60 @@ RtmRfInterlock: &RtmRfInterlock
       class: IntField
       at:
         offset: 0x804
-      sizeBits: 8
-      mode: RW
+      # sizeBits: 8
+      mode: WO
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32   
       description: "Write Wiper Register A"
     #########################################################
     ModWiperRegB:
       class: IntField
       at:
         offset: 0x808
-      sizeBits: 8
-      mode: RW
+      # sizeBits: 8
+      mode: WO
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32   
       description: "Write Wiper Register B"
     #########################################################
     # ModWiperRegAB:
       # class: IntField
       # at:
         # offset: 0x80C
-      # sizeBits: 8
-      # mode: RW
+      # # sizeBits: 8
+      # mode: WO
+      # # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      # sizeBits: 32   
       # description: "Write Wiper Register A and B"
     #########################################################
     ModNVRegA:
       class: IntField
       at:
         offset: 0x844
-      sizeBits: 8
-      mode: RW
+      # sizeBits: 8
+      mode: WO
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32   
       description: "Write NV Register A"
     #########################################################
     ModNVRegB:
       class: IntField
       at:
         offset: 0x848
-      sizeBits: 8
-      mode: RW
+      # sizeBits: 8
+      mode: WO
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32   
       description: "Write NV Register B"
     #########################################################
     # ModNVRegAB:
       # class: IntField
       # at:
         # offset: 0x84C
-      # sizeBits: 8
-      # mode: RW
+      # # sizeBits: 8
+      # mode: WO
+      # # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      # sizeBits: 32   
       # description: "Write NV Register A and B"
     #########################################################
     #    ADC THRESHOLD readout chip. AD7682
