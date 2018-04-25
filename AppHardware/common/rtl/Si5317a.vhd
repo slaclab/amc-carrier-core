@@ -2,7 +2,7 @@
 -- File       : Si5317a.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-12-04
--- Last update: 2018-03-14
+-- Last update: 2018-04-24
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -228,7 +228,7 @@ begin
       -- Map the read only registers
       axiSlaveRegister(regCon, x"00", 0, v.userValueOut);
 
-      axiSlaveRegister(regCon, x"04", 0, v.pllRst);         -- BIT[00:00]
+      -- axiSlaveRegister(regCon, x"04", 0, v.pllRst);         -- BIT[00:00] -- CPSW requires all WO variables to be 32-bit size and 32-bit aligned
       axiSlaveRegister(regCon, x"04", 1, v.pllInc);         -- BIT[01:01]
       axiSlaveRegister(regCon, x"04", 2, v.pllDec);         -- BIT[02:02]
       axiSlaveRegisterR(regCon, x"04", 3, los);             -- BIT[03:03]
@@ -254,6 +254,7 @@ begin
       axiSlaveRegisterR(regCon, x"88", 0, r.cntLocked);
       axiSlaveRegisterR(regCon, x"8C", 0, r.cntPllRst);
 
+      axiSlaveRegister(regCon, x"F8", 0, v.pllRst);  -- BIT[00:00] -- CPSW requires all WO variables to be 32-bit size and 32-bit aligned
       axiSlaveRegister(regCon, x"FC", 0, v.cntRst);
 
       -- Closeout the transaction

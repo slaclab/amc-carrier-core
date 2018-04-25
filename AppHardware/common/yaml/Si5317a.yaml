@@ -20,12 +20,14 @@ Si5317a: &Si5317a
     #########################################################
     pllRst:
       at:
-        offset: 0x4
+        offset: 0xF8
       class: IntField
       name: pllRst
       mode: WO
-      sizeBits: 1
+      # sizeBits: 1
       lsBit: 0
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32          
       description: pllRst    
     #########################################################
     pllInc:
@@ -240,7 +242,9 @@ Si5317a: &Si5317a
       class: IntField
       name: cntRst
       mode: WO
-      sizeBits: 1
+      # sizeBits: 1
       lsBit: 0
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32         
       description: cntRst      
     #########################################################

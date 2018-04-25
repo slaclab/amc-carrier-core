@@ -155,7 +155,9 @@ AppMpsSalt: &AppMpsSalt
       name: CntRst
       mode: WO
       lsBit: 0
-      sizeBits: 1
+      # sizeBits: 1
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32          
       description: Status Counter Reset
     #########################################################
     PllRst:
@@ -165,7 +167,9 @@ AppMpsSalt: &AppMpsSalt
       name: PllRst
       mode: WO
       lsBit: 0
-      sizeBits: 1
+      # sizeBits: 1
+      # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
+      sizeBits: 32          
       description: PLL Reset      
     #########################################################
     RstCnt:
