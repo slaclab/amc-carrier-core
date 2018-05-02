@@ -39,6 +39,7 @@ class TopLevel(pr.Device):
             # JESD Parameters
             numRxLanes      = [0,0],
             numTxLanes      = [0,0],
+            enJesdDrp       = False,
             # Signal Generator Parameters
             numSigGen       = [0,0],
             sizeSigGen      = [0,0],
@@ -171,6 +172,7 @@ class TopLevel(pr.Device):
             offset       = 0x80000000,
             numRxLanes   = numRxLanes,
             numTxLanes   = numTxLanes,
+            enJesdDrp    = enJesdDrp,
             numSigGen    = numSigGen,
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,
