@@ -32,6 +32,7 @@ class AppTop(pr.Device):
             description    = "Common Application Top Level", 
             numRxLanes     = [0,0], 
             numTxLanes     = [0,0],
+            enJesdDrp      = False,
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
@@ -68,6 +69,7 @@ class AppTop(pr.Device):
                     offset       =  0x40000000 + (i * 0x10000000),
                     numRxLanes   =  numRxLanes[i],
                     numTxLanes   =  numTxLanes[i],
+                    enJesdDrp    =  enJesdDrp,
                     expand       =  False,
                 ))
 

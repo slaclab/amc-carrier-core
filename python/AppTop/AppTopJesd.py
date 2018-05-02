@@ -19,15 +19,17 @@
 
 import pyrogue as pr
 
-from surf.protocols.jesd204b import *
+import surf.xilinx as xil
+import surf.protocols.jesd204b as jesd
 
 class AppTopJesd(pr.Device):
     def __init__(   self, 
             name        = "AppTopJesd", 
             description = "Common Application Top Level JESD Module", 
-            numRxLanes  =  6, 
-            numTxLanes  =  2,
-            expand      =  False,
+            numRxLanes  = 6, 
+            numTxLanes  = 2,
+            enJesdDrp   = False,
+            expand      = False,
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)
 
@@ -35,15 +37,29 @@ class AppTopJesd(pr.Device):
         # Variables
         ##############################
         if (numRxLanes > 0):
-            self.add(JesdRx(
-                offset       =  0x00000000,
-                numRxLanes   =  numRxLanes,
+            self.add(jesd.JesdRx(
+                offset       = 0x00000000,
+                numRxLanes   = numRxLanes,
                 expand       = expand,
             ))
 
         if (numTxLanes > 0):
-            self.add(JesdTx(
-                offset       =  0x01000000,
-                numTxLanes   =  numTxLanes,
+            self.add(jesd.JesdTx(
+                offset       = 0x01000000,
+                numTxLanes   = numTxLanes,
                 expand       = expand,
             ))
+        
+        # Find max number of lanes
+        maxlanes = numRxLanes
+        if (numTxLanes>maxlanes):
+            maxlanes = numTxLanes
+        
+        # Check if DRP enabled and non-zero lane count
+        if((maxlanes > 0) and enJesdDrp):
+            for i in range(maxlanes):
+                self.add(xil.Gthe3Channel(
+                    name   = "Gthe3Channel[%i]" % (i),
+                    offset =  0x03000000 + (i * 0x100000),
+                    expand =  False,
+                ))            
