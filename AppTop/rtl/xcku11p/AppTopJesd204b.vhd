@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2018-03-14
+-- Last update: 2018-05-02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -228,51 +228,55 @@ architecture mapping of AppTopJesd204b is
    end component;
 
 
-   signal r_jesdGtRxArr : jesdGtRxLaneTypeArray(GT_LANE_G-1 downto 0) := (others => JESD_GT_RX_LANE_INIT_C);
-   signal r_jesdGtTxArr : jesdGtTxLaneTypeArray(GT_LANE_G-1 downto 0) := (others => JESD_GT_TX_LANE_INIT_C);
+   signal r_jesdGtRxArr : jesdGtRxLaneTypeArray(9 downto 0) := (others => JESD_GT_RX_LANE_INIT_C);
+   signal r_jesdGtTxArr : jesdGtTxLaneTypeArray(9 downto 0) := (others => JESD_GT_TX_LANE_INIT_C);
 
-   signal s_gtRxUserReset : slv(GT_LANE_G-1 downto 0) := (others => '0');
-   signal s_gtRxReset     : sl                        := '0';
-   signal s_gtTxUserReset : slv(GT_LANE_G-1 downto 0) := (others => '0');
-   signal s_gtTxReset     : sl                        := '0';
-   signal s_gtResetAll    : sl                        := '0';
+   signal s_gtRxUserReset : slv(9 downto 0) := (others => '0');
+   signal s_gtRxReset     : sl              := '0';
+   signal s_gtTxUserReset : slv(9 downto 0) := (others => '0');
+   signal s_gtTxReset     : sl              := '0';
+   signal s_gtResetAll    : sl              := '0';
 
-   signal s_sysRef        : sl                                    := '0';
-   signal s_sysRefDbg     : sl                                    := '0';
-   signal s_rxctrl0       : slv(GT_LANE_G*16-1 downto 0)          := (others => '0');
-   signal s_rxctrl1       : slv(GT_LANE_G*16-1 downto 0)          := (others => '0');
-   signal s_rxctrl2       : slv(GT_LANE_G*8-1 downto 0)           := (others => '0');
-   signal s_rxctrl3       : slv(GT_LANE_G*8-1 downto 0)           := (others => '0');
-   signal s_rxData        : slv(GT_LANE_G*32-1 downto 0)          := (others => '0');
-   signal s_txData        : slv(GT_LANE_G*32-1 downto 0)          := (others => '0');
-   signal s_txDataK       : slv(GT_LANE_G*8-1 downto 0)           := (others => '0');
-   signal s_devClkVec     : slv(GT_LANE_G-1 downto 0)             := (others => '0');
-   signal s_devClk2Vec    : slv(GT_LANE_G-1 downto 0)             := (others => '0');
-   signal s_stableClkVec  : slv(GT_LANE_G-1 downto 0)             := (others => '0');
-   signal s_gtRefClkVec   : slv(GT_LANE_G-1 downto 0)             := (others => '0');
-   signal s_rxDone        : slv(1 downto 0)                       := (others => '0');
-   signal s_txDone        : slv(1 downto 0)                       := (others => '0');
-   signal s_gtTxReady     : slv(GT_LANE_G-1 downto 0)             := (others => '0');
-   signal s_allignEnVec   : slv(GT_LANE_G-1 downto 0)             := (others => '0');
-   signal s_dataValidVec  : slv(GT_LANE_G-1 downto 0)             := (others => '0');
-   signal s_sampleDataArr : sampleDataArray(GT_LANE_G-1 downto 0) := (others => (others => '0'));
+   signal s_sysRef        : sl                          := '0';
+   signal s_sysRefDbg     : sl                          := '0';
+   signal s_rxctrl0       : slv(10*16-1 downto 0)       := (others => '0');
+   signal s_rxctrl1       : slv(10*16-1 downto 0)       := (others => '0');
+   signal s_rxctrl2       : slv(10*8-1 downto 0)        := (others => '0');
+   signal s_rxctrl3       : slv(10*8-1 downto 0)        := (others => '0');
+   signal s_rxData        : slv(10*32-1 downto 0)       := (others => '0');
+   signal s_txData        : slv(10*32-1 downto 0)       := (others => '0');
+   signal s_txDataK       : slv(10*8-1 downto 0)        := (others => '0');
+   signal s_devClkVec     : slv(9 downto 0)             := (others => '0');
+   signal s_devClk2Vec    : slv(9 downto 0)             := (others => '0');
+   signal s_stableClkVec  : slv(9 downto 0)             := (others => '0');
+   signal s_gtRefClkVec   : slv(9 downto 0)             := (others => '0');
+   signal s_rxDone        : slv(1 downto 0)             := (others => '0');
+   signal s_txDone        : slv(1 downto 0)             := (others => '0');
+   signal s_gtTxReady     : slv(9 downto 0)             := (others => '0');
+   signal s_allignEnVec   : slv(9 downto 0)             := (others => '0');
+   signal s_dataValidVec  : slv(9 downto 0)             := (others => '0');
+   signal s_sampleDataArr : sampleDataArray(9 downto 0) := (others => (others => '0'));
 
-   signal txDiffCtrl   : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '1'));
-   signal txPostCursor : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
-   signal txPreCursor  : Slv8Array(GT_LANE_G-1 downto 0) := (others => (others => '0'));
-   signal txPolarity   : slv(GT_LANE_G-1 downto 0)       := (others => '0');
-   signal rxPolarity   : slv(GT_LANE_G-1 downto 0)       := (others => '0');
-   signal txInhibit    : slv(GT_LANE_G-1 downto 0)       := (others => '1');
+   signal txDiffCtrl   : Slv8Array(9 downto 0) := (others => (others => '1'));
+   signal txPostCursor : Slv8Array(9 downto 0) := (others => (others => '0'));
+   signal txPreCursor  : Slv8Array(9 downto 0) := (others => (others => '0'));
+   signal txPolarity   : slv(9 downto 0)       := (others => '0');
+   signal rxPolarity   : slv(9 downto 0)       := (others => '0');
+   signal txPowerDown  : slv(9 downto 0)       := (others => '0');
+   signal rxPowerDown  : slv(9 downto 0)       := (others => '0');
+   signal txInhibit    : slv(9 downto 0)       := (others => '1');
 
-   signal gtTxDiffCtrl   : slv(GT_LANE_G*5-1 downto 0) := (others => '1');
-   signal gtTxPostCursor : slv(GT_LANE_G*5-1 downto 0) := (others => '0');
-   signal gtTxPreCursor  : slv(GT_LANE_G*5-1 downto 0) := (others => '0');
+   signal gtTxDiffCtrl   : slv(10*5-1 downto 0) := (others => '1');
+   signal gtTxPostCursor : slv(10*5-1 downto 0) := (others => '0');
+   signal gtTxPreCursor  : slv(10*5-1 downto 0) := (others => '0');
+   signal gtTxPd         : slv(10*2-1 downto 0) := (others => '0');
+   signal gtRxPd         : slv(10*2-1 downto 0) := (others => '0');
 
    signal s_cdrStable  : slv(1 downto 0);
    signal dummyZeroBit : sl;
 
    type RegType is record
-      jesdGtRxArr : jesdGtRxLaneTypeArray(GT_LANE_G-1 downto 0);
+      jesdGtRxArr : jesdGtRxLaneTypeArray(9 downto 0);
    end record RegType;
 
    constant REG_INIT_C : RegType := (
@@ -308,12 +312,13 @@ begin
             devRst_i        => devRst_i,
             sysRef_i        => s_sysRef,
             sysRefDbg_o     => s_sysRefDbg,
-            r_jesdGtRxArr   => r.jesdGtRxArr(JESD_RX_LANE_G-1 downto 0),
+            r_jesdGtRxArr   => r_jesdGtRxArr(JESD_RX_LANE_G-1 downto 0),
             gtRxReset_o     => s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0),
             sampleDataArr_o => s_sampleDataArr(JESD_RX_LANE_G-1 downto 0),
             dataValidVec_o  => s_dataValidVec(JESD_RX_LANE_G-1 downto 0),
             nSync_o         => nSync_o,
-            rxPolarity      => rxPolarity);
+            rxPowerDown     => rxPowerDown(JESD_RX_LANE_G-1 downto 0),
+            rxPolarity      => rxPolarity(JESD_RX_LANE_G-1 downto 0));
       s_gtRxReset <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
    end generate;
 
@@ -355,11 +360,12 @@ begin
             gtTxReady_i          => s_gtTxReady(JESD_TX_LANE_G-1 downto 0),
             gtTxReset_o          => s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0),
             r_jesdGtTxArr        => r_jesdGtTxArr(JESD_TX_LANE_G-1 downto 0),
-            txDiffCtrl           => txDiffCtrl,
-            txPostCursor         => txPostCursor,
-            txPreCursor          => txPreCursor,
-            txPolarity           => txPolarity,
-            txEnableL            => txInhibit);
+            txDiffCtrl           => txDiffCtrl(JESD_TX_LANE_G-1 downto 0),
+            txPostCursor         => txPostCursor(JESD_TX_LANE_G-1 downto 0),
+            txPreCursor          => txPreCursor(JESD_TX_LANE_G-1 downto 0),
+            txPowerDown          => txPowerDown(JESD_TX_LANE_G-1 downto 0),
+            txPolarity           => txPolarity(JESD_TX_LANE_G-1 downto 0),
+            txEnableL            => txInhibit(JESD_TX_LANE_G-1 downto 0));
 
       s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
    end generate;
@@ -397,7 +403,8 @@ begin
    -----------------
    -- GTH TX signals
    -----------------   
-   TX_LANES_GEN : for i in GT_LANE_G-1 downto 0 generate
+   TX_LANES_GEN : for i in 9 downto 0 generate
+
       process(devClk_i)
       begin
          if rising_edge(devClk_i) then
@@ -411,13 +418,14 @@ begin
       gtTxDiffCtrl((i*5)+4 downto i*5)   <= txDiffCtrl(i)(4 downto 0);
       gtTxPostCursor((i*5)+4 downto i*5) <= txPostCursor(i)(4 downto 0);
       gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
+      gtTxPd((i*2)+1 downto i*2)         <= txPowerDown(i) & txPowerDown(i);
 
    end generate TX_LANES_GEN;
 
    -----------------
    -- GTH RX signals
    -----------------
-   RX_LANES_GEN : for i in GT_LANE_G-1 downto 0 generate
+   RX_LANES_GEN : for i in 9 downto 0 generate
 
       r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
       r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
@@ -430,6 +438,8 @@ begin
       s_devClk2Vec(i)   <= devClk2_i;
       s_stableClkVec(i) <= stableClk;
       s_gtRefClkVec(i)  <= refClkR when i < 7 else refClkL;
+
+      gtRxPd((i*2)+1 downto i*2) <= rxPowerDown(i) & rxPowerDown(i);
 
       process(devClk_i)
       begin
@@ -482,7 +492,7 @@ begin
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec(6 downto 0),
          rxpcommaalignen_in                    => s_allignEnVec(6 downto 0),
-         rxpd_in                               => (others => '0'),
+         rxpd_in                               => gtRxPd(13 downto 0),
          rxpolarity_in                         => rxPolarity(6 downto 0),
          rxusrclk_in                           => s_devClkVec(6 downto 0),
          rxusrclk2_in                          => s_devClk2Vec(6 downto 0),
@@ -492,7 +502,7 @@ begin
          txctrl2_in                            => s_txDataK(55 downto 0),
          txdiffctrl_in                         => gtTxDiffCtrl(34 downto 0),
          txinhibit_in                          => txInhibit(6 downto 0),
-         txpd_in                               => (others => '0'),
+         txpd_in                               => gtTxPd(13 downto 0),
          txpolarity_in                         => txPolarity(6 downto 0),
          txpostcursor_in                       => gtTxPostCursor(34 downto 0),
          txprecursor_in                        => gtTxPreCursor(34 downto 0),
@@ -548,7 +558,7 @@ begin
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec(9 downto 7),
          rxpcommaalignen_in                    => s_allignEnVec(9 downto 7),
-         rxpd_in                               => (others => '0'),
+         rxpd_in                               => gtRxPd(19 downto 14),
          rxpolarity_in                         => rxPolarity(9 downto 7),
          rxusrclk_in                           => s_devClkVec(9 downto 7),
          rxusrclk2_in                          => s_devClk2Vec(9 downto 7),
@@ -558,7 +568,7 @@ begin
          txctrl2_in                            => s_txDataK(79 downto 56),
          txdiffctrl_in                         => gtTxDiffCtrl(49 downto 35),
          txinhibit_in                          => txInhibit(9 downto 7),
-         txpd_in                               => (others => '0'),
+         txpd_in                               => gtTxPd(19 downto 14),
          txpolarity_in                         => txPolarity(9 downto 7),
          txpostcursor_in                       => gtTxPostCursor(49 downto 35),
          txprecursor_in                        => gtTxPreCursor(49 downto 35),

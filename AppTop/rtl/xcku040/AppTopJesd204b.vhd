@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2018-03-14
+-- Last update: 2018-05-02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -186,11 +186,15 @@ architecture mapping of AppTopJesd204b is
    signal txPreCursor  : Slv8Array(6 downto 0) := (others => (others => '0'));
    signal txPolarity   : slv(6 downto 0)       := (others => '0');
    signal rxPolarity   : slv(6 downto 0)       := (others => '0');
+   signal txPowerDown  : slv(6 downto 0)       := (others => '0');
+   signal rxPowerDown  : slv(6 downto 0)       := (others => '0');
    signal txInhibit    : slv(6 downto 0)       := (others => '1');
 
    signal gtTxDiffCtrl   : slv(7*4-1 downto 0) := (others => '1');
    signal gtTxPostCursor : slv(7*5-1 downto 0) := (others => '0');
    signal gtTxPreCursor  : slv(7*5-1 downto 0) := (others => '0');
+   signal gtTxPd         : slv(7*2-1 downto 0) := (others => '0');
+   signal gtRxPd         : slv(7*2-1 downto 0) := (others => '0');
 
    signal s_cdrStable  : sl;
    signal dummyZeroBit : sl;
@@ -227,6 +231,7 @@ begin
             sampleDataArr_o => s_sampleDataArr(JESD_RX_LANE_G-1 downto 0),
             dataValidVec_o  => s_dataValidVec(JESD_RX_LANE_G-1 downto 0),
             nSync_o         => nSync_o,
+            rxPowerDown     => rxPowerDown(JESD_RX_LANE_G-1 downto 0),
             rxPolarity      => rxPolarity(JESD_RX_LANE_G-1 downto 0));
       s_gtRxReset <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
    end generate;
@@ -270,6 +275,7 @@ begin
             txDiffCtrl           => txDiffCtrl(JESD_TX_LANE_G-1 downto 0),
             txPostCursor         => txPostCursor(JESD_TX_LANE_G-1 downto 0),
             txPreCursor          => txPreCursor(JESD_TX_LANE_G-1 downto 0),
+            txPowerDown          => txPowerDown(JESD_TX_LANE_G-1 downto 0),
             txPolarity           => txPolarity(JESD_TX_LANE_G-1 downto 0),
             txEnableL            => txInhibit(JESD_TX_LANE_G-1 downto 0));
       s_gtTxReset <= devRst_i or uOr(s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0));
@@ -309,18 +315,30 @@ begin
    -- GTH TX signals
    -----------------   
    TX_LANES_GEN : for i in 6 downto 0 generate
-      s_txData((i*32)+31 downto (i*32))  <= r_jesdGtTxArr(i).data;
-      s_txDataK((i*8)+7 downto (i*8))    <= x"0" & r_jesdGtTxArr(i).dataK;
+
+      process(devClk_i)
+      begin
+         if rising_edge(devClk_i) then
+            -- Help with timing
+            s_txData((i*32)+31 downto (i*32)) <= r_jesdGtTxArr(i).data           after TPD_G;
+            s_txDataK((i*8)+7 downto (i*8))   <= (x"0" & r_jesdGtTxArr(i).dataK) after TPD_G;
+         end if;
+      end process;
+
       s_gtTxReady(i)                     <= s_txDone;
       gtTxDiffCtrl((i*4)+3 downto i*4)   <= txDiffCtrl(i)(3 downto 0);
       gtTxPostCursor((i*5)+4 downto i*5) <= txPostCursor(i)(4 downto 0);
       gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
+      gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
+      gtTxPd((i*2)+1 downto i*2)         <= txPowerDown(i) & txPowerDown(i);
+
    end generate TX_LANES_GEN;
 
    -----------------
    -- GTH RX signals
    -----------------
    RX_LANES_GEN : for i in 6 downto 0 generate
+
       r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
       r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
       r_jesdGtRxArr(i).dispErr   <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
@@ -331,7 +349,16 @@ begin
       s_devClk2Vec(i)            <= devClk2_i;
       s_stableClkVec(i)          <= stableClk;
       s_gtRefClkVec(i)           <= refClk;
-      s_allignEnVec(i)           <= not(s_dataValidVec(i));
+
+      gtRxPd((i*2)+1 downto i*2) <= rxPowerDown(i) & rxPowerDown(i);
+
+      process(devClk_i)
+      begin
+         if rising_edge(devClk_i) then
+            s_allignEnVec(i) <= not(s_dataValidVec(i)) after TPD_G;
+         end if;
+      end process;
+
    end generate RX_LANES_GEN;
 
    s_gtResetAll <= s_gtTxReset or s_gtRxReset;
@@ -375,7 +402,7 @@ begin
          rxcommadeten_in                       => (others => '1'),
          rxmcommaalignen_in                    => s_allignEnVec,
          rxpcommaalignen_in                    => s_allignEnVec,
-         rxpd_in                               => (others => '0'),
+         rxpd_in                               => gtRxPd,
          rxpolarity_in                         => JESD_RX_POLARITY_G,
          rxusrclk_in                           => s_devClkVec,
          rxusrclk2_in                          => s_devClk2Vec,
@@ -385,7 +412,7 @@ begin
          txctrl2_in                            => s_txDataK,
          txdiffctrl_in                         => gtTxDiffCtrl,
          txinhibit_in                          => txInhibit,
-         txpd_in                               => (others => '0'),
+         txpd_in                               => gtTxPd,
          txpolarity_in                         => JESD_TX_POLARITY_G,
          txpostcursor_in                       => gtTxPostCursor,
          txprecursor_in                        => gtTxPreCursor,
