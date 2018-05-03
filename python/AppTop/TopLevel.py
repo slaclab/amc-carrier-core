@@ -36,6 +36,7 @@ class TopLevel(pr.Device):
             ipAddr          = '10.0.1.101',
             pcieDev         = '/dev/datadev_0',
             pcieRssiLink    = 0,
+            includeStream   = True,
             # JESD Parameters
             numRxLanes      = [0,0],
             numTxLanes      = [0,0],
@@ -97,7 +98,8 @@ class TopLevel(pr.Device):
                 pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
 
                 # Create stream interface
-                self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, packVer = 1)       
+                if(includeStream):
+                    self.stream = pr.protocols.UdpRssiPack( host=ipAddr, port=8194, packVer = 1)       
             
             elif ( commType=="eth-rssi-interleaved" ):
             
@@ -105,8 +107,11 @@ class TopLevel(pr.Device):
                 rssiInterlaved = True            
 
                 # Create Interleaved RSSI interface
-                rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8198, packVer = 2)
-
+                if(includeStream):
+                    rudp = self.stream = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8198, packVer = 2)
+                else:
+                    rudp = pyrogue.protocols.UdpRssiPack( host=ipAddr, port=8198, packVer = 2)
+                
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
@@ -148,11 +153,12 @@ class TopLevel(pr.Device):
                 srp = rogue.protocols.srp.SrpV3()                
                 pr.streamConnectBiDir( srp, vc0Srp )   
 
-                # Create the Raw Data stream interface
-                self.stream_vc1 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
+                if(includeStream):
+                    # Create the Raw Data stream interface
+                    self.stream_vc1 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
 
-                # Create the Raw Data stream interface
-                self.stream_vc2 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+2,1)
+                    # Create the Raw Data stream interface
+                    self.stream_vc2 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+2,1)
 
             # Undefined device type
             else:
