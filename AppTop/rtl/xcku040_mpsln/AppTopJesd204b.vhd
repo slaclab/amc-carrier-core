@@ -325,12 +325,9 @@ begin
          end if;
       end process;
 
-      s_txData((i*32)+31 downto (i*32))  <= r_jesdGtTxArr(i).data;
-      s_txDataK((i*8)+7 downto (i*8))    <= x"0" & r_jesdGtTxArr(i).dataK;
       s_gtTxReady(i)                     <= s_txDone;
       gtTxDiffCtrl((i*4)+3 downto i*4)   <= txDiffCtrl(i)(3 downto 0);
       gtTxPostCursor((i*5)+4 downto i*5) <= txPostCursor(i)(4 downto 0);
-      gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
       gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
       gtTxPd((i*2)+1 downto i*2)         <= txPowerDown(i) & txPowerDown(i);
 

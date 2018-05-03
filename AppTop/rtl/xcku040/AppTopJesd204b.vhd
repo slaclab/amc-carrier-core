@@ -329,7 +329,6 @@ begin
       gtTxDiffCtrl((i*4)+3 downto i*4)   <= txDiffCtrl(i)(3 downto 0);
       gtTxPostCursor((i*5)+4 downto i*5) <= txPostCursor(i)(4 downto 0);
       gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
-      gtTxPreCursor((i*5)+4 downto i*5)  <= txPreCursor(i)(4 downto 0);
       gtTxPd((i*2)+1 downto i*2)         <= txPowerDown(i) & txPowerDown(i);
 
    end generate TX_LANES_GEN;
