@@ -2,7 +2,7 @@
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2018-03-14
+-- Last update: 2018-05-04
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ architecture mapping of AppTopJesd is
    signal locked   : sl;
 
    signal drpClk  : slv(9 downto 0)       := (others => '0');
-   signal drpRdy  : slv(9 downto 0)       := (others => '0');
+   signal drpRdy  : slv(9 downto 0)       := (others => '1');
    signal drpEn   : slv(9 downto 0)       := (others => '0');
    signal drpWe   : slv(9 downto 0)       := (others => '0');
    signal drpAddr : slv(10*9-1 downto 0)  := (others => '0');
@@ -283,11 +283,8 @@ begin
    U_Jesd : entity work.AppTopJesd204b
       generic map (
          TPD_G              => TPD_G,
-         TEST_G             => false,
-         SYSREF_GEN_G       => false,
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
          JESD_TX_LANE_G     => JESD_TX_LANE_G,
-         GT_LANE_G          => 10,
          JESD_RX_POLARITY_G => JESD_RX_POLARITY_G,
          JESD_TX_POLARITY_G => JESD_TX_POLARITY_G)
       port map (

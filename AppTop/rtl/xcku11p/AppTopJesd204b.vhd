@@ -32,38 +32,35 @@ use unisim.vcomponents.all;
 entity AppTopJesd204b is
    generic (
       TPD_G              : time                  := 1 ns;
-      TEST_G             : boolean               := false;
-      SYSREF_GEN_G       : boolean               := false;
       JESD_RX_LANE_G     : natural range 0 to 10 := 8;
       JESD_TX_LANE_G     : natural range 0 to 10 := 8;
-      GT_LANE_G          : natural range 0 to 10 := 8;
-      JESD_RX_POLARITY_G : slv(9 downto 0)       := "0000000000";
-      JESD_TX_POLARITY_G : slv(9 downto 0)       := "0000000000");
+      JESD_RX_POLARITY_G : slv(9 downto 0)       := (others => '0');
+      JESD_TX_POLARITY_G : slv(9 downto 0)       := (others => '0'));
    port (
       -- DRP Interface
-      drpClk          : in  slv(GT_LANE_G-1 downto 0);
-      drpRdy          : out slv(GT_LANE_G-1 downto 0);
-      drpEn           : in  slv(GT_LANE_G-1 downto 0);
-      drpWe           : in  slv(GT_LANE_G-1 downto 0);
-      drpAddr         : in  slv(GT_LANE_G*10-1 downto 0);
-      drpDi           : in  slv(GT_LANE_G*16-1 downto 0);
-      drpDo           : out slv(GT_LANE_G*16-1 downto 0);
+      drpClk          : in  slv(9 downto 0);
+      drpRdy          : out slv(9 downto 0)       := (others => '1');
+      drpEn           : in  slv(9 downto 0);
+      drpWe           : in  slv(9 downto 0);
+      drpAddr         : in  slv(10*9 downto 0);
+      drpDi           : in  slv(10*16-1 downto 0);
+      drpDo           : out slv(10*16-1 downto 0) := (others => '0');
       -- AXI interface
       axilClk         : in  sl;
       axilRst         : in  sl;
       rxReadMaster    : in  AxiLiteReadMasterType;
-      rxReadSlave     : out AxiLiteReadSlaveType;
+      rxReadSlave     : out AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
       rxWriteMaster   : in  AxiLiteWriteMasterType;
-      rxWriteSlave    : out AxiLiteWriteSlaveType;
+      rxWriteSlave    : out AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
       txReadMaster    : in  AxiLiteReadMasterType;
-      txReadSlave     : out AxiLiteReadSlaveType;
+      txReadSlave     : out AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
       txWriteMaster   : in  AxiLiteWriteMasterType;
-      txWriteSlave    : out AxiLiteWriteSlaveType;
+      txWriteSlave    : out AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
       -- Sample data output (Use if external data acquisition core is attached)
-      sampleDataArr_o : out sampleDataArray(GT_LANE_G-1 downto 0);
-      dataValidVec_o  : out slv(GT_LANE_G-1 downto 0);
+      sampleDataArr_o : out sampleDataArray(9 downto 0);
+      dataValidVec_o  : out slv(9 downto 0);
       -- Sample data input (Use if external data generator core is attached)      
-      sampleDataArr_i : in  sampleDataArray(GT_LANE_G-1 downto 0);
+      sampleDataArr_i : in  sampleDataArray(9 downto 0);
       -------
       -- JESD
       -------
@@ -74,22 +71,20 @@ entity AppTopJesd204b is
       devClk_i        : in  sl;         -- Device clock also rxUsrClkIn for MGT
       devClk2_i       : in  sl;  -- Device clock divided by 2 also rxUsrClk2In for MGT       
       devRst_i        : in  sl;         -- 
-      devClkActive_i  : in  sl := '1';  -- devClk_i MCMM locked      
+      devClkActive_i  : in  sl                    := '1';  -- devClk_i MCMM locked      
       -- GTH Ports
-      gtTxP           : out slv(GT_LANE_G-1 downto 0);  -- GT Serial Transmit Positive
-      gtTxN           : out slv(GT_LANE_G-1 downto 0);  -- GT Serial Transmit Negative
-      gtRxP           : in  slv(GT_LANE_G-1 downto 0);  -- GT Serial Receive Positive
-      gtRxN           : in  slv(GT_LANE_G-1 downto 0);  -- GT Serial Receive Negative      
+      gtTxP           : out slv(9 downto 0);  -- GT Serial Transmit Positive
+      gtTxN           : out slv(9 downto 0);  -- GT Serial Transmit Negative
+      gtRxP           : in  slv(9 downto 0);  -- GT Serial Receive Positive
+      gtRxN           : in  slv(9 downto 0);  -- GT Serial Receive Negative      
       -- SYSREF for subclass 1 fixed latency
       sysRef_i        : in  sl;
       -- Synchronization output combined from all receivers to be connected to ADC/DAC chips
-      nSync_o         : out sl;         -- Active HIGH
+      nSync_o         : out sl                    := '0';  -- Active HIGH
       nSync_i         : in  sl);        -- Active HIGH
 end AppTopJesd204b;
 
 architecture mapping of AppTopJesd204b is
-
-   constant PD_C : sl := ite(((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)), '1', '0');
 
    component JesdCryoCoreRightColumn
       port (
@@ -264,15 +259,15 @@ architecture mapping of AppTopJesd204b is
    signal txPreCursor  : Slv8Array(9 downto 0) := (others => (others => '0'));
    signal txPolarity   : slv(9 downto 0)       := (others => '0');
    signal rxPolarity   : slv(9 downto 0)       := (others => '0');
-   signal txPowerDown  : slv(9 downto 0)       := (others => PD_C);
-   signal rxPowerDown  : slv(9 downto 0)       := (others => PD_C);
+   signal txPowerDown  : slv(9 downto 0)       := (others => '0');
+   signal rxPowerDown  : slv(9 downto 0)       := (others => '0');
    signal txInhibit    : slv(9 downto 0)       := (others => '1');
 
    signal gtTxDiffCtrl   : slv(10*5-1 downto 0) := (others => '1');
    signal gtTxPostCursor : slv(10*5-1 downto 0) := (others => '0');
    signal gtTxPreCursor  : slv(10*5-1 downto 0) := (others => '0');
-   signal gtTxPd         : slv(10*2-1 downto 0) := (others => PD_C);
-   signal gtRxPd         : slv(10*2-1 downto 0) := (others => PD_C);
+   signal gtTxPd         : slv(10*2-1 downto 0) := (others => '0');
+   signal gtRxPd         : slv(10*2-1 downto 0) := (others => '0');
 
    signal s_cdrStable  : slv(1 downto 0);
    signal dummyZeroBit : sl;
@@ -282,8 +277,7 @@ architecture mapping of AppTopJesd204b is
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      jesdGtRxArr => (others => JESD_GT_RX_LANE_INIT_C)
-      );
+      jesdGtRxArr => (others => JESD_GT_RX_LANE_INIT_C));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -292,6 +286,7 @@ begin
 
    dataValidVec_o  <= s_dataValidVec;
    sampleDataArr_o <= s_sampleDataArr;
+   s_sysRef        <= sysRef_i;
 
    ---------------
    -- JESD RX core
@@ -324,9 +319,9 @@ begin
       s_gtRxReset <= devRst_i or uOr(s_gtRxUserReset(JESD_RX_LANE_G-1 downto 0));
    end generate;
 
-   TERM_UNUSED : if (JESD_RX_LANE_G /= GT_LANE_G) generate
-      s_dataValidVec(GT_LANE_G-1 downto JESD_RX_LANE_G)  <= (others => dummyZeroBit);
-      s_sampleDataArr(GT_LANE_G-1 downto JESD_RX_LANE_G) <= (others => (others => dummyZeroBit));
+   TERM_UNUSED : if (JESD_RX_LANE_G /= 10) generate
+      s_dataValidVec(9 downto JESD_RX_LANE_G)  <= (others => dummyZeroBit);
+      s_sampleDataArr(9 downto JESD_RX_LANE_G) <= (others => (others => dummyZeroBit));
    end generate;
 
    BYP_RX_CORE : if (JESD_RX_LANE_G = 0) generate
@@ -377,30 +372,6 @@ begin
       txWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
       s_gtTxReset  <= devRst_i;
    end generate;
-
-   -------------------------------------------
-   -- Generate the internal or external SYSREF 
-   -------------------------------------------
-   SELF_TEST_GEN : if SYSREF_GEN_G = true generate
-      -- Generate the sysref internally
-      -- Sysref period will be 8x K_G.
-      SysrefGen_INST : entity work.JesdLmfcGen
-         generic map (
-            TPD_G => TPD_G,
-            K_G   => 256,
-            F_G   => 2)
-         port map (
-            clk      => devClk_i,
-            rst      => devRst_i,
-            nSync_i  => '0',
-            sysref_i => '0',
-            lmfc_o   => s_sysRef
-            );
-   end generate SELF_TEST_GEN;
-
-   OPER_GEN : if SYSREF_GEN_G = false generate
-      s_sysRef <= sysRef_i;
-   end generate OPER_GEN;
 
    -----------------
    -- GTH TX signals
@@ -471,138 +442,157 @@ begin
       end if;
    end process;
 
-   U_Coregen_Right : JesdCryoCoreRightColumn
-      port map (
-         -- Clocks
-         gtwiz_userclk_tx_active_in(0)         => devClkActive_i,
-         gtwiz_userclk_rx_active_in(0)         => devClkActive_i,
-         gtwiz_buffbypass_tx_reset_in(0)       => s_gtTxReset,
-         gtwiz_buffbypass_tx_start_user_in(0)  => s_gtTxReset,
-         gtwiz_userclk_tx_reset_in(0)          => s_gtTxReset,
-         gtwiz_buffbypass_tx_done_out          => open,
-         gtwiz_buffbypass_tx_error_out         => open,
-         gtwiz_reset_clk_freerun_in(0)         => stableClk,
-         gtwiz_reset_all_in(0)                 => s_gtResetAll,
-         gtwiz_reset_tx_pll_and_datapath_in(0) => s_gtTxReset,
-         gtwiz_reset_tx_datapath_in(0)         => s_gtTxReset,
-         gtwiz_reset_rx_pll_and_datapath_in(0) => s_gtRxReset,
-         gtwiz_reset_rx_datapath_in(0)         => s_gtRxReset,
-         gtwiz_reset_rx_cdr_stable_out(0)      => s_cdrStable(0),
-         gtwiz_reset_tx_done_out(0)            => s_txDone(0),
-         gtwiz_reset_rx_done_out(0)            => s_rxDone(0),
-         gtwiz_userdata_tx_in                  => s_txData(223 downto 0),
-         gtwiz_userdata_rx_out                 => s_rxData(223 downto 0),
-         drpaddr_in                            => drpAddr(69 downto 0),
-         drpclk_in                             => drpClk(6 downto 0),
-         drpdi_in                              => drpDi(111 downto 0),
-         drpen_in                              => drpEn(6 downto 0),
-         drpwe_in                              => drpWe(6 downto 0),
-         gthrxn_in                             => gtRxN(6 downto 0),
-         gthrxp_in                             => gtRxP(6 downto 0),
-         gtrefclk0_in                          => s_gtRefClkVec(6 downto 0),
-         loopback_in                           => (others => '0'),
-         rx8b10ben_in                          => (others => '1'),
-         rxcommadeten_in                       => (others => '1'),
-         rxmcommaalignen_in                    => s_allignEnVec(6 downto 0),
-         rxpcommaalignen_in                    => s_allignEnVec(6 downto 0),
-         rxpd_in                               => gtRxPd(13 downto 0),
-         rxpolarity_in                         => rxPolarity(6 downto 0),
-         rxusrclk_in                           => s_devClkVec(6 downto 0),
-         rxusrclk2_in                          => s_devClk2Vec(6 downto 0),
-         tx8b10ben_in                          => (others => '1'),
-         txctrl0_in                            => (others => '0'),
-         txctrl1_in                            => (others => '0'),
-         txctrl2_in                            => s_txDataK(55 downto 0),
-         txdiffctrl_in                         => gtTxDiffCtrl(34 downto 0),
-         txinhibit_in                          => txInhibit(6 downto 0),
-         txpd_in                               => gtTxPd(13 downto 0),
-         txpolarity_in                         => txPolarity(6 downto 0),
-         txpostcursor_in                       => gtTxPostCursor(34 downto 0),
-         txprecursor_in                        => gtTxPreCursor(34 downto 0),
-         txusrclk_in                           => s_devClkVec(6 downto 0),
-         txusrclk2_in                          => s_devClk2Vec(6 downto 0),
-         drpdo_out                             => drpDo(111 downto 0),
-         drprdy_out                            => drpRdy(6 downto 0),
-         gthtxn_out                            => gtTxN(6 downto 0),
-         gthtxp_out                            => gtTxP(6 downto 0),
-         rxbyteisaligned_out                   => open,
-         rxbyterealign_out                     => open,
-         rxcommadet_out                        => open,
-         rxctrl0_out                           => s_rxctrl0(111 downto 0),
-         rxctrl1_out                           => s_rxctrl1(111 downto 0),
-         rxctrl2_out                           => s_rxctrl2(55 downto 0),
-         rxctrl3_out                           => s_rxctrl3(55 downto 0),
-         rxoutclk_out                          => open,
-         rxpmaresetdone_out                    => open,
-         txoutclk_out                          => open,
-         txpmaresetdone_out                    => open);
 
-   U_Coregen_Left : JesdCryoCoreLeftColumn
-      port map (
-         -- Clocks
-         gtwiz_userclk_tx_active_in(0)         => devClkActive_i,
-         gtwiz_userclk_rx_active_in(0)         => devClkActive_i,
-         gtwiz_buffbypass_tx_reset_in(0)       => s_gtTxReset,
-         gtwiz_buffbypass_tx_start_user_in(0)  => s_gtTxReset,
-         gtwiz_userclk_tx_reset_in(0)          => s_gtTxReset,
-         gtwiz_buffbypass_tx_done_out          => open,
-         gtwiz_buffbypass_tx_error_out         => open,
-         gtwiz_reset_clk_freerun_in(0)         => stableClk,
-         gtwiz_reset_all_in(0)                 => s_gtResetAll,
-         gtwiz_reset_tx_pll_and_datapath_in(0) => s_gtTxReset,
-         gtwiz_reset_tx_datapath_in(0)         => s_gtTxReset,
-         gtwiz_reset_rx_pll_and_datapath_in(0) => s_gtRxReset,
-         gtwiz_reset_rx_datapath_in(0)         => s_gtRxReset,
-         gtwiz_reset_rx_cdr_stable_out(0)      => s_cdrStable(1),
-         gtwiz_reset_tx_done_out(0)            => s_txDone(1),
-         gtwiz_reset_rx_done_out(0)            => s_rxDone(1),
-         gtwiz_userdata_tx_in                  => s_txData(319 downto 224),
-         gtwiz_userdata_rx_out                 => s_rxData(319 downto 224),
-         drpaddr_in                            => drpAddr(99 downto 70),
-         drpclk_in                             => drpClk(9 downto 7),
-         drpdi_in                              => drpDi(159 downto 112),
-         drpen_in                              => drpEn(9 downto 7),
-         drpwe_in                              => drpWe(9 downto 7),
-         gtyrxn_in                             => gtRxN(9 downto 7),
-         gtyrxp_in                             => gtRxP(9 downto 7),
-         gtrefclk0_in                          => s_gtRefClkVec(9 downto 7),
-         loopback_in                           => (others => '0'),
-         rx8b10ben_in                          => (others => '1'),
-         rxcommadeten_in                       => (others => '1'),
-         rxmcommaalignen_in                    => s_allignEnVec(9 downto 7),
-         rxpcommaalignen_in                    => s_allignEnVec(9 downto 7),
-         rxpd_in                               => gtRxPd(19 downto 14),
-         rxpolarity_in                         => rxPolarity(9 downto 7),
-         rxusrclk_in                           => s_devClkVec(9 downto 7),
-         rxusrclk2_in                          => s_devClk2Vec(9 downto 7),
-         tx8b10ben_in                          => (others => '1'),
-         txctrl0_in                            => (others => '0'),
-         txctrl1_in                            => (others => '0'),
-         txctrl2_in                            => s_txDataK(79 downto 56),
-         txdiffctrl_in                         => gtTxDiffCtrl(49 downto 35),
-         txinhibit_in                          => txInhibit(9 downto 7),
-         txpd_in                               => gtTxPd(19 downto 14),
-         txpolarity_in                         => txPolarity(9 downto 7),
-         txpostcursor_in                       => gtTxPostCursor(49 downto 35),
-         txprecursor_in                        => gtTxPreCursor(49 downto 35),
-         txusrclk_in                           => s_devClkVec(9 downto 7),
-         txusrclk2_in                          => s_devClk2Vec(9 downto 7),
-         drpdo_out                             => drpDo(159 downto 112),
-         drprdy_out                            => drpRdy(9 downto 7),
-         gtytxn_out                            => gtTxN(9 downto 7),
-         gtytxp_out                            => gtTxP(9 downto 7),
-         rxbyteisaligned_out                   => open,
-         rxbyterealign_out                     => open,
-         rxcommadet_out                        => open,
-         rxctrl0_out                           => s_rxctrl0(159 downto 112),
-         rxctrl1_out                           => s_rxctrl1(159 downto 112),
-         rxctrl2_out                           => s_rxctrl2(79 downto 56),
-         rxctrl3_out                           => s_rxctrl3(79 downto 56),
-         rxoutclk_out                          => open,
-         rxpmaresetdone_out                    => open,
-         txoutclk_out                          => open,
-         txpmaresetdone_out                    => open);
+   GEN_GT : if ((JESD_RX_LANE_G /= 0) or (JESD_TX_LANE_G /= 0)) generate
 
+      U_Coregen_Right : JesdCryoCoreRightColumn
+         port map (
+            -- Clocks
+            gtwiz_userclk_tx_active_in(0)         => devClkActive_i,
+            gtwiz_userclk_rx_active_in(0)         => devClkActive_i,
+            gtwiz_buffbypass_tx_reset_in(0)       => s_gtTxReset,
+            gtwiz_buffbypass_tx_start_user_in(0)  => s_gtTxReset,
+            gtwiz_userclk_tx_reset_in(0)          => s_gtTxReset,
+            gtwiz_buffbypass_tx_done_out          => open,
+            gtwiz_buffbypass_tx_error_out         => open,
+            gtwiz_reset_clk_freerun_in(0)         => stableClk,
+            gtwiz_reset_all_in(0)                 => s_gtResetAll,
+            gtwiz_reset_tx_pll_and_datapath_in(0) => s_gtTxReset,
+            gtwiz_reset_tx_datapath_in(0)         => s_gtTxReset,
+            gtwiz_reset_rx_pll_and_datapath_in(0) => s_gtRxReset,
+            gtwiz_reset_rx_datapath_in(0)         => s_gtRxReset,
+            gtwiz_reset_rx_cdr_stable_out(0)      => s_cdrStable(0),
+            gtwiz_reset_tx_done_out(0)            => s_txDone(0),
+            gtwiz_reset_rx_done_out(0)            => s_rxDone(0),
+            gtwiz_userdata_tx_in                  => s_txData(223 downto 0),
+            gtwiz_userdata_rx_out                 => s_rxData(223 downto 0),
+            drpaddr_in                            => drpAddr(69 downto 0),
+            drpclk_in                             => drpClk(6 downto 0),
+            drpdi_in                              => drpDi(111 downto 0),
+            drpen_in                              => drpEn(6 downto 0),
+            drpwe_in                              => drpWe(6 downto 0),
+            gthrxn_in                             => gtRxN(6 downto 0),
+            gthrxp_in                             => gtRxP(6 downto 0),
+            gtrefclk0_in                          => s_gtRefClkVec(6 downto 0),
+            loopback_in                           => (others => '0'),
+            rx8b10ben_in                          => (others => '1'),
+            rxcommadeten_in                       => (others => '1'),
+            rxmcommaalignen_in                    => s_allignEnVec(6 downto 0),
+            rxpcommaalignen_in                    => s_allignEnVec(6 downto 0),
+            rxpd_in                               => gtRxPd(13 downto 0),
+            rxpolarity_in                         => rxPolarity(6 downto 0),
+            rxusrclk_in                           => s_devClkVec(6 downto 0),
+            rxusrclk2_in                          => s_devClk2Vec(6 downto 0),
+            tx8b10ben_in                          => (others => '1'),
+            txctrl0_in                            => (others => '0'),
+            txctrl1_in                            => (others => '0'),
+            txctrl2_in                            => s_txDataK(55 downto 0),
+            txdiffctrl_in                         => gtTxDiffCtrl(34 downto 0),
+            txinhibit_in                          => txInhibit(6 downto 0),
+            txpd_in                               => gtTxPd(13 downto 0),
+            txpolarity_in                         => txPolarity(6 downto 0),
+            txpostcursor_in                       => gtTxPostCursor(34 downto 0),
+            txprecursor_in                        => gtTxPreCursor(34 downto 0),
+            txusrclk_in                           => s_devClkVec(6 downto 0),
+            txusrclk2_in                          => s_devClk2Vec(6 downto 0),
+            drpdo_out                             => drpDo(111 downto 0),
+            drprdy_out                            => drpRdy(6 downto 0),
+            gthtxn_out                            => gtTxN(6 downto 0),
+            gthtxp_out                            => gtTxP(6 downto 0),
+            rxbyteisaligned_out                   => open,
+            rxbyterealign_out                     => open,
+            rxcommadet_out                        => open,
+            rxctrl0_out                           => s_rxctrl0(111 downto 0),
+            rxctrl1_out                           => s_rxctrl1(111 downto 0),
+            rxctrl2_out                           => s_rxctrl2(55 downto 0),
+            rxctrl3_out                           => s_rxctrl3(55 downto 0),
+            rxoutclk_out                          => open,
+            rxpmaresetdone_out                    => open,
+            txoutclk_out                          => open,
+            txpmaresetdone_out                    => open);
+
+      U_Coregen_Left : JesdCryoCoreLeftColumn
+         port map (
+            -- Clocks
+            gtwiz_userclk_tx_active_in(0)         => devClkActive_i,
+            gtwiz_userclk_rx_active_in(0)         => devClkActive_i,
+            gtwiz_buffbypass_tx_reset_in(0)       => s_gtTxReset,
+            gtwiz_buffbypass_tx_start_user_in(0)  => s_gtTxReset,
+            gtwiz_userclk_tx_reset_in(0)          => s_gtTxReset,
+            gtwiz_buffbypass_tx_done_out          => open,
+            gtwiz_buffbypass_tx_error_out         => open,
+            gtwiz_reset_clk_freerun_in(0)         => stableClk,
+            gtwiz_reset_all_in(0)                 => s_gtResetAll,
+            gtwiz_reset_tx_pll_and_datapath_in(0) => s_gtTxReset,
+            gtwiz_reset_tx_datapath_in(0)         => s_gtTxReset,
+            gtwiz_reset_rx_pll_and_datapath_in(0) => s_gtRxReset,
+            gtwiz_reset_rx_datapath_in(0)         => s_gtRxReset,
+            gtwiz_reset_rx_cdr_stable_out(0)      => s_cdrStable(1),
+            gtwiz_reset_tx_done_out(0)            => s_txDone(1),
+            gtwiz_reset_rx_done_out(0)            => s_rxDone(1),
+            gtwiz_userdata_tx_in                  => s_txData(319 downto 224),
+            gtwiz_userdata_rx_out                 => s_rxData(319 downto 224),
+            drpaddr_in                            => drpAddr(99 downto 70),
+            drpclk_in                             => drpClk(9 downto 7),
+            drpdi_in                              => drpDi(159 downto 112),
+            drpen_in                              => drpEn(9 downto 7),
+            drpwe_in                              => drpWe(9 downto 7),
+            gtyrxn_in                             => gtRxN(9 downto 7),
+            gtyrxp_in                             => gtRxP(9 downto 7),
+            gtrefclk0_in                          => s_gtRefClkVec(9 downto 7),
+            loopback_in                           => (others => '0'),
+            rx8b10ben_in                          => (others => '1'),
+            rxcommadeten_in                       => (others => '1'),
+            rxmcommaalignen_in                    => s_allignEnVec(9 downto 7),
+            rxpcommaalignen_in                    => s_allignEnVec(9 downto 7),
+            rxpd_in                               => gtRxPd(19 downto 14),
+            rxpolarity_in                         => rxPolarity(9 downto 7),
+            rxusrclk_in                           => s_devClkVec(9 downto 7),
+            rxusrclk2_in                          => s_devClk2Vec(9 downto 7),
+            tx8b10ben_in                          => (others => '1'),
+            txctrl0_in                            => (others => '0'),
+            txctrl1_in                            => (others => '0'),
+            txctrl2_in                            => s_txDataK(79 downto 56),
+            txdiffctrl_in                         => gtTxDiffCtrl(49 downto 35),
+            txinhibit_in                          => txInhibit(9 downto 7),
+            txpd_in                               => gtTxPd(19 downto 14),
+            txpolarity_in                         => txPolarity(9 downto 7),
+            txpostcursor_in                       => gtTxPostCursor(49 downto 35),
+            txprecursor_in                        => gtTxPreCursor(49 downto 35),
+            txusrclk_in                           => s_devClkVec(9 downto 7),
+            txusrclk2_in                          => s_devClk2Vec(9 downto 7),
+            drpdo_out                             => drpDo(159 downto 112),
+            drprdy_out                            => drpRdy(9 downto 7),
+            gtytxn_out                            => gtTxN(9 downto 7),
+            gtytxp_out                            => gtTxP(9 downto 7),
+            rxbyteisaligned_out                   => open,
+            rxbyterealign_out                     => open,
+            rxcommadet_out                        => open,
+            rxctrl0_out                           => s_rxctrl0(159 downto 112),
+            rxctrl1_out                           => s_rxctrl1(159 downto 112),
+            rxctrl2_out                           => s_rxctrl2(79 downto 56),
+            rxctrl3_out                           => s_rxctrl3(79 downto 56),
+            rxoutclk_out                          => open,
+            rxpmaresetdone_out                    => open,
+            txoutclk_out                          => open,
+            txpmaresetdone_out                    => open);
+
+   end generate;
+
+   BYP_GT : if ((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) generate
+
+      U_TERM_GT : entity work.Gthe4ChannelDummy
+         generic map (
+            TPD_G   => TPD_G,
+            WIDTH_G => 10)
+         port map (
+            refClk => axilClk,
+            gtRxP  => gtRxP,
+            gtRxN  => gtRxN,
+            gtTxP  => gtTxP,
+            gtTxN  => gtTxN);
+
+   end generate;
 
 
    comb : process (devRst_i, r, r_jesdGtRxArr) is
