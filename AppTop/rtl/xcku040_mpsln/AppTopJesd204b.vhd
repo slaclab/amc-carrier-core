@@ -87,6 +87,8 @@ end AppTopJesd204b;
 
 architecture mapping of AppTopJesd204b is
 
+   constant PD_C : sl := ite(((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)), '1', '0');
+
    component AppTopJesd204bCoregen
       port (
          gtwiz_userclk_tx_active_in         : in  std_logic_vector(0 downto 0);
@@ -186,15 +188,15 @@ architecture mapping of AppTopJesd204b is
    signal txPreCursor  : Slv8Array(4 downto 0) := (others => (others => '0'));
    signal txPolarity   : slv(4 downto 0)       := (others => '0');
    signal rxPolarity   : slv(4 downto 0)       := (others => '0');
-   signal txPowerDown  : slv(4 downto 0)       := (others => '1');
-   signal rxPowerDown  : slv(4 downto 0)       := (others => '1');
+   signal txPowerDown  : slv(4 downto 0)       := (others => PD_C);
+   signal rxPowerDown  : slv(4 downto 0)       := (others => PD_C);
    signal txInhibit    : slv(4 downto 0)       := (others => '1');
 
    signal gtTxDiffCtrl   : slv(19 downto 0)    := (others => '1');
    signal gtTxPostCursor : slv(24 downto 0)    := (others => '0');
    signal gtTxPreCursor  : slv(24 downto 0)    := (others => '0');
-   signal gtTxPd         : slv(4*2-1 downto 0) := (others => '1');
-   signal gtRxPd         : slv(4*2-1 downto 0) := (others => '1');
+   signal gtTxPd         : slv(4*2-1 downto 0) := (others => PD_C);
+   signal gtRxPd         : slv(4*2-1 downto 0) := (others => PD_C);
 
    signal s_cdrStable  : sl;
    signal dummyZeroBit : sl;

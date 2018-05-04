@@ -89,6 +89,8 @@ end AppTopJesd204b;
 
 architecture mapping of AppTopJesd204b is
 
+   constant PD_C : sl := ite(((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)), '1', '0');
+
    component JesdCryoCoreRightColumn
       port (
          gtwiz_userclk_tx_active_in         : in  std_logic_vector (0 to 0);
@@ -258,15 +260,15 @@ architecture mapping of AppTopJesd204b is
    signal txPreCursor  : Slv8Array(9 downto 0) := (others => (others => '0'));
    signal txPolarity   : slv(9 downto 0)       := (others => '0');
    signal rxPolarity   : slv(9 downto 0)       := (others => '0');
-   signal txPowerDown  : slv(9 downto 0)       := (others => '1');
-   signal rxPowerDown  : slv(9 downto 0)       := (others => '1');
+   signal txPowerDown  : slv(9 downto 0)       := (others => PD_C);
+   signal rxPowerDown  : slv(9 downto 0)       := (others => PD_C);
    signal txInhibit    : slv(9 downto 0)       := (others => '1');
 
    signal gtTxDiffCtrl   : slv(10*4-1 downto 0) := (others => '1');
    signal gtTxPostCursor : slv(10*5-1 downto 0) := (others => '0');
    signal gtTxPreCursor  : slv(10*5-1 downto 0) := (others => '0');
-   signal gtTxPd         : slv(10*2-1 downto 0) := (others => '1');
-   signal gtRxPd         : slv(10*2-1 downto 0) := (others => '1');
+   signal gtTxPd         : slv(10*2-1 downto 0) := (others => PD_C);
+   signal gtRxPd         : slv(10*2-1 downto 0) := (others => PD_C);
 
    signal s_cdrStable  : slv(1 downto 0);
    signal dummyZeroBit : sl;
