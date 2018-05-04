@@ -186,8 +186,8 @@ architecture mapping of AppTopJesd204b is
    signal txPreCursor  : Slv8Array(6 downto 0) := (others => (others => '0'));
    signal txPolarity   : slv(6 downto 0)       := (others => '0');
    signal rxPolarity   : slv(6 downto 0)       := (others => '0');
-   signal txPowerDown  : slv(6 downto 0)       := (others => '0');
-   signal rxPowerDown  : slv(6 downto 0)       := (others => '0');
+   signal txPowerDown  : slv(6 downto 0)       := (others => '1');
+   signal rxPowerDown  : slv(6 downto 0)       := (others => '1');
    signal txInhibit    : slv(6 downto 0)       := (others => '1');
 
    signal gtTxDiffCtrl   : slv(7*4-1 downto 0) := (others => '1');
