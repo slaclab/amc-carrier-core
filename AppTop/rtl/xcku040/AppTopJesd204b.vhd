@@ -2,7 +2,7 @@
 -- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2018-05-02
+-- Last update: 2018-05-04
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -338,16 +338,24 @@ begin
    -----------------
    RX_LANES_GEN : for i in 6 downto 0 generate
 
-      r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
-      r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
-      r_jesdGtRxArr(i).dispErr   <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
-      r_jesdGtRxArr(i).decErr    <= s_rxctrl3(i*8+GT_WORD_SIZE_C-1 downto i*8);
-      r_jesdGtRxArr(i).rstDone   <= s_rxDone;
-      r_jesdGtRxArr(i).cdrStable <= s_cdrStable;
-      s_devClkVec(i)             <= devClk_i;
-      s_devClk2Vec(i)            <= devClk2_i;
-      s_stableClkVec(i)          <= stableClk;
-      s_gtRefClkVec(i)           <= refClk;
+      process(devClk_i)
+      begin
+         if rising_edge(devClk_i) then
+            -- Help with timing    
+            r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
+            r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
+            r_jesdGtRxArr(i).dispErr   <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
+            r_jesdGtRxArr(i).decErr    <= s_rxctrl3(i*8+GT_WORD_SIZE_C-1 downto i*8);
+            r_jesdGtRxArr(i).rstDone   <= s_rxDone;
+            r_jesdGtRxArr(i).cdrStable <= s_cdrStable;
+         end if;
+      end process;
+
+
+      s_devClkVec(i)    <= devClk_i;
+      s_devClk2Vec(i)   <= devClk2_i;
+      s_stableClkVec(i) <= stableClk;
+      s_gtRefClkVec(i)  <= refClk;
 
       gtRxPd((i*2)+1 downto i*2) <= rxPowerDown(i) & rxPowerDown(i);
 
