@@ -127,6 +127,7 @@ architecture mapping of AppTopJesd is
    signal txSync     : sl;
    signal rxSync     : sl;
    signal rxSyncReg  : sl;
+   signal jesdClk1xL : sl;
 
    signal drpClk  : slv(9 downto 0)       := (others => '0');
    signal drpRdy  : slv(9 downto 0)       := (others => '1');
@@ -339,23 +340,18 @@ begin
          nSync_o         => rxSync,
          nSync_i         => txSync);
 
-   U_SysRef : IDDR
+   U_SysRef : IDDRE1
       generic map (
-         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED",  -- "OPPOSITE_EDGE", "SAME_EDGE", or "SAME_EDGE_PIPELINED"
-         INIT_Q1      => '0',           -- Initial value of Q1: '0' or '1'
-         INIT_Q2      => '0',           -- Initial value of Q2: '0' or '1'
-         SRTYPE       => "SYNC")        -- Set/Reset type: "SYNC" or "ASYNC" 
+         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED")
       port map (
-         D  => jesdSysRef,              -- 1-bit DDR data input
-         C  => jesdClk1x,               -- 1-bit clock input
-         CE => '1',                     -- 1-bit clock enable input
-         R  => '0',                     -- 1-bit reset
-         S  => '0',                     -- 1-bit set
-         Q1 => sysRef,            -- 1-bit output for positive edge of clock 
-         Q2 => open);  -- 1-bit output for negative edge of clock      
+         Q1 => sysRef,
+         Q2 => open,
+         C  => jesdClk1x,
+         CB => jesdClk1xL,
+         D  => jesdSysRef,
+         R  => '0');
 
-   -- Add Synchronizer here because common to both TX/RX
-   U_SysRefSync : entity work.Synchronizer
+   U_SysRefSync : entity work.Synchronizer  -- Add Synchronizer here because common to both TX/RX
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -363,20 +359,16 @@ begin
          dataIn  => sysRef,
          dataOut => sysRefSync);
 
-   U_txSync : IDDR
+   U_txSync : IDDRE1
       generic map (
-         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED",  -- "OPPOSITE_EDGE", "SAME_EDGE", or "SAME_EDGE_PIPELINED"
-         INIT_Q1      => '0',           -- Initial value of Q1: '0' or '1'
-         INIT_Q2      => '0',           -- Initial value of Q2: '0' or '1'
-         SRTYPE       => "SYNC")        -- Set/Reset type: "SYNC" or "ASYNC" 
+         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED")
       port map (
-         D  => jesdTxSync,              -- 1-bit DDR data input
-         C  => jesdClk1x,               -- 1-bit clock input
-         CE => '1',                     -- 1-bit clock enable input
-         R  => '0',                     -- 1-bit reset
-         S  => '0',                     -- 1-bit set
-         Q1 => txSync,            -- 1-bit output for positive edge of clock 
-         Q2 => open);  -- 1-bit output for negative edge of clock      
+         Q1 => txSync,
+         Q2 => open,
+         C  => jesdClk1x,
+         CB => jesdClk1xL,
+         D  => jesdTxSync,
+         R  => '0');
 
    U_rxSyncReg : ODDRE1
       port map (
@@ -390,6 +382,8 @@ begin
       port map (
          I => rxSyncReg,
          O => jesdRxSync);
+
+   jesdClk1xL <= not(jesdClk1x);
 
    -----------------------
    -- GTH's DRP Interfaces
