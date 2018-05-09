@@ -30,6 +30,7 @@ entity AmcMicrowaveMuxDualCore is
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Interface
+      jesdClk         : in    slv(1 downto 0);
       jesdSysRef      : out   slv(1 downto 0);
       jesdRxSync      : in    slv(1 downto 0);
       jesdTxSync      : out   slv(1 downto 0);
@@ -108,6 +109,7 @@ begin
             AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map(
             -- JESD SYNC Interface
+            jesdClk         => jesdClk(i),
             jesdSysRef      => jesdSysRef(i),
             jesdRxSync      => jesdRxSync(i),
             jesdTxSync      => jesdTxSync(i),
