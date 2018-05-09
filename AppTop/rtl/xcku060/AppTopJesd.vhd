@@ -2,7 +2,7 @@
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2018-05-08
+-- Last update: 2018-05-04
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -121,13 +121,6 @@ architecture mapping of AppTopJesd is
    signal resetOut : slv(2 downto 0);
    signal rstOut   : slv(2 downto 0);
    signal locked   : sl;
-
-   signal sysRef     : sl;
-   signal sysRefSync : sl;
-   signal txSync     : sl;
-   signal rxSync     : sl;
-   signal rxSyncReg  : sl;
-   signal jesdClk1xL : sl;
 
    signal drpClk  : slv(9 downto 0)       := (others => '0');
    signal drpRdy  : slv(9 downto 0)       := (others => '1');
@@ -335,55 +328,10 @@ begin
          gtRxP           => jesdRxP,
          gtRxN           => jesdRxN,
          -- SYSREF for subclass 1 fixed latency
-         sysRef_i        => sysRefSync,
+         sysRef_i        => jesdSysRef,
          -- Synchronization output combined from all receivers to be connected to ADC chips
-         nSync_o         => rxSync,
-         nSync_i         => txSync);
-
-   U_SysRef : IDDRE1
-      generic map (
-         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED")
-      port map (
-         Q1 => sysRef,
-         Q2 => open,
-         C  => jesdClk1x,
-         CB => jesdClk1xL,
-         D  => jesdSysRef,
-         R  => '0');
-
-   U_SysRefSync : entity work.Synchronizer  -- Add Synchronizer here because common to both TX/RX
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk     => jesdClk1x,
-         dataIn  => sysRef,
-         dataOut => sysRefSync);
-
-   U_txSync : IDDRE1
-      generic map (
-         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED")
-      port map (
-         Q1 => txSync,
-         Q2 => open,
-         C  => jesdClk1x,
-         CB => jesdClk1xL,
-         D  => jesdTxSync,
-         R  => '0');
-
-   U_rxSyncReg : ODDRE1
-      port map (
-         C  => jesdClk1x,
-         Q  => rxSyncReg,
-         D1 => rxSync,
-         D2 => rxSync,
-         SR => '0');
-
-   U_jesdRxSync : OBUF
-      port map (
-         I => rxSyncReg,
-         O => jesdRxSync);
-
-   jesdClk1xL <= not(jesdClk1x);
+         nSync_o         => jesdRxSync,
+         nSync_i         => jesdTxSync);
 
    -----------------------
    -- GTH's DRP Interfaces
