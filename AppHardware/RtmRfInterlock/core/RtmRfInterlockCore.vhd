@@ -286,15 +286,15 @@ begin
 
    ----------------------------------------------------------------
    -- Set Threshold SPI interfaces (TPL0202)
-   -- 8 bit Address (bit 7 is command 0-write, 1-read)
-   -- 8 bit data
+   -- 8 bit Address & 8 bit data
+   -- constant PACKET_SIZE_C : positive := ite(MODE_G = "RW", 1, 0) + ADDRESS_SIZE_G + DATA_SIZE_G;
    ----------------------------------------------------------------         
    GEN_THR_SPI_CHIPS : for i in 1 downto 0 generate
       U_thrSpi : entity work.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             MODE_G            => "WO",
-            ADDRESS_SIZE_G    => 7,
+            ADDRESS_SIZE_G    => 8,
             DATA_SIZE_G       => 8,
             CLK_PERIOD_G      => 6.4E-9,
             SPI_SCLK_PERIOD_G => 3.0E-6)  -- 1 MHz
