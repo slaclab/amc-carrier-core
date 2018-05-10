@@ -32,6 +32,12 @@ class DacSigGen(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, size=0x10000000, **kwargs)
 
+        if((numOfChs<0) or (numOfChs>10)):
+            raise ValueError("Invalid numOfChse (%d)" % (numOfChs) ) 
+            
+        if((buffSize<0) or (buffSize>0x100000)):
+            raise ValueError("Invalid buffSize (0x%x)" % (buffSize) )             
+        
         self._numOfChs = numOfChs
         self._buffSize = (buffSize<<1) if (fillMode) else buffSize
         
