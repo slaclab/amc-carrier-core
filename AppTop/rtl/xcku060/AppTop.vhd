@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-03-14
+-- Last update: 2018-05-02
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -50,6 +50,7 @@ entity AppTop is
       JESD_RX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
       JESD_TX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
       JESD_REF_SEL_G         : Slv2Array(1 downto 0)     := (others => DEV_CLK0_SEL_C);
+      JESD_USR_DIV_G         : natural                   := 4;
       -- Signal Generator Generics
       SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 8);
       SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
@@ -390,7 +391,8 @@ begin
             JESD_TX_POLARITY_G => JESD_TX_POLARITY_G(i),
             JESD_RX_ROUTES_G   => JESD_RX_ROUTES_G(i),
             JESD_TX_ROUTES_G   => JESD_TX_ROUTES_G(i),
-            JESD_REF_SEL_G     => JESD_REF_SEL_G(i))
+            JESD_REF_SEL_G     => JESD_REF_SEL_G(i),
+            JESD_USR_DIV_G     => JESD_USR_DIV_G)
          port map (
             -- Clock/reset/SYNC
             jesdClk         => jesdClk(i),
@@ -489,7 +491,8 @@ begin
          TPD_G           => TPD_G,
          SIM_SPEEDUP_G   => SIM_SPEEDUP_G,
          SIMULATION_G    => SIMULATION_G,
-         AXI_BASE_ADDR_G => AXI_CONFIG_C(CORE_INDEX_C).baseAddr)
+         AXI_BASE_ADDR_G => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
+         JESD_USR_DIV_G  => JESD_USR_DIV_G)
       port map (
          -- Clocks and resets   
          jesdClk             => jesdClk,
