@@ -92,7 +92,7 @@ class TopLevel(pr.Device):
             
                 # Create SRP/ASYNC_MSG interface
                 rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1) 
-                self.add(rudp)  
+                # self.add(rudp)  
 
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
@@ -101,7 +101,7 @@ class TopLevel(pr.Device):
                 # Create stream interface
                 if(includeStream):
                     self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1)       
-                    self.add(self.stream)    
+                    # self.add(self.stream)    
             
             elif ( commType=="eth-rssi-interleaved" ):
             
@@ -114,8 +114,8 @@ class TopLevel(pr.Device):
                 else:
                     rudp = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2)
                 
-                # Add RUDP to device tree
-                self.add(rudp)
+                # # Add RUDP to device tree
+                # self.add(rudp)
                 
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
