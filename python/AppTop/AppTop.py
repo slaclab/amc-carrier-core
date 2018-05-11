@@ -110,7 +110,6 @@ class AppTop(pr.Device):
                 if (self._numRxLanes[i] > 0):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
                     v.JesdRx.CmdClearErrors()
-                    v.JesdRx.LinkErrMask.set(0x38) # Work around for DEC2017 demo, plan to remove this line when we receive C07 revision of the AMC carrier. 
                 if (self._numTxLanes[i] > 0):
                     v = getattr(self, 'AppTopJesd[%i]'%i)
                     v.JesdTx.CmdClearErrors()        
