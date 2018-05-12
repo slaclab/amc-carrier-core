@@ -87,13 +87,14 @@ class AppTop(pr.Device):
                     expand       =  False,
                 ))
                 
-        @self.command(description  = "JESD Reset")        
-        def JesdReset():
+        @self.command(description  = "AppTop Init() cmd")        
+        def Init():
             # Get devices
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             lmkDevices    = self.find(typ=ti.Lmk04828)
             dacDevices    = self.find(typ=ti.Dac38J84)
+            sigGenDevices = self.find(typ=DacSigGen)
             # Power down sysref
             for lmk in lmkDevices: 
                 enable = lmk.enable.get()
@@ -133,7 +134,10 @@ class AppTop(pr.Device):
                 dac.enable.set(True)
                 dac.ClearAlarms()
                 dac.enable.set(enable)
-             
+            for sigGen in sigGenDevices: 
+                if ( sigGen.CsvFilePath.get() != "" ):
+                    sigGen.LoadCsvFile("")
+                    
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """
         Write all of the blocks held by this Device to memory
@@ -142,27 +146,22 @@ class AppTop(pr.Device):
 
         # Process local blocks.
         if variable is not None:
-            #variable._block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
             variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
         else:
             for block in self._blocks:
                 if force or block.stale:
                     if block.bulkEn:
-                        #block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
         # Process rest of tree
         if recurse:
             for key,value in self.devices.items():
-                #value.writeBlocks(force=force, recurse=True, checkEach=checkEach) # > 2.4.0
                 value.writeBlocks(force=force, recurse=True)
                         
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
-        self.JesdReset()
-        for i in range(2):
-            if ( (self._numSigGen[i] > 0) and (self._sizeSigGen[i] > 0) ):
-                v = getattr(self, 'DacSigGen[%i]'%i)
-                if ( v.CsvFilePath.get() != "" ):
-                    v.LoadCsvFile("")
+        
+        # Perform the system init 
+        self.Init()
+
         self.checkBlocks(recurse=True)
