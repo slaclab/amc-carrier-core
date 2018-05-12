@@ -103,6 +103,9 @@ class AppTop(pr.Device):
                     v.JesdTx.CmdResetGTs()
             self.checkBlocks(recurse=True)
             time.sleep(1.0)
+            dacDevices = self.find(typ=Dac38J84)
+            for dac in dacDevices: 
+                dac.Init()
             for lmk in lmkDevices: 
                 lmk.PwrUpSysRef()            
             time.sleep(1.0)
