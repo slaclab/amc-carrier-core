@@ -22,8 +22,11 @@ import pyrogue as pr
 from AppTop.AppTopJesd import *
 from DacSigGen.DacSigGen import *
 from DaqMuxV2.DaqMuxV2 import *
-from surf.devices.ti._Lmk04828  import *
 from common.AppCore import *
+
+import surf.devices.ti         as ti
+import surf.protocols.jesd204b as jesd
+
 import time
 
 class AppTop(pr.Device):
@@ -86,37 +89,51 @@ class AppTop(pr.Device):
                 
         @self.command(description  = "JESD Reset")        
         def JesdReset():
-            for i in range(2):
-                if (self._numRxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdRx.LinkErrMask.set(0x3F)            
-            lmkDevices = self.find(typ=Lmk04828)
+            # Get devices
+            jesdRxDevices = self.find(typ=jesd.JesdRx)
+            jesdTxDevices = self.find(typ=jesd.JesdTx)
+            lmkDevices    = self.find(typ=ti.Lmk04828)
+            dacDevices    = self.find(typ=ti.Dac38J84)
+            # Power down sysref
             for lmk in lmkDevices: 
+                enable = lmk.enable.get()
+                lmk.enable.set(True)
                 lmk.PwrDwnSysRef()
+                lmk.enable.set(enable)
             self.checkBlocks(recurse=True)
-            for i in range(2):
-                if (self._numRxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdRx.CmdResetGTs()
-                if (self._numTxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdTx.CmdResetGTs()
+            # Reset the GTs
+            for rx in jesdRxDevices: 
+                rx.CmdResetGTs()  
+            for tx in jesdTxDevices: 
+                tx.CmdResetGTs()
             self.checkBlocks(recurse=True)
+            # Wait for GTs to setting (typical 100ms)
             time.sleep(1.0)
-            dacDevices = self.find(typ=Dac38J84)
-            for dac in dacDevices: 
+            # Init the DACs
+            for dac in dacDevices:
+                enable = dac.enable.get()
+                dac.enable.set(True)
                 dac.Init()
+                dac.enable.set(enable)
+            # Init the LMKs
             for lmk in lmkDevices: 
-                lmk.PwrUpSysRef()            
-            time.sleep(1.0)
-            for i in range(2):
-                if (self._numRxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdRx.CmdClearErrors()
-                if (self._numTxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdTx.CmdClearErrors()        
-        
+                enable = lmk.enable.get()
+                lmk.enable.set(True)
+                lmk.PwrUpSysRef() 
+                lmk.enable.set(enable)
+            # Wait for the system settle
+            time.sleep(1.0)            
+            # Clear all error counters
+            for rx in jesdRxDevices: 
+                rx.CmdClearErrors()  
+            for tx in jesdTxDevices: 
+                tx.CmdClearErrors()
+            for dac in dacDevices: 
+                enable = dac.enable.get()
+                dac.enable.set(True)
+                dac.ClearAlarms()
+                dac.enable.set(enable)
+             
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """
         Write all of the blocks held by this Device to memory
