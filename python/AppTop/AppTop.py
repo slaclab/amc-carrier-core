@@ -95,6 +95,12 @@ class AppTop(pr.Device):
             lmkDevices    = self.find(typ=ti.Lmk04828)
             dacDevices    = self.find(typ=ti.Dac38J84)
             sigGenDevices = self.find(typ=DacSigGen)
+            
+            # Assert GTs Reset
+            for rx in jesdRxDevices: 
+                rx.ResetGTs.set(1)
+            for tx in jesdTxDevices: 
+                rx.ResetGTs.set(1)          
             # Power down sysref
             for lmk in lmkDevices: 
                 enable = lmk.enable.get()
@@ -102,11 +108,12 @@ class AppTop(pr.Device):
                 lmk.PwrDwnSysRef()
                 lmk.enable.set(enable)
             self.checkBlocks(recurse=True)
+            time.sleep(1.0)
             # Reset the GTs
             for rx in jesdRxDevices: 
-                rx.CmdResetGTs()  
+                rx.ResetGTs.set(0)
             for tx in jesdTxDevices: 
-                tx.CmdResetGTs()
+                tx.ResetGTs.set(0)
             self.checkBlocks(recurse=True)
             # Wait for GTs to setting (typical 100ms)
             time.sleep(1.0)
@@ -123,7 +130,7 @@ class AppTop(pr.Device):
                 lmk.PwrUpSysRef() 
                 lmk.enable.set(enable)
             # Wait for the system settle
-            time.sleep(1.0)            
+            time.sleep(0.5)            
             # Clear all error counters
             for rx in jesdRxDevices: 
                 rx.CmdClearErrors()  
@@ -134,6 +141,7 @@ class AppTop(pr.Device):
                 dac.enable.set(True)
                 dac.ClearAlarms()
                 dac.enable.set(enable)
+            # Load the DAC signal generator
             for sigGen in sigGenDevices: 
                 if ( sigGen.CsvFilePath.get() != "" ):
                     sigGen.LoadCsvFile("")
@@ -161,7 +169,7 @@ class AppTop(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
         
-        # Perform the system init 
+        # Perform the device init 
         self.Init()
 
         self.checkBlocks(recurse=True)
