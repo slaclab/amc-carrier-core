@@ -2,7 +2,7 @@
 -- File       : JesdSyncOut.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-05-04
--- Last update: 2018-05-08
+-- Last update: 2018-05-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -41,12 +41,22 @@ end JesdSyncOut;
 
 architecture mapping of JesdSyncOut is
 
+   signal syncIn  : sl;
    signal sync    : sl;
    signal regSync : sl;
 
 begin
 
-   sync <= jesdSync when(INVERT_G = false) else not(jesdSync);
+   -- Help with meeting timing
+   U_sync : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => jesdClk,
+         rstIn  => jesdSync,
+         rstOut => syncIn);
+
+   sync <= syncIn when(INVERT_G = false) else not(syncIn);
 
    U_rxSyncReg : ODDRE1
       port map (
