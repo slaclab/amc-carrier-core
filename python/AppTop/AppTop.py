@@ -22,8 +22,11 @@ import pyrogue as pr
 from AppTop.AppTopJesd import *
 from DacSigGen.DacSigGen import *
 from DaqMuxV2.DaqMuxV2 import *
-from surf.devices.ti._Lmk04828  import *
 from common.AppCore import *
+
+import surf.devices.ti         as ti
+import surf.protocols.jesd204b as jesd
+
 import time
 
 class AppTop(pr.Device):
@@ -84,37 +87,65 @@ class AppTop(pr.Device):
                     expand       =  False,
                 ))
                 
-        @self.command(description  = "JESD Reset")        
-        def JesdReset():
-            for i in range(2):
-                if (self._numRxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdRx.LinkErrMask.set(0x3F)            
-            lmkDevices = self.find(typ=Lmk04828)
+        @self.command(description  = "AppTop Init() cmd")        
+        def Init():
+            # Get devices
+            jesdRxDevices = self.find(typ=jesd.JesdRx)
+            jesdTxDevices = self.find(typ=jesd.JesdTx)
+            lmkDevices    = self.find(typ=ti.Lmk04828)
+            dacDevices    = self.find(typ=ti.Dac38J84)
+            sigGenDevices = self.find(typ=DacSigGen)
+            
+            # Assert GTs Reset
+            for rx in jesdRxDevices: 
+                rx.ResetGTs.set(1)
+            for tx in jesdTxDevices: 
+                rx.ResetGTs.set(1)          
+            # Power down sysref
             for lmk in lmkDevices: 
+                enable = lmk.enable.get()
+                lmk.enable.set(True)
                 lmk.PwrDwnSysRef()
-            self.checkBlocks(recurse=True)
-            for i in range(2):
-                if (self._numRxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdRx.CmdResetGTs()
-                if (self._numTxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdTx.CmdResetGTs()
+                lmk.enable.set(enable)
             self.checkBlocks(recurse=True)
             time.sleep(1.0)
+            # Reset the GTs
+            for rx in jesdRxDevices: 
+                rx.ResetGTs.set(0)
+            for tx in jesdTxDevices: 
+                tx.ResetGTs.set(0)
+            self.checkBlocks(recurse=True)
+            # Wait for GTs to setting (typical 100ms)
+            time.sleep(1.0)
+            # Init the DACs
+            for dac in dacDevices:
+                enable = dac.enable.get()
+                dac.enable.set(True)
+                dac.Init()
+                dac.enable.set(enable)
+            # Init the LMKs
             for lmk in lmkDevices: 
-                lmk.PwrUpSysRef()            
-            time.sleep(1.0)
-            for i in range(2):
-                if (self._numRxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdRx.CmdClearErrors()
-                    v.JesdRx.LinkErrMask.set(0x38) # Work around for DEC2017 demo, plan to remove this line when we receive C07 revision of the AMC carrier. 
-                if (self._numTxLanes[i] > 0):
-                    v = getattr(self, 'AppTopJesd[%i]'%i)
-                    v.JesdTx.CmdClearErrors()        
-        
+                enable = lmk.enable.get()
+                lmk.enable.set(True)
+                lmk.PwrUpSysRef() 
+                lmk.enable.set(enable)
+            # Wait for the system settle
+            time.sleep(0.5)            
+            # Clear all error counters
+            for rx in jesdRxDevices: 
+                rx.CmdClearErrors()  
+            for tx in jesdTxDevices: 
+                tx.CmdClearErrors()
+            for dac in dacDevices: 
+                enable = dac.enable.get()
+                dac.enable.set(True)
+                dac.ClearAlarms()
+                dac.enable.set(enable)
+            # Load the DAC signal generator
+            for sigGen in sigGenDevices: 
+                if ( sigGen.CsvFilePath.get() != "" ):
+                    sigGen.LoadCsvFile("")
+                    
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """
         Write all of the blocks held by this Device to memory
@@ -123,27 +154,22 @@ class AppTop(pr.Device):
 
         # Process local blocks.
         if variable is not None:
-            #variable._block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
             variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
         else:
             for block in self._blocks:
                 if force or block.stale:
                     if block.bulkEn:
-                        #block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
         # Process rest of tree
         if recurse:
             for key,value in self.devices.items():
-                #value.writeBlocks(force=force, recurse=True, checkEach=checkEach) # > 2.4.0
                 value.writeBlocks(force=force, recurse=True)
                         
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
-        self.JesdReset()
-        for i in range(2):
-            if ( (self._numSigGen[i] > 0) and (self._sizeSigGen[i] > 0) ):
-                v = getattr(self, 'DacSigGen[%i]'%i)
-                if ( v.CsvFilePath.get() != "" ):
-                    v.LoadCsvFile("")
+        
+        # Perform the device init 
+        self.Init()
+
         self.checkBlocks(recurse=True)

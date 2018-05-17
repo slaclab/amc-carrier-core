@@ -93,6 +93,7 @@ class SpiSr(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "WO",
+            overlapEn    = True,
         ))
 
         #--Ctrl Reg0_[0]
@@ -103,6 +104,7 @@ class SpiSr(pr.Device):
             bitSize      =  1,
             bitOffset    =  0, #--offset from LSB
             mode         = "WO",
+            overlapEn    = True,
         ))        
         
         #--Ctrl Reg0_[2]
@@ -113,6 +115,7 @@ class SpiSr(pr.Device):
             bitSize      =  1,
             bitOffset    =  2, #--offset from LSB
             mode         = "WO",
+            overlapEn    = True,
         ))        
         
         #--Ctrl Reg0_[3]
@@ -123,6 +126,7 @@ class SpiSr(pr.Device):
             bitSize      =  1,
             bitOffset    =  3, #--offset from LSB
             mode         = "WO",
+            overlapEn    = True,
         ))        
 
         self.add(pr.RemoteVariable(    

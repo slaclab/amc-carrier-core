@@ -122,6 +122,8 @@ architecture rtl of DaqMuxV2 is
    signal s_freeze          : sl;
    signal s_headerEn        : sl;
    signal s_clearStatus     : sl;
+   
+   signal devRst : sl;
 
    -- Data Format
    signal s_data16or32 : slv(N_DATA_OUT_G-1 downto 0);
@@ -146,6 +148,15 @@ begin
    assert (1 <= N_DATA_IN_G and N_DATA_IN_G <= 29) report "N_DATA_IN_G must be between 1 and 29" severity failure;
    assert (1 <= N_DATA_OUT_G and N_DATA_OUT_G <= 16) report "N_DATA_OUT_G must be between 1 and 16"severity failure;
 
+   -- Help with timing
+   U_rst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => devClk_i,
+         rstIn  => devRst_i,
+         rstOut => devRst);   
+   
    -----------------------------------------------------------
    -- Synchronize timestamp_i and bsa
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
@@ -157,7 +168,6 @@ begin
          WIDTH_G => 64)
       port map (
          clk     => devClk_i,
-         rst     => devRst_i,
          dataIn  => timeStamp_i,
          dataOut => s_timeStampSync);
 
@@ -167,7 +177,6 @@ begin
          WIDTH_G => 128)
       port map (
          clk     => devClk_i,
-         rst     => devRst_i,
          dataIn  => bsa_i,
          dataOut => s_bsaSync);
 
@@ -177,7 +186,6 @@ begin
          WIDTH_G => 192)
       port map (
          clk     => devClk_i,
-         rst     => devRst_i,
          dataIn  => dmod_i,
          dataOut => s_dmodSync);
 
@@ -201,7 +209,7 @@ begin
 
          -- DevClk domain
          devClk_i          => devClk_i,
-         devRst_i          => devRst_i,
+         devRst_i          => devRst,
          -- Status
          daqStatus_i       => s_daqStatus,
          trigStatus_i      => s_trigStatus,
@@ -236,7 +244,7 @@ begin
          TPD_G => TPD_G)
       port map (
          clk               => devClk_i,
-         rst               => devRst_i,
+         rst               => devRst,
          trigSw_i          => s_trigSw,
          trigHw_i          => trigHw_i,
          trigCasc_i        => trigCasc_i,
@@ -314,7 +322,7 @@ begin
          port map (
 
             devClk_i => devClk_i,
-            devRst_i => devRst_i,
+            devRst_i => devRst,
 
             -- Controls from registers
             enable_i     => s_enAxi(i),
@@ -374,7 +382,7 @@ begin
             MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(WAVEFORM_TDATA_BYTES_G, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3))  -- Must match AmcCarrierCore.WAVEFORM_TDATA_BYTES_G generic configuration
          port map (
             sAxisClk    => devClk_i,
-            sAxisRst    => devRst_i,
+            sAxisRst    => devRst,
             sAxisMaster => s_rxAxisMasterArr(i),
             sAxisSlave  => s_rxAxisSlaveArr(i),
             mAxisClk    => wfClk_i,
@@ -386,36 +394,27 @@ begin
       -- Separately synchronize AXI Stream control
       Sync_0 : entity work.Synchronizer
          generic map (
-            TPD_G => TPD_G
-            )
+            TPD_G => TPD_G)
          port map (
             clk     => devClk_i,
-            rst     => devRst_i,
             dataIn  => rxAxisCtrlArr_i(i).pause,
-            dataOut => s_rxAxisCtrlArr(i).pause
-            );
+            dataOut => s_rxAxisCtrlArr(i).pause);
 
       Sync_1 : entity work.Synchronizer
          generic map (
-            TPD_G => TPD_G
-            )
+            TPD_G => TPD_G)
          port map (
             clk     => devClk_i,
-            rst     => devRst_i,
             dataIn  => rxAxisCtrlArr_i(i).overflow,
-            dataOut => s_rxAxisCtrlArr(i).overflow
-            );
+            dataOut => s_rxAxisCtrlArr(i).overflow);
 
       Sync_2 : entity work.Synchronizer
          generic map (
-            TPD_G => TPD_G
-            )
+            TPD_G => TPD_G)
          port map (
             clk     => devClk_i,
-            rst     => devRst_i,
             dataIn  => rxAxisCtrlArr_i(i).idle,
-            dataOut => s_rxAxisCtrlArr(i).idle
-            );
+            dataOut => s_rxAxisCtrlArr(i).idle);
    end generate GEN_OUT_LANES;
    ----------------------------------------
    s_daqBusy <= uOr(s_daqBusyVec);

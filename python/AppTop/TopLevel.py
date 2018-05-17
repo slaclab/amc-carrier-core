@@ -36,7 +36,6 @@ class TopLevel(pr.Device):
             ipAddr          = '10.0.1.101',
             pcieDev         = '/dev/datadev_0',
             pcieRssiLink    = 0,
-            includeStream   = True,
             # JESD Parameters
             numRxLanes      = [0,0],
             numTxLanes      = [0,0],
@@ -92,16 +91,13 @@ class TopLevel(pr.Device):
             
                 # Create SRP/ASYNC_MSG interface
                 rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1) 
-                self.add(rudp)  
 
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
 
                 # Create stream interface
-                if(includeStream):
-                    self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1)       
-                    self.add(self.stream)    
+                self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1)       
             
             elif ( commType=="eth-rssi-interleaved" ):
             
@@ -109,13 +105,7 @@ class TopLevel(pr.Device):
                 rssiInterlaved = True            
 
                 # Create Interleaved RSSI interface
-                if(includeStream):
-                    rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2)
-                else:
-                    rudp = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2)
-                
-                # Add RUDP to device tree
-                self.add(rudp)
+                rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2)
                 
                 # Connect the SRPv3 to tDest = 0x0
                 srp = rogue.protocols.srp.SrpV3()
@@ -158,12 +148,13 @@ class TopLevel(pr.Device):
                 srp = rogue.protocols.srp.SrpV3()                
                 pr.streamConnectBiDir( srp, vc0Srp )   
 
-                if(includeStream):
-                    # Create the Raw Data stream interface
-                    self.stream_vc1 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
-
-                    # Create the Raw Data stream interface
-                    self.stream_vc2 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+2,1)
+                # Create the Raw Data stream interface (TDEST x80-0xBF routed to stream 1 (Raw Data))
+                self.stream = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
+                
+                #########################################################################################
+                # Note: (pcieRssiLink*3)+2 <--> TDEST 0xC0-0xFF routed to stream 2 (Application) 
+                #        not include in this device and assumed to be attached to c++ or python in separate code
+                #########################################################################################
 
             # Undefined device type
             else:
