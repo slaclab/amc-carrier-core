@@ -13,7 +13,7 @@
 #######################
 
 # ETH Ports (Mapping to RTM's High Speed Ports rtmHsTxP/M & rtmHsRxP/M)
-set_property PACKAGE_PIN D32 [get_ports {ethTxP[0]}]
+set_property PACKAGE_PIN D31 [get_ports {ethTxP[0]}]
 set_property PACKAGE_PIN D32 [get_ports {ethTxN[0]}]
 set_property PACKAGE_PIN E33 [get_ports {ethRxP[0]}]
 set_property PACKAGE_PIN E34 [get_ports {ethRxN[0]}]
