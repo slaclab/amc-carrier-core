@@ -5,7 +5,7 @@ proc MyVersionCheck { } {
 
    # Get the Vivado version
    set VersionNumber [version -short]
-   set supported "2016.4 2017.3 2017.4 2018.1"
+   set supported "2016.4 2017.4 2018.1"
    set retVar -1
    
    # Generate error message
@@ -47,8 +47,8 @@ if { [info exists ::env(OVERRIDE_SUBMODULE_LOCKS)] != 1 || $::env(OVERRIDE_SUBMO
 
 # Check for Kintex Ultrascale+
 if { ${family} == "kintexuplus" } {
-   ## Check for Vivado version 2017.3 (or later)
-   if { [VersionCheck 2017.3 ] < 0 } {
+   ## Check for Vivado version 2018.1 (or later)
+   if { [VersionCheck 2018.1 ] < 0 } {
       exit -1
    }
 # Check Kintex Ultrascale

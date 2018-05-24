@@ -2,7 +2,7 @@
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-11-11
--- Last update: 2018-05-04
+-- Last update: 2018-05-23
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -106,11 +106,10 @@ architecture mapping of AppTopJesd is
    signal gthReadMasters  : AxiLiteReadMasterArray(JESD_LANE_C-1 downto 0);
    signal gthReadSlaves   : AxiLiteReadSlaveArray(JESD_LANE_C-1 downto 0);
 
-   signal refClkDiv2Vec  : slv(2 downto 0);
-   signal refClkVec      : slv(2 downto 0);
-   signal refClkR        : sl;
-   signal refClkL        : sl;
-   signal amcClkVec      : slv(2 downto 0);
+   signal refClkDiv2Vec  : slv(3 downto 0);
+   signal refClkVec      : slv(3 downto 0);
+   signal refClk         : sl;
+   signal amcClkVec      : slv(3 downto 0);
    signal amcClk         : sl;
    signal amcRst         : sl;
    signal jesdClk1x      : sl;
@@ -169,22 +168,7 @@ begin
    ----------------
    -- JESD Clocking
    ----------------
-
-   -- Left column reference
-   U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
-      generic map (
-         REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
-         REFCLK_ICNTL_RX    => "00")
-      port map (
-         I     => jesdClkP(3),
-         IB    => jesdClkN(3),
-         CEB   => '0',
-         ODIV2 => open,  -- 185 MHz, Frequency the same as jesdRefClk
-         O     => refClkL);             -- 185 MHz    
-
-   -- Choose Right coulumn reference
-   GEN_GTH_R_CLK : for i in 2 downto 0 generate
+   GEN_GTH_R_CLK : for i in 3 downto 0 generate
 
       U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
          generic map (
@@ -210,8 +194,8 @@ begin
 
    end generate GEN_GTH_R_CLK;
 
-   refClkR <= refClkVec(conv_integer(JESD_REF_SEL_G));
-   amcClk  <= amcClkVec(conv_integer(JESD_REF_SEL_G));
+   refClk <= refClkVec(conv_integer(JESD_REF_SEL_G));
+   amcClk <= amcClkVec(conv_integer(JESD_REF_SEL_G));
 
    U_PwrUpRst : entity work.PwrUpRst
       generic map (
@@ -316,8 +300,7 @@ begin
          -------
          -- Clocks
          stableClk       => axilClk,
-         refClkR         => refClkR,
-         refClkL         => refClkL,
+         refClk          => refClk,
          devClk_i        => jesdClk1x,
          devClk2_i       => jesdClk1x,
          devRst_i        => jesdRst1x,
