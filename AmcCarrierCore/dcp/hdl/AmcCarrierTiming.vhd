@@ -214,7 +214,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- GTH Timing Receiver
    -------------------------------------------------------------------------------------------------
-   TimingGthCoreWrapper_1 : entity work.TimingGthCoreWrapper
+   TimingGthCoreWrapper_1 : entity work.TimingGtCoreWrapper
       generic map (
          TPD_G            => TPD_G,
          AXIL_BASE_ADDR_G => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_GTH_INDEX_C).baseAddr,

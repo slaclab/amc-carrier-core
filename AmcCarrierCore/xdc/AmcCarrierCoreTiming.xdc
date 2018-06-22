@@ -23,7 +23,7 @@ create_clock -name timingRef  -period  2.691  [get_ports {timingRefClkInP}]
 create_generated_clock -name axilClk      [get_pins -hier -filter {NAME =~ *U_AmcCorePll/PllGen.U_Pll/CLKOUT0}] 
 create_generated_clock -name ddrIntClk0   [get_pins -hier -filter {NAME =~ *U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT0}]
 create_generated_clock -name ddrIntClk1   [get_pins -hier -filter {NAME =~ *U_DdrMem/MigCore_Inst/inst/u_ddr3_infrastructure/gen_mmcme3.u_mmcme_adv_inst/CLKOUT6}]
-create_generated_clock -name recTimingClk [get_pins -hier -filter {NAME =~ *U_Timing/TimingGthCoreWrapper_1/LOCREF_G.U_TimingGthCore/*/RXOUTCLK}]   
+create_generated_clock -name recTimingClk [get_pins -hier -filter {NAME =~ *U_Timing/TimingGthCoreWrapper_1/*/RXOUTCLK}]   
 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ddrClkIn}] 
 set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ddrIntClk0}] 
