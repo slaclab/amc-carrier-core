@@ -11,6 +11,32 @@
 ## Application Ports ##
 #######################
 
+set_property PACKAGE_PIN T31 [get_ports {jesdTxP[0][7]}] ; #
+set_property PACKAGE_PIN T32 [get_ports {jesdTxN[0][7]}] ; #
+set_property PACKAGE_PIN R33 [get_ports {jesdRxP[0][7]}] ; #
+set_property PACKAGE_PIN R34 [get_ports {jesdRxN[0][7]}] ; #
+set_property PACKAGE_PIN P31 [get_ports {jesdTxP[0][8]}] ; #
+set_property PACKAGE_PIN P32 [get_ports {jesdTxN[0][8]}] ; #
+set_property PACKAGE_PIN N33 [get_ports {jesdRxP[0][8]}] ; #
+set_property PACKAGE_PIN N34 [get_ports {jesdRxN[0][8]}] ; #
+set_property PACKAGE_PIN M31 [get_ports {jesdTxP[0][9]}] ; #
+set_property PACKAGE_PIN M32 [get_ports {jesdTxN[0][9]}] ; #
+set_property PACKAGE_PIN L33 [get_ports {jesdRxP[0][9]}] ; #
+set_property PACKAGE_PIN L34 [get_ports {jesdRxN[0][9]}] ; #
+
+set_property PACKAGE_PIN H31 [get_ports {jesdTxP[1][7]}] ; #
+set_property PACKAGE_PIN H32 [get_ports {jesdTxN[1][7]}] ; #
+set_property PACKAGE_PIN G33 [get_ports {jesdRxP[1][7]}] ; #
+set_property PACKAGE_PIN G34 [get_ports {jesdRxN[1][7]}] ; #
+set_property PACKAGE_PIN G29 [get_ports {jesdTxP[1][8]}] ; #
+set_property PACKAGE_PIN G30 [get_ports {jesdTxN[1][8]}] ; #
+set_property PACKAGE_PIN F31 [get_ports {jesdRxP[1][8]}] ; #
+set_property PACKAGE_PIN F32 [get_ports {jesdRxN[1][8]}] ; #
+set_property PACKAGE_PIN D31 [get_ports {jesdTxP[1][9]}] ; #
+set_property PACKAGE_PIN D32 [get_ports {jesdTxN[1][9]}] ; #
+set_property PACKAGE_PIN E33 [get_ports {jesdRxP[1][9]}] ; #
+set_property PACKAGE_PIN E34 [get_ports {jesdRxN[1][9]}] ; #
+
 set_property PACKAGE_PIN N29 [get_ports {jesdClkP[0][3]}] ; #P11 PIN88 
 set_property PACKAGE_PIN N30 [get_ports {jesdClkN[0][3]}] ; #P11 PIN87 
 set_property PACKAGE_PIN J29 [get_ports {jesdClkP[1][3]}] ; #P13 PIN88

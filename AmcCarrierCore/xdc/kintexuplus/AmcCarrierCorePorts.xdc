@@ -20,24 +20,24 @@ set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets {U_Core/U_AppMps/U_Clk/mps
 #######################
 
 # Common fabrication clock
-set_property PACKAGE_PIN T6 [get_ports {fabClkP}]
-set_property PACKAGE_PIN T5 [get_ports {fabClkN}]
+set_property PACKAGE_PIN N29 [get_ports {fabClkP}]
+set_property PACKAGE_PIN N30 [get_ports {fabClkN}]
 
 # ETH Ports
-set_property PACKAGE_PIN V6  [get_ports {ethClkP}]
-set_property PACKAGE_PIN V5  [get_ports {ethClkN}]
+set_property PACKAGE_PIN R29  [get_ports {ethClkP}]
+set_property PACKAGE_PIN R30  [get_ports {ethClkN}]
 
 # LCLS Timing Ports
 set_property -dict { PACKAGE_PIN U34  IOSTANDARD LVDS     } [get_ports {timingRecClkOutP}]
 set_property -dict { PACKAGE_PIN V34  IOSTANDARD LVDS     } [get_ports {timingRecClkOutN}]
 set_property -dict { PACKAGE_PIN AP13 IOSTANDARD LVCMOS25 } [get_ports {timingClkSel}]
 
-set_property PACKAGE_PIN AK6  [get_ports {timingTxP}]
-set_property PACKAGE_PIN AK5  [get_ports {timingTxN}]
-set_property PACKAGE_PIN AJ4  [get_ports {timingRxP}]
-set_property PACKAGE_PIN AJ3  [get_ports {timingRxN}]
-set_property PACKAGE_PIN Y6   [get_ports {timingRefClkInP}]
-set_property PACKAGE_PIN Y5   [get_ports {timingRefClkInN}]
+set_property PACKAGE_PIN H31  [get_ports {timingTxP}]
+set_property PACKAGE_PIN H32  [get_ports {timingTxN}]
+set_property PACKAGE_PIN G33  [get_ports {timingRxP}]
+set_property PACKAGE_PIN G34  [get_ports {timingRxN}]
+set_property PACKAGE_PIN L29  [get_ports {timingRefClkInP}]
+set_property PACKAGE_PIN L30  [get_ports {timingRefClkInN}]
 
 # Secondary AMC Auxiliary Power Enable Port
 set_property -dict { PACKAGE_PIN AN13 IOSTANDARD LVCMOS25 } [get_ports {enAuxPwrL}] 

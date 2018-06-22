@@ -40,11 +40,8 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
    loadSource      -dir  "$::DIR_PATH/rtl/xcku11p"
    loadConstraints -path "$::DIR_PATH/xdc/AppTop_gen2.xdc"
    
-   loadSource  -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.dcp"
-   # loadIpCore -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreLeftColumn/JesdCryoCoreLeftColumn.xci"
-   
-   loadSource  -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.dcp"
-   # loadIpCore -path "$::DIR_PATH/coregen/xcku11p/JesdCryoCoreRightColumn/JesdCryoCoreRightColumn.xci"      
+   loadSource  -path "$::DIR_PATH/coregen/xcku11p/AppTopJesd204bCoregen.dcp"
+   # loadIpCore -path "$::DIR_PATH/coregen/xcku11p/AppTopJesd204bCoregen.xci"    
    
 } else { 
    puts "\n\nERROR: Invalid PRJ_PART was defined in the Makefile\n\n"; exit -1

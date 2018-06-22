@@ -22,6 +22,66 @@
 # set_property PACKAGE_PIN P6 [get_ports {genClkP}]
 # set_property PACKAGE_PIN P5 [get_ports {genClkN}]
 
+# Default JESD High Speed Port Mapping for BAY[0]
+set_property PACKAGE_PIN AH6 [get_ports {jesdTxP[0][0]}] ; #
+set_property PACKAGE_PIN AH5 [get_ports {jesdTxN[0][0]}] ; #
+set_property PACKAGE_PIN AH2 [get_ports {jesdRxP[0][0]}] ; #
+set_property PACKAGE_PIN AH1 [get_ports {jesdRxN[0][0]}] ; #
+set_property PACKAGE_PIN AG4 [get_ports {jesdTxP[0][1]}] ; # 
+set_property PACKAGE_PIN AG3 [get_ports {jesdTxN[0][1]}] ; #
+set_property PACKAGE_PIN AF2 [get_ports {jesdRxP[0][1]}] ; #
+set_property PACKAGE_PIN AF1 [get_ports {jesdRxN[0][1]}] ; #
+set_property PACKAGE_PIN AE4 [get_ports {jesdTxP[0][2]}] ; #
+set_property PACKAGE_PIN AE3 [get_ports {jesdTxN[0][2]}] ; #
+set_property PACKAGE_PIN AD2 [get_ports {jesdRxP[0][2]}] ; #
+set_property PACKAGE_PIN AD1 [get_ports {jesdRxN[0][2]}] ; #
+set_property PACKAGE_PIN AC4 [get_ports {jesdTxP[0][3]}] ; #
+set_property PACKAGE_PIN AC3 [get_ports {jesdTxN[0][3]}] ; #
+set_property PACKAGE_PIN AB2 [get_ports {jesdRxP[0][3]}] ; #
+set_property PACKAGE_PIN AB1 [get_ports {jesdRxN[0][3]}] ; #
+set_property PACKAGE_PIN AN4 [get_ports {jesdTxP[0][4]}] ; #
+set_property PACKAGE_PIN AN3 [get_ports {jesdTxN[0][4]}] ; #
+set_property PACKAGE_PIN AP2 [get_ports {jesdRxP[0][4]}] ; #
+set_property PACKAGE_PIN AP1 [get_ports {jesdRxN[0][4]}] ; #
+set_property PACKAGE_PIN AM6 [get_ports {jesdTxP[0][5]}] ; #
+set_property PACKAGE_PIN AM5 [get_ports {jesdTxN[0][5]}] ; #
+set_property PACKAGE_PIN AM2 [get_ports {jesdRxP[0][5]}] ; #
+set_property PACKAGE_PIN AM1 [get_ports {jesdRxN[0][5]}] ; #
+set_property PACKAGE_PIN AL4 [get_ports {jesdTxP[0][6]}] ; #
+set_property PACKAGE_PIN AL3 [get_ports {jesdTxN[0][6]}] ; #
+set_property PACKAGE_PIN AK2 [get_ports {jesdRxP[0][6]}] ; #
+set_property PACKAGE_PIN AK1 [get_ports {jesdRxN[0][6]}] ; #
+
+# Default JESD High Speed Port Mapping for BAY[1]
+set_property PACKAGE_PIN N4 [get_ports {jesdTxP[1][0]}] ; #
+set_property PACKAGE_PIN N3 [get_ports {jesdTxN[1][0]}] ; #
+set_property PACKAGE_PIN M2 [get_ports {jesdRxP[1][0]}] ; #
+set_property PACKAGE_PIN M1 [get_ports {jesdRxN[1][0]}] ; #
+set_property PACKAGE_PIN L4 [get_ports {jesdTxP[1][1]}] ; #
+set_property PACKAGE_PIN L3 [get_ports {jesdTxN[1][1]}] ; #
+set_property PACKAGE_PIN K2 [get_ports {jesdRxP[1][1]}] ; #
+set_property PACKAGE_PIN K1 [get_ports {jesdRxN[1][1]}] ; #
+set_property PACKAGE_PIN J4 [get_ports {jesdTxP[1][2]}] ; #
+set_property PACKAGE_PIN J3 [get_ports {jesdTxN[1][2]}] ; #
+set_property PACKAGE_PIN H2 [get_ports {jesdRxP[1][2]}] ; #
+set_property PACKAGE_PIN H1 [get_ports {jesdRxN[1][2]}] ; #
+set_property PACKAGE_PIN G4 [get_ports {jesdTxP[1][3]}] ; #
+set_property PACKAGE_PIN G3 [get_ports {jesdTxN[1][3]}] ; #
+set_property PACKAGE_PIN F2 [get_ports {jesdRxP[1][3]}] ; #
+set_property PACKAGE_PIN F1 [get_ports {jesdRxN[1][3]}] ; #
+set_property PACKAGE_PIN F6 [get_ports {jesdTxP[1][4]}] ; #
+set_property PACKAGE_PIN F5 [get_ports {jesdTxN[1][4]}] ; #
+set_property PACKAGE_PIN E4 [get_ports {jesdRxP[1][4]}] ; #
+set_property PACKAGE_PIN E3 [get_ports {jesdRxN[1][4]}] ; #
+set_property PACKAGE_PIN D6 [get_ports {jesdTxP[1][5]}] ; #
+set_property PACKAGE_PIN D5 [get_ports {jesdTxN[1][5]}] ; #
+set_property PACKAGE_PIN D2 [get_ports {jesdRxP[1][5]}] ; #
+set_property PACKAGE_PIN D1 [get_ports {jesdRxN[1][5]}] ; #
+set_property PACKAGE_PIN C4 [get_ports {jesdTxP[1][6]}] ; #
+set_property PACKAGE_PIN C3 [get_ports {jesdTxN[1][6]}] ; #
+set_property PACKAGE_PIN B2 [get_ports {jesdRxP[1][6]}] ; #
+set_property PACKAGE_PIN B1 [get_ports {jesdRxN[1][6]}] ; #
+
 # AMC's JESD Ports
 set_property PACKAGE_PIN AB6 [get_ports {jesdClkP[0][0]}] ; #P11 PIN20
 set_property PACKAGE_PIN AB5 [get_ports {jesdClkN[0][0]}] ; #P11 PIN21

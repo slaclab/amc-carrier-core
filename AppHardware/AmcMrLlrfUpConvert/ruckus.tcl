@@ -25,3 +25,8 @@ if { $::env(AMC_TYPE_BAY1) == ${rootName} } {
       exit -1
    } 
 }
+
+if {  $::env(PRJ_PART) eq {XCKU11P-FFVA1156-2-E} ||
+      $::env(PRJ_PART) eq {XCKU15P-FFVA1156-2-E} } {
+   puts "\n\nERROR: Invalid PRJ_PART=$::env(PRJ_PART) not supported yet for this application hardware\n\n"; exit -1
+} 
