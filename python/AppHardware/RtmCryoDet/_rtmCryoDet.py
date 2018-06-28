@@ -81,7 +81,18 @@ class RtmCryoDet(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
             units        = "1/(307MHz)",
-        )) 
+            hidden       = True,
+        ))
+        
+        self.add(pr.LinkVariable(
+            name         = "FluxRampRateHz",
+            description  = "Flux ramp rate in Hz",
+            dependencies = [self.RampMaxCnt],
+            linkedGet    = lambda var: (307.2e6)/(var.dependencies[0].value() + 1) if var.dependencies[0].value() > 0 else 0,
+            linkedSet    = lambda var, value, write: var.dependencies[0].set(round( ( (307.2e6) / value ) - 1 ), write=write),
+            typeStr      = "Float64",
+        ))
+
         
         self.add(pr.RemoteVariable(    
             name         = "SelectRamp",
