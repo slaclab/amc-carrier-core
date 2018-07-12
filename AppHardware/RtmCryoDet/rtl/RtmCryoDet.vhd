@@ -122,6 +122,7 @@ architecture mapping of RtmCryoDet is
    signal selRamp       : sl;
    signal enableRamp    : sl;
    signal rampStartMode : sl;
+   signal rtmReset      : sl;
    signal kRelay        : slv(1 downto 0);
    signal pulseWidth    : slv(15 downto 0);
    signal debounceWidth : slv(15 downto 0);
@@ -184,7 +185,7 @@ begin
    rtmLsN(14) <= maxSdi;
    rtmLsP(15) <= maxSck;
    maxSdo     <= rtmLsN(15);
-   rtmLsN(16) <= not(jesdRst);
+   rtmLsN(16) <= not(jesdRst or rtmReset);
 
    ---------------------------------------------
    U_OREG_jesdClkDiv : ODDRE1
@@ -373,6 +374,7 @@ begin
          rampStartMode   => rampStartMode,
          pulseWidth      => pulseWidth,
          debounceWidth   => debounceWidth,
+         rtmReset        => rtmReset,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
