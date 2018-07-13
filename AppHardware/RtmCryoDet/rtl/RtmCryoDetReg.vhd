@@ -38,6 +38,7 @@ entity RtmCryoDetReg is
       selRamp         : out sl;
       pulseWidth      : out slv(15 downto 0);
       debounceWidth   : out slv(15 downto 0);
+      rtmReset        : out sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -58,6 +59,7 @@ architecture rtl of RtmCryoDetReg is
       selRamp        : sl;
       pulseWidth     : slv(15 downto 0);
       debounceWidth  : slv(15 downto 0);
+      rtmReset       : sl;
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -71,6 +73,7 @@ architecture rtl of RtmCryoDetReg is
       selRamp        => '0',
       pulseWidth     => (others => '0'),
       debounceWidth  => (others => '0'),
+      rtmReset       => '1',
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -105,6 +108,7 @@ begin
       axiSlaveRegister(regCon, x"14", 2, v.rampStartMode);
       axiSlaveRegister(regCon, x"18", 0, v.pulseWidth);
       axiSlaveRegister(regCon, x"1C", 0, v.debounceWidth);
+      axiSlaveRegister(regCon, x"20", 0, v.rtmReset);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
@@ -133,15 +137,17 @@ begin
    Sync_selRamp : entity work.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 3)
+         WIDTH_G => 4)
       port map (
          clk        => jesdClk,
          dataIn(0)  => r.enableRamp,
          dataIn(1)  => r.rampStartMode,
          dataIn(2)  => r.selRamp,
+         dataIn(3)  => r.rtmReset,
          dataOut(0) => enableRamp,
          dataOut(1) => rampStartMode,
-         dataOut(2) => selRamp);
+         dataOut(2) => selRamp,
+         dataOut(3) => rtmReset);
 
    Sync_rampMaxCnt : entity work.SynchronizerVector
       generic map (
