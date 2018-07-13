@@ -73,7 +73,7 @@ architecture rtl of RtmCryoDetReg is
       selRamp        => '0',
       pulseWidth     => (others => '0'),
       debounceWidth  => (others => '0'),
-      rtmReset       => '0',
+      rtmReset       => '1',
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
