@@ -152,7 +152,7 @@ class RtmCryoDet(pr.Device):
         def resetRtm():
            # Toggle reset bit
            self.CpldReset.set(0x1)
-           time.sleep(100)
+           time.sleep(0.100)
            self.CpldReset.set(0x0)
            # Reset all registers
            self.writeBlocks(force=True, recurse=True)
