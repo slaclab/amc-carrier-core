@@ -2,7 +2,7 @@
 -- File       : FpgaTypePkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-08
--- Last update: 2017-04-26
+-- Last update: 2018-07-21
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -22,6 +22,7 @@ use work.StdRtlPkg.all;
 
 package FpgaTypePkg is
 
-   constant CPSW_TARBALL_ADDR_C : slv(31 downto 0) := x"05701DEC";
+   -- constant CPSW_TARBALL_ADDR_C : slv(31 downto 0) := x"05701DEC";
+   constant CPSW_TARBALL_ADDR_C : slv(31 downto 0) := x"05701DF0";  -- Include ones.bin 4 byte offset
 
 end package FpgaTypePkg;
