@@ -23,6 +23,8 @@ from AppHardware.RtmCryoDet._spiCryo import *
 from AppHardware.RtmCryoDet._spiMax import *
 from AppHardware.RtmCryoDet._spiSr import *
 
+import time
+
 class RtmCryoDet(pr.Device):
     def __init__(   self, 
             name        = "RtmCryoDet", 
@@ -135,3 +137,23 @@ class RtmCryoDet(pr.Device):
             units        = "1/(307MHz)",
         ))   
         
+        self.add(pr.RemoteVariable(    
+            name         = "CpldReset",
+            description  = "CpldReset",
+            offset       = 0x20,
+            bitSize      = 1,
+            bitOffset    = 0,
+            base         = pr.UInt,
+            mode         = "RW",
+            hidden       = True,
+        ))   
+
+        @self.command(description="Reset RTM CPLD")
+        def resetRtm():
+           # Toggle reset bit
+           self.CpldReset.set(0x1)
+           time.sleep(0.100)
+           self.CpldReset.set(0x0)
+           # Reset all registers
+           self.writeBlocks(force=True, recurse=True)
+           self.checkBlocks(recurse=True)

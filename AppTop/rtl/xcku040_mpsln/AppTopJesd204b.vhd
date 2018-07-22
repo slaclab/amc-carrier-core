@@ -191,8 +191,8 @@ architecture mapping of AppTopJesd204b is
    signal gtTxDiffCtrl   : slv(19 downto 0)    := (others => '1');
    signal gtTxPostCursor : slv(24 downto 0)    := (others => '0');
    signal gtTxPreCursor  : slv(24 downto 0)    := (others => '0');
-   signal gtTxPd         : slv(4*2-1 downto 0) := (others => '0');
-   signal gtRxPd         : slv(4*2-1 downto 0) := (others => '0');
+   signal gtTxPd         : slv(5*2-1 downto 0) := (others => '0');
+   signal gtRxPd         : slv(5*2-1 downto 0) := (others => '0');
 
    signal s_cdrStable  : sl;
    signal dummyZeroBit : sl;
