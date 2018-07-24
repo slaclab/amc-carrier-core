@@ -26,6 +26,7 @@ from surf.devices.ti._Lmk04828  import *
 
 from AppHardware.AmcMicrowaveMux._amcMicrowaveMuxCtrl import *
 from AppHardware.AmcMicrowaveMux._adf5355 import *
+from AppHardware.AmcMicrowaveMux._hmc305 import *
 
 class AmcMicrowaveMuxCore(pr.Device):
     def __init__(   self, 
@@ -41,7 +42,8 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.add(Adf5355(           offset=0x00001000,name='PLL[0]', expand=False))
         self.add(Adf5355(           offset=0x00002000,name='PLL[1]', expand=False))
         self.add(Adf5355(           offset=0x00003000,name='PLL[2]', expand=False))
-        self.add(Adf5355(           offset=0x00004000,name='PLL[3]', expand=False))        
+        self.add(Adf5355(           offset=0x00004000,name='PLL[3]', expand=False))     
+        self.add(Hmc305(            offset=0x00005000,name='ATT',    expand=False))
         self.add(Lmk04828(          offset=0x00020000,name='LMK',    expand=False))
         self.add(Dac38J84(          offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
         self.add(Dac38J84(          offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))

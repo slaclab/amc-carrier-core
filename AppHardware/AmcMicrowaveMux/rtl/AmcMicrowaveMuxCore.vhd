@@ -2,7 +2,7 @@
 -- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
--- Last update: 2018-05-08
+-- Last update: 2018-07-23
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -120,12 +120,12 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal locAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal locAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
 
-   constant REG_CONFIG_C : AxiLiteCrossbarMasterConfigArray(4 downto 0) := genAxiLiteConfig(5, CTRL_BASE_ADDR_C, 16, 12);
+   constant REG_CONFIG_C : AxiLiteCrossbarMasterConfigArray(5 downto 0) := genAxiLiteConfig(6, CTRL_BASE_ADDR_C, 16, 12);
 
-   signal regWriteMasters : AxiLiteWriteMasterArray(4 downto 0);
-   signal regWriteSlaves  : AxiLiteWriteSlaveArray(4 downto 0);
-   signal regReadMasters  : AxiLiteReadMasterArray(4 downto 0);
-   signal regReadSlaves   : AxiLiteReadSlaveArray(4 downto 0);
+   signal regWriteMasters : AxiLiteWriteMasterArray(5 downto 0);
+   signal regWriteSlaves  : AxiLiteWriteSlaveArray(5 downto 0);
+   signal regReadMasters  : AxiLiteReadMasterArray(5 downto 0);
+   signal regReadSlaves   : AxiLiteReadSlaveArray(5 downto 0);
 
    -----------------------
    -- Application Ports --
@@ -192,6 +192,12 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal pllSpiDi      : sl;
    signal pllSpiBusy    : sl;
 
+   -- HMC305 Interface
+   signal hmc305Sck  : sl;
+   signal hmc305Sdi  : sl;
+   signal hmc305Le   : sl;
+   signal hmc305Addr : slv(2 downto 0);
+
    -- Misc.
    signal axilRstL : sl;
 
@@ -252,6 +258,16 @@ begin
    -- ADC resets remapping
    spareN(3)   <= axilRst or adcCoreRst(0);
    syncOutN(9) <= axilRst or adcCoreRst(1);
+   
+   -- HMC305 Ports
+   syncOutP(1) <= hmc305Addr(0);
+   syncOutN(1) <= hmc305Sdi;
+   
+   syncInP(1) <= hmc305Sck; -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
+   syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware 
+   
+   syncOutP(2) <= hmc305Addr(1);
+   syncOutN(2) <= hmc305Addr(2);   
 
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
@@ -279,7 +295,7 @@ begin
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
-         NUM_MASTER_SLOTS_G => 5,
+         NUM_MASTER_SLOTS_G => 6,
          MASTERS_CONFIG_G   => REG_CONFIG_C)
       port map (
          axiClk              => axilClk,
@@ -368,6 +384,29 @@ begin
    end process;
 
    ----------------------------------------------------------------
+   -- ADI HMC305 Module
+   ----------------------------------------------------------------            
+
+   U_HMC305 : entity work.hmc305
+      generic map (
+         TPD_G             => TPD_G,
+         CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
+         SPI_SCLK_PERIOD_G => (1.0/500.0E+3))
+      port map (
+         -- AXI-Lite Interface
+         axiClk         => axilClk,
+         axiRst         => axilRst,
+         axiReadMaster  => regReadMasters(5),
+         axiReadSlave   => regReadSlaves(5),
+         axiWriteMaster => regWriteMasters(5),
+         axiWriteSlave  => regWriteSlaves(5),
+         -- HMC305 Interface
+         spiSck         => hmc305Sck,
+         spiSdi         => hmc305Sdi,
+         devLe          => hmc305Le,
+         devAddr        => hmc305Addr);
+
+   ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
    U_jesdSysRef : entity work.JesdSyncIn
@@ -409,7 +448,7 @@ begin
          jesdSyncP => jesdRxSyncP(1),
          jesdSyncN => jesdRxSyncN(1));
 
-      U_jesdTxSync0 : entity work.JesdSyncIn
+   U_jesdTxSync0 : entity work.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
