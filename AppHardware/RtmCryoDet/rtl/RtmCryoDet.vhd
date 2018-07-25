@@ -390,8 +390,8 @@ begin
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 7,               -- A[6:0]
-         DATA_SIZE_G       => 32,              -- D[31:0]
+         ADDRESS_SIZE_G    => 11,              -- A[10:0]
+         DATA_SIZE_G       => 20,              -- D[19:0]
          CPHA_G            => '0',             -- CPHA = 0
          CPOL_G            => '0',             -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
