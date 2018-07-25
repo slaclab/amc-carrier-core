@@ -25,4 +25,32 @@ class SpiCryo(pr.Device):
             description = "SpiCryo module", 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-                     
+
+        self.add(pr.LocalVariable(
+            name        = "data",
+            description = "data - 20 bits",
+            mode        = "RW",
+            value       = 0,
+            typeStr     = "Int20",
+        ))
+
+        self.add(pr.LocalVariable(
+            name        = "addr",
+            description = "address - 11 bits",
+            mode        = "RW",
+            value       = 0,
+            typeStr     = "Int11",
+        ))
+
+        @self.command(description="read",)
+        def read():
+            addr = self.addr.get()
+            self._rawWrite( (addr << 2), 0 )
+            read = self._rawRead( (addr << 2) ) & 0x1FFF
+            self.data.set( read )
+
+        @self.command(description="write",)
+        def write():
+            address = self.addr.get()
+            data    = self.data.get()
+            self._rawWrite( (addr << 2), data )            
