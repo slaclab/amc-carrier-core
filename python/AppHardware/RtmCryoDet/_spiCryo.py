@@ -31,7 +31,6 @@ class SpiCryo(pr.Device):
             description = "data - 20 bits",
             mode        = "RW",
             value       = 0,
-            typeStr     = "Int20",
         ))
 
         self.add(pr.LocalVariable(
@@ -39,7 +38,6 @@ class SpiCryo(pr.Device):
             description = "address - 11 bits",
             mode        = "RW",
             value       = 0,
-            typeStr     = "Int11",
         ))
 
         @self.command(description="read",)
