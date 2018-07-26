@@ -43,8 +43,8 @@ class SpiCryo(pr.Device):
         @self.command(description="read",)
         def read():
             addr = self.addr.get()
-            self._rawWrite( (addr << 2), 0 )
-            read = self._rawRead( (addr << 2) ) & 0x1FFF
+            read = self._rawRead( (addr << 2) ) & 0xFFFFF
+            read = self._rawRead( (addr << 2) ) & 0xFFFFF
             self.data.set( read )
 
         @self.command(description="write",)
