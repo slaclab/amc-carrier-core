@@ -149,7 +149,10 @@ class TopLevel(pr.Device):
                 pr.streamConnectBiDir( srp, vc0Srp )   
 
                 # Create the Raw Data stream interface (TDEST x80-0xBF routed to stream 1 (Raw Data))
-                self.stream = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
+                self.streamVc0 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
+                
+                # Create the Raw Data stream interface (TDEST xC0-0xFF routed to stream 2 (Raw Data))
+                self.streamVc1 = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+2,1)
                 
                 #########################################################################################
                 # Note: (pcieRssiLink*3)+2 <--> TDEST 0xC0-0xFF routed to stream 2 (Application) 
