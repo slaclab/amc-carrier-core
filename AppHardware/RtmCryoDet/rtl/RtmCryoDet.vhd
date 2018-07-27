@@ -2,7 +2,7 @@
 -- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2018-03-26
+-- Last update: 2018-07-27
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
 ------------------------------------------------------------------------------
@@ -63,10 +63,10 @@ architecture mapping of RtmCryoDet is
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);
 
-   constant REG_INDEX_C  : natural := 0;
-   constant CRYO_INDEX_C : natural := 1;
-   constant MAX_INDEX_C  : natural := 2;
-   constant SR_INDEX_C   : natural := 3;
+   constant REG_INDEX_C : natural := 0;
+   constant PIC_INDEX_C : natural := 1;
+   constant MAX_INDEX_C : natural := 2;
+   constant SR_INDEX_C  : natural := 3;
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -99,10 +99,10 @@ architecture mapping of RtmCryoDet is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal cryoCsL : sl;
-   signal cryoSck : sl;
-   signal cryoSdi : sl;
-   signal cryoSdo : sl;
+   signal picCsL : sl;
+   signal picSck : sl;
+   signal picSdi : sl;
+   signal picSdo : sl;
 
    signal maxCsL : sl;
    signal maxSck : sl;
@@ -140,9 +140,9 @@ begin
    -- Refer to mapping table on confluence page
    -- https://confluence.slac.stanford.edu/x/5WV4DQ
    ------------------------------------------------
-   rtmLsN(1) <= cryoCsL;
-   rtmLsP(3) <= cryoSck;
-   rtmLsN(3) <= cryoSdi;
+   rtmLsN(1) <= picCsL;
+   rtmLsP(3) <= picSck;
+   rtmLsN(3) <= picSdi;
 
    extTrig <= rtmLsP(7);                -- LEMO1
 
@@ -161,7 +161,7 @@ begin
          O => rtmLsN(7));               -- LEMO2
    ---------------------------------------------
 
-   cryoSdo   <= rtmLsP(11);
+   picSdo    <= rtmLsP(11);
    kRelay(0) <= rtmLsN(11);
 
    ---------------------------------------------
@@ -384,14 +384,11 @@ begin
          axilWriteSlave  => axilWriteSlaves(REG_INDEX_C));
 
    ------------------
-   -- CRYO SPI Module
+   -- PIC SPI Module
    ------------------
-   CRYO_SPI : entity work.AxiSpiMaster         -- FPGA=Master and CPLD=SLAVE
+   PIC_SPI : entity work.RtmCryoSpiMaster      -- FPGA=Master and PIC=SLAVE
       generic map (
          TPD_G             => TPD_G,
-         MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 11,              -- A[10:0]
-         DATA_SIZE_G       => 20,              -- D[19:0]
          CPHA_G            => '0',             -- CPHA = 0
          CPOL_G            => '0',             -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -399,14 +396,14 @@ begin
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
-         axiReadMaster  => axilReadMasters(CRYO_INDEX_C),
-         axiReadSlave   => axilReadSlaves(CRYO_INDEX_C),
-         axiWriteMaster => axilWriteMasters(CRYO_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(CRYO_INDEX_C),
-         coreSclk       => cryoSck,
-         coreSDin       => cryoSdo,
-         coreSDout      => cryoSdi,
-         coreCsb        => cryoCsL);
+         axiReadMaster  => axilReadMasters(PIC_INDEX_C),
+         axiReadSlave   => axilReadSlaves(PIC_INDEX_C),
+         axiWriteMaster => axilWriteMasters(PIC_INDEX_C),
+         axiWriteSlave  => axilWriteSlaves(PIC_INDEX_C),
+         coreSclk       => picSck,
+         coreSDin       => picSdo,
+         coreSDout      => picSdi,
+         coreCsb        => picCsL);
 
    ------------------
    -- MAX SPI Module
