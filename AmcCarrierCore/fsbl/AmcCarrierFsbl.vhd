@@ -2,7 +2,7 @@
 -- File       : AmcCarrierFsbl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-03-14
+-- Last update: 2018-08-03
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -45,6 +45,7 @@ entity AmcCarrierFsbl is
       timingPhyRst         : out   sl;
       timingRefClk         : out   sl;
       timingRefClkDiv2     : out   sl;
+      timingTrig           : out   TimingTrigType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -174,6 +175,13 @@ architecture mapping of AmcCarrierFsbl is
    signal obBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
    signal ibBsaMasters : AxiStreamMasterArray(3 downto 0);
    signal ibBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
+
+   signal obTimingEthMsgMaster  : AxiStreamMasterType;
+   signal obTimingEthMsgSlave   : AxiStreamSlaveType;
+   signal ibTimingEthMsgMaster  : AxiStreamMasterType;
+   signal ibTimingEthMsgSlave   : AxiStreamSlaveType;
+   signal intTimingEthMsgMaster : AxiStreamMasterType;
+   signal intTimingEthMsgSlave  : AxiStreamSlaveType;
 
    signal gtClk   : sl;
    signal fabClk  : sl;
@@ -334,39 +342,45 @@ begin
          TIME_GEN_EXTREF_G => false)
       port map (
          -- AXI-Lite Interface (axilClk domain)
-         axilClk             => axilClk,
-         axilRst             => axilRst,
-         axilReadMaster      => timingReadMaster,
-         axilReadSlave       => timingReadSlave,
-         axilWriteMaster     => timingWriteMaster,
-         axilWriteSlave      => timingWriteSlave,
+         axilClk              => axilClk,
+         axilRst              => axilRst,
+         axilReadMaster       => timingReadMaster,
+         axilReadSlave        => timingReadSlave,
+         axilWriteMaster      => timingWriteMaster,
+         axilWriteSlave       => timingWriteSlave,
+         -- Timing ETH MSG Interface (axilClk domain)
+         obTimingEthMsgMaster => intTimingEthMsgMaster,
+         obTimingEthMsgSlave  => intTimingEthMsgSlave,
+         ibTimingEthMsgMaster => ibTimingEthMsgMaster,
+         ibTimingEthMsgSlave  => ibTimingEthMsgSlave,
          ----------------------
          -- Top Level Interface
          ----------------------         
          -- Timing Interface 
-         recTimingClk        => recTimingClk,
-         recTimingRst        => recTimingRst,
-         appTimingClk        => timingClk,
-         appTimingRst        => timingRst,
-         appTimingBus        => timingBusIntf,
-         appTimingPhy        => timingPhy,
-         appTimingPhyClk     => timingPhyClk,
-         appTimingPhyRst     => timingPhyRst,
-         appTimingRefClk     => timingRefClk,
-         appTimingRefClkDiv2 => timingRefClkDiv2,
+         recTimingClk         => recTimingClk,
+         recTimingRst         => recTimingRst,
+         appTimingClk         => timingClk,
+         appTimingRst         => timingRst,
+         appTimingBus         => timingBusIntf,
+         appTimingTrig        => timingTrig,
+         appTimingPhy         => timingPhy,
+         appTimingPhyClk      => timingPhyClk,
+         appTimingPhyRst      => timingPhyRst,
+         appTimingRefClk      => timingRefClk,
+         appTimingRefClkDiv2  => timingRefClkDiv2,
          ----------------
          -- Core Ports --
          ----------------   
          -- LCLS Timing Ports
-         timingRxP           => timingRxP,
-         timingRxN           => timingRxN,
-         timingTxP           => timingTxP,
-         timingTxN           => timingTxN,
-         timingRefClkInP     => timingRefClkInP,
-         timingRefClkInN     => timingRefClkInN,
-         timingRecClkOutP    => timingRecClkOutP,
-         timingRecClkOutN    => timingRecClkOutN,
-         timingClkSel        => timingClkSel);
+         timingRxP            => timingRxP,
+         timingRxN            => timingRxN,
+         timingTxP            => timingTxP,
+         timingTxN            => timingTxN,
+         timingRefClkInP      => timingRefClkInP,
+         timingRefClkInN      => timingRefClkInN,
+         timingRecClkOutP     => timingRecClkOutP,
+         timingRecClkOutN     => timingRecClkOutN,
+         timingClkSel         => timingClkSel);
 
    --------------
    -- BSA Core
@@ -408,7 +422,12 @@ begin
          waveformClk          => axiClk,
          waveformRst          => axiRst,
          obAppWaveformMasters => obAppWaveformMasters,
-         obAppWaveformSlaves  => obAppWaveformSlaves);
+         obAppWaveformSlaves  => obAppWaveformSlaves,
+         -- Timing ETH MSG Interface (axilClk domain)
+         ibEthMsgMaster       => intTimingEthMsgMaster,
+         ibEthMsgSlave        => intTimingEthMsgSlave,
+         obEthMsgMaster       => obTimingEthMsgMaster,
+         obEthMsgSlave        => obTimingEthMsgSlave);
 
    ------------------
    -- DDR Memory Core
