@@ -31,6 +31,7 @@ if { $::env(AMC_ADV_BUILD)  == 1 ||
    # Check for FSBL
    if { [info exists ::env(AMC_FSBL)] == 1 }  {
       loadSource -dir "$::DIR_PATH/fsbl"
+      loadSource -dir "$::DIR_PATH/fsbl/${family}"
    } else {
       # NON-FSBL configuration
       loadSource -path "$::DIR_PATH/core/AmcCarrierCoreAdv.vhd"
