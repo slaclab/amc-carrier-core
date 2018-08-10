@@ -22,11 +22,11 @@ set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_C
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AppMps/U_Salt/*/idelay_m}]
 set_property IODELAY_GROUP MPS_IODELAY_GRP [get_cells -hier -filter {name =~ U_Core/U_AppMps/U_Salt/*/idelay_s}]
 
-set_property LOC MMCME3_ADV_X0Y1 [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm}]
+# set_property LOC MMCME3_ADV_X0Y1 [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm}]
 
-set_property LOC BUFGCE_X0Y24 [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/ClkOutGen[0].U_Bufg}]
-set_property LOC BUFGCE_X0Y28 [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/ClkOutGen[1].U_Bufg}]
-set_property LOC BUFGCE_X0Y32 [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/ClkOutGen[2].U_Bufg}]
+# set_property LOC BUFGCE_X0Y24 [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/ClkOutGen[0].U_Bufg}]
+# set_property LOC BUFGCE_X0Y28 [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/ClkOutGen[1].U_Bufg}]
+# set_property LOC BUFGCE_X0Y32 [get_cells {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/ClkOutGen[2].U_Bufg}]
 
 #####################################
 ## Core Area/Placement Constraints ##

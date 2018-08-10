@@ -2,7 +2,7 @@
 -- File       : AppMpsClk.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2017-12-15
+-- Last update: 2018-08-09
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -67,6 +67,11 @@ architecture mapping of AppMpsClk is
    signal mpsMmcmRstOut : slv(2 downto 0);
    signal locked        : sl;
 
+   signal clkFbIn  : sl;
+   signal clkFbOut : sl;
+   signal clkout0  : sl;
+   signal clkout1  : sl;
+
 begin
 
    U_IBUF : IBUF
@@ -102,33 +107,102 @@ begin
 
    mpsReset <= mpsRst or mpsPllRst;
 
-   U_ClkManagerMps : entity work.ClockManagerUltraScale
-      generic map(
-         TPD_G              => TPD_G,
-         TYPE_G             => "MMCM",
-         INPUT_BUFG_G       => false,
-         FB_BUFG_G          => true,
-         RST_IN_POLARITY_G  => '1',
-         NUM_CLOCKS_G       => 3,
-         -- MMCM attributes
-         BANDWIDTH_G        => "OPTIMIZED",
-         CLKIN_PERIOD_G     => ite(MPS_SLOT_G, 6.4, 8.0),
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => ite(MPS_SLOT_G, 8.0, 10.0),  -- 1.25 GHz
-         CLKOUT0_DIVIDE_F_G => 2.0,     -- 625 MHz = 1.25 GHz/2.0
-         CLKOUT0_RST_HOLD_G => 4,
-         CLKOUT1_DIVIDE_G   => 4,       -- 312.5 MHz = 1.25 GHz/4
-         CLKOUT2_DIVIDE_G   => 10)      -- 125 MHz = 1.25 GHz/10
-      port map(
-         -- Clock Input
-         clkIn  => mpsClk,
-         rstIn  => mpsReset,
-         -- Clock Outputs
-         clkOut => mpsMmcmClkOut,
-         -- Reset Outputs
-         rstOut => mpsMmcmRstOut,
-         -- Locked Status
-         locked => locked);
+   U_MpsSerdesPll : PLLE3_ADV
+      generic map (
+         STARTUP_WAIT       => "FALSE",
+         CLKIN_PERIOD       => ite(MPS_SLOT_G, 6.4, 8.0),
+         DIVCLK_DIVIDE      => 1,
+         CLKFBOUT_MULT      => ite(MPS_SLOT_G, 8, 10),  -- 1.25 GHz
+         CLKOUT0_DIVIDE     => 2,       -- 625 MHz = 1.25 GHz/2
+         CLKOUT1_DIVIDE     => 10,      -- 125 MHz = 1.25 GHz/10
+         CLKOUT0_PHASE      => 0.0,
+         CLKOUT1_PHASE      => 0.0,
+         CLKOUT0_DUTY_CYCLE => 0.5,
+         CLKOUT1_DUTY_CYCLE => 0.5)
+      port map (
+         DCLK        => axilClk,
+         DRDY        => open,
+         DEN         => '0',
+         DWE         => '0',
+         DADDR       => (others => '0'),
+         DI          => (others => '0'),
+         DO          => open,
+         PWRDWN      => '0',
+         RST         => mpsReset,
+         CLKIN       => mpsClk,
+         CLKOUTPHYEN => '0',
+         CLKFBOUT    => clkFbOut,
+         CLKFBIN     => clkFbIn,
+         LOCKED      => locked,
+         CLKOUT0     => clkout0,
+         CLKOUT1     => clkout1);
+
+   U_Bufg : BUFG
+      port map (
+         I => clkFbOut,
+         O => clkFbIn);
+
+   U_Bufg625 : BUFG
+      port map (
+         I => clkout0,
+         O => mpsMmcmClkOut(0));
+
+   U_Rst625 : entity work.RstSync
+      generic map (
+         TPD_G          => TPD_G,
+         IN_POLARITY_G  => '0',
+         OUT_POLARITY_G => '1')
+      port map (
+         clk      => mpsMmcmClkOut(0),
+         asyncRst => locked,
+         syncRst  => mpsMmcmRstOut(0));
+
+   ------------------------------------------------------------------------------------------------------
+   -- 312.5 MHz is the OSERDESE3's CLKDIV port
+   -- Refer to "Figure 3-49: Sub-Optimal to Optimal Clocking Topologies for OSERDESE3" in UG949 (v2018.2)
+   ------------------------------------------------------------------------------------------------------
+   U_Bufg312 : BUFGCE_DIV
+      generic map (
+         BUFGCE_DIVIDE => 2)            -- 312.5 MHz = 625 MHz/2
+      port map (
+         I   => clkout0,                -- 625 MHz
+         CE  => '1',
+         CLR => '0',
+         O   => mpsMmcmClkOut(1));      -- 312.5 MHz
+
+   U_Rst312 : entity work.RstSync
+      generic map (
+         TPD_G          => TPD_G,
+         IN_POLARITY_G  => '0',
+         OUT_POLARITY_G => '1')
+      port map (
+         clk      => mpsMmcmClkOut(1),
+         asyncRst => locked,
+         syncRst  => mpsMmcmRstOut(1));
+
+   U_Bufg125 : BUFG
+      port map (
+         I => clkout1,
+         O => mpsMmcmClkOut(2));
+
+   U_Rst125 : entity work.RstSync
+      generic map (
+         TPD_G          => TPD_G,
+         IN_POLARITY_G  => '0',
+         OUT_POLARITY_G => '1')
+      port map (
+         clk      => mpsMmcmClkOut(2),
+         asyncRst => locked,
+         syncRst  => mpsMmcmRstOut(2));
+
+   mps625MHzClk <= mpsMmcmClkOut(0);
+   mps625MHzRst <= mpsMmcmRstOut(0);
+
+   mps312MHzClk <= mpsMmcmClkOut(1);
+   mps312MHzRst <= mpsMmcmRstOut(1);
+
+   mps125MHzClk <= mpsMmcmClkOut(2);
+   mps125MHzRst <= mpsMmcmRstOut(2);
 
    Sync_locked : entity work.Synchronizer
       generic map (
@@ -137,15 +211,6 @@ begin
          clk     => axilClk,
          dataIn  => locked,
          dataOut => mpsPllLocked);
-
-   mps125MHzClk <= mpsMmcmClkOut(2);
-   mps125MHzRst <= mpsMmcmRstOut(2);
-
-   mps312MHzClk <= mpsMmcmClkOut(1);
-   mps312MHzRst <= mpsMmcmRstOut(1);
-
-   mps625MHzClk <= mpsMmcmClkOut(0);
-   mps625MHzRst <= mpsMmcmRstOut(0);
 
    U_PLL : entity work.ClockManagerUltraScale
       generic map(
