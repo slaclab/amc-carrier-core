@@ -135,6 +135,8 @@ architecture mapping of AmcCarrierTiming is
    signal appBus         : TimingBusType;
    signal appExptBus     : ExptBusType;
    signal appTimingMode  : sl;
+   signal timingStrobe   : sl;
+   signal timingValid    : sl;
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(2 downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray (2 downto 0) := (others => AXI_LITE_WRITE_SLAVE_INIT_C);
@@ -339,16 +341,20 @@ begin
    process(appTimingClk)
    begin
       if rising_edge(appTimingClk) then
-         appTimingBus.strobe <= appBus.strobe after TPD_G;  -- Pipeline for register replication during impl_1
-         appTimingBus.valid  <= appBus.valid  after TPD_G;  -- Pipeline for register replication during impl_1
+         timingStrobe <= appBus.strobe after TPD_G;  -- Pipeline for register replication during impl_1
+         timingValid  <= appBus.valid  after TPD_G;  -- Pipeline for register replication during impl_1
       end if;
    end process;
 
    -- No pipelining: message, V1, and V2 only updated during strobe's HIGH cycle
-   appTimingBus.message <= appBus.message;
-   appTimingBus.stream  <= appBus.stream;
-   appTimingBus.v1      <= appBus.v1;
-   appTimingBus.v2      <= appBus.v2;
+   process(appBus, timingStrobe, timingValid)
+      variable v : TimingBusType;
+   begin
+      v        := appBus;
+      v.strobe := timingStrobe;
+      v.valid  := timingValid;
+      appTimingBus <= v;
+   end process;
 
    -- Declaring the primitive because it's DCP output
    U_timingClkSel : OBUF
