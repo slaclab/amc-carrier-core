@@ -504,16 +504,19 @@ begin
             coreCsb        => adcCoreCsb(i));
    end generate GEN_ADC;
 
-   -- Output mux
-   with adcCoreCsb select
-      adcMuxClk <= adcCoreClk(0) when "10",
-      adcCoreClk(1)              when "01",
-      '0'                        when others;
-
-   with adcCoreCsb select
-      adcMuxDout <= adcCoreDout(0) when "10",
-      adcCoreDout(1)               when "01",
-      '0'                          when others;
+   process(adcCoreCsb)
+   begin
+      if adcCoreCsb = "10" then
+         adcMuxClk  <= adcCoreClk(0);
+         adcMuxDout <= adcCoreDout(0);
+      elsif adcCoreCsb = "01" then
+         adcMuxClk  <= adcCoreClk(1);
+         adcMuxDout <= adcCoreDout(1);
+      else
+         adcMuxClk  <= '0';
+         adcMuxDout <= '0';
+      end if;
+   end process;     
    -- IO Assignment
    adcSpiClk <= adcMuxClk;
    adcSpiDi  <= adcMuxDout;
@@ -543,18 +546,21 @@ begin
             coreSDout      => dacCoreDout(i),
             coreCsb        => dacCoreCsb(i));
    end generate GEN_DAC;
+   
+   process(dacCoreCsb)
+   begin
+      if dacCoreCsb = "10" then
+         dacMuxClk  <= dacCoreClk(0);
+         dacMuxDout <= dacCoreDout(0);
+      elsif dacCoreCsb = "01" then
+         dacMuxClk  <= dacCoreClk(1);
+         dacMuxDout <= dacCoreDout(1);
+      else
+         dacMuxClk  <= '0';
+         dacMuxDout <= '1'; -- sdio = 'Z'
+      end if;
+   end process;   
 
-   -- Output mux
-   with dacCoreCsb select
-      dacMuxClk <= dacCoreClk(0) when "10",
-      dacCoreClk(1)              when "01",
-      '0'                        when others;
-
-   with dacCoreCsb select
-      dacMuxDout <= dacCoreDout(0) when "10",
-      dacCoreDout(1)               when "01",
-      '0'                          when others;
-   -- IO Assignment
    IOBUF_Dac : IOBUF
       port map (
          I  => '0',
