@@ -2,7 +2,7 @@
 -- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
--- Last update: 2018-07-23
+-- Last update: 2018-08-15
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -258,16 +258,16 @@ begin
    -- ADC resets remapping
    spareN(3)   <= axilRst or adcCoreRst(0);
    syncOutN(9) <= axilRst or adcCoreRst(1);
-   
+
    -- HMC305 Ports
    syncOutP(1) <= hmc305Addr(0);
    syncOutN(1) <= hmc305Sdi;
-   
-   syncInP(1) <= hmc305Sck; -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
+
+   syncInP(1) <= hmc305Sck;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
    syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware 
-   
+
    syncOutP(2) <= hmc305Addr(1);
-   syncOutN(2) <= hmc305Addr(2);   
+   syncOutN(2) <= hmc305Addr(2);
 
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
@@ -504,7 +504,7 @@ begin
             coreCsb        => adcCoreCsb(i));
    end generate GEN_ADC;
 
-   process(adcCoreCsb)
+   process(adcCoreClk, adcCoreCsb, adcCoreDout)
    begin
       if adcCoreCsb = "10" then
          adcMuxClk  <= adcCoreClk(0);
@@ -516,7 +516,7 @@ begin
          adcMuxClk  <= '0';
          adcMuxDout <= '0';
       end if;
-   end process;     
+   end process;
    -- IO Assignment
    adcSpiClk <= adcMuxClk;
    adcSpiDi  <= adcMuxDout;
@@ -546,8 +546,8 @@ begin
             coreSDout      => dacCoreDout(i),
             coreCsb        => dacCoreCsb(i));
    end generate GEN_DAC;
-   
-   process(dacCoreCsb)
+
+   process(dacCoreClk, dacCoreCsb, dacCoreDout)
    begin
       if dacCoreCsb = "10" then
          dacMuxClk  <= dacCoreClk(0);
@@ -557,9 +557,9 @@ begin
          dacMuxDout <= dacCoreDout(1);
       else
          dacMuxClk  <= '0';
-         dacMuxDout <= '1'; -- sdio = 'Z'
+         dacMuxDout <= '1';             -- sdio = 'Z'
       end if;
-   end process;   
+   end process;
 
    IOBUF_Dac : IOBUF
       port map (
