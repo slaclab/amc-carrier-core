@@ -2,7 +2,7 @@
 -- File       : AmcMicrowaveMuxCoreCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-06-14
--- Last update: 2018-03-14
+-- Last update: 2018-08-16
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -39,19 +39,30 @@ entity AmcMicrowaveMuxCoreCtrl is
       rxSync          : in  sl;
       txSyncRaw       : in  slv(1 downto 0);
       txSync          : in  slv(1 downto 0);
-      txSyncMask      : out slv(1 downto 0));
+      txSyncMask      : out slv(1 downto 0);
+      -- DAC reset
+      dacReset        : out slv(1 downto 0);
+      dacJtagReset    : out sl;
+      -- LMK Sync
+      lmkSync         : out sl);
 end AmcMicrowaveMuxCoreCtrl;
 
 architecture rtl of AmcMicrowaveMuxCoreCtrl is
 
    type RegType is record
       txSyncMask     : slv(1 downto 0);
+      dacReset       : slv(1 downto 0);
+      dacJtagReset   : sl;
+      lmkSync        : sl;
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
 
    constant REG_INIT_C : RegType := (
       txSyncMask     => (others => '0'),
+      dacReset       => (others => '0'),
+      dacJtagReset   => '0',
+      lmkSync        => '0',
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -78,6 +89,9 @@ begin
 
       -- Map the read/write registers
       axiSlaveRegister(regCon, x"800", 0, v.txSyncMask);
+      axiSlaveRegister(regCon, x"800", 2, v.dacReset);
+      axiSlaveRegister(regCon, x"800", 4, v.dacJtagReset);
+      axiSlaveRegister(regCon, x"800", 5, v.lmkSync);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
@@ -94,6 +108,9 @@ begin
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
       txSyncMask     <= r.txSyncMask;
+      dacReset       <= r.dacReset;
+      dacJtagReset   <= r.dacJtagReset;
+      lmkSync        <= r.lmkSync;
 
    end process comb;
 

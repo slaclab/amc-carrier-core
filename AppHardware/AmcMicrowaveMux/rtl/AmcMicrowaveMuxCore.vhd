@@ -175,6 +175,13 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal dacSpiDio : sl;
    signal dacSpiCsb : slv(1 downto 0);
 
+   -- DAC JTAG
+   signal dacJtagTclk  : sl := '0';
+   signal dacJtagTrstb : sl := '0';
+   signal dacJtagTdo   : sl := '0';
+   signal dacJtagTdi   : sl := '0';
+   signal dacJtagTms   : sl := '0';
+
    -- LMK SPI config interface
    signal lmkSpiDout : sl;
    signal lmkSpiDin  : sl;
@@ -199,7 +206,10 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal hmc305Addr : slv(2 downto 0);
 
    -- Misc.
-   signal axilRstL : sl;
+   signal axilRstL     : sl;
+   signal dacReset     : slv(1 downto 0) := (others => '0');
+   signal dacJtagReset : sl              := '0';
+   signal lmkSync      : sl              := '0';
 
 begin
 
@@ -242,10 +252,24 @@ begin
    spareN(0)   <= dacSpiCsb(0);
    syncOutP(8) <= dacSpiCsb(1);
 
+   -- DAC JTAG
+   syncOutP(4) <= dacJtagTclk;
+   syncOutP(3) <= dacJtagReset;
+   syncOutP(5) <= dacJtagTdi;
+   syncOutN(4) <= dacJtagTdo;
+   syncOutN(3) <= dacJtagTms;
+
+   -- DAC reset
+   syncOutN(0) <= not dacReset(0);
+   spareN(9)   <= not dacReset(1);
+
    -- LMK SPI
    spareP(10) <= lmkSpiClk;
    spareP(11) <= lmkSpiDio;
    spareP(9)  <= lmkSpiCsb;
+
+   -- LMK SYNC
+   jtagSec(3) <= lmkSync;
 
    -- PLL SPI
    spareP(12) <= pllSpiClk;
@@ -328,7 +352,10 @@ begin
          rxSync          => jesdRxSync,
          txSyncRaw       => jesdTxSyncRaw,
          txSync          => jesdTxSyncVec,
-         txSyncMask      => jesdTxSyncMask);
+         txSyncMask      => jesdTxSyncMask,
+         dacReset        => dacReset,
+         dacJtagReset    => dacJtagReset,
+         lmkSync         => lmkSync);
 
    ----------------------------------------------------------------
    -- SPI interface PLL (ADF5355)

@@ -18,6 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
+import time
 
 class AmcMicrowaveMuxCtrl(pr.Device):
     def __init__(   self, 
@@ -66,3 +67,53 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             mode         = "RW",
         ))                           
                         
+        self.add(pr.RemoteVariable(   
+            name         = "dacReset[0]",
+            description  = "dac(0) reset",
+            offset       =  0x800,
+            bitSize      =  1,
+            bitOffset    =  2,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))                           
+                        
+        self.add(pr.RemoteVariable(   
+            name         = "dacReset[1]",
+            description  = "dac(1) reset",
+            offset       =  0x800,
+            bitSize      =  1,
+            bitOffset    =  3,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))                           
+                        
+        self.add(pr.RemoteVariable(   
+            name         = "dacJtagReset",
+            description  = "dac JTAG reset",
+            offset       =  0x800,
+            bitSize      =  1,
+            bitOffset    =  4,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))     
+        
+        self.add(pr.RemoteVariable(   
+            name         = "lmkSync",
+            description  = "lmk SYNC request",
+            offset       =  0x800,
+            bitSize      =  1,
+            bitOffset    =  5,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))     
+        
+        @self.command(name= "Init", description  = "Initialize ADC/DAC")        
+        def Init():
+            # Reset DAC, active low 
+            self.dacReset[0].set(1)
+            self.dacReset[1].set(1)
+            time.sleep(0.1)
+            self.dacReset[0].set(0)
+            self.dacReset[1].set(0)
+            self.lmkSync.set(0)
+            
