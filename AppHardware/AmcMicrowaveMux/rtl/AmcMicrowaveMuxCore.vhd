@@ -256,7 +256,7 @@ begin
    syncOutP(4) <= dacJtagTclk;
    syncOutP(3) <= dacJtagReset;
    syncOutP(5) <= dacJtagTdi;
-   syncOutN(4) <= dacJtagTdo;
+   dacJtagTdo  <= syncOutN(4);
    syncOutN(3) <= dacJtagTms;
 
    -- DAC reset
