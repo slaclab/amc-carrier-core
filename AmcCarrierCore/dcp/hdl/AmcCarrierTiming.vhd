@@ -2,7 +2,7 @@
 -- File       : AmcCarrierTiming.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-03-16
+-- Last update: 2018-08-05
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ entity AmcCarrierTiming is
       TPD_G             : time     := 1 ns;
       TIME_GEN_APP_G    : boolean  := false;
       TIME_GEN_EXTREF_G : boolean  := false;
-      CORE_TRIGGERS_G   : positive := 16;
+      CORE_TRIGGERS_G   : natural  := 16;
       TRIG_PIPE_G       : natural  := 0;
       STREAM_L1_G       : boolean  := true;
       RX_CLK_MMCM_G     : boolean  := false);
@@ -133,7 +133,6 @@ architecture mapping of AmcCarrierTiming is
    signal loopback       : slv(2 downto 0);
    signal refclksel      : slv(2 downto 0);
    signal appBus         : TimingBusType;
-   signal appExptBus     : ExptBusType;
    signal appTimingMode  : sl;
    signal timingStrobe   : sl;
    signal timingValid    : sl;
@@ -324,7 +323,6 @@ begin
          appTimingRst    => appTimingRst,
          appTimingMode   => appTimingMode,
          appTimingBus    => appBus,
-         exptBus         => appExptBus,
          timingPhy       => coreTimingPhy,
          timingClkSel    => timingClockSel,
          axilClk         => axilClk,
@@ -385,7 +383,6 @@ begin
             evrClk          => appTimingClk,
             evrRst          => appTimingRst,
             evrBus          => appBus,
-            exptBus         => appExptBus,
             trigOut         => appTimingTrig,
             evrModeSel      => appTimingMode);
    end generate;
