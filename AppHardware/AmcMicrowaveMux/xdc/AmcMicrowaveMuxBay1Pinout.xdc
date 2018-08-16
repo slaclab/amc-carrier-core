@@ -36,10 +36,24 @@ set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][1]}] 
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][0]}]    ; # dacSpiCsb(0)
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {syncOutP[1][8]}]  ; # dacSpiCsb(1)
 
+# DAC JTAG
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports syncOutP[1][4]}]   ; # DAC TCLK
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports syncOutP[1][3]}]   ; # DAC TRSTB
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports syncOutP[1][5]}]   ; # DAC TDI
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports syncOutN[1][4]}]   ; # DAC TDO
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports syncOutN[1][3]}]   ; # DAC TMS
+
+# DAC reset
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {syncOutN[1][0]}]  ; # dacReset(0)
+set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][9]}]    ; # dacReset(1)
+
 # LMK SPI
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][10]}]    ; # lmkSpiClk
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][11]}]    ; # lmkSpiDio
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][9]}]     ; # lmkSpiCsb
+
+# LMK SYNC
+set_property -dict { IOSTANDARD LVCMOS25 PULLUP true } [get_ports {jtagSec[1][3]}]  ; # lmkSync
 
 # PLL SPI
 set_property -dict { IOSTANDARD LVCMOS18 SLEW SLOW DRIVE 2 } [get_ports {spareP[1][12]}]    ; # pllSpiClk

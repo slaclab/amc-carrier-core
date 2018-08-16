@@ -2,7 +2,7 @@
 -- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
--- Last update: 2018-07-23
+-- Last update: 2018-08-16
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -175,6 +175,13 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal dacSpiDio : sl;
    signal dacSpiCsb : slv(1 downto 0);
 
+   -- DAC JTAG
+   signal dacJtagTclk  : sl := '0';
+   signal dacJtagTrstb : sl := '0';
+   signal dacJtagTdo   : sl := '0';
+   signal dacJtagTdi   : sl := '0';
+   signal dacJtagTms   : sl := '0';
+
    -- LMK SPI config interface
    signal lmkSpiDout : sl;
    signal lmkSpiDin  : sl;
@@ -199,7 +206,10 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal hmc305Addr : slv(2 downto 0);
 
    -- Misc.
-   signal axilRstL : sl;
+   signal axilRstL     : sl;
+   signal dacReset     : slv(1 downto 0) := (others => '0');
+   signal dacJtagReset : sl              := '0';
+   signal lmkSync      : sl              := '0';
 
 begin
 
@@ -242,10 +252,24 @@ begin
    spareN(0)   <= dacSpiCsb(0);
    syncOutP(8) <= dacSpiCsb(1);
 
+   -- DAC JTAG
+   syncOutP(4) <= dacJtagTclk;
+   syncOutP(3) <= dacJtagReset;
+   syncOutP(5) <= dacJtagTdi;
+   syncOutN(4) <= dacJtagTdo;
+   syncOutN(3) <= dacJtagTms;
+
+   -- DAC reset
+   syncOutN(0) <= not dacReset(0);
+   spareN(9)   <= not dacReset(1);
+
    -- LMK SPI
    spareP(10) <= lmkSpiClk;
    spareP(11) <= lmkSpiDio;
    spareP(9)  <= lmkSpiCsb;
+
+   -- LMK SYNC
+   jtagSec(3) <= lmkSync;
 
    -- PLL SPI
    spareP(12) <= pllSpiClk;
@@ -258,16 +282,16 @@ begin
    -- ADC resets remapping
    spareN(3)   <= axilRst or adcCoreRst(0);
    syncOutN(9) <= axilRst or adcCoreRst(1);
-   
+
    -- HMC305 Ports
    syncOutP(1) <= hmc305Addr(0);
    syncOutN(1) <= hmc305Sdi;
-   
-   syncInP(1) <= hmc305Sck; -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
+
+   syncInP(1) <= hmc305Sck;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
    syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware 
-   
+
    syncOutP(2) <= hmc305Addr(1);
-   syncOutN(2) <= hmc305Addr(2);   
+   syncOutN(2) <= hmc305Addr(2);
 
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
@@ -328,7 +352,10 @@ begin
          rxSync          => jesdRxSync,
          txSyncRaw       => jesdTxSyncRaw,
          txSync          => jesdTxSyncVec,
-         txSyncMask      => jesdTxSyncMask);
+         txSyncMask      => jesdTxSyncMask,
+         dacReset        => dacReset,
+         dacJtagReset    => dacJtagReset,
+         lmkSync         => lmkSync);
 
    ----------------------------------------------------------------
    -- SPI interface PLL (ADF5355)
@@ -504,7 +531,7 @@ begin
             coreCsb        => adcCoreCsb(i));
    end generate GEN_ADC;
 
-   process(adcCoreCsb)
+   process(adcCoreClk, adcCoreCsb, adcCoreDout)
    begin
       if adcCoreCsb = "10" then
          adcMuxClk  <= adcCoreClk(0);
@@ -516,7 +543,7 @@ begin
          adcMuxClk  <= '0';
          adcMuxDout <= '0';
       end if;
-   end process;     
+   end process;
    -- IO Assignment
    adcSpiClk <= adcMuxClk;
    adcSpiDi  <= adcMuxDout;
@@ -546,8 +573,8 @@ begin
             coreSDout      => dacCoreDout(i),
             coreCsb        => dacCoreCsb(i));
    end generate GEN_DAC;
-   
-   process(dacCoreCsb)
+
+   process(dacCoreClk, dacCoreCsb, dacCoreDout)
    begin
       if dacCoreCsb = "10" then
          dacMuxClk  <= dacCoreClk(0);
@@ -557,9 +584,9 @@ begin
          dacMuxDout <= dacCoreDout(1);
       else
          dacMuxClk  <= '0';
-         dacMuxDout <= '1'; -- sdio = 'Z'
+         dacMuxDout <= '1';             -- sdio = 'Z'
       end if;
-   end process;   
+   end process;
 
    IOBUF_Dac : IOBUF
       port map (
