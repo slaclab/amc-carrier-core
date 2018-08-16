@@ -36,7 +36,7 @@ set family [getFpgaFamily]
 # Check for submodule tagging
 if { [info exists ::env(OVERRIDE_SUBMODULE_LOCKS)] != 1 || $::env(OVERRIDE_SUBMODULE_LOCKS) == 0 } {
    if { [SubmoduleCheck {lcls-timing-core} {1.11.6} "mustBeExact" ] < 0 } {exit -1}
-   if { [SubmoduleCheck {ruckus}           {1.6.9}  "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {ruckus}           {1.6.11} "mustBeExact" ] < 0 } {exit -1}
    if { [SubmoduleCheck {surf}             {1.8.9}  "mustBeExact" ] < 0 } {exit -1}
 } else {
    puts "\n\n*********************************************************"
