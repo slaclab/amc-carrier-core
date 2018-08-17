@@ -91,14 +91,14 @@ class TopLevel(pr.Device):
                 rssiNotInterlaved = True
             
                 # Create SRP/ASYNC_MSG interface
-                self.rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1) 
+                self.rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1, jumbo = False)
 
                 # Connect the SRPv3 to tDest = 0x0
                 self.srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
 
                 # Create stream interface
-                self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1)       
+                self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1, jumbo = False)
             
             elif ( commType=="eth-rssi-interleaved" ):
             
@@ -106,7 +106,7 @@ class TopLevel(pr.Device):
                 rssiInterlaved = True
 
                 # Create Interleaved RSSI interface
-                self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2)
+                self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2, jumbo = True)
                 
                 # Connect the SRPv3 to tDest = 0x0
                 self.srp = rogue.protocols.srp.SrpV3()
