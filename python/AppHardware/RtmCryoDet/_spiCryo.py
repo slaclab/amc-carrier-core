@@ -38,7 +38,7 @@ class SpiCryo(pr.Device):
         self.add(pr.RemoteVariable(
             name        = "read",
             description = "read - 32 bits",
-            offset      = 0x0,
+            offset      = 0x4,
             bitSize     = 32,
             base        = pr.UInt,
             mode        = "RO",
