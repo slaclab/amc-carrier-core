@@ -1,5 +1,5 @@
 # Define Firmware Version Number
-export PRJ_VERSION = 0x02040700
+export PRJ_VERSION = 0x02050000
 
 # Define target output
 target: dcp

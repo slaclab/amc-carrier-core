@@ -71,7 +71,8 @@ package AmcCarrierPkg is
    -- 05/17/2018 (0x02040600): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.6
    -- 06/22/2018 (0x02040700): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.7
    -- 07/21/2018 (0x02040800): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.8
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_04_08_00";
+   -- 08/20/2018 (0x02050000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.5.0
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_05_00_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
