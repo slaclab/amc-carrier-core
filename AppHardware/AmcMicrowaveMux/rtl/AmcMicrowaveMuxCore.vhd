@@ -282,6 +282,16 @@ begin
    -- ADC resets remapping
    spareN(3)   <= axilRst or adcCoreRst(0);
    syncOutN(9) <= axilRst or adcCoreRst(1);
+   
+   -- HMC305 Ports
+   syncOutP(1) <= hmc305Addr(0);
+   syncOutN(1) <= hmc305Sdi;
+   
+   syncInP(1) <= hmc305Sck; -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
+   syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware 
+   
+   syncOutP(2) <= hmc305Addr(1);
+   syncOutN(2) <= hmc305Addr(2);   
 
    -- HMC305 Ports
    syncOutP(1) <= hmc305Addr(0);
