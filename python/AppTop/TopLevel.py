@@ -137,9 +137,9 @@ class TopLevel(pr.Device):
                 self.srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( self.srp, self.pack.application(0x0) )
 
-                # TDEST x80-0xBF routed to stream 4 (Raw Data)
-                self.rawData = [None] * 64
-                for i in range(64):
+                # TDEST x80-0x87 routed to stream 4 (Raw Data)
+                self.rawData = [None] * 8
+                for i in range(8):
                     self.rawData[i] = self.pack.application(0x80+i)
 
                 # TDEST 0xC0-0xFF routed to stream 5 (Application) 
