@@ -306,8 +306,7 @@ begin
          TPGEN_G           => TIME_GEN_APP_G,
          STREAM_L1_G       => STREAM_L1_G,
          ETHMSG_AXIS_CFG_G => EMAC_AXIS_CONFIG_C,
-         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr,
-         AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr)
       port map (
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,
