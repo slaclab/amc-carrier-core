@@ -91,14 +91,14 @@ class TopLevel(pr.Device):
                 rssiNotInterlaved = True
             
                 # Create SRP/ASYNC_MSG interface
-                self.rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1) 
+                self.rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1, jumbo = False)
 
                 # Connect the SRPv3 to tDest = 0x0
                 self.srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
 
                 # Create stream interface
-                self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1)       
+                self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1, jumbo = False)
             
             elif ( commType=="eth-rssi-interleaved" ):
             
@@ -106,7 +106,7 @@ class TopLevel(pr.Device):
                 rssiInterlaved = True
 
                 # Create Interleaved RSSI interface
-                self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2)
+                self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2, jumbo = True)
                 
                 # Connect the SRPv3 to tDest = 0x0
                 self.srp = rogue.protocols.srp.SrpV3()
@@ -130,22 +130,12 @@ class TopLevel(pr.Device):
             
                 # Using PackVer2 after the DMA in firmware
                 self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,pcieRssiLink,1)
-                self.pack = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
+                self.pack = self.stream = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
                 pr.streamConnectBiDir( self.pack.transport(), self.dma )
 
                 # TDEST 0 routed to stream 0 (SRPv3)
                 self.srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( self.srp, self.pack.application(0x0) )
-
-                # TDEST x80-0xBF routed to stream 4 (Raw Data)
-                self.rawData = [None] * 64
-                for i in range(64):
-                    self.rawData[i] = self.pack.application(0x80+i)
-
-                # TDEST 0xC0-0xFF routed to stream 5 (Application) 
-                self.appData = [None] * 64
-                for i in range(64):
-                    self.appData[i] = self.pack.application(0xC0+i)
                     
             # Undefined device type
             else:
