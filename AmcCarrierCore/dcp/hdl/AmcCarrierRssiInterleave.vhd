@@ -2,7 +2,7 @@
 -- File       : AmcCarrierRssiInterleave.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-02-09
--- Last update: 2018-03-14
+-- Last update: 2018-08-17
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -66,9 +66,8 @@ architecture mapping of AmcCarrierRssiInterleave is
 
    constant APP_STREAMS_C      : positive := 6;
    constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
-   constant WINDOW_ADDR_SIZE_C : positive := 3;
-   constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
-   constant MAX_RETRANS_CNT_C  : positive := ite((WINDOW_ADDR_SIZE_C > 1), WINDOW_ADDR_SIZE_C-1, 1);
+   constant WINDOW_ADDR_SIZE_C : positive := 4;       -- 16 buffers (2^4)
+   constant MAX_SEG_SIZE_C     : positive := 8192;    -- Jumbo frame chucking
 
    constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_C-1 downto 0) := (others => ETH_AXIS_CONFIG_C);
 
@@ -92,7 +91,10 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
+         PIPE_STAGES_G       => 1,
          APP_ILEAVE_EN_G     => true,   -- true = AxiStreamPacketizer2
+         MAX_SEG_SIZE_G      => MAX_SEG_SIZE_C,  -- Using Jumbo frames
+         SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_C/8),
          APP_STREAMS_G       => APP_STREAMS_C,
          APP_STREAM_ROUTES_G => (
             SRP_IDX_C        => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
@@ -107,11 +109,9 @@ begin
          RETRANSMIT_ENABLE_G => true,
          WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
          MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
-         PIPE_STAGES_G       => 1,
+         MAX_RETRANS_CNT_G   => 16,
          APP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
-         TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C,
-         MAX_RETRANS_CNT_G   => MAX_RETRANS_CNT_C,
-         MAX_CUM_ACK_CNT_G   => MAX_CUM_ACK_CNT_C)
+         TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C)
       port map (
          clk_i             => axilClk,
          rst_i             => axilRst,

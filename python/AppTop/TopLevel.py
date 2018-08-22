@@ -22,6 +22,7 @@ import pyrogue.interfaces.simulation
 import pyrogue.protocols
 import pyrogue.utilities.fileio
 import rogue.hardware.axi
+import rogue.protocols.packetizer
 
 from AmcCarrierCore import *
 from AppTop import *
@@ -54,11 +55,11 @@ class TopLevel(pr.Device):
         self._numTxLanes = numTxLanes
         
         rssiInterlaved    = False
-        rssiNotInterlaved = False       
+        rssiNotInterlaved = False
         
         # Check for valid link range
         if (pcieRssiLink<0) or (pcieRssiLink>5):
-            raise ValueError("Invalid pcieRssiLink (%d)" % (pcieRssiLink) )        
+            raise ValueError("Invalid pcieRssiLink (%d)" % (pcieRssiLink) )
 
         if (simGui):
             # Create simulation srp interface
@@ -78,11 +79,11 @@ class TopLevel(pr.Device):
             if ( commType=="eth-fsbl" ):
             
                 # UDP only
-                udp = rogue.protocols.udp.Client(ipAddr,8192,0)
+                self.udp = rogue.protocols.udp.Client(ipAddr,8192,0)
             
                 # Connect the SRPv0 to RAW UDP
-                srp = rogue.protocols.srp.SrpV0()
-                pyrogue.streamConnectBiDir( srp, udp )           
+                self.srp = rogue.protocols.srp.SrpV0()
+                pyrogue.streamConnectBiDir( self.srp, self.udp )
             
             elif ( commType=="eth-rssi-non-interleaved" ):
                 
@@ -90,79 +91,59 @@ class TopLevel(pr.Device):
                 rssiNotInterlaved = True
             
                 # Create SRP/ASYNC_MSG interface
-                rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1) 
+                self.rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1, jumbo = False)
 
                 # Connect the SRPv3 to tDest = 0x0
-                srp = rogue.protocols.srp.SrpV3()
-                pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
+                self.srp = rogue.protocols.srp.SrpV3()
+                pr.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
 
                 # Create stream interface
-                self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1)       
+                self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1, jumbo = False)
             
             elif ( commType=="eth-rssi-interleaved" ):
             
                 # Update the flag
-                rssiInterlaved = True            
+                rssiInterlaved = True
 
                 # Create Interleaved RSSI interface
-                rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2)
+                self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2, jumbo = True)
                 
                 # Connect the SRPv3 to tDest = 0x0
-                srp = rogue.protocols.srp.SrpV3()
-                pr.streamConnectBiDir( srp, rudp.application(dest=0x0) )
+                self.srp = rogue.protocols.srp.SrpV3()
+                pr.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
                 
             elif ( commType == 'pcie-fsbl' ):
             
+                # Using PackVer2 after the DMA in firmware
+                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,pcieRssiLink,1)
+                self.pack = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
+                pr.streamConnectBiDir( self.pack.transport(), self.dma )
+
                 # Connect the SRPv0 to tDest = 0x0
-                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+0,1)
-                srp = rogue.protocols.srp.SrpV0()              
-                pr.streamConnectBiDir( srp, vc0Srp )          
-                    
+                self.srp = rogue.protocols.srp.SrpV0()
+                pr.streamConnectBiDir( self.srp, self.pack.application(0x0) )            
+
             elif ( commType == 'pcie-rssi-interleaved' ):
             
                 # Update the flag
-                rssiInterlaved = True               
-
-                #########################################################################################
-                # Assumes this PCIe card Configuration:
-                #########################################################################################
-                # constant NUM_LINKS_C     : positive := 1;
-                # constant RSSI_PER_LINK_C : positive := 6;
-                # constant RSSI_STREAMS_C  : positive := 3;
-                # constant AXIS_PER_LINK_C : positive := RSSI_PER_LINK_C*RSSI_STREAMS_C;
-                # constant NUM_AXIS_C      : positive := NUM_LINKS_C*AXIS_PER_LINK_C;
-                # constant NUM_RSSI_C      : positive := NUM_LINKS_C*RSSI_PER_LINK_C;
-                #########################################################################################
-               
-                #########################################################################################
-                # Assumes this RSSI Wrapper TDEST Mapping:
-                #########################################################################################
-                #   APP_STREAM_ROUTES_G => (
-                #       0 => X"00",         -- TDEST 0 routed to stream 0 (SRPv3)
-                #       1 => "10------",    -- TDEST x80-0xBF routed to stream 1 (Raw Data)
-                #       2 => "11------"),   -- TDEST 0xC0-0xFF routed to stream 2 (Application)  
-                #########################################################################################
+                rssiInterlaved = True
             
-                # Connect the SRPv3 to tDest = 0x0
-                vc0Srp  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+0,1)
-                srp = rogue.protocols.srp.SrpV3()                
-                pr.streamConnectBiDir( srp, vc0Srp )   
+                # Using PackVer2 after the DMA in firmware
+                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,pcieRssiLink,1)
+                self.pack = self.stream = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
+                pr.streamConnectBiDir( self.pack.transport(), self.dma )
 
-                # Create the Raw Data stream interface (TDEST x80-0xBF routed to stream 1 (Raw Data))
-                self.stream = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*3)+1,1)
-                
-                #########################################################################################
-                # Note: (pcieRssiLink*3)+2 <--> TDEST 0xC0-0xFF routed to stream 2 (Application) 
-                #        not include in this device and assumed to be attached to c++ or python in separate code
-                #########################################################################################
-
+                # TDEST 0 routed to stream 0 (SRPv3)
+                self.srp = rogue.protocols.srp.SrpV3()
+                pr.streamConnectBiDir( self.srp, self.pack.application(0x0) )
+                    
             # Undefined device type
             else:
                 raise ValueError("Invalid type (%s)" % (commType) )
 
         # Add devices
         self.add(AmcCarrierCore(
-            memBase           = srp,
+            memBase           = self.srp,
             offset            = 0x00000000,
             rssiInterlaved    = rssiInterlaved,
             rssiNotInterlaved = rssiNotInterlaved,
@@ -170,7 +151,7 @@ class TopLevel(pr.Device):
             enableMps         = enableMps,
         ))
         self.add(AppTop(
-            memBase      = srp,
+            memBase      = self.srp,
             offset       = 0x80000000,
             numRxLanes   = numRxLanes,
             numTxLanes   = numTxLanes,

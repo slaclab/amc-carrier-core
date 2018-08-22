@@ -56,6 +56,7 @@ class AmcMicrowaveMuxCore(pr.Device):
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
             self.checkBlocks(recurse=True)
+            self.DBG.Init()
             self.LMK.Init()
             self.DAC[0].Init()
             self.DAC[1].Init()

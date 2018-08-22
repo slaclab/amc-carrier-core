@@ -55,6 +55,7 @@ entity AmcCarrierCoreFsbl is
       timingPhyRst         : out   sl;
       timingRefClk         : out   sl;
       timingRefClkDiv2     : out   sl;
+      timingTrig           : out   TimingTrigType;      
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -362,6 +363,7 @@ begin
          timingClk            => timingClk,
          timingRst            => timingRst,
          timingBusIntf        => timingBusIntf,
+         timingTrig           => timingTrig,
          timingPhy            => timingPhy,
          timingPhyClk         => timingPhyClk,
          timingPhyRst         => timingPhyRst,

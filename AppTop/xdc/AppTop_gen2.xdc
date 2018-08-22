@@ -364,9 +364,9 @@ create_clock -name jesdClk12 -period 3.255 [get_ports {jesdClkP[1][2]}]
 create_clock -name jesdClk13 -period 3.255 [get_ports {jesdClkP[1][3]}]
 create_clock -name mpsClkIn  -period 8.000 [get_ports {mpsClkIn}]
 
-create_generated_clock -name mpsClk625MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT0}] 
-create_generated_clock -name mpsClk312MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT1}] 
-create_generated_clock -name mpsClk125MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_ClkManagerMps/MmcmGen.U_Mmcm/CLKOUT2}] 
+create_generated_clock -name mpsClk625MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_MpsSerdesPll/CLKOUT0}] 
+create_generated_clock -name mpsClk312MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_Bufg312/O}] 
+create_generated_clock -name mpsClk125MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_Bufg125/O}] 
 create_clock           -name mpsClkThresh  -period 16.000 [get_pins {U_Core/U_AppMps/U_Clk/U_PLL/PllGen.U_Pll/CLKOUT0}]
 
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {mpsClk625MHz}]

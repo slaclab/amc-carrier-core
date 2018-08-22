@@ -2,7 +2,7 @@
 -- File       : AmcCarrierTiming.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-03-16
+-- Last update: 2018-08-05
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ entity AmcCarrierTiming is
       TPD_G             : time     := 1 ns;
       TIME_GEN_APP_G    : boolean  := false;
       TIME_GEN_EXTREF_G : boolean  := false;
-      CORE_TRIGGERS_G   : positive := 16;
+      CORE_TRIGGERS_G   : natural  := 16;
       TRIG_PIPE_G       : natural  := 0;
       STREAM_L1_G       : boolean  := true;
       RX_CLK_MMCM_G     : boolean  := false);
@@ -133,8 +133,9 @@ architecture mapping of AmcCarrierTiming is
    signal loopback       : slv(2 downto 0);
    signal refclksel      : slv(2 downto 0);
    signal appBus         : TimingBusType;
-   signal appExptBus     : ExptBusType;
    signal appTimingMode  : sl;
+   signal timingStrobe   : sl;
+   signal timingValid    : sl;
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(2 downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray (2 downto 0) := (others => AXI_LITE_WRITE_SLAVE_INIT_C);
@@ -305,8 +306,7 @@ begin
          TPGEN_G           => TIME_GEN_APP_G,
          STREAM_L1_G       => STREAM_L1_G,
          ETHMSG_AXIS_CFG_G => EMAC_AXIS_CONFIG_C,
-         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr,
-         AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr)
       port map (
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,
@@ -322,7 +322,6 @@ begin
          appTimingRst    => appTimingRst,
          appTimingMode   => appTimingMode,
          appTimingBus    => appBus,
-         exptBus         => appExptBus,
          timingPhy       => coreTimingPhy,
          timingClkSel    => timingClockSel,
          axilClk         => axilClk,
@@ -339,16 +338,20 @@ begin
    process(appTimingClk)
    begin
       if rising_edge(appTimingClk) then
-         appTimingBus.strobe <= appBus.strobe after TPD_G;  -- Pipeline for register replication during impl_1
-         appTimingBus.valid  <= appBus.valid  after TPD_G;  -- Pipeline for register replication during impl_1
+         timingStrobe <= appBus.strobe after TPD_G;  -- Pipeline for register replication during impl_1
+         timingValid  <= appBus.valid  after TPD_G;  -- Pipeline for register replication during impl_1
       end if;
    end process;
 
    -- No pipelining: message, V1, and V2 only updated during strobe's HIGH cycle
-   appTimingBus.message <= appBus.message;
-   appTimingBus.stream  <= appBus.stream;
-   appTimingBus.v1      <= appBus.v1;
-   appTimingBus.v2      <= appBus.v2;
+   process(appBus, timingStrobe, timingValid)
+      variable v : TimingBusType;
+   begin
+      v        := appBus;
+      v.strobe := timingStrobe;
+      v.valid  := timingValid;
+      appTimingBus <= v;
+   end process;
 
    -- Declaring the primitive because it's DCP output
    U_timingClkSel : OBUF
@@ -379,7 +382,6 @@ begin
             evrClk          => appTimingClk,
             evrRst          => appTimingRst,
             evrBus          => appBus,
-            exptBus         => appExptBus,
             trigOut         => appTimingTrig,
             evrModeSel      => appTimingMode);
    end generate;

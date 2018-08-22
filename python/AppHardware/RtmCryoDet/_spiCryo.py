@@ -25,4 +25,21 @@ class SpiCryo(pr.Device):
             description = "SpiCryo module", 
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-                     
+
+        self.add(pr.RemoteVariable(
+            name        = "write",
+            description = "write - 32 bits",
+            offset      = 0x0,
+            bitSize     = 32,
+            base        = pr.UInt,
+            mode        = "WO",
+        ))
+        
+        self.add(pr.RemoteVariable(
+            name        = "read",
+            description = "read - 32 bits",
+            offset      = 0x4,
+            bitSize     = 32,
+            base        = pr.UInt,
+            mode        = "RO",
+        ))
