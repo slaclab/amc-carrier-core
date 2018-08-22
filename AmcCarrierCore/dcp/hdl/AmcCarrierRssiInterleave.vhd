@@ -66,7 +66,7 @@ architecture mapping of AmcCarrierRssiInterleave is
 
    constant APP_STREAMS_C      : positive := 6;
    constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
-   constant WINDOW_ADDR_SIZE_C : positive := 5;       -- 32 buffers (2^5)
+   constant WINDOW_ADDR_SIZE_C : positive := 4;       -- 16 buffers (2^4)
    constant MAX_SEG_SIZE_C     : positive := 8192;    -- Jumbo frame chucking
 
    constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_C-1 downto 0) := (others => ETH_AXIS_CONFIG_C);
@@ -109,7 +109,7 @@ begin
          RETRANSMIT_ENABLE_G => true,
          WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
          MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
-         MAX_RETRANS_CNT_G   => 16
+         MAX_RETRANS_CNT_G   => 16,
          APP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
          TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C)
       port map (
