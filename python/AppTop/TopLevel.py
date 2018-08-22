@@ -130,22 +130,12 @@ class TopLevel(pr.Device):
             
                 # Using PackVer2 after the DMA in firmware
                 self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,pcieRssiLink,1)
-                self.pack = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
+                self.pack = self.stream = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
                 pr.streamConnectBiDir( self.pack.transport(), self.dma )
 
                 # TDEST 0 routed to stream 0 (SRPv3)
                 self.srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( self.srp, self.pack.application(0x0) )
-
-                # TDEST x80-0x87 routed to stream 4 (Raw Data)
-                self.rawData = [None] * 8
-                for i in range(8):
-                    self.rawData[i] = self.pack.application(0x80+i)
-
-                # TDEST 0xC0-0xFF routed to stream 5 (Application) 
-                self.appData = [None] * 64
-                for i in range(64):
-                    self.appData[i] = self.pack.application(0xC0+i)
                     
             # Undefined device type
             else:
