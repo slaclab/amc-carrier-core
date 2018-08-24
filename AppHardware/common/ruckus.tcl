@@ -8,7 +8,7 @@ set family [getFpgaFamily]
 loadSource -dir "$::DIR_PATH/rtl"
 
 # Load AMC BAY[0] constraints files
-if { $::env(AMC_TYPE_BAY0) != "AmcMpsSfp" } {
+if { $::env(AMC_TYPE_BAY0) eq {AmcMpsSfp} } {
    set temp "AmcMpsSfp uses special JESD mapping"
 } else {
    loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay0.xdc"  
@@ -19,7 +19,7 @@ if { $::env(AMC_TYPE_BAY0) != "AmcMpsSfp" } {
 }
 
 # Load AMC BAY[1] constraints files
-if { $::env(AMC_TYPE_BAY1) != "AmcMpsSfp" } {
+if { $::env(AMC_TYPE_BAY1) eq {AmcMpsSfp} } {
    set temp "AmcMpsSfp uses special JESD mapping"
 } else {
    loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay1.xdc"  
