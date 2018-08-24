@@ -1,9 +1,19 @@
 # Load RUCKUS library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
+# Get the family type
+set family [getFpgaFamily]
+
 # Load Source Code
 loadSource -dir "$::DIR_PATH/rtl/"
-loadSource -path "$::DIR_PATH/coregen/MpsPgpGthCore.dcp"
+
+loadSource -path "$::DIR_PATH/coregen/${family}/MpsPgpGthCore.dcp"
+# loadIpCore -path "$::DIR_PATH/coregen/${family}/MpsPgpGthCore.xci"
+
+if { ${family} eq {kintexuplus} } {
+   loadSource -path "$::DIR_PATH/coregen/${family}/MpsPgpGtyCore.dcp"
+   # loadIpCore -path "$::DIR_PATH/coregen/${family}/MpsPgpGtyCore.xci"
+}
 
 if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
 
