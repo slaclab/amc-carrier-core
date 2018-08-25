@@ -42,7 +42,7 @@ entity RtmEmptyCore is
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
       --  RTM's Clock Reference
-      genClkP         : in    sl                     := '0'
+      genClkP         : in    sl                     := '0';
       genClkN         : in    sl                     := '0');
 end RtmEmptyCore;
 
