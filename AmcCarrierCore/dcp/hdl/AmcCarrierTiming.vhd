@@ -38,6 +38,7 @@ entity AmcCarrierTiming is
       TPD_G             : time     := 1 ns;
       TIME_GEN_APP_G    : boolean  := false;
       TIME_GEN_EXTREF_G : boolean  := false;
+      DISABLE_TIME_GT_G : boolean  := false;
       CORE_TRIGGERS_G   : natural  := 16;
       TRIG_PIPE_G       : natural  := 0;
       STREAM_L1_G       : boolean  := true;
@@ -217,9 +218,10 @@ begin
    -------------------------------------------------------------------------------------------------
    TimingGthCoreWrapper_1 : entity work.TimingGtCoreWrapper
       generic map (
-         TPD_G            => TPD_G,
-         AXIL_BASE_ADDR_G => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_GTH_INDEX_C).baseAddr,
-         EXTREF_G         => TIME_GEN_EXTREF_G)
+         TPD_G             => TPD_G,
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_GTH_INDEX_C).baseAddr,
+         EXTREF_G          => TIME_GEN_EXTREF_G,
+         DISABLE_TIME_GT_G => DISABLE_TIME_GT_G)
       port map (
          axilClk         => axilClk,
          axilRst         => axilRst,
