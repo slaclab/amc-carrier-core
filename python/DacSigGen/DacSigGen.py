@@ -131,7 +131,7 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
-            number       =  2,
+            number       =  self._numOfChs,
             stride       =  4,
         )
                 
