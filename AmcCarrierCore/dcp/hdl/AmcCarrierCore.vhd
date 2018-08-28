@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-08-05
+-- Last update: 2018-08-28
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -220,9 +220,9 @@ begin
 
    waveformClk <= axiClk;
    waveformRst <= axiRst;
-   
+
    stableClk <= fabClk;
-   stableRst <= fabRst;   
+   stableRst <= fabRst;
 
    --------------------------------
    -- Common Clock and Reset Module
@@ -267,10 +267,10 @@ begin
          NUM_CLOCKS_G      => 1,
          -- MMCM attributes
          BANDWIDTH_G       => "OPTIMIZED",
-         CLKIN_PERIOD_G    => 12.8,
-         DIVCLK_DIVIDE_G   => 1,
-         CLKFBOUT_MULT_G   => 16,
-         CLKOUT0_DIVIDE_G  => 16)
+         CLKIN_PERIOD_G    => 12.8,     -- 78.125MHz
+         DIVCLK_DIVIDE_G   => 1,        -- 78.125MHz = 78.125MHz/1
+         CLKFBOUT_MULT_G   => 16,       -- 1.25GHz=78.125MHz*16
+         CLKOUT0_DIVIDE_G  => 8)        -- 156.25MHz=1.25GHz/8
       port map(
          -- Clock Input
          clkIn     => fabClk,
@@ -364,7 +364,7 @@ begin
          STREAM_L1_G       => true)
       port map (
          stableClk            => fabClk,
-         stableRst            => fabRst,      
+         stableRst            => fabRst,
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
          axilRst              => axilRst,
