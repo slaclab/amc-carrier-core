@@ -104,6 +104,8 @@ entity AmcCarrierCoreAdv is
       recTimingClk         : out   sl;
       recTimingRst         : out   sl;
       gthFabClk            : out   sl;
+      stableClk            : out   sl;
+      stableRst            : out   sl;      
       -- Misc. Interface (axilClk domain)
       ipmiBsi              : out   BsiBusType;
       ethPhyReady          : out   sl;
@@ -430,6 +432,8 @@ begin
          ref156MHzClk         => ref156MHzClk,
          ref156MHzRst         => ref156MHzRst,
          gthFabClk            => gthFabClk,
+         stableClk            => stableClk,
+         stableRst            => stableRst,
          ------------------------         
          -- Core Ports to Wrapper
          ------------------------         

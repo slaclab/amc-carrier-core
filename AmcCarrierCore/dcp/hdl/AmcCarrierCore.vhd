@@ -89,6 +89,8 @@ entity AmcCarrierCore is
       recTimingRst         : out   sl;
       ref156MHzClk         : out   sl;
       ref156MHzRst         : out   sl;
+      stableClk            : out   sl;
+      stableRst            : out   sl;
       gthFabClk            : out   sl;
       ------------------------         
       -- Core Ports to Wrapper
@@ -218,6 +220,9 @@ begin
 
    waveformClk <= axiClk;
    waveformRst <= axiRst;
+   
+   stableClk <= fabClk;
+   stableRst <= fabRst;   
 
    --------------------------------
    -- Common Clock and Reset Module
@@ -225,7 +230,7 @@ begin
    U_IBUFDS : entity work.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
          REFCLK_ICNTL_RX    => "00")
       port map (
          I     => fabClkP,
@@ -262,10 +267,10 @@ begin
          NUM_CLOCKS_G      => 1,
          -- MMCM attributes
          BANDWIDTH_G       => "OPTIMIZED",
-         CLKIN_PERIOD_G    => 6.4,
+         CLKIN_PERIOD_G    => 12.8,
          DIVCLK_DIVIDE_G   => 1,
-         CLKFBOUT_MULT_G   => 8,
-         CLKOUT0_DIVIDE_G  => 8)
+         CLKFBOUT_MULT_G   => 16,
+         CLKOUT0_DIVIDE_G  => 16)
       port map(
          -- Clock Input
          clkIn     => fabClk,
@@ -358,6 +363,8 @@ begin
          TRIG_PIPE_G       => TRIG_PIPE_G,
          STREAM_L1_G       => true)
       port map (
+         stableClk            => fabClk,
+         stableRst            => fabRst,      
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
          axilRst              => axilRst,

@@ -5,7 +5,8 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 set family [getFpgaFamily]
 
 # Load Source Code
-loadSource -dir "$::DIR_PATH/rtl/"
+loadSource -dir "$::DIR_PATH/rtl"
+loadSource -dir "$::DIR_PATH/rtl/${family}"
 
 loadSource -path "$::DIR_PATH/coregen/${family}/MpsPgpGthCore.dcp"
 # loadIpCore -path "$::DIR_PATH/coregen/${family}/MpsPgpGthCore.xci"

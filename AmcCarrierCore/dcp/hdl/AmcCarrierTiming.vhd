@@ -44,6 +44,8 @@ entity AmcCarrierTiming is
       STREAM_L1_G       : boolean  := true;
       RX_CLK_MMCM_G     : boolean  := false);
    port (
+      stableClk            : in  sl;
+      stableRst            : in  sl;
       -- AXI-Lite Interface (axilClk domain)
       axilClk              : in  sl;
       axilRst              : in  sl;
@@ -229,7 +231,8 @@ begin
          axilReadSlave   => axilReadSlaves (AXIL_GTH_INDEX_C),
          axilWriteMaster => axilWriteMasters(AXIL_GTH_INDEX_C),
          axilWriteSlave  => axilWriteSlaves (AXIL_GTH_INDEX_C),
-         stableClk       => axilClk,
+         stableClk       => stableClk,
+         stableRst       => stableRst,
          gtRefClk        => timingRefClk,
          gtRefClkDiv2    => timingRefClkDiv2,
          gtRxP           => timingRxP,
