@@ -2,7 +2,7 @@
 -- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
--- Last update: 2018-08-15
+-- Last update: 2018-08-28
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -33,6 +33,9 @@ entity AmcMicrowaveMuxCore is
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
+      -- Timing Interface (timingClk domain) 
+      timingClk       : in    sl;
+      timingRst       : in    sl;
       -- JESD Interface
       jesdClk         : in    sl;
       jesdSysRef      : out   sl;
@@ -271,6 +274,18 @@ begin
    -- LMK SYNC
    jtagSec(3) <= lmkSync;
 
+   -- LMK CLKin0
+   U_LmkClk0 : entity work.ClkOutBufDiff
+      generic map (
+         TPD_G        => TPD_G,
+         INVERT_G     => true,  -- Fix polarity swap in AMC card hardware
+         XIL_DEVICE_G => "ULTRASCALE")
+      port map (
+         clkIn   => timingClk,
+         rstIn   => timingRst,
+         clkOutP => fpgaClkP(0),
+         clkOutN => fpgaClkN(0));
+
    -- PLL SPI
    spareP(12) <= pllSpiClk;
    spareN(12) <= pllSpiDi;
@@ -282,16 +297,16 @@ begin
    -- ADC resets remapping
    spareN(3)   <= axilRst or adcCoreRst(0);
    syncOutN(9) <= axilRst or adcCoreRst(1);
-   
+
    -- HMC305 Ports
    syncOutP(1) <= hmc305Addr(0);
    syncOutN(1) <= hmc305Sdi;
-   
-   syncInP(1) <= hmc305Sck; -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
+
+   syncInP(1) <= hmc305Sck;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
    syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware 
-   
+
    syncOutP(2) <= hmc305Addr(1);
-   syncOutN(2) <= hmc305Addr(2);   
+   syncOutN(2) <= hmc305Addr(2);
 
    -- HMC305 Ports
    syncOutP(1) <= hmc305Addr(0);
