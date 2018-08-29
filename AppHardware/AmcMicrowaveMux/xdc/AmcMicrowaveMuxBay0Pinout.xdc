@@ -55,6 +55,10 @@ set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][9]}] 
 # LMK SYNC
 set_property -dict { IOSTANDARD LVCMOS25 PULLUP true } [get_ports {jtagSec[0][3]}]  ; # lmkSync
 
+# LMK CLKin0
+set_property -dict {IOSTANDARD LVDS } [get_ports {fpgaClkP[0][0]}] ; #LMK.CLKin0 
+set_property -dict {IOSTANDARD LVDS } [get_ports {fpgaClkN[0][0]}] ; #LMK.CLKin0
+
 # PLL SPI
 set_property -dict { IOSTANDARD LVCMOS18 SLEW SLOW DRIVE 2 } [get_ports {spareP[0][12]}]    ; # pllSpiClk
 set_property -dict { IOSTANDARD LVCMOS18 SLEW SLOW DRIVE 2 } [get_ports {spareN[0][12]}]    ; # pllSpiDio
