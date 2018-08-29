@@ -79,11 +79,11 @@ class AmcMicrowaveMuxCore(pr.Device):
             
         @self.command(description="Select internal LMK reference",)
         def SelIntLmkRef():
-            self.LMK.LmkReg_0x0147.set(0x1A)
+            self.LMK.LmkReg_0x0147.set(0xA)
 
         @self.command(description="Select external LMK reference",)
         def SelExtLmkRef():
-            self.LMK.LmkReg_0x0147.set(0xA)
+            self.LMK.LmkReg_0x0147.set(0x1A)
 
         @self.command(description="Enable Front Panel LMK reference",)
         def CmdEnLmkRef():            
