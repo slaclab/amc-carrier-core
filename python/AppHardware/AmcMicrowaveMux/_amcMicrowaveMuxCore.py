@@ -47,8 +47,8 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.add(Lmk04828(          offset=0x00020000,name='LMK',    expand=False))
         self.add(Dac38J84(          offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
         self.add(Dac38J84(          offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
-        self.add(Adc32Rf45(         offset=0x00080000,name='ADC[0]', expand=False))
-        self.add(Adc32Rf45(         offset=0x000C0000,name='ADC[1]', expand=False))
+        self.add(Adc32Rf45(         offset=0x00100000,name='ADC[0]', expand=False))
+        self.add(Adc32Rf45(         offset=0x00180000,name='ADC[1]', expand=False))
 
         ##########
         # Commands
