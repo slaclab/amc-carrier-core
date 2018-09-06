@@ -8,8 +8,6 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-set_property -dict { PACKAGE_PIN V12 IOSTANDARD ANALOG } [get_ports {vPIn}]
-
 set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes [current_design]
 set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 1     [current_design]
 set_property BITSTREAM.CONFIG.SPI_FALL_EDGE No   [current_design]
