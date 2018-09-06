@@ -55,15 +55,36 @@ class AmcMicrowaveMuxCore(pr.Device):
         ##########
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            self.checkBlocks(recurse=True)
+            # Enable devices
+            self.DBG.enable.set(True)
+            self.LMK.enable.set(True)
+            self.DAC[0].enable.set(True)
+            self.DAC[1].enable.set(True)
+            self.ADC[0].enable.set(True)
+            self.ADC[1].enable.set(True)
+
             self.DBG.Init()
-            self.LMK.Init()
             self.DAC[0].Init()
             self.DAC[1].Init()
-            self.ADC[0].Init()
-            self.ADC[1].Init()
+#            self.ADC[0].Init()
+#            self.ADC[1].Init()
+
+            time.sleep(0.2)
+            self.ADC[0].DigRst()
+            self.ADC[1].DigRst()
+
+            # pulse SysRef
+            self.LMK.PwrUpSysRef()
             self.checkBlocks(recurse=True)            
             
+        @self.command(description="Select internal LMK reference",)
+        def SelIntLmkRef():
+            self.LMK.LmkReg_0x0147.set(0x1A)
+
+        @self.command(description="Select external LMK reference",)
+        def SelExtLmkRef():
+            self.LMK.LmkReg_0x0147.set(0xA)
+
         @self.command(description="Enable Front Panel LMK reference",)
         def CmdEnLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x7) 
@@ -105,31 +126,34 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.ADC[0].enable.set(True)
         self.ADC[1].enable.set(True)       
         
-        #self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.PLL[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.PLL[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[1].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.PLL[2].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[2].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.PLL[3].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[3].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
-        self.InitAmcCard()
-        
-        #self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
+
+        self.ADC[0].HW_RST.set(0x1)
+        self.ADC[1].HW_RST.set(0x1)
+
+        self.ADC[0].HW_RST.set(0x0)
+        self.ADC[1].HW_RST.set(0x0)
+
+        time.sleep(0.10)
+
+        # must pulse SYSREF before SPI to ADC
+        self.LMK.Init()
+
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
-        
+
         self._root.checkBlocks(recurse=True)
+        self.ADC[0].Init()
+        self.ADC[1].Init()
+
         self.ADC[0].DigRst()
         self.ADC[1].DigRst()
         
@@ -139,10 +163,10 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.PLL[3].RegInitSeq()        
         
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
-        self.DAC[0].enable.set(False)
-        self.DAC[1].enable.set(False)
-        self.ADC[0].enable.set(False)
-        self.ADC[1].enable.set(False)          
+        # self.DAC[0].enable.set(False)
+        # self.DAC[1].enable.set(False)
+        # self.ADC[0].enable.set(False)
+        # self.ADC[1].enable.set(False)
         # self.PLL[0].enable.set(False)
         # self.PLL[1].enable.set(False)
         # self.PLL[2].enable.set(False)
