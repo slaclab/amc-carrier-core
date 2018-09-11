@@ -153,7 +153,7 @@ begin
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
-            VALID_THOLD_G       => 0,
+            VALID_THOLD_G       => 0, -- 0 = only when frame ready
             BRAM_EN_G           => true,
             XIL_DEVICE_G        => "ULTRASCALE",
             USE_BUILT_IN_G      => false,
@@ -161,7 +161,6 @@ begin
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 9,
             FIFO_FIXED_THRESH_G => true,
-            FIFO_PAUSE_THRESH_G => 1,                       --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
             SLAVE_AXI_CONFIG_G  => WAVEFORM_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)  -- 128-bit
          port map (
@@ -169,7 +168,6 @@ begin
             sAxisRst    => waveformRst,
             sAxisMaster => ibWaveformMasters(i),
             sAxisSlave  => ibWaveformSlaves(i).slave,
-            sAxisCtrl   => open,
             mAxisClk    => axiClk,
             mAxisRst    => axiRst,
             mAxisMaster => muxInAxisMaster(i),
@@ -198,7 +196,7 @@ begin
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
-         VALID_THOLD_G       => 1,
+         VALID_THOLD_G       => 0, -- 0 = only when frame ready
          BRAM_EN_G           => true,
          XIL_DEVICE_G        => "ULTRASCALE",
          USE_BUILT_IN_G      => false,
@@ -206,7 +204,6 @@ begin
          CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 9,
          FIFO_FIXED_THRESH_G => true,
-         FIFO_PAUSE_THRESH_G => 2**9-32,
          SLAVE_AXI_CONFIG_G  => WRITE_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)
       port map (
