@@ -31,7 +31,7 @@ entity DaqMuxV2 is
       DECIMATOR_EN_G         : boolean               := true;
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 8 := 4;
       FRAME_BWIDTH_G         : positive              := 10;  -- Axi stream frame size Dafault 10: 4096 byte frames
-      BAY_INDEX_G            : sl;
+      BAY_INDEX_G            : sl                    := '0';
       -- Number of data lanes
       N_DATA_IN_G            : positive              := 16;
       --Number of output Axi Stream Lanes
