@@ -289,7 +289,7 @@ begin
          BURST_SIZE_BYTES_G    => 4096,
          SSI_OUTPUT_G          => true,
          AXIL_BASE_ADDR_G      => AXIL_BASE_ADDR_G,
-         AXI_STREAM_READY_EN_G => true,
+         AXI_STREAM_READY_EN_G => false, -- using readDmaDataCtrl for flow control
          AXI_STREAM_CONFIG_G   => READ_AXIS_CONFIG_C,
          AXI_READ_CONFIG_G     => AXI_CONFIG_G)
       port map (
@@ -317,18 +317,17 @@ begin
    AxiStreamFifo_RD_DATA : entity work.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
-         SLAVE_READY_EN_G    => true,
+         SLAVE_READY_EN_G    => false, -- using readDmaDataCtrl for flow control
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => false,
-         XIL_DEVICE_G        => "ULTRASCALE",
-         USE_BUILT_IN_G      => false,
+         INT_WIDTH_SELECT_G  => "CUSTOM",
+         INT_DATA_WIDTH_G    => 16, --  16B = 128-bit
+         BRAM_EN_G           => true,
          GEN_SYNC_FIFO_G     => false,
-         CASCADE_SIZE_G      => 1,
-         FIFO_ADDR_WIDTH_G   => 4,
+         FIFO_ADDR_WIDTH_G   => 9, -- 8kB buffer (512 x 16B)
          FIFO_FIXED_THRESH_G => true,
-         FIFO_PAUSE_THRESH_G => 1,
+         FIFO_PAUSE_THRESH_G => 128,  -- 2048 byte threshold 
          SLAVE_AXI_CONFIG_G  => READ_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C) 
       port map (
          sAxisClk    => axiClk,
          sAxisRst    => axiRst,
@@ -338,7 +337,7 @@ begin
          mAxisClk    => axisDataClk,
          mAxisRst    => axisDataRst,
          mAxisMaster => axisDataMaster,
-         mAxisSlave  => axisDataSlave);
+         mAxisSlave  => axisDataSlave); 
 
    -------------------------------------------------------------------------------------------------
    -- AxiLite crossbar to allow AxiStreamDmaRingRead to access AxiStreamDmaRingWrite registers
