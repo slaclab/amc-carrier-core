@@ -26,16 +26,18 @@ class AmcGenericAdcDacCtrl(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
                         
-        self.add(pr.RemoteVariable( 
+        self.addRemoteVariables( 
             name         = "AdcValidCnt",
             description  = "ADC Valid Transition Counter[3:0]",
             offset       = 0x00,
-            bitSize      = 4,
-            bitOffset    = 0,
+            bitSize      = 32,
+            bitOffset    = 0,            
+            number       = 4,
+            stride       = 4,
             base         = pr.UInt,
             mode         = "RO",
             pollInterval = 1,
-        ))  
+        )
 
         self.add(pr.RemoteVariable( 
             name         = "AdcValid",

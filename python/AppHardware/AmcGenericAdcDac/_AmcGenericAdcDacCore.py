@@ -43,10 +43,10 @@ class AmcGenericAdcDacCore(pr.Device):
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
             self.checkBlocks(recurse=True)
-            self.ADC[0].CalibrateAdc()
-            self.ADC[1].CalibrateAdc()
             self.LMK.Init()
             self.DAC.Init()        
+            self.ADC[0].CalibrateAdc()
+            self.ADC[1].CalibrateAdc()
             self.checkBlocks(recurse=True)  
            
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
