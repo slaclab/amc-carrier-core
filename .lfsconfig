@@ -1,3 +1,0 @@
-#Fetch LFS from github
-[lfs]
-  url = "git@github.com:slaclab/amc-carrier-core"
