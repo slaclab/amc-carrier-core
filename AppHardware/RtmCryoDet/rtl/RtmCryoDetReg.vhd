@@ -34,7 +34,7 @@ entity RtmCryoDetReg is
       kRelay          : in  slv(1 downto 0);
       rampMaxCnt      : out slv(31 downto 0);
       enableRamp      : out sl;
-      rampStartMode   : out sl;
+      rampStartMode   : out slv(1 downto 0);
       selRamp         : out sl;
       pulseWidth      : out slv(15 downto 0);
       debounceWidth   : out slv(15 downto 0);
@@ -55,7 +55,7 @@ architecture rtl of RtmCryoDetReg is
       highCycle      : slv(CNT_WIDTH_G-1 downto 0);
       rampMaxCnt     : slv(31 downto 0);
       enableRamp     : sl;
-      rampStartMode  : sl;
+      rampStartMode  : slv(1 downto 0);
       selRamp        : sl;
       pulseWidth     : slv(15 downto 0);
       debounceWidth  : slv(15 downto 0);
@@ -69,7 +69,7 @@ architecture rtl of RtmCryoDetReg is
       highCycle      => toSlv(2, CNT_WIDTH_G),  -- 3 cycles low by default (zero inclusive)
       rampMaxCnt     => (others => '0'),
       enableRamp     => '0',
-      rampStartMode  => '0',
+      rampStartMode  => (others => '0'),
       selRamp        => '0',
       pulseWidth     => (others => '0'),
       debounceWidth  => (others => '0'),
@@ -137,17 +137,17 @@ begin
    Sync_selRamp : entity work.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 4)
+         WIDTH_G => 5)
       port map (
-         clk        => jesdClk,
-         dataIn(0)  => r.enableRamp,
-         dataIn(1)  => r.rampStartMode,
-         dataIn(2)  => r.selRamp,
-         dataIn(3)  => r.rtmReset,
-         dataOut(0) => enableRamp,
-         dataOut(1) => rampStartMode,
-         dataOut(2) => selRamp,
-         dataOut(3) => rtmReset);
+         clk                  => jesdClk,
+         dataIn(0)            => r.enableRamp,
+         dataIn(2 downto 1)   => r.rampStartMode,
+         dataIn(3)            => r.selRamp,
+         dataIn(4)            => r.rtmReset,
+         dataOut(0)           => enableRamp,
+         dataOut(2 downto 1)  => rampStartMode,
+         dataOut(3)           => selRamp,
+         dataOut(4)           => rtmReset);
 
    Sync_rampMaxCnt : entity work.SynchronizerVector
       generic map (
