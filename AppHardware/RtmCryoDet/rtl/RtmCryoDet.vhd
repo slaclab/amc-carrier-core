@@ -35,6 +35,8 @@ entity RtmCryoDet is
       -- JESD Clock Reference
       jesdClk         : in    sl;
       jesdRst         : in    sl;
+      -- Timing trigger
+      timingTrig      : in    sl;
       -- Digital I/O Interface
       startRamp       : out   sl;
       selectRamp      : out   sl;
@@ -121,7 +123,7 @@ architecture mapping of RtmCryoDet is
    signal extTrigSync   : sl;
    signal selRamp       : sl;
    signal enableRamp    : sl;
-   signal rampStartMode : sl;
+   signal rampStartMode : slv(1 downto 0);
    signal rtmReset      : sl;
    signal kRelay        : slv(1 downto 0);
    signal pulseWidth    : slv(15 downto 0);
@@ -129,6 +131,8 @@ architecture mapping of RtmCryoDet is
    signal rampMaxCnt    : slv(31 downto 0);
 
    signal startRampPulseReg : slv(1 downto 0);
+
+   signal timingTrigOneShot : sl;
 
 begin
 
@@ -216,11 +220,19 @@ begin
          dataIn  => extTrig,
          dataOut => extTrigSync);
 
+   U_TimingTrig : entity work.SynchronizerOneShot
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => jesdClk,
+         dataIn  => timingTrig,
+         dataOut => timingTrigOneShot);
+
    ------
    -- FSM
    ------
    comb : process (debounceWidth, enableRamp, extTrigSync, jesdRst, pulseWidth,
-                   r, rampMaxCnt, rampStartMode) is
+                   r, rampMaxCnt, rampStartMode, timingTrigOneShot) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
@@ -231,6 +243,7 @@ begin
       v.startRamp         := '0';
       v.startRampInt      := '0';
       v.startRampExtPulse := '0';
+      v.timingTrig        := timingTrigOneShot;
 
       ------------------------------------------------------------
       -- Internal Ramp Generation
@@ -284,9 +297,12 @@ begin
       -- Check if enabled
       if (enableRamp = '1') then
          -- Check ramp mode
-         if (rampStartMode = '0') then
+         if (rampStartMode = "00") then
             -- Select internal mode
             v.startRamp := r.startRampInt;
+         elsif (rampStartMode = "01") then
+            -- Select timing trigger
+            v.startRamp := r.timingTrig;
          else
             -- Select external mode
             v.startRamp := r.startRampExtPulse;
