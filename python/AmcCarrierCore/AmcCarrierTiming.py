@@ -22,6 +22,7 @@ import pyrogue as pr
 from LclsTimingCore.TimingFrameRx import *
 from LclsTimingCore.TPGMiniCore import *
 from LclsTimingCore.GthRxAlignCheck import *
+from LclsTimingCore.EvrV2CoreTriggers import *
 
 class AmcCarrierTiming(pr.Device):
     def __init__(   self, 
@@ -45,3 +46,7 @@ class AmcCarrierTiming(pr.Device):
         self.add(GthRxAlignCheck(
             offset = 0x00800000,
         ))        
+
+        self.add(EvrV2CoreTriggers(
+            offset = 0x00040000,
+        ))
