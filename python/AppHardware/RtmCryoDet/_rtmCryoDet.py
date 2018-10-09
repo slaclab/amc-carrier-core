@@ -107,9 +107,9 @@ class RtmCryoDet(pr.Device):
 
         self.add(pr.RemoteVariable(    
             name         = "RampStartMode",
-            description  = "0x0 = internal start ramp pulses, 0x1 = external start ramp pulses",
+            description  = "0x0 = internal start ramp pulses, 0x1 = timing system trigger, 0x2 = external start ramp pulses",
             offset       = 0x14,
-            bitSize      = 1,
+            bitSize      = 2,
             bitOffset    = 2,
             base         = pr.UInt,
             mode         = "RW",
