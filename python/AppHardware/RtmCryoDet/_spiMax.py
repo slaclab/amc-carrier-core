@@ -44,14 +44,14 @@ class SpiMax(pr.Device):
         # Variables
         ##############################
 
-        for i in range(0,225,32):
-            if i/32 < 7: 
+        for i in range(0,1056,32):
+            if i/32 <= 31:
                 j = i/32+1
                 str1 = "TesBias"
-            else: 
+            else:
                 j = 33
                 str1 = "HemtBias"
-                         
+
             self.add(pr.RemoteVariable(
                 name         = str1 + "DacNopRegCh[%d]" % (j),
                 description  = "BiasDac_Reg0",
@@ -62,8 +62,8 @@ class SpiMax(pr.Device):
                 base         = pr.UInt,
                 mode         = "WO",
             ))
-            
-            self.add(pr.RemoteVariable(    
+
+            self.add(pr.RemoteVariable(
                 name         = str1 + "DacDataRegCh[%d]" % (j),
                 description  = "BiasDac_Reg1",
                 offset       =  0x00 + (i+4),
@@ -72,8 +72,8 @@ class SpiMax(pr.Device):
                 base         = pr.Int,
                 mode         = "WO",
             ))
-            
-            self.add(pr.RemoteVariable(    
+
+            self.add(pr.RemoteVariable(
                 name         = str1 + "DacCtrlRegCh[%d]" % (j),
                 description  = "BiasDac_Reg2",
                 offset       =  0x00 + (i+8),
@@ -82,8 +82,8 @@ class SpiMax(pr.Device):
                 base         = pr.UInt,
                 mode         = "WO",
             ))
-            
-            self.add(pr.RemoteVariable(    
+
+            self.add(pr.RemoteVariable(
                 name         = str1 + "DacClrCRegCh[%d]" % (j),
                 description  = "BiasDac_Reg3",
                 offset       =  0x00 + (i+12),
