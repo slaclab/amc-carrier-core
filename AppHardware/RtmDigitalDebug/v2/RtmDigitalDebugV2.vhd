@@ -36,7 +36,7 @@ entity RtmDigitalDebugV2 is
    port (
       -- Digital I/O Interface
       din             : out   slv(7 downto 0);  -- digital inputs from the RTM: ASYNC (not registered in FPGA or RTM)  
-      dout            : in    slv(7 downto 0);  -- digital outputs to the RTM: If REG_DOUT_MODE_G[x] = '0', then dout[x] SYNC to recClkOut(1) domain else DOUT driven as clock output.
+      dout            : in    slv(7 downto 0);  -- digital outputs to the RTM: If REG_DOUT_MODE_G[x] = '0', then dout[x] SYNC to recClkOut(0) domain else DOUT driven as clock output.
       cout            : in    slv(7 downto 0);  -- clock outputs to the RTM (REG_DOUT_EN_G(x) = '1' and REG_DOUT_MODE_G(x) = '1')
       -- Clock Jitter Cleaner Interface
       recClkIn        : in    sl;
@@ -168,7 +168,7 @@ begin
          REG_DOUT_EN_G   => REG_DOUT_EN_G,
          REG_DOUT_MODE_G => REG_DOUT_MODE_G)
       port map (
-         clk     => clk(1),             -- Used for REG_DOUT_EN_G(x) = '1')
+         clk     => clk(0),             -- Used for REG_DOUT_EN_G(x) = '1')
          disable => userValueOut(7 downto 0),
          -- Digital Output Interface
          dout    => dout,
