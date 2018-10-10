@@ -45,13 +45,18 @@ entity RtmDigitalDebugV2 is
       recRstOut       : out   slv(1 downto 0);
       cleanClkOut     : out   sl;
       cleanClkLocked  : out   sl;
-      -- AXI-Lite Interface
+      -- AXI-Lite Interface (axilClk domain)
       axilClk         : in    sl;
       axilRst         : in    sl;
       axilReadMaster  : in    AxiLiteReadMasterType;
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- MMCM DRP Interface (axilClk domain)
+      mmcmReadMaster  : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+      mmcmReadSlave   : out   AxiLiteReadSlaveType;
+      mmcmWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+      mmcmWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
       -----------------------      
@@ -105,11 +110,18 @@ begin
          CLKOUT0_PHASE_G  => CLKOUT0_PHASE_G,
          CLKOUT1_PHASE_G  => CLKOUT1_PHASE_G)
       port map (
-         clkIn  => recClkIn,
-         rstIn  => recRstIn,
-         clkOut => clk,
-         rstOut => rst,
-         locked => userValueIn(0));
+         clkIn           => recClkIn,
+         rstIn           => recRstIn,
+         clkOut          => clk,
+         rstOut          => rst,
+         locked          => userValueIn(0),
+         -- AXI-Lite Interface 
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => mmcmReadMaster,
+         axilReadSlave   => mmcmReadSlave,
+         axilWriteMaster => mmcmWriteMaster,
+         axilWriteSlave  => mmcmWriteSlave);
 
    userValueIn(31 downto 1) <= (others => '0');
 
