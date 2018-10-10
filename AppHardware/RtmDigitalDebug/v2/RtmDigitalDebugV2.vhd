@@ -52,11 +52,11 @@ entity RtmDigitalDebugV2 is
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
-      -- MMCM DRP Interface (axilClk domain)
-      mmcmReadMaster  : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
-      mmcmReadSlave   : out   AxiLiteReadSlaveType;
-      mmcmWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-      mmcmWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- Optional FPGA's PLL DRP Interface (axilClk domain)
+      pllReadMaster   : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+      pllReadSlave    : out   AxiLiteReadSlaveType;
+      pllWriteMaster  : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+      pllWriteSlave   : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
       -----------------------      
@@ -118,10 +118,10 @@ begin
          -- AXI-Lite Interface 
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => mmcmReadMaster,
-         axilReadSlave   => mmcmReadSlave,
-         axilWriteMaster => mmcmWriteMaster,
-         axilWriteSlave  => mmcmWriteSlave);
+         axilReadMaster  => pllReadMaster,
+         axilReadSlave   => pllReadSlave,
+         axilWriteMaster => pllWriteMaster,
+         axilWriteSlave  => pllWriteSlave);
 
    userValueIn(31 downto 1) <= (others => '0');
 
