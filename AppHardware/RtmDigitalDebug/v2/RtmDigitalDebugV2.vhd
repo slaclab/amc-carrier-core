@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : RtmDigitalDebugV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-23
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -26,13 +24,15 @@ use unisim.vcomponents.all;
 
 entity RtmDigitalDebugV2 is
    generic (
-      TPD_G            : time            := 1 ns;
-      REG_DOUT_EN_G    : slv(7 downto 0) := x"00";  -- '1' = registered, '0' = unregistered
-      REG_DOUT_MODE_G  : slv(7 downto 0) := x"00";  -- If registered enabled, '1' = "cout" output, '0' = "dout" output
-      DIVCLK_DIVIDE_G  : positive        := 1;
-      CLKFBOUT_MULT_G  : positive        := 6;
-      CLKOUT0_DIVIDE_G : positive        := 6;
-      CLKOUT1_DIVIDE_G : positive        := 3);  -- drives the RTM's jitter clean input clock port
+      TPD_G            : time                       := 1 ns;
+      REG_DOUT_EN_G    : slv(7 downto 0)            := x"00";  -- '1' = registered, '0' = unregistered
+      REG_DOUT_MODE_G  : slv(7 downto 0)            := x"00";  -- If registered enabled, '1' = "cout" output, '0' = "dout" output
+      DIVCLK_DIVIDE_G  : positive                   := 1;
+      CLKFBOUT_MULT_G  : positive                   := 6;
+      CLKOUT0_DIVIDE_G : positive                   := 6;
+      CLKOUT1_DIVIDE_G : positive                   := 3;  -- drives the RTM's jitter clean input clock port
+      CLKOUT0_PHASE_G  : real range -360.0 to 360.0 := 0.0;
+      CLKOUT1_PHASE_G  : real range -360.0 to 360.0 := 0.0);
    port (
       -- Digital I/O Interface
       din             : out   slv(7 downto 0);  -- digital inputs from the RTM: ASYNC (not registered in FPGA or RTM)  
@@ -101,7 +101,9 @@ begin
          DIVCLK_DIVIDE_G  => DIVCLK_DIVIDE_G,
          CLKFBOUT_MULT_G  => CLKFBOUT_MULT_G,
          CLKOUT0_DIVIDE_G => CLKOUT0_DIVIDE_G,
-         CLKOUT1_DIVIDE_G => CLKOUT1_DIVIDE_G)
+         CLKOUT1_DIVIDE_G => CLKOUT1_DIVIDE_G,
+         CLKOUT0_PHASE_G  => CLKOUT0_PHASE_G,
+         CLKOUT1_PHASE_G  => CLKOUT1_PHASE_G)
       port map (
          clkIn  => recClkIn,
          rstIn  => recRstIn,
