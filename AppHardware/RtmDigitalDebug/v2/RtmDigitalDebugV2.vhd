@@ -30,7 +30,7 @@ entity RtmDigitalDebugV2 is
       DIVCLK_DIVIDE_G  : positive                   := 1;
       CLKFBOUT_MULT_G  : positive                   := 6;
       CLKOUT0_DIVIDE_G : positive                   := 6;
-      CLKOUT1_DIVIDE_G : positive                   := 3;  -- drives the RTM's jitter clean input clock port
+      CLKOUT1_DIVIDE_G : positive                   := 6;  -- drives the RTM's jitter clean input clock port
       CLKOUT0_PHASE_G  : real range -360.0 to 360.0 := 0.0;
       CLKOUT1_PHASE_G  : real range -360.0 to 360.0 := 0.0);
    port (
