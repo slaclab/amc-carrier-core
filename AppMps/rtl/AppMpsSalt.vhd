@@ -1,10 +1,8 @@
 -------------------------------------------------------------------------------
 -- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-04
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description: Application MPS SALT PHY Wrapper
 -------------------------------------------------------------------------------
 -- Note: Do not forget to configure the ATCA crate to drive the clock from the slot#2 MPS link node
 -- For the 7-slot crate:
@@ -133,6 +131,10 @@ architecture mapping of AppMpsSalt is
    signal cntOut    : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
 
    signal diagnosticstrobe : sl;
+
+   signal pktPeriod    : Slv32Array(14 downto 0);
+   signal pktPeriodMax : Slv32Array(14 downto 0);
+   signal pktPeriodMin : Slv32Array(14 downto 0);
 
 begin
 
@@ -357,7 +359,8 @@ begin
 
    comb : process (axilReadMaster, axilRst, axilWriteMaster, cntOut,
                    diagnosticstrobe, mpsPllLocked, mpsRxErrDet, mpsRxPktRcvd,
-                   mpsTxEofeSent, mpsTxPktSent, r, statusOut) is
+                   mpsTxEofeSent, mpsTxPktSent, pktPeriod, pktPeriodMax,
+                   pktPeriodMin, r, statusOut) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
       variable i      : natural;
@@ -377,6 +380,9 @@ begin
          axiSlaveRegisterR(regCon, toSlv(4*i, 12), 0, muxSlVectorArray(cntOut, i));
          axiSlaveRegisterR(regCon, toSlv(((4*i)+128), 12), 0, r.mpsPktCnt(i));
          axiSlaveRegisterR(regCon, toSlv(((4*i)+256), 12), 0, r.mpsErrCnt(i));
+         axiSlaveRegisterR(regCon, toSlv(((4*i)+384), 12), 0, pktPeriod(i));
+         axiSlaveRegisterR(regCon, toSlv(((4*i)+512), 12), 0, pktPeriodMax(i));
+         axiSlaveRegisterR(regCon, toSlv(((4*i)+640), 12), 0, pktPeriodMin(i));
       end loop;
 
       axiSlaveRegisterR(regCon, x"700", 0, statusOut);
@@ -437,6 +443,43 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
+
+   U_PktStats : entity work.SyncTrigPeriod
+      generic map (
+         TPD_G        => TPD_G,
+         COMMON_CLK_G => true)
+      port map (
+         -- Trigger Input (trigClk domain)
+         trigClk   => axilClk,
+         trigRst   => axilRst,
+         trigIn    => mpsTxPktSent,
+         -- Trigger Period Output (locClk domain)
+         locClk    => axilClk,
+         locRst    => axilRst,
+         resetStat => r.cntRst,
+         period    => pktPeriod(0),
+         periodMax => pktPeriodMax(0),
+         periodMin => pktPeriodMin(0));
+
+   GEN_STATS :
+   for i in 14 downto 1 generate
+      U_PktStats : entity work.SyncTrigPeriod
+         generic map (
+            TPD_G        => TPD_G,
+            COMMON_CLK_G => true)
+         port map (
+            -- Trigger Input (trigClk domain)
+            trigClk   => axilClk,
+            trigRst   => axilRst,
+            trigIn    => mpsRxPktRcvd(i),
+            -- Trigger Period Output (locClk domain)
+            locClk    => axilClk,
+            locRst    => axilRst,
+            resetStat => r.cntRst,
+            period    => pktPeriod(i),
+            periodMax => pktPeriodMax(i),
+            periodMin => pktPeriodMin(i));
+   end generate GEN_STATS;
 
    U_mpsPllRst : entity work.PwrUpRst
       generic map (

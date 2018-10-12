@@ -66,7 +66,7 @@ class AppMpsSalt(pr.Device):
         ))
 
         self.addRemoteVariables( 
-            name         = "MpsRxPktRcvdSentCnt",
+            name         = "MpsRxPktRcvdCnt",
             description  = "MPS RX Packet Received Counter[13:0]",
             offset       =  0x84,
             bitSize      =  32,
@@ -76,7 +76,103 @@ class AppMpsSalt(pr.Device):
             number       =  14,
             stride       =  4,
             pollInterval = 1,
-        )        
+        ) 
+
+        self.add(pr.RemoteVariable(    
+            name         = "MpsTxEofeSentCnt",
+            description  = "MPS TX EOFE Sent Counter",
+            offset       =  0x100,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.addRemoteVariables( 
+            name         = "MpsRxErrDetCnt",
+            description  = "MPS RX Error Detected Counter[13:0]",
+            offset       =  0x104,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            number       =  14,
+            stride       =  4,
+            pollInterval = 1,
+        ) 
+
+        self.add(pr.RemoteVariable(    
+            name         = "MpsTxPktPeriod",
+            description  = "MPS TX Period between packets",
+            offset       =  0x180,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.addRemoteVariables( 
+            name         = "MpsRxPktPeriod",
+            description  = "MPS RX[13:0] Period between packets ",
+            offset       =  0x184,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            number       =  14,
+            stride       =  4,
+            pollInterval = 1,
+        ) 
+
+        self.add(pr.RemoteVariable(    
+            name         = "MpsTxPktPeriodMin",
+            description  = "Min MPS TX Period between packets",
+            offset       =  0x200,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.addRemoteVariables( 
+            name         = "MpsRxPktPeriodMin",
+            description  = "Min MPS RX[13:0] Period between packets ",
+            offset       =  0x204,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            number       =  14,
+            stride       =  4,
+            pollInterval = 1,
+        )  
+
+        self.add(pr.RemoteVariable(    
+            name         = "MpsTxPktPeriodMax",
+            description  = "Max MPS TX Period between packets",
+            offset       =  0x280,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.addRemoteVariables( 
+            name         = "MpsRxPktPeriodMax",
+            description  = "Max MPS RX[13:0] Period between packets ",
+            offset       =  0x284,
+            bitSize      =  32,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "RO",
+            number       =  14,
+            stride       =  4,
+            pollInterval = 1,
+        )          
 
         self.add(pr.RemoteVariable(    
             name         = "MpsTxLinkUP",
