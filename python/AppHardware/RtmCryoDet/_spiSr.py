@@ -18,11 +18,12 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
+import math
 
 class SpiSr(pr.Device):
-    def __init__(   self, 
-        name        = "RtmSpiSr", 
-        description = "RTM Flux Ramp SPI Interface", 
+    def __init__(   self,
+        name        = "RtmSpiSr",
+        description = "RTM Flux Ramp SPI Interface",
         memBase     =  None,
         offset      =  0x00,
         hidden      =  False,
@@ -37,58 +38,18 @@ class SpiSr(pr.Device):
             offset      = offset,
             hidden      = hidden,
             expand      = expand,
-            enabled     = enabled,        
+            enabled     = enabled,
         )
 
         ##############################
         # Variables
         ##############################
-        
-        self.add(pr.RemoteVariable(    
-            name         = "AD5790NopReg",
-            description  = "FluxRamp_Reg0",
-            offset       =  0x00,
-            bitSize      =  20,
-            bitOffset    =  0x00,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
-        self.add(pr.RemoteVariable(    
-            name         = "AD5790DataReg",
-            description  = "FluxRamp_Reg1",
-            offset       =  0x04,
-            bitSize      =  20,
-            bitOffset    =  0x00,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
-        self.add(pr.RemoteVariable(    
-            name         = "AD5790CtrlReg",
-            description  = "FluxRamp_Reg2",
-            offset       =  0x08,
-            bitSize      =  20,
-            bitOffset    =  0x00,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
-        
-        self.add(pr.RemoteVariable(    
-            name         = "AD5790ClrCodeReg",
-            description  = "FluxRamp_Reg3",
-            offset       =  0x0C,
-            bitSize      =  20,
-            bitOffset    =  0x00,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))
 
         #--entire control register
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "ConfigReg",
             description  = "FluxRamp_Reg4",
-            offset       =  0x20,
+            offset       =  0x800,
             bitSize      =  20,
             bitOffset    =  0x00,
             base         = pr.UInt,
@@ -97,64 +58,115 @@ class SpiSr(pr.Device):
         ))
 
         #--Ctrl Reg0_[0]
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "CfgRegEnaBit",
             description  = "FluxRamp_Reg4_0",
-            offset       =  0x20,
+            offset       =  0x800,
             bitSize      =  1,
             bitOffset    =  0, #--offset from LSB
             mode         = "WO",
             overlapEn    = True,
-        ))        
-        
+        ))
+
         #--Ctrl Reg0_[2]
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "RampSlope",
-            description  = "FluxRamp_Reg4_1",
-            offset       =  0x20,
+            description  = "Sets ramp slope, 0 = Positive, 1 = Negative",
+            offset       =  0x800,
             bitSize      =  1,
             bitOffset    =  2, #--offset from LSB
             mode         = "WO",
             overlapEn    = True,
-        ))        
-        
+        ))
+
         #--Ctrl Reg0_[3]
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "ModeControl",
-            description  = "FluxRamp_Reg4_3",
-            offset       =  0x20,
+            description  = "0 = normal operation, 1 = write to DAC from control registers",
+            offset       =  0x800,
             bitSize      =  1,
             bitOffset    =  3, #--offset from LSB
             mode         = "WO",
             overlapEn    = True,
-        ))        
+        ))
 
-        self.add(pr.RemoteVariable(    
-            name         = "FastSlowStepSize",
+        self.add(pr.RemoteVariable(
+            name         = "FastSlowStepSizeLow",
             description  = "FluxRamp_Control_Reg5",
-            offset       =  0x24,
+            offset       =  0x804,
             bitSize      =  16,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "WO",
         ))
 
-        self.add(pr.RemoteVariable(    
-            name         = "FastSlowRstValue",
-            description  = "FluxRamp_Control_Reg6",
-            offset       =  0x28,
+        self.add(pr.RemoteVariable(
+            name         = "FastSlowStepSizeHigh",
+            description  = "FluxRamp_Control_Reg5",
+            offset       =  0x808,
             bitSize      =  16,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "WO",
         ))
-         
-        self.add(pr.RemoteVariable(    
+
+        self.add(pr.LinkVariable(
+            name         = "FastSlowStepSize",
+            description  = "Flux ramp reset value, UInt32",
+            dependencies = [self.FastSlowStepSizeLow, self.FastSlowStepSizeHigh],
+            linkedGet    = self.fromReg,
+            linkedSet    = self.toReg,
+            typeStr      = "UInt32"
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "FastSlowRstValueLow",
+            description  = "FluxRamp_Control_Reg6",
+            offset       =  0x80C,
+            bitSize      =  16,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "WO",
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "FastSlowRstValueHigh",
+            description  = "FluxRamp_Control_Reg6",
+            offset       =  0x810,
+            bitSize      =  16,
+            bitOffset    =  0x00,
+            base         = pr.UInt,
+            mode         = "WO",
+        ))
+
+        self.add(pr.LinkVariable(
+            name         = "FastSlowRstValue",
+            description  = "Flux ramp reset value, UInt32",
+            dependencies = [self.FastSlowRstValueLow, self.FastSlowRstValueHigh],
+            linkedGet    = self.fromReg,
+            linkedSet    = self.toReg,
+            typeStr      = "UInt32"
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "LTC1668RawDacData",
             description  = "FluxRamp_Control_Reg7",
-            offset       =  0x2C,
+            offset       =  0x814,
             bitSize      =  16,
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "WO",
         ))
+
+    @staticmethod
+    def toReg(dev, var, value):
+       highVal = math.floor( value / 2**16 )
+       lowVal  = value - highVal*2**16
+       var.dependencies[0].set( lowVal )
+       var.dependencies[1].set( highVal )
+
+    @staticmethod
+    def fromReg(dev, var, read):
+       lowVal  = var.dependencies[0].get()
+       highVal = var.dependencies[1].get()
+       return highVal*2**16 + lowVal
