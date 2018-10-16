@@ -37,7 +37,7 @@ class RtmCryoDet(pr.Device):
         #########
         self.add(SpiCryo(offset=0x00100000, expand=False))    
         self.add(SpiMax( offset=0x00200000, expand=False))    
-        self.add(SpiSr(  offset=0x00300000, expand=False))    
+        self.add(SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax 
         
         ###########
         # Registers

@@ -61,14 +61,13 @@ end RtmCryoDet;
 
 architecture mapping of RtmCryoDet is
 
-   constant NUM_AXI_MASTERS_C : natural := 4;
+   constant NUM_AXI_MASTERS_C : natural := 3;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);
 
    constant REG_INDEX_C : natural := 0;
    constant PIC_INDEX_C : natural := 1;
    constant MAX_INDEX_C : natural := 2;
-   constant SR_INDEX_C  : natural := 3;
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -81,6 +80,7 @@ architecture mapping of RtmCryoDet is
       startRampExtPulse : sl;
       startRampExt      : sl;
       startRampPulse    : sl;
+      timingTrig        : sl;
       cnt               : slv(15 downto 0);
       pulseCnt          : slv(15 downto 0);
       rampMaxCnt        : slv(31 downto 0);
@@ -93,6 +93,7 @@ architecture mapping of RtmCryoDet is
       startRampExtPulse => '0',
       startRampExt      => '0',
       startRampPulse    => '0',
+      timingTrig        => '0',
       cnt               => (others => '0'),
       pulseCnt          => (others => '0'),
       rampMaxCnt        => (others => '0'),
@@ -110,11 +111,6 @@ architecture mapping of RtmCryoDet is
    signal maxSck : sl;
    signal maxSdi : sl;
    signal maxSdo : sl;
-
-   signal srCsL : sl;
-   signal srSck : sl;
-   signal srSdi : sl;
-   signal srSdo : sl;
 
    signal jesdClkDiv    : sl;
    signal jesdClkDivReg : sl;
@@ -206,11 +202,6 @@ begin
          O  => rtmLsP(17),
          OB => rtmLsN(17));
    ---------------------------------------------
-
-   srSdo      <= rtmLsP(18);
-   rtmLsN(18) <= srSck;
-   rtmLsP(19) <= srSdi;
-   rtmLsN(19) <= srCsL;
 
    U_extTrig : entity work.Synchronizer
       generic map (
@@ -445,30 +436,5 @@ begin
          coreSDin       => maxSdo,
          coreSDout      => maxSdi,
          coreCsb        => maxCsL);
-
-   ----------------
-   -- SR SPI Module
-   ----------------
-   SR_SPI : entity work.AxiSpiMaster         -- FPGA=Master and CPLD=SLAVE
-      generic map (
-         TPD_G             => TPD_G,
-         MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 11,            -- A[10:0]
-         DATA_SIZE_G       => 20,            -- D[19:0]
-         CPHA_G            => '0',           -- CPHA = 0
-         CPOL_G            => '0',           -- CPOL = 0
-         CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => (1.0/1.0E+6))  -- SCLK = 1MHz
-      port map (
-         axiClk         => axilClk,
-         axiRst         => axilRst,
-         axiReadMaster  => axilReadMasters(SR_INDEX_C),
-         axiReadSlave   => axilReadSlaves(SR_INDEX_C),
-         axiWriteMaster => axilWriteMasters(SR_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(SR_INDEX_C),
-         coreSclk       => srSck,
-         coreSDin       => srSdo,
-         coreSDout      => srSdi,
-         coreCsb        => srCsL);
 
 end architecture mapping;

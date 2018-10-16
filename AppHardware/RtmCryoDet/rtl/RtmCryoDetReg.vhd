@@ -137,17 +137,17 @@ begin
    Sync_selRamp : entity work.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 4)
+         WIDTH_G => 5)
       port map (
-         clk        => jesdClk,
-         dataIn(0)  => r.enableRamp,
-         dataIn(1)  => r.rampStartMode,
-         dataIn(2)  => r.selRamp,
-         dataIn(3)  => r.rtmReset,
-         dataOut(0) => enableRamp,
-         dataOut(1) => rampStartMode,
-         dataOut(2) => selRamp,
-         dataOut(3) => rtmReset);
+         clk                 => jesdClk,
+         dataIn(0)           => r.enableRamp,
+         dataIn(2 downto 1)  => r.rampStartMode,
+         dataIn(3)           => r.selRamp,
+         dataIn(4)           => r.rtmReset,
+         dataOut(0)          => enableRamp,
+         dataOut(2 downto 1) => rampStartMode,
+         dataOut(3)          => selRamp,
+         dataOut(4)          => rtmReset);
 
    Sync_rampMaxCnt : entity work.SynchronizerVector
       generic map (
