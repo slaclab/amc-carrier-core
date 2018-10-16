@@ -155,7 +155,7 @@ class AmcCarrierCore(pr.Device):
         
         for i in range(2):
             self.add(rssi.RssiCore(
-                name         = "SwRssiServer[%i]" % (i),
+                name         = f'SwRssiServer[{i}]',
                 offset       =  0x0A010000 + (i * 0x1000),
                 description  = "SwRssiServer Server: %i" % (i),                                
                 expand       =  False,                                    
@@ -201,7 +201,7 @@ class AmcCarrierCore(pr.Device):
         self._root.checkBlocks(recurse=True)
         
         for i in range(2):
-            v = getattr(self.AmcCarrierBsa, 'BsaWaveformEngine[%i]'%i)
+            v = getattr(self.AmcCarrierBsa, f'BsaWaveformEngine[{i}]')
             v.WaveformEngineBuffers.Initialize()
         
         self.checkBlocks(recurse=True)

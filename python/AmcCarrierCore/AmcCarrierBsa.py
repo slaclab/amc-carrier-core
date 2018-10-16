@@ -39,6 +39,6 @@ class AmcCarrierBsa(pr.Device):
 
         for i in range(2):
             self.add(bsa.BsaWaveformEngine(
-                name         = "BsaWaveformEngine[%i]" % (i), 
-                offset       =  0x00010000 + i * 0x00010000,
+                name   = f'BsaWaveformEngine[{i}]',
+                offset =  0x00010000 + i * 0x00010000,
             ))

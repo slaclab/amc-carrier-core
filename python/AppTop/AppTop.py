@@ -59,7 +59,7 @@ class AppTop(pr.Device):
 
         for i in range(2):
             self.add(daqMuxV2.DaqMuxV2(
-                name         = "DaqMuxV2[%i]" % (i),
+                name         = f'DaqMuxV2[{i}]',
                 offset       =  0x20000000 + (i * 0x10000000),
                 expand       =  False,
             ))
@@ -67,7 +67,7 @@ class AppTop(pr.Device):
         for i in range(2):
             if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
                 self.add(appTop.AppTopJesd(
-                    name         = "AppTopJesd[%i]" % (i),
+                    name         = f'AppTopJesd[{i}]',
                     offset       =  0x40000000 + (i * 0x10000000),
                     numRxLanes   =  numRxLanes[i],
                     numTxLanes   =  numTxLanes[i],
@@ -78,7 +78,7 @@ class AppTop(pr.Device):
         for i in range(2):
             if ( (numSigGen[i] > 0) and (sizeSigGen[i] > 0) ):
                 self.add(dacSigGen.DacSigGen(
-                    name         = "DacSigGen[%i]" % (i),
+                    name         = f'DacSigGen[{i}]',
                     offset       =  0x60000000 + (i * 0x10000000),
                     numOfChs     =  numSigGen[i],
                     buffSize     =  sizeSigGen[i],

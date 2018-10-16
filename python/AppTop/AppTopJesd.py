@@ -59,7 +59,7 @@ class AppTopJesd(pr.Device):
         if((maxlanes > 0) and enJesdDrp):
             for i in range(maxlanes):
                 self.add(xil.Gthe3Channel(
-                    name   = "Gthe3Channel[%i]" % (i),
+                    name   = f'Gthe3Channel[{i}]',
                     offset =  0x03000000 + (i * 0x100000),
                     expand =  False,
                 ))            
