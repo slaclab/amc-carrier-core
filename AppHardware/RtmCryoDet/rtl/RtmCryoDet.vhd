@@ -108,11 +108,6 @@ architecture mapping of RtmCryoDet is
    signal maxSdi : sl;
    signal maxSdo : sl;
 
-   signal srCsL : sl;
-   signal srSck : sl;
-   signal srSdi : sl;
-   signal srSdo : sl;
-
    signal jesdClkDiv    : sl;
    signal jesdClkDivReg : sl;
 
@@ -201,11 +196,6 @@ begin
          O  => rtmLsP(17),
          OB => rtmLsN(17));
    ---------------------------------------------
-
-   srSdo      <= rtmLsP(18);
-   rtmLsN(18) <= srSck;
-   rtmLsP(19) <= srSdi;
-   rtmLsN(19) <= srCsL;
 
    U_extTrig : entity work.Synchronizer
       generic map (
