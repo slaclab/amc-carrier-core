@@ -17,11 +17,8 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-
-from LclsTimingCore.TimingFrameRx import *
-from LclsTimingCore.TPGMiniCore import *
-from LclsTimingCore.GthRxAlignCheck import *
+import pyrogue        as pr
+import LclsTimingCore as timingCore
 
 class AmcCarrierTiming(pr.Device):
     def __init__(   self, 
@@ -34,14 +31,14 @@ class AmcCarrierTiming(pr.Device):
         # Variables
         ##############################
 
-        self.add(TimingFrameRx(
+        self.add(timingCore.TimingFrameRx(
             offset = 0x00000000,
         ))
 
-        self.add(TPGMiniCore(
+        self.add(timingCore.TPGMiniCore(
             offset = 0x00030000,
         ))
 
-        self.add(GthRxAlignCheck(
+        self.add(timingCore.GthRxAlignCheck(
             offset = 0x00800000,
         ))        

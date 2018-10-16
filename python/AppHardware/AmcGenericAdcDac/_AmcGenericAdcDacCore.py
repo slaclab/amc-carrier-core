@@ -17,12 +17,10 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
 import time
-
-from surf.devices.ti import *
-
-from AppHardware.AmcGenericAdcDac._AmcGenericAdcDacCtrl import *
+import pyrogue         as pr
+import surf.devices.ti as ti
+import AppHardware     as appHw
 
 class AmcGenericAdcDacCore(pr.Device):
     def __init__(   self, 
@@ -34,11 +32,11 @@ class AmcGenericAdcDacCore(pr.Device):
         #########
         # Devices
         #########
-        self.add(AmcGenericAdcDacCtrl(  offset=0x00000000, name='DBG',    expand=False))
-        self.add(Dac38J84(              offset=0x00002000, name='DAC',    expand=False, numTxLanes=2))
-        self.add(Lmk04828(              offset=0x00020000, name='LMK',    expand=False))
-        self.add(Adc16Dx370(            offset=0x00040000, name='ADC[0]', expand=False))
-        self.add(Adc16Dx370(            offset=0x00060000, name='ADC[1]', expand=False))
+        self.add(appHw.AmcGenericAdcDac.AmcGenericAdcDacCtrl(offset=0x00000000, name='DBG',    expand=False))
+        self.add(ti.Dac38J84(  offset=0x00002000, name='DAC',    expand=False, numTxLanes=2))
+        self.add(ti.Lmk04828(  offset=0x00020000, name='LMK',    expand=False))
+        self.add(ti.Adc16Dx370(offset=0x00040000, name='ADC[0]', expand=False))
+        self.add(ti.Adc16Dx370(offset=0x00060000, name='ADC[1]', expand=False))
 
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():

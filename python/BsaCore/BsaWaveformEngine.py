@@ -17,9 +17,8 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-
-from surf.axi._AxiStreamDmaRingWrite import *
+import pyrogue  as pr
+import surf.axi as axi
 
 class BsaWaveformEngine(pr.Device):
     def __init__(   self, 
@@ -28,7 +27,7 @@ class BsaWaveformEngine(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
-        self.add(AxiStreamDmaRingWrite(
+        self.add(axi.AxiStreamDmaRingWrite(
             offset =  0x00000000,
             name   = "WaveformEngineBuffers",
         ))

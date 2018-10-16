@@ -17,17 +17,16 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-
-from AppTop.AppTopJesd import *
-from DacSigGen.DacSigGen import *
-from DaqMuxV2.DaqMuxV2 import *
-from common.AppCore import *
+import time
+import pyrogue   as pr
+import AppTop    as appTop
+import DacSigGen as dacSigGen
+import DaqMuxV2  as daqMuxV2
 
 import surf.devices.ti         as ti
 import surf.protocols.jesd204b as jesd
 
-import time
+import common as appCommon
 
 class AppTop(pr.Device):
     def __init__(   self, 
@@ -51,7 +50,7 @@ class AppTop(pr.Device):
         # Variables
         ##############################
 
-        self.add(AppCore(   
+        self.add(appCommon.AppCore(   
             offset       =  0x00000000, 
             numRxLanes   =  numRxLanes,
             numTxLanes   =  numTxLanes,
@@ -59,7 +58,7 @@ class AppTop(pr.Device):
         ))
 
         for i in range(2):
-            self.add(DaqMuxV2(
+            self.add(daqMuxV2.DaqMuxV2(
                 name         = "DaqMuxV2[%i]" % (i),
                 offset       =  0x20000000 + (i * 0x10000000),
                 expand       =  False,
@@ -67,7 +66,7 @@ class AppTop(pr.Device):
 
         for i in range(2):
             if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
-                self.add(AppTopJesd(
+                self.add(appTop.AppTopJesd(
                     name         = "AppTopJesd[%i]" % (i),
                     offset       =  0x40000000 + (i * 0x10000000),
                     numRxLanes   =  numRxLanes[i],
@@ -78,7 +77,7 @@ class AppTop(pr.Device):
 
         for i in range(2):
             if ( (numSigGen[i] > 0) and (sizeSigGen[i] > 0) ):
-                self.add(DacSigGen(
+                self.add(dacSigGen.DacSigGen(
                     name         = "DacSigGen[%i]" % (i),
                     offset       =  0x60000000 + (i * 0x10000000),
                     numOfChs     =  numSigGen[i],
@@ -92,8 +91,8 @@ class AppTop(pr.Device):
             # Get devices
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
-            appCore       = self.find(typ=AppCore)
-            sigGenDevices = self.find(typ=DacSigGen)
+            appCore       = self.find(typ=appCommon.AppCore)
+            sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
             
             # Power down AppCore (power down SysRef)
             for core in appCore:

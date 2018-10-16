@@ -17,13 +17,9 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-
-from AppHardware.RtmCryoDet._spiCryo import *
-from AppHardware.RtmCryoDet._spiMax import *
-from AppHardware.RtmCryoDet._spiSr import *
-
 import time
+import pyrogue     as pr
+import AppHardware as appHw
 
 class RtmCryoDet(pr.Device):
     def __init__(   self, 
@@ -35,9 +31,9 @@ class RtmCryoDet(pr.Device):
         #########
         # Devices
         #########
-        self.add(SpiCryo(offset=0x00100000, expand=False))    
-        self.add(SpiMax( offset=0x00200000, expand=False))    
-        self.add(SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax 
+        self.add(appHw.RtmCryoDet.SpiCryo(offset=0x00100000, expand=False))    
+        self.add(appHw.RtmCryoDet.SpiMax( offset=0x00200000, expand=False))    
+        self.add(appHw.RtmCryoDet.SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax 
         
         ###########
         # Registers
