@@ -98,29 +98,9 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 32
       description: Min MPS RX[13:0] Period between packets    
     #########################################################
-    MpsTxPktPeriodMin:
-      at:
-        offset: 0x200
-      class: IntField
-      name: MpsTxPktPeriodMin
-      mode: RO
-      sizeBits: 32
-      description: Min MPS TX Period between packets
-    #########################################################
-    MpsRxPktPeriodMin:
-      at:
-        offset: 0x204
-        stride: 4
-        nelms: 14
-      class: IntField
-      name: MpsRxPktPeriodMin
-      mode: RO
-      sizeBits: 32
-      description: Max MPS RX[13:0] Period between packets    
-    #########################################################  
     MpsTxPktPeriodMax:
       at:
-        offset: 0x280
+        offset: 0x200
       class: IntField
       name: MpsTxPktPeriodMax
       mode: RO
@@ -129,14 +109,34 @@ AppMpsSalt: &AppMpsSalt
     #########################################################
     MpsRxPktPeriodMax:
       at:
-        offset: 0x284
+        offset: 0x204
         stride: 4
         nelms: 14
       class: IntField
       name: MpsRxPktPeriodMax
       mode: RO
       sizeBits: 32
-      description: MPS RX[13:0] Period between packets    
+      description: Max MPS RX[13:0] Period between packets    
+    #########################################################  
+    MpsTxPktPeriodMin:
+      at:
+        offset: 0x280
+      class: IntField
+      name: MpsTxPktPeriodMin
+      mode: RO
+      sizeBits: 32
+      description: Min MPS TX Period between packets
+    #########################################################
+    MpsRxPktPeriodMin:
+      at:
+        offset: 0x284
+        stride: 4
+        nelms: 14
+      class: IntField
+      name: MpsRxPktPeriodMin
+      mode: RO
+      sizeBits: 32
+      description: Min MPS RX[13:0] Period between packets    
     #########################################################      
     MpsTxLinkUP:
       at:

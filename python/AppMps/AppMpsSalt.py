@@ -127,8 +127,8 @@ class AppMpsSalt(pr.Device):
         ) 
 
         self.add(pr.RemoteVariable(    
-            name         = "MpsTxPktPeriodMin",
-            description  = "Min MPS TX Period between packets",
+            name         = "MpsTxPktPeriodMax",
+            description  = "Max MPS TX Period between packets",
             offset       =  0x200,
             bitSize      =  32,
             bitOffset    =  0x00,
@@ -138,8 +138,8 @@ class AppMpsSalt(pr.Device):
         ))
 
         self.addRemoteVariables( 
-            name         = "MpsRxPktPeriodMin",
-            description  = "Min MPS RX[13:0] Period between packets ",
+            name         = "MpsRxPktPeriodMax",
+            description  = "Max MPS RX[13:0] Period between packets ",
             offset       =  0x204,
             bitSize      =  32,
             bitOffset    =  0x00,
@@ -151,8 +151,8 @@ class AppMpsSalt(pr.Device):
         )  
 
         self.add(pr.RemoteVariable(    
-            name         = "MpsTxPktPeriodMax",
-            description  = "Max MPS TX Period between packets",
+            name         = "MpsTxPktPeriodMin",
+            description  = "Min MPS TX Period between packets",
             offset       =  0x280,
             bitSize      =  32,
             bitOffset    =  0x00,
@@ -162,8 +162,8 @@ class AppMpsSalt(pr.Device):
         ))
 
         self.addRemoteVariables( 
-            name         = "MpsRxPktPeriodMax",
-            description  = "Max MPS RX[13:0] Period between packets ",
+            name         = "MpsRxPktPeriodMin",
+            description  = "Min MPS RX[13:0] Period between packets ",
             offset       =  0x284,
             bitSize      =  32,
             bitOffset    =  0x00,
