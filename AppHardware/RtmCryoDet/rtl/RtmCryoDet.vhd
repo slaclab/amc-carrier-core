@@ -80,6 +80,7 @@ architecture mapping of RtmCryoDet is
       startRampExtPulse : sl;
       startRampExt      : sl;
       startRampPulse    : sl;
+      timingTrig        : sl;
       cnt               : slv(15 downto 0);
       pulseCnt          : slv(15 downto 0);
       rampMaxCnt        : slv(31 downto 0);
@@ -92,6 +93,7 @@ architecture mapping of RtmCryoDet is
       startRampExtPulse => '0',
       startRampExt      => '0',
       startRampPulse    => '0',
+      timingTrig        => '0',
       cnt               => (others => '0'),
       pulseCnt          => (others => '0'),
       rampMaxCnt        => (others => '0'),
