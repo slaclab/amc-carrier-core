@@ -2,7 +2,7 @@
 -- File       : AmcMicrowaveMuxDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-05-11
--- Last update: 2018-03-14
+-- Last update: 2018-08-28
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -29,6 +29,9 @@ entity AmcMicrowaveMuxDualCore is
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
+      -- Timing Interface (timingClk domain) 
+      timingClk       : in    sl;
+      timingRst       : in    sl;
       -- JESD Interface
       jesdClk         : in    slv(1 downto 0);
       jesdSysRef      : out   slv(1 downto 0);
@@ -108,6 +111,9 @@ begin
             AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,
             AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map(
+            -- Timing Interface (timingClk domain) 
+            timingClk       => timingClk,
+            timingRst       => timingRst,
             -- JESD SYNC Interface
             jesdClk         => jesdClk(i),
             jesdSysRef      => jesdSysRef(i),

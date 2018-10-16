@@ -43,10 +43,10 @@ class AmcGenericAdcDacCore(pr.Device):
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
             self.checkBlocks(recurse=True)
-            self.ADC[0].CalibrateAdc()
-            self.ADC[1].CalibrateAdc()
             self.LMK.Init()
             self.DAC.Init()        
+            self.ADC[0].CalibrateAdc()
+            self.ADC[1].CalibrateAdc()
             self.checkBlocks(recurse=True)  
            
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
@@ -73,28 +73,19 @@ class AmcGenericAdcDacCore(pr.Device):
         self.enable.set(True)
         self.DBG.enable.set(True)
         self.DAC.enable.set(True)
-        self.LMK.enable.set(True)        
+        self.LMK.enable.set(True)
         self.ADC[0].enable.set(True)
         self.ADC[1].enable.set(True)    
 
         self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
         
-        #self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
         self.InitAmcCard()
         
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
-        self.ADC[0].enable.set(False)
-        self.ADC[1].enable.set(False)         
-        self.DAC.enable.set(False)    
-        self.checkBlocks(recurse=True)        
-        
+        self.checkBlocks(recurse=True)

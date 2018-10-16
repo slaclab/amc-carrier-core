@@ -92,43 +92,22 @@ class AppTop(pr.Device):
             # Get devices
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
-            lmkDevices    = self.find(typ=ti.Lmk04828)
-            dacDevices    = self.find(typ=ti.Dac38J84)
+            appCore       = self.find(typ=AppCore)
             sigGenDevices = self.find(typ=DacSigGen)
             
-            # Assert GTs Reset
+            # Power down AppCore (power down SysRef)
+            for core in appCore:
+                core.Disable()
+            # GTs Reset
             for rx in jesdRxDevices: 
-                rx.ResetGTs.set(1)
+                rx.CmdResetGTs()
             for tx in jesdTxDevices: 
-                rx.ResetGTs.set(1)          
-            # Power down sysref
-            for lmk in lmkDevices: 
-                enable = lmk.enable.get()
-                lmk.enable.set(True)
-                lmk.PwrDwnSysRef()
-                lmk.enable.set(enable)
+                tx.CmdResetGTs()
             self.checkBlocks(recurse=True)
             time.sleep(1.0)
-            # Reset the GTs
-            for rx in jesdRxDevices: 
-                rx.ResetGTs.set(0)
-            for tx in jesdTxDevices: 
-                tx.ResetGTs.set(0)
-            self.checkBlocks(recurse=True)
-            # Wait for GTs to setting (typical 100ms)
-            time.sleep(1.0)
-            # Init the DACs
-            for dac in dacDevices:
-                enable = dac.enable.get()
-                dac.enable.set(True)
-                dac.Init()
-                dac.enable.set(enable)
-            # Init the LMKs
-            for lmk in lmkDevices: 
-                enable = lmk.enable.get()
-                lmk.enable.set(True)
-                lmk.PwrUpSysRef() 
-                lmk.enable.set(enable)
+            # Init the AppCore
+            for core in appCore:
+                core.Init()
             # Wait for the system settle
             time.sleep(0.5)            
             # Clear all error counters
@@ -136,11 +115,6 @@ class AppTop(pr.Device):
                 rx.CmdClearErrors()  
             for tx in jesdTxDevices: 
                 tx.CmdClearErrors()
-            for dac in dacDevices: 
-                enable = dac.enable.get()
-                dac.enable.set(True)
-                dac.ClearAlarms()
-                dac.enable.set(enable)
             # Load the DAC signal generator
             for sigGen in sigGenDevices: 
                 if ( sigGen.CsvFilePath.get() != "" ):

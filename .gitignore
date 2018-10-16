@@ -26,6 +26,7 @@
 ehthumbs.db
 Thumps.db
 build.info
+.lfsconfig
 
 # Vivado Build
 build*

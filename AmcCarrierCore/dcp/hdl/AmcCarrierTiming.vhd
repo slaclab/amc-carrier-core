@@ -38,11 +38,14 @@ entity AmcCarrierTiming is
       TPD_G             : time     := 1 ns;
       TIME_GEN_APP_G    : boolean  := false;
       TIME_GEN_EXTREF_G : boolean  := false;
+      DISABLE_TIME_GT_G : boolean  := false;
       CORE_TRIGGERS_G   : natural  := 16;
       TRIG_PIPE_G       : natural  := 0;
       STREAM_L1_G       : boolean  := true;
       RX_CLK_MMCM_G     : boolean  := false);
    port (
+      stableClk            : in  sl;
+      stableRst            : in  sl;
       -- AXI-Lite Interface (axilClk domain)
       axilClk              : in  sl;
       axilRst              : in  sl;
@@ -217,9 +220,10 @@ begin
    -------------------------------------------------------------------------------------------------
    TimingGthCoreWrapper_1 : entity work.TimingGtCoreWrapper
       generic map (
-         TPD_G            => TPD_G,
-         AXIL_BASE_ADDR_G => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_GTH_INDEX_C).baseAddr,
-         EXTREF_G         => TIME_GEN_EXTREF_G)
+         TPD_G             => TPD_G,
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_GTH_INDEX_C).baseAddr,
+         EXTREF_G          => TIME_GEN_EXTREF_G,
+         DISABLE_TIME_GT_G => DISABLE_TIME_GT_G)
       port map (
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -227,7 +231,8 @@ begin
          axilReadSlave   => axilReadSlaves (AXIL_GTH_INDEX_C),
          axilWriteMaster => axilWriteMasters(AXIL_GTH_INDEX_C),
          axilWriteSlave  => axilWriteSlaves (AXIL_GTH_INDEX_C),
-         stableClk       => axilClk,
+         stableClk       => stableClk,
+         stableRst       => stableRst,
          gtRefClk        => timingRefClk,
          gtRefClkDiv2    => timingRefClkDiv2,
          gtRxP           => timingRxP,
@@ -306,8 +311,7 @@ begin
          TPGEN_G           => TIME_GEN_APP_G,
          STREAM_L1_G       => STREAM_L1_G,
          ETHMSG_AXIS_CFG_G => EMAC_AXIS_CONFIG_C,
-         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr,
-         AXIL_ERROR_RESP_G => AXI_RESP_DECERR_C)
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr)
       port map (
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,
