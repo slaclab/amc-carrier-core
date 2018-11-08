@@ -2,9 +2,6 @@
 #-----------------------------------------------------------------------------
 # Title      : Release notes generation
 # ----------------------------------------------------------------------------
-# File       : releaseNotes.py
-# Created    : 2018-03-12
-# ----------------------------------------------------------------------------
 # Description:
 # Generate release notes for pull requests relative to a tag.
 # Usage: releaseNotes.py tag (i.e. releaseNotes.py v2.5.0
@@ -19,33 +16,69 @@
 #       > git co master
 #       > git merge origin/master
 #       > git merge origin/pre-release
+#       > git push
 #    - Tag the release in master: 
 #       > git tag -a vMAJOR.MINOR.0
 #       > git push --tags
 #    - Create release using tag on github.com, use this script to generate notes
 # ----------------------------------------------------------------------------
-# This file is part of the rogue software platform. It is subject to 
+# This file is part of the 'SLAC Firmware Standard Library'. It is subject to 
 # the license terms in the LICENSE.txt file found in the top-level directory 
 # of this distribution and at: 
 #    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-# No part of the rogue software platform, including this file, may be 
+# No part of the 'SLAC Firmware Standard Library', including this file, may be 
 # copied, modified, propagated, or distributed except according to the terms 
 # contained in the LICENSE.txt file.
 # ----------------------------------------------------------------------------
-import os,sys
-import git   # GitPython
-from github import Github # PyGithub
-import re
+
+##
+# @file releaseNotes.py
+# Generate release notes for pull requests relative to a tag.
+
+import os
+import sys
 import argparse
 import pyperclip
+from getpass import getpass
 
+import git   # https://gitpython.readthedocs.io/en/stable/tutorial.html
+from github import Github # https://pygithub.readthedocs.io/en/latest/introduction.html
+
+#################################################################
+
+# Set the argument parser
 parser = argparse.ArgumentParser('Release notes generator')
-parser.add_argument('tag', type=str, help='reference tag or range. (i.e. v2.5.0 or v2.5.0..v2.6.0)')
-parser.add_argument('--user', type=str, help='Username for github')
-parser.add_argument('--password', type=str, help='Password for github')
-parser.add_argument('--nosort', help='Disable sort by change counts', action="store_true")
-parser.add_argument('--copy', help='Copy to clipboard', action="store_true")
+
+# Convert str to bool
+argBool = lambda s: s.lower() in ['true', 't', 'yes', '1']
+
+# Add arguments
+parser.add_argument(
+    "tag", 
+    type     = str,
+    help     = 'reference tag or range. (i.e. v2.5.0 or v2.5.0..v2.6.0)',
+) 
+
+parser.add_argument(
+    "--nosort", 
+    type     = argBool,
+    required = False,
+    default  = False,
+    help     = "Disable sort by change counts",
+)  
+
+parser.add_argument(
+    "--copy", 
+    type     = argBool,
+    required = False,
+    default  = False,
+    help     = "Copy to clipboard",
+)  
+
+# Get the arguments
 args = parser.parse_args()
+
+#################################################################
 
 if '..' in args.tag:
     tags = args.tag
@@ -57,20 +90,21 @@ print(f"Using range: {tags}")
 # Local git clone
 g = git.Git('.')
 g.fetch()
-# project = re.compile(r'slaclab/(?P<name>.*?).git').search(g.remote('get-url','origin')).group('name')
+project = g.remote('get-url','origin').strip('git@github.com:/')
 
-# Git server
-gh = Github('ruck314','')
-repo = gh.get_repo('slaclab/amc-carrier-core')
+# Connect to the Git server
+token = input("Enter your github token: ")
+github = Github(token)
 
+# Get the repo information
+repo = github.get_repo(f'{project}')
+
+# Collect all the pull request with request to the tagging
 loginfo = g.log(tags,'--grep','Merge pull request')
 
+# Parse the log entries
 records = []
 entry = {}
-
-#print("# Pull Requests")
-
-# Parse the log entries
 for line in loginfo.splitlines():
 
     if line.startswith('Author:'):
@@ -84,7 +118,7 @@ for line in loginfo.splitlines():
         entry['Branch'] = line.split()[5].lstrip()
 
         # Get PR info from github
-        #print(f"{entry['Pull']}")
+        # print(f"{entry['PR']}")
         req = repo.get_pull(int(entry['PR'][1:]))
         entry['Title'] = req.title
         entry['body']  = req.body
@@ -100,8 +134,9 @@ for line in loginfo.splitlines():
             entry['Jira'] = None
 
         records.append(entry)
-        entry = {}
-
+        entry = {}         
+        
+# Check if sorting the pull request entries        
 if args.nosort is False:
     records = sorted(records, key=lambda v : v['changes'], reverse=True)
 
@@ -109,7 +144,7 @@ if args.nosort is False:
 md = '# Pull Requests\n'
 
 for i, entry in enumerate(records):
-    md += f" {i+1}. {entry['PR']} - {entry['Title']}\n"
+    md += f" 1. {entry['PR']} - {entry['Title']}\n"
 
 md += '## Pull Request Details\n'
 
@@ -126,8 +161,16 @@ for entry in records:
     md += '\n**Notes:**\n'
     for line in entry['body'].splitlines():
         md += '> ' + line + '\n'
-    md += '-------\n'         
+    md += '\n-------\n'         
     md += '\n\n'
+
+# Deal with potential UNICODE in the md
+# Note: Markup language uses the XML # character for unicode
+md = md.encode('ascii', 'xmlcharrefreplace')  
+md = str(md)[2:-1]      
+md = md.replace('\\n', '\n') 
+
+print(md)
 
 if args.copy:
     try:	
@@ -135,5 +178,3 @@ if args.copy:
         print('Release notes copied to clipboard')	
     except:	
         print("Copy to clipboard failed!")
-
-print(md)
