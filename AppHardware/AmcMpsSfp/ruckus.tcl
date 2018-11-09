@@ -1,6 +1,17 @@
 # Load RUCKUS environment and library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
+# Get the family type
+set family [getFpgaFamily]
+
+# Check for GEN1 + extended JESD lanes
+if { $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} ||
+     $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {   
+   set bayExt true
+} else {
+   set bayExt false
+}
+
 # Load local Source Code
 loadSource -dir "$::DIR_PATH/rtl/"
 
@@ -12,12 +23,18 @@ if { $::env(AMC_TYPE_BAY0) == ${rootName} } {
       ################################################
       # Version1 = PC-379-396-09-C00/PC-379-396-09-C01
       ################################################
-      loadConstraints -path "$::DIR_PATH/xdc/AmcMpsSfpV1Bay0Pinout.xdc"
+      loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcMpsSfpV1Bay0.xdc"
+      if { ${bayExt} } {
+         loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcMpsSfpV1Bay0Ext.xdc"
+      }
    } elseif { $::env(AMC_INTF_BAY0)  == "Version2" } {
       ################################################
       # Version2 = PC-379-396-09-C02 (or later)
       ################################################
-      loadConstraints -path "$::DIR_PATH/xdc/AmcMpsSfpV2Bay0Pinout.xdc"
+      loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcMpsSfpV2Bay0.xdc"
+      if { ${bayExt} } {
+         loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcMpsSfpV2Bay0Ext.xdc"
+      }      
    } else {
       puts "\n\n $::env(AMC_INTF_BAY0) is an invalid AMC_INTF_BAY0 name. AMC_INTF_BAY0 can be \[Version1,Version2\]. Please fixed your target/makefile's.\n\n"   
       exit -1
@@ -31,19 +48,20 @@ if { $::env(AMC_TYPE_BAY1) == ${rootName} } {
       ################################################
       # Version1 = PC-379-396-09-C00/PC-379-396-09-C01
       ################################################
-      loadConstraints -path "$::DIR_PATH/xdc/AmcMpsSfpV1Bay1Pinout.xdc"
+      loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcMpsSfpV1Bay1.xdc"
+      if { ${bayExt} } {
+         loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcMpsSfpV1Bay1Ext.xdc"
+      }      
    } elseif { $::env(AMC_INTF_BAY1)  == "Version2" } {
       ################################################
       # Version2 = PC-379-396-09-C02 (or later)
       ################################################
-      loadConstraints -path "$::DIR_PATH/xdc/AmcMpsSfpV2Bay1Pinout.xdc"
+      loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcMpsSfpV2Bay1.xdc"
+      if { ${bayExt} } {
+         loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcMpsSfpV2Bay1Ext.xdc"
+      }        
    } else {
       puts "\n\n $::env(AMC_INTF_BAY1) is an invalid AMC_INTF_BAY1 name. AMC_INTF_BAY1 can be \[Version1,Version2\]. Please fixed your target/makefile's.\n\n"   
       exit -1
    }
 }
-
-if {  $::env(PRJ_PART) eq {XCKU11P-FFVA1156-2-E} ||
-      $::env(PRJ_PART) eq {XCKU15P-FFVA1156-2-E} } {
-   puts "\n\nERROR: Invalid PRJ_PART=$::env(PRJ_PART) not supported yet for this application hardware\n\n"; exit -1
-} 

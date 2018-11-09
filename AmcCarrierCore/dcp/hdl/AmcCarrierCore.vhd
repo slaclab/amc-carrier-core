@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-08-05
+-- Last update: 2018-08-28
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -41,6 +41,7 @@ entity AmcCarrierCore is
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
       TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
+      DISABLE_TIME_GT_G      : boolean  := false;  -- false = normal application, true = doesn't build the Timing GT
       CORE_TRIGGERS_G        : natural  := 16;
       TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
       FSBL_G                 : boolean  := false);  -- false = Normal Operation, true = First Stage Boot loader
@@ -88,6 +89,8 @@ entity AmcCarrierCore is
       recTimingRst         : out   sl;
       ref156MHzClk         : out   sl;
       ref156MHzRst         : out   sl;
+      stableClk            : out   sl;
+      stableRst            : out   sl;
       gthFabClk            : out   sl;
       ------------------------         
       -- Core Ports to Wrapper
@@ -218,13 +221,16 @@ begin
    waveformClk <= axiClk;
    waveformRst <= axiRst;
 
+   stableClk <= fabClk;
+   stableRst <= fabRst;
+
    --------------------------------
    -- Common Clock and Reset Module
    -------------------------------- 
    U_IBUFDS : entity work.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
-         REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
+         REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
          REFCLK_ICNTL_RX    => "00")
       port map (
          I     => fabClkP,
@@ -261,10 +267,10 @@ begin
          NUM_CLOCKS_G      => 1,
          -- MMCM attributes
          BANDWIDTH_G       => "OPTIMIZED",
-         CLKIN_PERIOD_G    => 6.4,
-         DIVCLK_DIVIDE_G   => 1,
-         CLKFBOUT_MULT_G   => 8,
-         CLKOUT0_DIVIDE_G  => 8)
+         CLKIN_PERIOD_G    => 12.8,     -- 78.125MHz
+         DIVCLK_DIVIDE_G   => 1,        -- 78.125MHz = 78.125MHz/1
+         CLKFBOUT_MULT_G   => 16,       -- 1.25GHz=78.125MHz*16
+         CLKOUT0_DIVIDE_G  => 8)        -- 156.25MHz=1.25GHz/8
       port map(
          -- Clock Input
          clkIn     => fabClk,
@@ -352,10 +358,13 @@ begin
          TPD_G             => TPD_G,
          TIME_GEN_APP_G    => TIME_GEN_APP_G,
          TIME_GEN_EXTREF_G => TIME_GEN_EXTREF_G,
+         DISABLE_TIME_GT_G => DISABLE_TIME_GT_G,
          CORE_TRIGGERS_G   => CORE_TRIGGERS_G,
          TRIG_PIPE_G       => TRIG_PIPE_G,
          STREAM_L1_G       => true)
       port map (
+         stableClk            => fabClk,
+         stableRst            => fabRst,
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
          axilRst              => axilRst,

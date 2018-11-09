@@ -17,16 +17,10 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
 import time
-
-from surf.devices.ti._adc32Rf45 import *
-from surf.devices.ti._Dac38J84  import *
-from surf.devices.ti._Lmk04828  import *
-
-from AppHardware.AmcMicrowaveMux._amcMicrowaveMuxCtrl import *
-from AppHardware.AmcMicrowaveMux._adf5355 import *
-from AppHardware.AmcMicrowaveMux._hmc305 import *
+import pyrogue         as pr
+import surf.devices.ti as ti
+import AppHardware     as appHw
 
 class AmcMicrowaveMuxCore(pr.Device):
     def __init__(   self, 
@@ -38,32 +32,53 @@ class AmcMicrowaveMuxCore(pr.Device):
         #########
         # Devices
         #########
-        self.add(AmcMicrowaveMuxCtrl(offset=0x00000000,name='DBG',    expand=False))
-        self.add(Adf5355(           offset=0x00001000,name='PLL[0]', expand=False))
-        self.add(Adf5355(           offset=0x00002000,name='PLL[1]', expand=False))
-        self.add(Adf5355(           offset=0x00003000,name='PLL[2]', expand=False))
-        self.add(Adf5355(           offset=0x00004000,name='PLL[3]', expand=False))     
-        self.add(Hmc305(            offset=0x00005000,name='ATT',    expand=False))
-        self.add(Lmk04828(          offset=0x00020000,name='LMK',    expand=False))
-        self.add(Dac38J84(          offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
-        self.add(Dac38J84(          offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
-        self.add(Adc32Rf45(         offset=0x00080000,name='ADC[0]', expand=False))
-        self.add(Adc32Rf45(         offset=0x000C0000,name='ADC[1]', expand=False))
+        self.add(appHw.AmcMicrowaveMux.AmcMicrowaveMuxCtrl(offset=0x00000000,name='DBG',    expand=False))
+        self.add(appHw.AmcMicrowaveMux.Adf5355(offset=0x00001000,name='PLL[0]', expand=False))
+        self.add(appHw.AmcMicrowaveMux.Adf5355(offset=0x00002000,name='PLL[1]', expand=False))
+        self.add(appHw.AmcMicrowaveMux.Adf5355(offset=0x00003000,name='PLL[2]', expand=False))
+        self.add(appHw.AmcMicrowaveMux.Adf5355(offset=0x00004000,name='PLL[3]', expand=False))     
+        self.add(appHw.AmcMicrowaveMux.Hmc305( offset=0x00005000,name='ATT',    expand=False))
+        self.add(ti.Lmk04828( offset=0x00020000,name='LMK',    expand=False))
+        self.add(ti.Dac38J84( offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
+        self.add(ti.Dac38J84( offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
+        self.add(ti.Adc32Rf45(offset=0x00080000,name='ADC[0]', expand=False))
+        self.add(ti.Adc32Rf45(offset=0x000C0000,name='ADC[1]', expand=False))
 
         ##########
         # Commands
         ##########
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
+            # Enable devices
+            self.DBG.enable.set(True)
+            self.LMK.enable.set(True)
+            self.DAC[0].enable.set(True)
+            self.DAC[1].enable.set(True)
+            self.ADC[0].enable.set(True)
+            self.ADC[1].enable.set(True)
+
             self.checkBlocks(recurse=True)
             self.DBG.Init()
-            self.LMK.Init()
             self.DAC[0].Init()
             self.DAC[1].Init()
-            self.ADC[0].Init()
-            self.ADC[1].Init()
+            #self.ADC[0].Init()
+            #self.ADC[1].Init()
+            time.sleep(0.5)
+            self.ADC[0].DigRst()
+            self.ADC[1].DigRst()
+
+            # pulse SysRef
+            self.LMK.PwrUpSysRef()
             self.checkBlocks(recurse=True)            
             
+        @self.command(description="Select internal LMK reference",)
+        def SelIntLmkRef():
+            self.LMK.LmkReg_0x0147.set(0xA)
+
+        @self.command(description="Select external LMK reference",)
+        def SelExtLmkRef():
+            self.LMK.LmkReg_0x0147.set(0x1A)
+
         @self.command(description="Enable Front Panel LMK reference",)
         def CmdEnLmkRef():            
             self.LMK.LmkReg_0x011F.set(0x7) 
@@ -105,28 +120,18 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.ADC[0].enable.set(True)
         self.ADC[1].enable.set(True)       
         
-        #self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.PLL[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.PLL[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[1].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.PLL[2].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[2].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.PLL[3].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.PLL[3].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
-        self.InitAmcCard()
+        self.LMK.Init()
         
-        #self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
         
         self._root.checkBlocks(recurse=True)
@@ -139,10 +144,10 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.PLL[3].RegInitSeq()        
         
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
-        self.DAC[0].enable.set(False)
-        self.DAC[1].enable.set(False)
-        self.ADC[0].enable.set(False)
-        self.ADC[1].enable.set(False)          
+        # self.DAC[0].enable.set(False)
+        # self.DAC[1].enable.set(False)
+        # self.ADC[0].enable.set(False)
+        # self.ADC[1].enable.set(False)
         # self.PLL[0].enable.set(False)
         # self.PLL[1].enable.set(False)
         # self.PLL[2].enable.set(False)

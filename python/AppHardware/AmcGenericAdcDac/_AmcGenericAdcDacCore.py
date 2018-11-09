@@ -17,12 +17,10 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
 import time
-
-from surf.devices.ti import *
-
-from AppHardware.AmcGenericAdcDac._AmcGenericAdcDacCtrl import *
+import pyrogue         as pr
+import surf.devices.ti as ti
+import AppHardware     as appHw
 
 class AmcGenericAdcDacCore(pr.Device):
     def __init__(   self, 
@@ -34,19 +32,19 @@ class AmcGenericAdcDacCore(pr.Device):
         #########
         # Devices
         #########
-        self.add(AmcGenericAdcDacCtrl(  offset=0x00000000, name='DBG',    expand=False))
-        self.add(Dac38J84(              offset=0x00002000, name='DAC',    expand=False, numTxLanes=2))
-        self.add(Lmk04828(              offset=0x00020000, name='LMK',    expand=False))
-        self.add(Adc16Dx370(            offset=0x00040000, name='ADC[0]', expand=False))
-        self.add(Adc16Dx370(            offset=0x00060000, name='ADC[1]', expand=False))
+        self.add(appHw.AmcGenericAdcDac.AmcGenericAdcDacCtrl(offset=0x00000000, name='DBG',    expand=False))
+        self.add(ti.Dac38J84(  offset=0x00002000, name='DAC',    expand=False, numTxLanes=2))
+        self.add(ti.Lmk04828(  offset=0x00020000, name='LMK',    expand=False))
+        self.add(ti.Adc16Dx370(offset=0x00040000, name='ADC[0]', expand=False))
+        self.add(ti.Adc16Dx370(offset=0x00060000, name='ADC[1]', expand=False))
 
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
             self.checkBlocks(recurse=True)
-            self.ADC[0].CalibrateAdc()
-            self.ADC[1].CalibrateAdc()
             self.LMK.Init()
             self.DAC.Init()        
+            self.ADC[0].CalibrateAdc()
+            self.ADC[1].CalibrateAdc()
             self.checkBlocks(recurse=True)  
            
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
@@ -73,28 +71,19 @@ class AmcGenericAdcDacCore(pr.Device):
         self.enable.set(True)
         self.DBG.enable.set(True)
         self.DAC.enable.set(True)
-        self.LMK.enable.set(True)        
+        self.LMK.enable.set(True)
         self.ADC[0].enable.set(True)
         self.ADC[1].enable.set(True)    
 
         self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
         
-        #self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        #self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable, checkEach=checkEach) # > 2.4.0
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
         self.InitAmcCard()
         
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
-        self.ADC[0].enable.set(False)
-        self.ADC[1].enable.set(False)         
-        self.DAC.enable.set(False)    
-        self.checkBlocks(recurse=True)        
-        
+        self.checkBlocks(recurse=True)

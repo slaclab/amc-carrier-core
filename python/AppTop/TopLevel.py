@@ -23,9 +23,8 @@ import pyrogue.protocols
 import pyrogue.utilities.fileio
 import rogue.hardware.axi
 import rogue.protocols.packetizer
-
-from AmcCarrierCore import *
-from AppTop import *
+import AmcCarrierCore as amccCore
+import AppTop         as appTop
 
 class TopLevel(pr.Device):
     def __init__(   self, 
@@ -142,7 +141,7 @@ class TopLevel(pr.Device):
                 raise ValueError("Invalid type (%s)" % (commType) )
 
         # Add devices
-        self.add(AmcCarrierCore(
+        self.add(amccCore.AmcCarrierCore(
             memBase           = self.srp,
             offset            = 0x00000000,
             rssiInterlaved    = rssiInterlaved,
@@ -150,7 +149,7 @@ class TopLevel(pr.Device):
             enableBsa         = enableBsa,
             enableMps         = enableMps,
         ))
-        self.add(AppTop(
+        self.add(appTop.AppTop(
             memBase      = self.srp,
             offset       = 0x80000000,
             numRxLanes   = numRxLanes,

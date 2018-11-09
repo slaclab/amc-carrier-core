@@ -17,17 +17,16 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-
-from AppTop.AppTopJesd import *
-from DacSigGen.DacSigGen import *
-from DaqMuxV2.DaqMuxV2 import *
-from common.AppCore import *
+import time
+import pyrogue   as pr
+import AppTop    as appTop
+import DacSigGen as dacSigGen
+import DaqMuxV2  as daqMuxV2
 
 import surf.devices.ti         as ti
 import surf.protocols.jesd204b as jesd
 
-import time
+import common as appCommon
 
 class AppTop(pr.Device):
     def __init__(   self, 
@@ -51,7 +50,7 @@ class AppTop(pr.Device):
         # Variables
         ##############################
 
-        self.add(AppCore(   
+        self.add(appCommon.AppCore(   
             offset       =  0x00000000, 
             numRxLanes   =  numRxLanes,
             numTxLanes   =  numTxLanes,
@@ -59,16 +58,16 @@ class AppTop(pr.Device):
         ))
 
         for i in range(2):
-            self.add(DaqMuxV2(
-                name         = "DaqMuxV2[%i]" % (i),
+            self.add(daqMuxV2.DaqMuxV2(
+                name         = f'DaqMuxV2[{i}]',
                 offset       =  0x20000000 + (i * 0x10000000),
                 expand       =  False,
             ))
 
         for i in range(2):
             if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
-                self.add(AppTopJesd(
-                    name         = "AppTopJesd[%i]" % (i),
+                self.add(appTop.AppTopJesd(
+                    name         = f'AppTopJesd[{i}]',
                     offset       =  0x40000000 + (i * 0x10000000),
                     numRxLanes   =  numRxLanes[i],
                     numTxLanes   =  numTxLanes[i],
@@ -78,8 +77,8 @@ class AppTop(pr.Device):
 
         for i in range(2):
             if ( (numSigGen[i] > 0) and (sizeSigGen[i] > 0) ):
-                self.add(DacSigGen(
-                    name         = "DacSigGen[%i]" % (i),
+                self.add(dacSigGen.DacSigGen(
+                    name         = f'DacSigGen[{i}]',
                     offset       =  0x60000000 + (i * 0x10000000),
                     numOfChs     =  numSigGen[i],
                     buffSize     =  sizeSigGen[i],
@@ -92,43 +91,22 @@ class AppTop(pr.Device):
             # Get devices
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
-            lmkDevices    = self.find(typ=ti.Lmk04828)
-            dacDevices    = self.find(typ=ti.Dac38J84)
-            sigGenDevices = self.find(typ=DacSigGen)
+            appCore       = self.find(typ=appCommon.AppCore)
+            sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
             
-            # Assert GTs Reset
+            # Power down AppCore (power down SysRef)
+            for core in appCore:
+                core.Disable()
+            # GTs Reset
             for rx in jesdRxDevices: 
-                rx.ResetGTs.set(1)
+                rx.CmdResetGTs()
             for tx in jesdTxDevices: 
-                rx.ResetGTs.set(1)          
-            # Power down sysref
-            for lmk in lmkDevices: 
-                enable = lmk.enable.get()
-                lmk.enable.set(True)
-                lmk.PwrDwnSysRef()
-                lmk.enable.set(enable)
+                tx.CmdResetGTs()
             self.checkBlocks(recurse=True)
             time.sleep(1.0)
-            # Reset the GTs
-            for rx in jesdRxDevices: 
-                rx.ResetGTs.set(0)
-            for tx in jesdTxDevices: 
-                tx.ResetGTs.set(0)
-            self.checkBlocks(recurse=True)
-            # Wait for GTs to setting (typical 100ms)
-            time.sleep(1.0)
-            # Init the DACs
-            for dac in dacDevices:
-                enable = dac.enable.get()
-                dac.enable.set(True)
-                dac.Init()
-                dac.enable.set(enable)
-            # Init the LMKs
-            for lmk in lmkDevices: 
-                enable = lmk.enable.get()
-                lmk.enable.set(True)
-                lmk.PwrUpSysRef() 
-                lmk.enable.set(enable)
+            # Init the AppCore
+            for core in appCore:
+                core.Init()
             # Wait for the system settle
             time.sleep(0.5)            
             # Clear all error counters
@@ -136,11 +114,6 @@ class AppTop(pr.Device):
                 rx.CmdClearErrors()  
             for tx in jesdTxDevices: 
                 tx.CmdClearErrors()
-            for dac in dacDevices: 
-                enable = dac.enable.get()
-                dac.enable.set(True)
-                dac.ClearAlarms()
-                dac.enable.set(enable)
             # Load the DAC signal generator
             for sigGen in sigGenDevices: 
                 if ( sigGen.CsvFilePath.get() != "" ):

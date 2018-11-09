@@ -2,7 +2,7 @@
 -- File       : RtmEmptyCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-06
--- Last update: 2018-03-14
+-- Last update: 2018-08-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -42,8 +42,8 @@ entity RtmEmptyCore is
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
       --  RTM's Clock Reference
-      genClkP         : in    sl;
-      genClkN         : in    sl);
+      genClkP         : in    sl                     := '0';
+      genClkN         : in    sl                     := '0');
 end RtmEmptyCore;
 
 architecture mapping of RtmEmptyCore is

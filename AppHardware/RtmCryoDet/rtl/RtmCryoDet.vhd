@@ -35,6 +35,8 @@ entity RtmCryoDet is
       -- JESD Clock Reference
       jesdClk         : in    sl;
       jesdRst         : in    sl;
+      -- Timing trigger
+      timingTrig      : in    sl;
       -- Digital I/O Interface
       startRamp       : out   sl;
       selectRamp      : out   sl;
@@ -59,14 +61,13 @@ end RtmCryoDet;
 
 architecture mapping of RtmCryoDet is
 
-   constant NUM_AXI_MASTERS_C : natural := 4;
+   constant NUM_AXI_MASTERS_C : natural := 3;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);
 
    constant REG_INDEX_C : natural := 0;
    constant PIC_INDEX_C : natural := 1;
    constant MAX_INDEX_C : natural := 2;
-   constant SR_INDEX_C  : natural := 3;
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -79,6 +80,7 @@ architecture mapping of RtmCryoDet is
       startRampExtPulse : sl;
       startRampExt      : sl;
       startRampPulse    : sl;
+      timingTrig        : sl;
       cnt               : slv(15 downto 0);
       pulseCnt          : slv(15 downto 0);
       rampMaxCnt        : slv(31 downto 0);
@@ -91,6 +93,7 @@ architecture mapping of RtmCryoDet is
       startRampExtPulse => '0',
       startRampExt      => '0',
       startRampPulse    => '0',
+      timingTrig        => '0',
       cnt               => (others => '0'),
       pulseCnt          => (others => '0'),
       rampMaxCnt        => (others => '0'),
@@ -109,11 +112,6 @@ architecture mapping of RtmCryoDet is
    signal maxSdi : sl;
    signal maxSdo : sl;
 
-   signal srCsL : sl;
-   signal srSck : sl;
-   signal srSdi : sl;
-   signal srSdo : sl;
-
    signal jesdClkDiv    : sl;
    signal jesdClkDivReg : sl;
 
@@ -121,7 +119,7 @@ architecture mapping of RtmCryoDet is
    signal extTrigSync   : sl;
    signal selRamp       : sl;
    signal enableRamp    : sl;
-   signal rampStartMode : sl;
+   signal rampStartMode : slv(1 downto 0);
    signal rtmReset      : sl;
    signal kRelay        : slv(1 downto 0);
    signal pulseWidth    : slv(15 downto 0);
@@ -129,6 +127,8 @@ architecture mapping of RtmCryoDet is
    signal rampMaxCnt    : slv(31 downto 0);
 
    signal startRampPulseReg : slv(1 downto 0);
+
+   signal timingTrigOneShot : sl;
 
 begin
 
@@ -203,11 +203,6 @@ begin
          OB => rtmLsN(17));
    ---------------------------------------------
 
-   srSdo      <= rtmLsP(18);
-   rtmLsN(18) <= srSck;
-   rtmLsP(19) <= srSdi;
-   rtmLsN(19) <= srCsL;
-
    U_extTrig : entity work.Synchronizer
       generic map (
          TPD_G => TPD_G)
@@ -216,11 +211,19 @@ begin
          dataIn  => extTrig,
          dataOut => extTrigSync);
 
+   U_TimingTrig : entity work.SynchronizerOneShot
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => jesdClk,
+         dataIn  => timingTrig,
+         dataOut => timingTrigOneShot);
+
    ------
    -- FSM
    ------
    comb : process (debounceWidth, enableRamp, extTrigSync, jesdRst, pulseWidth,
-                   r, rampMaxCnt, rampStartMode) is
+                   r, rampMaxCnt, rampStartMode, timingTrigOneShot) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
@@ -231,6 +234,7 @@ begin
       v.startRamp         := '0';
       v.startRampInt      := '0';
       v.startRampExtPulse := '0';
+      v.timingTrig        := timingTrigOneShot;
 
       ------------------------------------------------------------
       -- Internal Ramp Generation
@@ -284,9 +288,12 @@ begin
       -- Check if enabled
       if (enableRamp = '1') then
          -- Check ramp mode
-         if (rampStartMode = '0') then
+         if (rampStartMode = "00") then
             -- Select internal mode
             v.startRamp := r.startRampInt;
+         elsif (rampStartMode = "01") then
+            -- Select timing trigger
+            v.startRamp := r.timingTrig;
          else
             -- Select external mode
             v.startRamp := r.startRampExtPulse;
@@ -429,30 +436,5 @@ begin
          coreSDin       => maxSdo,
          coreSDout      => maxSdi,
          coreCsb        => maxCsL);
-
-   ----------------
-   -- SR SPI Module
-   ----------------
-   SR_SPI : entity work.AxiSpiMaster         -- FPGA=Master and CPLD=SLAVE
-      generic map (
-         TPD_G             => TPD_G,
-         MODE_G            => "RW",
-         ADDRESS_SIZE_G    => 11,            -- A[10:0]
-         DATA_SIZE_G       => 20,            -- D[19:0]
-         CPHA_G            => '0',           -- CPHA = 0
-         CPOL_G            => '0',           -- CPOL = 0
-         CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => (1.0/1.0E+6))  -- SCLK = 1MHz
-      port map (
-         axiClk         => axilClk,
-         axiRst         => axilRst,
-         axiReadMaster  => axilReadMasters(SR_INDEX_C),
-         axiReadSlave   => axilReadSlaves(SR_INDEX_C),
-         axiWriteMaster => axilWriteMasters(SR_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(SR_INDEX_C),
-         coreSclk       => srSck,
-         coreSDin       => srSdo,
-         coreSDout      => srSdi,
-         coreCsb        => srCsL);
 
 end architecture mapping;

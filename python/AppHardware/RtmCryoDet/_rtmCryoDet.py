@@ -17,13 +17,9 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-
-from AppHardware.RtmCryoDet._spiCryo import *
-from AppHardware.RtmCryoDet._spiMax import *
-from AppHardware.RtmCryoDet._spiSr import *
-
 import time
+import pyrogue     as pr
+import AppHardware as appHw
 
 class RtmCryoDet(pr.Device):
     def __init__(   self, 
@@ -35,9 +31,9 @@ class RtmCryoDet(pr.Device):
         #########
         # Devices
         #########
-        self.add(SpiCryo(offset=0x00100000, expand=False))    
-        self.add(SpiMax( offset=0x00200000, expand=False))    
-        self.add(SpiSr(  offset=0x00300000, expand=False))    
+        self.add(appHw.RtmCryoDet.SpiCryo(offset=0x00100000, expand=False))    
+        self.add(appHw.RtmCryoDet.SpiMax( offset=0x00200000, expand=False))    
+        self.add(appHw.RtmCryoDet.SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax 
         
         ###########
         # Registers
@@ -107,9 +103,9 @@ class RtmCryoDet(pr.Device):
 
         self.add(pr.RemoteVariable(    
             name         = "RampStartMode",
-            description  = "0x0 = internal start ramp pulses, 0x1 = external start ramp pulses",
+            description  = "0x0 = internal start ramp pulses, 0x1 = timing system trigger, 0x2 = external start ramp pulses",
             offset       = 0x14,
-            bitSize      = 1,
+            bitSize      = 2,
             bitOffset    = 2,
             base         = pr.UInt,
             mode         = "RW",

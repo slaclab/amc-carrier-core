@@ -17,10 +17,8 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
 import time
-
-from surf.devices.ti import *
+import pyrogue as pr
 
 class RtmDigitalDebug(pr.Device):
     def __init__(   self, 

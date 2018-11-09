@@ -11,11 +11,9 @@ import surf.misc as misc
 import surf.protocols.rssi as rssi
 import surf.xilinx as xilinx
 
-# Modules from AmcCarrierCore
-from AmcCarrierCore import *
-
-# Modules from AppMps
-from AppMps.AppMps import *
+# Modules from amc-carrier-core
+import AmcCarrierCore as amcc
+import AppMps as mps
 
 class AmcCarrierCore(pr.Device):
     def __init__(   self, 
@@ -83,17 +81,17 @@ class AmcCarrierCore(pr.Device):
             expand       =  False,
         ))
 
-        self.add(AmcCarrierBsi(   
+        self.add(amcc.AmcCarrierBsi(   
             offset       =  0x07000000, 
             expand       =  False,
         ))
 
-        self.add(AmcCarrierTiming(
+        self.add(amcc.AmcCarrierTiming(
             offset       =  0x08000000, 
             expand       =  False,
         ))
 
-        self.add(AmcCarrierBsa(   
+        self.add(amcc.AmcCarrierBsa(   
             offset       =  0x09000000, 
             enableBsa    =  enableBsa,
             expand       =  False,
@@ -157,7 +155,7 @@ class AmcCarrierCore(pr.Device):
         
         for i in range(2):
             self.add(rssi.RssiCore(
-                name         = "SwRssiServer[%i]" % (i),
+                name         = f'SwRssiServer[{i}]',
                 offset       =  0x0A010000 + (i * 0x1000),
                 description  = "SwRssiServer Server: %i" % (i),                                
                 expand       =  False,                                    
@@ -171,7 +169,7 @@ class AmcCarrierCore(pr.Device):
         ))            
 
         if (enableMps):
-            self.add(AppMps(      
+            self.add(mps.AppMps(      
                 offset =  0x0C000000, 
                 expand =  False
             ))            
@@ -203,7 +201,7 @@ class AmcCarrierCore(pr.Device):
         self._root.checkBlocks(recurse=True)
         
         for i in range(2):
-            v = getattr(self.AmcCarrierBsa, 'BsaWaveformEngine[%i]'%i)
+            v = getattr(self.AmcCarrierBsa, f'BsaWaveformEngine[{i}]')
             v.WaveformEngineBuffers.Initialize()
         
         self.checkBlocks(recurse=True)
