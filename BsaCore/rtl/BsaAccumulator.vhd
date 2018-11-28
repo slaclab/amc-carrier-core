@@ -514,8 +514,8 @@ begin
       axisMaster.tData(63 downto 0) <= fifoDout;
       axisMaster.tLast              <= r.tLast;
       axisMaster.tDest              <= toSlv(BSA_NUMBER_G, 8);
-      axisMaster.tKeep              <= X"00FF";
-      axisMaster.tStrb              <= X"00FF";
+      axisMaster.tKeep              <= resize(x"00FF",AXI_STREAM_MAX_TKEEP_WIDTH_C);
+      axisMaster.tStrb              <= resize(x"00FF",AXI_STREAM_MAX_TKEEP_WIDTH_C);
       axisMaster.tUser(14)          <= r.overflow or r.underflow;    -- EOFE
       axisMaster.tUser(15)          <= r.trigger;                    -- TRIGGER
 
