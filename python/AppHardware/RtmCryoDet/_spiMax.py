@@ -44,14 +44,14 @@ class SpiMax(pr.Device):
         # Variables
         ##############################
 
-        for i in range(0,225,32):
-            if i/32 < 7: 
+        for i in range(0,1056,32):
+            if i/32 <= 31:
                 j = i/32+1
                 str1 = "TesBias"
-            else: 
+            else:
                 j = 33
                 str1 = "HemtBias"
-                         
+
             self.add(pr.RemoteVariable(
                 name         = str1 + "DacNopRegCh[%d]" % (j),
                 description  = "BiasDac_Reg0",
@@ -62,8 +62,8 @@ class SpiMax(pr.Device):
                 base         = pr.UInt,
                 mode         = "WO",
             ))
-            
-            self.add(pr.RemoteVariable(    
+
+            self.add(pr.RemoteVariable(
                 name         = str1 + "DacDataRegCh[%d]" % (j),
                 description  = "BiasDac_Reg1",
                 offset       =  0x00 + (i+4),
@@ -72,8 +72,8 @@ class SpiMax(pr.Device):
                 base         = pr.Int,
                 mode         = "WO",
             ))
-            
-            self.add(pr.RemoteVariable(    
+
+            self.add(pr.RemoteVariable(
                 name         = str1 + "DacCtrlRegCh[%d]" % (j),
                 description  = "BiasDac_Reg2",
                 offset       =  0x00 + (i+8),
@@ -82,8 +82,8 @@ class SpiMax(pr.Device):
                 base         = pr.UInt,
                 mode         = "WO",
             ))
-            
-            self.add(pr.RemoteVariable(    
+
+            self.add(pr.RemoteVariable(
                 name         = str1 + "DacClrCRegCh[%d]" % (j),
                 description  = "BiasDac_Reg3",
                 offset       =  0x00 + (i+12),
@@ -92,3 +92,66 @@ class SpiMax(pr.Device):
                 base         = pr.UInt,
                 mode         = "WO",
             ))
+
+        # make waveform of DacNopRegChArray 
+        self.add(pr.LinkVariable(
+            name         = "TesBiasDacNopRegChArray",
+            hidden       = True,
+            description  = "TesBiasDacNopRegCh",
+            dependencies = [self.node(f'TesBiasDacNopRegCh[{i+1}]') for i in range(32)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray( dev, var, value),
+            typeStr      = "List[UInt20]",
+        ))
+
+        # make waveform of DacDataRegChArray 
+        self.add(pr.LinkVariable(
+            name         = "TesBiasDacDataRegChArray",
+            hidden       = True,
+            description  = "TesBiasDacDataRegCh",
+            dependencies = [self.node(f'TesBiasDacDataRegCh[{i+1}]') for i in range(32)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray( dev, var, value),
+            typeStr      = "List[Int20]",
+        ))
+
+        # make waveform of DacCtrlRegChArray 
+        self.add(pr.LinkVariable(
+            name         = "TesBiasDacCtrlRegChArray",
+            hidden       = True,
+            description  = "TesBiasDacCtrlRegCh",
+            dependencies = [self.node(f'TesBiasDacCtrlRegCh[{i+1}]') for i in range(32)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray( dev, var, value),
+            typeStr      = "List[UInt20]",
+        ))
+
+        # make waveform of DacClrCRegChArray 
+        self.add(pr.LinkVariable(
+            name         = "TesBiasDacClrCRegChArray",
+            hidden       = True,
+            description  = "TesBiasDacClrCRegCh",
+            dependencies = [self.node(f'TesBiasDacClrCRegCh[{i+1}]') for i in range(32)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray( dev, var, value),
+            typeStr      = "List[UInt20]",
+        ))
+
+    @staticmethod
+    def setArray(dev, var, value):
+       # workaround for rogue local variables
+       # list objects get written as string, not list of float when set by GUI
+       if isinstance(value, str):
+           value = eval(value)
+       for variable, setpoint in zip( var.dependencies, value ):
+           variable.set( setpoint, write=False )
+       dev.writeBlocks()
+       dev.verifyBlocks()
+       dev.checkBlocks()
+
+    @staticmethod
+    def getArray(dev, var, read):
+       if read:
+          dev.readBlocks(variable=var.dependencies)
+          dev.checkBlocks(variable=var.dependencies)
+       return [variable.value() for variable in var.dependencies]
