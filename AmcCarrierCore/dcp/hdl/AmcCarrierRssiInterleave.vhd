@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierRssiInterleave.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-02-09
--- Last update: 2018-08-17
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -90,28 +88,29 @@ begin
    -------------------------
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
-         TPD_G               => TPD_G,
-         PIPE_STAGES_G       => 1,
-         APP_ILEAVE_EN_G     => true,   -- true = AxiStreamPacketizer2
-         MAX_SEG_SIZE_G      => MAX_SEG_SIZE_C,  -- Using Jumbo frames
-         SEGMENT_ADDR_SIZE_G => bitSize(MAX_SEG_SIZE_C/8),
-         APP_STREAMS_G       => APP_STREAMS_C,
-         APP_STREAM_ROUTES_G => (
-            SRP_IDX_C        => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
-            BSA_ASYNC_IDX_C  => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
-            DIAG_ASYNC_IDX_C => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
-            MEM_DATA_IDX_C   => X"04",  -- TDEST 4 routed to stream 0 (MEM)
-            RAW_DATA_IDX_C   => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)            
-            APP_ASYNC_IDX_C  => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
-         CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
-         TIMEOUT_UNIT_G      => TIMEOUT_C,
-         SERVER_G            => true,
-         RETRANSMIT_ENABLE_G => true,
-         WINDOW_ADDR_SIZE_G  => WINDOW_ADDR_SIZE_C,
-         MAX_NUM_OUTS_SEG_G  => (2**WINDOW_ADDR_SIZE_C),
-         MAX_RETRANS_CNT_G   => 16,
-         APP_AXIS_CONFIG_G   => APP_AXIS_CONFIG_C,
-         TSP_AXIS_CONFIG_G   => EMAC_AXIS_CONFIG_C)
+         TPD_G                => TPD_G,
+         PIPE_STAGES_G        => 1,
+         APP_ILEAVE_EN_G      => true,  -- true = AxiStreamPacketizer2
+         ILEAVE_ON_NOTVALID_G => true,
+         MAX_SEG_SIZE_G       => MAX_SEG_SIZE_C,  -- Using Jumbo frames
+         SEGMENT_ADDR_SIZE_G  => bitSize(MAX_SEG_SIZE_C/8),
+         APP_STREAMS_G        => APP_STREAMS_C,
+         APP_STREAM_ROUTES_G  => (
+            SRP_IDX_C         => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
+            BSA_ASYNC_IDX_C   => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
+            DIAG_ASYNC_IDX_C  => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
+            MEM_DATA_IDX_C    => X"04",  -- TDEST 4 routed to stream 0 (MEM)
+            RAW_DATA_IDX_C    => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)            
+            APP_ASYNC_IDX_C   => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
+         CLK_FREQUENCY_G      => AXI_CLK_FREQ_C,
+         TIMEOUT_UNIT_G       => TIMEOUT_C,
+         SERVER_G             => true,
+         RETRANSMIT_ENABLE_G  => true,
+         WINDOW_ADDR_SIZE_G   => WINDOW_ADDR_SIZE_C,
+         MAX_NUM_OUTS_SEG_G   => (2**WINDOW_ADDR_SIZE_C),
+         MAX_RETRANS_CNT_G    => 16,
+         APP_AXIS_CONFIG_G    => APP_AXIS_CONFIG_C,
+         TSP_AXIS_CONFIG_G    => EMAC_AXIS_CONFIG_C)
       port map (
          clk_i             => axilClk,
          rst_i             => axilRst,

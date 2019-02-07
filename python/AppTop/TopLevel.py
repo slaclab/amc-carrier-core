@@ -62,7 +62,7 @@ class TopLevel(pr.Device):
 
         if (simGui):
             # Create simulation srp interface
-            srp=pyrogue.interfaces.simulation.MemEmulate()
+            self.srp=pyrogue.interfaces.simulation.MemEmulate()
         else:
         
             ################################################################################################################
@@ -113,29 +113,21 @@ class TopLevel(pr.Device):
                 
             elif ( commType == 'pcie-fsbl' ):
             
-                # Using PackVer2 after the DMA in firmware
-                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,pcieRssiLink,1)
-                self.pack = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
-                pr.streamConnectBiDir( self.pack.transport(), self.dma )
-
-                # Connect the SRPv0 to tDest = 0x0
-                self.srp = rogue.protocols.srp.SrpV0()
-                pr.streamConnectBiDir( self.srp, self.pack.application(0x0) )            
-
+                # TDEST 0 routed to stream 0 (SRPv3)
+                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*0x100 + 0),True)
+                self.srp = rogue.protocols.srp.SrpV3()
+                pr.streamConnectBiDir( self.srp, self.dma )
+    
             elif ( commType == 'pcie-rssi-interleaved' ):
             
                 # Update the flag
                 rssiInterlaved = True
-            
-                # Using PackVer2 after the DMA in firmware
-                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,pcieRssiLink,1)
-                self.pack = self.stream = rogue.protocols.packetizer.CoreV2(False,False) # ibCRC = False, obCRC = False
-                pr.streamConnectBiDir( self.pack.transport(), self.dma )
 
                 # TDEST 0 routed to stream 0 (SRPv3)
+                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*0x100 + 0),True)
                 self.srp = rogue.protocols.srp.SrpV3()
-                pr.streamConnectBiDir( self.srp, self.pack.application(0x0) )
-                    
+                pr.streamConnectBiDir( self.srp, self.dma )
+
             # Undefined device type
             else:
                 raise ValueError("Invalid type (%s)" % (commType) )
