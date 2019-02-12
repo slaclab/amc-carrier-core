@@ -47,6 +47,6 @@ class AmcCarrierTiming(pr.Device):
             offset = 0x00800000,
         ))        
 
-        self.add(EvrV2CoreTriggers(
+        self.add(timingCore.EvrV2CoreTriggers(
             offset = 0x00040000,
         ))
