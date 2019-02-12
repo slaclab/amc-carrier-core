@@ -17,13 +17,9 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-
-from AppHardware.RtmCryoDet._spiCryo import *
-from AppHardware.RtmCryoDet._spiMax import *
-from AppHardware.RtmCryoDet._spiSr import *
-
 import time
+import pyrogue     as pr
+import AppHardware as appHw
 
 class RtmCryoDet(pr.Device):
     def __init__(   self, 

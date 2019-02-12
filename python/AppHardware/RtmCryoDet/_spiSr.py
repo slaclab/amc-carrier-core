@@ -21,9 +21,9 @@ import pyrogue as pr
 import math
 
 class SpiSr(pr.Device):
-    def __init__(   self, 
-        name        = "RtmSpiSr", 
-        description = "RTM Flux Ramp SPI Interface", 
+    def __init__(   self,
+        name        = "RtmSpiSr",
+        description = "RTM Flux Ramp SPI Interface",
         memBase     =  None,
         offset      =  0x00,
         hidden      =  False,
@@ -38,15 +38,14 @@ class SpiSr(pr.Device):
             offset      = offset,
             hidden      = hidden,
             expand      = expand,
-            enabled     = enabled,        
+            enabled     = enabled,
         )
 
         ##############################
         # Variables
         ##############################
-        
         #--entire control register
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "ConfigReg",
             description  = "FluxRamp_Reg4",
             offset       =  0x800,
@@ -58,7 +57,7 @@ class SpiSr(pr.Device):
         ))
 
         #--Ctrl Reg0_[0]
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "CfgRegEnaBit",
             description  = "FluxRamp_Reg4_0",
             offset       =  0x800,
@@ -66,10 +65,10 @@ class SpiSr(pr.Device):
             bitOffset    =  0, #--offset from LSB
             mode         = "WO",
             overlapEn    = True,
-        ))        
-        
+        ))
+
         #--Ctrl Reg0_[2]
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "RampSlope",
             description  = "Sets ramp slope, 0 = Positive, 1 = Negative",
             offset       =  0x800,
@@ -77,10 +76,10 @@ class SpiSr(pr.Device):
             bitOffset    =  2, #--offset from LSB
             mode         = "WO",
             overlapEn    = True,
-        ))        
-        
+        ))
+
         #--Ctrl Reg0_[3]
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "ModeControl",
             description  = "0 = normal operation, 1 = write to DAC from control registers",
             offset       =  0x800,
@@ -88,7 +87,7 @@ class SpiSr(pr.Device):
             bitOffset    =  3, #--offset from LSB
             mode         = "WO",
             overlapEn    = True,
-        ))        
+        ))
 
         self.add(pr.RemoteVariable(    
             name         = "FastSlowStepSizeLow",

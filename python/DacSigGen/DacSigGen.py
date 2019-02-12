@@ -18,7 +18,6 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-from surf.misc import *
 import click 
 import csv
 
@@ -135,21 +134,15 @@ class DacSigGen(pr.Device):
             stride       =  4,
         )
                 
-        # ###########################################################
-        # ## Need to replace this with Ben future "MemoryNode" device
-        # ###########################################################
-        # for i in range(self._numOfChs):  
-            # self.add(GenericMemory(
-                # name         = "Waveform[%i]" % (i),
-                # description  = "Waveform data 16-bit samples.",
-                # offset       =  0x01000000 + (i * 0x01000000),
-                # bitSize      =  16,
-                # stride       =  4,
-                # mode         = "RW",
-                # # nelms        =  self._buffSize,
-                # nelms        =  16,
-                # # hidden       =  True,
-            # ))
+        for i in range(self._numOfChs):  
+            pr.MemoryDevice(
+                name        = ('Waveform[%d]' % i),
+                description = "Waveform data 16-bit samples.",
+                offset      = 0x01000000 + (i * 0x01000000),
+                size        = (2*self._buffSize),
+                wordBitSize = (16 if (fillMode) else 32),
+                stride      = (2  if (fillMode) else  4),
+            )        
     
         self.add(pr.LocalVariable(    
             name         = "CsvFilePath",

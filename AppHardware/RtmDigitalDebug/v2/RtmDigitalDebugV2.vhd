@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : RtmDigitalDebugV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-23
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -26,17 +24,19 @@ use unisim.vcomponents.all;
 
 entity RtmDigitalDebugV2 is
    generic (
-      TPD_G            : time            := 1 ns;
-      REG_DOUT_EN_G    : slv(7 downto 0) := x"00";  -- '1' = registered, '0' = unregistered
-      REG_DOUT_MODE_G  : slv(7 downto 0) := x"00";  -- If registered enabled, '1' = "cout" output, '0' = "dout" output
-      DIVCLK_DIVIDE_G  : positive        := 1;
-      CLKFBOUT_MULT_G  : positive        := 6;
-      CLKOUT0_DIVIDE_G : positive        := 6;
-      CLKOUT1_DIVIDE_G : positive        := 3);  -- drives the RTM's jitter clean input clock port
+      TPD_G            : time                       := 1 ns;
+      REG_DOUT_EN_G    : slv(7 downto 0)            := x"00";  -- '1' = registered, '0' = unregistered
+      REG_DOUT_MODE_G  : slv(7 downto 0)            := x"00";  -- If registered enabled, '1' = "cout" output, '0' = "dout" output
+      DIVCLK_DIVIDE_G  : positive                   := 1;
+      CLKFBOUT_MULT_G  : positive                   := 6;
+      CLKOUT0_DIVIDE_G : positive                   := 6;
+      CLKOUT1_DIVIDE_G : positive                   := 6;  -- drives the RTM's jitter clean input clock port
+      CLKOUT0_PHASE_G  : real range -360.0 to 360.0 := 0.0;
+      CLKOUT1_PHASE_G  : real range -360.0 to 360.0 := 0.0);
    port (
       -- Digital I/O Interface
       din             : out   slv(7 downto 0);  -- digital inputs from the RTM: ASYNC (not registered in FPGA or RTM)  
-      dout            : in    slv(7 downto 0);  -- digital outputs to the RTM: If REG_DOUT_MODE_G[x] = '0', then dout[x] SYNC to recClkOut(1) domain else DOUT driven as clock output.
+      dout            : in    slv(7 downto 0);  -- digital outputs to the RTM: If REG_DOUT_MODE_G[x] = '0', then dout[x] SYNC to recClkOut(0) domain else DOUT driven as clock output.
       cout            : in    slv(7 downto 0);  -- clock outputs to the RTM (REG_DOUT_EN_G(x) = '1' and REG_DOUT_MODE_G(x) = '1')
       -- Clock Jitter Cleaner Interface
       recClkIn        : in    sl;
@@ -45,13 +45,18 @@ entity RtmDigitalDebugV2 is
       recRstOut       : out   slv(1 downto 0);
       cleanClkOut     : out   sl;
       cleanClkLocked  : out   sl;
-      -- AXI-Lite Interface
+      -- AXI-Lite Interface (axilClk domain)
       axilClk         : in    sl;
       axilRst         : in    sl;
       axilReadMaster  : in    AxiLiteReadMasterType;
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- Optional FPGA's PLL DRP Interface (axilClk domain)
+      pllReadMaster   : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+      pllReadSlave    : out   AxiLiteReadSlaveType;
+      pllWriteMaster  : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+      pllWriteSlave   : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
       -----------------------      
@@ -101,13 +106,22 @@ begin
          DIVCLK_DIVIDE_G  => DIVCLK_DIVIDE_G,
          CLKFBOUT_MULT_G  => CLKFBOUT_MULT_G,
          CLKOUT0_DIVIDE_G => CLKOUT0_DIVIDE_G,
-         CLKOUT1_DIVIDE_G => CLKOUT1_DIVIDE_G)
+         CLKOUT1_DIVIDE_G => CLKOUT1_DIVIDE_G,
+         CLKOUT0_PHASE_G  => CLKOUT0_PHASE_G,
+         CLKOUT1_PHASE_G  => CLKOUT1_PHASE_G)
       port map (
-         clkIn  => recClkIn,
-         rstIn  => recRstIn,
-         clkOut => clk,
-         rstOut => rst,
-         locked => userValueIn(0));
+         clkIn           => recClkIn,
+         rstIn           => recRstIn,
+         clkOut          => clk,
+         rstOut          => rst,
+         locked          => userValueIn(0),
+         -- AXI-Lite Interface 
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => pllReadMaster,
+         axilReadSlave   => pllReadSlave,
+         axilWriteMaster => pllWriteMaster,
+         axilWriteSlave  => pllWriteSlave);
 
    userValueIn(31 downto 1) <= (others => '0');
 
@@ -166,7 +180,7 @@ begin
          REG_DOUT_EN_G   => REG_DOUT_EN_G,
          REG_DOUT_MODE_G => REG_DOUT_MODE_G)
       port map (
-         clk     => clk(1),             -- Used for REG_DOUT_EN_G(x) = '1')
+         clk     => clk(0),             -- Used for REG_DOUT_EN_G(x) = '1')
          disable => userValueOut(7 downto 0),
          -- Digital Output Interface
          dout    => dout,

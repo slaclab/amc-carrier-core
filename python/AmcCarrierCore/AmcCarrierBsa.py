@@ -18,9 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-
-from BsaCore.BsaBufferControl import *
-from BsaCore.BsaWaveformEngine import *
+import BsaCore as bsa
 
 class AmcCarrierBsa(pr.Device):
     def __init__( self, 
@@ -35,12 +33,12 @@ class AmcCarrierBsa(pr.Device):
         ##############################
 
         if (enableBsa):
-            self.add(BsaBufferControl(
+            self.add(bsa.BsaBufferControl(
                 offset       =  0x00000000,
             ))
 
         for i in range(2):
-            self.add(BsaWaveformEngine(
-                name         = "BsaWaveformEngine[%i]" % (i), 
-                offset       =  0x00010000 + i * 0x00010000,
+            self.add(bsa.BsaWaveformEngine(
+                name   = f'BsaWaveformEngine[{i}]',
+                offset =  0x00010000 + i * 0x00010000,
             ))

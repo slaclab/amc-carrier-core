@@ -438,6 +438,8 @@ set_clock_groups -asynchronous \
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {mpsClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {ddrClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]
 
+set_clock_groups -asynchronous -group [get_clocks mpsClkThresh] -group [get_clocks -of_objects [get_pins U_Core/U_AppMps/U_Clk/U_MpsSerdesPll/CLKOUT1]]
+
 ##########################
 ## Misc. Configurations ##
 ##########################

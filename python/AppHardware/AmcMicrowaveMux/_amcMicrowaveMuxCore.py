@@ -17,16 +17,10 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
 import time
-
-from surf.devices.ti._adc32Rf45 import *
-from surf.devices.ti._Dac38J84  import *
-from surf.devices.ti._Lmk04828  import *
-
-from AppHardware.AmcMicrowaveMux._amcMicrowaveMuxCtrl import *
-from AppHardware.AmcMicrowaveMux._adf5355 import *
-from AppHardware.AmcMicrowaveMux._hmc305 import *
+import pyrogue         as pr
+import surf.devices.ti as ti
+import AppHardware     as appHw
 
 class AmcMicrowaveMuxCore(pr.Device):
     def __init__(   self, 
@@ -134,7 +128,6 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
-
 
         self.ADC[0].HW_RST.set(0x1)
         self.ADC[1].HW_RST.set(0x1)

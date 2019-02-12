@@ -17,10 +17,8 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import pyrogue as pr
-
-from surf.misc import *
-from surf.axi import *
+import pyrogue  as pr
+import surf.axi as axi
 
 class BsaBufferControl(pr.Device):
     def __init__(   self, 
@@ -33,17 +31,18 @@ class BsaBufferControl(pr.Device):
         # Variables
         ##############################
 
-        self.add(GenericMemory(
-            name    = "Timestamps",
-            offset  =  0x00,
-            nelms   =  64,
-            bitSize =  64,
-            stride  =  8,
-            base    = pr.UInt,
-            mode    = "RO",                           
-        ))
+        pr.MemoryDevice(
+            name        = 'Timestamps',
+            description = '',
+            offset      = 0x00,
+            size        = (8*64), # Units of bytes
+            wordBitSize = 64, 
+            stride      = 8, 
+            verify      = False,
+            # mode        = "RO",                           
+        )        
         
-        self.add(AxiStreamDmaRingWrite(
+        self.add(axi.AxiStreamDmaRingWrite(
             offset     =  0x00001000,
             name       = "BsaBuffers",
             numBuffers =  1,
