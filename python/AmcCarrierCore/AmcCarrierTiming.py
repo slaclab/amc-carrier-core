@@ -46,7 +46,3 @@ class AmcCarrierTiming(pr.Device):
         self.add(timingCore.GthRxAlignCheck(
             offset = 0x00800000,
         ))        
-
-        self.add(timingCore.EvrV2CoreTriggers(
-            offset = 0x00040000,
-        ))

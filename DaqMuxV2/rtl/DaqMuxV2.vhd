@@ -31,7 +31,7 @@ entity DaqMuxV2 is
       DECIMATOR_EN_G         : boolean               := true;
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 8 := 4;
       FRAME_BWIDTH_G         : positive              := 10;  -- Axi stream frame size Dafault 10: 4096 byte frames
-      BAY_INDEX_G            : sl                    := '0';
+      BAY_INDEX_G            : sl;
       -- Number of data lanes
       N_DATA_IN_G            : positive              := 16;
       --Number of output Axi Stream Lanes
@@ -368,15 +368,16 @@ begin
       U_AsyncOutFifo : entity work.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
+            SLAVE_READY_EN_G    => true,
+            VALID_THOLD_G       => 1,
+            BRAM_EN_G           => true,
+            GEN_SYNC_FIFO_G     => false,
+            CASCADE_SIZE_G      => 1,
+            CASCADE_PAUSE_SEL_G => 0,
+            FIFO_ADDR_WIDTH_G   => 5,
+            FIFO_FIXED_THRESH_G => true,
             INT_PIPE_STAGES_G   => 0,
             PIPE_STAGES_G       => 1,
-            VALID_THOLD_G       => 1,
-            SLAVE_READY_EN_G    => true,
-            GEN_SYNC_FIFO_G     => false,
-            BRAM_EN_G           => true,
-            CASCADE_SIZE_G      => 1,
-            FIFO_ADDR_WIDTH_G   => 9,
-            FIFO_FIXED_THRESH_G => true,
             SLAVE_AXI_CONFIG_G  => ssiAxiStreamConfig(4, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3),  -- No tdest bits, 3 tUser bits
             MASTER_AXI_CONFIG_G => ssiAxiStreamConfig(WAVEFORM_TDATA_BYTES_G, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3))  -- Must match AmcCarrierCore.WAVEFORM_TDATA_BYTES_G generic configuration
          port map (

@@ -153,7 +153,7 @@ begin
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
-            VALID_THOLD_G       => 0, -- 0 = only when frame ready
+            VALID_THOLD_G       => 0,
             BRAM_EN_G           => true,
             XIL_DEVICE_G        => "ULTRASCALE",
             USE_BUILT_IN_G      => false,
@@ -161,6 +161,7 @@ begin
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 9,
             FIFO_FIXED_THRESH_G => true,
+            FIFO_PAUSE_THRESH_G => 1,                       --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
             SLAVE_AXI_CONFIG_G  => WAVEFORM_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)  -- 128-bit
          port map (
@@ -168,6 +169,7 @@ begin
             sAxisRst    => waveformRst,
             sAxisMaster => ibWaveformMasters(i),
             sAxisSlave  => ibWaveformSlaves(i).slave,
+            sAxisCtrl   => open,
             mAxisClk    => axiClk,
             mAxisRst    => axiRst,
             mAxisMaster => muxInAxisMaster(i),
@@ -196,7 +198,7 @@ begin
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
-         VALID_THOLD_G       => 0, -- 0 = only when frame ready
+         VALID_THOLD_G       => 1,
          BRAM_EN_G           => true,
          XIL_DEVICE_G        => "ULTRASCALE",
          USE_BUILT_IN_G      => false,
@@ -204,6 +206,7 @@ begin
          CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 9,
          FIFO_FIXED_THRESH_G => true,
+         FIFO_PAUSE_THRESH_G => 2**9-32,
          SLAVE_AXI_CONFIG_G  => WRITE_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)
       port map (
@@ -289,7 +292,7 @@ begin
          BURST_SIZE_BYTES_G    => 4096,
          SSI_OUTPUT_G          => true,
          AXIL_BASE_ADDR_G      => AXIL_BASE_ADDR_G,
-         AXI_STREAM_READY_EN_G => false, -- using readDmaDataCtrl for flow control
+         AXI_STREAM_READY_EN_G => true,
          AXI_STREAM_CONFIG_G   => READ_AXIS_CONFIG_C,
          AXI_READ_CONFIG_G     => AXI_CONFIG_G)
       port map (
@@ -317,17 +320,18 @@ begin
    AxiStreamFifo_RD_DATA : entity work.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
-         SLAVE_READY_EN_G    => false, -- using readDmaDataCtrl for flow control
+         SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
-         INT_WIDTH_SELECT_G  => "CUSTOM",
-         INT_DATA_WIDTH_G    => 16, --  16B = 128-bit
-         BRAM_EN_G           => true,
+         BRAM_EN_G           => false,
+         XIL_DEVICE_G        => "ULTRASCALE",
+         USE_BUILT_IN_G      => false,
          GEN_SYNC_FIFO_G     => false,
-         FIFO_ADDR_WIDTH_G   => 9, -- 8kB buffer (512 x 16B)
+         CASCADE_SIZE_G      => 1,
+         FIFO_ADDR_WIDTH_G   => 4,
          FIFO_FIXED_THRESH_G => true,
-         FIFO_PAUSE_THRESH_G => 128,  -- 2048 byte threshold 
+         FIFO_PAUSE_THRESH_G => 1,
          SLAVE_AXI_CONFIG_G  => READ_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C) 
+         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
          sAxisClk    => axiClk,
          sAxisRst    => axiRst,
@@ -337,7 +341,7 @@ begin
          mAxisClk    => axisDataClk,
          mAxisRst    => axisDataRst,
          mAxisMaster => axisDataMaster,
-         mAxisSlave  => axisDataSlave); 
+         mAxisSlave  => axisDataSlave);
 
    -------------------------------------------------------------------------------------------------
    -- AxiLite crossbar to allow AxiStreamDmaRingRead to access AxiStreamDmaRingWrite registers

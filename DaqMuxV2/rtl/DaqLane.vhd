@@ -2,7 +2,7 @@
 -- File       : DaqLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-04-02
--- Last update: 2018-09-11
+-- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:   This module sends sample data to a single Lane.
 --                In non-continuous mode
@@ -160,17 +160,9 @@ architecture rtl of DaqLane is
    signal s_sampDataTst   : slv((GT_WORD_SIZE_C*8)-1 downto 0);
    signal s_decSampData   : slv((GT_WORD_SIZE_C*8)-1 downto 0);
 
-   signal compCheck  : sl;
-   signal bufferDone : sl;
+   signal compCheck : sl;
 
 begin
-
-   ------------------------------------------------------
-   -- In BsaWaveformEngine.vhd: 
-   -- ibWaveformSlaves(i).ctrl.pause    <= bufferDone(i);
-   ------------------------------------------------------
-   bufferDone <= rxAxisCtrl_i.pause;
-
    -- Do not trigger decimator when busy
    -- because it will zero s_rateClk and data will be missed
    s_trigDecimator <= trig_i and not r.busy;
@@ -231,10 +223,10 @@ begin
          bin  => toSlv(HEADER_SIZE_C, 32),
          lsEq => compCheck);  -- less than or equal to (a <= b) --- (r.packetSize <= HEADER_SIZE_C)  
 
-   comb : process (LinkReady_i, averaging_i, axiNum_i, bsa_i, bufferDone,
-                   compCheck, dec16or32_i, devRst_i, dmod_i, enable_i,
-                   freeze_i, headerEn_i, header_i, mode_i, packetSize_i, r,
-                   rateDiv_i, rxAxisSlave_i, s_decSampData, s_rateClk,
+   comb : process (LinkReady_i, averaging_i, axiNum_i, bsa_i, compCheck,
+                   dec16or32_i, devRst_i, dmod_i, enable_i, freeze_i,
+                   headerEn_i, header_i, mode_i, packetSize_i, r, rateDiv_i,
+                   rxAxisCtrl_i, rxAxisSlave_i, s_decSampData, s_rateClk,
                    signWidth_i, signed_i, test_i, timeStamp_i, trig_i) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
@@ -249,11 +241,9 @@ begin
       v.compCheck := compCheck;
 
       -- Reset strobing signals
-      if (rxAxisSlave_i.tReady = '1') then
-         v.txAxisMaster.tValid := '0';
-         v.txAxisMaster.tLast  := '0';
-         v.txAxisMaster.tUser  := (others => '0');
-      end if;
+      v.txAxisMaster.tValid := '0';
+      v.txAxisMaster.tLast  := '0';
+      v.txAxisMaster.tUser  := (others => '0');
 
       -- Latch Freeze buffers flag if applied
       if (freeze_i = '1') then
@@ -265,7 +255,7 @@ begin
       -- Check if not in the IDLE state
       if (r.state /= IDLE_S) then
          -- Error if tReady or dataReady drops 
-         if (LinkReady_i = '0') then
+         if (rxAxisSlave_i.tReady = '0') or (LinkReady_i = '0') then
             v.error := '1';
          end if;
       end if;
@@ -285,7 +275,11 @@ begin
             v.signed             := signed_i;
             v.txAxisMaster.tDest := toSlv(axiNum_i, 8);
             -- Check if FIFO and JESD is ready
-            if (enable_i = '1')and (LinkReady_i = '1') and (bufferDone = '0')and (r.txAxisMaster.tValid = '0') and (r.trigSh(2) = '1') then
+            if (rxAxisCtrl_i.pause = '0')
+               and (enable_i = '1')
+               and (rxAxisSlave_i.tReady = '1')
+               and (LinkReady_i = '1')
+               and (r.trigSh(2) = '1') then
                -- Clear error at the beginning of transmission
                v.error := '0';
                -- Set the debug flag
@@ -302,127 +296,115 @@ begin
          when HEADER_S =>
             -- Sample data on s_rateClk rate
             if (s_rateClk = '1') then
-               -- Check if back pressure
-               if (v.txAxisMaster.tValid = '1') then
-                  -- Set error flag
-                  v.error := '1';
+               -- Move data
+               v.txAxisMaster.tvalid := '1';
+               -- Set the SOF bit
+               ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, r.sof);
+               v.sof                 := '0';
+               -- Increment the counter
+               v.dataCnt             := r.dataCnt + 1;
+               -- Insert header words depending on which it is
+               if (r.headerEn = '1') then
+                  case (r.dataCnt) is
+                     when toSlv(0, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(31 downto 0);
+                     when toSlv(1, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(63 downto 32);
+                     when toSlv(2, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(95 downto 64);
+                     when toSlv(3, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(127 downto 96);
+                     when toSlv(4, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(159 downto 128);
+                     when toSlv(5, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(191 downto 160);
+                     when toSlv(6, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(31 downto 0);
+                     when toSlv(7, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(63 downto 32);
+                     when toSlv(8, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(127 downto 96);
+                     when toSlv(9, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(95 downto 64);
+                     when toSlv(10, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(63 downto 32);
+                     when toSlv(11, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(31 downto 0);
+                     when toSlv(12, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := r.packetSize;
+                     when toSlv(13, 32) =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & r.dec16or32 & r.averaging & test_i & BAY_INDEX_G & toSlv(axiNum_i, 4) & r.rateDiv;
+                     when others =>
+                        v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := (others => '0');
+                  end case;
                else
-                  -- Move data
-                  v.txAxisMaster.tvalid := '1';
-                  -- Set the SOF bit
-                  ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, r.sof);
-                  v.sof                 := '0';
-                  -- Increment the counter
-                  v.dataCnt             := r.dataCnt + 1;
-                  -- Insert header words depending on which it is
-                  if (r.headerEn = '1') then
-                     case (r.dataCnt) is
-                        when toSlv(0, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(31 downto 0);
-                        when toSlv(1, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(63 downto 32);
-                        when toSlv(2, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(95 downto 64);
-                        when toSlv(3, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(127 downto 96);
-                        when toSlv(4, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(159 downto 128);
-                        when toSlv(5, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := dmod_i(191 downto 160);
-                        when toSlv(6, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(31 downto 0);
-                        when toSlv(7, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := timeStamp_i(63 downto 32);
-                        when toSlv(8, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(127 downto 96);
-                        when toSlv(9, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(95 downto 64);
-                        when toSlv(10, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(63 downto 32);
-                        when toSlv(11, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := bsa_i(31 downto 0);
-                        when toSlv(12, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := r.packetSize;
-                        when toSlv(13, 32) =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := header_i & r.dec16or32 & r.averaging & test_i & BAY_INDEX_G & toSlv(axiNum_i, 4) & r.rateDiv;
-                        when others =>
-                           v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := (others => '0');
-                     end case;
-                  else
-                     -- Send the JESD data
-                     v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
-                  end if;
-                  -- Check if packet length error
-                  if ((r.dataCnt = (HEADER_SIZE_C-1)) and (r.compCheck = '1')) or (r.error = '1') then
-                     -- Set the EOF bit
-                     v.txAxisMaster.tLast := '1';
-                     -- Set the EOFE bit
-                     ssiSetUserEofe(SSI_CONFIG_C, v.txAxisMaster, '1');
-                     -- Next state
-                     v.state              := IDLE_S;
-                  -- Check if header has been sent
-                  elsif (r.dataCnt = (HEADER_SIZE_C-1)) then
-                     -- Next state
-                     v.state := DATA_S;
-                  end if;
+                  -- Send the JESD data
+                  v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
+               end if;
+               -- Check if packet length error
+               if (r.dataCnt = (HEADER_SIZE_C-1)) and (r.compCheck = '1') then
+                  -- Set the EOF bit
+                  v.txAxisMaster.tLast := '1';
+                  -- Set the EOFE bit
+                  ssiSetUserEofe(SSI_CONFIG_C, v.txAxisMaster, '1');
+                  -- Next state
+                  v.state              := IDLE_S;
+               -- Check if header has been sent
+               elsif (r.dataCnt = (HEADER_SIZE_C-1)) then
+                  -- Next state
+                  v.state := DATA_S;
                end if;
             end if;
          ----------------------------------------------------------------------
          when DATA_S =>
             -- Sample data on s_rateClk rate
             if (s_rateClk = '1') then
-               -- Check if back pressure
-               if (v.txAxisMaster.tValid = '1') then
-                  -- Set error flag
-                  v.error := '1';
-               else
-                  -- Move data
-                  v.txAxisMaster.tvalid := '1';
-                  -- Set the SOF bit
-                  ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, r.sof);
-                  v.sof                 := '0';
-                  -- Check the counter
-                  if (r.dataCnt /= r.maxSize) then
-                     -- Increment the counter
-                     v.dataCnt := r.dataCnt + 1;
-                  end if;
-                  -- Send the JESD data 
-                  v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
-                  -- Check for EOF condition
-                  if (r.dataCnt = r.maxSize and mode_i = '0')  -- Stop sending data if packet size reached  
-                                             or (v.error = '1')  -- Immediately stop sending data if error occurs
-                                             or (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) then  -- end of frame condition
-                     -- Set the EOF bit
-                     v.txAxisMaster.tLast := '1';
-                     -- Set the EOFE bit
-                     ssiSetUserEofe(SSI_CONFIG_C, v.txAxisMaster, v.error);
-                     -- Set the freeze buffer tUser bit 
-                     -- if the trigger occurred during the packet the EOF will contain freeze buffer bit 
-                     axiStreamSetUserBit(SSI_CONFIG_C, v.txAxisMaster, FREZE_BUFFER_TUSER_G, r.freeze);
-                  end if;
-                  -- Check if need to stop sending data if in continuous mode or error detected
-                  if (r.dataCnt = r.maxSize and mode_i = '0')  -- Stop sending data if packet size reached  
-                                 or (v.error = '1') then  -- Immediately stop sending data if error occurs                                      
-                     -- Clear the flag
-                     v.freeze := '0';
+               -- Move data
+               v.txAxisMaster.tvalid := '1';
+               -- Set the SOF bit
+               ssiSetUserSof(SSI_CONFIG_C, v.txAxisMaster, r.sof);
+               v.sof                 := '0';
+               -- Check the counter
+               if (r.dataCnt /= r.maxSize) then
+                  -- Increment the counter
+                  v.dataCnt := r.dataCnt + 1;
+               end if;
+               -- Send the JESD data 
+               v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
+               -- Check for EOF condition
+               if (r.dataCnt = r.maxSize and mode_i = '0')  -- Stop sending data if packet size reached  
+                                          or (v.error = '1')  -- Immediately stop sending data if error occurs
+                                          or (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) then  -- end of frame condition
+                  -- Set the EOF bit
+                  v.txAxisMaster.tLast := '1';
+                  -- Set the EOFE bit
+                  ssiSetUserEofe(SSI_CONFIG_C, v.txAxisMaster, v.error);
+                  -- Set the freeze buffer tUser bit 
+                  -- if the trigger occurred during the packet the EOF will contain freeze buffer bit 
+                  axiStreamSetUserBit(SSI_CONFIG_C, v.txAxisMaster, FREZE_BUFFER_TUSER_G, r.freeze);
+               end if;
+               -- Check if need to stop sending data if in continuous mode or error detected
+               if (r.dataCnt = r.maxSize and mode_i = '0')  -- Stop sending data if packet size reached  
+                              or (v.error = '1') then  -- Immediately stop sending data if error occurs                                      
+                  -- Clear the flag
+                  v.freeze := '0';
+                  -- Next state
+                  v.state  := IDLE_S;
+               -- Check if finished a frame
+               elsif (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) then  -- end of frame condition
+                  -- Check if still enabled
+                  if (enable_i = '1') then
+                     -- Go to next frame                 
+                     v.sof := '1';
+                  else
                      -- Next state
-                     v.state  := IDLE_S;
-                  -- Check if finished a frame
-                  elsif (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) then  -- end of frame condition
-                     -- Check if still enabled
-                     if (enable_i = '1') then
-                        -- Go to next frame                 
-                        v.sof := '1';
-                     else
-                        -- Next state
-                        v.state := IDLE_S;  -- End packet if disabled                             
-                     end if;
-                     -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
-                     if (freeze_i = '1') then
-                        v.freeze := '1';
-                     else
-                        v.freeze := '0';
-                     end if;
+                     v.state := IDLE_S;  -- End packet if disabled                             
+                  end if;
+                  -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
+                  if (freeze_i = '1') then
+                     v.freeze := '1';
+                  else
+                     v.freeze := '0';
                   end if;
                end if;
             end if;
