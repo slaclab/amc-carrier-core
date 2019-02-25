@@ -89,8 +89,8 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    constant LMK_BASE_ADDR_C   : slv(31 downto 0) := x"0002_0000" + AXI_BASE_ADDR_G;
    constant DAC_0_BASE_ADDR_C : slv(31 downto 0) := x"0004_0000" + AXI_BASE_ADDR_G;
    constant DAC_1_BASE_ADDR_C : slv(31 downto 0) := x"0006_0000" + AXI_BASE_ADDR_G;
-   constant ADC_0_BASE_ADDR_C : slv(31 downto 0) := x"0008_0000" + AXI_BASE_ADDR_G;
-   constant ADC_1_BASE_ADDR_C : slv(31 downto 0) := x"000C_0000" + AXI_BASE_ADDR_G;
+   constant ADC_0_BASE_ADDR_C : slv(31 downto 0) := x"0010_0000" + AXI_BASE_ADDR_G;
+   constant ADC_1_BASE_ADDR_C : slv(31 downto 0) := x"0018_0000" + AXI_BASE_ADDR_G;
 
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       CTRL_INDEX_C    => (
@@ -111,11 +111,11 @@ architecture top_level_app of AmcMicrowaveMuxCore is
          connectivity => x"FFFF"),
       ADC_0_INDEX_C   => (
          baseAddr     => ADC_0_BASE_ADDR_C,
-         addrBits     => 18,
+         addrBits     => 19,
          connectivity => x"FFFF"),
       ADC_1_INDEX_C   => (
          baseAddr     => ADC_1_BASE_ADDR_C,
-         addrBits     => 18,
+         addrBits     => 19,
          connectivity => x"FFFF"));
 
    signal locAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
