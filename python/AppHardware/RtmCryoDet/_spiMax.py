@@ -92,3 +92,66 @@ class SpiMax(pr.Device):
                 base         = pr.UInt,
                 mode         = "WO",
             ))
+
+        # make waveform of DacNopRegChArray 
+        self.add(pr.LinkVariable(
+            name         = "TesBiasDacNopRegChArray",
+            hidden       = True,
+            description  = "TesBiasDacNopRegCh",
+            dependencies = [self.node(f'TesBiasDacNopRegCh[{i+1}]') for i in range(32)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray( dev, var, value),
+            typeStr      = "List[UInt20]",
+        ))
+
+        # make waveform of DacDataRegChArray 
+        self.add(pr.LinkVariable(
+            name         = "TesBiasDacDataRegChArray",
+            hidden       = True,
+            description  = "TesBiasDacDataRegCh",
+            dependencies = [self.node(f'TesBiasDacDataRegCh[{i+1}]') for i in range(32)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray( dev, var, value),
+            typeStr      = "List[Int20]",
+        ))
+
+        # make waveform of DacCtrlRegChArray 
+        self.add(pr.LinkVariable(
+            name         = "TesBiasDacCtrlRegChArray",
+            hidden       = True,
+            description  = "TesBiasDacCtrlRegCh",
+            dependencies = [self.node(f'TesBiasDacCtrlRegCh[{i+1}]') for i in range(32)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray( dev, var, value),
+            typeStr      = "List[UInt20]",
+        ))
+
+        # make waveform of DacClrCRegChArray 
+        self.add(pr.LinkVariable(
+            name         = "TesBiasDacClrCRegChArray",
+            hidden       = True,
+            description  = "TesBiasDacClrCRegCh",
+            dependencies = [self.node(f'TesBiasDacClrCRegCh[{i+1}]') for i in range(32)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray( dev, var, value),
+            typeStr      = "List[UInt20]",
+        ))
+
+    @staticmethod
+    def setArray(dev, var, value):
+       # workaround for rogue local variables
+       # list objects get written as string, not list of float when set by GUI
+       if isinstance(value, str):
+           value = eval(value)
+       for variable, setpoint in zip( var.dependencies, value ):
+           variable.set( setpoint, write=False )
+       dev.writeBlocks()
+       dev.verifyBlocks()
+       dev.checkBlocks()
+
+    @staticmethod
+    def getArray(dev, var, read):
+       if read:
+          dev.readBlocks(variable=var.dependencies)
+          dev.checkBlocks(variable=var.dependencies)
+       return [variable.value() for variable in var.dependencies]

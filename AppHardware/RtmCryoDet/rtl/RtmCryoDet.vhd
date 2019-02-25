@@ -85,6 +85,7 @@ architecture mapping of RtmCryoDet is
       pulseCnt          : slv(15 downto 0);
       rampMaxCnt        : slv(31 downto 0);
       rampCnt           : slv(31 downto 0);
+      timingTrig        : sl;
    end record;
 
    constant REG_INIT_C : RegType := (
@@ -97,7 +98,8 @@ architecture mapping of RtmCryoDet is
       cnt               => (others => '0'),
       pulseCnt          => (others => '0'),
       rampMaxCnt        => (others => '0'),
-      rampCnt           => (others => '0'));
+      rampCnt           => (others => '0'),
+      timingTrig        => '0');
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
