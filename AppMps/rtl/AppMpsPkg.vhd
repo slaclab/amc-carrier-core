@@ -441,10 +441,10 @@ package body AppMpsPkg is
             ret.BYTE_COUNT_C := 6;
 
             for i in 0 to 5 loop
-               ret.CHAN_CONFIG_C(i*4).THOLD_COUNT_C := 7;
-               ret.CHAN_CONFIG_C(i*4).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i*4).BYTE_MAP_C    := i;
-               ret.CHAN_CONFIG_C(i*4).IDLE_EN_C     := true;
+               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 7;
+               ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;
+               ret.CHAN_CONFIG_C(i).IDLE_EN_C     := true;
             end loop;
 
         when others =>
