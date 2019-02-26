@@ -202,7 +202,7 @@ begin
       U_URAM : entity work.AxiDualPortRam
          generic map (
             TPD_G         => TPD_G,
-            SYNTH_MODE_G  => "XPM",
+            SYNTH_MODE_G  => "xpm",
             MEMORY_TYPE_G => "ultra",
             COMMON_CLK_G  => true,
             ADDR_WIDTH_G  => ADDR_WIDTH_G,
