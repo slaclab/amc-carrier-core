@@ -49,6 +49,7 @@ use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.FpgaTypePkg.all;
 
 use work.Jesd204bPkg.all;
 
@@ -130,6 +131,11 @@ architecture rtl of DacSigGenLane is
    signal s_ramData  : slv(WIDTH_C-1 downto 0);
    signal s_dacData  : slv(WIDTH_C-1 downto 0);
    signal s_zeroData : slv(WIDTH_C-1 downto 0);
+   
+   signal readMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+   signal readSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
+   signal writeMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+   signal writeSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;   
 
 begin
 
@@ -144,30 +150,80 @@ begin
          dataIn     => start_i,
          risingEdge => s_startRe);      -- Rising edge
 
-   AxiDualPortRam_INST : entity work.AxiDualPortRam
-      generic map (
-         TPD_G        => TPD_G,
-         BRAM_EN_G    => true,
-         REG_EN_G     => true,
-         MODE_G       => "write-first",
-         ADDR_WIDTH_G => ADDR_WIDTH_G,
-         DATA_WIDTH_G => WIDTH_C,
-         INIT_G       => RAM_INIT_C)
-      port map (
-         -- Axi clk domain
-         axiClk         => axilClk,
-         axiRst         => axilRst,
-         axiReadMaster  => axilReadMaster,
-         axiReadSlave   => axilReadSlave,
-         axiWriteMaster => axilWriteMaster,
-         axiWriteSlave  => axilWriteSlave,
-         -- Dev clk domain
-         clk            => devClk,
-         rst            => devRst,
-         en             => enable_i,    -- Always read when enabled
-         addr           => r.cnt,
-         dout           => s_ramData);
+   
+         
+   GEN_BRAM : if (not ULTRASCALE_PLUS_C) generate
+            
+      U_RAM : entity work.AxiDualPortRam
+         generic map (
+            TPD_G        => TPD_G,
+            ADDR_WIDTH_G => ADDR_WIDTH_G,
+            DATA_WIDTH_G => WIDTH_C)
+         port map (
+            -- Axi clk domain
+            axiClk         => axilClk,
+            axiRst         => axilRst,
+            axiReadMaster  => axilReadMaster,
+            axiReadSlave   => axilReadSlave,
+            axiWriteMaster => axilWriteMaster,
+            axiWriteSlave  => axilWriteSlave,
+            -- Dev clk domain
+            clk            => devClk,
+            rst            => devRst,
+            en             => enable_i,    -- Always read when enabled
+            addr           => r.cnt,
+            dout           => s_ramData);
 
+   end generate GEN_BRAM;   
+
+   GEN_URAM : if (ULTRASCALE_PLUS_C) generate
+   
+      U_AxiLiteAsync : entity work.AxiLiteAsync
+         generic map (
+            TPD_G            => TPD_G,
+            NUM_ADDR_BITS_G  => (ADDR_WIDTH_G+2),
+            AXI_ERROR_RESP_G => AXI_RESP_SLVERR_C)
+         port map (
+            -- Slave Port
+            sAxiClk         => axilClk,
+            sAxiClkRst      => axilRst,
+            sAxiReadMaster  => axilReadMaster,
+            sAxiReadSlave   => axilReadSlave,
+            sAxiWriteMaster => axilWriteMaster,
+            sAxiWriteSlave  => axilWriteSlave,
+            -- Master Port
+            mAxiClk         => devClk,
+            mAxiClkRst      => devRst,
+            mAxiReadMaster  => readMaster,
+            mAxiReadSlave   => readSlave,
+            mAxiWriteMaster => writeMaster,
+            mAxiWriteSlave  => writeSlave);   
+            
+      U_URAM : entity work.AxiDualPortRam
+         generic map (
+            TPD_G         => TPD_G,
+            SYNTH_MODE_G  => "XPM",
+            MEMORY_TYPE_G => "ultra",
+            COMMON_CLK_G  => true,
+            ADDR_WIDTH_G  => ADDR_WIDTH_G,
+            DATA_WIDTH_G  => WIDTH_C)
+         port map (
+            -- Axi clk domain
+            axiClk         => devClk,
+            axiRst         => devRst,
+            axiReadMaster  => readMaster,
+            axiReadSlave   => readSlave,
+            axiWriteMaster => writeMaster,
+            axiWriteSlave  => writeSlave,
+            -- Dev clk domain
+            clk            => devClk,
+            rst            => devRst,
+            en             => enable_i,    -- Always read when enabled
+            addr           => r.cnt,
+            dout           => s_ramData);
+
+   end generate GEN_URAM;      
+            
    comb : process (devRst, enable_i, mode_i, period_i, r, s_startRe) is
       variable v : RegType;
    begin
