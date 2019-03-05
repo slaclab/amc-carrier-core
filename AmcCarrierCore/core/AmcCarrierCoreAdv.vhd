@@ -38,6 +38,8 @@ entity AmcCarrierCoreAdv is
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
       DISABLE_BLD_G          : boolean  := false;  -- false = includes BLD engine, true = doesn't build the BLD engine
+      DISABLE_MPS_G          : boolean  := false;  -- false = includes BSA engine
+      DISABLE_DDR_SRP_G      : boolean  := false;  -- false = includes SRPv3 for DDR
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
       TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
@@ -324,49 +326,59 @@ begin
          vPIn              => vPIn,
          vNIn              => vNIn);
 
-   ------------------
-   -- Application MPS
-   ------------------
-   U_AppMps : entity work.AppMps
-      generic map (
-         TPD_G      => TPD_G,
-         APP_TYPE_G => APP_TYPE_G,
-         MPS_SLOT_G => MPS_SLOT_G)
-      port map (
-         -- AXI-Lite Interface
-         axilClk         => ref156MHzClk,
-         axilRst         => ref156MHzRst,
-         axilReadMaster  => mpsReadMaster,
-         axilReadSlave   => mpsReadSlave,
-         axilWriteMaster => mpsWriteMaster,
-         axilWriteSlave  => mpsWriteSlave,
-         mpsCoreReg      => mpsCoreReg,
-         -- -- System Status
-         -- bsiBus          => bsiBus,
-         -- ethLinkUp       => ethLinkUp,
-         -- timingClk       => timingClk,
-         -- timingRst       => timingRst,
-         -- timingBus       => timingBusIntf,
-         ----------------------
-         -- Top Level Interface
-         ----------------------
-         -- Diagnostic Interface (diagnosticClk domain)
-         diagnosticClk   => diagnosticClk,
-         diagnosticRst   => diagnosticRst,
-         diagnosticBus   => diagnosticBus,
-         -- MPS Interface
-         mpsObMasters    => mpsObMasters,
-         mpsObSlaves     => mpsObSlaves,
-         ----------------
-         -- Core Ports --
-         ----------------
-         -- Backplane MPS Ports
-         mpsClkIn        => mpsClkIn,
-         mpsClkOut       => mpsClkOut,
-         mpsBusRxP       => mpsBusRxP,
-         mpsBusRxN       => mpsBusRxN,
-         mpsTxP          => mpsTxP,
-         mpsTxN          => mpsTxN);
+--   ------------------
+--   -- Application MPS
+--   ------------------
+   GEN_EN_MPS : if ( DISABLE_MPS_G = false ) generate
+      U_AppMps : entity work.AppMps
+         generic map (
+            TPD_G      => TPD_G,
+            APP_TYPE_G => APP_TYPE_G,
+            MPS_SLOT_G => MPS_SLOT_G)
+         port map (
+            -- AXI-Lite Interface
+            axilClk         => ref156MHzClk,
+            axilRst         => ref156MHzRst,
+            axilReadMaster  => mpsReadMaster,
+            axilReadSlave   => mpsReadSlave,
+            axilWriteMaster => mpsWriteMaster,
+            axilWriteSlave  => mpsWriteSlave,
+            mpsCoreReg      => mpsCoreReg,
+            -- -- System Status
+            -- bsiBus          => bsiBus,
+            -- ethLinkUp       => ethLinkUp,
+            -- timingClk       => timingClk,
+            -- timingRst       => timingRst,
+            -- timingBus       => timingBusIntf,
+            ----------------------
+            -- Top Level Interface
+            ----------------------
+            -- Diagnostic Interface (diagnosticClk domain)
+            diagnosticClk   => diagnosticClk,
+            diagnosticRst   => diagnosticRst,
+            diagnosticBus   => diagnosticBus,
+            -- MPS Interface
+            mpsObMasters    => mpsObMasters,
+            mpsObSlaves     => mpsObSlaves,
+            ----------------
+            -- Core Ports --
+            ----------------
+            -- Backplane MPS Ports
+            mpsClkIn        => mpsClkIn,
+            mpsClkOut       => mpsClkOut,
+            mpsBusRxP       => mpsBusRxP,
+            mpsBusRxN       => mpsBusRxN,
+            mpsTxP          => mpsTxP,
+            mpsTxN          => mpsTxN);
+   end generate GEN_EN_MPS;
+
+   GEN_DIS_MPS : if ( DISABLE_MPS_G = true ) generate
+         U_OBUFDS : OBUFDS
+            port map (
+               I  => '0',
+               O  => mpsTxP,
+               OB => mpsTxN);
+   end generate GEN_DIS_MPS;
 
    -------------------
    -- AMC Carrier Core
@@ -380,6 +392,7 @@ begin
          SIM_SPEEDUP_G          => SIM_SPEEDUP_G,
          DISABLE_BSA_G          => DISABLE_BSA_G,
          DISABLE_BLD_G          => DISABLE_BLD_G,
+         DISABLE_DDR_SRP_G      => DISABLE_DDR_SRP_G,
          RTM_ETH_G              => RTM_ETH_G,
          TIME_GEN_APP_G         => TIME_GEN_APP_G,
          TIME_GEN_EXTREF_G      => TIME_GEN_EXTREF_G,

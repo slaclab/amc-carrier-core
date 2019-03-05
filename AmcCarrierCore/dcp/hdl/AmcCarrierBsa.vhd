@@ -38,6 +38,7 @@ entity AmcCarrierBsa is
       FSBL_G                 : boolean                := false;
       DISABLE_BSA_G          : boolean                := false;
       DISABLE_BLD_G          : boolean                := false;
+      DISABLE_DDR_SRP_G      : boolean                := false;
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);
    port (
       -- AXI-Lite Interface (axilClk domain)
@@ -351,43 +352,45 @@ begin
          obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
       end generate BSA_DISABLE_GEN;
 
-      -----------------------------------------------------------------------------------------------
-      -- Mem Read engine
-      -----------------------------------------------------------------------------------------------
-      U_SrpV3Axi_1 : entity work.SrpV3Axi
-         generic map (
-            TPD_G               => TPD_G,
-            PIPE_STAGES_G       => 1,
-            FIFO_PAUSE_THRESH_G => 128,
-            TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
-            SLAVE_READY_EN_G    => true,
-            GEN_SYNC_FIFO_G     => false,
-            AXI_CLK_FREQ_G      => 200.0E+6,
-            AXI_CONFIG_G        => MEM_AXI_CONFIG_C,
---          AXI_BURST_G         => AXI_BURST_G,
---          AXI_CACHE_G         => AXI_CACHE_G,
-            ACK_WAIT_BVALID_G   => false,
-            AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C,
-            UNALIGNED_ACCESS_G  => false,
-            BYTE_ACCESS_G       => false,
-            WRITE_EN_G          => true,
-            READ_EN_G           => true)
-         port map (
-            sAxisClk       => axilClk,  -- [in]
-            sAxisRst       => axilRst,  -- [in]
-            sAxisMaster    => ibBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [in]
-            sAxisSlave     => ibBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [out]
-            sAxisCtrl      => open,     -- [out]
-            mAxisClk       => axilClk,  -- [in]
-            mAxisRst       => axilRst,  -- [in]
-            mAxisMaster    => obBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [out]
-            mAxisSlave     => obBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [in]
-            axiClk         => axiClk,   -- [in]
-            axiRst         => axiRst,   -- [in]
-            axiWriteMaster => memAxiWriteMaster,                   -- [out]
-            axiWriteSlave  => memAxiWriteSlave,                    -- [in]
-            axiReadMaster  => memAxiReadMaster,                    -- [out]
-            axiReadSlave   => memAxiReadSlave);                    -- [in]
+--      -----------------------------------------------------------------------------------------------
+--      -- Mem Read engine
+--      -----------------------------------------------------------------------------------------------
+     GEN_EN_SRP : if ( DISABLE_DDR_SRP_G = false ) generate
+         U_SrpV3Axi_1 : entity work.SrpV3Axi
+            generic map (
+               TPD_G               => TPD_G,
+               PIPE_STAGES_G       => 1,
+               FIFO_PAUSE_THRESH_G => 128,
+               TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
+               SLAVE_READY_EN_G    => true,
+               GEN_SYNC_FIFO_G     => false,
+               AXI_CLK_FREQ_G      => 200.0E+6,
+               AXI_CONFIG_G        => MEM_AXI_CONFIG_C,
+   --          AXI_BURST_G         => AXI_BURST_G,
+   --          AXI_CACHE_G         => AXI_CACHE_G,
+               ACK_WAIT_BVALID_G   => false,
+               AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C,
+               UNALIGNED_ACCESS_G  => false,
+               BYTE_ACCESS_G       => false,
+               WRITE_EN_G          => true,
+               READ_EN_G           => true)
+            port map (
+               sAxisClk       => axilClk,  -- [in]
+               sAxisRst       => axilRst,  -- [in]
+               sAxisMaster    => ibBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [in]
+               sAxisSlave     => ibBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [out]
+               sAxisCtrl      => open,     -- [out]
+               mAxisClk       => axilClk,  -- [in]
+               mAxisRst       => axilRst,  -- [in]
+               mAxisMaster    => obBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [out]
+               mAxisSlave     => obBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [in]
+               axiClk         => axiClk,   -- [in]
+               axiRst         => axiRst,   -- [in]
+               axiWriteMaster => memAxiWriteMaster,                   -- [out]
+               axiWriteSlave  => memAxiWriteSlave,                    -- [in]
+               axiReadMaster  => memAxiReadMaster,                    -- [out]
+               axiReadSlave   => memAxiReadSlave);                    -- [in]
+   end generate GEN_EN_SRP;
 
       ------------------------------------------------------------------------------------------------
       -- Axi Interconnect
