@@ -220,9 +220,9 @@ architecture mapping of AmcCarrierCoreAdv is
    signal ddrMemError       : sl;
    --  MPS Interface
    signal mpsReadMaster     : AxiLiteReadMasterType;
-   signal mpsReadSlave      : AxiLiteReadSlaveType;
+   signal mpsReadSlave      : AxiLiteReadSlaveType := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
    signal mpsWriteMaster    : AxiLiteWriteMasterType;
-   signal mpsWriteSlave     : AxiLiteWriteSlaveType;
+   signal mpsWriteSlave     : AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
    signal ref156MHzClk  : sl;
    signal ref156MHzRst  : sl;
@@ -373,11 +373,13 @@ begin
    end generate GEN_EN_MPS;
 
    GEN_DIS_MPS : if ( DISABLE_MPS_G = true ) generate
-         U_OBUFDS : OBUFDS
-            port map (
-               I  => '0',
-               O  => mpsTxP,
-               OB => mpsTxN);
+      mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
+      mpsClkOut    <= '0';
+      U_OBUFDS : OBUFDS
+         port map (
+            I  => '0',
+            O  => mpsTxP,
+            OB => mpsTxN);
    end generate GEN_DIS_MPS;
 
    -------------------

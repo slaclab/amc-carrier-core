@@ -392,6 +392,13 @@ begin
                axiReadSlave   => memAxiReadSlave);                    -- [in]
    end generate GEN_EN_SRP;
 
+   GEN_DIS_SRP : if ( DISABLE_DDR_SRP_G = true ) generate
+      ibBsaSlaves(BSA_MEM_AXIS_INDEX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
+      obBsaMasters(BSA_MEM_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
+      memAxiWriteMaster                  <= AXI_WRITE_MASTER_INIT_C;
+      memAxiReadMaster                   <= AXI_READ_MASTER_INIT_C;
+   end generate GEN_DIS_SRP;
+
       ------------------------------------------------------------------------------------------------
       -- Axi Interconnect
       -- Mux AXI busses, resize to 512 wide data words, buffer bursts
