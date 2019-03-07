@@ -38,10 +38,8 @@ set_clock_groups -asynchronous -group [get_clocks {ddrClkIn}] -group [get_clocks
 ## Wrapper Timing Constraints ##
 ################################
 
-create_generated_clock -name iprogClk -divide_by 8 -source [get_pins {U_Core/U_SysReg/U_Iprog/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/I}] [get_pins {U_Core/U_SysReg/U_Iprog/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O}]
-create_generated_clock -name dnaClk -divide_by 8 -source [get_pins {U_Core/U_SysReg/U_Version/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/I}] [get_pins {U_Core/U_SysReg/U_Version/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O}]
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {iprogClk}]
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {dnaClk}]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_AmcCorePll/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_Core/U_SysReg/U_Iprog/GEN_ULTRA_SCALE.IprogUltraScale_Inst/BUFGCE_DIV_Inst/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_AmcCorePll/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_Core/U_SysReg/U_Version/GEN_DEVICE_DNA.DeviceDna_1/GEN_ULTRA_SCALE.DeviceDnaUltraScale_Inst/BUFGCE_DIV_Inst/O]]
 
 create_generated_clock -name jesd0_185MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
 create_generated_clock -name jesd0_370MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
