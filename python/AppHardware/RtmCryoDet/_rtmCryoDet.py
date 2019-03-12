@@ -31,9 +31,9 @@ class RtmCryoDet(pr.Device):
         #########
         # Devices
         #########
-        self.add(SpiCryo(offset=0x00100000, expand=False))    
-        self.add(SpiMax( offset=0x00200000, expand=False))    
-        self.add(SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax 
+        self.add(appHw.RtmCryoDet.SpiCryo(offset=0x00100000, expand=False))    
+        self.add(appHw.RtmCryoDet.SpiMax( offset=0x00200000, expand=False))    
+        self.add(appHw.RtmCryoDet.SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax 
         
         ###########
         # Registers
