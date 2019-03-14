@@ -24,6 +24,7 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
+use work.FpgaTypePkg.all;
 
 entity AmcCarrierRssiInterleave is
    generic (
@@ -90,6 +91,8 @@ begin
       generic map (
          TPD_G                => TPD_G,
          PIPE_STAGES_G        => 1,
+         SYNTH_MODE_G         => "xpm",
+         MEMORY_TYPE_G        => ite(ULTRASCALE_PLUS_C,"ultra","block"),   
          APP_ILEAVE_EN_G      => true,  -- true = AxiStreamPacketizer2
          ILEAVE_ON_NOTVALID_G => true,
          MAX_SEG_SIZE_G       => MAX_SEG_SIZE_C,  -- Using Jumbo frames

@@ -25,4 +25,6 @@ package FpgaTypePkg is
    -- constant CPSW_TARBALL_ADDR_C : slv(31 downto 0) := x"062A8D48";
    constant CPSW_TARBALL_ADDR_C : slv(31 downto 0) := x"062A8D4C";  -- Include ones.bin 4 byte offset
 
+   constant ULTRASCALE_PLUS_C : boolean := true;
+
 end package FpgaTypePkg;
