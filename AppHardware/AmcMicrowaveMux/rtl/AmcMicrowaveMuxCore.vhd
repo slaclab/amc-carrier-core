@@ -2,7 +2,7 @@
 -- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-10-05
--- Last update: 2018-08-28
+-- Last update: 2019-03-26
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -169,14 +169,13 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal dacCoreClk  : slv(1 downto 0);
    signal dacCoreDout : slv(1 downto 0);
    signal dacCoreCsb  : slv(1 downto 0);
+   signal dacDinVec   : slv(1 downto 0);
+   signal dacIoVec    : slv(1 downto 0);
 
    signal dacMuxClk  : sl;
    signal dacMuxDout : sl;
    signal dacMuxDin  : sl;
-
-   signal dacSpiClk : sl;
-   signal dacSpiDio : sl;
-   signal dacSpiCsb : slv(1 downto 0);
+   signal dacDin     : sl;
 
    -- DAC JTAG
    signal dacJtagTclk  : sl := '0';
@@ -212,6 +211,8 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal axilRstL     : sl;
    signal dacReset     : slv(1 downto 0) := (others => '0');
    signal dacJtagReset : sl              := '0';
+   signal dacSpiMode   : sl              := '0';
+   signal dacTriState  : sl              := '0';
    signal lmkSync      : sl              := '0';
 
 begin
@@ -250,10 +251,15 @@ begin
    syncOutP(9) <= adcSpiDi;
 
    -- DAC SPI
-   spareP(0)   <= dacSpiClk;
-   spareP(1)   <= dacSpiDio;
-   spareN(0)   <= dacSpiCsb(0);
-   syncOutP(8) <= dacSpiCsb(1);
+   spareP(1)   <= dacIoVec(0);
+   spareP(0)   <= dacMuxClk when(dacSpiMode = '0') else dacCoreClk(0);
+   spareN(0)   <= dacCoreCsb(0);
+   syncOutP(8) <= dacIoVec(1);
+
+   spareP(6)    <= dacCoreDout(1);
+   spareN(6)    <= dacCoreClk(1);
+   spareP(7)    <= dacCoreCsb(1);
+   dacDinVec(1) <= spareN(7);
 
    -- DAC JTAG
    syncOutP(4) <= dacJtagTclk;
@@ -380,7 +386,8 @@ begin
          txSyncMask      => jesdTxSyncMask,
          dacReset        => dacReset,
          dacJtagReset    => dacJtagReset,
-         lmkSync         => lmkSync);
+         lmkSync         => lmkSync,
+         dacSpiMode      => dacSpiMode);
 
    ----------------------------------------------------------------
    -- SPI interface PLL (ADF5355)
@@ -613,15 +620,34 @@ begin
       end if;
    end process;
 
-   IOBUF_Dac : IOBUF
+   IOBUF_Dac0 : IOBUF
       port map (
          I  => '0',
-         O  => dacMuxDin,
-         IO => dacSpiDio,
-         T  => dacMuxDout);
+         O  => dacDin,
+         IO => dacIoVec(0),
+         T  => dacTriState);
 
-   dacSpiClk <= dacMuxClk;
-   dacSpiCsb <= dacCoreCsb;
+   IOBUF_Dac1 : IOBUF
+      port map (
+         I  => dacCoreCsb(1),
+         O  => dacDinVec(0),
+         IO => dacIoVec(1),
+         T  => dacSpiMode);
+
+   dacTriState <= dacSpiMode or dacMuxDout;
+
+   process(dacCoreCsb, dacDin, dacDinVec, dacSpiMode)
+   begin
+      if (dacSpiMode = '0') then
+         dacMuxDin <= dacDin;
+      elsif dacCoreCsb = "10" then
+         dacMuxDin <= dacDinVec(0);
+      elsif dacCoreCsb = "01" then
+         dacMuxDin <= dacDinVec(1);
+      else
+         dacMuxDin <= '0';
+      end if;
+   end process;
 
    -------------------------------
    -- SPI interface LMK (LMK04828)
