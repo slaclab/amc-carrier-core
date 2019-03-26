@@ -55,13 +55,11 @@ class AmcGenericAdcDacCore(pr.Device):
 
         # Process local blocks.
         if variable is not None:
-            #variable._block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
             variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
         else:
             for block in self._blocks:
                 if force or block.stale:
                     if block.bulkEn:
-                        #block.startTransaction(rogue.interfaces.memory.Write, check=checkEach) # > 2.4.0
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
         # Retire any in-flight transactions before starting
