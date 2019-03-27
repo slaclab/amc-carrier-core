@@ -60,7 +60,7 @@ class SpiMax(pr.Device):
                 bitSize      =  20,
                 bitOffset    =  0x00,
                 base         = pr.UInt,
-                mode         = "WO",
+                mode         = "RW",
             ))
 
             self.add(pr.RemoteVariable(
@@ -70,7 +70,7 @@ class SpiMax(pr.Device):
                 bitSize      =  20,
                 bitOffset    =  0x00,
                 base         = pr.Int,
-                mode         = "WO",
+                mode         = "RW",
             ))
 
             self.add(pr.RemoteVariable(
@@ -80,7 +80,7 @@ class SpiMax(pr.Device):
                 bitSize      =  20,
                 bitOffset    =  0x00,
                 base         = pr.UInt,
-                mode         = "WO",
+                mode         = "RW",
             ))
 
             self.add(pr.RemoteVariable(
@@ -90,7 +90,7 @@ class SpiMax(pr.Device):
                 bitSize      =  20,
                 bitOffset    =  0x00,
                 base         = pr.UInt,
-                mode         = "WO",
+                mode         = "RW",
             ))
 
         # make waveform of DacNopRegChArray 
