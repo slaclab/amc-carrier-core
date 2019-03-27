@@ -57,7 +57,7 @@ architecture rtl of hmc305 is
 
    type RegType is record
       cnt           : natural range 0 to MAX_CNT_C;
-      data          : Slv5Array(2 downto 0);
+      data          : Slv5Array(7 downto 0);
       devAddr       : slv(2 downto 0);
       devLe         : sl;
       wrEn          : sl;
