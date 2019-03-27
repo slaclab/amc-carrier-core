@@ -129,6 +129,7 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
+        self._root.checkBlocks(recurse=True)
         self.ADC[0].HW_RST.set(0x1)
         self.ADC[1].HW_RST.set(0x1)
 
