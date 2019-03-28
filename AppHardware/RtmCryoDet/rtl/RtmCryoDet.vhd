@@ -419,6 +419,7 @@ begin
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",
+         SHADOW_EN_G       => true,
          ADDRESS_SIZE_G    => 11,            -- A[10:0]
          DATA_SIZE_G       => 20,            -- D[19:0]
          CPHA_G            => '0',           -- CPHA = 0

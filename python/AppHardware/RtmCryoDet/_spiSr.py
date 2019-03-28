@@ -52,7 +52,7 @@ class SpiSr(pr.Device):
             bitSize      =  20,
             bitOffset    =  0x00,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
             overlapEn    = True,
         ))
 
@@ -63,7 +63,7 @@ class SpiSr(pr.Device):
             offset       =  0x800,
             bitSize      =  1,
             bitOffset    =  0, #--offset from LSB
-            mode         = "WO",
+            mode         = "RW",
             overlapEn    = True,
         ))
 
@@ -74,7 +74,7 @@ class SpiSr(pr.Device):
             offset       =  0x800,
             bitSize      =  1,
             bitOffset    =  2, #--offset from LSB
-            mode         = "WO",
+            mode         = "RW",
             overlapEn    = True,
         ))
 
@@ -85,7 +85,7 @@ class SpiSr(pr.Device):
             offset       =  0x800,
             bitSize      =  1,
             bitOffset    =  3, #--offset from LSB
-            mode         = "WO",
+            mode         = "RW",
             overlapEn    = True,
         ))
 
@@ -96,7 +96,7 @@ class SpiSr(pr.Device):
             bitSize      =  16,
             bitOffset    =  0x00,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))
 
         self.add(pr.RemoteVariable(    
@@ -106,7 +106,7 @@ class SpiSr(pr.Device):
             bitSize      =  16,
             bitOffset    =  0x00,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))
 
         self.add(pr.LinkVariable(    
@@ -125,7 +125,7 @@ class SpiSr(pr.Device):
             bitSize      =  16,
             bitOffset    =  0x00,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))
          
         self.add(pr.RemoteVariable(    
@@ -135,7 +135,7 @@ class SpiSr(pr.Device):
             bitSize      =  16,
             bitOffset    =  0x00,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))
 
         self.add(pr.LinkVariable(    
@@ -154,7 +154,7 @@ class SpiSr(pr.Device):
             bitSize      =  16,
             bitOffset    =  0x00,
             base         = pr.UInt,
-            mode         = "WO",
+            mode         = "RW",
         ))
 
     @staticmethod
