@@ -281,11 +281,14 @@ begin
          -- Reset Outputs
          rstOut(0) => reset);
 
-   -- Forcing BUFG for reset that's used everywhere      
-   U_BUFG : BUFG
+   -- Help with meeting timing on the reset path
+   U_Rst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
       port map (
-         I => reset,
-         O => axilRst);
+         clk    => axilClk,
+         rstIn  => reset,
+         rstOut => axilRst);
 
    ------------------
    -- Ethernet Module
