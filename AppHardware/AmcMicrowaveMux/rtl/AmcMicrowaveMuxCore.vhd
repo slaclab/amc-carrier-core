@@ -213,6 +213,7 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal dacJtagReset : sl              := '0';
    signal dacSpiMode   : sl              := '0';
    signal dacTriState  : sl              := '0';
+   signal dacInState   : sl              := '0';
    signal lmkSync      : sl              := '0';
 
 begin
@@ -622,19 +623,20 @@ begin
 
    IOBUF_Dac0 : IOBUF
       port map (
-         I  => '0',
+         I  => dacInState,
          O  => dacDin,
          IO => dacIoVec(0),
          T  => dacTriState);
 
+   dacInState  <= dacCoreDout(0) when (dacSpiMode='1') else '0';
+   dacTriState <= '0'            when (dacSpiMode='1') else dacMuxDout;      
+      
    IOBUF_Dac1 : IOBUF
       port map (
          I  => dacCoreCsb(1),
          O  => dacDinVec(0),
          IO => dacIoVec(1),
          T  => dacSpiMode);
-
-   dacTriState <= dacSpiMode or dacMuxDout;
 
    process(dacCoreCsb, dacDin, dacDinVec, dacSpiMode)
    begin
