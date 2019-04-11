@@ -43,6 +43,7 @@ entity AmcMicrowaveMuxCoreCtrl is
       -- DAC reset
       dacReset        : out slv(1 downto 0);
       dacJtagReset    : out sl;
+      dacSpiMode      : out sl;
       -- LMK Sync
       lmkSync         : out sl);
 end AmcMicrowaveMuxCoreCtrl;
@@ -54,6 +55,7 @@ architecture rtl of AmcMicrowaveMuxCoreCtrl is
       dacReset       : slv(1 downto 0);
       dacJtagReset   : sl;
       lmkSync        : sl;
+      dacSpiMode     : sl;
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -63,6 +65,7 @@ architecture rtl of AmcMicrowaveMuxCoreCtrl is
       dacReset       => (others => '0'),
       dacJtagReset   => '0',
       lmkSync        => '0',
+      dacSpiMode     => '0',
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -92,6 +95,7 @@ begin
       axiSlaveRegister(regCon, x"800", 2, v.dacReset);
       axiSlaveRegister(regCon, x"800", 4, v.dacJtagReset);
       axiSlaveRegister(regCon, x"800", 5, v.lmkSync);
+      axiSlaveRegister(regCon, x"800", 6, v.dacSpiMode);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
@@ -111,6 +115,7 @@ begin
       dacReset       <= r.dacReset;
       dacJtagReset   <= r.dacJtagReset;
       lmkSync        <= r.lmkSync;
+      dacSpiMode     <= r.dacSpiMode;
 
    end process comb;
 
