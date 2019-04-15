@@ -2,7 +2,7 @@
 -- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2018-07-27
+-- Last update: 2019-04-15
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
 ------------------------------------------------------------------------------
@@ -61,18 +61,35 @@ end RtmCryoDet;
 
 architecture mapping of RtmCryoDet is
 
-   constant NUM_AXI_MASTERS_C : natural := 3;
+   constant NUM_AXI_MASTERS_C : natural := 4;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXI_MASTERS_C, AXI_BASE_ADDR_G, 24, 20);
 
    constant REG_INDEX_C : natural := 0;
    constant PIC_INDEX_C : natural := 1;
    constant MAX_INDEX_C : natural := 2;
+   constant LUT_INDEX_C : natural := 3;
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+
+   constant DAC_LUT_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(0 downto 0) := (
+      0               => (
+         baseAddr     => AXI_BASE_ADDR_G,
+         addrBits     => 24,
+         connectivity => x"FFFF"));
+
+   signal dacLutReadMaster  : AxiLiteReadMasterType;
+   signal dacLutReadSlave   : AxiLiteReadSlaveType;
+   signal dacLutWriteMaster : AxiLiteWriteMasterType;
+   signal dacLutWriteSlave  : AxiLiteWriteSlaveType;
+
+   signal maxSpiReadMaster  : AxiLiteReadMasterType;
+   signal maxSpiReadSlave   : AxiLiteReadSlaveType;
+   signal maxSpiWriteMaster : AxiLiteWriteMasterType;
+   signal maxSpiWriteSlave  : AxiLiteWriteSlaveType;
 
    type RegType is record
       startRamp         : sl;
@@ -413,6 +430,53 @@ begin
          coreCsb        => picCsL);
 
    ------------------
+   -- DAC LUT Module
+   ------------------
+   DAC_LUT : entity work.RtmCryoDacLut
+      generic map (
+         TPD_G            => TPD_G,
+         AXIL_BASE_ADDR_G => AXI_CONFIG_C(LUT_INDEX_C).baseAddr)
+      port map (
+         hwTrig           => '0', -- Mitch: Please connect this to the correct port.
+         -- Clock and Reset
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         -- Slave AXI-Lite Interface
+         sAxilReadMaster  => axilReadMasters(LUT_INDEX_C),
+         sAxilReadSlave   => axilReadSlaves(LUT_INDEX_C),
+         sAxilWriteMaster => axilWriteMasters(LUT_INDEX_C),
+         sAxilWriteSlave  => axilWriteSlaves(LUT_INDEX_C),
+         -- Slave AXI-Lite Interface
+         mAxilReadMaster  => dacLutReadMaster,
+         mAxilReadSlave   => dacLutReadSlave,
+         mAxilWriteMaster => dacLutWriteMaster,
+         mAxilWriteSlave  => dacLutWriteSlave);
+
+   U_DAC_LUT_XBAR : entity work.AxiLiteCrossbar
+      generic map (
+         TPD_G              => TPD_G,
+         NUM_SLAVE_SLOTS_G  => 2,
+         NUM_MASTER_SLOTS_G => 1,
+         MASTERS_CONFIG_G   => DAC_LUT_XBAR_CONFIG_C)
+      port map (
+         axiClk              => axilClk,
+         axiClkRst           => axilRst,
+         -- Slave Ports
+         sAxiWriteMasters(0) => axilWriteMasters(MAX_INDEX_C),
+         sAxiWriteMasters(1) => dacLutWriteMaster,
+         sAxiWriteSlaves(0)  => axilWriteSlaves(MAX_INDEX_C),
+         sAxiWriteSlaves(1)  => dacLutWriteSlave,
+         sAxiReadMasters(0)  => axilReadMasters(MAX_INDEX_C),
+         sAxiReadMasters(1)  => dacLutReadMaster,
+         sAxiReadSlaves(0)   => axilReadSlaves(MAX_INDEX_C),
+         sAxiReadSlaves(1)   => dacLutReadSlave,
+         -- Master Ports
+         mAxiWriteMasters(0) => maxSpiWriteMaster,
+         mAxiWriteSlaves(0)  => maxSpiWriteSlave,
+         mAxiReadMasters(0)  => maxSpiReadMaster,
+         mAxiReadSlaves(0)   => maxSpiReadSlave);
+
+   ------------------
    -- MAX SPI Module
    ------------------
    MAX_SPI : entity work.AxiSpiMaster        -- FPGA=Master and CPLD=SLAVE
@@ -429,10 +493,10 @@ begin
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
-         axiReadMaster  => axilReadMasters(MAX_INDEX_C),
-         axiReadSlave   => axilReadSlaves(MAX_INDEX_C),
-         axiWriteMaster => axilWriteMasters(MAX_INDEX_C),
-         axiWriteSlave  => axilWriteSlaves(MAX_INDEX_C),
+         axiReadMaster  => maxSpiReadMaster,
+         axiReadSlave   => maxSpiReadSlave,
+         axiWriteMaster => maxSpiWriteMaster,
+         axiWriteSlave  => maxSpiWriteSlave,
          coreSclk       => maxSck,
          coreSDin       => maxSdo,
          coreSDout      => maxSdi,
