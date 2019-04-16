@@ -76,6 +76,8 @@ architecture rtl of RtmCryoDacLut is
       dropTrigCnt    : slv(15 downto 0);
       timerSize      : slv(15 downto 0);
       timer          : slv(15 downto 0);
+      eventCnt       : slv(15 downto 0);
+      errorCnt       : slv(15 downto 0);
       rdLat          : natural range 0 to 4;
       index          : natural range 0 to NUM_CH_G-1;
       req            : AxiLiteReqType;
@@ -97,6 +99,8 @@ architecture rtl of RtmCryoDacLut is
       dropTrigCnt    => (others => '0'),
       timerSize      => (others => '0'),
       timer          => (others => '0'),
+      eventCnt       => (others => '0'),
+      errorCnt       => (others => '0'),
       rdLat          => 0,
       index          => 0,
       req            => AXI_LITE_REQ_INIT_C,
@@ -179,6 +183,8 @@ begin
       axiSlaveRegisterR(axilEp, x"20", 16, r.busy);
       axiSlaveRegisterR(axilEp, x"24", 0, r.trigCnt);
       axiSlaveRegisterR(axilEp, x"28", 0, r.dropTrigCnt);
+      axiSlaveRegisterR(axilEp, x"2C", 0, r.eventCnt);
+      axiSlaveRegisterR(axilEp, x"30", 0, r.errorCnt);
 
       axiSlaveRegister (axilEp, x"40", 0, v.continuous);
       axiSlaveRegister (axilEp, x"44", 0, v.maxAddr);
@@ -223,6 +229,9 @@ begin
                   -- Increment the trigger counter
                   v.trigCnt := r.trigCnt + 1;
                end if;
+               
+               -- Count each iteration 
+               v.eventCnt := r.eventCnt + 1;
 
                -- Next state
                v.state := WAIT_S;
@@ -263,6 +272,11 @@ begin
 
                -- Reset the flag
                v.req.request := '0';
+               
+               if (r.req.request = '1') and (ack.resp /= AXI_RESP_OK_C) then
+                  -- Increment the address
+                  v.errorCnt := r.errorCnt + 1;               
+               end if;
 
                -- Check if last channel
                if (r.index = NUM_CH_G-1) then
@@ -316,6 +330,8 @@ begin
       if (r.cntRst = '1') then
          v.trigCnt     := (others => '0');
          v.dropTrigCnt := (others => '0');
+         v.eventCnt    := (others => '0');
+         v.errorCnt    := (others => '0');
       end if;
 
       -- Synchronous Reset

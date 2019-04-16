@@ -29,6 +29,7 @@ use unisim.vcomponents.all;
 entity RtmCryoDet is
    generic (
       TPD_G           : time             := 1 ns;
+      SIMULATION_G    : boolean          := false;
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
@@ -406,13 +407,13 @@ begin
    ------------------
    -- PIC SPI Module
    ------------------
-   PIC_SPI : entity work.RtmCryoSpiMaster      -- FPGA=Master and PIC=SLAVE
+   PIC_SPI : entity work.RtmCryoSpiMaster  -- FPGA=Master and PIC=SLAVE
       generic map (
          TPD_G             => TPD_G,
-         CPHA_G            => '0',             -- CPHA = 0
-         CPOL_G            => '0',             -- CPOL = 0
+         CPHA_G            => '0',      -- CPHA = 0
+         CPOL_G            => '0',      -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => (1.0/100.0E+3))  -- SCLK = 100KHz
+         SPI_SCLK_PERIOD_G => ite(SIMULATION_G, (1.0/AXI_CLK_FREQ_G), (1.0/100.0E+3)))  -- SCLK = 100KHz
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -471,17 +472,17 @@ begin
    ------------------
    -- MAX SPI Module
    ------------------
-   MAX_SPI : entity work.AxiSpiMaster        -- FPGA=Master and CPLD=SLAVE
+   MAX_SPI : entity work.AxiSpiMaster   -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",
          SHADOW_EN_G       => true,
-         ADDRESS_SIZE_G    => 11,            -- A[10:0]
-         DATA_SIZE_G       => 20,            -- D[19:0]
-         CPHA_G            => '0',           -- CPHA = 0
-         CPOL_G            => '0',           -- CPOL = 0
+         ADDRESS_SIZE_G    => 11,       -- A[10:0]
+         DATA_SIZE_G       => 20,       -- D[19:0]
+         CPHA_G            => '0',      -- CPHA = 0
+         CPOL_G            => '0',      -- CPOL = 0
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
-         SPI_SCLK_PERIOD_G => (1.0/1.0E+6))  -- SCLK = 1MHz
+         SPI_SCLK_PERIOD_G => ite(SIMULATION_G, (1.0/AXI_CLK_FREQ_G), (1.0/1.0E+6)))  -- SCLK = 1MHz
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
