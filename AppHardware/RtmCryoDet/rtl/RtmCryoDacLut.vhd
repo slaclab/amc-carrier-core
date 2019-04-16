@@ -42,8 +42,6 @@ entity RtmCryoDacLut is
       sAxilWriteMaster : in  AxiLiteWriteMasterType;
       sAxilWriteSlave  : out AxiLiteWriteSlaveType;
       -- Slave AXI-Lite Interface
-      mAxilReadMaster  : out AxiLiteReadMasterType;
-      mAxilReadSlave   : in  AxiLiteReadSlaveType;
       mAxilWriteMaster : out AxiLiteWriteMasterType;
       mAxilWriteSlave  : in  AxiLiteWriteSlaveType);
 end entity RtmCryoDacLut;
@@ -351,7 +349,7 @@ begin
          axilRst         => axilRst,
          axilWriteMaster => mAxilWriteMaster,
          axilWriteSlave  => mAxilWriteSlave,
-         axilReadMaster  => mAxilReadMaster,
-         axilReadSlave   => mAxilReadSlave);
+         axilReadMaster  => open,
+         axilReadSlave   => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
 
 end rtl;

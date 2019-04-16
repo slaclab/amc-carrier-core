@@ -2,7 +2,7 @@
 -- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-11-03
--- Last update: 2019-04-15
+-- Last update: 2019-04-16
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
 ------------------------------------------------------------------------------
@@ -81,13 +81,9 @@ architecture mapping of RtmCryoDet is
          addrBits     => 24,
          connectivity => x"FFFF"));
 
-   signal dacLutReadMaster  : AxiLiteReadMasterType;
-   signal dacLutReadSlave   : AxiLiteReadSlaveType;
    signal dacLutWriteMaster : AxiLiteWriteMasterType;
    signal dacLutWriteSlave  : AxiLiteWriteSlaveType;
 
-   signal maxSpiReadMaster  : AxiLiteReadMasterType;
-   signal maxSpiReadSlave   : AxiLiteReadSlaveType;
    signal maxSpiWriteMaster : AxiLiteWriteMasterType;
    signal maxSpiWriteSlave  : AxiLiteWriteSlaveType;
 
@@ -437,7 +433,7 @@ begin
          TPD_G            => TPD_G,
          AXIL_BASE_ADDR_G => AXI_CONFIG_C(LUT_INDEX_C).baseAddr)
       port map (
-         hwTrig           => '0', -- Mitch: Please connect this to the correct port.
+         hwTrig           => '0',  -- Mitch: Please connect this to the correct port.
          -- Clock and Reset
          axilClk          => axilClk,
          axilRst          => axilRst,
@@ -447,8 +443,6 @@ begin
          sAxilWriteMaster => axilWriteMasters(LUT_INDEX_C),
          sAxilWriteSlave  => axilWriteSlaves(LUT_INDEX_C),
          -- Slave AXI-Lite Interface
-         mAxilReadMaster  => dacLutReadMaster,
-         mAxilReadSlave   => dacLutReadSlave,
          mAxilWriteMaster => dacLutWriteMaster,
          mAxilWriteSlave  => dacLutWriteSlave);
 
@@ -466,15 +460,13 @@ begin
          sAxiWriteMasters(1) => dacLutWriteMaster,
          sAxiWriteSlaves(0)  => axilWriteSlaves(MAX_INDEX_C),
          sAxiWriteSlaves(1)  => dacLutWriteSlave,
-         sAxiReadMasters(0)  => axilReadMasters(MAX_INDEX_C),
-         sAxiReadMasters(1)  => dacLutReadMaster,
-         sAxiReadSlaves(0)   => axilReadSlaves(MAX_INDEX_C),
-         sAxiReadSlaves(1)   => dacLutReadSlave,
+         sAxiReadMasters     => (others => AXI_LITE_READ_MASTER_INIT_C),
+         sAxiReadSlaves      => open,
          -- Master Ports
          mAxiWriteMasters(0) => maxSpiWriteMaster,
          mAxiWriteSlaves(0)  => maxSpiWriteSlave,
-         mAxiReadMasters(0)  => maxSpiReadMaster,
-         mAxiReadSlaves(0)   => maxSpiReadSlave);
+         mAxiReadMasters     => open,
+         mAxiReadSlaves      => (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C));
 
    ------------------
    -- MAX SPI Module
@@ -493,8 +485,8 @@ begin
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
-         axiReadMaster  => maxSpiReadMaster,
-         axiReadSlave   => maxSpiReadSlave,
+         axiReadMaster  => axilReadMasters(MAX_INDEX_C),
+         axiReadSlave   => axilReadSlaves(MAX_INDEX_C),
          axiWriteMaster => maxSpiWriteMaster,
          axiWriteSlave  => maxSpiWriteSlave,
          coreSclk       => maxSck,
