@@ -105,11 +105,14 @@ begin
       -- dacAxilAddr(1) = 0x00020004
       axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0004", x"0020_0004", true);
 
-      -- timerSize = 0x0
-      axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0048", x"0000_0000", true);
+      -- timerSize = 0xFF
+      axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0048", x"0000_00FF", true);
 
-      -- maxAddr = 0x0
-      axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0044", x"0000_0000", true);      
+      -- -- maxAddr = 0x0
+      -- axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0044", x"0000_0000", true);    
+      
+      -- enableCh = 0x1
+      axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0044", x"0000_0001", true);          
       
       -- continuous = 0x1
       axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0040", x"0000_0001", true);
