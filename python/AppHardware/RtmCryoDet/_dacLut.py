@@ -32,12 +32,39 @@ class LutMem(pr.Device):
             name        = 'MEM', 
             offset      = 0x0, 
             number      =  2**ADDR_WIDTH_G, 
-            bitSize     =  32, 
+            bitSize     =  20,
             bitOffset   =  0, 
             stride      =  4,
             mode        = "RW", 
+            base         = pr.Int,
             hidden      = True,
         )
+
+        self.add(pr.LinkVariable(
+            name         = 'MemArray',
+            hidden       = True,
+            description  = "LUT mem array",
+            dependencies = [self.node(f'MEM[{i}]') for i in range(2**ADDR_WIDTH_G)],
+            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
+            linkedSet    = lambda dev, var, value: dev.setArray(dev, var, value),
+            typeStr      = "List[Int20]",
+        ))
+
+    @staticmethod
+    def setArray(dev, var, value):
+        for variable, setpoint in zip(var.dependencies, value):
+            variable.set(setpoint, write=False)
+        dev.writeBlocks()
+        dev.verifyBlocks()
+        dev.checkBlocks()
+
+    @staticmethod
+    def getArray(dev, var, read):
+        if read:
+           dev.readBlocks(variable=var.dependencies)
+           dev.checkBlocks(variable=var.dependencies)
+        return [variable.value() for variable in var.dependencies]
+
         
 class LutCtrl(pr.Device):
     def __init__(   self,       
@@ -164,19 +191,17 @@ class DacLut(pr.Device):
         super().__init__(name=name,description=description,**kwargs)
         
         self.add(LutCtrl(
-            name     = 'Ctrl', 
-            offset   = 0x00000, 
-            NUM_CH_G = NUM_CH_G,
-            NUM_CH_G = ADDR_WIDTH_G,
-            expand   = False,
+            name         = 'Ctrl',
+            offset       = 0x00000,
+            NUM_CH_G     = NUM_CH_G,
+            ADDR_WIDTH_G = ADDR_WIDTH_G,
+            expand       = False,
         ))
         
         for i in range(NUM_CH_G):
             self.add(LutMem(
-                name     = f'Lut[{i}]', 
-                offset   = 0x10000+i*0x10000, 
-                NUM_CH_G = NUM_CH_G,
-                NUM_CH_G = ADDR_WIDTH_G,
-                expand   = False,
+                name         = f'Lut[{i}]',
+                offset       = 0x10000+i*0x10000,
+                ADDR_WIDTH_G = ADDR_WIDTH_G,
+                expand       = False,
             ))            
-            
