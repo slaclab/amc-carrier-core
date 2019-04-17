@@ -34,6 +34,7 @@ class RtmCryoDet(pr.Device):
         self.add(appHw.RtmCryoDet.SpiCryo(offset=0x00100000, expand=False))    
         self.add(appHw.RtmCryoDet.SpiMax( offset=0x00200000, expand=False))    
         self.add(appHw.RtmCryoDet.SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax 
+        self.add(appHw.RtmCryoDet.DacLut( offset=0x00300000, BASE_ADDR_G=0x82200000, expand=False))    
         
         ###########
         # Registers
