@@ -32,7 +32,7 @@ class LutMem(pr.Device):
             name        = 'MEM', 
             offset      = 0x0, 
             number      =  2**ADDR_WIDTH_G, 
-            bitSize     =  20,
+            bitSize     =  20, 
             bitOffset   =  0, 
             stride      =  4,
             mode        = "RW", 
@@ -72,6 +72,7 @@ class LutCtrl(pr.Device):
         description = "Container for LUT Memory Controls",
         NUM_CH_G     = 2,
         ADDR_WIDTH_G = 11,
+        BASE_ADDR_G  = 0,
         **kwargs):
         
         super().__init__(name=name,description=description,**kwargs)
@@ -83,6 +84,40 @@ class LutCtrl(pr.Device):
                 offset       = 4*i,
                 bitSize      = 32, 
                 mode         = 'RW',
+                enum         = {
+                   BASE_ADDR_G + 0x004 : "Dac[1]",
+                   BASE_ADDR_G + 0x024 : "Dac[2]",
+                   BASE_ADDR_G + 0x044 : "Dac[3]",
+                   BASE_ADDR_G + 0x064 : "Dac[4]",
+                   BASE_ADDR_G + 0x084 : "Dac[5]",
+                   BASE_ADDR_G + 0x0A4 : "Dac[6]",
+                   BASE_ADDR_G + 0x0C4 : "Dac[7]",
+                   BASE_ADDR_G + 0x0E4 : "Dac[8]",
+                   BASE_ADDR_G + 0x104 : "Dac[9]",
+                   BASE_ADDR_G + 0x124 : "Dac[10]",
+                   BASE_ADDR_G + 0x144 : "Dac[11]",
+                   BASE_ADDR_G + 0x164 : "Dac[12]",
+                   BASE_ADDR_G + 0x184 : "Dac[13]",
+                   BASE_ADDR_G + 0x1A4 : "Dac[14]",
+                   BASE_ADDR_G + 0x1C4 : "Dac[15]",
+                   BASE_ADDR_G + 0x1E4 : "Dac[16]",
+                   BASE_ADDR_G + 0x204 : "Dac[17]",
+                   BASE_ADDR_G + 0x224 : "Dac[18]",
+                   BASE_ADDR_G + 0x244 : "Dac[19]",
+                   BASE_ADDR_G + 0x264 : "Dac[20]",
+                   BASE_ADDR_G + 0x284 : "Dac[21]",
+                   BASE_ADDR_G + 0x2A4 : "Dac[22]",
+                   BASE_ADDR_G + 0x2C4 : "Dac[23]",
+                   BASE_ADDR_G + 0x2E4 : "Dac[24]",
+                   BASE_ADDR_G + 0x304 : "Dac[25]",
+                   BASE_ADDR_G + 0x324 : "Dac[26]",
+                   BASE_ADDR_G + 0x344 : "Dac[27]",
+                   BASE_ADDR_G + 0x364 : "Dac[28]",
+                   BASE_ADDR_G + 0x384 : "Dac[29]",
+                   BASE_ADDR_G + 0x3A4 : "Dac[30]",
+                   BASE_ADDR_G + 0x3C4 : "Dac[31]",
+                   BASE_ADDR_G + 0x3E4 : "Dac[32]",
+                },
             ))         
             
         self.add(pr.RemoteVariable(
@@ -186,22 +221,25 @@ class DacLut(pr.Device):
         description = "Container for LUT Memory Controls",
         NUM_CH_G     = 2,
         ADDR_WIDTH_G = 11,
+        BASE_ADDR_G  = 0,
         **kwargs):
         
         super().__init__(name=name,description=description,**kwargs)
         
         self.add(LutCtrl(
-            name         = 'Ctrl',
-            offset       = 0x00000,
+            name         = 'Ctrl', 
+            offset       = 0x00000, 
             NUM_CH_G     = NUM_CH_G,
             ADDR_WIDTH_G = ADDR_WIDTH_G,
+            BASE_ADDR_G  = BASE_ADDR_G,
             expand       = False,
         ))
         
         for i in range(NUM_CH_G):
             self.add(LutMem(
-                name         = f'Lut[{i}]',
-                offset       = 0x10000+i*0x10000,
+                name         = f'Lut[{i}]', 
+                offset       = 0x10000+i*0x10000, 
                 ADDR_WIDTH_G = ADDR_WIDTH_G,
                 expand       = False,
             ))            
+            
