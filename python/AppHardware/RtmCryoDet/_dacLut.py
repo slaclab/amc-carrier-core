@@ -85,6 +85,7 @@ class LutCtrl(pr.Device):
                 bitSize      = 32, 
                 mode         = 'RW',
                 enum         = {
+                   0                   : "Disabled",
                    BASE_ADDR_G + 0x004 : "Dac[1]",
                    BASE_ADDR_G + 0x024 : "Dac[2]",
                    BASE_ADDR_G + 0x044 : "Dac[3]",
