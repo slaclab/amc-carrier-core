@@ -186,7 +186,7 @@ class LutCtrl(pr.Device):
             name         = 'TimerSize', 
             description  = 'Sets the timer\'s timeout configuration size between sample updates',
             offset       = 0x48,
-            bitSize      = 32, 
+            bitSize      = 24, 
             mode         = 'RW',
             units        = '6.4ns',
         ))        
