@@ -74,8 +74,8 @@ architecture rtl of RtmCryoDacLut is
       dacAxilAddr    : Slv32Array(NUM_CH_G-1 downto 0);
       trigCnt        : slv(15 downto 0);
       dropTrigCnt    : slv(15 downto 0);
-      timerSize      : slv(15 downto 0);
-      timer          : slv(15 downto 0);
+      timerSize      : slv(23 downto 0);
+      timer          : slv(23 downto 0);
       eventCnt       : slv(15 downto 0);
       errorCnt       : slv(15 downto 0);
       rdLat          : natural range 0 to 4;
@@ -97,7 +97,7 @@ architecture rtl of RtmCryoDacLut is
       dacAxilAddr    => (others => (others => '0')),
       trigCnt        => (others => '0'),
       dropTrigCnt    => (others => '0'),
-      timerSize      => (others => '0'),
+      timerSize      => x"00FFFF",
       timer          => (others => '0'),
       eventCnt       => (others => '0'),
       errorCnt       => (others => '0'),
