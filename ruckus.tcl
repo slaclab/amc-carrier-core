@@ -5,7 +5,7 @@ proc MyVersionCheck { } {
 
    # Get the Vivado version
    set VersionNumber [version -short]
-   set supported "2016.4 2017.4 2018.1 2018.2 2018.3"
+   set supported "2017.4 2018.1 2018.2 2018.3"
    set retVar -1
    
    # Generate error message
@@ -36,7 +36,7 @@ set family [getFpgaFamily]
 # Check for submodule tagging
 if { [info exists ::env(OVERRIDE_SUBMODULE_LOCKS)] != 1 || $::env(OVERRIDE_SUBMODULE_LOCKS) == 0 } {
    if { [SubmoduleCheck {lcls-timing-core} {1.12.6} "mustBeExact" ] < 0 } {exit -1}
-   if { [SubmoduleCheck {ruckus}           {1.7.6}  "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {ruckus}           {1.7.7}  "mustBeExact" ] < 0 } {exit -1}
    if { [SubmoduleCheck {surf}             {1.9.9}  "mustBeExact" ] < 0 } {exit -1}
 } else {
    puts "\n\n*********************************************************"

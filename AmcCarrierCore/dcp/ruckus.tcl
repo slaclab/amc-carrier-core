@@ -13,6 +13,7 @@ set_property PROCESSING_ORDER EARLY [get_files "$::DIR_PATH/hdl/AmcCarrierCore.x
 loadSource      -path "$::DIR_PATH/../core/AmcCarrierPkg.vhd"
 loadSource      -path "$::DIR_PATH/../core/AmcCarrierSysRegPkg.vhd"
 loadSource      -dir  "$::DIR_PATH/../core/kintexu"
+loadSource      -path "$::DIR_PATH/../core/FpgaType/FpgaTypePkg_XCKU040.vhd"
 
 loadSource -path "$::DIR_PATH/../ip/MigCore.dcp"
 #loadIpCore  -path "$::DIR_PATH/../ip/MigCore.xci" 
@@ -32,3 +33,5 @@ set_property STEPS.OPT_DESIGN.ARGS.DIRECTIVE Explore [get_runs impl_1]
 
 ## Skip the utilization check during placement
 set_param place.skipUtilizationCheck 1
+
+set_property XPM_LIBRARIES XPM_MEMORY [current_project]
