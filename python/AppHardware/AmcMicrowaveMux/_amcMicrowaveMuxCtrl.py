@@ -105,7 +105,17 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  5,
             base         = pr.UInt,
             mode         = "RW",
-        ))     
+        ))   
+
+        self.add(pr.RemoteVariable(   
+            name         = "dacSpiMode",
+            description  = "0 for original 3-wire SPI configuration, 1 for new 4-wire configuration",
+            offset       =  0x800,
+            bitSize      =  1,
+            bitOffset    =  6,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))           
         
         @self.command(name= "Init", description  = "Initialize ADC/DAC")        
         def Init():

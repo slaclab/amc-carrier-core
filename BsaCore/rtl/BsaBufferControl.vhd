@@ -220,8 +220,9 @@ begin
    U_AxiDualPortRam_TimeStamps : entity work.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
-         BRAM_EN_G    => false,
-         REG_EN_G     => true,
+         SYNTH_MODE_G => "inferred",
+         MEMORY_TYPE_G=> "distributed",
+         READ_LATENCY_G => 1,
          AXI_WR_EN_G  => false,
          SYS_WR_EN_G  => true,
          ADDR_WIDTH_G => BSA_ADDR_BITS_C,

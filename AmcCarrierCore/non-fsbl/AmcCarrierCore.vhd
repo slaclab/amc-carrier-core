@@ -38,6 +38,7 @@ entity AmcCarrierCore is
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
       DISABLE_BLD_G          : boolean  := false;  -- false = includes BLD engine, true = doesn't build the BLD engine
+      DISABLE_DDR_SRP_G      : boolean  := false;  -- false = include DDR SRPv3 engine
       RTM_ETH_G              : boolean  := false;  -- false = 10GbE over backplane, true = 1GbE over RTM
       TIME_GEN_APP_G         : boolean  := false;  -- false = normal application, true = timing generator application
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
@@ -280,11 +281,14 @@ begin
          -- Reset Outputs
          rstOut(0) => reset);
 
-   -- Forcing BUFG for reset that's used everywhere      
-   U_BUFG : BUFG
+   -- Help with meeting timing on the reset path
+   U_Rst : entity work.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
       port map (
-         I => reset,
-         O => axilRst);
+         clk    => axilClk,
+         rstIn  => reset,
+         rstOut => axilRst);
 
    ------------------
    -- Ethernet Module
@@ -415,6 +419,7 @@ begin
          FSBL_G                 => FSBL_G,
          DISABLE_BSA_G          => DISABLE_BSA_G,
          DISABLE_BLD_G          => DISABLE_BLD_G,
+         DISABLE_DDR_SRP_G      => DISABLE_DDR_SRP_G,
          WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)

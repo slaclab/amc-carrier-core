@@ -32,17 +32,17 @@ class AmcMicrowaveMuxCore(pr.Device):
         #########
         # Devices
         #########
-        self.add(AmcMicrowaveMuxCtrl(offset=0x00000000,name='DBG',    expand=False))
-        self.add(Adf5355(           offset=0x00001000,name='PLL[0]', expand=False))
-        self.add(Adf5355(           offset=0x00002000,name='PLL[1]', expand=False))
-        self.add(Adf5355(           offset=0x00003000,name='PLL[2]', expand=False))
-        self.add(Adf5355(           offset=0x00004000,name='PLL[3]', expand=False))     
-        self.add(Hmc305(            offset=0x00005000,name='ATT',    expand=False))
-        self.add(Lmk04828(          offset=0x00020000,name='LMK',    expand=False))
-        self.add(Dac38J84(          offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
-        self.add(Dac38J84(          offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
-        self.add(Adc32Rf45(         offset=0x00100000,name='ADC[0]', expand=False))
-        self.add(Adc32Rf45(         offset=0x00180000,name='ADC[1]', expand=False))
+        self.add(appHw.AmcMicrowaveMux.AmcMicrowaveMuxCtrl(offset=0x00000000,name='DBG',    expand=False))
+        self.add(appHw.AmcMicrowaveMux.Adf5355(           offset=0x00001000,name='PLL[0]', expand=False))
+        self.add(appHw.AmcMicrowaveMux.Adf5355(           offset=0x00002000,name='PLL[1]', expand=False))
+        self.add(appHw.AmcMicrowaveMux.Adf5355(           offset=0x00003000,name='PLL[2]', expand=False))
+        self.add(appHw.AmcMicrowaveMux.Adf5355(           offset=0x00004000,name='PLL[3]', expand=False))     
+        self.add(appHw.AmcMicrowaveMux.Hmc305(            offset=0x00005000,name='ATT',    expand=False))
+        self.add(ti.Lmk04828(          offset=0x00020000,name='LMK',    expand=False))
+        self.add(ti.Dac38J84(          offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
+        self.add(ti.Dac38J84(          offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
+        self.add(ti.Adc32Rf45(         offset=0x00100000,name='ADC[0]', expand=False))
+        self.add(ti.Adc32Rf45(         offset=0x00180000,name='ADC[1]', expand=False))
 
         ##########
         # Commands
@@ -95,13 +95,11 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         # Process local blocks.
         if variable is not None:
-            #variable._block.startTransaction(rogue.interfaces.memory.Write, check=checkEach)  # > 2.4.0
             variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
         else:
             for block in self._blocks:
                 if force or block.stale:
                     if block.bulkEn:
-                        #block.startTransaction(rogue.interfaces.memory.Write, check=checkEach)  # > 2.4.0
                         block.backgroundTransaction(rogue.interfaces.memory.Write)
 
         # Retire any in-flight transactions before starting
@@ -129,6 +127,7 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
+        self._root.checkBlocks(recurse=True)
         self.ADC[0].HW_RST.set(0x1)
         self.ADC[1].HW_RST.set(0x1)
 

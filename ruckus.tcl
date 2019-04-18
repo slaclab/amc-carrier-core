@@ -5,7 +5,7 @@ proc MyVersionCheck { } {
 
    # Get the Vivado version
    set VersionNumber [version -short]
-   set supported "2016.4 2017.4 2018.1 2018.2 2018.3"
+   set supported "2017.4 2018.1 2018.2 2018.3"
    set retVar -1
    
    # Generate error message
@@ -35,9 +35,9 @@ set family [getFpgaFamily]
 
 # Check for submodule tagging
 if { [info exists ::env(OVERRIDE_SUBMODULE_LOCKS)] != 1 || $::env(OVERRIDE_SUBMODULE_LOCKS) == 0 } {
-   if { [SubmoduleCheck {lcls-timing-core} {1.12.5} "mustBeExact" ] < 0 } {exit -1}
-   if { [SubmoduleCheck {ruckus}           {1.7.3}  "mustBeExact" ] < 0 } {exit -1}
-   if { [SubmoduleCheck {surf}             {1.9.5}  "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {lcls-timing-core} {1.12.6} "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {ruckus}           {1.7.7}  "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {surf}             {1.9.9}  "mustBeExact" ] < 0 } {exit -1}
 } else {
    puts "\n\n*********************************************************"
    puts "OVERRIDE_SUBMODULE_LOCKS != 0"
@@ -61,7 +61,6 @@ if { ${family} == "kintexuplus" } {
 }
 
 # Check if required variables exist
-if { [info exists ::env(AMC_ADV_BUILD)] != 1 }  {puts "\n\nERROR: AMC_ADV_BUILD is not defined in $::env(PROJ_DIR)/Makefile\n\n";   exit -1}
 if { [info exists ::env(RTM_ETH)] != 1 }        {puts "\n\nERROR: RTM_ETH is not defined in $::env(PROJ_DIR)/Makefile\n\n";         exit -1}
 if { [info exists ::env(AMC_TYPE_BAY0)] != 1 }  {puts "\n\nERROR: AMC_TYPE_BAY0 is not defined in $::env(PROJ_DIR)/Makefile\n\n";   exit -1}
 if { [info exists ::env(AMC_INTF_BAY0)] != 1 }  {puts "\n\nERROR: AMC_INTF_BAY0 is not defined in $::env(PROJ_DIR)/Makefile\n\n";   exit -1}
@@ -70,7 +69,6 @@ if { [info exists ::env(AMC_INTF_BAY1)] != 1 }  {puts "\n\nERROR: AMC_INTF_BAY1 
 if { [info exists ::env(RTM_TYPE)] != 1 }       {puts "\n\nERROR: RTM_TYPE is not defined in $::env(PROJ_DIR)/Makefile\n\n";        exit -1}
 if { [info exists ::env(RTM_INTF)] != 1 }       {puts "\n\nERROR: RTM_INTF is not defined in $::env(PROJ_DIR)/Makefile\n\n";        exit -1}
 if { [info exists ::env(COMMON_FILE)] != 1 }    {puts "\n\nERROR: COMMON_FILE is not defined in $::env(PROJ_DIR)/Makefile\n\n";     exit -1}
-if { ( $::env(AMC_ADV_BUILD)  != 1) && ( $::env(RTM_ETH)  != 0) } {puts "\n\nERROR: (AMC_ADV_BUILD = 0) and (RTM_ETH = 1) is NOT supported!!!\n\n\n\n"; exit -1}
 
 # Load ruckus files
 loadRuckusTcl "$::DIR_PATH/AmcCarrierCore"

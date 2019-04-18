@@ -44,7 +44,7 @@ class Hmc305(pr.Device):
                 description = 'Hmc305 Device: Note that firmware does an invert and bit order swap to make the software interface with a LSB of 0.5dB',
                 offset      = devConfig[i][1], 
                 bitSize     = 5, 
-                mode        = 'WO',
+                mode        = 'RW',
                 units       = '0.5dB',
             ))
             

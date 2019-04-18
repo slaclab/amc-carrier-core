@@ -26,6 +26,7 @@ use work.AxiStreamPkg.all;
 use work.SsiPkg.all;
 use work.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
+use work.FpgaTypePkg.all;
 
 entity AmcCarrierRssi is
    generic (
@@ -127,6 +128,8 @@ begin
    U_RssiServer : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
+         SYNTH_MODE_G        => "xpm",
+         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),            
          APP_STREAMS_G       => 5,
          APP_STREAM_ROUTES_G => (
             0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
@@ -256,6 +259,8 @@ begin
    U_Temp : entity work.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
+         SYNTH_MODE_G        => "xpm",
+         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),              
          APP_STREAMS_G       => 2,
          APP_STREAM_ROUTES_G => (
             0                => X"04",  -- TDEST 4 routed to stream 0 (MEM)
