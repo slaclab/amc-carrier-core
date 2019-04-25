@@ -9,6 +9,7 @@
 ##############################################################################
 #schemaversion 3.0.0
 #once AmcMrLlrfGen2UpConvert.yaml
+#include Dac38J84.yaml
 #include Lmk04828.yaml
 #include Adc16Dx370.yaml
 #include Adt7420.yaml
@@ -51,7 +52,11 @@ AmcMrLlrfGen2UpConvert: &AmcMrLlrfGen2UpConvert
       <<: *Lmk04828
       at:
         offset: 0x00080000     
-        
+    ##################################################
+    Dac38J84:
+      <<: *Dac38J84
+      at:
+        offset: 0x000C0000         
     ##################################################
     InitAmcCard:
       description: Initialization for AMC card's JESD modules
