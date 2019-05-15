@@ -192,7 +192,6 @@ begin
          I => startRampPulseReg(1),
          O => rtmLsP(12));
    ---------------------------------------------
-
    rtmLsN(12) <= selRamp;
    kRelay(1)  <= rtmLsP(13);
    rtmLsN(13) <= maxCsL;
@@ -201,21 +200,35 @@ begin
    maxSdo     <= rtmLsN(15);
    rtmLsN(16) <= not(jesdRst or rtmReset);
 
-   ---------------------------------------------
-   U_OREG_jesdClkDiv : ODDRE1
-      port map (
-         C  => jesdClk,
-         Q  => jesdClkDivReg,
-         D1 => jesdClkDiv,
-         D2 => jesdClkDiv,
-         SR => '0');
 
+   U_RTM_CLK : entity work.ClockManagerUltraScale
+      generic map (
+         CLKIN_PERIOD_G     => 3.255,
+         NUM_CLOCKS_G       => 1,
+         DIVCLK_DIVIDE_G    => 6,
+         CLKFBOUT_MULT_F_G  => 23.375,
+         CLKOUT0_DIVIDE_F_G => 23.375)
+      port map (
+         clkIn           => jesdClk,
+         rstIn           => '0',
+         clkOut(0)       => jesdClkDivReg,
+         rstOut(0)       => open,
+         locked          => open);
+   ---------------------------------------------
+--   U_OREG_jesdClkDiv : ODDRE1
+--      port map (
+--         C  => jesdClk,
+--         Q  => jesdClkDivReg,
+--         D1 => jesdClkDiv,
+--         D2 => jesdClkDiv,
+--         SR => '0');
+--
    U_OBUFDS_jesdClkDiv : OBUFDS
       port map (
          I  => jesdClkDivReg,
          O  => rtmLsP(17),
          OB => rtmLsN(17));
-   ---------------------------------------------
+  ---------------------------------------------
 
    U_extTrig : entity work.Synchronizer
       generic map (
