@@ -22,6 +22,7 @@ use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 use work.jesd204bpkg.all;
+use work.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -170,6 +171,8 @@ begin
 
    DATA_OUT : if (TIMING_TRIG_MODE_G = false) generate
       U_ODDR : ODDRE1
+         generic map (
+            SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))      
          port map (
             C  => recClk,
             Q  => timingTrigReg,

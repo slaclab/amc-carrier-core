@@ -20,6 +20,7 @@ use ieee.std_logic_1164.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -92,6 +93,8 @@ begin
 
          REG_DATA : if (REG_DOUT_MODE_G(i) = '0') generate
             U_ODDR : ODDRE1
+               generic map (
+                  SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
                port map (
                   C  => doutClk(i),
                   Q  => doutReg(i),

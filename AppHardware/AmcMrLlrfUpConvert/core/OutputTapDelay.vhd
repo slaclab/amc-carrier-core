@@ -27,6 +27,7 @@ use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
+use work.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -63,7 +64,8 @@ begin
          IS_C_INVERTED  => '0',         -- Optional inversion for C
          IS_D1_INVERTED => '0',         -- Optional inversion for D1
          IS_D2_INVERTED => '0',         -- Optional inversion for D2
-         SRVAL          => '0')  -- Initializes the ODDRE1 Flip-Flops to the specified value ('0', '1')
+         SRVAL          => '0',  -- Initializes the ODDRE1 Flip-Flops to the specified value ('0', '1')
+         SIM_DEVICE     => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))          
       port map (
          Q  => dataReg,                 -- 1-bit output: Data output to IOB
          C  => clk_i,                   -- 1-bit input: High-speed clock input
