@@ -22,6 +22,7 @@ use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -208,6 +209,8 @@ begin
          OB => rtmLsN(52));
 
    U_stndbyTrigReg : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
       port map (
          C  => recClk,
          Q  => stndbyTrigLReg,
@@ -222,6 +225,8 @@ begin
          OB => rtmLsN(45));
 
    U_accelTrigReg : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
       port map (
          C  => recClk,
          Q  => accelTrigReg,

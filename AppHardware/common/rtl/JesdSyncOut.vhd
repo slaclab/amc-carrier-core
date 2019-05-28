@@ -21,6 +21,7 @@ use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
+use work.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -59,6 +60,8 @@ begin
    sync <= syncIn when(INVERT_G = false) else not(syncIn);
 
    U_rxSyncReg : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
       port map (
          C  => jesdClk,
          SR => '0',
