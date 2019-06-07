@@ -120,6 +120,7 @@ architecture mapping of AppTopJesd is
    signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
+   signal localClk : slv(2 downto 0);
    signal resetOut : slv(2 downto 0);
    signal locked   : sl;
 
@@ -231,7 +232,7 @@ begin
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
-         clkOut          => clkOut,
+         clkOut          => localClk,
          rstOut          => resetOut,
          locked          => locked,
          -- AXI-Lite Interface 
@@ -242,12 +243,14 @@ begin
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
+   clkOut <= localClk;
+
    GEN_RST : for i in 2 downto 0 generate
       U_RstPipeline : entity work.RstPipeline
          generic map (
             TPD_G => TPD_G)
          port map (
-            clk    => clkOut(i),
+            clk    => localClk(i),
             rstIn  => resetOut(i),
             rstOut => rstOut(i));
    end generate GEN_RST;
