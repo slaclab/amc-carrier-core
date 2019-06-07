@@ -46,6 +46,10 @@ entity AppTopJesd is
       JESD_REF_SEL_G     : slv(1 downto 0)       := DEV_CLK2_SEL_C;
       JESD_USR_DIV_G     : natural               := 4);
    port (
+      clkOut          : out slv(2 downto 0);
+      rstOut          : out slv(2 downto 0);
+      clkIn           : in  slv(2 downto 0);
+      rstIn           : in  slv(2 downto 0);
       -- Clock/reset/SYNC
       jesdClk         : out sl;
       jesdRst         : out sl;
@@ -116,9 +120,7 @@ architecture mapping of AppTopJesd is
    signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
-   signal clkOut   : slv(2 downto 0);
    signal resetOut : slv(2 downto 0);
-   signal rstOut   : slv(2 downto 0);
    signal locked   : sl;
 
    signal drpClk  : slv(9 downto 0)       := (others => '0');
@@ -250,12 +252,12 @@ begin
             rstOut => rstOut(i));
    end generate GEN_RST;
 
-   jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(0);
-   jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(1);
-   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);
-   jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(0);
-   jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(1);
-   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(2);
+   jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkIn(0);
+   jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkIn(1);
+   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkIn(2);
+   jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstIn(0);
+   jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstIn(1);
+   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstIn(2);
    jesdMmcmLocked <= '1'     when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else locked;
 
    jesdClk <= jesdClk1x;

@@ -51,6 +51,7 @@ entity AppTop is
       JESD_TX_ROUTES_G       : AppTopJesdRouteArray      := (others => JESD_ROUTES_INIT_C);
       JESD_REF_SEL_G         : Slv2Array(1 downto 0)     := (others => DEV_CLK0_SEL_C);
       JESD_USR_DIV_G         : natural                   := 4;
+      JESD_CLK_XBAR_G        : slv(1 downto 0)           := "10"; -- Default: JESD_CLK_XBAR_G[0] = 0 maps clkOut[0]->clkIn[0], JESD_CLK_XBAR_G[1] = 1 maps clkOut[1]->clkIn[1]
       -- Signal Generator Generics
       SIG_GEN_SIZE_G         : NaturalArray(1 downto 0)  := (others => 8);
       SIG_GEN_ADDR_WIDTH_G   : PositiveArray(1 downto 0) := (others => 9);
@@ -201,6 +202,11 @@ architecture mapping of AppTop is
    signal dacSigStatus : DacSigStatusArray(1 downto 0);
    signal dacSigValids : Slv10Array(1 downto 0);
    signal dacSigValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
+
+   signal clkOut : Slv3Array(1 downto 0);
+   signal rstOut : Slv3Array(1 downto 0);
+   signal clkIn  : Slv3Array(1 downto 0);
+   signal rstIn  : Slv3Array(1 downto 0);
 
 begin
 
@@ -375,6 +381,9 @@ begin
       dataValids(i) <= debugValids(i) & dacValids(i) & adcValids(i);
       linkReady(i)  <= x"F" & dacValids(i) & adcValids(i);
 
+      clkIn(i) <= clkOut(0) when(JESD_CLK_XBAR_G(i) = '0') else clkOut(1);
+      rstIn(i) <= rstOut(0) when(JESD_CLK_XBAR_G(i) = '0') else rstOut(1);
+
       ------------
       -- JESD Core
       ------------
@@ -394,6 +403,10 @@ begin
             JESD_REF_SEL_G     => JESD_REF_SEL_G(i),
             JESD_USR_DIV_G     => JESD_USR_DIV_G)
          port map (
+            clkOut          => clkOut(i),
+            rstOut          => rstOut(i),
+            clkIn           => clkIn(i),
+            rstIn           => rstIn(i),
             -- Clock/reset/SYNC
             jesdClk         => jesdClk(i),
             jesdRst         => jesdRst(i),
