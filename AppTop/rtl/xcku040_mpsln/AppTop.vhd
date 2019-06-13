@@ -445,11 +445,14 @@ begin
       adcValues(i, 6)          <= (others => '0');
       adcValues(i, 5)          <= (others => '0');
 
-      intRxP(i) <= jesdRxP(i)(4 downto 0);
-      intRxN(i) <= jesdRxN(i)(4 downto 0);
+      intRxP(i) <= jesdRxP(i)(6) & jesdRxP(i)(3 downto 0);
+      intRxN(i) <= jesdRxN(i)(6) & jesdRxN(i)(3 downto 0);
 
-      jesdTxP(i)(4 downto 0) <= intTxP(i);
-      jesdTxN(i)(4 downto 0) <= intTxN(i);
+      jesdTxP(i)(3 downto 0) <= intTxP(i)(3 downto 0);
+      jesdTxN(i)(3 downto 0) <= intTxN(i)(3 downto 0);
+      
+      jesdTxP(i)(6) <= intTxP(i)(4);
+      jesdTxN(i)(6) <= intTxN(i)(4);      
 
       U_DacSigGen : entity work.DacSigGen
          generic map (
