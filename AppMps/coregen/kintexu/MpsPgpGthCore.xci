@@ -98,7 +98,7 @@
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_TX_USRCLK_FREQUENCY">250.0000000</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CHANNEL_ENABLE">X0Y19</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.Component_Name">MpsPgpGthCore</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ENABLE_OPTIONAL_PORTS">loopback_in rxpolarity_in</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ENABLE_OPTIONAL_PORTS">loopback_in rxpolarity_in txdiffctrl_in txpolarity_in txpostcursor_in txprecursor_in</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.FREERUN_FREQUENCY">125.0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GT_DIRECTION">BOTH</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.GT_REV">0</spirit:configurableElementValue>
@@ -638,7 +638,7 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLED_UBMDMTDO_OUT">-1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLED_UBRSVDOUT_OUT">-1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLED_UBTXUART_OUT">-1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLEMENT_UPDATED">25</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_ENABLEMENT_UPDATED">27</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PORT_USAGE_UPDATED">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_PRESET">Aurora_8B10B</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.INTERNAL_RX_COMMA_PRESET_UPDATE">6</spirit:configurableElementValue>
@@ -1230,7 +1230,7 @@
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txdccreset_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txdeemph_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txdetectrx_in">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txdiffctrl_in">false</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txdiffctrl_in">true</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txdiffpd_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txdlybypass_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txdlyen_in">false</spirit:configurableElementValue>
@@ -1277,12 +1277,12 @@
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpllclksel_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpmareset_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpmaresetdone_out">true</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpolarity_in">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpostcursor_in">false</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpolarity_in">true</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpostcursor_in">true</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txpostcursorinv_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txprbsforceerr_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txprbssel_in">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txprecursor_in">false</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txprecursor_in">true</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txprecursorinv_in">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txprgdivresetdone_out">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PORT_ENABLEMENT.txprogdivreset_in">false</spirit:configurableElementValue>

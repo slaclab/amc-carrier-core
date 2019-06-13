@@ -5,7 +5,7 @@
 -- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-16
--- Last update: 2015-10-14
+-- Last update: 2019-06-13
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -36,30 +36,36 @@ entity MpsPgpFrontEndGth is
       PGP_TX_ENABLE_G   : boolean              := true;
       PAYLOAD_CNT_TOP_G : integer              := 7;  -- Top bit for payload counter
       VC_INTERLEAVE_G   : integer              := 1;  -- Interleave Frames
-      NUM_VC_EN_G       : integer range 1 to 4 := 4);      
+      NUM_VC_EN_G       : integer range 1 to 4 := 4);
    port (
       -- System Signals
-      pgpClk       : in  sl;
-      pgpRst       : in  sl;
-      stableClk    : in  sl;
-      gtRefClk     : in  sl;
+      pgpClk         : in  sl;
+      pgpRst         : in  sl;
+      stableClk      : in  sl;
+      gtRefClk       : in  sl;
+      -- GT Tuning Interface
+      gtTxPreCursor  : in  slv(4 downto 0) := "00111";  -- 1.67 dB
+      gtTxPostCursor : in  slv(4 downto 0) := "01111";  -- 4.08 dB
+      gtTxDiffCtrl   : in  slv(3 downto 0) := "1111";   -- 1080 mV
+      gtTxPolarity   : in  sl              := '0';
+      gtRxPolarity   : in  sl              := '0';
       -- GT Ports
-      gtTxP        : out sl;
-      gtTxN        : out sl;
-      gtRxP        : in  sl;
-      gtRxN        : in  sl;
+      gtTxP          : out sl;
+      gtTxN          : out sl;
+      gtRxP          : in  sl;
+      gtRxN          : in  sl;
       -- Non VC Rx Signals
-      pgpRxIn      : in  Pgp2bRxInType;
-      pgpRxOut     : out Pgp2bRxOutType;
+      pgpRxIn        : in  Pgp2bRxInType;
+      pgpRxOut       : out Pgp2bRxOutType;
       -- Non VC Tx Signals
-      pgpTxIn      : in  Pgp2bTxInType;
-      pgpTxOut     : out Pgp2bTxOutType;
+      pgpTxIn        : in  Pgp2bTxInType;
+      pgpTxOut       : out Pgp2bTxOutType;
       -- Frame Transmit Interface - 1 Lane, Array of 4 VCs
-      pgpTxMasters : in  AxiStreamMasterArray(3 downto 0);
-      pgpTxSlaves  : out AxiStreamSlaveArray(3 downto 0);
+      pgpTxMasters   : in  AxiStreamMasterArray(3 downto 0);
+      pgpTxSlaves    : out AxiStreamSlaveArray(3 downto 0);
       -- Frame Receive Interface - 1 Lane, Array of 4 VCs
-      pgpRxMasters : out AxiStreamMasterArray(3 downto 0);
-      pgpRxCtrl    : in  AxiStreamCtrlArray(3 downto 0));      
+      pgpRxMasters   : out AxiStreamMasterArray(3 downto 0);
+      pgpRxCtrl      : in  AxiStreamCtrlArray(3 downto 0));
 end MpsPgpFrontEndGth;
 
 architecture mapping of MpsPgpFrontEndGth is
@@ -96,6 +102,10 @@ architecture mapping of MpsPgpFrontEndGth is
          txctrl0_in                         : in  std_logic_vector(15 downto 0);
          txctrl1_in                         : in  std_logic_vector(15 downto 0);
          txctrl2_in                         : in  std_logic_vector(7 downto 0);
+         txdiffctrl_in                      : in  std_logic_vector(3 downto 0);
+         txpolarity_in                      : in  std_logic_vector(0 downto 0);
+         txpostcursor_in                    : in  std_logic_vector(4 downto 0);
+         txprecursor_in                     : in  std_logic_vector(4 downto 0);
          txusrclk_in                        : in  std_logic_vector(0 downto 0);
          txusrclk2_in                       : in  std_logic_vector(0 downto 0);
          gthtxn_out                         : out std_logic_vector(0 downto 0);
@@ -112,7 +122,8 @@ architecture mapping of MpsPgpFrontEndGth is
          rxoutclk_out                       : out std_logic_vector(0 downto 0);
          rxpmaresetdone_out                 : out std_logic_vector(0 downto 0);
          txoutclk_out                       : out std_logic_vector(0 downto 0);
-         txpmaresetdone_out                 : out std_logic_vector(0 downto 0));
+         txpmaresetdone_out                 : out std_logic_vector(0 downto 0)
+         );
    end component;
 
    signal gtRxUserReset : sl;
@@ -124,7 +135,7 @@ architecture mapping of MpsPgpFrontEndGth is
    signal gtTxUserReset : sl;
    signal phyTxLaneOut  : Pgp2bTxPhyLaneOutType;
    signal phyTxReady    : sl;
-   
+
 begin
 
    gtRxUserReset <= phyRxInit or pgpRst or pgpRxIn.resetRx;
@@ -183,7 +194,7 @@ begin
          rxcommadeten_in(0)                    => '1',
          rxmcommaalignen_in(0)                 => '1',
          rxpcommaalignen_in(0)                 => '1',
-         rxpolarity_in(0)                      => phyRxLaneOut.polarity,
+         rxpolarity_in(0)                      => gtRxPolarity,
          rxusrclk_in(0)                        => pgpClk,
          rxusrclk2_in(0)                       => pgpClk,
          tx8b10ben_in(0)                       => '1',
@@ -191,6 +202,10 @@ begin
          txctrl1_in                            => X"0000",
          txctrl2_in(1 downto 0)                => phyTxLaneOut.dataK,
          txctrl2_in(7 downto 2)                => (others => '0'),
+         txdiffctrl_in                         => gtTxDiffCtrl,
+         txpolarity_in(0)                      => gtTxPolarity,
+         txpostcursor_in                       => gtTxPostCursor,
+         txprecursor_in                        => gtTxPreCursor,
          txusrclk_in(0)                        => pgpClk,
          txusrclk2_in(0)                       => pgpClk,
          gthtxn_out(0)                         => gtTxN,
@@ -210,6 +225,6 @@ begin
          rxoutclk_out(0)                       => open,
          rxpmaresetdone_out(0)                 => open,
          txoutclk_out(0)                       => open,
-         txpmaresetdone_out(0)                 => open);    
+         txpmaresetdone_out(0)                 => open);
 
 end mapping;
