@@ -8,6 +8,13 @@
 --
 -- Note: Common-to-Application interface defined in HPS ESD: LCLSII-2.7-ES-0536
 --
+-- RTM SFP Mapping:
+--    FPGA[0]   = rtmHs(0) = PGP[LANE=0]
+--    FPGA[1]   = Unconnected (reserved for bigger FPGA)
+--    AMC[0][0] = rtmHs(1) = PGP[LANE=1]  
+--    AMC[0][1] = rtmHs(4) = LCLS1 1Gbe (placed on this SFP due to high bit error rate at PGP@5.0Gb/s)
+--    AMC[1][0] = rtmHs(2) = PGP[LANE=2] 
+--    AMC[1][1] = rtmHs(3) = PGP[LANE=3] 
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 AMC Carrier Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -584,28 +591,39 @@ begin
          spareN              => spareN,
          -- RTM's Low Speed Ports
          rtmLsP              => rtmLsP,
-         rtmLsN              => rtmLsN,
-         -- RTM's High Speed Ports
+         rtmLsN              => rtmLsN,         
+         -------------------------------------------------------------------------------
+         -- RTM SFP Mapping:
+         --    FPGA[0]   = rtmHs          = rtmHs(0) 
+         --    AMC[0][0] = jesdRxP(0)(4)  = rtmHs(1) 
+         --    AMC[0][1] = jesdRxP(0)(5)  = rtmHs(4) 
+         --    AMC[1][0] = jesdRxP(1)(4)  = rtmHs(2) 
+         --    AMC[1][1] = jesdRxP(1)(5)  = rtmHs(3) 
+         -------------------------------------------------------------------------------
+         -- RTM HS RX_P Ports
          rtmHsRxP(0)         => rtmHsRxP,
-         rtmHsRxP(1)         => jesdRxP(0)(5),
-         rtmHsRxP(2)         => jesdRxP(0)(6),
+         rtmHsRxP(1)         => jesdRxP(0)(4),
+         rtmHsRxP(2)         => jesdRxP(1)(4),
          rtmHsRxP(3)         => jesdRxP(1)(5),
-         rtmHsRxP(4)         => jesdRxP(1)(6),
+         rtmHsRxP(4)         => jesdRxP(0)(5),
+         -- RTM HS RX_N Ports
          rtmHsRxN(0)         => rtmHsRxN,
-         rtmHsRxN(1)         => jesdRxN(0)(5),
-         rtmHsRxN(2)         => jesdRxN(0)(6),
+         rtmHsRxN(1)         => jesdRxN(0)(4),
+         rtmHsRxN(2)         => jesdRxN(1)(4),
          rtmHsRxN(3)         => jesdRxN(1)(5),
-         rtmHsRxN(4)         => jesdRxN(1)(6),
+         rtmHsRxN(4)         => jesdRxN(0)(5),
+         -- RTM HS TX_P Ports
          rtmHsTxP(0)         => rtmHsTxP,
-         rtmHsTxP(1)         => jesdTxP(0)(5),
-         rtmHsTxP(2)         => jesdTxP(0)(6),
+         rtmHsTxP(1)         => jesdTxP(0)(4),
+         rtmHsTxP(2)         => jesdTxP(1)(4),
          rtmHsTxP(3)         => jesdTxP(1)(5),
-         rtmHsTxP(4)         => jesdTxP(1)(6),
+         rtmHsTxP(4)         => jesdTxP(0)(5),
+         -- RTM HS TX_N Ports
          rtmHsTxN(0)         => rtmHsTxN,
-         rtmHsTxN(1)         => jesdTxN(0)(5),
-         rtmHsTxN(2)         => jesdTxN(0)(6),
+         rtmHsTxN(1)         => jesdTxN(0)(4),
+         rtmHsTxN(2)         => jesdTxN(1)(4),
          rtmHsTxN(3)         => jesdTxN(1)(5),
-         rtmHsTxN(4)         => jesdTxN(1)(6),
+         rtmHsTxN(4)         => jesdTxN(0)(5),
          -- RTM's Clock Reference 
          genClkP             => genClkP,
          genClkN             => genClkN);
