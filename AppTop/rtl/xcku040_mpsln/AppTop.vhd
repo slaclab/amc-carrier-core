@@ -494,6 +494,7 @@ begin
    U_AppCore : entity work.AppCore
       generic map (
          TPD_G           => TPD_G,
+         MR_LCLS_APP_G   => MR_LCLS_APP_G,
          SIM_SPEEDUP_G   => SIM_SPEEDUP_G,
          SIMULATION_G    => SIMULATION_G,
          AXI_BASE_ADDR_G => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
