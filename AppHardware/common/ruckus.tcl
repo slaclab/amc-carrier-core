@@ -9,6 +9,7 @@ loadSource -dir "$::DIR_PATH/rtl"
 
 # Load AMC BAY[0] constraints files
 if { $::env(AMC_TYPE_BAY0) eq {AmcMrLlrfUpConvert}  ||
+     $::env(AMC_TYPE_BAY1) eq {AmcMrLlrfGen2UpConvert}||
      $::env(AMC_TYPE_BAY0) eq {AmcMrLlrfDownConvert}||
      $::env(AMC_TYPE_BAY0) eq {AmcCryoDemo}||
      $::env(AMC_TYPE_BAY0) eq {AmcStriplineBpm}||
@@ -24,6 +25,7 @@ if { $::env(AMC_TYPE_BAY0) eq {AmcMrLlrfUpConvert}  ||
 
 # Load AMC BAY[1] constraints files
 if { $::env(AMC_TYPE_BAY1) eq {AmcMrLlrfUpConvert}  ||
+     $::env(AMC_TYPE_BAY1) eq {AmcMrLlrfGen2UpConvert}||
      $::env(AMC_TYPE_BAY1) eq {AmcMrLlrfDownConvert}||
      $::env(AMC_TYPE_BAY1) eq {AmcCryoDemo}||
      $::env(AMC_TYPE_BAY1) eq {AmcStriplineBpm}||
