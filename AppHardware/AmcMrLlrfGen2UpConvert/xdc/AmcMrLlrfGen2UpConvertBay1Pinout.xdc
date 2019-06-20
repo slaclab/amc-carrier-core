@@ -43,8 +43,8 @@ set_property PACKAGE_PIN B1 [get_ports {jesdRxN[1][6]}]
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutP[1][7]}] ; #jesdSysRefP[1]
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutN[1][7]}] ; #jesdSysRefN[1]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutP[1][9]}] ; #jesdTxSyncP
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutN[1][9]}] ; #jesdTxSyncN
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareP[1][9]}] ; #jesdTxSyncP
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareN[1][9]}] ; #jesdTxSyncN
 
 # JESD ADC Sync Ports
 set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][4]}] ; # jesdSyncP[1][0]
