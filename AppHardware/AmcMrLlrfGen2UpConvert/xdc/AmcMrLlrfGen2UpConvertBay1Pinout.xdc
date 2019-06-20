@@ -43,8 +43,8 @@ set_property PACKAGE_PIN B1 [get_ports {jesdRxN[1][6]}]
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutP[1][7]}] ; #jesdSysRefP[1]
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutN[1][7]}] ; #jesdSysRefN[1]
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutP[1][9]}] ; #jesdTxSyncP
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutN[1][9]}] ; #jesdTxSyncN
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareP[1][9]}] ; #jesdTxSyncP
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareN[1][9]}] ; #jesdTxSyncN
 
 # JESD ADC Sync Ports
 set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][4]}] ; # jesdSyncP[1][0]
@@ -82,3 +82,5 @@ set_property -dict { IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][4]}] ; # fpgaI
 # I2C Temp Sensors
 set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports { spareN[1][1] }] ; # SCL @ P13.PIN150
 set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports { spareN[1][0] }] ; # SDA @ P13.PIN147
+
+set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports syncOutP[1][1]]
