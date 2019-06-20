@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfUpConvertMapping.vhd
+-- File       : AmcMrLlrfGen2UpConvertMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-03-30
--- Last update: 2018-02-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -29,7 +27,7 @@ use work.FpgaTypePkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity AmcMrLlrfUpConvertMapping is
+entity AmcMrLlrfGen2UpConvertMapping is
    generic (
       TPD_G              : time    := 1 ns;
       TIMING_TRIG_MODE_G : boolean := false);  -- false = data output, true = clock output
@@ -45,13 +43,18 @@ entity AmcMrLlrfUpConvertMapping is
       attSclk_o     : in    sl;
       attSdi_o      : in    sl;
       attLatchEn_o  : in    slv(3 downto 0);
-      s_dacDataDly  : in    slv(15 downto 0);
       jesdClk       : in    sl;
       jesdRst       : in    sl;
       timingTrig    : in    sl;
       fpgaInterlock : in    sl;
       i2cScl        : inout sl;
       i2cSda        : inout sl;
+      jesdTxSync    : out   sl;
+      dacRst        : in    sl;
+      dacCsL        : in    sl;
+      dacSck        : in    sl;
+      dacSdi        : in    sl;
+      dacSdo        : out   sl;
       -- Recovered EVR clock
       recClk        : in    sl;
       recRst        : in    sl;
@@ -75,9 +78,9 @@ entity AmcMrLlrfUpConvertMapping is
       -- AMC's Spare Ports
       spareP        : inout slv(15 downto 0);
       spareN        : inout slv(15 downto 0));
-end AmcMrLlrfUpConvertMapping;
+end AmcMrLlrfGen2UpConvertMapping;
 
-architecture mapping of AmcMrLlrfUpConvertMapping is
+architecture mapping of AmcMrLlrfGen2UpConvertMapping is
 
    signal timingTrigReg : sl;
 
@@ -86,31 +89,57 @@ begin
    -----------------------
    -- Generalized Mapping 
    -----------------------
-   U_jesdSysRef : IBUFDS
+   U_jesdSysRef : entity work.JesdSyncIn
       generic map (
-         DIFF_TERM => true)
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => syncOutP(7),
-         IB => syncOutN(7),
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(7),
+         jesdSyncN => syncOutN(7),
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : OBUFDS
+   U_jesdRxSync0 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(4),
-         OB => syncOutN(4));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(4),
+         jesdSyncN => syncOutN(4));
 
-   U_jesdRxSync1 : OBUFDS
+   U_jesdRxSync1 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(2),
-         OB => syncOutN(2));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(2),
+         jesdSyncN => syncOutN(2));
 
-   U_jesdRxSync2 : OBUFDS
+   U_jesdRxSync2 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(1),
-         OB => syncOutN(1));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(1),
+         jesdSyncN => syncOutN(1));
 
    ADC_SDIO_IOBUFT : IOBUF
       port map (
@@ -143,7 +172,7 @@ begin
    DATA_OUT : if (TIMING_TRIG_MODE_G = false) generate
       U_ODDR : ODDRE1
          generic map (
-            SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
+            SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))      
          port map (
             C  => recClk,
             Q  => timingTrigReg,
@@ -166,39 +195,27 @@ begin
             clkOut => jtagSec(0));
    end generate;
 
-   U_DOUT0 : OBUFDS port map (I => s_dacDataDly(0), O => spareP(9), OB => spareN(9));
-   U_DOUT1 : OBUFDS port map (I => s_dacDataDly(1), O => spareP(10), OB => spareN(10));
-   U_DOUT2 : OBUFDS port map (I => s_dacDataDly(2), O => spareP(11), OB => spareN(11));
-   U_DOUT3 : OBUFDS port map (I => s_dacDataDly(3), O => spareP(12), OB => spareN(12));
-   U_DOUT4 : OBUFDS port map (I => s_dacDataDly(4), O => spareP(13), OB => spareN(13));
-   U_DOUT5 : OBUFDS port map (I => s_dacDataDly(5), O => spareP(14), OB => spareN(14));
-   U_DOUT6 : OBUFDS port map (I => s_dacDataDly(6), O => spareP(15), OB => spareN(15));
-
    i2cScl <= spareN(1);
    i2cSda <= spareN(0);
 
-   ----------------------------
-   -- Version2 Specific Mapping 
-   ----------------------------    
+   -- DAC reset (active LOW)
+   spareP(14) <= not(dacRst);
+   spareN(12) <= dacSck;
+   spareP(12) <= dacCsL;
+   spareN(13) <= dacSdi;
+   dacSdo     <= spareP(13);
 
-   U_DOUT7  : OBUFDS port map (I => s_dacDataDly(7), O => sysRefP(0), OB => sysRefN(0));
-   U_DOUT8  : OBUFDS port map (I => s_dacDataDly(8), O => sysRefP(1), OB => sysRefN(1));
-   U_DOUT9  : OBUFDS port map (I => s_dacDataDly(9), O => syncInP(1), OB => syncInN(1));
-   U_DOUT10 : OBUFDS port map (I => s_dacDataDly(10), O => sysRefP(2), OB => sysRefN(2));
-   U_DOUT11 : OBUFDS port map (I => s_dacDataDly(11), O => syncInP(2), OB => syncInN(2));
-   U_DOUT12 : OBUFDS port map (I => s_dacDataDly(12), O => sysRefP(3), OB => sysRefN(3));
-   U_DOUT13 : OBUFDS port map (I => s_dacDataDly(13), O => syncInP(3), OB => syncInN(3));
-   U_DOUT14 : OBUFDS port map (I => s_dacDataDly(14), O => syncOutP(0), OB => syncOutN(0));
-   U_DOUT15 : OBUFDS port map (I => s_dacDataDly(15), O => syncOutP(3), OB => syncOutN(3));
-
-   U_CLK_DIFF_BUF : entity work.ClkOutBufDiff
+   U_jesdTxSync : entity work.JesdSyncIn
       generic map (
-         TPD_G        => TPD_G,
-         XIL_DEVICE_G => "ULTRASCALE")
+         TPD_G    => TPD_G,
+         INVERT_G => true)  -- Note inverted because it is Swapped on the board
       port map (
-         rstIn   => jesdRst,
-         clkIn   => jesdClk,  -- Samples on both edges of jesdClk (~185MHz). Sample rate = jesdClk2x (~370MHz)
-         clkOutP => syncInP(0),
-         clkOutN => syncInN(0));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => spareP(9),
+         jesdSyncN => spareN(9),
+         -- JESD Low speed Interface
+         jesdSync  => jesdTxSync);
 
 end mapping;

@@ -69,7 +69,7 @@ architecture rtl of hmc305 is
 
    constant REG_INIT_C : RegType := (
       cnt           => 0,
-      data          => (others => (others => '0')),
+      data          => (others => (others => '1')),
       devAddr       => (others => '0'),
       devLe         => '0',
       wrEn          => '0',

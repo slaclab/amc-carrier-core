@@ -16,3 +16,6 @@ set_property SEVERITY {Warning} [get_drc_checks {NSTD-1}]
 set_property SEVERITY {Warning} [get_drc_checks {UCIO-1}]
 
 set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports {ddrPg}]
+
+set_property -dict { PACKAGE_PIN V12 IOSTANDARD ANALOG } [get_ports { vPIn }]
+set_property -dict { PACKAGE_PIN W11 IOSTANDARD ANALOG } [get_ports { vNIn }]

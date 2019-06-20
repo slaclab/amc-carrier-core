@@ -166,6 +166,6 @@ class SpiSr(pr.Device):
  
     @staticmethod
     def fromReg(dev, var, read):
-       lowVal  = var.dependencies[0].get()
-       highVal = var.dependencies[1].get()
+       lowVal  = var.dependencies[0].get(read=read)
+       highVal = var.dependencies[1].get(read=read)
        return highVal*2**16 + lowVal

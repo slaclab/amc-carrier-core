@@ -94,7 +94,8 @@ begin
          SYNTH_MODE_G         => "xpm",
          MEMORY_TYPE_G        => ite(ULTRASCALE_PLUS_C,"ultra","block"),   
          APP_ILEAVE_EN_G      => true,  -- true = AxiStreamPacketizer2
-         ILEAVE_ON_NOTVALID_G => true,
+         -- ILEAVE_ON_NOTVALID_G => true,
+         ILEAVE_ON_NOTVALID_G => false, -- Might be a bug in the AxiStreamPacketizer2 when (ILEAVE_ON_NOTVALID_G=true): LLR - 05MAY2019
          MAX_SEG_SIZE_G       => MAX_SEG_SIZE_C,  -- Using Jumbo frames
          SEGMENT_ADDR_SIZE_G  => bitSize(MAX_SEG_SIZE_C/8),
          APP_STREAMS_G        => APP_STREAMS_C,
@@ -147,7 +148,7 @@ begin
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
-         TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
+         TX_VALID_THOLD_G    => 256, -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
          AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)

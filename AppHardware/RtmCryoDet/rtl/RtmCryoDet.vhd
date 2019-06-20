@@ -22,6 +22,7 @@ use ieee.std_logic_arith.all;
 
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
+use work.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -162,6 +163,8 @@ begin
 
    ---------------------------------------------
    U_OREG_startRampPulse0 : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
       port map (
          C  => jesdClk,
          Q  => startRampPulseReg(0),
@@ -180,6 +183,8 @@ begin
 
    ---------------------------------------------
    U_OREG_startRampPulse1 : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
       port map (
          C  => jesdClk,
          Q  => startRampPulseReg(1),
@@ -203,6 +208,8 @@ begin
 
    ---------------------------------------------
    U_OREG_jesdClkDiv : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
       port map (
          C  => jesdClk,
          Q  => jesdClkDivReg,
