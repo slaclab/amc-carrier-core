@@ -27,11 +27,12 @@ entity RtmCryoDetClkDiv is
       TPD_G       : time     := 1 ns;
       CNT_WIDTH_G : positive := 8);
    port (
-      jesdClk    : in  sl;
-      jesdRst    : in  sl;
-      jesdClkDiv : out sl;
-      lowCycle   : in  slv(CNT_WIDTH_G-1 downto 0);
-      highCycle  : in  slv(CNT_WIDTH_G-1 downto 0));
+      jesdClk       : in  sl;
+      jesdRst       : in  sl;
+      jesdClkDiv    : out sl;
+      rtmClockDelay : in  slv(2 downto 0);
+      lowCycle      : in  slv(CNT_WIDTH_G-1 downto 0);
+      highCycle     : in  slv(CNT_WIDTH_G-1 downto 0));
 end RtmCryoDetClkDiv;
 
 architecture rtl of RtmCryoDetClkDiv is
@@ -48,7 +49,21 @@ architecture rtl of RtmCryoDetClkDiv is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   signal clkDiv : sl;
+
 begin
+
+
+   U_CLOCK_DELAY : entity work.SlvDelay
+   generic map (
+      TPD_G   => TPD_G,
+      DELAY_G => 8,
+      WIDTH_G => 1)
+   port map (
+      clk     => jesdClk,
+      delay   => rtmClockDelay, 
+      din(0)  => clkDiv,
+      dout(0) => jesdClkDiv);
 
    comb : process (highCycle, jesdRst, lowCycle, r) is
       variable v : RegType;
@@ -87,7 +102,7 @@ begin
       rin <= v;
 
       -- Outputs
-      jesdClkDiv <= r.clkDiv;
+      clkDiv <= r.clkDiv;
 
    end process comb;
 

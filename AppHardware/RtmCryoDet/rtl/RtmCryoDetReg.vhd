@@ -60,6 +60,7 @@ architecture rtl of RtmCryoDetReg is
       pulseWidth     : slv(15 downto 0);
       debounceWidth  : slv(15 downto 0);
       rtmReset       : sl;
+      rtmClockDelay  : slv(2 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -74,6 +75,7 @@ architecture rtl of RtmCryoDetReg is
       pulseWidth     => (others => '0'),
       debounceWidth  => (others => '0'),
       rtmReset       => '1',
+      rtmClockDelay  => "011",
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -83,6 +85,8 @@ architecture rtl of RtmCryoDetReg is
    signal kRelaySync : slv(1 downto 0);
    signal lowCycle   : slv(CNT_WIDTH_G-1 downto 0);
    signal highCycle  : slv(CNT_WIDTH_G-1 downto 0);
+
+   signal rtmClockDelay : slv(2 downto 0) := (others => '0');
 
 begin
 
@@ -109,6 +113,7 @@ begin
       axiSlaveRegister(regCon, x"18", 0, v.pulseWidth);
       axiSlaveRegister(regCon, x"1C", 0, v.debounceWidth);
       axiSlaveRegister(regCon, x"20", 0, v.rtmReset);
+      axiSlaveRegister(regCon, x"20", 1, v.rtmClockDelay);
 
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
@@ -137,17 +142,19 @@ begin
    Sync_selRamp : entity work.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 5)
+         WIDTH_G => 8)
       port map (
          clk                  => jesdClk,
          dataIn(0)            => r.enableRamp,
          dataIn(2 downto 1)   => r.rampStartMode,
          dataIn(3)            => r.selRamp,
          dataIn(4)            => r.rtmReset,
+         dataIn(7 downto 5)   => r.rtmClockDelay,
          dataOut(0)           => enableRamp,
          dataOut(2 downto 1)  => rampStartMode,
          dataOut(3)           => selRamp,
-         dataOut(4)           => rtmReset);
+         dataOut(4)           => rtmReset,
+         dataOut(7 downto 5)  => rtmClockDelay);
 
    Sync_rampMaxCnt : entity work.SynchronizerVector
       generic map (
@@ -208,10 +215,11 @@ begin
          TPD_G       => TPD_G,
          CNT_WIDTH_G => CNT_WIDTH_G)
       port map (
-         jesdClk    => jesdClk,
-         jesdRst    => jesdRst,
-         jesdClkDiv => jesdClkDiv,
-         lowCycle   => lowCycle,
-         highCycle  => highCycle);
+         jesdClk       => jesdClk,
+         jesdRst       => jesdRst,
+         rtmClockDelay => rtmClockDelay,
+         jesdClkDiv    => jesdClkDiv,
+         lowCycle      => lowCycle,
+         highCycle     => highCycle);
 
 end rtl;

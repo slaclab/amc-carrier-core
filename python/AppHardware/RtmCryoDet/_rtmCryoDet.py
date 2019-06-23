@@ -144,6 +144,16 @@ class RtmCryoDet(pr.Device):
             mode         = "RW",
         ))   
 
+        self.add(pr.RemoteVariable(    
+            name         = "rtmClockDelay",
+            description  = "deskew RTM clock",
+            offset       = 0x20,
+            bitSize      = 3,
+            bitOffset    = 1,
+            base         = pr.UInt,
+            mode         = "RW",
+        ))   
+
         @self.command(description="Reset RTM CPLD")
         def resetRtm():
            # Toggle reset bit
