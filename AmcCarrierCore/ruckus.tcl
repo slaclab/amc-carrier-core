@@ -7,7 +7,9 @@ set family [getFpgaFamily]
 # Load local Source Code and constraints
 loadSource -dir  "$::DIR_PATH/core"
 loadSource -dir  "$::DIR_PATH/core/${family}"
+
 loadSource -path "$::DIR_PATH/ip/SysMonCore.dcp"
+# loadIpCore -path "$::DIR_PATH/ip/SysMonCore.xci"
 
 loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCorePorts.xdc"    
 loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreTiming.xdc" 
