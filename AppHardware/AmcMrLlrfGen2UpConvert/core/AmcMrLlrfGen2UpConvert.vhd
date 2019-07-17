@@ -86,22 +86,26 @@ architecture mapping of AmcMrLlrfGen2UpConvert is
          i2cAddress => "1001000",       -- ADT7420: A1=GND,A0=GND
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'),            -- Big endian
+         endianness => '1',             -- Big endian
+         repeatStart=> '1'),            -- Enable repeated start
       1             => MakeI2cAxiLiteDevType(
          i2cAddress => "1001001",       -- ADT7420: A1=GND,A0=VDD
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'),            -- Big endian
+         endianness => '1',             -- Big endian
+         repeatStart=> '1'),            -- Enable repeated start
       2             => MakeI2cAxiLiteDevType(
          i2cAddress => "1001010",       -- ADT7420: A1=VDD,A0=GND
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'),            -- Big endian
+         endianness => '1',             -- Big endian
+         repeatStart=> '1'),            -- Enable repeated start
       3             => MakeI2cAxiLiteDevType(
          i2cAddress => "1001011",       -- ADT7420: A1=VDD,A0=VDD
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'));           -- Big endian   
+         endianness => '1',             -- Big endian
+         repeatStart=> '1'));           -- Enable repeated start  
 
    constant NUM_AXI_MASTERS_C      : natural               := 11;
    constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 5;
