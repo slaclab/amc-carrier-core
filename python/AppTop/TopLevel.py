@@ -113,8 +113,8 @@ class TopLevel(pr.Device):
                 
             elif ( commType == 'pcie-fsbl' ):
             
-                # TDEST 0 routed to stream 0 (SRPv3)
-                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*0x100 + 0),True)
+                # TDEST 0xC0 routed to stream 0xC0 (SRPv0)
+                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*0x100 + 0xC0),True)
                 self.srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( self.srp, self.dma )
     
