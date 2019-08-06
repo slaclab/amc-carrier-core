@@ -116,7 +116,7 @@ package AmcCarrierPkg is
    -------------------------------------------------------------------------------------------------
    -- Ethernet stream configurations
    -------------------------------------------------------------------------------------------------
-   constant ETH_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);  -- Use 8 tDest bits
+   constant AXIS_8BYTE_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);  -- Use 8 tDest bits
 
    -- BSA stream indicies
    constant BSA_MEM_AXIS_INDEX_C             : integer := 0;

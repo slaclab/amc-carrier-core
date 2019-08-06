@@ -68,7 +68,7 @@ architecture mapping of AmcCarrierRssiInterleave is
    constant WINDOW_ADDR_SIZE_C : positive := 4;       -- 16 buffers (2^4)
    constant MAX_SEG_SIZE_C     : positive := 8192;    -- Jumbo frame chucking
 
-   constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_C-1 downto 0) := (others => ETH_AXIS_CONFIG_C);
+   constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_C-1 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
 
    constant SRP_IDX_C        : natural := 0;
    constant BSA_ASYNC_IDX_C  : natural := 1;
@@ -148,7 +148,7 @@ begin
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
-         AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
+         AXI_STREAM_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)
          sAxisClk         => axilClk,
@@ -211,12 +211,12 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- ETH_AXIS_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of ETH_AXIS_CONFIG_C.TDATA_BYTES_C
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- AXIS_8BYTE_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of AXIS_8BYTE_CONFIG_C.TDATA_BYTES_C
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
+         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,

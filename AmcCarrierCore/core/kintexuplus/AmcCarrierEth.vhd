@@ -486,8 +486,8 @@ begin
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
+         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
@@ -523,8 +523,8 @@ begin
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
+         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,

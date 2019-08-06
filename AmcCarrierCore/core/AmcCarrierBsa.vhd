@@ -369,7 +369,7 @@ begin
    --          AXI_BURST_G         => AXI_BURST_G,
    --          AXI_CACHE_G         => AXI_CACHE_G,
                ACK_WAIT_BVALID_G   => false,
-               AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C,
+               AXI_STREAM_CONFIG_G => AXIS_8BYTE_CONFIG_C,
                UNALIGNED_ACCESS_G  => false,
                BYTE_ACCESS_G       => false,
                WRITE_EN_G          => true,
