@@ -481,7 +481,7 @@ begin
          READY_EN_G          => true,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Clock and reset
          axisClk     => axilClk,
@@ -499,11 +499,11 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => 1.0E-3,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Slave Port
@@ -535,7 +535,7 @@ begin
          READY_EN_G          => true,
          -- AXI Stream Port Configurations
          SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Clock and reset
          axisClk     => axilClk,
@@ -553,11 +553,11 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => 1.0E-3,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Slave Port
