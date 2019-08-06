@@ -94,7 +94,8 @@ package AmcCarrierPkg is
    constant APP_BLEN_TYPE_C       : AppType := toSlv(12, AppType'length);
    constant APP_LLRF_TYPE_C       : AppType := toSlv(13, AppType'length);
    constant APP_EXTREF_GEN_TYPE_C : AppType := toSlv(14, AppType'length);  --Timing Generator with external reference
-
+   constant APP_FWS_TYPE_C        : AppType := toSlv(15, AppType'length);  --Fast Wire Scanner
+                                                     
    constant APP_BPM_STRIPLINE_TYPE_C : AppType := toSlv(100, AppType'length);
    constant APP_BPM_CAVITY_TYPE_C    : AppType := toSlv(101, AppType'length);
 
