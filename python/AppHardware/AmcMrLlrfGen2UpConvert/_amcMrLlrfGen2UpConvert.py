@@ -39,7 +39,7 @@ class AmcMrLlrfGen2UpConvert(pr.Device):
         for i in range(3):
            self.add(ti.Adc16Dx370(     offset=0x00020000 + 0x20000*i,name=f'ADC[{i}]', expand=False))
         self.add(ti.Lmk04828(          offset=0x00080000,name='LMK',    expand=False))
-        self.add(ti.Dac38J84(          offset=0x000C0000,name='Dac38J84',    expand=False))
+        self.add(ti.Dac38J84(          offset=0x000C0000,name='Dac38J84', numTxLanes=4, expand=False))
 
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
@@ -74,14 +74,14 @@ class AmcMrLlrfGen2UpConvert(pr.Device):
             self.Dac38J84.DacReg[62].set(0x108)
             self.Dac38J84.DacReg[76].set(0x1F01)
             self.Dac38J84.DacReg[77].set(0x100)
-            self.Dac38J84.DacReg[75].set(0x801)
+            self.Dac38J84.DacReg[75].set(0x501)
             self.Dac38J84.DacReg[77].set(0x100)
             self.Dac38J84.DacReg[78].set(0xF2F)
             self.Dac38J84.DacReg[0].set(0x018)
-            self.Dac38J84.DacReg[74].set(0x33E)
-            self.Dac38J84.DacReg[74].set(0x33E)
-            self.Dac38J84.DacReg[74].set(0x33F)
-            self.Dac38J84.DacReg[74].set(0x321)
+            self.Dac38J84.DacReg[74].set(0x83E)
+            self.Dac38J84.DacReg[74].set(0x83E)
+            self.Dac38J84.DacReg[74].set(0x83F)
+            self.Dac38J84.DacReg[74].set(0x821)
             self.Dac38J84.EnableTx.set(1)
 
             # DAC clear alarms
