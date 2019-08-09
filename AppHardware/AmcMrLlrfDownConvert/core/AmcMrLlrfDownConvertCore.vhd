@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcMrLlrfDownConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-12-07
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_16_C02
 -------------------------------------------------------------------------------
@@ -79,30 +77,30 @@ end AmcMrLlrfDownConvertCore;
 architecture mapping of AmcMrLlrfDownConvertCore is
 
    constant I2C_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 3) := (
-      0             => MakeI2cAxiLiteDevType(
-         i2cAddress => "1001000",       -- ADT7420: A1=GND,A0=GND
-         dataSize   => 8,               -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '1',             -- Big endian
-         repeatStart=> '1'),            -- Enable repeated start
-      1             => MakeI2cAxiLiteDevType(
-         i2cAddress => "1001001",       -- ADT7420: A1=GND,A0=VDD
-         dataSize   => 8,               -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '1',             -- Big endian
-         repeatStart=> '1'),            -- Enable repeated start
-      2             => MakeI2cAxiLiteDevType(
-         i2cAddress => "1001010",       -- ADT7420: A1=VDD,A0=GND
-         dataSize   => 8,               -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '1',             -- Big endian
-         repeatStart=> '1'),            -- Enable repeated start
-      3             => MakeI2cAxiLiteDevType(
-         i2cAddress => "1001011",       -- ADT7420: A1=VDD,A0=VDD
-         dataSize   => 8,               -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '1',             -- Big endian
-         repeatStart=> '1'));           -- Enable repeated start       
+      0              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "1001000",      -- ADT7420: A1=GND,A0=GND
+         dataSize    => 8,              -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '1',            -- Big endian
+         repeatStart => '1'),           -- Enable repeated start
+      1              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "1001001",      -- ADT7420: A1=GND,A0=VDD
+         dataSize    => 8,              -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '1',            -- Big endian
+         repeatStart => '1'),           -- Enable repeated start
+      2              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "1001010",      -- ADT7420: A1=VDD,A0=GND
+         dataSize    => 8,              -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '1',            -- Big endian
+         repeatStart => '1'),           -- Enable repeated start
+      3              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "1001011",      -- ADT7420: A1=VDD,A0=VDD
+         dataSize    => 8,              -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         endianness  => '1',            -- Big endian
+         repeatStart => '1'));          -- Enable repeated start       
 
    constant NUM_AXI_MASTERS_C      : natural  := 15;
    constant NUM_COMMON_SPI_CHIPS_C : positive := 4;
@@ -237,31 +235,57 @@ begin
    -----------------------
    -- Generalized Mapping 
    -----------------------
-   U_jesdSysRef : IBUFDS
+   U_jesdSysRef : entity work.JesdSyncIn
       generic map (
-         DIFF_TERM => true)
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => sysRefP(2),
-         IB => sysRefN(2),
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => sysRefP(2),
+         jesdSyncN => sysRefN(2),
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : OBUFDS
+   U_jesdRxSync0 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(5),
-         OB => syncOutN(5));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(5),
+         jesdSyncN => syncOutN(5));
 
-   U_jesdRxSync1 : OBUFDS
+   U_jesdRxSync1 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(0),
-         OB => syncOutN(0));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(0),
+         jesdSyncN => syncOutN(0));
 
-   U_jesdRxSync2 : OBUFDS
+   U_jesdRxSync2 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncInP(1),
-         OB => syncInN(1));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncInP(1),
+         jesdSyncN => syncInN(1));
 
    ADC_SDIO_IOBUFT : IOBUF
       port map (
