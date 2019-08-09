@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcCryoDemoCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-09-09
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
 -------------------------------------------------------------------------------
@@ -225,26 +223,47 @@ begin
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
-   IBUFDS_SysRef : IBUFDS
+   U_jesdSysRef : entity work.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdSysRefP,
-         IB => jesdSysRefN,
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdSysRefP,
+         jesdSyncN => jesdSysRefN,
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
    GEN_RX_SYNC :
    for i in 2 downto 0 generate
-      OBUFDS_RxSync : OBUFDS
+      U_jesdRxSync : entity work.JesdSyncOut
+         generic map (
+            TPD_G    => TPD_G,
+            INVERT_G => false)
          port map (
-            I  => jesdRxSync,
-            O  => jesdRxSyncP(i),
-            OB => jesdRxSyncN(i));
+            -- Clock
+            jesdClk   => jesdClk,
+            -- JESD Low speed Interface
+            jesdSync  => jesdRxSync,
+            -- JESD Low speed Ports
+            jesdSyncP => jesdRxSyncP(i),
+            jesdSyncN => jesdRxSyncN(i));
    end generate GEN_RX_SYNC;
 
-   IBUFDS_TxSync : IBUFDS
+   U_jesdTxSync : entity work.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdTxSyncP,
-         IB => jesdTxSyncN,
-         O  => jesdTxSync);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdTxSyncP,
+         jesdSyncN => jesdTxSyncN,
+         -- JESD Low speed Interface
+         jesdSync  => jesdTxSync);
 
    ----------------------------------------------------------------
    -- SPI interface ADCs and LMK 
