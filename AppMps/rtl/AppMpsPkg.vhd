@@ -447,7 +447,7 @@ package body AppMpsPkg is
                ret.CHAN_CONFIG_C(i).IDLE_EN_C     := true;
             end loop;
 
-         while APP_FWS_TYPE_C =>
+         when APP_FWS_TYPE_C =>
             ret.DIGITAL_EN_C := true;
             ret.BYTE_COUNT_C := 1;
 
