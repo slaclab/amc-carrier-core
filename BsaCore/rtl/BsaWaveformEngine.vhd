@@ -330,6 +330,8 @@ begin
          FIFO_ADDR_WIDTH_G   => 4,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 1,
+         INT_WIDTH_SELECT_G  => "CUSTOM",
+         INT_DATA_WIDTH_G    => 4, -- Limitting the bandwidth to 5 Gb/s  = 32-bit (4B) x 156.25 MHz    
          SLAVE_AXI_CONFIG_G  => READ_AXIS_CONFIG_C,
          MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
       port map (
