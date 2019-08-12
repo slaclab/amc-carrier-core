@@ -145,7 +145,8 @@ begin
          
    U_RssiTspObFifo : entity work.AmcCarrierRssiObFifo
       generic map (
-         TPD_G => TPD_G)
+         TPD_G    => TPD_G,
+         BYPASS_G => false)
       port map (
          -- Clock and Reset
          axilClk         => axilClk,

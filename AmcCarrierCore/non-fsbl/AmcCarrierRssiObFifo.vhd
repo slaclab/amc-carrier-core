@@ -24,7 +24,8 @@ use work.EthMacPkg.all;
 
 entity AmcCarrierRssiObFifo is
    generic (
-      TPD_G : time := 1 ns);
+      TPD_G    : time    := 1 ns;
+      BYPASS_G : boolean := true);
    port (
       -- Clock and Reset
       axilClk         : in  sl;
@@ -53,51 +54,60 @@ architecture mapping of AmcCarrierRssiObFifo is
 
 begin
 
-   U_Choke : entity work.AxiStreamResize
-      generic map (
-         -- General Configurations
-         TPD_G               => TPD_G,
-         READY_EN_G          => true,
-         -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
-      port map (
-         -- Clock and reset
-         axisClk     => axilClk,
-         axisRst     => axilRst,
-         -- Slave Port
-         sAxisMaster => obRssiTspMaster,
-         sAxisSlave  => obRssiTspSlave,
-         -- Master Port
-         mAxisMaster => chokeMaster,
-         mAxisSlave  => chokeSlave);
+   BYPASS_LOGIC : if (BYPASS_G = true) generate
+      ddrObMasters <= ddrIbMasters;
+      ddrIbSlaves  <= ddrObSlaves;
+   end generate;
 
-   U_Burst_Fifo : entity work.AxiStreamFifoV2
-      generic map (
-         -- General Configurations
-         TPD_G               => TPD_G,
-         PIPE_STAGES_G       => 1,
-         SLAVE_READY_EN_G    => true,
-         VALID_THOLD_G       => 0,      -- 0 = "store and forward"
-         -- FIFO configurations
-         BRAM_EN_G           => true,
-         GEN_SYNC_FIFO_G     => true,
-         INT_WIDTH_SELECT_G  => "CUSTOM",  -- Force internal width
-         INT_DATA_WIDTH_G    => 16,     -- 128-bit         
-         FIFO_ADDR_WIDTH_G   => 10,  -- 16kB/FIFO = 128-bits x 1024 entries         
-         -- AXI Stream Port Configurations
-         SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
-      port map (
-         -- Slave Port
-         sAxisClk    => axilClk,
-         sAxisRst    => axilRst,
-         sAxisMaster => chokeMaster,
-         sAxisSlave  => chokeSlave,
-         -- Master Port
-         mAxisClk    => axilClk,
-         mAxisRst    => axilRst,
-         mAxisMaster => ibServerMaster,
-         mAxisSlave  => ibServerSlave);
+   BUILD_LOGIC : if (BYPASS_G = false) generate
 
+      U_Choke : entity work.AxiStreamResize
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            READY_EN_G          => true,
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => AXIS_CONFIG_C)
+         port map (
+            -- Clock and reset
+            axisClk     => axilClk,
+            axisRst     => axilRst,
+            -- Slave Port
+            sAxisMaster => obRssiTspMaster,
+            sAxisSlave  => obRssiTspSlave,
+            -- Master Port
+            mAxisMaster => chokeMaster,
+            mAxisSlave  => chokeSlave);
+
+      U_Burst_Fifo : entity work.AxiStreamFifoV2
+         generic map (
+            -- General Configurations
+            TPD_G               => TPD_G,
+            PIPE_STAGES_G       => 1,
+            SLAVE_READY_EN_G    => true,
+            VALID_THOLD_G       => 0,      -- 0 = "store and forward"
+            -- FIFO configurations
+            BRAM_EN_G           => true,
+            GEN_SYNC_FIFO_G     => true,
+            INT_WIDTH_SELECT_G  => "CUSTOM",  -- Force internal width
+            INT_DATA_WIDTH_G    => 16,     -- 128-bit         
+            FIFO_ADDR_WIDTH_G   => 10,  -- 16kB/FIFO = 128-bits x 1024 entries         
+            -- AXI Stream Port Configurations
+            SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
+            MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+         port map (
+            -- Slave Port
+            sAxisClk    => axilClk,
+            sAxisRst    => axilRst,
+            sAxisMaster => chokeMaster,
+            sAxisSlave  => chokeSlave,
+            -- Master Port
+            mAxisClk    => axilClk,
+            mAxisRst    => axilRst,
+            mAxisMaster => ibServerMaster,
+            mAxisSlave  => ibServerSlave);
+            
+   end generate;
+   
 end mapping;

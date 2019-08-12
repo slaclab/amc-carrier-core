@@ -178,7 +178,8 @@ begin
          
    U_RssiTspObFifo_0 : entity work.AmcCarrierRssiObFifo
       generic map (
-         TPD_G => TPD_G)
+         TPD_G    => TPD_G,
+         BYPASS_G => true) -- true to reduce logic footprint
       port map (
          -- Clock and Reset
          axilClk         => axilClk,
@@ -320,7 +321,8 @@ begin
 
    U_RssiTspObFifo_1 : entity work.AmcCarrierRssiObFifo
       generic map (
-         TPD_G => TPD_G)
+         TPD_G    => TPD_G,
+         BYPASS_G => true) -- true to reduce logic footprint
       port map (
          -- Clock and Reset
          axilClk         => axilClk,
