@@ -55,8 +55,8 @@ architecture mapping of AmcCarrierRssiObFifo is
 begin
 
    BYPASS_LOGIC : if (BYPASS_G = true) generate
-      ddrObMasters <= ddrIbMasters;
-      ddrIbSlaves  <= ddrObSlaves;
+      ibServerMaster  <= obRssiTspMaster;
+      obRssiTspSlave  <= ibServerSlave;
    end generate;
 
    BUILD_LOGIC : if (BYPASS_G = false) generate
