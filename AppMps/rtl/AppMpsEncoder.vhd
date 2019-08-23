@@ -183,18 +183,18 @@ begin
       -- Latch the current value
       v := r;
 
+      if mpsReg.mpsCore.lcls1Mode = '1' then
+         v.mpsMessage := mpsMessageInit(APP_CONFIG_C.LCLS1_COUNT_C);
+      else 
+         v.mpsMessage := mpsMessageInit(APP_CONFIG_C.LCLS2_COUNT_C);
+      end if;
+
       -- Init and setup MPS message
       v.mpsMessage.version   := mpsReg.mpsCore.mpsVersion;
       v.mpsMessage.lcls      := mpsReg.mpsCore.lcls1Mode;
       v.mpsMessage.timeStamp := mpsSelect.timeStamp;
       v.mpsMessage.appId     := resize(mpsReg.mpsCore.mpsAppId, 16);
       v.mpsMessage.valid     := mpsSelect.valid and mpsReg.mpsCore.mpsEnable;
-
-      if mpsReg.mpsCore.lcls1Mode = '1' then
-         v.mpsMessage := mpsMessageInit(APP_CONFIG_C.LCLS1_COUNT_C);
-      else 
-         v.mpsMessage := mpsMessageInit(APP_CONFIG_C.LCLS2_COUNT_C);
-      end if;
 
       -- Init message data
       msgData := (others => (others => '0'));
