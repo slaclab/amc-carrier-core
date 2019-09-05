@@ -215,10 +215,11 @@ architecture mapping of AmcCarrierSysReg is
 
    constant PWR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
       0             => MakeI2cAxiLiteDevType(
-         i2cAddress => "0001010",  -- EM2280P01QI: ADDR1=0Ohm, ADDR0=10kOhm --> Address=0x0A
-         dataSize   => 16,              -- in units of bits
-         addrSize   => 8,               -- in units of bits
-         endianness => '1'));           -- Big endian         
+         i2cAddress  => "0001010",  -- EM2280P01QI: ADDR1=0Ohm, ADDR0=10kOhm --> Address=0x0A
+         dataSize    => 16,              -- in units of bits
+         addrSize    => 8,               -- in units of bits
+         repeatStart => '1',             -- repeated start 
+         endianness  => '1'));           -- Big endian         
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
