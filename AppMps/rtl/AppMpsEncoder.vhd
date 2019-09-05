@@ -236,14 +236,14 @@ begin
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.mpsCore.lcls1Mode = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
-                                 mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, 1,
+                                 mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '1',
                                  0, r.tholdMem(chan, 0), v.tholdMem(chan, 0), msgData);
 
                -- LCLS2 idle table
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
-                                 mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, 0,
+                                 mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
                                  7, r.tholdMem(chan, 7), v.tholdMem(chan, 7), msgData);
 
                -- Multiple thresholds
@@ -254,14 +254,14 @@ begin
                      if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
                         compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
-                                       mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, 0,
+                                       mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
                                        thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
 
                      -- Standard table
                      else
                         compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
-                                       mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, 0,
+                                       mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
                                        thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
                      end if;
                   end loop;
