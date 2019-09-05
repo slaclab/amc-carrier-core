@@ -93,13 +93,13 @@ architecture mapping of AppMpsEncoder is
       if ignore = '0' and ((thold.maxTholdEn = '1' and signedVal > signedMax) or
                            (thold.minTholdEn = '1' and signedVal < signedMin)) then
 
-         tholdMemOut := (others => '1');
-
          if holdDisable = '1' then
-            message(config.BYTE_MAP_C)(bitPos) := '0';
+            tholdMemOut := (others => '0');
          else
-            message(config.BYTE_MAP_C)(bitPos) := '1';
+            tholdMemOut := (others => '1');
          end if;
+
+         message(config.BYTE_MAP_C)(bitPos) := '1';
 
       -- Threhold was exceeded within the last 15 clocks
       elsif tholdMemIn /= 0 then
