@@ -104,8 +104,8 @@ entity AmcCarrierSysReg is
       pwrScl            : inout sl := 'Z';
       pwrSda            : inout sl := 'Z';
       -- Clock Cleaner Ports
-      timingClkScl      : inout sl;
-      timingClkSda      : inout sl;
+      timingClkScl      : inout sl := 'Z';
+      timingClkSda      : inout sl := 'Z';
       -- DDR3L SO-DIMM Ports
       ddrScl            : inout sl;
       ddrSda            : inout sl;
@@ -454,24 +454,24 @@ begin
    ---------------------------------
    -- AXI-Lite: Clock Cleaner Module
    ---------------------------------
-   AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
-      generic map (
-         TPD_G          => TPD_G,
-         I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
-         DEVICE_MAP_G   => TIME_DEVICE_MAP_C,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
-      port map (
-         -- I2C Ports
-         scl            => timingClkScl,
-         sda            => timingClkSda,
-         -- AXI-Lite Register Interface
-         axiReadMaster  => mAxilReadMasters(CLK_I2C_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(CLK_I2C_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(CLK_I2C_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(CLK_I2C_INDEX_C),
-         -- Clocks and Resets
-         axiClk         => axilClk,
-         axiRst         => axilRst);
+--   AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
+--      generic map (
+--         TPD_G          => TPD_G,
+--         I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
+--         DEVICE_MAP_G   => TIME_DEVICE_MAP_C,
+--         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+--      port map (
+--         -- I2C Ports
+--         scl            => timingClkScl,
+--         sda            => timingClkSda,
+--         -- AXI-Lite Register Interface
+--         axiReadMaster  => mAxilReadMasters(CLK_I2C_INDEX_C),
+--         axiReadSlave   => mAxilReadSlaves(CLK_I2C_INDEX_C),
+--         axiWriteMaster => mAxilWriteMasters(CLK_I2C_INDEX_C),
+--         axiWriteSlave  => mAxilWriteSlaves(CLK_I2C_INDEX_C),
+--         -- Clocks and Resets
+--         axiClk         => axilClk,
+--         axiRst         => axilRst);
 
    -------------------------------
    -- AXI-Lite: DDR Monitor Module

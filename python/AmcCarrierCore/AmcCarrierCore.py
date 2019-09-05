@@ -76,12 +76,12 @@ class AmcCarrierCore(pr.Device):
                 -----------------------------------------------------------------\n"\
             ))
                             
-        self.add(ti.AxiCdcm6208(     
-            offset       =  0x05000000, 
-            enabled      =  False,
-            hidden       =  True,
-            expand       =  False,            
-        ))
+        # self.add(ti.AxiCdcm6208(     
+            # offset       =  0x05000000, 
+            # enabled      =  False,
+            # hidden       =  True,
+            # expand       =  False,            
+        # ))
 
         self.add(amcc.AmcCarrierBsi(   
             offset       =  0x07000000, 

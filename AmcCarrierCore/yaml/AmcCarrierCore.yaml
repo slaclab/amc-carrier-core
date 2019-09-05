@@ -117,10 +117,10 @@ AmcCarrierCore: &AmcCarrierCore
           sizeBits: 32
       instantiate: false          
    ##################################################
-    AxiCdcm6208:
-      <<: *AxiCdcm6208
-      at:
-        offset: 0x05000000
+    # AxiCdcm6208:
+      # <<: *AxiCdcm6208
+      # at:
+        # offset: 0x05000000
     ##################################################
     DdrSpd:
       at:
