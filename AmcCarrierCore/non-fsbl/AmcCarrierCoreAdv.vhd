@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-04
--- Last update: 2018-08-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -107,7 +105,7 @@ entity AmcCarrierCoreAdv is
       recTimingRst         : out   sl;
       gthFabClk            : out   sl;
       stableClk            : out   sl;
-      stableRst            : out   sl;      
+      stableRst            : out   sl;
       -- Misc. Interface (axilClk domain)
       ipmiBsi              : out   BsiBusType;
       ethPhyReady          : out   sl;
@@ -156,6 +154,9 @@ entity AmcCarrierCoreAdv is
       -- Configuration PROM Ports
       calScl               : inout sl;
       calSda               : inout sl;
+      -- VCCINT DC/DC Ports
+      pwrScl               : inout sl                               := 'Z';
+      pwrSda               : inout sl                               := 'Z';
       -- DDR3L SO-DIMM Ports
       ddrClkP              : in    sl;
       ddrClkN              : in    sl;
@@ -220,7 +221,7 @@ architecture mapping of AmcCarrierCoreAdv is
    signal ddrMemError       : sl;
    --  MPS Interface
    signal mpsReadMaster     : AxiLiteReadMasterType;
-   signal mpsReadSlave      : AxiLiteReadSlaveType := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+   signal mpsReadSlave      : AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
    signal mpsWriteMaster    : AxiLiteWriteMasterType;
    signal mpsWriteSlave     : AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
@@ -316,6 +317,9 @@ begin
          -- Configuration PROM Ports
          calScl            => calScl,
          calSda            => calSda,
+         -- VCCINT DC/DC Ports
+         pwrScl            => pwrScl,
+         pwrSda            => pwrSda,
          -- Clock Cleaner Ports
          timingClkScl      => timingClkScl,
          timingClkSda      => timingClkSda,
@@ -329,7 +333,7 @@ begin
 --   ------------------
 --   -- Application MPS
 --   ------------------
-   GEN_EN_MPS : if ( DISABLE_MPS_G = false ) generate
+   GEN_EN_MPS : if (DISABLE_MPS_G = false) generate
       U_AppMps : entity work.AppMps
          generic map (
             TPD_G      => TPD_G,
@@ -372,7 +376,7 @@ begin
             mpsTxN          => mpsTxN);
    end generate GEN_EN_MPS;
 
-   GEN_DIS_MPS : if ( DISABLE_MPS_G = true ) generate
+   GEN_DIS_MPS : if (DISABLE_MPS_G = true) generate
       mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
       mpsClkOut    <= '0';
       U_OBUFDS : OBUFDS
