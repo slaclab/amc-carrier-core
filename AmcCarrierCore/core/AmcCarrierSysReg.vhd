@@ -219,7 +219,7 @@ architecture mapping of AmcCarrierSysReg is
          dataSize    => 16,              -- in units of bits
          addrSize    => 8,               -- in units of bits
          repeatStart => '1',             -- repeated start 
-         endianness  => '1'));           -- Big endian         
+         endianness  => '0'));           -- Little endian         
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
