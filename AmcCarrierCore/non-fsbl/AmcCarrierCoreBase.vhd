@@ -45,6 +45,10 @@ entity AmcCarrierCoreBase is
       CORE_TRIGGERS_G        : positive := 16;
       TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
       USE_TPGMINI_G          : boolean  := true;   -- Build TPG Mini by default
+      CLKSEL_MODE_G          : string   := "SELECT"; -- "LCLSI","LCLSII"
+      STREAM_L1_G            : boolean  := true;
+      AXIL_RINGB_G           : boolean  := true;
+      ASYNC_G                : boolean  := true;
       FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G             : AppType;
       WAVEFORM_TDATA_BYTES_G : positive := 4;
@@ -407,6 +411,10 @@ begin
          CORE_TRIGGERS_G        => CORE_TRIGGERS_G,
          TRIG_PIPE_G            => TRIG_PIPE_G,
          USE_TPGMINI_G          => USE_TPGMINI_G,
+	 STREAM_L1_G            => STREAM_L1_G,
+	 CLKSEL_MODE_G          => CLKSEL_MODE_G,
+	 AXIL_RINGB_G           => AXIL_RINGB_G,
+	 ASYNC_G                => ASYNC_G,
          FSBL_G                 => FSBL_G)
       port map (
          -----------------------
