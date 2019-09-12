@@ -84,9 +84,9 @@ entity AppTop is
       waveformClk          : in    sl;
       waveformRst          : in    sl;
       obAppWaveformMasters : out   WaveformMasterArrayType := (others=>(others=>AXI_STREAM_MASTER_INIT_C));
-      obAppWaveformSlaves  : in    WaveformSlaveArrayType  := (others=>WAVEFORM_SLAVE_REC_FORCE_C);
+      obAppWaveformSlaves  : in    WaveformSlaveArrayType  := (others=>(others=>WAVEFORM_SLAVE_REC_FORCE_C));
       ibAppWaveformMasters : in    WaveformMasterArrayType := (others=>(others=>AXI_STREAM_MASTER_INIT_C));
-      ibAppWaveformSlaves  : out   WaveformSlaveArrayType  := (others=>WAVEFORM_SLAVE_REC_FORCE_C);
+      ibAppWaveformSlaves  : out   WaveformSlaveArrayType  := (others=>(others=>WAVEFORM_SLAVE_REC_FORCE_C));
       -- Backplane Messaging Interface  (axilClk domain)
       obBpMsgClientMaster  : out   AxiStreamMasterType;
       obBpMsgClientSlave   : in    AxiStreamSlaveType;
@@ -203,9 +203,9 @@ architecture mapping of AppTop is
    signal dacSigValids : Slv10Array(1 downto 0);
    signal dacSigValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
    
-   type WaveMasterArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0 downto 0);   
-   type WaveSlaveArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0 downto 0);   
-   type WaveCtrlArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0 downto 0);   
+   type WaveMasterArray is array (natural range <>) of AxiStreamMasterArray(WAVEFORM_NUM_LANES_G-1 downto 0);   
+   type WaveSlaveArray is array (natural range <>) of AxiStreamSlaveArray(WAVEFORM_NUM_LANES_G-1 downto 0);   
+   type WaveCtrlArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0);   
    
    signal waveAxisMasterArr : WaveMasterArray(1 downto 0);
    signal waveAxisSlaveArr  : WaveSlaveArray(1 downto 0);
