@@ -31,7 +31,7 @@ entity DaqRegItf is
       TPD_G            : time     := 1 ns;
       AXI_ADDR_WIDTH_G : positive := 10;
       N_DATA_IN_G      : positive := 16;
-      N_DATA_OUT_G     : positive := 8
+      N_DATA_OUT_G     : positive := 4
       );
    port (
       -- Axi-Lite Clk

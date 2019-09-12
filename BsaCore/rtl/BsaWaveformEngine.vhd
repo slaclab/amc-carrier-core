@@ -29,6 +29,7 @@ entity BsaWaveformEngine is
 
    generic (
       TPD_G                  : time                   := 1 ns;
+      WAVEFORM_NUM_LANES_G   : positive range 1 to 4  := 4;
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4;
       AXIL_BASE_ADDR_G       : slv(31 downto 0)       := (others => '0');
       AXI_CONFIG_G           : AxiConfigType          := axiConfig(33, 16, 1, 8));
@@ -37,7 +38,7 @@ entity BsaWaveformEngine is
       waveformClk : in sl;
       waveformRst : in sl;
       ibWaveformMasters : in  WaveformMasterType;
-      ibWaveformSlaves  : out WaveformSlaveType;
+      ibWaveformSlaves  : out WaveformSlaveType := (others=>WAVEFORM_SLAVE_REC_FORCE_C);
       -- AXI-Lite configuration interface
       axilClk           : in  sl;
       axilRst           : in  sl;
@@ -72,7 +73,8 @@ architecture rtl of BsaWaveformEngine is
    constant WAVEFORM_AXIS_CONFIG_C : AxiStreamConfigType :=
       ssiAxiStreamConfig(WAVEFORM_TDATA_BYTES_G, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
 
-   constant STREAMS_C : integer := WaveformMasterType'length;
+   -- constant STREAMS_C : positive := WaveformMasterType'length;
+   constant STREAMS_C : positive := WAVEFORM_NUM_LANES_G;
 
    constant TDEST_ROUTES_C : Slv8Array(STREAMS_C-1 downto 0) := (others => "--------");
 
@@ -82,7 +84,7 @@ architecture rtl of BsaWaveformEngine is
    constant WRITE_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => AXI_CONFIG_G.DATA_BYTES_C,
-      TDEST_BITS_C  => log2(STREAMS_C),
+      TDEST_BITS_C  => bitSize(STREAMS_C-1),
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 3,
@@ -118,7 +120,7 @@ architecture rtl of BsaWaveformEngine is
    constant READ_AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => false,
       TDATA_BYTES_C => AXI_CONFIG_G.DATA_BYTES_C,
-      TDEST_BITS_C  => log2(STREAMS_C),
+      TDEST_BITS_C  => bitSize(STREAMS_C-1),
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 2,

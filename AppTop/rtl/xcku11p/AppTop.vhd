@@ -39,6 +39,7 @@ entity AppTop is
       SIMULATION_G           : boolean                   := false;
       DAQMUX_DECIMATOR_EN_G  : boolean                   := true;
       MR_LCLS_APP_G          : boolean                   := false;
+      WAVEFORM_NUM_LANES_G   : positive                  := 4;
       WAVEFORM_TDATA_BYTES_G : positive                  := 4;
       TIMING_BUS_DOMAIN_G    : string                    := "REC_CLK";
       -- JESD Generics
@@ -82,10 +83,10 @@ entity AppTop is
       -- Waveform interface (waveformClk domain)
       waveformClk          : in    sl;
       waveformRst          : in    sl;
-      obAppWaveformMasters : out   WaveformMasterArrayType;
-      obAppWaveformSlaves  : in    WaveformSlaveArrayType;
-      ibAppWaveformMasters : in    WaveformMasterArrayType;
-      ibAppWaveformSlaves  : out   WaveformSlaveArrayType;
+      obAppWaveformMasters : out   WaveformMasterArrayType := (others=>(others=>AXI_STREAM_MASTER_INIT_C));
+      obAppWaveformSlaves  : in    WaveformSlaveArrayType  := (others=>WAVEFORM_SLAVE_REC_FORCE_C);
+      ibAppWaveformMasters : in    WaveformMasterArrayType := (others=>(others=>AXI_STREAM_MASTER_INIT_C));
+      ibAppWaveformSlaves  : out   WaveformSlaveArrayType  := (others=>WAVEFORM_SLAVE_REC_FORCE_C);
       -- Backplane Messaging Interface  (axilClk domain)
       obBpMsgClientMaster  : out   AxiStreamMasterType;
       obBpMsgClientSlave   : in    AxiStreamSlaveType;
@@ -201,6 +202,14 @@ architecture mapping of AppTop is
    signal dacSigStatus : DacSigStatusArray(1 downto 0);
    signal dacSigValids : Slv10Array(1 downto 0);
    signal dacSigValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
+   
+   type WaveMasterArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0 downto 0);   
+   type WaveSlaveArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0 downto 0);   
+   type WaveCtrlArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0 downto 0);   
+   
+   signal waveAxisMasterArr : WaveMasterArray(1 downto 0);
+   signal waveAxisSlaveArr  : WaveSlaveArray(1 downto 0);
+   signal waveAxisCtrlArr   : WaveCtrlArray(1 downto 0);
 
 begin
 
@@ -303,7 +312,7 @@ begin
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
             BAY_INDEX_G            => ite((i = 0), '0', '1'),
             N_DATA_IN_G            => 24,
-            N_DATA_OUT_G           => 4)
+            N_DATA_OUT_G           => WAVEFORM_NUM_LANES_G)
          port map (
             -- Clocks and Resets
             axiClk              => axilClk,
@@ -362,15 +371,20 @@ begin
             -- Output AXI Streaming Interface (Has to be synced with waveform clk)
             wfClk_i             => waveformClk,
             wfRst_i             => waveformRst,
-            rxAxisMasterArr_o   => obAppWaveformMasters(i),
-            rxAxisSlaveArr_i(0) => obAppWaveformSlaves(i)(0).slave,
-            rxAxisSlaveArr_i(1) => obAppWaveformSlaves(i)(1).slave,
-            rxAxisSlaveArr_i(2) => obAppWaveformSlaves(i)(2).slave,
-            rxAxisSlaveArr_i(3) => obAppWaveformSlaves(i)(3).slave,
-            rxAxisCtrlArr_i(0)  => obAppWaveformSlaves(i)(0).ctrl,
-            rxAxisCtrlArr_i(1)  => obAppWaveformSlaves(i)(1).ctrl,
-            rxAxisCtrlArr_i(2)  => obAppWaveformSlaves(i)(2).ctrl,
-            rxAxisCtrlArr_i(3)  => obAppWaveformSlaves(i)(3).ctrl);
+            rxAxisMasterArr_o   => waveAxisMasterArr(i),
+            rxAxisSlaveArr_i    => waveAxisSlaveArr(i),
+            rxAxisCtrlArr_i     => waveAxisCtrlArr(i));
+            
+         
+      U_WaveLane : for j in WAVEFORM_NUM_LANES_G-1 downto 0 generate
+         
+         obAppWaveformMasters(i)(j) <= waveAxisMasterArr(i)(j);
+         
+         waveAxisSlaveArr(i)(j) <= obAppWaveformSlaves(i)(j).slave;
+         waveAxisCtrlArr(i)(j)  <= obAppWaveformSlaves(i)(j).ctrl;
+      
+      end generate U_WaveLane;
+
 
       dataValids(i) <= debugValids(i) & dacValids(i) & adcValids(i);
       linkReady(i)  <= x"F" & dacValids(i) & adcValids(i);
