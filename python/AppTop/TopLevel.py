@@ -47,6 +47,7 @@ class TopLevel(pr.Device):
             # General Parameters
             enableBsa       = False,
             enableMps       = False,
+            numWaveformBuffers  = 4,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
@@ -140,6 +141,7 @@ class TopLevel(pr.Device):
             rssiNotInterlaved = rssiNotInterlaved,
             enableBsa         = enableBsa,
             enableMps         = enableMps,
+            numWaveformBuffers= numWaveformBuffers,
         ))
         self.add(appTop.AppTop(
             memBase      = self.srp,
@@ -150,6 +152,7 @@ class TopLevel(pr.Device):
             numSigGen    = numSigGen,
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,
+            numWaveformBuffers = numWaveformBuffers,
         ))
 
         # Define SW trigger command
