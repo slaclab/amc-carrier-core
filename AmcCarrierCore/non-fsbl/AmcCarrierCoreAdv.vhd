@@ -43,12 +43,13 @@ entity AmcCarrierCoreAdv is
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
       DISABLE_TIME_GT_G      : boolean  := false;  -- false = normal application, true = doesn't build the Timing GT
       CORE_TRIGGERS_G        : positive := 16;
-      TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
+      TRIG_PIPE_G            : natural  := 0;      -- no trigger pipeline by default
+      USE_TPGMINI_G          : boolean  := true;   -- Build TPG Mini by default
       FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G             : AppType;
       WAVEFORM_TDATA_BYTES_G : positive := 4;
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB  
-      MPS_SLOT_G             : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      MPS_SLOT_G             : boolean  := false); -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -405,6 +406,7 @@ begin
          DISABLE_TIME_GT_G      => DISABLE_TIME_GT_G,
          CORE_TRIGGERS_G        => CORE_TRIGGERS_G,
          TRIG_PIPE_G            => TRIG_PIPE_G,
+         USE_TPGMINI_G          => USE_TPGMINI_G,
          FSBL_G                 => FSBL_G)
       port map (
          -----------------------

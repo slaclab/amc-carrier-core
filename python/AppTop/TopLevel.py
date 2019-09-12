@@ -47,6 +47,7 @@ class TopLevel(pr.Device):
             # General Parameters
             enableBsa       = False,
             enableMps       = False,
+            enableTpgMini   = True,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
@@ -140,6 +141,7 @@ class TopLevel(pr.Device):
             rssiNotInterlaved = rssiNotInterlaved,
             enableBsa         = enableBsa,
             enableMps         = enableMps,
+            enableTpgMini     = enableTpgMini,
         ))
         self.add(appTop.AppTop(
             memBase      = self.srp,

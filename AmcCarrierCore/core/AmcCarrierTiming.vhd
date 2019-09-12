@@ -42,7 +42,8 @@ entity AmcCarrierTiming is
       CORE_TRIGGERS_G   : natural  := 16;
       TRIG_PIPE_G       : natural  := 0;
       STREAM_L1_G       : boolean  := true;
-      RX_CLK_MMCM_G     : boolean  := false);
+      RX_CLK_MMCM_G     : boolean  := false;
+      USE_TPGMINI_G     : boolean  := true);
    port (
       stableClk            : in  sl;
       stableRst            : in  sl;
@@ -311,7 +312,8 @@ begin
          TPGEN_G           => TIME_GEN_APP_G,
          STREAM_L1_G       => STREAM_L1_G,
          ETHMSG_AXIS_CFG_G => EMAC_AXIS_CONFIG_C,
-         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr)
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr,
+         USE_TPGMINI_G     => USE_TPGMINI_G)
       port map (
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,

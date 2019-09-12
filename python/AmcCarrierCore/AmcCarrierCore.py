@@ -23,7 +23,8 @@ class AmcCarrierCore(pr.Device):
             rssiInterlaved      = False,            
             enableBsa           = True,
             enableMps           = True,
-            expand	            = False,
+            enableTpgMini       = True,
+            expand	        = False,
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)  
 
@@ -89,8 +90,9 @@ class AmcCarrierCore(pr.Device):
         ))
 
         self.add(amcc.AmcCarrierTiming(
-            offset       =  0x08000000, 
-            expand       =  False,
+            offset        =  0x08000000, 
+            expand        =  False,
+            enableTpgMini = enableTpgMini,
         ))
 
         self.add(amcc.AmcCarrierBsa(   
