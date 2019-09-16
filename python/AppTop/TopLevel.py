@@ -47,9 +47,10 @@ class TopLevel(pr.Device):
             # General Parameters
             enableBsa       = False,
             enableMps       = False,
+            expand          = True,
             enableTpgMini   = True,
             **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
+        super().__init__(name=name, description=description, expand=expand, **kwargs)
 
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
@@ -152,6 +153,7 @@ class TopLevel(pr.Device):
             numSigGen    = numSigGen,
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,
+            expand       = True,
         ))
 
         # Define SW trigger command
