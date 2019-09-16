@@ -38,6 +38,7 @@ class AppTop(pr.Device):
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
+            numWaveformBuffers  = 4,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
@@ -59,9 +60,10 @@ class AppTop(pr.Device):
 
         for i in range(2):
             self.add(daqMuxV2.DaqMuxV2(
-                name         = f'DaqMuxV2[{i}]',
-                offset       =  0x20000000 + (i * 0x10000000),
-                expand       =  False,
+                name       = f'DaqMuxV2[{i}]',
+                offset     =  0x20000000 + (i * 0x10000000),
+                numBuffers =  numWaveformBuffers,
+                expand     =  False,
             ))
 
         for i in range(2):

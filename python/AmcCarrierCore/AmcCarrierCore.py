@@ -23,8 +23,9 @@ class AmcCarrierCore(pr.Device):
             rssiInterlaved      = False,            
             enableBsa           = True,
             enableMps           = True,
+            numWaveformBuffers  = 4,
             enableTpgMini       = True,
-            expand	        = False,
+            expand	            = False,
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)  
 
@@ -96,9 +97,10 @@ class AmcCarrierCore(pr.Device):
         ))
 
         self.add(amcc.AmcCarrierBsa(   
-            offset       =  0x09000000, 
-            enableBsa    =  enableBsa,
-            expand       =  False,
+            offset             =  0x09000000, 
+            enableBsa          =  enableBsa,
+            numWaveformBuffers =  numWaveformBuffers,
+            expand             =  False,
         ))
                             
         self.add(udp.UdpEngineClient(

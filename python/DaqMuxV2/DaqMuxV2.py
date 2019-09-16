@@ -23,6 +23,7 @@ class DaqMuxV2(pr.Device):
     def __init__(   self,       
             name        = "DaqMuxV2",
             description = "Waveform Data Acquisition Module",
+            numBuffers  = 4,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
@@ -36,7 +37,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x00,
             bitSize      =  1,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RW",
         ))
 
@@ -72,7 +72,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x00,
             bitSize      =  1,
             bitOffset    =  0x03,
-            base         = pr.UInt,
             mode         = "RW",
         ))
 
@@ -82,7 +81,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x00,
             bitSize      =  1,
             bitOffset    =  0x04,
-            base         = pr.UInt,
             mode         = "RW",
         ))
 
@@ -118,7 +116,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x00,
             bitSize      =  1,
             bitOffset    =  0x07,
-            base         = pr.UInt,
             mode         = "RW",
         ))
 
@@ -141,7 +138,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x04,
             bitSize      =  1,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
         ))
@@ -152,7 +148,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x04,
             bitSize      =  1,
             bitOffset    =  0x01,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
         ))
@@ -163,7 +158,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x04,
             bitSize      =  1,
             bitOffset    =  0x02,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
         ))
@@ -174,7 +168,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x04,
             bitSize      =  1,
             bitOffset    =  0x03,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
         ))
@@ -185,7 +178,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x04,
             bitSize      =  1,
             bitOffset    =  0x04,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
         ))
@@ -196,7 +188,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x04,
             bitSize      =  1,
             bitOffset    =  0x05,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
         ))
@@ -207,7 +198,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x08,
             bitSize      =  16,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RW",
         ))
 
@@ -217,7 +207,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x0C,
             bitSize      =  32,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RW",
         ))
 
@@ -227,7 +216,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x10,
             bitSize      =  32,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RO",
             number       =  2,
             stride       =  4,
@@ -240,9 +228,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0x18,
             bitSize      =  32,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RO",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             pollInterval =  1,                            
         )
@@ -253,7 +240,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x28,
             bitSize      =  32,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
         ))
@@ -264,7 +250,6 @@ class DaqMuxV2(pr.Device):
             offset       =  0x2C,
             bitSize      =  32,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
         ))       
@@ -275,10 +260,33 @@ class DaqMuxV2(pr.Device):
             offset       =  0x30,
             bitSize      =  32,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
-        ))               
+        ))
+
+        self.add(pr.RemoteVariable(   
+            name         = "AXI_ADDR_WIDTH_G",
+            offset       =  0x34,
+            bitSize      =  8,
+            bitOffset    =  0,
+            mode         = 'RO',
+        ))  
+
+        self.add(pr.RemoteVariable(   
+            name         = "N_DATA_IN_G",
+            offset       =  0x34,
+            bitSize      =  8,
+            bitOffset    =  8,
+            mode         = 'RO',
+        ))     
+
+        self.add(pr.RemoteVariable(   
+            name         = "N_DATA_OUT_G",
+            offset       =  0x34,
+            bitSize      =  8,
+            bitOffset    =  16,
+            mode         = 'RO',
+        ))             
 
         self.addRemoteVariables(   
             name         = "InputMuxSel",
@@ -287,7 +295,7 @@ class DaqMuxV2(pr.Device):
             bitSize      =  5,
             bitOffset    =  0x00,
             mode         = "RW",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             enum         = {
                    0 : "Disabled",
@@ -331,9 +339,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0x80,
             bitSize      =  1,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RO",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             pollInterval =  1,                            
         )
@@ -344,9 +351,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0x80,
             bitSize      =  1,
             bitOffset    =  0x01,
-            base         = pr.UInt,
             mode         = "RO",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             pollInterval =  1,                            
         )
@@ -357,9 +363,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0x80,
             bitSize      =  1,
             bitOffset    =  0x02,
-            base         = pr.UInt,
             mode         = "RO",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             pollInterval =  1,                            
         )
@@ -370,9 +375,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0x80,
             bitSize      =  1,
             bitOffset    =  0x03,
-            base         = pr.UInt,
             mode         = "RO",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             pollInterval =  1,                            
         )
@@ -383,9 +387,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0x80,
             bitSize      =  1,
             bitOffset    =  0x04,
-            base         = pr.UInt,
             mode         = "RO",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             pollInterval =  1,                            
         )
@@ -396,9 +399,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0x80,
             bitSize      =  1,
             bitOffset    =  0x05,
-            base         = pr.UInt,
             mode         = "RO",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             pollInterval =  1,                            
         )
@@ -409,9 +411,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0x80,
             bitSize      =  26,
             bitOffset    =  0x06,
-            base         = pr.UInt,
             mode         = "RO",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             pollInterval =  1,                            
         )
@@ -422,9 +423,8 @@ class DaqMuxV2(pr.Device):
             offset       =  0xC0,
             bitSize      =  5,
             bitOffset    =  0x00,
-            base         = pr.UInt,
             mode         = "RW",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
         )
 
@@ -435,7 +435,7 @@ class DaqMuxV2(pr.Device):
             bitSize      =  1,
             bitOffset    =  0x05,
             mode         = "RW",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             enum         = {
                 0 : "D32-bit",
@@ -450,7 +450,7 @@ class DaqMuxV2(pr.Device):
             bitSize      =  1,
             bitOffset    =  0x06,
             mode         = "RW",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             enum         = {
                 0 : "Unsigned",
@@ -465,7 +465,7 @@ class DaqMuxV2(pr.Device):
             bitSize      =  1,
             bitOffset    =  0x07,
             mode         = "RW",
-            number       =  4,
+            number       =  numBuffers,
             stride       =  4,
             enum         = {
                 0 : "Disabled",

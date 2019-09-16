@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-08-28
+-- Last update: 2019-09-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -33,7 +33,8 @@ entity AmcCarrierCore is
    generic (
       TPD_G                  : time     := 1 ns;
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB   
-      WAVEFORM_TDATA_BYTES_G : positive := 4;
+      WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
+      WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
       RSSI_ILEAVE_EN_G       : boolean  := false;
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
@@ -429,6 +430,7 @@ begin
          DISABLE_BSA_G          => DISABLE_BSA_G,
          DISABLE_BLD_G          => DISABLE_BLD_G,
          DISABLE_DDR_SRP_G      => DISABLE_DDR_SRP_G,
+         WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
          WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)

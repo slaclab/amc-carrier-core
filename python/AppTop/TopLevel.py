@@ -47,6 +47,7 @@ class TopLevel(pr.Device):
             # General Parameters
             enableBsa       = False,
             enableMps       = False,
+            numWaveformBuffers  = 4,
             expand          = True,
             enableTpgMini   = True,
             **kwargs):
@@ -142,6 +143,7 @@ class TopLevel(pr.Device):
             rssiNotInterlaved = rssiNotInterlaved,
             enableBsa         = enableBsa,
             enableMps         = enableMps,
+            numWaveformBuffers= numWaveformBuffers,
             enableTpgMini     = enableTpgMini,
         ))
         self.add(appTop.AppTop(
@@ -153,6 +155,7 @@ class TopLevel(pr.Device):
             numSigGen    = numSigGen,
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,
+            numWaveformBuffers = numWaveformBuffers,
             expand       = True,
         ))
 
