@@ -23,7 +23,8 @@ class AmcCarrierCore(pr.Device):
             rssiInterlaved      = False,            
             enableBsa           = True,
             enableMps           = True,
-            expand	            = False,
+            enableTpgMini       = True,
+            expand	        = False,
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)  
 
@@ -76,10 +77,12 @@ class AmcCarrierCore(pr.Device):
                 -----------------------------------------------------------------\n"\
             ))
                             
-        self.add(ti.AxiCdcm6208(     
-            offset       =  0x05000000, 
-            expand       =  False,
-        ))
+        # self.add(ti.AxiCdcm6208(     
+            # offset       =  0x05000000, 
+            # enabled      =  False,
+            # hidden       =  True,
+            # expand       =  False,            
+        # ))
 
         self.add(amcc.AmcCarrierBsi(   
             offset       =  0x07000000, 
@@ -87,8 +90,9 @@ class AmcCarrierCore(pr.Device):
         ))
 
         self.add(amcc.AmcCarrierTiming(
-            offset       =  0x08000000, 
-            expand       =  False,
+            offset        =  0x08000000, 
+            expand        =  False,
+            enableTpgMini = enableTpgMini,
         ))
 
         self.add(amcc.AmcCarrierBsa(   

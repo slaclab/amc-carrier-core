@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-04
--- Last update: 2018-08-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -45,12 +43,17 @@ entity AmcCarrierCoreAdv is
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
       DISABLE_TIME_GT_G      : boolean  := false;  -- false = normal application, true = doesn't build the Timing GT
       CORE_TRIGGERS_G        : positive := 16;
-      TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
+      TRIG_PIPE_G            : natural  := 0;      -- no trigger pipeline by default
+      USE_TPGMINI_G          : boolean  := true;   -- Build TPG Mini by default
+      CLKSEL_MODE_G          : string   := "SELECT"; -- "LCLSI","LCLSII"
+      STREAM_L1_G            : boolean  := true;
+      AXIL_RINGB_G           : boolean  := true;
+      ASYNC_G                : boolean  := true;
       FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G             : AppType;
       WAVEFORM_TDATA_BYTES_G : positive := 4;
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB  
-      MPS_SLOT_G             : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      MPS_SLOT_G             : boolean  := false); -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -107,7 +110,7 @@ entity AmcCarrierCoreAdv is
       recTimingRst         : out   sl;
       gthFabClk            : out   sl;
       stableClk            : out   sl;
-      stableRst            : out   sl;      
+      stableRst            : out   sl;
       -- Misc. Interface (axilClk domain)
       ipmiBsi              : out   BsiBusType;
       ethPhyReady          : out   sl;
@@ -156,6 +159,9 @@ entity AmcCarrierCoreAdv is
       -- Configuration PROM Ports
       calScl               : inout sl;
       calSda               : inout sl;
+      -- VCCINT DC/DC Ports
+      pwrScl               : inout sl                               := 'Z';
+      pwrSda               : inout sl                               := 'Z';
       -- DDR3L SO-DIMM Ports
       ddrClkP              : in    sl;
       ddrClkN              : in    sl;
@@ -220,7 +226,7 @@ architecture mapping of AmcCarrierCoreAdv is
    signal ddrMemError       : sl;
    --  MPS Interface
    signal mpsReadMaster     : AxiLiteReadMasterType;
-   signal mpsReadSlave      : AxiLiteReadSlaveType := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+   signal mpsReadSlave      : AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
    signal mpsWriteMaster    : AxiLiteWriteMasterType;
    signal mpsWriteSlave     : AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
@@ -316,6 +322,9 @@ begin
          -- Configuration PROM Ports
          calScl            => calScl,
          calSda            => calSda,
+         -- VCCINT DC/DC Ports
+         pwrScl            => pwrScl,
+         pwrSda            => pwrSda,
          -- Clock Cleaner Ports
          timingClkScl      => timingClkScl,
          timingClkSda      => timingClkSda,
@@ -329,7 +338,7 @@ begin
 --   ------------------
 --   -- Application MPS
 --   ------------------
-   GEN_EN_MPS : if ( DISABLE_MPS_G = false ) generate
+   GEN_EN_MPS : if (DISABLE_MPS_G = false) generate
       U_AppMps : entity work.AppMps
          generic map (
             TPD_G      => TPD_G,
@@ -372,7 +381,7 @@ begin
             mpsTxN          => mpsTxN);
    end generate GEN_EN_MPS;
 
-   GEN_DIS_MPS : if ( DISABLE_MPS_G = true ) generate
+   GEN_DIS_MPS : if (DISABLE_MPS_G = true) generate
       mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
       mpsClkOut    <= '0';
       U_OBUFDS : OBUFDS
@@ -401,6 +410,11 @@ begin
          DISABLE_TIME_GT_G      => DISABLE_TIME_GT_G,
          CORE_TRIGGERS_G        => CORE_TRIGGERS_G,
          TRIG_PIPE_G            => TRIG_PIPE_G,
+         USE_TPGMINI_G          => USE_TPGMINI_G,
+	 CLKSEL_MODE_G          => CLKSEL_MODE_G,
+	 STREAM_L1_G            => STREAM_L1_G,
+	 AXIL_RINGB_G           => AXIL_RINGB_G,
+	 ASYNC_G                => ASYNC_G,
          FSBL_G                 => FSBL_G)
       port map (
          -----------------------

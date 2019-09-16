@@ -82,6 +82,9 @@ architecture mapping of AmcCarrierRssiInterleave is
    signal rssiObMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
    signal rssiObSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
 
+   signal obRssiTspMaster : AxiStreamMasterType;
+   signal obRssiTspSlave  : AxiStreamSlaveType;
+
 begin
 
    -------------------------
@@ -126,8 +129,8 @@ begin
          -- Transport Layer Interface
          sTspAxisMaster_i  => obServerMaster,
          sTspAxisSlave_o   => obServerSlave,
-         mTspAxisMaster_o  => ibServerMaster,
-         mTspAxisSlave_i   => ibServerSlave,
+         mTspAxisMaster_o  => obRssiTspMaster,
+         mTspAxisSlave_i   => obRssiTspSlave,
          -- High level  Application side interface
          openRq_i          => '1',  -- Automatically start the connection without debug SRP channel
          closeRq_i         => '0',
@@ -139,6 +142,21 @@ begin
          axilReadSlave     => axilReadSlave,
          axilWriteMaster   => axilWriteMaster,
          axilWriteSlave    => axilWriteSlave);
+         
+   U_RssiTspObFifo : entity work.AmcCarrierRssiObFifo
+      generic map (
+         TPD_G    => TPD_G,
+         BYPASS_G => false)
+      port map (
+         -- Clock and Reset
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         -- RSSI Interface
+         obRssiTspMaster => obRssiTspMaster,
+         obRssiTspSlave  => obRssiTspSlave,
+         -- Interface to UDP Server engine
+         ibServerMaster  => ibServerMaster,
+         ibServerSlave   => ibServerSlave);         
 
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
