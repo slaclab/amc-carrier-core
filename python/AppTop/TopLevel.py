@@ -48,8 +48,10 @@ class TopLevel(pr.Device):
             enableBsa       = False,
             enableMps       = False,
             numWaveformBuffers  = 4,
+            expand          = True,
+            enableTpgMini   = True,
             **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
+        super().__init__(name=name, description=description, expand=expand, **kwargs)
 
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
@@ -142,6 +144,7 @@ class TopLevel(pr.Device):
             enableBsa         = enableBsa,
             enableMps         = enableMps,
             numWaveformBuffers= numWaveformBuffers,
+            enableTpgMini     = enableTpgMini,
         ))
         self.add(appTop.AppTop(
             memBase      = self.srp,
@@ -153,6 +156,7 @@ class TopLevel(pr.Device):
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,
             numWaveformBuffers = numWaveformBuffers,
+            expand       = True,
         ))
 
         # Define SW trigger command

@@ -93,34 +93,51 @@ class AppTop(pr.Device):
             # Get devices
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
+            dacDevices    = self.find(typ=ti.Dac38J84)
             appCore       = self.find(typ=appCommon.AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
             
-            # Power down AppCore (power down SysRef)
+            # Assert GTs Reset
+            for rx in jesdRxDevices: 
+                rx.ResetGTs.set(1)
+            for tx in jesdTxDevices: 
+                rx.ResetGTs.set(1)      
+            self.checkBlocks(recurse=True)
+            time.sleep(0.5)
+            
+            # Execute the AppCore.Disable
             for core in appCore:
                 core.Disable()
-            # GTs Reset
+
+            # Deassert GTs Reset
             for rx in jesdRxDevices: 
-                rx.CmdResetGTs()
+                rx.ResetGTs.set(0)
             for tx in jesdTxDevices: 
-                tx.CmdResetGTs()
+                tx.ResetGTs.set(0)
             self.checkBlocks(recurse=True)
-            time.sleep(1.0)
+            time.sleep(0.5)
+            
             # Init the AppCore
             for core in appCore:
                 core.Init()
-            # Wait for the system settle
-            time.sleep(0.5)            
+            time.sleep(1.0)
+            
             # Clear all error counters
             for rx in jesdRxDevices: 
                 rx.CmdClearErrors()  
             for tx in jesdTxDevices: 
                 tx.CmdClearErrors()
+            for dac in dacDevices: 
+                enable = dac.enable.get()
+                dac.enable.set(True)
+                dac.ClearAlarms()
+                dac.enable.set(enable)                
+                
             # Load the DAC signal generator
             for sigGen in sigGenDevices: 
                 if ( sigGen.CsvFilePath.get() != "" ):
                     sigGen.LoadCsvFile("")
-                    
+                                   
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)
                         
