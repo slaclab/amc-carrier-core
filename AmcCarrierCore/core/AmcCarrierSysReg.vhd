@@ -98,8 +98,8 @@ entity AmcCarrierSysReg is
       ipmcScl           : inout sl;
       ipmcSda           : inout sl;
       -- Configuration PROM Ports
-      calScl            : inout sl;
-      calSda            : inout sl;
+      calScl            : inout sl := 'Z';
+      calSda            : inout sl := 'Z';
       -- VCCINT DC/DC Ports
       pwrScl            : inout sl := 'Z';
       pwrSda            : inout sl := 'Z';
@@ -107,8 +107,8 @@ entity AmcCarrierSysReg is
       timingClkScl      : inout sl := 'Z';
       timingClkSda      : inout sl := 'Z';
       -- DDR3L SO-DIMM Ports
-      ddrScl            : inout sl;
-      ddrSda            : inout sl;
+      ddrScl            : inout sl := 'Z';
+      ddrSda            : inout sl := 'Z';
       -- SYSMON Ports
       vPIn              : in    sl;
       vNIn              : in    sl);
@@ -431,25 +431,25 @@ begin
    ----------------------------------------
    -- AXI-Lite: Configuration Memory Module
    ----------------------------------------
-   AxiI2cRegMaster_0 : entity work.AxiI2cEeprom
-      generic map (
-         TPD_G          => TPD_G,
-         ADDR_WIDTH_G   => 13,
-         I2C_ADDR_G     => "1010000",
-         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
-      port map (
-         -- I2C Ports
-         scl             => calScl,
-         sda             => calSda,
-         -- AXI-Lite Register Interface
-         axilReadMaster  => mAxilReadMasters(CONFIG_I2C_INDEX_C),
-         axilReadSlave   => mAxilReadSlaves(CONFIG_I2C_INDEX_C),
-         axilWriteMaster => mAxilWriteMasters(CONFIG_I2C_INDEX_C),
-         axilWriteSlave  => mAxilWriteSlaves(CONFIG_I2C_INDEX_C),
-         -- Clocks and Resets
-         axilClk         => axilClk,
-         axilRst         => axilRst);
+--   AxiI2cRegMaster_0 : entity work.AxiI2cEeprom
+--      generic map (
+--         TPD_G          => TPD_G,
+--         ADDR_WIDTH_G   => 13,
+--         I2C_ADDR_G     => "1010000",
+--         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
+--         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+--      port map (
+--         -- I2C Ports
+--         scl             => calScl,
+--         sda             => calSda,
+--         -- AXI-Lite Register Interface
+--         axilReadMaster  => mAxilReadMasters(CONFIG_I2C_INDEX_C),
+--         axilReadSlave   => mAxilReadSlaves(CONFIG_I2C_INDEX_C),
+--         axilWriteMaster => mAxilWriteMasters(CONFIG_I2C_INDEX_C),
+--         axilWriteSlave  => mAxilWriteSlaves(CONFIG_I2C_INDEX_C),
+--         -- Clocks and Resets
+--         axilClk         => axilClk,
+--         axilRst         => axilRst);
 
    ---------------------------------
    -- AXI-Lite: Clock Cleaner Module
@@ -476,24 +476,24 @@ begin
    -------------------------------
    -- AXI-Lite: DDR Monitor Module
    -------------------------------
-   AxiI2cRegMaster_2 : entity work.AxiI2cRegMaster
-      generic map (
-         TPD_G          => TPD_G,
-         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
-         DEVICE_MAP_G   => DDR_DEVICE_MAP_C,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
-      port map (
-         -- I2C Ports
-         scl            => ddrScl,
-         sda            => ddrSda,
-         -- AXI-Lite Register Interface
-         axiReadMaster  => mAxilReadMasters(DDR_I2C_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(DDR_I2C_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(DDR_I2C_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(DDR_I2C_INDEX_C),
-         -- Clocks and Resets
-         axiClk         => axilClk,
-         axiRst         => axilRst);
+--   AxiI2cRegMaster_2 : entity work.AxiI2cRegMaster
+--      generic map (
+--         TPD_G          => TPD_G,
+--         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
+--         DEVICE_MAP_G   => DDR_DEVICE_MAP_C,
+--         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+--      port map (
+--         -- I2C Ports
+--         scl            => ddrScl,
+--         sda            => ddrSda,
+--         -- AXI-Lite Register Interface
+--         axiReadMaster  => mAxilReadMasters(DDR_I2C_INDEX_C),
+--         axiReadSlave   => mAxilReadSlaves(DDR_I2C_INDEX_C),
+--         axiWriteMaster => mAxilWriteMasters(DDR_I2C_INDEX_C),
+--         axiWriteSlave  => mAxilWriteSlaves(DDR_I2C_INDEX_C),
+--         -- Clocks and Resets
+--         axiClk         => axilClk,
+--         axiRst         => axilRst);
 
    -----------------------
    -- AXI-Lite: BSI Module
