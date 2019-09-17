@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcCryoCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-10-05
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_23_C00
 -------------------------------------------------------------------------------
@@ -266,39 +264,70 @@ begin
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
-   IBUFDS_SysRef : IBUFDS
+   U_jesdSysRef : entity work.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => true)  -- Note inverted because it is Swapped on the board
       port map (
-         I  => jesdSysRefP,
-         IB => jesdSysRefN,
-         O  => s_jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdSysRefP,
+         jesdSyncN => jesdSysRefN,
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   jesdSysRef <= not(s_jesdSysRef);  -- Note inverted because it is Swapped on the board
-
-   OBUFDS0_RxSync : OBUFDS
+   U_jesdRxSync0 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => jesdRxSyncP(0),
-         OB => jesdRxSyncN(0));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdRxSyncP(0),
+         jesdSyncN => jesdRxSyncN(0));
 
-   jesdRxSyncL <= not(jesdRxSync);  -- Note inverted because it is Swapped on the board
-
-   OBUFDS1_RxSync : OBUFDS
+   U_jesdRxSync1 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => true)  -- Note inverted because it is Swapped on the board
       port map (
-         I  => jesdRxSyncL,
-         O  => jesdRxSyncP(1),
-         OB => jesdRxSyncN(1));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdRxSyncP(1),
+         jesdSyncN => jesdRxSyncN(1));
 
-   IBUFDS0_TxSync : IBUFDS
+   U_jesdTxSync0 : entity work.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdTxSyncP(0),
-         IB => jesdTxSyncN(0),
-         O  => jesdTxSyncRaw(0));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdTxSyncP(0),
+         jesdSyncN => jesdTxSyncN(0),
+         -- JESD Low speed Interface
+         jesdSync  => jesdTxSyncRaw(0));
 
-   IBUFDS1_TxSync : IBUFDS
+   U_jesdTxSync1 : entity work.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdTxSyncP(1),
-         IB => jesdTxSyncN(1),
-         O  => jesdTxSyncRaw(1));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdTxSyncP(1),
+         jesdSyncN => jesdTxSyncN(1),
+         -- JESD Low speed Interface
+         jesdSync  => jesdTxSyncRaw(1));
 
    jesdTxSyncVec(0) <= jesdTxSyncMask(0) or not(jesdTxSyncRaw(0));
    jesdTxSyncVec(1) <= jesdTxSyncMask(1) or jesdTxSyncRaw(1);
