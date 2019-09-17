@@ -125,12 +125,12 @@ class AppTop(pr.Device):
             
             # Special DAC Init procedure
             for dac in dacDevices: 
-                tx.EnableTx.set(0x0)
-                tx.InitJesd.set(0x1)
-                tx.JesdRstN.set(0x0)
-                tx.JesdRstN.set(0x1)
-                tx.InitJesd.set(0x0)
-                tx.EnableTx.set(0x1)
+                dac.EnableTx.set(0x0)
+                dac.InitJesd.set(0x1)
+                dac.JesdRstN.set(0x0)
+                dac.JesdRstN.set(0x1)
+                dac.InitJesd.set(0x0)
+                dac.EnableTx.set(0x1)
             if len(dacDevices) > 0:
                 for lmk in lmkDevices:
                     lmk.PwrUpSysRef()
