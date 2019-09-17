@@ -94,6 +94,7 @@ class AppTop(pr.Device):
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
+            lmkDevices    = self.find(typ=ti.Lmk04828)
             appCore       = self.find(typ=appCommon.AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
             
@@ -122,6 +123,18 @@ class AppTop(pr.Device):
                 core.Init()
             time.sleep(1.0)
             
+            # Special DAC Init procedure
+            for dac in dacDevices: 
+                tx.EnableTx.set(0x0)
+                tx.InitJesd.set(0x1)
+                tx.JesdRstN.set(0x0)
+                tx.JesdRstN.set(0x1)
+                tx.InitJesd.set(0x0)
+                tx.EnableTx.set(0x1)
+            if len(dacDevices) > 0:
+                for lmk in lmkDevices:
+                    lmk.PwrUpSysRef()
+         
             # Clear all error counters
             for rx in jesdRxDevices: 
                 rx.CmdClearErrors()  
