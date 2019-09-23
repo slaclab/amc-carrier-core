@@ -214,12 +214,12 @@ architecture mapping of AmcCarrierSysReg is
          endianness => '1'));           -- Big endian
 
    constant PWR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
-      0             => MakeI2cAxiLiteDevType(
+      0              => MakeI2cAxiLiteDevType(
          i2cAddress  => "0001010",  -- EM2280P01QI: ADDR1=0Ohm, ADDR0=10kOhm --> Address=0x0A
-         dataSize    => 16,              -- in units of bits
-         addrSize    => 8,               -- in units of bits
-         repeatStart => '1',             -- repeated start 
-         endianness  => '0'));           -- Little endian         
+         dataSize    => 16,             -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         repeatStart => '1',            -- repeated start 
+         endianness  => '0'));          -- Little endian         
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
@@ -530,24 +530,26 @@ begin
    -------------------------------
    -- AXI-Lite: PWR Monitor Module
    -------------------------------
-   AxiI2cRegMaster_3 : entity work.AxiI2cRegMaster
-      generic map (
-         TPD_G          => TPD_G,
-         I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
-         DEVICE_MAP_G   => PWR_DEVICE_MAP_C,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
-      port map (
-         -- I2C Ports
-         scl            => pwrScl,
-         sda            => pwrSda,
-         -- AXI-Lite Register Interface
-         axiReadMaster  => mAxilReadMasters(PWR_I2C_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(PWR_I2C_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(PWR_I2C_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(PWR_I2C_INDEX_C),
-         -- Clocks and Resets
-         axiClk         => axilClk,
-         axiRst         => axilRst);
+   GEN_PWR_I2C : if (ULTRASCALE_PLUS_C) generate
+      AxiI2cRegMaster_3 : entity work.AxiI2cRegMaster
+         generic map (
+            TPD_G          => TPD_G,
+            I2C_SCL_FREQ_G => 100.0E+3,  -- units of Hz
+            DEVICE_MAP_G   => PWR_DEVICE_MAP_C,
+            AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+         port map (
+            -- I2C Ports
+            scl            => pwrScl,
+            sda            => pwrSda,
+            -- AXI-Lite Register Interface
+            axiReadMaster  => mAxilReadMasters(PWR_I2C_INDEX_C),
+            axiReadSlave   => mAxilReadSlaves(PWR_I2C_INDEX_C),
+            axiWriteMaster => mAxilWriteMasters(PWR_I2C_INDEX_C),
+            axiWriteSlave  => mAxilWriteSlaves(PWR_I2C_INDEX_C),
+            -- Clocks and Resets
+            axiClk         => axilClk,
+            axiRst         => axilRst);
+   end generate;
 
    --------------------------------------
    -- Map the AXI-Lite to Timing Firmware
