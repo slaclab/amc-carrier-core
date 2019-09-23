@@ -31,7 +31,7 @@ entity DaqRegItf is
       TPD_G            : time     := 1 ns;
       AXI_ADDR_WIDTH_G : positive := 10;
       N_DATA_IN_G      : positive := 16;
-      N_DATA_OUT_G     : positive := 8
+      N_DATA_OUT_G     : positive := 4
       );
    port (
       -- Axi-Lite Clk
@@ -243,6 +243,11 @@ begin
                v.axilReadSlave.rdata(N_DATA_IN_G-1 downto 0) := s_sampleValid;
             when 16#0c# =>              -- ADDR (0x30)
                v.axilReadSlave.rdata(N_DATA_IN_G-1 downto 0) := s_linkReady;
+            when 16#0d# =>              -- ADDR (0x34)
+               v.axilReadSlave.rdata(7 downto 0)   := toSlv(AXI_ADDR_WIDTH_G,8);
+               v.axilReadSlave.rdata(15 downto 8)  := toSlv(N_DATA_IN_G,8);
+               v.axilReadSlave.rdata(23 downto 16) := toSlv(N_DATA_OUT_G,8);
+               v.axilReadSlave.rdata(31 downto 24) := x"00";               
             when 16#10# to 16#1F# =>    -- ADDR (0x40)
                for I in (N_DATA_OUT_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = I) then

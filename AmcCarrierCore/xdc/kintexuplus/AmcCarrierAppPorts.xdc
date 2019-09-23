@@ -69,6 +69,10 @@ set_property -dict { PACKAGE_PIN AD8 IOSTANDARD LVCMOS25 } [get_ports {ipmcSda}]
 set_property -dict { PACKAGE_PIN AM12 IOSTANDARD LVCMOS25 } [get_ports {calScl}]
 set_property -dict { PACKAGE_PIN AN12 IOSTANDARD LVCMOS25 } [get_ports {calSda}]
 
+# VCCINT DC/DC Ports
+set_property -dict { PACKAGE_PIN AA34 IOSTANDARD LVCMOS18 } [get_ports {pwrScl}]
+set_property -dict { PACKAGE_PIN AB34 IOSTANDARD LVCMOS18 } [get_ports {pwrSda}]
+
 # DDR3L SO-DIMM Ports
 set_property -dict { PACKAGE_PIN K20 IOSTANDARD LVCMOS15 } [get_ports {ddrScl}] 
 set_property -dict { PACKAGE_PIN K21 IOSTANDARD LVCMOS15 } [get_ports {ddrSda}] 

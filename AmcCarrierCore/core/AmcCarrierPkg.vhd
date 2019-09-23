@@ -80,7 +80,8 @@ package AmcCarrierPkg is
    -- 06/24/2019 (0x02060200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.2
    -- 07/03/2019 (0x02060300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.3
    -- 08/05/2019 (0x02060400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.4
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_06_04_00";
+   -- 09/23/2019 (0x02060500): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.5
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_06_05_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
@@ -94,7 +95,8 @@ package AmcCarrierPkg is
    constant APP_BLEN_TYPE_C       : AppType := toSlv(12, AppType'length);
    constant APP_LLRF_TYPE_C       : AppType := toSlv(13, AppType'length);
    constant APP_EXTREF_GEN_TYPE_C : AppType := toSlv(14, AppType'length);  --Timing Generator with external reference
-
+   constant APP_FWS_TYPE_C        : AppType := toSlv(15, AppType'length);  --Fast Wire Scanner
+                                                     
    constant APP_BPM_STRIPLINE_TYPE_C : AppType := toSlv(100, AppType'length);
    constant APP_BPM_CAVITY_TYPE_C    : AppType := toSlv(101, AppType'length);
 
@@ -116,7 +118,7 @@ package AmcCarrierPkg is
    -------------------------------------------------------------------------------------------------
    -- Ethernet stream configurations
    -------------------------------------------------------------------------------------------------
-   constant ETH_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);  -- Use 8 tDest bits
+   constant AXIS_8BYTE_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(8, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);  -- Use 8 tDest bits
 
    -- BSA stream indicies
    constant BSA_MEM_AXIS_INDEX_C             : integer := 0;

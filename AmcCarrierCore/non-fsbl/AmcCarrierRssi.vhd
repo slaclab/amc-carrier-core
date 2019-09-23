@@ -70,8 +70,8 @@ architecture mapping of AmcCarrierRssi is
    constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
    constant MAX_RETRANS_CNT_C  : positive := ite((WINDOW_ADDR_SIZE_C > 1), WINDOW_ADDR_SIZE_C-1, 1);
 
-   constant APP_AXIS_CONFIG_C  : AxiStreamConfigArray(4 downto 0) := (others => ETH_AXIS_CONFIG_C);
-   constant TEMP_AXIS_CONFIG_C : AxiStreamConfigArray(1 downto 0) := (others => ETH_AXIS_CONFIG_C);
+   constant APP_AXIS_CONFIG_C  : AxiStreamConfigArray(4 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
+   constant TEMP_AXIS_CONFIG_C : AxiStreamConfigArray(1 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
 
    signal rssiIbMasters : AxiStreamMasterArray(4 downto 0);
    signal rssiIbSlaves  : AxiStreamSlaveArray(4 downto 0);
@@ -98,6 +98,9 @@ architecture mapping of AmcCarrierRssi is
    signal tempIbSlaves  : AxiStreamSlaveArray(1 downto 0);
    signal tempObMasters : AxiStreamMasterArray(1 downto 0);
    signal tempObSlaves  : AxiStreamSlaveArray(1 downto 0);
+
+   signal obRssiTspMasters : AxiStreamMasterArray(1 downto 0);
+   signal obRssiTspSlaves  : AxiStreamSlaveArray(1 downto 0);
 
 begin
 
@@ -159,8 +162,8 @@ begin
          -- Transport Layer Interface
          sTspAxisMaster_i  => obServerMasters(0),
          sTspAxisSlave_o   => obServerSlaves(0),
-         mTspAxisMaster_o  => ibServerMasters(0),
-         mTspAxisSlave_i   => ibServerSlaves(0),
+         mTspAxisMaster_o  => obRssiTspMasters(0),
+         mTspAxisSlave_i   => obRssiTspSlaves(0),
          -- High level  Application side interface
          openRq_i          => '1',  -- Automatically start the connection without debug SRP channel
          closeRq_i         => '0',
@@ -172,6 +175,21 @@ begin
          axilReadSlave     => axilReadSlaves(0),
          axilWriteMaster   => axilWriteMasters(0),
          axilWriteSlave    => axilWriteSlaves(0));
+         
+   U_RssiTspObFifo_0 : entity work.AmcCarrierRssiObFifo
+      generic map (
+         TPD_G    => TPD_G,
+         BYPASS_G => true) -- true to reduce logic footprint
+      port map (
+         -- Clock and Reset
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         -- RSSI Interface
+         obRssiTspMaster => obRssiTspMasters(0),
+         obRssiTspSlave  => obRssiTspSlaves(0),
+         -- Interface to UDP Server engine
+         ibServerMaster  => ibServerMasters(0),
+         ibServerSlave   => ibServerSlaves(0));          
 
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
@@ -182,7 +200,7 @@ begin
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
          TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
-         AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
+         AXI_STREAM_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)
          sAxisClk         => axilClk,
@@ -235,12 +253,12 @@ begin
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- ETH_AXIS_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of ETH_AXIS_CONFIG_C.TDATA_BYTES_C
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- AXIS_8BYTE_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of AXIS_8BYTE_CONFIG_C.TDATA_BYTES_C
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
+         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
@@ -287,8 +305,8 @@ begin
          -- Transport Layer Interface
          sTspAxisMaster_i  => obServerMasters(1),
          sTspAxisSlave_o   => obServerSlaves(1),
-         mTspAxisMaster_o  => ibServerMasters(1),
-         mTspAxisSlave_i   => ibServerSlaves(1),
+         mTspAxisMaster_o  => obRssiTspMasters(1),
+         mTspAxisSlave_i   => obRssiTspSlaves(1),
          -- High level  Application side interface
          openRq_i          => '1',  -- Automatically start the connection without debug SRP channel
          closeRq_i         => '0',
@@ -300,6 +318,21 @@ begin
          axilReadSlave     => axilReadSlaves(1),
          axilWriteMaster   => axilWriteMasters(1),
          axilWriteSlave    => axilWriteSlaves(1));
+
+   U_RssiTspObFifo_1 : entity work.AmcCarrierRssiObFifo
+      generic map (
+         TPD_G    => TPD_G,
+         BYPASS_G => true) -- true to reduce logic footprint
+      port map (
+         -- Clock and Reset
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         -- RSSI Interface
+         obRssiTspMaster => obRssiTspMasters(1),
+         obRssiTspSlave  => obRssiTspSlaves(1),
+         -- Interface to UDP Server engine
+         ibServerMaster  => ibServerMasters(1),
+         ibServerSlave   => ibServerSlaves(1));  
 
    -----------------------------
    -- Memory Access: TDEST = 0x4
