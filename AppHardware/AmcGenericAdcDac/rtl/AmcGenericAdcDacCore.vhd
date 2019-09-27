@@ -178,6 +178,8 @@ architecture mapping of AmcGenericAdcDacCore is
    signal lemoDoutN   : slv(1 downto 0);
    signal lemoDinput  : slv(1 downto 0);
    signal bcmL        : sl;
+   signal smaTrigMon  : sl;
+   signal adcCalMon   : sl;
 
 begin
 
@@ -490,8 +492,8 @@ begin
          AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)
       port map (
          -- Pass through Interfaces
-         smaTrig         => ite(TRIG_CLK_G, '0', smaTrig),
-         adcCal          => ite(CAL_CLK_G, '0', adcCal),
+         smaTrig         => smaTrigMon,
+         adcCal          => adcCalMon,
          lemoDin         => lemoDinput,
          lemoDout        => lemoDout,
          bcm             => bcm,
@@ -521,4 +523,7 @@ begin
          lmkRst          => lmkRst,
          lmkSync         => lmkSync);
 
+   smaTrigMon <= '0' when(TRIG_CLK_G) else smaTrig;
+   adcCalMon  <= '0' when(CAL_CLK_G) else adcCal;
+      
 end mapping;
