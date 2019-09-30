@@ -43,7 +43,7 @@ entity AmcGenericAdcDacCore is
       jesdRst         : in    sl;
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
-      jesdTxSync      : out   sl;
+      jesdTxSync      : out   slv(9 downto 0);
       -- ADC/DAC Interface
       adcValids       : in    slv(3 downto 0);
       adcValues       : in    sampleDataArray(3 downto 0);
@@ -180,6 +180,8 @@ architecture mapping of AmcGenericAdcDacCore is
    signal bcmL        : sl;
    signal smaTrigMon  : sl;
    signal adcCalMon   : sl;
+   
+   signal locJesdTxSync : sl;   
 
 begin
 
@@ -349,7 +351,9 @@ begin
          jesdSyncP => jesdTxSyncP,
          jesdSyncN => jesdTxSyncN,
          -- JESD Low speed Interface
-         jesdSync  => jesdTxSync);
+         jesdSync  => locJesdTxSync);
+         
+   jesdTxSync <= (others=>locJesdTxSync);    
 
    GEN_RX_SYNC :
    for i in 1 downto 0 generate
