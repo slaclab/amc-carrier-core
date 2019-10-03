@@ -49,7 +49,7 @@ entity AmcMrLlrfGen2UpConvertMapping is
       fpgaInterlock : in    sl;
       i2cScl        : inout sl;
       i2cSda        : inout sl;
-      jesdTxSync    : out   sl;
+      jesdTxSync    : out   slv(9 downto 0);
       dacRst        : in    sl;
       dacCsL        : in    sl;
       dacSck        : in    sl;
@@ -83,6 +83,8 @@ end AmcMrLlrfGen2UpConvertMapping;
 architecture mapping of AmcMrLlrfGen2UpConvertMapping is
 
    signal timingTrigReg : sl;
+
+   signal locJesdTxSync : sl;   
 
 begin
 
@@ -216,6 +218,8 @@ begin
          jesdSyncP => spareP(9),
          jesdSyncN => spareN(9),
          -- JESD Low speed Interface
-         jesdSync  => jesdTxSync);
+         jesdSync  => locJesdTxSync);
+         
+   jesdTxSync <= (others=>locJesdTxSync);    
 
 end mapping;

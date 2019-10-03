@@ -43,7 +43,7 @@ entity AmcMrLlrfGen2UpConvert is
       jesdRst2x       : in    sl;
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
-      jesdTxSync      : out   sl;
+      jesdTxSync      : out   slv(9 downto 0);
       -- Interlock and trigger
       timingTrig      : in    sl;
       fpgaInterlock   : in    sl;

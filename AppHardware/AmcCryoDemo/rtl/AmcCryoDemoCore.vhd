@@ -37,7 +37,7 @@ entity AmcCryoDemoCore is
       -- JESD Interface
       jesdSysRef : out sl;
       jesdRxSync : in  sl;
-      jesdTxSync : out sl;
+      jesdTxSync : out slv(9 downto 0);
 
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -130,6 +130,8 @@ architecture top_level_app of AmcCryoDemoCore is
    signal jesdRxSyncN : slv(3 downto 0);
    signal jesdTxSyncP : sl;
    signal jesdTxSyncN : sl;
+   
+   signal locJesdTxSync : sl;
 
    -------------------------------------------------------------------------------------------------
    -- SPI
@@ -263,7 +265,9 @@ begin
          jesdSyncP => jesdTxSyncP,
          jesdSyncN => jesdTxSyncN,
          -- JESD Low speed Interface
-         jesdSync  => jesdTxSync);
+         jesdSync  => locJesdTxSync);
+         
+   jesdTxSync <= (others=>locJesdTxSync);         
 
    ----------------------------------------------------------------
    -- SPI interface ADCs and LMK 
