@@ -26,9 +26,9 @@ use unisim.vcomponents.all;
 
 entity JesdSyncOut is
    generic (
-      TPD_G      : time    := 1 ns;
-      GEN_SYNC_G : boolean := false;    -- default false don't add synchronizer
-      INVERT_G   : boolean := false);
+      TPD_G       : time    := 1 ns;
+      GEN_ASYNC_G : boolean := false;    -- default false don't add synchronizer
+      INVERT_G    : boolean := false);
    port (
       -- Clock
       jesdClk   : in  sl;
@@ -47,7 +47,7 @@ architecture mapping of JesdSyncOut is
 
 begin
 
-   GEN_ASYNC : if (GEN_SYNC_G = true) generate
+   GEN_ASYNC : if (GEN_ASYNC_G = true) generate
       U_sync : entity work.RstPipeline
          generic map (
             TPD_G => TPD_G)
@@ -57,7 +57,7 @@ begin
             rstOut => syncIn);
    end generate;
 
-   GEN_SYNC : if (GEN_SYNC_G = false) generate
+   GEN_SYNC : if (GEN_ASYNC_G = false) generate
       process(jesdClk)
       begin
          if rising_edge(jesdClk) then
