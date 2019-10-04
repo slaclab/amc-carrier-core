@@ -30,7 +30,7 @@ entity JesdSyncIn is
       INVERT_G    : boolean := false);
    port (
       -- Edge Select
-      edgeSelet : in  sl;  -- '0': jesdClk's rising edge sampled, '1': jesdClk's falling edge sampled
+      edgeSelet : in  sl := '0';  -- '0': jesdClk's rising edge sampled, '1': jesdClk's falling edge sampled
       -- Clock
       jesdClk   : in  sl;
       -- JESD Low speed Ports
