@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-10-05
--- Last update: 2019-03-26
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -471,8 +469,9 @@ begin
    ----------------------------------------------------------------
    U_jesdSysRef : entity work.JesdSyncIn
       generic map (
-         TPD_G    => TPD_G,
-         INVERT_G => true)  -- Note inverted because it is Swapped on the board
+         TPD_G      => TPD_G,
+         GEN_SYNC_G => false, -- Deskewed using LMK to get rid of race condition between jesdSysRefP/N and jesdClk
+         INVERT_G   => true)  -- Note inverted because it is Swapped on the board
       port map (
          -- Clock
          jesdClk   => jesdClk,
