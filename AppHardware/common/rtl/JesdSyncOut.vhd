@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : JesdSyncOut.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-05-04
--- Last update: 2018-05-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -28,8 +26,9 @@ use unisim.vcomponents.all;
 
 entity JesdSyncOut is
    generic (
-      TPD_G    : time    := 1 ns;
-      INVERT_G : boolean := false);
+      TPD_G      : time    := 1 ns;
+      GEN_SYNC_G : boolean := false;    -- default false don't add synchronizer
+      INVERT_G   : boolean := false);
    port (
       -- Clock
       jesdClk   : in  sl;
@@ -48,20 +47,30 @@ architecture mapping of JesdSyncOut is
 
 begin
 
-   -- Help with meeting timing
-   U_sync : entity work.RstPipeline
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk    => jesdClk,
-         rstIn  => jesdSync,
-         rstOut => syncIn);
+   GEN_ASYNC : if (GEN_SYNC_G = true) generate
+      U_sync : entity work.RstPipeline
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk    => jesdClk,
+            rstIn  => jesdSync,
+            rstOut => syncIn);
+   end generate;
+
+   GEN_SYNC : if (GEN_SYNC_G = false) generate
+      process(jesdClk)
+      begin
+         if rising_edge(jesdClk) then
+            syncIn <= jesdSync after TPD_G;
+         end if;
+      end process;
+   end generate;
 
    sync <= syncIn when(INVERT_G = false) else not(syncIn);
 
    U_rxSyncReg : ODDRE1
       generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C, "ULTRASCALE_PLUS", "ULTRASCALE"))
       port map (
          C  => jesdClk,
          SR => '0',

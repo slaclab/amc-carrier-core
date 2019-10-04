@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : JesdSyncIn.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-05-04
--- Last update: 2018-05-11
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -27,9 +25,12 @@ use unisim.vcomponents.all;
 
 entity JesdSyncIn is
    generic (
-      TPD_G    : time    := 1 ns;
-      INVERT_G : boolean := false);
+      TPD_G      : time    := 1 ns;
+      GEN_SYNC_G : boolean := true;  -- default true means to add synchronizer
+      INVERT_G   : boolean := false);
    port (
+      -- Edge Select
+      edgeSelet : in  sl;  -- '0': jesdClk's rising edge sampled, '1': jesdClk's falling edge sampled
       -- Clock
       jesdClk   : in  sl;
       -- JESD Low speed Ports
@@ -41,10 +42,11 @@ end JesdSyncIn;
 
 architecture mapping of JesdSyncIn is
 
-   signal jesdClkL : sl;
-   signal ibufSync : sl;
-   signal regSync  : sl;
-   signal syncOut  : sl;
+   signal jesdClkL   : sl;
+   signal ibufSync   : sl;
+   signal regSyncVec : slv(1 downto 0);
+   signal regSync    : sl;
+   signal syncOut    : sl;
 
 begin
 
@@ -64,18 +66,30 @@ begin
          CB => jesdClkL,
          D  => ibufSync,
          R  => '0',
-         Q1 => regSync,
-         Q2 => open);
+         Q1 => regSyncVec(0),
+         Q2 => regSyncVec(1));
+
+   regSync <= regSyncVec(0) when(edgeSelet = '0') else regSyncVec(1);
 
    syncOut <= regSync when(INVERT_G = false) else not(regSync);
 
-   -- Help with meeting timing
-   U_sync : entity work.RstPipeline
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk    => jesdClk,
-         rstIn  => syncOut,
-         rstOut => jesdSync);
+   GEN_ASYNC : if (GEN_SYNC_G = true) generate
+      U_sync : entity work.RstPipeline
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk    => jesdClk,
+            rstIn  => syncOut,
+            rstOut => jesdSync);
+   end generate;
+
+   GEN_SYNC : if (GEN_SYNC_G = false) generate
+      process(jesdClk)
+      begin
+         if rising_edge(jesdClk) then
+            jesdSync <= syncOut after TPD_G;
+         end if;
+      end process;
+   end generate;
 
 end mapping;
