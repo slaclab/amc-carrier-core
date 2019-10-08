@@ -87,7 +87,7 @@ class AppTop(pr.Device):
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
             lmkDevices    = self.find(typ=ti.Lmk04828)
-            appCore       = self.find(typ=AppCore)
+            appCore       = self.find(typ=AppCore.AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
 
             # Assert GTs Reset
