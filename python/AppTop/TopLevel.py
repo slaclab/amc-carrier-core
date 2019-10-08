@@ -50,6 +50,7 @@ class TopLevel(pr.Device):
             numWaveformBuffers  = 4,
             expand          = True,
             enableTpgMini   = True,
+            appCoreClass    = None,
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)
 
@@ -158,6 +159,7 @@ class TopLevel(pr.Device):
             modeSigGen   = modeSigGen,
             numWaveformBuffers = numWaveformBuffers,
             expand       = True,
+            appCoreClass = appCoreClass
         ))
 
         # Define SW trigger command
