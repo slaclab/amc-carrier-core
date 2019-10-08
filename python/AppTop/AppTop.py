@@ -37,7 +37,7 @@ class AppTop(pr.Device):
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
-            numWaveformBuffers  = 4
+            numWaveformBuffers  = 4,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
