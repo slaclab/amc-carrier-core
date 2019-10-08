@@ -20,6 +20,7 @@
 import time
 import pyrogue   as pr
 import AppTop    as appTop
+import AppCore
 import DacSigGen as dacSigGen
 import DaqMuxV2  as daqMuxV2
 
@@ -36,8 +37,7 @@ class AppTop(pr.Device):
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
-            numWaveformBuffers  = 4,
-            appCoreClass   = None,
+            numWaveformBuffers  = 4
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
@@ -45,19 +45,10 @@ class AppTop(pr.Device):
         self._numTxLanes   = numTxLanes
         self._numSigGen    = numSigGen
         self._sizeSigGen   = sizeSigGen
-        self._appCoreClass = appCoreClass
         
         ##############################
         # Variables
         ##############################
-
-        if appCoreClass is not None:
-            self.add(appCoreClass(   
-                offset       =  0x00000000, 
-                numRxLanes   =  numRxLanes,
-                numTxLanes   =  numTxLanes,
-                expand       =  True,
-            ))
 
         for i in range(2):
             self.add(daqMuxV2.DaqMuxV2(
@@ -96,13 +87,9 @@ class AppTop(pr.Device):
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
             lmkDevices    = self.find(typ=ti.Lmk04828)
+            appCore       = self.find(typ=AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
 
-            if self._appCoreClass is not None:
-                appCore = self.find(typ=self._appCoreClass)
-            else:
-                appCore = []
-            
             # Assert GTs Reset
             for rx in jesdRxDevices: 
                 rx.ResetGTs.set(1)
