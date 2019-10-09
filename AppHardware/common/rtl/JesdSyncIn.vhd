@@ -46,7 +46,10 @@ architecture mapping of JesdSyncIn is
    signal ibufSync   : sl;
    signal regSyncVec : slv(1 downto 0);
    signal regSync    : sl;
-   signal syncOut    : sl;
+
+   attribute dont_touch             : string;
+   attribute dont_touch of ibufSync : signal is "TRUE";
+   attribute dont_touch of regSync  : signal is "TRUE";
 
 begin
 
@@ -58,38 +61,37 @@ begin
          IB => jesdSyncN,
          O  => ibufSync);
 
-   U_IDDRE1 : IDDRE1
-      generic map (
-         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED")
-      port map (
-         C  => jesdClk,
-         CB => jesdClkL,
-         D  => ibufSync,
-         R  => '0',
-         Q1 => regSyncVec(0),
-         Q2 => regSyncVec(1));
-
-   regSync <= regSyncVec(0) when(edgeSelet = '0') else regSyncVec(1);
-
-   syncOut <= regSync when(INVERT_G = false) else not(regSync);
-
    GEN_ASYNC : if (GEN_ASYNC_G = true) generate
-      U_sync : entity work.RstPipeline
+
+      U_Synchronizer : entity work.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
-            clk    => jesdClk,
-            rstIn  => syncOut,
-            rstOut => jesdSync);
+            clk     => jesdClk,
+            dataIn  => ibufSync,
+            dataOut => regSync);
+
    end generate;
 
    GEN_SYNC : if (GEN_ASYNC_G = false) generate
-      process(jesdClk)
-      begin
-         if rising_edge(jesdClk) then
-            jesdSync <= syncOut after TPD_G;
-         end if;
-      end process;
+
+      U_IDDRE1 : IDDRE1
+         generic map (
+            DDR_CLK_EDGE => "SAME_EDGE_PIPELINED")
+         port map (
+            C  => jesdClk,
+            CB => jesdClkL,
+            D  => ibufSync,
+            R  => '0',
+            Q1 => regSyncVec(0),        -- Rising edge sample
+            Q2 => regSyncVec(1));       -- Falling edge sample
+
+      -- Select whether sampling the rising or falling edge sample
+      regSync <= regSyncVec(0) when(edgeSelet = '0') else regSyncVec(1);
+
    end generate;
+
+   -- Select whether the output is inverted for not
+   jesdSync <= regSync when(INVERT_G = false) else not(regSync);
 
 end mapping;
