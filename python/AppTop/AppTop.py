@@ -26,8 +26,6 @@ import DaqMuxV2  as daqMuxV2
 import surf.devices.ti         as ti
 import surf.protocols.jesd204b as jesd
 
-import common as appCommon
-
 class AppTop(pr.Device):
     def __init__(   self, 
             name           = "AppTop", 
@@ -42,21 +40,14 @@ class AppTop(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
-        self._numRxLanes = numRxLanes
-        self._numTxLanes = numTxLanes
-        self._numSigGen  = numSigGen
-        self._sizeSigGen = sizeSigGen
+        self._numRxLanes   = numRxLanes
+        self._numTxLanes   = numTxLanes
+        self._numSigGen    = numSigGen
+        self._sizeSigGen   = sizeSigGen
         
         ##############################
         # Variables
         ##############################
-
-        self.add(appCommon.AppCore(   
-            offset       =  0x00000000, 
-            numRxLanes   =  numRxLanes,
-            numTxLanes   =  numTxLanes,
-            expand       =  True,
-        ))
 
         for i in range(2):
             self.add(daqMuxV2.DaqMuxV2(
@@ -95,9 +86,9 @@ class AppTop(pr.Device):
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
             lmkDevices    = self.find(typ=ti.Lmk04828)
-            appCore       = self.find(typ=appCommon.AppCore)
+            appCore       = self.find(typ=appTop.AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
-            
+
             # Assert GTs Reset
             for rx in jesdRxDevices: 
                 rx.ResetGTs.set(1)
