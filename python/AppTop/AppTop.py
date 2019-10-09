@@ -20,7 +20,6 @@
 import time
 import pyrogue   as pr
 import AppTop    as appTop
-import AppCore
 import DacSigGen as dacSigGen
 import DaqMuxV2  as daqMuxV2
 
@@ -87,7 +86,7 @@ class AppTop(pr.Device):
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
             lmkDevices    = self.find(typ=ti.Lmk04828)
-            appCore       = self.find(typ=AppCore.AppCore)
+            appCore       = self.find(typ=appTop.AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
 
             # Assert GTs Reset
