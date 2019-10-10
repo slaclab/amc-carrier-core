@@ -39,8 +39,8 @@ class AppCore(pr.Device):
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
 
-        self.add(py.LocalCommand(name='Init', description='Init', function=self.init))
-        self.add(py.LocalCommand(name='Disable', description='Disable', function=self.disable))
+        self.add(pr.LocalCommand(name='Init', description='Init', function=self.init))
+        self.add(pr.LocalCommand(name='Disable', description='Disable', function=self.disable))
 
     def init(self):
         pass
