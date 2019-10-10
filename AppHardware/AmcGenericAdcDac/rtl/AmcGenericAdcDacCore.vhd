@@ -329,8 +329,9 @@ begin
 
    U_jesdSysRef : entity work.JesdSyncIn
       generic map (
-         TPD_G    => TPD_G,
-         INVERT_G => false)
+         TPD_G       => TPD_G,
+         GEN_ASYNC_G => false, -- Deskewed using LMK to get rid of race condition between jesdSysRefP/N and jesdClk
+         INVERT_G    => true)  -- Note inverted because it is Swapped on the board
       port map (
          -- Clock
          jesdClk   => jesdClk,
