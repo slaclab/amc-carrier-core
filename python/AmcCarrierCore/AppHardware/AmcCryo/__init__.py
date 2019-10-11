@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 
-from AppHardware.AmcCryo._amcCryoCore import *
-from AppHardware.AmcCryo._amcCryoCtrl import *
+from AmcCarrierCore.AppHardware.AmcCryo._amcCryoCore import *
+from AmcCarrierCore.AppHardware.AmcCryo._amcCryoCtrl import *

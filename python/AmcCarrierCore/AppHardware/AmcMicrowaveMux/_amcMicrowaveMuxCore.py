@@ -20,7 +20,7 @@
 import time
 import pyrogue         as pr
 import surf.devices.ti as ti
-import AppHardware     as appHw
+import AmcCarrierCore.AppHardware     as appHw
 
 class AmcMicrowaveMuxCore(pr.Device):
     def __init__(   self, 

@@ -1,4 +1,4 @@
 #!/usr/bin/env python
 
-from AppHardware.AmcGenericAdcDac._AmcGenericAdcDacCore import *
-from AppHardware.AmcGenericAdcDac._AmcGenericAdcDacCtrl import *
+from AmcCarrierCore.AppHardware.AmcGenericAdcDac._AmcGenericAdcDacCore import *
+from AmcCarrierCore.AppHardware.AmcGenericAdcDac._AmcGenericAdcDacCtrl import *

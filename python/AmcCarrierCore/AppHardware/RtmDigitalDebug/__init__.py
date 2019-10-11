@@ -1,3 +1,3 @@
 #!/usr/bin/env python
 
-from AppHardware.RtmDigitalDebug._RtmDigitalDebug import *
+from AmcCarrierCore.AppHardware.RtmDigitalDebug._RtmDigitalDebug import *

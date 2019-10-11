@@ -19,7 +19,7 @@
 
 import time
 import pyrogue     as pr
-import AppHardware as appHw
+import AmcCarrierCore.AppHardware as appHw
 
 class RtmCryoDet(pr.Device):
     def __init__(   self, 
