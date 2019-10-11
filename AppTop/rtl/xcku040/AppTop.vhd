@@ -183,7 +183,7 @@ architecture mapping of AppTop is
    signal jesdRst2x  : slv(1 downto 0);
    signal jesdSysRef : slv(1 downto 0);
    signal jesdRxSync : slv(1 downto 0);
-   signal jesdTxSync : slv(1 downto 0);
+   signal jesdTxSync : Slv7Array(1 downto 0);
 
    signal adcValids : Slv7Array(1 downto 0);
    signal adcValues : sampleDataVectorArray(1 downto 0, 6 downto 0);
