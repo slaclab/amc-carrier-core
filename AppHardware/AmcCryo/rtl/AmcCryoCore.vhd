@@ -34,7 +34,7 @@ entity AmcCryoCore is
       -- JESD Interface
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
-      jesdTxSync      : out   sl;
+      jesdTxSync      : out   slv(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -332,7 +332,8 @@ begin
    jesdTxSyncVec(0) <= jesdTxSyncMask(0) or not(jesdTxSyncRaw(0));
    jesdTxSyncVec(1) <= jesdTxSyncMask(1) or jesdTxSyncRaw(1);
 
-   jesdTxSync <= jesdTxSyncVec(0) and jesdTxSyncVec(1);
+   jesdTxSync(4 downto 0) <= (others=>jesdTxSyncVec(0));
+   jesdTxSync(9 downto 5) <= (others=>jesdTxSyncVec(1));
 
    ----------------------------------------------------------------
    -- SPI interface ADC

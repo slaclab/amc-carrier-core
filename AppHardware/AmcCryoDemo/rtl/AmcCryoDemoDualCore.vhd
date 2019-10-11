@@ -35,7 +35,7 @@ entity AmcCryoDemoDualCore is
       -- JESD Interface
       jesdSysRef : out slv(1 downto 0);
       jesdRxSync : in  slv(1 downto 0);
-      jesdTxSync : out slv(1 downto 0);
+      jesdTxSync : out Slv10Array(1 downto 0);
 
       -- AXI-Lite Interface
       axilClk         : in    sl;
