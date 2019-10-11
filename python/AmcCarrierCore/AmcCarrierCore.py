@@ -19,8 +19,6 @@ class AmcCarrierCore(pr.Device):
     def __init__(   self, 
             name                = "AmcCarrierCore", 
             description         = "AmcCarrierCore", 
-            rssiNotInterlaved   = True,
-            rssiInterlaved      = False,            
             enableBsa           = True,
             enableMps           = True,
             numWaveformBuffers  = 4,

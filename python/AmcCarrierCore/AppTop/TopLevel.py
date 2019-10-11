@@ -7,6 +7,15 @@
 #-----------------------------------------------------------------------------
 # Description:
 # PyRogue AMC Carrier Cryo Demo Board Application
+#
+# Network Interfaces:
+#    UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC 
+#    UDP_SRV_SRPV0_IDX_C       => 8192,  -- Legacy SRPv0 register access (still used for remote FPGA reprogramming)
+#    UDP_SRV_RSSI0_IDX_C       => 8193,  -- Legacy Non-interleaved RSSI for Register access and ASYNC messages
+#    UDP_SRV_RSSI1_IDX_C       => 8194,  -- Legacy Non-interleaved RSSI for bulk data transfer
+#    UDP_SRV_BP_MGS_IDX_C      => 8195,  -- Backplane Messaging
+#    UDP_SRV_TIMING_IDX_C      => 8197,  -- Timing ASYNC Messaging
+#    UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI         
 #-----------------------------------------------------------------------------
 # This file is part of the rogue software platform. It is subject to
 # the license terms in the LICENSE.txt file found in the top-level directory
@@ -30,12 +39,6 @@ class TopLevel(pr.Device):
     def __init__(   self, 
             name            = 'FpgaTopLevel',
             description     = 'Container for FPGA Top-Level', 
-            # Communication Parameters
-            simGui          = False,
-            commType        = 'eth-rssi-non-interleaved',
-            ipAddr          = '10.0.1.101',
-            pcieDev         = '/dev/datadev_0',
-            pcieRssiLink    = 0,
             # JESD Parameters
             numRxLanes      = [0,0],
             numTxLanes      = [0,0],
@@ -56,99 +59,16 @@ class TopLevel(pr.Device):
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
         self._numWaveformBuffers = numWaveformBuffers
-        
-        rssiInterlaved    = False
-        rssiNotInterlaved = False
-        
-        # Check for valid link range
-        if (pcieRssiLink<0) or (pcieRssiLink>5):
-            raise ValueError("Invalid pcieRssiLink (%d)" % (pcieRssiLink) )
-
-        if (simGui):
-            # Create simulation srp interface
-            self.srp=pyrogue.interfaces.simulation.MemEmulate()
-        else:
-        
-            ################################################################################################################
-            # UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC 
-            # UDP_SRV_SRPV0_IDX_C       => 8192,  -- Legacy SRPv0 register access (still used for remote FPGA reprogramming)
-            # UDP_SRV_RSSI0_IDX_C       => 8193,  -- Legacy Non-interleaved RSSI for Register access and ASYNC messages
-            # UDP_SRV_RSSI1_IDX_C       => 8194,  -- Legacy Non-interleaved RSSI for bulk data transfer
-            # UDP_SRV_BP_MGS_IDX_C      => 8195,  -- Backplane Messaging
-            # UDP_SRV_TIMING_IDX_C      => 8197,  -- Timing ASYNC Messaging
-            # UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI         
-            ################################################################################################################
-        
-            if ( commType=="eth-fsbl" ):
-            
-                # UDP only
-                self.udp = rogue.protocols.udp.Client(ipAddr,8192,0)
-            
-                # Connect the SRPv0 to RAW UDP
-                self.srp = rogue.protocols.srp.SrpV0()
-                pyrogue.streamConnectBiDir( self.srp, self.udp )
-            
-            elif ( commType=="eth-rssi-non-interleaved" ):
-                
-                # Update the flag
-                rssiNotInterlaved = True
-            
-                # Create SRP/ASYNC_MSG interface
-                self.rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1, jumbo = False)
-
-                # Connect the SRPv3 to tDest = 0x0
-                self.srp = rogue.protocols.srp.SrpV3()
-                pr.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
-
-                # Create stream interface
-                self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1, jumbo = False)
-            
-            elif ( commType=="eth-rssi-interleaved" ):
-            
-                # Update the flag
-                rssiInterlaved = True
-
-                # Create Interleaved RSSI interface
-                self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2, jumbo = True)
-                
-                # Connect the SRPv3 to tDest = 0x0
-                self.srp = rogue.protocols.srp.SrpV3()
-                pr.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
-                
-            elif ( commType == 'pcie-fsbl' ):
-            
-                # TDEST 0xC0 routed to stream 0xC0 (SRPv0)
-                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*0x100 + 0xC0),True)
-                self.srp = rogue.protocols.srp.SrpV3()
-                pr.streamConnectBiDir( self.srp, self.dma )
-    
-            elif ( commType == 'pcie-rssi-interleaved' ):
-            
-                # Update the flag
-                rssiInterlaved = True
-
-                # TDEST 0 routed to stream 0 (SRPv3)
-                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*0x100 + 0),True)
-                self.srp = rogue.protocols.srp.SrpV3()
-                pr.streamConnectBiDir( self.srp, self.dma )
-
-            # Undefined device type
-            else:
-                raise ValueError("Invalid type (%s)" % (commType) )
 
         # Add devices
         self.add(amccCore.AmcCarrierCore(
-            memBase           = self.srp,
             offset            = 0x00000000,
-            rssiInterlaved    = rssiInterlaved,
-            rssiNotInterlaved = rssiNotInterlaved,
             enableBsa         = enableBsa,
             enableMps         = enableMps,
             numWaveformBuffers= numWaveformBuffers,
             enableTpgMini     = enableTpgMini,
         ))
         self.add(appTop.AppTop(
-            memBase      = self.srp,
             offset       = 0x80000000,
             numRxLanes   = numRxLanes,
             numTxLanes   = numTxLanes,
