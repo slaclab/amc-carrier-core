@@ -18,7 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import AppMps  as mps
+import AmcCarrierCore.AppMps  as mps
 
 class AppMps(pr.Device):
     def __init__(   self, 

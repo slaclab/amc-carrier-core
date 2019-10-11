@@ -18,7 +18,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import BsaCore as bsa
+import AmcCarrierCore.BsaCore as bsa
 
 class AmcCarrierBsa(pr.Device):
     def __init__( self, 

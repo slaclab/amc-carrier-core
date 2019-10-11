@@ -13,7 +13,7 @@ import surf.xilinx as xilinx
 
 # Modules from amc-carrier-core
 import AmcCarrierCore as amcc
-import AppMps as mps
+import AmcCarrierCore.AppMps as mps
 
 class AmcCarrierCore(pr.Device):
     def __init__(   self, 

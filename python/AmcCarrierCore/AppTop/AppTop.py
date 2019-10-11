@@ -19,9 +19,9 @@
 
 import time
 import pyrogue   as pr
-import AppTop    as appTop
-import DacSigGen as dacSigGen
-import DaqMuxV2  as daqMuxV2
+import AmcaCarrierCore.AppTop    as appTop
+import AmcaCarrierCore.DacSigGen as dacSigGen
+import AmcaCarrierCore.DaqMuxV2  as daqMuxV2
 
 import surf.devices.ti         as ti
 import surf.protocols.jesd204b as jesd

@@ -24,7 +24,7 @@ import pyrogue.utilities.fileio
 import rogue.hardware.axi
 import rogue.protocols.packetizer
 import AmcCarrierCore as amccCore
-import AppTop         as appTop
+import AmcCarrierCore.AppTop as appTop
 
 class TopLevel(pr.Device):
     def __init__(   self, 
