@@ -47,11 +47,15 @@ class TopLevel(pr.Device):
             # General Parameters
             enableBsa       = False,
             enableMps       = False,
+            numWaveformBuffers  = 4,
+            expand          = True,
+            enableTpgMini   = True,
             **kwargs):
-        super().__init__(name=name, description=description, **kwargs)
+        super().__init__(name=name, description=description, expand=expand, **kwargs)
 
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
+        self._numWaveformBuffers = numWaveformBuffers
         
         rssiInterlaved    = False
         rssiNotInterlaved = False
@@ -113,8 +117,8 @@ class TopLevel(pr.Device):
                 
             elif ( commType == 'pcie-fsbl' ):
             
-                # TDEST 0 routed to stream 0 (SRPv3)
-                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*0x100 + 0),True)
+                # TDEST 0xC0 routed to stream 0xC0 (SRPv0)
+                self.dma  = rogue.hardware.axi.AxiStreamDma(pcieDev,(pcieRssiLink*0x100 + 0xC0),True)
                 self.srp = rogue.protocols.srp.SrpV3()
                 pr.streamConnectBiDir( self.srp, self.dma )
     
@@ -140,6 +144,8 @@ class TopLevel(pr.Device):
             rssiNotInterlaved = rssiNotInterlaved,
             enableBsa         = enableBsa,
             enableMps         = enableMps,
+            numWaveformBuffers= numWaveformBuffers,
+            enableTpgMini     = enableTpgMini,
         ))
         self.add(appTop.AppTop(
             memBase      = self.srp,
@@ -150,6 +156,8 @@ class TopLevel(pr.Device):
             numSigGen    = numSigGen,
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,
+            numWaveformBuffers = numWaveformBuffers,
+            expand       = True
         ))
 
         # Define SW trigger command
@@ -165,10 +173,10 @@ class TopLevel(pr.Device):
         self._root.checkBlocks(recurse=True)
 
         # Calculate the BsaWaveformEngine buffer sizes
-        size    = [[0,0,0,0],[0,0,0,0]]
+        size    = [[0]*self._numWaveformBuffers,[0]*self._numWaveformBuffers]
         for i in range(2):
             if ((self._numRxLanes[i] > 0) or (self._numTxLanes[i] > 0)):
-                for j in range(4):
+                for j in range(self._numWaveformBuffers):
                     waveBuff = self.AmcCarrierCore.AmcCarrierBsa.BsaWaveformEngine[i].WaveformEngineBuffers
                     if ( (waveBuff.Enabled[j].get() > 0) and (waveBuff.EndAddr[j].get() > waveBuff.StartAddr[j].get()) ):
                         size[i][j] = waveBuff.EndAddr[j].get() - waveBuff.StartAddr[j].get()
@@ -177,7 +185,7 @@ class TopLevel(pr.Device):
         minSize = [size[0][0],size[1][0]]
         for i in range(2):
             if ((self._numRxLanes[i] > 0) or (self._numTxLanes[i] > 0)):
-                for j in range(4):
+                for j in range(self._numWaveformBuffers):
                     if ( size[i][j]<minSize[i] ):
                         minSize[i] = size[i][j]
 

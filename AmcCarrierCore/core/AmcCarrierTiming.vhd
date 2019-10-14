@@ -41,8 +41,12 @@ entity AmcCarrierTiming is
       DISABLE_TIME_GT_G : boolean  := false;
       CORE_TRIGGERS_G   : natural  := 16;
       TRIG_PIPE_G       : natural  := 0;
+      CLKSEL_MODE_G     : string   := "SELECT"; -- "LCLSI","LCLSII"
       STREAM_L1_G       : boolean  := true;
-      RX_CLK_MMCM_G     : boolean  := false);
+      AXIL_RINGB_G      : boolean  := true;
+      ASYNC_G           : boolean  := true;
+      RX_CLK_MMCM_G     : boolean  := false;
+      USE_TPGMINI_G     : boolean  := true);
    port (
       stableClk            : in  sl;
       stableRst            : in  sl;
@@ -311,7 +315,11 @@ begin
          TPGEN_G           => TIME_GEN_APP_G,
          STREAM_L1_G       => STREAM_L1_G,
          ETHMSG_AXIS_CFG_G => EMAC_AXIS_CONFIG_C,
-         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr)
+         AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr,
+	 AXIL_RINGB_G      => AXIL_RINGB_G,
+	 ASYNC_G           => ASYNC_G,
+	 CLKSEL_MODE_G     => CLKSEL_MODE_G,
+         USE_TPGMINI_G     => USE_TPGMINI_G)
       port map (
          gtTxUsrClk      => txUsrClk,
          gtTxUsrRst      => txUsrRst,

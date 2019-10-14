@@ -25,6 +25,7 @@ class AmcCarrierBsa(pr.Device):
             name        = "AmcCarrierBsa", 
             description = "AmcCarrier BSA Module", 
             enableBsa   = True,
+            numWaveformBuffers  = 4,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
@@ -39,6 +40,7 @@ class AmcCarrierBsa(pr.Device):
 
         for i in range(2):
             self.add(bsa.BsaWaveformEngine(
-                name   = f'BsaWaveformEngine[{i}]',
-                offset =  0x00010000 + i * 0x00010000,
+                name       = f'BsaWaveformEngine[{i}]',
+                offset     =  0x00010000 + i * 0x00010000,
+                numBuffers = numWaveformBuffers,
             ))

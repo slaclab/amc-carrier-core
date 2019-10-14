@@ -30,11 +30,9 @@ class AmcGenericAdcDacCtrl(pr.Device):
             name         = "AdcValidCnt",
             description  = "ADC Valid Transition Counter[3:0]",
             offset       = 0x00,
-            bitSize      = 32,
-            bitOffset    = 0,            
+            bitSize      = 32,            
             number       = 4,
             stride       = 4,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval = 1,
         )
@@ -44,8 +42,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "ADC Valid[3:0]",
             offset       = 0x0FC,
             bitSize      = 4,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval = 1,
         ))          
@@ -55,8 +51,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "ADC Data[3:0]",
             offset       =  0x100,
             bitSize      =  16,
-            bitOffset    =  0,
-            base         = pr.UInt,
             mode         = "RO",
             number       =  4,
             stride       =  4,
@@ -68,8 +62,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "DAC Data[1:0]",
             offset       =  0x110,
             bitSize      =  16,
-            bitOffset    =  0,
-            base         = pr.UInt,
             mode         = "RO",
             number       =  2,
             stride       =  4,
@@ -81,8 +73,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "VCO's DAC Value",
             offset       = 0x1F8,
             bitSize      = 16,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval = 1,
         ))          
@@ -92,10 +82,9 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "AMC Clock frequency",
             offset       = 0x1FC,
             bitSize      = 32,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RO",
             units        = "Hz",
+            disp         = '{:d}',
             pollInterval = 1,
         ))          
                 
@@ -105,7 +94,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             offset       = 0x200,
             bitSize      = 2,
             bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RW",
         ))   
                 
@@ -114,8 +102,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "LMK Reset",
             offset       = 0x204,
             bitSize      = 1,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RW",
         ))   
                 
@@ -124,8 +110,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "LMK SYNC",
             offset       = 0x208,
             bitSize      = 1,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RW",
         ))           
         
@@ -134,8 +118,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "LMK Status",
             offset       = 0x20C,
             bitSize      = 2,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RO",
             pollInterval = 1,
         ))   
@@ -145,8 +127,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "LMK Clock MUX Select",
             offset       = 0x214,
             bitSize      = 1,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RW",
         )) 
 
@@ -155,8 +135,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "VCO DAC SCK Rate Configuration",
             offset       = 0x220,
             bitSize      = 16,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RW",
         ))         
         
@@ -165,8 +143,6 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "VCO DAC Enable",
             offset       = 0x224,
             bitSize      = 1,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RW",
         ))   
         
@@ -175,17 +151,16 @@ class AmcGenericAdcDacCtrl(pr.Device):
             description  = "Enable Status counter roll over",
             offset       = 0x3F8,
             bitSize      = 4,
-            bitOffset    = 0,
-            base         = pr.UInt,
             mode         = "RW",
         ))           
-                                
-        self.add(pr.RemoteVariable( 
-            name         = "CntRst",
-            description  = "Status counter reset",
+
+        self.add(pr.RemoteCommand(   
+            name         = 'CntRst',
+            description  = 'Status counter reset',
             offset       = 0x3FC,
             bitSize      = 1,
-            bitOffset    = 0,
-            base         = pr.UInt,
-            mode         = "WO",
-        ))  
+            function     = pr.BaseCommand.touchOne
+        ))        
+        
+    def countReset(self):
+        self.CntRst()

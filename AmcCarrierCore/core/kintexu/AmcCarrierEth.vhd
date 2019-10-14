@@ -474,20 +474,37 @@ begin
    ----------------------
    -- BP Messenger Server
    ----------------------
-   ibBpMsgServerMaster                  <= obServerMasters(UDP_SRV_BP_MGS_IDX_C);
-   obServerSlaves(UDP_SRV_BP_MGS_IDX_C) <= ibBpMsgServerSlave;
+   U_Resize_Server : entity work.AxiStreamResize
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         READY_EN_G          => true,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+      port map (
+         -- Clock and reset
+         axisClk     => axilClk,
+         axisRst     => axilRst,
+         -- Slave Port
+         sAxisMaster => obServerMasters(UDP_SRV_BP_MGS_IDX_C),
+         sAxisSlave  => obServerSlaves(UDP_SRV_BP_MGS_IDX_C),
+         -- Master Port
+         mAxisMaster => ibBpMsgServerMaster,
+         mAxisSlave  => ibBpMsgServerSlave);
+
    U_ServerLimiter : entity work.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => 1.0E-3,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
@@ -511,20 +528,37 @@ begin
    ----------------------
    -- BP Messenger Client
    ----------------------
-   ibBpMsgClientMaster                  <= obClientMasters(UDP_CLT_BP_MGS_IDX_C);
-   obClientSlaves(UDP_CLT_BP_MGS_IDX_C) <= ibBpMsgClientSlave;
+   U_Resize_Client : entity work.AxiStreamResize
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         READY_EN_G          => true,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+      port map (
+         -- Clock and reset
+         axisClk     => axilClk,
+         axisRst     => axilRst,
+         -- Slave Port
+         sAxisMaster => obClientMasters(UDP_CLT_BP_MGS_IDX_C),
+         sAxisSlave  => obClientSlaves(UDP_CLT_BP_MGS_IDX_C),
+         -- Master Port
+         mAxisMaster => ibBpMsgClientMaster,
+         mAxisSlave  => ibBpMsgClientSlave);
+
    U_ClientLimiter : entity work.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => 1.0E-3,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,

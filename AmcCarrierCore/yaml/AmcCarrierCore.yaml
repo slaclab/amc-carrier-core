@@ -101,42 +101,42 @@ AmcCarrierCore: &AmcCarrierCore
         OutputConfig[3] = 0x3: Connects Backplane DIST1 to RTM_TIMING_IN1
         -----------------------------------------------------------------
     ##################################################
-    Axi24LC64FT:
-      at:
-        offset: 0x04000000
-      class: MMIODev
-      size: 0x2000
-      description: AMC Carrier core's Non-volatile memory (100k endurance)
-      children:
-        MemoryArray:
-          <<: *MemoryArray
-          at:
-            offset: 0x0
-            nelms: 0x800
-            stride: 4
-          sizeBits: 32
-      instantiate: false          
+    # Axi24LC64FT:
+      # at:
+        # offset: 0x04000000
+      # class: MMIODev
+      # size: 0x2000
+      # description: AMC Carrier core's Non-volatile memory (100k endurance)
+      # children:
+        # MemoryArray:
+          # <<: *MemoryArray
+          # at:
+            # offset: 0x0
+            # nelms: 0x800
+            # stride: 4
+          # sizeBits: 32
+      # instantiate: false          
    ##################################################
-    AxiCdcm6208:
-      <<: *AxiCdcm6208
-      at:
-        offset: 0x05000000
+    # AxiCdcm6208:
+      # <<: *AxiCdcm6208
+      # at:
+        # offset: 0x05000000
     ##################################################
-    DdrSpd:
-      at:
-        offset: 0x06000000
-      size: 0x400
-      class: MMIODev
-      description: Lookup tool at www.micron.com/spd
-      children:
-        MemoryArray:
-          <<: *MemoryArray
-          at:
-            offset: 0x0
-            nelms: 0x100
-            stride: 4
-          sizeBits: 8
-          mode: RO # Read only
+    # DdrSpd:
+      # at:
+        # offset: 0x06000000
+      # size: 0x400
+      # class: MMIODev
+      # description: Lookup tool at www.micron.com/spd
+      # children:
+        # MemoryArray:
+          # <<: *MemoryArray
+          # at:
+            # offset: 0x0
+            # nelms: 0x100
+            # stride: 4
+          # sizeBits: 8
+          # mode: RO # Read only
     ##################################################
     AmcCarrierBsi:
       <<: *AmcCarrierBsi

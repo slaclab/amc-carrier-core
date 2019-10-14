@@ -3,3 +3,4 @@
 from AppTop.AppTop import *
 from AppTop.AppTopJesd import *
 from AppTop.TopLevel import *
+from AppTop.AppCore  import *

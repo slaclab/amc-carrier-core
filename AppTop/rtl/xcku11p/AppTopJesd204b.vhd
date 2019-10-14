@@ -79,8 +79,8 @@ entity AppTopJesd204b is
       -- SYSREF for subclass 1 fixed latency
       sysRef_i        : in  sl;
       -- Synchronization output combined from all receivers to be connected to ADC/DAC chips
-      nSync_o         : out sl                    := '0';  -- Active HIGH
-      nSync_i         : in  sl);        -- Active HIGH
+      nSync_o         : out sl                    := '0';
+      nSync_i         : in  slv(9 downto 0));
 end AppTopJesd204b;
 
 architecture mapping of AppTopJesd204b is
@@ -283,7 +283,7 @@ begin
             devClk_i             => devClk_i,
             devRst_i             => devRst_i,
             sysRef_i             => s_sysRef,
-            nSync_i              => nSync_i,
+            nSync_i              => nSync_i(JESD_TX_LANE_G-1 downto 0),
             gtTxReady_i          => s_gtTxReady(JESD_TX_LANE_G-1 downto 0),
             gtTxReset_o          => s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0),
             r_jesdGtTxArr        => r_jesdGtTxArr(JESD_TX_LANE_G-1 downto 0),

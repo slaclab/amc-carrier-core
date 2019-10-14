@@ -52,7 +52,7 @@ entity AppTopJesd is
       jesdRst2x       : out sl;
       jesdSysRef      : in  sl;
       jesdRxSync      : out sl;
-      jesdTxSync      : in  sl;
+      jesdTxSync      : in  slv(4 downto 0);
       jesdUsrClk      : out sl;
       jesdUsrRst      : out sl;
       -- ADC Interface

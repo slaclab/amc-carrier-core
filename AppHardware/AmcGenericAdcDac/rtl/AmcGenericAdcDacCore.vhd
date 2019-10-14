@@ -43,7 +43,7 @@ entity AmcGenericAdcDacCore is
       jesdRst         : in    sl;
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
-      jesdTxSync      : out   sl;
+      jesdTxSync      : out   slv(9 downto 0);
       -- ADC/DAC Interface
       adcValids       : in    slv(3 downto 0);
       adcValues       : in    sampleDataArray(3 downto 0);
@@ -178,6 +178,10 @@ architecture mapping of AmcGenericAdcDacCore is
    signal lemoDoutN   : slv(1 downto 0);
    signal lemoDinput  : slv(1 downto 0);
    signal bcmL        : sl;
+   signal smaTrigMon  : sl;
+   signal adcCalMon   : sl;
+   
+   signal locJesdTxSync : sl;   
 
 begin
 
@@ -323,25 +327,48 @@ begin
 
    bcmL <= not(bcm);
 
-   IBUFDS_SysRef : IBUFDS
+   U_jesdSysRef : entity work.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdSysRefP,
-         IB => jesdSysRefN,
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdSysRefP,
+         jesdSyncN => jesdSysRefN,
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   IBUFDS_TxSync : IBUFDS
+   U_jesdTxSync : entity work.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdTxSyncP,
-         IB => jesdTxSyncN,
-         O  => jesdTxSync);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdTxSyncP,
+         jesdSyncN => jesdTxSyncN,
+         -- JESD Low speed Interface
+         jesdSync  => locJesdTxSync);
+         
+   jesdTxSync <= (others=>locJesdTxSync);    
 
    GEN_RX_SYNC :
    for i in 1 downto 0 generate
-      OBUFDS_RxSync : OBUFDS
+      U_jesdRxSync : entity work.JesdSyncOut
+         generic map (
+            TPD_G    => TPD_G,
+            INVERT_G => false)
          port map (
-            I  => jesdRxSync,
-            O  => jesdRxSyncP(i),
-            OB => jesdRxSyncN(i));
+            -- Clock
+            jesdClk   => jesdClk,
+            -- JESD Low speed Interface
+            jesdSync  => jesdRxSync,
+            -- JESD Low speed Ports
+            jesdSyncP => jesdRxSyncP(i),
+            jesdSyncN => jesdRxSyncN(i));
    end generate GEN_RX_SYNC;
 
    ---------------------
@@ -469,8 +496,8 @@ begin
          AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)
       port map (
          -- Pass through Interfaces
-         smaTrig         => ite(TRIG_CLK_G, '0', smaTrig),
-         adcCal          => ite(CAL_CLK_G, '0', adcCal),
+         smaTrig         => smaTrigMon,
+         adcCal          => adcCalMon,
          lemoDin         => lemoDinput,
          lemoDout        => lemoDout,
          bcm             => bcm,
@@ -500,4 +527,7 @@ begin
          lmkRst          => lmkRst,
          lmkSync         => lmkSync);
 
+   smaTrigMon <= '0' when(TRIG_CLK_G) else smaTrig;
+   adcCalMon  <= '0' when(CAL_CLK_G) else adcCal;
+      
 end mapping;

@@ -26,8 +26,6 @@ import DaqMuxV2  as daqMuxV2
 import surf.devices.ti         as ti
 import surf.protocols.jesd204b as jesd
 
-import common as appCommon
-
 class AppTop(pr.Device):
     def __init__(   self, 
             name           = "AppTop", 
@@ -38,30 +36,25 @@ class AppTop(pr.Device):
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
+            numWaveformBuffers  = 4,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
-        self._numRxLanes = numRxLanes
-        self._numTxLanes = numTxLanes
-        self._numSigGen  = numSigGen
-        self._sizeSigGen = sizeSigGen
+        self._numRxLanes   = numRxLanes
+        self._numTxLanes   = numTxLanes
+        self._numSigGen    = numSigGen
+        self._sizeSigGen   = sizeSigGen
         
         ##############################
         # Variables
         ##############################
 
-        self.add(appCommon.AppCore(   
-            offset       =  0x00000000, 
-            numRxLanes   =  numRxLanes,
-            numTxLanes   =  numTxLanes,
-            expand       =  True,
-        ))
-
         for i in range(2):
             self.add(daqMuxV2.DaqMuxV2(
-                name         = f'DaqMuxV2[{i}]',
-                offset       =  0x20000000 + (i * 0x10000000),
-                expand       =  False,
+                name       = f'DaqMuxV2[{i}]',
+                offset     =  0x20000000 + (i * 0x10000000),
+                numBuffers =  numWaveformBuffers,
+                expand     =  False,
             ))
 
         for i in range(2):
@@ -91,34 +84,64 @@ class AppTop(pr.Device):
             # Get devices
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
-            appCore       = self.find(typ=appCommon.AppCore)
+            dacDevices    = self.find(typ=ti.Dac38J84)
+            lmkDevices    = self.find(typ=ti.Lmk04828)
+            appCore       = self.find(typ=appTop.AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
+
+            # Assert GTs Reset
+            for rx in jesdRxDevices: 
+                rx.ResetGTs.set(1)
+            for tx in jesdTxDevices: 
+                rx.ResetGTs.set(1)      
+            self.checkBlocks(recurse=True)
+            time.sleep(0.5)
             
-            # Power down AppCore (power down SysRef)
+            # Execute the AppCore.Disable
             for core in appCore:
                 core.Disable()
-            # GTs Reset
+
+            # Deassert GTs Reset
             for rx in jesdRxDevices: 
-                rx.CmdResetGTs()
+                rx.ResetGTs.set(0)
             for tx in jesdTxDevices: 
-                tx.CmdResetGTs()
+                tx.ResetGTs.set(0)
             self.checkBlocks(recurse=True)
-            time.sleep(1.0)
+            time.sleep(0.5)
+            
             # Init the AppCore
             for core in appCore:
                 core.Init()
-            # Wait for the system settle
-            time.sleep(0.5)            
+            time.sleep(1.0)
+            
+            # Special DAC Init procedure
+            for dac in dacDevices: 
+                dac.EnableTx.set(0x0)
+                dac.InitJesd.set(0x1)
+                dac.JesdRstN.set(0x0)
+                dac.JesdRstN.set(0x1)
+                dac.InitJesd.set(0x0)
+                dac.EnableTx.set(0x1)
+            if len(dacDevices) > 0:
+                for lmk in lmkDevices:
+                    lmk.PwrUpSysRef()
+         
             # Clear all error counters
             for rx in jesdRxDevices: 
                 rx.CmdClearErrors()  
             for tx in jesdTxDevices: 
                 tx.CmdClearErrors()
+            for dac in dacDevices: 
+                enable = dac.enable.get()
+                dac.enable.set(True)
+                dac.ClearAlarms()
+                dac.enable.set(enable)                
+                
             # Load the DAC signal generator
             for sigGen in sigGenDevices: 
                 if ( sigGen.CsvFilePath.get() != "" ):
                     sigGen.LoadCsvFile("")
-                    
+                                   
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)
                         

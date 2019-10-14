@@ -2,7 +2,7 @@
 -- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-08-28
+-- Last update: 2019-09-12
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -33,7 +33,8 @@ entity AmcCarrierCore is
    generic (
       TPD_G                  : time     := 1 ns;
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB   
-      WAVEFORM_TDATA_BYTES_G : positive := 4;
+      WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
+      WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
       RSSI_ILEAVE_EN_G       : boolean  := false;
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
@@ -44,8 +45,13 @@ entity AmcCarrierCore is
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
       DISABLE_TIME_GT_G      : boolean  := false;  -- false = normal application, true = doesn't build the Timing GT
       CORE_TRIGGERS_G        : natural  := 16;
-      TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
-      FSBL_G                 : boolean  := false);  -- false = Normal Operation, true = First Stage Boot loader
+      TRIG_PIPE_G            : natural  := 0;      -- no trigger pipeline by default
+      USE_TPGMINI_G          : boolean  := true;   -- build TPG Mini by default
+      CLKSEL_MODE_G          : string   := "SELECT"; -- "LCLSI","LCLSII"
+      STREAM_L1_G            : boolean  := true;
+      AXIL_RINGB_G           : boolean  := true;
+      ASYNC_G                : boolean  := true;
+      FSBL_G                 : boolean  := false); -- false = Normal Operation, true = First Stage Boot loader
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -365,7 +371,11 @@ begin
          DISABLE_TIME_GT_G => DISABLE_TIME_GT_G,
          CORE_TRIGGERS_G   => CORE_TRIGGERS_G,
          TRIG_PIPE_G       => TRIG_PIPE_G,
-         STREAM_L1_G       => true)
+	 CLKSEL_MODE_G     => CLKSEL_MODE_G,
+	 STREAM_L1_G       => STREAM_L1_G,
+	 AXIL_RINGB_G      => AXIL_RINGB_G,
+	 ASYNC_G           => ASYNC_G,
+         USE_TPGMINI_G     => USE_TPGMINI_G)
       port map (
          stableClk            => fabClk,
          stableRst            => fabRst,
@@ -420,6 +430,7 @@ begin
          DISABLE_BSA_G          => DISABLE_BSA_G,
          DISABLE_BLD_G          => DISABLE_BLD_G,
          DISABLE_DDR_SRP_G      => DISABLE_DDR_SRP_G,
+         WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
          WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)
