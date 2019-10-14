@@ -99,6 +99,9 @@ architecture mapping of AmcCarrierRssi is
    signal tempObMasters : AxiStreamMasterArray(1 downto 0);
    signal tempObSlaves  : AxiStreamSlaveArray(1 downto 0);
 
+   signal obRssiTspMasters : AxiStreamMasterArray(1 downto 0);
+   signal obRssiTspSlaves  : AxiStreamSlaveArray(1 downto 0);
+
 begin
 
    --------------------------
@@ -159,8 +162,8 @@ begin
          -- Transport Layer Interface
          sTspAxisMaster_i  => obServerMasters(0),
          sTspAxisSlave_o   => obServerSlaves(0),
-         mTspAxisMaster_o  => ibServerMasters(0),
-         mTspAxisSlave_i   => ibServerSlaves(0),
+         mTspAxisMaster_o  => obRssiTspMasters(0),
+         mTspAxisSlave_i   => obRssiTspSlaves(0),
          -- High level  Application side interface
          openRq_i          => '1',  -- Automatically start the connection without debug SRP channel
          closeRq_i         => '0',
@@ -172,6 +175,21 @@ begin
          axilReadSlave     => axilReadSlaves(0),
          axilWriteMaster   => axilWriteMasters(0),
          axilWriteSlave    => axilWriteSlaves(0));
+         
+   U_RssiTspObFifo_0 : entity work.AmcCarrierRssiObFifo
+      generic map (
+         TPD_G    => TPD_G,
+         BYPASS_G => true) -- true to reduce logic footprint
+      port map (
+         -- Clock and Reset
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         -- RSSI Interface
+         obRssiTspMaster => obRssiTspMasters(0),
+         obRssiTspSlave  => obRssiTspSlaves(0),
+         -- Interface to UDP Server engine
+         ibServerMaster  => ibServerMasters(0),
+         ibServerSlave   => ibServerSlaves(0));          
 
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
@@ -287,8 +305,8 @@ begin
          -- Transport Layer Interface
          sTspAxisMaster_i  => obServerMasters(1),
          sTspAxisSlave_o   => obServerSlaves(1),
-         mTspAxisMaster_o  => ibServerMasters(1),
-         mTspAxisSlave_i   => ibServerSlaves(1),
+         mTspAxisMaster_o  => obRssiTspMasters(1),
+         mTspAxisSlave_i   => obRssiTspSlaves(1),
          -- High level  Application side interface
          openRq_i          => '1',  -- Automatically start the connection without debug SRP channel
          closeRq_i         => '0',
@@ -300,6 +318,21 @@ begin
          axilReadSlave     => axilReadSlaves(1),
          axilWriteMaster   => axilWriteMasters(1),
          axilWriteSlave    => axilWriteSlaves(1));
+
+   U_RssiTspObFifo_1 : entity work.AmcCarrierRssiObFifo
+      generic map (
+         TPD_G    => TPD_G,
+         BYPASS_G => true) -- true to reduce logic footprint
+      port map (
+         -- Clock and Reset
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         -- RSSI Interface
+         obRssiTspMaster => obRssiTspMasters(1),
+         obRssiTspSlave  => obRssiTspSlaves(1),
+         -- Interface to UDP Server engine
+         ibServerMaster  => ibServerMasters(1),
+         ibServerSlave   => ibServerSlaves(1));  
 
    -----------------------------
    -- Memory Access: TDEST = 0x4

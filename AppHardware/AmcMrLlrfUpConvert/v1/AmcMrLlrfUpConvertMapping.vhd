@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcMrLlrfUpConvertMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-03-30
--- Last update: 2018-02-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -86,31 +84,57 @@ begin
    -----------------------
    -- Generalized Mapping 
    -----------------------
-   U_jesdSysRef : IBUFDS
+   U_jesdSysRef : entity work.JesdSyncIn
       generic map (
-         DIFF_TERM => true)
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => syncOutP(7),
-         IB => syncOutN(7),
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(7),
+         jesdSyncN => syncOutN(7),
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : OBUFDS
+   U_jesdRxSync0 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(4),
-         OB => syncOutN(4));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(4),
+         jesdSyncN => syncOutN(4));
 
-   U_jesdRxSync1 : OBUFDS
+   U_jesdRxSync1 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(2),
-         OB => syncOutN(2));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(2),
+         jesdSyncN => syncOutN(2));
 
-   U_jesdRxSync2 : OBUFDS
+   U_jesdRxSync2 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(1),
-         OB => syncOutN(1));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(1),
+         jesdSyncN => syncOutN(1));
 
    ADC_SDIO_IOBUFT : IOBUF
       port map (
@@ -143,7 +167,7 @@ begin
    DATA_OUT : if (TIMING_TRIG_MODE_G = false) generate
       U_ODDR : ODDRE1
          generic map (
-            SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
+            SIM_DEVICE => ite(ULTRASCALE_PLUS_C, "ULTRASCALE_PLUS", "ULTRASCALE"))
          port map (
             C  => recClk,
             Q  => timingTrigReg,

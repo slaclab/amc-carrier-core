@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierSysReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-07-08
--- Last update: 2018-03-23
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -100,14 +98,17 @@ entity AmcCarrierSysReg is
       ipmcScl           : inout sl;
       ipmcSda           : inout sl;
       -- Configuration PROM Ports
-      calScl            : inout sl;
-      calSda            : inout sl;
+      calScl            : inout sl := 'Z';
+      calSda            : inout sl := 'Z';
+      -- VCCINT DC/DC Ports
+      pwrScl            : inout sl := 'Z';
+      pwrSda            : inout sl := 'Z';
       -- Clock Cleaner Ports
-      timingClkScl      : inout sl;
-      timingClkSda      : inout sl;
+      timingClkScl      : inout sl := 'Z';
+      timingClkSda      : inout sl := 'Z';
       -- DDR3L SO-DIMM Ports
-      ddrScl            : inout sl;
-      ddrSda            : inout sl;
+      ddrScl            : inout sl := 'Z';
+      ddrSda            : inout sl := 'Z';
       -- SYSMON Ports
       vPIn              : in    sl;
       vNIn              : in    sl);
@@ -118,7 +119,7 @@ architecture mapping of AmcCarrierSysReg is
    -- FSBL Timeout Duration
    constant TIMEOUT_C : integer := integer(10.0 / AXI_CLK_PERIOD_C);
 
-   constant NUM_AXI_MASTERS_C : natural := 14;
+   constant NUM_AXI_MASTERS_C : natural := 15;
 
    constant VERSION_INDEX_C    : natural := 0;
    constant SYSMON_INDEX_C     : natural := 1;
@@ -133,7 +134,8 @@ architecture mapping of AmcCarrierSysReg is
    constant ETH_INDEX_C        : natural := 10;
    constant DDR_INDEX_C        : natural := 11;
    constant MPS_INDEX_C        : natural := 12;
-   constant APP_INDEX_C        : natural := 13;
+   constant PWR_I2C_INDEX_C    : natural := 13;
+   constant APP_INDEX_C        : natural := 14;
 
    constant AXI_CROSSBAR_MASTERS_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       VERSION_INDEX_C    => (
@@ -188,6 +190,10 @@ architecture mapping of AmcCarrierSysReg is
          baseAddr        => MPS_ADDR_C,
          addrBits        => 24,
          connectivity    => x"FFFF"),
+      PWR_I2C_INDEX_C    => (
+         baseAddr        => PWR_I2C_ADDR_C,
+         addrBits        => 24,
+         connectivity    => x"FFFF"),
       APP_INDEX_C        => (
          baseAddr        => APP_ADDR_C,
          addrBits        => 31,
@@ -207,10 +213,18 @@ architecture mapping of AmcCarrierSysReg is
          addrSize   => 8,               -- in units of bits
          endianness => '1'));           -- Big endian
 
+   constant PWR_DEVICE_MAP_C : I2cAxiLiteDevArray(0 to 0) := (
+      0              => MakeI2cAxiLiteDevType(
+         i2cAddress  => "0001010",  -- EM2280P01QI: ADDR1=0Ohm, ADDR0=10kOhm --> Address=0x0A
+         dataSize    => 16,             -- in units of bits
+         addrSize    => 8,              -- in units of bits
+         repeatStart => '1',            -- repeated start 
+         endianness  => '0'));          -- Little endian         
+
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
    signal mAxilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal mAxilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
 
    signal bootCsL  : sl;
    signal bootSck  : sl;
@@ -258,11 +272,11 @@ begin
    --------------------------
    U_Version : entity work.AxiVersion
       generic map (
-         TPD_G            => TPD_G,
-         BUILD_INFO_G     => BUILD_INFO_G,
-         CLK_PERIOD_G     => 6.4E-9,
-         XIL_DEVICE_G     => "ULTRASCALE",
-         EN_DEVICE_DNA_G  => true)
+         TPD_G           => TPD_G,
+         BUILD_INFO_G    => BUILD_INFO_G,
+         CLK_PERIOD_G    => 6.4E-9,
+         XIL_DEVICE_G    => "ULTRASCALE",
+         EN_DEVICE_DNA_G => true)
       port map (
          -- AXI-Lite Interface
          axiClk         => axilClk,
@@ -313,8 +327,8 @@ begin
 
    U_Iprog : entity work.Iprog
       generic map (
-         TPD_G         => TPD_G,
-         XIL_DEVICE_G  => "ULTRASCALE")
+         TPD_G        => TPD_G,
+         XIL_DEVICE_G => "ULTRASCALE")
       port map (
          clk         => axilClk,
          rst         => axilRst,
@@ -417,69 +431,69 @@ begin
    ----------------------------------------
    -- AXI-Lite: Configuration Memory Module
    ----------------------------------------
-   AxiI2cRegMaster_0 : entity work.AxiI2cEeprom
-      generic map (
-         TPD_G          => TPD_G,
-         ADDR_WIDTH_G   => 13,
-         I2C_ADDR_G     => "1010000",
-         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
-      port map (
-         -- I2C Ports
-         scl             => calScl,
-         sda             => calSda,
-         -- AXI-Lite Register Interface
-         axilReadMaster  => mAxilReadMasters(CONFIG_I2C_INDEX_C),
-         axilReadSlave   => mAxilReadSlaves(CONFIG_I2C_INDEX_C),
-         axilWriteMaster => mAxilWriteMasters(CONFIG_I2C_INDEX_C),
-         axilWriteSlave  => mAxilWriteSlaves(CONFIG_I2C_INDEX_C),
-         -- Clocks and Resets
-         axilClk         => axilClk,
-         axilRst         => axilRst);
+--   AxiI2cRegMaster_0 : entity work.AxiI2cEeprom
+--      generic map (
+--         TPD_G          => TPD_G,
+--         ADDR_WIDTH_G   => 13,
+--         I2C_ADDR_G     => "1010000",
+--         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
+--         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+--      port map (
+--         -- I2C Ports
+--         scl             => calScl,
+--         sda             => calSda,
+--         -- AXI-Lite Register Interface
+--         axilReadMaster  => mAxilReadMasters(CONFIG_I2C_INDEX_C),
+--         axilReadSlave   => mAxilReadSlaves(CONFIG_I2C_INDEX_C),
+--         axilWriteMaster => mAxilWriteMasters(CONFIG_I2C_INDEX_C),
+--         axilWriteSlave  => mAxilWriteSlaves(CONFIG_I2C_INDEX_C),
+--         -- Clocks and Resets
+--         axilClk         => axilClk,
+--         axilRst         => axilRst);
 
    ---------------------------------
    -- AXI-Lite: Clock Cleaner Module
    ---------------------------------
-   AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
-      generic map (
-         TPD_G          => TPD_G,
-         I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
-         DEVICE_MAP_G   => TIME_DEVICE_MAP_C,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
-      port map (
-         -- I2C Ports
-         scl            => timingClkScl,
-         sda            => timingClkSda,
-         -- AXI-Lite Register Interface
-         axiReadMaster  => mAxilReadMasters(CLK_I2C_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(CLK_I2C_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(CLK_I2C_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(CLK_I2C_INDEX_C),
-         -- Clocks and Resets
-         axiClk         => axilClk,
-         axiRst         => axilRst);
+--   AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
+--      generic map (
+--         TPD_G          => TPD_G,
+--         I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
+--         DEVICE_MAP_G   => TIME_DEVICE_MAP_C,
+--         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+--      port map (
+--         -- I2C Ports
+--         scl            => timingClkScl,
+--         sda            => timingClkSda,
+--         -- AXI-Lite Register Interface
+--         axiReadMaster  => mAxilReadMasters(CLK_I2C_INDEX_C),
+--         axiReadSlave   => mAxilReadSlaves(CLK_I2C_INDEX_C),
+--         axiWriteMaster => mAxilWriteMasters(CLK_I2C_INDEX_C),
+--         axiWriteSlave  => mAxilWriteSlaves(CLK_I2C_INDEX_C),
+--         -- Clocks and Resets
+--         axiClk         => axilClk,
+--         axiRst         => axilRst);
 
    -------------------------------
    -- AXI-Lite: DDR Monitor Module
    -------------------------------
-   AxiI2cRegMaster_2 : entity work.AxiI2cRegMaster
-      generic map (
-         TPD_G          => TPD_G,
-         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
-         DEVICE_MAP_G   => DDR_DEVICE_MAP_C,
-         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
-      port map (
-         -- I2C Ports
-         scl            => ddrScl,
-         sda            => ddrSda,
-         -- AXI-Lite Register Interface
-         axiReadMaster  => mAxilReadMasters(DDR_I2C_INDEX_C),
-         axiReadSlave   => mAxilReadSlaves(DDR_I2C_INDEX_C),
-         axiWriteMaster => mAxilWriteMasters(DDR_I2C_INDEX_C),
-         axiWriteSlave  => mAxilWriteSlaves(DDR_I2C_INDEX_C),
-         -- Clocks and Resets
-         axiClk         => axilClk,
-         axiRst         => axilRst);
+--   AxiI2cRegMaster_2 : entity work.AxiI2cRegMaster
+--      generic map (
+--         TPD_G          => TPD_G,
+--         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
+--         DEVICE_MAP_G   => DDR_DEVICE_MAP_C,
+--         AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+--      port map (
+--         -- I2C Ports
+--         scl            => ddrScl,
+--         sda            => ddrSda,
+--         -- AXI-Lite Register Interface
+--         axiReadMaster  => mAxilReadMasters(DDR_I2C_INDEX_C),
+--         axiReadSlave   => mAxilReadSlaves(DDR_I2C_INDEX_C),
+--         axiWriteMaster => mAxilWriteMasters(DDR_I2C_INDEX_C),
+--         axiWriteSlave  => mAxilWriteSlaves(DDR_I2C_INDEX_C),
+--         -- Clocks and Resets
+--         axiClk         => axilClk,
+--         axiRst         => axilRst);
 
    -----------------------
    -- AXI-Lite: BSI Module
@@ -512,6 +526,30 @@ begin
          -- Clocks and Resets
          axilClk         => axilClk,
          axilRst         => axilRst);
+
+   -------------------------------
+   -- AXI-Lite: PWR Monitor Module
+   -------------------------------
+   GEN_PWR_I2C : if (ULTRASCALE_PLUS_C) generate
+      AxiI2cRegMaster_3 : entity work.AxiI2cRegMaster
+         generic map (
+            TPD_G          => TPD_G,
+            I2C_SCL_FREQ_G => 100.0E+3,  -- units of Hz
+            DEVICE_MAP_G   => PWR_DEVICE_MAP_C,
+            AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+         port map (
+            -- I2C Ports
+            scl            => pwrScl,
+            sda            => pwrSda,
+            -- AXI-Lite Register Interface
+            axiReadMaster  => mAxilReadMasters(PWR_I2C_INDEX_C),
+            axiReadSlave   => mAxilReadSlaves(PWR_I2C_INDEX_C),
+            axiWriteMaster => mAxilWriteMasters(PWR_I2C_INDEX_C),
+            axiWriteSlave  => mAxilWriteSlaves(PWR_I2C_INDEX_C),
+            -- Clocks and Resets
+            axiClk         => axilClk,
+            axiRst         => axilRst);
+   end generate;
 
    --------------------------------------
    -- Map the AXI-Lite to Timing Firmware

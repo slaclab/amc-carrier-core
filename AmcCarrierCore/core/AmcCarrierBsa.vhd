@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2018-03-14
+-- Last update: 2019-09-12
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -39,7 +39,8 @@ entity AmcCarrierBsa is
       DISABLE_BSA_G          : boolean                := false;
       DISABLE_BLD_G          : boolean                := false;
       DISABLE_DDR_SRP_G      : boolean                := false;
-      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);
+      WAVEFORM_NUM_LANES_G   : positive range 1 to 4  := 4;  -- Number of Waveform lanes per DaqMuxV2
+      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);  -- Waveform stream's tData width (in units of bytes)      
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
@@ -214,6 +215,7 @@ begin
       BsaWaveformEngine_0 : entity work.BsaWaveformEngine
          generic map (
             TPD_G                  => TPD_G,
+            WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
             AXIL_BASE_ADDR_G       => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_0_AXIL_C).baseAddr,
             AXI_CONFIG_G           => WAVEFORM_AXI_CONFIG_C)
@@ -246,6 +248,7 @@ begin
       BsaWaveformEngine_1 : entity work.BsaWaveformEngine
          generic map (
             TPD_G                  => TPD_G,
+            WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
             AXIL_BASE_ADDR_G       => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_1_AXIL_C).baseAddr,
             AXI_CONFIG_G           => WAVEFORM_AXI_CONFIG_C)
@@ -355,7 +358,7 @@ begin
 --      -----------------------------------------------------------------------------------------------
 --      -- Mem Read engine
 --      -----------------------------------------------------------------------------------------------
-     GEN_EN_SRP : if ( DISABLE_DDR_SRP_G = false ) generate
+      GEN_EN_SRP : if (DISABLE_DDR_SRP_G = false) generate
          U_SrpV3Axi_1 : entity work.SrpV3Axi
             generic map (
                TPD_G               => TPD_G,
@@ -366,8 +369,8 @@ begin
                GEN_SYNC_FIFO_G     => false,
                AXI_CLK_FREQ_G      => 200.0E+6,
                AXI_CONFIG_G        => MEM_AXI_CONFIG_C,
-   --          AXI_BURST_G         => AXI_BURST_G,
-   --          AXI_CACHE_G         => AXI_CACHE_G,
+               --          AXI_BURST_G         => AXI_BURST_G,
+               --          AXI_CACHE_G         => AXI_CACHE_G,
                ACK_WAIT_BVALID_G   => false,
                AXI_STREAM_CONFIG_G => AXIS_8BYTE_CONFIG_C,
                UNALIGNED_ACCESS_G  => false,
@@ -375,29 +378,29 @@ begin
                WRITE_EN_G          => true,
                READ_EN_G           => true)
             port map (
-               sAxisClk       => axilClk,  -- [in]
-               sAxisRst       => axilRst,  -- [in]
+               sAxisClk       => axilClk,   -- [in]
+               sAxisRst       => axilRst,   -- [in]
                sAxisMaster    => ibBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [in]
                sAxisSlave     => ibBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [out]
-               sAxisCtrl      => open,     -- [out]
-               mAxisClk       => axilClk,  -- [in]
-               mAxisRst       => axilRst,  -- [in]
+               sAxisCtrl      => open,  -- [out]
+               mAxisClk       => axilClk,   -- [in]
+               mAxisRst       => axilRst,   -- [in]
                mAxisMaster    => obBsaMasters(BSA_MEM_AXIS_INDEX_C),  -- [out]
                mAxisSlave     => obBsaSlaves(BSA_MEM_AXIS_INDEX_C),   -- [in]
-               axiClk         => axiClk,   -- [in]
-               axiRst         => axiRst,   -- [in]
+               axiClk         => axiClk,    -- [in]
+               axiRst         => axiRst,    -- [in]
                axiWriteMaster => memAxiWriteMaster,                   -- [out]
                axiWriteSlave  => memAxiWriteSlave,                    -- [in]
                axiReadMaster  => memAxiReadMaster,                    -- [out]
                axiReadSlave   => memAxiReadSlave);                    -- [in]
-   end generate GEN_EN_SRP;
+      end generate GEN_EN_SRP;
 
-   GEN_DIS_SRP : if ( DISABLE_DDR_SRP_G = true ) generate
-      ibBsaSlaves(BSA_MEM_AXIS_INDEX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
-      obBsaMasters(BSA_MEM_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
-      memAxiWriteMaster                  <= AXI_WRITE_MASTER_INIT_C;
-      memAxiReadMaster                   <= AXI_READ_MASTER_INIT_C;
-   end generate GEN_DIS_SRP;
+      GEN_DIS_SRP : if (DISABLE_DDR_SRP_G = true) generate
+         ibBsaSlaves(BSA_MEM_AXIS_INDEX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
+         obBsaMasters(BSA_MEM_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
+         memAxiWriteMaster                  <= AXI_WRITE_MASTER_INIT_C;
+         memAxiReadMaster                   <= AXI_READ_MASTER_INIT_C;
+      end generate GEN_DIS_SRP;
 
       ------------------------------------------------------------------------------------------------
       -- Axi Interconnect

@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcCarrierSysRegPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-08
--- Last update: 2017-04-26
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -39,6 +37,7 @@ package AmcCarrierSysRegPkg is
    constant ETH_ADDR_C        : slv(31 downto 0) := x"0A000000";
    constant DDR_ADDR_C        : slv(31 downto 0) := x"0B000000";
    constant MPS_ADDR_C        : slv(31 downto 0) := x"0C000000";
+   constant PWR_I2C_ADDR_C    : slv(31 downto 0) := x"0D000000";
    constant APP_ADDR_C        : slv(31 downto 0) := x"80000000";
 
    constant XBAR_TIME_GEN_C : Slv2Array(3 downto 0) := (

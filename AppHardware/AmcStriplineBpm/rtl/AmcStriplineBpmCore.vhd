@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcStriplineBpmCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-10-28
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
@@ -242,23 +240,44 @@ begin
    spareN(9)   <= clClkOe;
    spareP(9)   <= rfAmpOn;
    -- JESD
-   IBUFDS_SysRef : IBUFDS
+   U_jesdSysRef : entity work.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => fpgaClkP(0),
-         IB => fpgaClkN(0),
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => fpgaClkP(0),
+         jesdSyncN => fpgaClkN(0),
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   OBUFDS_RxSync0 : OBUFDS
+   U_jesdRxSync0 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => jtagSec(0),
-         OB => jtagSec(1));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => jtagSec(0),
+         jesdSyncN => jtagSec(1));
 
-   OBUFDS_RxSync1 : OBUFDS
+   U_jesdRxSync1 : entity work.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => jtagSec(2),
-         OB => jtagSec(3));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => jtagSec(2),
+         jesdSyncN => jtagSec(3));
 
    -- Triggers
    IBUFDS_ExtTrig : IBUFDS
