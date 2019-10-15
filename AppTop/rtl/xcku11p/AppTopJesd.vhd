@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-11-11
--- Last update: 2018-05-23
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -116,9 +114,9 @@ architecture mapping of AppTopJesd is
    signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
-   signal clkOut   : slv(2 downto 0);
-   signal resetOut : slv(2 downto 0);
-   signal rstOut   : slv(2 downto 0);
+   signal clkOut   : slv(3 downto 0);
+   signal resetOut : slv(3 downto 0);
+   signal rstOut   : slv(3 downto 0);
    signal locked   : sl;
 
    signal drpClk  : slv(9 downto 0)       := (others => '0');
@@ -213,19 +211,23 @@ begin
          TYPE_G             => "MMCM",
          INPUT_BUFG_G       => false,
          FB_BUFG_G          => true,
-         NUM_CLOCKS_G       => 3,
+         NUM_CLOCKS_G       => 4,
          BANDWIDTH_G        => "OPTIMIZED",
-         --CLKIN_PERIOD_G     => 3.2,
          CLKIN_PERIOD_G     => 3.2,
-         --CLKIN_PERIOD_G     => 6.4,
          DIVCLK_DIVIDE_G    => 1,
          CLKFBOUT_MULT_F_G  => 4.000,
+         -- CLKOUT0: Unused
          CLKOUT0_DIVIDE_F_G => 4.000,
          CLKOUT0_RST_HOLD_G => 16,
-         CLKOUT1_DIVIDE_G   => 2,
-         CLKOUT1_RST_HOLD_G => 32,
-         CLKOUT2_DIVIDE_G   => JESD_USR_DIV_G*3,
-         CLKOUT2_RST_HOLD_G => 32)
+         -- CLKOUT1: jesdClk1x
+         CLKOUT1_DIVIDE_G   => 4,
+         CLKOUT1_RST_HOLD_G => 16,
+         -- CLKOUT2: jesdClk2x
+         CLKOUT2_DIVIDE_G   => 2,
+         CLKOUT2_RST_HOLD_G => 32,
+         -- CLKOUT3: jesdUsrClk
+         CLKOUT3_DIVIDE_G   => JESD_USR_DIV_G*3,
+         CLKOUT3_RST_HOLD_G => 32)
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
@@ -250,12 +252,15 @@ begin
             rstOut => rstOut(i));
    end generate GEN_RST;
 
-   jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(0);
-   jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(1);
-   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);
-   jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(0);
-   jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(1);
-   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(2);
+   -- Clocks
+   jesdClk1x  <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(1);
+   jesdClk2x  <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);
+   jesdUsrClk <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(3);
+
+   -- Resets
+   jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(1);
+   jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(2);
+   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(3);
    jesdMmcmLocked <= '1'     when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else locked;
 
    jesdClk <= jesdClk1x;
