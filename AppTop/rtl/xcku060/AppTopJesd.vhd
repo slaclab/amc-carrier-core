@@ -284,7 +284,7 @@ begin
          clkIn     => amcClk,
          rstIn     => amcRst,
          clkOut(0) => jesdUsrClk,
-         rstOut(1) => jesdUsrRst);
+         rstOut(0) => jesdUsrRst);
 
    -------------
    -- JESD block
