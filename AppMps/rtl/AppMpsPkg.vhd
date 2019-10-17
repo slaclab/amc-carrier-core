@@ -113,13 +113,17 @@ package AppMpsPkg is
    ---------------------------------------------------   
    type MpsAppConfigType is record
       DIGITAL_EN_C  : boolean;          -- APP is digital
-      BYTE_COUNT_C  : integer range 0 to MPS_CHAN_COUNT_C;  -- MPS message bytes
+      BYTE_COUNT_C  : integer range 0 to MPS_CHAN_COUNT_C;  -- MPS message bytes max
+      LCLS1_COUNT_C : integer range 0 to MPS_CHAN_COUNT_C;  -- MPS message bytes for LCLS1
+      LCLS2_COUNT_C : integer range 0 to MPS_CHAN_COUNT_C;  -- MPS message bytes for LCLS1
       CHAN_CONFIG_C : MpsChanConfigArray(MPS_CHAN_COUNT_C-1 downto 0);
    end record;
 
    constant MPS_APP_CONFIG_INIT_C : MpsAppConfigType := (
       DIGITAL_EN_C  => false,
       BYTE_COUNT_C  => 0,
+      LCLS1_COUNT_C => 0,
+      LCLS2_COUNT_C => 0,
       CHAN_CONFIG_C => (others => MPS_CHAN_CONFIG_INIT_C));
 
    ---------------------------------------------------
@@ -360,7 +364,9 @@ package body AppMpsPkg is
 
       case app is
          when APP_BPM_STRIPLINE_TYPE_C | APP_BPM_CAVITY_TYPE_C =>
-            ret.BYTE_COUNT_C := 6;
+            ret.BYTE_COUNT_C  := 6;
+            ret.LCLS1_COUNT_C := 6;
+            ret.LCLS2_COUNT_C := 6;
 
             for i in 0 to 1 loop
 
@@ -388,7 +394,8 @@ package body AppMpsPkg is
             end loop;
 
          when APP_BLEN_TYPE_C =>
-            ret.BYTE_COUNT_C := 2;
+            ret.BYTE_COUNT_C  := 2;
+            ret.LCLS2_COUNT_C := 2;
 
             -- Input 0
             ret.CHAN_CONFIG_C(0).THOLD_COUNT_C := 4;
@@ -401,7 +408,8 @@ package body AppMpsPkg is
             ret.CHAN_CONFIG_C(16).BYTE_MAP_C    := 1;
 
          when APP_BCM_TYPE_C =>
-            ret.BYTE_COUNT_C := 4;
+            ret.BYTE_COUNT_C  := 4;
+            ret.LCLS2_COUNT_C := 4;
 
             -- Input 0
             ret.CHAN_CONFIG_C(0).THOLD_COUNT_C := 4;
@@ -427,25 +435,21 @@ package body AppMpsPkg is
             ret.DIGITAL_EN_C := true;
             ret.BYTE_COUNT_C := 1;
 
-         when APP_MPS_24CH_TYPE_C =>
-            ret.BYTE_COUNT_C := 24;
+         when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
+            ret.BYTE_COUNT_C  := 12;
+            ret.LCLS1_COUNT_C := 12;
+            ret.LCLS2_COUNT_C := 6;
 
-            for i in 0 to 23 loop
+            for i in 0 to 11 loop
                ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 7;
                ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;
                ret.CHAN_CONFIG_C(i).IDLE_EN_C     := true;
             end loop;
 
-         when APP_MPS_6CH_TYPE_C =>
-            ret.BYTE_COUNT_C := 6;
-
-            for i in 0 to 5 loop
-               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 7;
-               ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;
-               ret.CHAN_CONFIG_C(i).IDLE_EN_C     := true;
-            end loop;
+         when APP_FWS_TYPE_C =>
+            ret.DIGITAL_EN_C := true;
+            ret.BYTE_COUNT_C := 1;
 
         when others =>
             NULL;
