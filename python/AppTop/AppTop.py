@@ -145,10 +145,9 @@ class AppTop(pr.Device):
                 dac.enable.set(True)
                 dac.ClearAlarms()
                 dac.enable.set(enable)
-                dac.enable.set(enable)                
 
             for adc in adcDevices:
-                adc.PDN_SYSREF.set(0x1)              
+                adc.PDN_SYSREF.set(0x1)
                 
             # Load the DAC signal generator
             for sigGen in sigGenDevices: 
