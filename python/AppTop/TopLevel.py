@@ -157,7 +157,7 @@ class TopLevel(pr.Device):
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,
             numWaveformBuffers = numWaveformBuffers,
-            expand       = True
+            expand       = True,
         ))
 
         # Define SW trigger command
