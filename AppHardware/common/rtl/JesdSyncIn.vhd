@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : JesdSyncIn.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-05-04
--- Last update: 2018-05-11
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -27,9 +25,12 @@ use unisim.vcomponents.all;
 
 entity JesdSyncIn is
    generic (
-      TPD_G    : time    := 1 ns;
-      INVERT_G : boolean := false);
+      TPD_G       : time    := 1 ns;
+      GEN_ASYNC_G : boolean := true;  -- default true means to add synchronizer
+      INVERT_G    : boolean := false);
    port (
+      -- Edge Select
+      edgeSelet : in  sl := '0';  -- '0': jesdClk's rising edge sampled, '1': jesdClk's falling edge sampled
       -- Clock
       jesdClk   : in  sl;
       -- JESD Low speed Ports
@@ -41,10 +42,14 @@ end JesdSyncIn;
 
 architecture mapping of JesdSyncIn is
 
-   signal jesdClkL : sl;
-   signal ibufSync : sl;
-   signal regSync  : sl;
-   signal syncOut  : sl;
+   signal jesdClkL   : sl;
+   signal ibufSync   : sl;
+   signal regSyncVec : slv(1 downto 0);
+   signal regSync    : sl;
+
+   attribute dont_touch             : string;
+   attribute dont_touch of ibufSync : signal is "TRUE";
+   attribute dont_touch of regSync  : signal is "TRUE";
 
 begin
 
@@ -56,26 +61,37 @@ begin
          IB => jesdSyncN,
          O  => ibufSync);
 
-   U_IDDRE1 : IDDRE1
-      generic map (
-         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED")
-      port map (
-         C  => jesdClk,
-         CB => jesdClkL,
-         D  => ibufSync,
-         R  => '0',
-         Q1 => regSync,
-         Q2 => open);
+   GEN_ASYNC : if (GEN_ASYNC_G = true) generate
 
-   syncOut <= regSync when(INVERT_G = false) else not(regSync);
+      U_Synchronizer : entity work.Synchronizer
+         generic map (
+            TPD_G => TPD_G)
+         port map (
+            clk     => jesdClk,
+            dataIn  => ibufSync,
+            dataOut => regSync);
 
-   -- Help with meeting timing
-   U_sync : entity work.RstPipeline
-      generic map (
-         TPD_G => TPD_G)
-      port map (
-         clk    => jesdClk,
-         rstIn  => syncOut,
-         rstOut => jesdSync);
+   end generate;
+
+   GEN_SYNC : if (GEN_ASYNC_G = false) generate
+
+      U_IDDRE1 : IDDRE1
+         generic map (
+            DDR_CLK_EDGE => "SAME_EDGE_PIPELINED")
+         port map (
+            C  => jesdClk,
+            CB => jesdClkL,
+            D  => ibufSync,
+            R  => '0',
+            Q1 => regSyncVec(0),        -- Rising edge sample
+            Q2 => regSyncVec(1));       -- Falling edge sample
+
+      -- Select whether sampling the rising or falling edge sample
+      regSync <= regSyncVec(0) when(edgeSelet = '0') else regSyncVec(1);
+
+   end generate;
+
+   -- Select whether the output is inverted for not
+   jesdSync <= regSync when(INVERT_G = false) else not(regSync);
 
 end mapping;
