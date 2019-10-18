@@ -64,59 +64,59 @@ end MpsPgpFrontEndGty;
 
 architecture mapping of MpsPgpFrontEndGty is
 
-   component MpsPgpGtyCore
-      port (
-         gtwiz_userclk_tx_reset_in          : in  std_logic_vector(0 downto 0);
-         gtwiz_userclk_tx_active_in         : in  std_logic_vector(0 downto 0);
-         gtwiz_userclk_rx_active_in         : in  std_logic_vector(0 downto 0);
-         gtwiz_reset_clk_freerun_in         : in  std_logic_vector(0 downto 0);
-         gtwiz_reset_all_in                 : in  std_logic_vector(0 downto 0);
-         gtwiz_reset_tx_pll_and_datapath_in : in  std_logic_vector(0 downto 0);
-         gtwiz_reset_tx_datapath_in         : in  std_logic_vector(0 downto 0);
-         gtwiz_reset_rx_pll_and_datapath_in : in  std_logic_vector(0 downto 0);
-         gtwiz_reset_rx_datapath_in         : in  std_logic_vector(0 downto 0);
-         gtwiz_reset_rx_cdr_stable_out      : out std_logic_vector(0 downto 0);
-         gtwiz_reset_tx_done_out            : out std_logic_vector(0 downto 0);
-         gtwiz_reset_rx_done_out            : out std_logic_vector(0 downto 0);
-         gtwiz_userdata_tx_in               : in  std_logic_vector(15 downto 0);
-         gtwiz_userdata_rx_out              : out std_logic_vector(15 downto 0);
-         drpclk_in                          : in  std_logic_vector(0 downto 0);
-         gtrefclk0_in                       : in  std_logic_vector(0 downto 0);
-         gtyrxn_in                          : in  std_logic_vector(0 downto 0);
-         gtyrxp_in                          : in  std_logic_vector(0 downto 0);
-         loopback_in                        : in  std_logic_vector(2 downto 0);
-         rx8b10ben_in                       : in  std_logic_vector(0 downto 0);
-         rxbufreset_in                      : in  std_logic_vector(0 downto 0);
-         rxcommadeten_in                    : in  std_logic_vector(0 downto 0);
-         rxmcommaalignen_in                 : in  std_logic_vector(0 downto 0);
-         rxpcommaalignen_in                 : in  std_logic_vector(0 downto 0);
-         rxpolarity_in                      : in  std_logic_vector(0 downto 0);
-         rxusrclk_in                        : in  std_logic_vector(0 downto 0);
-         rxusrclk2_in                       : in  std_logic_vector(0 downto 0);
-         tx8b10ben_in                       : in  std_logic_vector(0 downto 0);
-         txctrl0_in                         : in  std_logic_vector(15 downto 0);
-         txctrl1_in                         : in  std_logic_vector(15 downto 0);
-         txctrl2_in                         : in  std_logic_vector(7 downto 0);
-         txusrclk_in                        : in  std_logic_vector(0 downto 0);
-         txusrclk2_in                       : in  std_logic_vector(0 downto 0);
-         gtpowergood_out                    : out std_logic_vector(0 downto 0);
-         gtytxn_out                         : out std_logic_vector(0 downto 0);
-         gtytxp_out                         : out std_logic_vector(0 downto 0);
-         rxbufstatus_out                    : out std_logic_vector(2 downto 0);
-         rxbyteisaligned_out                : out std_logic_vector(0 downto 0);
-         rxbyterealign_out                  : out std_logic_vector(0 downto 0);
-         rxclkcorcnt_out                    : out std_logic_vector(1 downto 0);
-         rxcommadet_out                     : out std_logic_vector(0 downto 0);
-         rxctrl0_out                        : out std_logic_vector(15 downto 0);
-         rxctrl1_out                        : out std_logic_vector(15 downto 0);
-         rxctrl2_out                        : out std_logic_vector(7 downto 0);
-         rxctrl3_out                        : out std_logic_vector(7 downto 0);
-         rxoutclk_out                       : out std_logic_vector(0 downto 0);
-         rxpmaresetdone_out                 : out std_logic_vector(0 downto 0);
-         txoutclk_out                       : out std_logic_vector(0 downto 0);
-         txpmaresetdone_out                 : out std_logic_vector(0 downto 0)
-         );
-   end component;
+COMPONENT MpsPgpGtyCore
+  PORT (
+    gtwiz_userclk_tx_reset_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_userclk_tx_active_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_userclk_rx_active_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_clk_freerun_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_all_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_tx_pll_and_datapath_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_tx_datapath_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_rx_pll_and_datapath_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_rx_datapath_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_rx_cdr_stable_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_tx_done_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_reset_rx_done_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtwiz_userdata_tx_in : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    gtwiz_userdata_rx_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    drpclk_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtrefclk0_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtyrxn_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtyrxp_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    loopback_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+    rx8b10ben_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxbufreset_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxcommadeten_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxmcommaalignen_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxpcommaalignen_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxpolarity_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxusrclk_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxusrclk2_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    tx8b10ben_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    txctrl0_in : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    txctrl1_in : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    txctrl2_in : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    txusrclk_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    txusrclk2_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtpowergood_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtytxn_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    gtytxp_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxbufstatus_out : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    rxbyteisaligned_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxbyterealign_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxclkcorcnt_out : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+    rxcommadet_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxctrl0_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    rxctrl1_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    rxctrl2_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+    rxctrl3_out : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+    rxoutclk_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    rxpmaresetdone_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    txoutclk_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+    txpmaresetdone_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+  );
+END COMPONENT;
 
    signal rxRstWdt      : sl;
    signal gtRxUserReset : sl;
@@ -185,14 +185,15 @@ begin
 
    U_MpsPgpGtyCore : MpsPgpGtyCore
       port map (
+         gtwiz_userclk_tx_reset_in(0)          => '0',
          gtwiz_userclk_tx_active_in(0)         => '1',
          gtwiz_userclk_rx_active_in(0)         => '1',
          gtwiz_reset_clk_freerun_in (0)        => stableClk,
          gtwiz_reset_all_in(0)                 => '0',
          gtwiz_reset_tx_pll_and_datapath_in(0) => '0',
-         gtwiz_reset_tx_datapath_in(0)         => gtTxUserReset,
          gtwiz_reset_rx_pll_and_datapath_in(0) => '0',
          gtwiz_reset_rx_datapath_in(0)         => gtRxUserReset,
+         gtwiz_reset_tx_datapath_in(0)         => '0',
          gtwiz_reset_rx_cdr_stable_out(0)      => open,
          gtwiz_reset_tx_done_out(0)            => phyTxReady,
          gtwiz_reset_rx_done_out(0)            => phyRxReady,
