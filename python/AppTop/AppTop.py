@@ -145,7 +145,7 @@ class AppTop(pr.Device):
                 dac.enable.set(True)
                 dac.ClearAlarms()
                 dac.enable.set(enable)
-
+                
             for adc in adcDevices:
                 adc.PDN_SYSREF.set(0x1)
                 
