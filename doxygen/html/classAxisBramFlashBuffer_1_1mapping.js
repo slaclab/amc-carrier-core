@@ -1,0 +1,26 @@
+var classAxisBramFlashBuffer_1_1mapping =
+[
+    [ "comb", "classAxisBramFlashBuffer_1_1mapping.html#affd938309c8af9794e036844d019d3ec", null ],
+    [ "seq", "classAxisBramFlashBuffer_1_1mapping.html#a72bbc70fc4a5d3542ed50c4c98efa103", null ],
+    [ "RegType", "classAxisBramFlashBuffer_1_1mapping.html#a35f0a6888bd1c2e56754f97c77a534b9", null ],
+    [ "enable", "classAxisBramFlashBuffer_1_1mapping.html#a930e18d69a17b1386fb16da9e53cc88b", null ],
+    [ "swTrig", "classAxisBramFlashBuffer_1_1mapping.html#aa784ce80b0cb9e05b3f7c5c705d87d5f", null ],
+    [ "tDest", "classAxisBramFlashBuffer_1_1mapping.html#a8b450762e686126ea9fdc10295a14d57", null ],
+    [ "axilReadSlave", "classAxisBramFlashBuffer_1_1mapping.html#a461fe0c6eae927e61d8120da155736e1", null ],
+    [ "axilWriteSlave", "classAxisBramFlashBuffer_1_1mapping.html#a877a7f1c1dae56ed1893b21d49755b47", null ],
+    [ "REG_INIT_C", "classAxisBramFlashBuffer_1_1mapping.html#ac43f648e0bca714adefb338dd64f68e9", null ],
+    [ "r", "classAxisBramFlashBuffer_1_1mapping.html#a0498304adc5e9a77df9df664a54ee3d3", null ],
+    [ "rin", "classAxisBramFlashBuffer_1_1mapping.html#a758a8cbb78916a3911d410a62191310d", null ],
+    [ "wrEn", "classAxisBramFlashBuffer_1_1mapping.html#ad679b99ea634fb912bb2c98921270321", null ],
+    [ "wrAddr", "classAxisBramFlashBuffer_1_1mapping.html#a121d03e60b901b7df4d599a36bb5fc83", null ],
+    [ "rdAddr", "classAxisBramFlashBuffer_1_1mapping.html#ae63651c45af3bee8206ddeb18e2e1b94", null ],
+    [ "wrData", "classAxisBramFlashBuffer_1_1mapping.html#a30e423ae0dee65d8fcec2918caf7e8e1", null ],
+    [ "rdData", "classAxisBramFlashBuffer_1_1mapping.html#a77d3643404365a91af90a35535c71650", null ],
+    [ "req", "classAxisBramFlashBuffer_1_1mapping.html#af71d7112d60f6bcdff41286935d69c2c", null ],
+    [ "ack", "classAxisBramFlashBuffer_1_1mapping.html#a6fb5bf3dc82bf6fcb25c9167c39f22fe", null ],
+    [ "valid", "classAxisBramFlashBuffer_1_1mapping.html#a3a6b62e29de69b4646a84e4348e2f338", null ],
+    [ "timestamp", "classAxisBramFlashBuffer_1_1mapping.html#ab2796274a7ff264ce8e65a12999bc1f4", null ],
+    [ "u_writefsm", "classAxisBramFlashBuffer_1_1mapping.html#a517c57383c1000ce14fd375e098d3625", null ],
+    [ "u_bram", "classAxisBramFlashBuffer_1_1mapping.html#a28ec34ecd4630cb86df66c71fc3ad64b", null ],
+    [ "u_readfsm", "classAxisBramFlashBuffer_1_1mapping.html#ac12b48ea4a7678dff2627b1240eae898", null ]
+];
