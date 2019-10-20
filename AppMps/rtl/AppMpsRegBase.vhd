@@ -111,6 +111,8 @@ begin
 
       axiSlaveRegisterR(regEp, x"0004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C, 8));
       axiSlaveRegisterR(regEp, x"0004", 8, ite(APP_CONFIG_G.DIGITAL_EN_C, '1', '0'));
+      axiSlaveRegisterR(regEp, x"0004", 16, toSlv(APP_CONFIG_G.LCLS2_COUNT_C, 8));
+      axiSlaveRegisterR(regEp, x"0004", 24, toSlv(APP_CONFIG_G.LCLS1_COUNT_C, 8));
 
       axiSlaveRegister(regEp, x"0008", 0, v.beamDestMask);
       axiSlaveRegister(regEp, x"0008", 16, v.altDestMask);

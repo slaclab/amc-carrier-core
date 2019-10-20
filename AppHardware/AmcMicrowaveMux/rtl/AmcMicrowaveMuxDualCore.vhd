@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcMicrowaveMuxDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-05-11
--- Last update: 2018-08-28
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -36,7 +34,7 @@ entity AmcMicrowaveMuxDualCore is
       jesdClk         : in    slv(1 downto 0);
       jesdSysRef      : out   slv(1 downto 0);
       jesdRxSync      : in    slv(1 downto 0);
-      jesdTxSync      : out   slv(1 downto 0);
+      jesdTxSync      : out   Slv10Array(1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;

@@ -36,7 +36,7 @@ entity AmcGenericAdcDacDualCore is
       jesdRst         : in    slv(1 downto 0);
       jesdSysRef      : out   slv(1 downto 0);
       jesdRxSync      : in    slv(1 downto 0);
-      jesdTxSync      : out   slv(1 downto 0);
+      jesdTxSync      : out   Slv10Array(1 downto 0);
       -- ADC/DAC Interface (jesdClk domain)
       adcValids       : in    Slv7Array(1 downto 0);
       adcValues       : in    sampleDataVectorArray(1 downto 0, 6 downto 0);

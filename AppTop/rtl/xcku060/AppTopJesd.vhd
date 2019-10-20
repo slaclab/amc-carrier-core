@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-11-11
--- Last update: 2018-05-04
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -53,7 +51,7 @@ entity AppTopJesd is
       jesdRst2x       : out sl;
       jesdSysRef      : in  sl;
       jesdRxSync      : out sl;
-      jesdTxSync      : in  sl;
+      jesdTxSync      : in  slv(9 downto 0);
       jesdUsrClk      : out sl;
       jesdUsrRst      : out sl;
       -- ADC Interface
@@ -117,9 +115,9 @@ architecture mapping of AppTopJesd is
    signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
-   signal clkOut   : slv(2 downto 0);
-   signal resetOut : slv(2 downto 0);
-   signal rstOut   : slv(2 downto 0);
+   signal clkOut   : slv(1 downto 0);
+   signal resetOut : slv(1 downto 0);
+   signal rstOut   : slv(1 downto 0);
    signal locked   : sl;
 
    signal drpClk  : slv(9 downto 0)       := (others => '0');
@@ -226,22 +224,16 @@ begin
    U_ClockManager : entity work.ClockManagerUltraScale
       generic map (
          TPD_G              => TPD_G,
-         TYPE_G             => "MMCM",
+         TYPE_G             => "PLL",
          INPUT_BUFG_G       => false,
          FB_BUFG_G          => true,
-         NUM_CLOCKS_G       => 3,
-         BANDWIDTH_G        => "OPTIMIZED",
-         --CLKIN_PERIOD_G     => 3.2,
+         NUM_CLOCKS_G       => 2,
          CLKIN_PERIOD_G     => 3.2,
-         --CLKIN_PERIOD_G     => 6.4,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 4.000,
-         CLKOUT0_DIVIDE_F_G => 4.000,
+         CLKFBOUT_MULT_G    => 4,
+         CLKOUT0_DIVIDE_G   => 4,
          CLKOUT0_RST_HOLD_G => 16,
          CLKOUT1_DIVIDE_G   => 2,
-         CLKOUT1_RST_HOLD_G => 32,
-         CLKOUT2_DIVIDE_G   => JESD_USR_DIV_G*3,
-         CLKOUT2_RST_HOLD_G => 32)
+         CLKOUT1_RST_HOLD_G => 32)
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
@@ -256,7 +248,7 @@ begin
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
-   GEN_RST : for i in 2 downto 0 generate
+   GEN_RST : for i in 1 downto 0 generate
       U_RstPipeline : entity work.RstPipeline
          generic map (
             TPD_G => TPD_G)
@@ -268,14 +260,31 @@ begin
 
    jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(0);
    jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(1);
-   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);
+   -- jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);
    jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(0);
    jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(1);
-   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(2);
+   -- jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(2);
    jesdMmcmLocked <= '1'     when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else locked;
 
    jesdClk <= jesdClk1x;
    jesdRst <= jesdRst1x;
+
+   U_jesdUsrClk : entity work.ClockManagerUltraScale
+      generic map (
+         TPD_G              => TPD_G,
+         TYPE_G             => "PLL",
+         INPUT_BUFG_G       => false,
+         FB_BUFG_G          => true,
+         NUM_CLOCKS_G       => 1,
+         CLKIN_PERIOD_G     => 3.2,
+         CLKFBOUT_MULT_G    => 4,
+         CLKOUT0_DIVIDE_G   => JESD_USR_DIV_G*3,
+         CLKOUT0_RST_HOLD_G => 32)
+      port map (
+         clkIn     => amcClk,
+         rstIn     => amcRst,
+         clkOut(0) => jesdUsrClk,
+         rstOut(0) => jesdUsrRst);
 
    -------------
    -- JESD block

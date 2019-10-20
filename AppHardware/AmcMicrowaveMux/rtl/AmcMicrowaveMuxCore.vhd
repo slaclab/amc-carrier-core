@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-10-05
--- Last update: 2019-03-26
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
@@ -40,7 +38,7 @@ entity AmcMicrowaveMuxCore is
       jesdClk         : in    sl;
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
-      jesdTxSync      : out   sl;
+      jesdTxSync      : out   slv(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -471,8 +469,9 @@ begin
    ----------------------------------------------------------------
    U_jesdSysRef : entity work.JesdSyncIn
       generic map (
-         TPD_G    => TPD_G,
-         INVERT_G => true)  -- Note inverted because it is Swapped on the board
+         TPD_G       => TPD_G,
+         GEN_ASYNC_G => false, -- Deskewed using LMK to get rid of race condition between jesdSysRefP/N and jesdClk
+         INVERT_G    => true)  -- Note inverted because it is Swapped on the board
       port map (
          -- Clock
          jesdClk   => jesdClk,
@@ -537,7 +536,8 @@ begin
    jesdTxSyncVec(0) <= jesdTxSyncMask(0) or not(jesdTxSyncRaw(0));
    jesdTxSyncVec(1) <= jesdTxSyncMask(1) or jesdTxSyncRaw(1);
 
-   jesdTxSync <= jesdTxSyncVec(0) and jesdTxSyncVec(1);
+   jesdTxSync(4 downto 0) <= (others=>jesdTxSyncVec(0));
+   jesdTxSync(9 downto 5) <= (others=>jesdTxSyncVec(1));
 
    ----------------------------------------------------------------
    -- SPI interface ADC (ADC32R44)

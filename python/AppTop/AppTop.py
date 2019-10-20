@@ -94,6 +94,7 @@ class AppTop(pr.Device):
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
+            adcDevices    = self.find(typ=ti.Adc32Rf45)
             lmkDevices    = self.find(typ=ti.Lmk04828)
             appCore       = self.find(typ=appCommon.AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
@@ -144,7 +145,10 @@ class AppTop(pr.Device):
                 enable = dac.enable.get()
                 dac.enable.set(True)
                 dac.ClearAlarms()
-                dac.enable.set(enable)                
+                dac.enable.set(enable)
+                
+            for adc in adcDevices:
+                adc.PDN_SYSREF.set(0x1)
                 
             # Load the DAC signal generator
             for sigGen in sigGenDevices: 
