@@ -1,3 +1,3 @@
 #!/usr/bin/env python
 
-from AmcCarrierCore.DacSigGen.DacSigGen import *
+from AmcCarrierCore.DacSigGen._DacSigGen import *
