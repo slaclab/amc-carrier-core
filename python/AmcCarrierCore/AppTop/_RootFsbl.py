@@ -21,7 +21,7 @@ import pyrogue
 import rogue.protocols.udp
 import rogue.protocols.srp
 
-import AmcCarrierCore.AppTop.TopLevel as FpgaTopLevel
+from AmcCarrierCore.AppTop import TopLevel as FpgaTopLevel
 
 class RootFsbl(pyrogue.Root):
     def __init__(self, *, ipAddr='10.0.0.1', name='base', description = '', **kwargs):
