@@ -1,3 +1,3 @@
 #!/usr/bin/env python
 
-from AmcCarrierCore.AxisBramRingBuffer.AxisBramRingBuffer import *
+from AmcCarrierCore.AxisBramRingBuffer._AxisBramRingBuffer import *
