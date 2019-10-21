@@ -9,13 +9,13 @@
 # PyRogue AMC Carrier Cryo Demo Board Application
 #
 # Network Interfaces:
-#    UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC 
+#    UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC
 #    UDP_SRV_SRPV0_IDX_C       => 8192,  -- Legacy SRPv0 register access (still used for remote FPGA reprogramming)
 #    UDP_SRV_RSSI0_IDX_C       => 8193,  -- Legacy Non-interleaved RSSI for Register access and ASYNC messages
 #    UDP_SRV_RSSI1_IDX_C       => 8194,  -- Legacy Non-interleaved RSSI for bulk data transfer
 #    UDP_SRV_BP_MGS_IDX_C      => 8195,  -- Backplane Messaging
 #    UDP_SRV_TIMING_IDX_C      => 8197,  -- Timing ASYNC Messaging
-#    UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI         
+#    UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI
 #-----------------------------------------------------------------------------
 # This file is part of the rogue software platform. It is subject to
 # the license terms in the LICENSE.txt file found in the top-level directory
@@ -33,12 +33,12 @@ import pyrogue.utilities.fileio
 import rogue.hardware.axi
 import rogue.protocols.packetizer
 import AmcCarrierCore as amccCore
-import AmcCarrierCore.AppTop as appTop
+from AmcCarrierCore.AppTop._AppTop import AppTop
 
 class TopLevel(pr.Device):
-    def __init__(   self, 
+    def __init__(   self,
             name            = 'FpgaTopLevel',
-            description     = 'Container for FPGA Top-Level', 
+            description     = 'Container for FPGA Top-Level',
             # JESD Parameters
             numRxLanes      = [0,0],
             numTxLanes      = [0,0],
@@ -68,7 +68,7 @@ class TopLevel(pr.Device):
             numWaveformBuffers= numWaveformBuffers,
             enableTpgMini     = enableTpgMini,
         ))
-        self.add(appTop.AppTop(
+        self.add(AppTop(
             offset       = 0x80000000,
             numRxLanes   = numRxLanes,
             numTxLanes   = numTxLanes,
@@ -83,7 +83,7 @@ class TopLevel(pr.Device):
         # Define SW trigger command
         @self.command(description="Software Trigger for DAQ MUX",)
         def SwDaqMuxTrig():
-            for i in range(2): 
+            for i in range(2):
                 self.AppTop.DaqMuxV2[i].TriggerDaq.call()
 
     def writeBlocks(self, **kwargs):
@@ -101,7 +101,7 @@ class TopLevel(pr.Device):
                     if ( (waveBuff.Enabled[j].get() > 0) and (waveBuff.EndAddr[j].get() > waveBuff.StartAddr[j].get()) ):
                         size[i][j] = waveBuff.EndAddr[j].get() - waveBuff.StartAddr[j].get()
 
-        # Calculate the 
+        # Calculate the
         minSize = [size[0][0],size[1][0]]
         for i in range(2):
             if ((self._numRxLanes[i] > 0) or (self._numTxLanes[i] > 0)):
