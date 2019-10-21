@@ -40,10 +40,10 @@ class AppTop(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
         
-        self._numRxLanes   = numRxLanes
-        self._numTxLanes   = numTxLanes
-        self._numSigGen    = numSigGen
-        self._sizeSigGen   = sizeSigGen
+        self._numRxLanes = numRxLanes
+        self._numTxLanes = numTxLanes
+        self._numSigGen  = numSigGen
+        self._sizeSigGen = sizeSigGen
         
         ##############################
         # Variables
@@ -88,7 +88,7 @@ class AppTop(pr.Device):
             lmkDevices    = self.find(typ=ti.Lmk04828)
             appCore       = self.find(typ=appTop.AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
-
+            
             # Assert GTs Reset
             for rx in jesdRxDevices: 
                 rx.ResetGTs.set(1)
@@ -135,7 +135,10 @@ class AppTop(pr.Device):
                 enable = dac.enable.get()
                 dac.enable.set(True)
                 dac.ClearAlarms()
-                dac.enable.set(enable)                
+                dac.enable.set(enable)
+                
+            for adc in adcDevices:
+                adc.PDN_SYSREF.set(0x1)
                 
             # Load the DAC signal generator
             for sigGen in sigGenDevices: 

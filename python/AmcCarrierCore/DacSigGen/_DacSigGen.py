@@ -45,6 +45,7 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
+            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(    
@@ -55,6 +56,7 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
+            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(    
@@ -65,6 +67,7 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
+            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(    
@@ -76,6 +79,7 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
             hidden       = True,
+            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(    
@@ -87,6 +91,7 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
+            overlapEn    = True
         ))
                         
         self.add(pr.RemoteVariable(    
@@ -98,6 +103,7 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
+            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(    
@@ -109,6 +115,7 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
+            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(    
@@ -120,6 +127,7 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,                            
+            overlapEn    = True
         ))
 
         self.addRemoteVariables( 
@@ -132,6 +140,7 @@ class DacSigGen(pr.Device):
             mode         = "RW",
             number       =  self._numOfChs,
             stride       =  4,
+            overlapEn    = True
         )
                 
         for i in range(self._numOfChs):  
