@@ -28,7 +28,8 @@ package AppMpsPkg is
    -- MPS: Configurations and Constants
    ---------------------------------------------------   
    constant MPS_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(2);
-   constant MPS_CHAN_COUNT_C  : integer             := 24;
+   constant MPS_CHAN_COUNT_C  : integer             := 8;
+   --type SlvMaxChanArray is array (natural range <>) of slv(MPS_CHAN_COUNT_C/4 -1 downto 0);  --one extra
 
    ---------------------------------------------------
    -- Mitigation message record
@@ -67,7 +68,7 @@ package AppMpsPkg is
       inputType : sl;                   -- '0' Digital, '1' Analog      
       timeStamp : slv(15 downto 0);
       appId     : slv(15 downto 0);
-      message   : Slv8Array(31 downto 0);
+      message   : Slv8Array(MPS_CHAN_COUNT_C-1 downto 0);
       msgSize   : slv(7 downto 0);      -- In units of Bytes
    end record;
 
@@ -436,11 +437,11 @@ package body AppMpsPkg is
             ret.BYTE_COUNT_C := 1;
 
          when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
-            ret.BYTE_COUNT_C  := 12;
-            ret.LCLS1_COUNT_C := 12;
-            ret.LCLS2_COUNT_C := 6;
+            ret.BYTE_COUNT_C  := MPS_CHAN_COUNT_C;
+            ret.LCLS1_COUNT_C := MPS_CHAN_COUNT_C;
+            ret.LCLS2_COUNT_C := MPS_CHAN_COUNT_C/2;
 
-            for i in 0 to 11 loop
+            for i in 0 to MPS_CHAN_COUNT_C - 1 loop
                ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 7;
                ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;
