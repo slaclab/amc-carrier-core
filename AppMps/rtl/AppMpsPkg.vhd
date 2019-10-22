@@ -28,7 +28,7 @@ package AppMpsPkg is
    -- MPS: Configurations and Constants
    ---------------------------------------------------   
    constant MPS_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(2);
-   constant MPS_CHAN_COUNT_C  : integer             := 8;
+   constant MPS_CHAN_COUNT_C  : integer             := 12;
    --type SlvMaxChanArray is array (natural range <>) of slv(MPS_CHAN_COUNT_C/4 -1 downto 0);  --one extra
 
    ---------------------------------------------------
