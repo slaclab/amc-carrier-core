@@ -30,7 +30,9 @@ use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 use surf.AxiPkg.all;
 use surf.AxiLitePkg.all;
-use work.TimingPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
 
 library amc_carrier_core;
 use amc_carrier_core.AmcCarrierPkg.all;
@@ -438,7 +440,7 @@ begin
    end generate BSA_GEN;
 
    BLD_ENABLE_GEN : if not DISABLE_BLD_G generate
-      U_BLD : entity work.BldAxiStream
+      U_BLD : entity lcls_timing_core.BldAxiStream
          generic map (
             TPD_G => TPD_G)
          port map (

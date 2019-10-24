@@ -27,7 +27,9 @@ use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 use surf.AxiPkg.all;
 use surf.AxiLitePkg.all;
-use work.TimingPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
 use surf.EthMacPkg.all;
 
 library amc_carrier_core;
@@ -226,7 +228,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- GTH Timing Receiver
    -------------------------------------------------------------------------------------------------
-   TimingGthCoreWrapper_1 : entity work.TimingGtCoreWrapper
+   TimingGthCoreWrapper_1 : entity lcls_timing_core.TimingGtCoreWrapper
       generic map (
          TPD_G             => TPD_G,
          AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_GTH_INDEX_C).baseAddr,
@@ -313,7 +315,7 @@ begin
    -- Timing Core
    -- Decode timing message from GTH and distribute to system
    ------------------------------------------------------------------------------------------------
-   TimingCore_1 : entity work.TimingCore
+   TimingCore_1 : entity lcls_timing_core.TimingCore
       generic map (
          TPD_G             => TPD_G,
          TPGEN_G           => TIME_GEN_APP_G,
@@ -380,7 +382,7 @@ begin
    --  Core Triggers
    -----------------
    GEN_CORETRIG : if CORE_TRIGGERS_G > 0 generate
-      U_CoreTrig : entity work.EvrV2CoreTriggers
+      U_CoreTrig : entity lcls_timing_core.EvrV2CoreTriggers
          generic map (
             TPD_G           => TPD_G,
             NCHANNELS_G     => CORE_TRIGGERS_G,

@@ -23,7 +23,9 @@ use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiPkg.all;
-use work.TimingPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
 
 library amc_carrier_core;
 use amc_carrier_core.AppMpsPkg.all;

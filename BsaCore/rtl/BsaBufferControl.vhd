@@ -37,7 +37,9 @@ use surf.TextUtilPkg.all;
 library amc_carrier_core;
 use amc_carrier_core.AmcCarrierPkg.all;
 --use amc_carrier_core.AmcCarrierSysRegPkg.all;
-use work.TimingPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
 
 entity BsaBufferControl is
 
