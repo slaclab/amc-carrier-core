@@ -18,10 +18,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 use work.FpgaTypePkg.all;
 
 library unisim;
@@ -188,7 +190,7 @@ begin
    end generate;
 
    CLK_OUT : if (TIMING_TRIG_MODE_G = true) generate
-      U_CLK : entity work.ClkOutBufSingle
+      U_CLK : entity surf.ClkOutBufSingle
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")

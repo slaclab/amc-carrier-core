@@ -18,11 +18,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 use work.FpgaTypePkg.all;
 
@@ -90,7 +92,7 @@ begin
    -------------------------
    -- Software's RSSI Server
    -------------------------
-   U_RssiServer : entity work.RssiCoreWrapper
+   U_RssiServer : entity surf.RssiCoreWrapper
       generic map (
          TPD_G                => TPD_G,
          PIPE_STAGES_G        => 1,
@@ -161,7 +163,7 @@ begin
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
    ------------------------------------------------
-   U_SRPv3 : entity work.SrpV3AxiLite
+   U_SRPv3 : entity surf.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
@@ -223,7 +225,7 @@ begin
    --------------------------------
    ibAppDebugMaster              <= rssiObMasters(APP_ASYNC_IDX_C);
    rssiObSlaves(APP_ASYNC_IDX_C) <= ibAppDebugSlave;
-   U_IbLimiter : entity work.SsiFrameLimiter
+   U_IbLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,

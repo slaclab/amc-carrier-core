@@ -30,9 +30,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.Jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.Jesd204bPkg.all;
 use work.AppTopPkg.all;
 
 entity DacSigGenReg is
@@ -224,7 +226,7 @@ begin
    end process seq;
 
    -- Input assignment and synchronization
-   Sync_IN0 : entity work.SynchronizerVector
+   Sync_IN0 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => NUM_SIG_GEN_G)
@@ -233,7 +235,7 @@ begin
          dataIn  => running_i,
          dataOut => s_runningSync);
 
-   Sync_IN1 : entity work.SynchronizerVector
+   Sync_IN1 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => NUM_SIG_GEN_G)
@@ -242,7 +244,7 @@ begin
          dataIn  => underflow_i,
          dataOut => s_underflowSync);
 
-   Sync_IN2 : entity work.SynchronizerVector
+   Sync_IN2 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => NUM_SIG_GEN_G)
@@ -257,7 +259,7 @@ begin
       devClk(i) <= jesdClk2x when(RAM_CLK_G(i) = '0') else jesdClk;
       devRst(i) <= jesdRst2x when(RAM_CLK_G(i) = '0') else jesdRst;
 
-      Sync_OUT1 : entity work.Synchronizer
+      Sync_OUT1 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -265,7 +267,7 @@ begin
             dataIn  => r.enable(i),
             dataOut => enable_o(i));
 
-      Sync_OUT2 : entity work.Synchronizer
+      Sync_OUT2 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -273,7 +275,7 @@ begin
             dataIn  => r.mode(i),
             dataOut => mode_o(i));
 
-      Sync_OUT3 : entity work.Synchronizer
+      Sync_OUT3 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -281,7 +283,7 @@ begin
             dataIn  => r.sign(i),
             dataOut => sign_o(i));
 
-      Sync_OUT4 : entity work.Synchronizer
+      Sync_OUT4 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -289,7 +291,7 @@ begin
             dataIn  => r.trigSw(i),
             dataOut => trigSw_o(i));
 
-      Sync_OUT5 : entity work.SynchronizerVector
+      Sync_OUT5 : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 32)
@@ -298,7 +300,7 @@ begin
             dataIn  => r.period(i),
             dataOut => period_o(i));
 
-      Sync_OUT6 : entity work.Synchronizer
+      Sync_OUT6 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (

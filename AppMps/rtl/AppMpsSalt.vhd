@@ -24,10 +24,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AppMpsPkg.all;
 
@@ -138,7 +140,7 @@ architecture mapping of AppMpsSalt is
 
 begin
 
-   U_diagnosticstrobe : entity work.SynchronizerOneShot
+   U_diagnosticstrobe : entity surf.SynchronizerOneShot
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -183,7 +185,7 @@ begin
       mpsRxErrDet  <= (others => '0');
       mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
 
-      U_SaltUltraScale : entity work.SaltUltraScale
+      U_SaltUltraScale : entity surf.SaltUltraScale
          generic map (
             TPD_G               => TPD_G,
             SIMULATION_G        => SIMULATION_G,
@@ -222,7 +224,7 @@ begin
             mAxisMaster   => open,
             mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);
 
-      U_mpsTxPktSent : entity work.SynchronizerOneShot
+      U_mpsTxPktSent : entity surf.SynchronizerOneShot
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -230,7 +232,7 @@ begin
             dataIn  => txPktSent,
             dataOut => mpsTxPktSent);
 
-      U_mpsTxEofeSent : entity work.SynchronizerOneShot
+      U_mpsTxEofeSent : entity surf.SynchronizerOneShot
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -253,7 +255,7 @@ begin
 
    MPS_SLOT : if (MPS_SLOT_G = true) and (APP_TYPE_G /= APP_NULL_TYPE_C) generate
 
-      U_SaltDelayCtrl : entity work.SaltDelayCtrl
+      U_SaltDelayCtrl : entity surf.SaltDelayCtrl
          generic map (
             TPD_G           => TPD_G,
             SIM_DEVICE_G    => "ULTRASCALE",
@@ -263,7 +265,7 @@ begin
             refClk        => mps625MHzClk,
             refRst        => mps625MHzRst);
 
-      LN_FIFO : entity work.AxiStreamFifoV2
+      LN_FIFO : entity surf.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
@@ -298,7 +300,7 @@ begin
 
       GEN_VEC :
       for i in 14 downto 1 generate
-         U_SaltUltraScale : entity work.SaltUltraScale
+         U_SaltUltraScale : entity surf.SaltUltraScale
             generic map (
                TPD_G               => TPD_G,
                SIMULATION_G        => SIMULATION_G,
@@ -337,7 +339,7 @@ begin
                mAxisMaster   => mpsObMasters(i),
                mAxisSlave    => mpsObSlaves(i));
 
-         U_mpsRxPktRcvd : entity work.SynchronizerOneShot
+         U_mpsRxPktRcvd : entity surf.SynchronizerOneShot
             generic map (
                TPD_G => TPD_G)
             port map (
@@ -345,7 +347,7 @@ begin
                dataIn  => rxPktRcvd(i),
                dataOut => mpsRxPktRcvd(i));
 
-         U_mpsRxErrDet : entity work.SynchronizerOneShot
+         U_mpsRxErrDet : entity surf.SynchronizerOneShot
             generic map (
                TPD_G => TPD_G)
             port map (
@@ -444,7 +446,7 @@ begin
       end if;
    end process seq;
 
-   U_PktStats : entity work.SyncTrigPeriod
+   U_PktStats : entity surf.SyncTrigPeriod
       generic map (
          TPD_G        => TPD_G,
          COMMON_CLK_G => true)
@@ -463,7 +465,7 @@ begin
 
    GEN_STATS :
    for i in 14 downto 1 generate
-      U_PktStats : entity work.SyncTrigPeriod
+      U_PktStats : entity surf.SyncTrigPeriod
          generic map (
             TPD_G        => TPD_G,
             COMMON_CLK_G => true)
@@ -481,7 +483,7 @@ begin
             periodMin => pktPeriodMin(i));
    end generate GEN_STATS;
 
-   U_mpsPllRst : entity work.PwrUpRst
+   U_mpsPllRst : entity surf.PwrUpRst
       generic map (
          TPD_G         => TPD_G,
          SIM_SPEEDUP_G => SIMULATION_G,
@@ -491,7 +493,7 @@ begin
          clk    => axilClk,
          rstOut => mpsPllRst);
 
-   SyncStatusVec_Inst : entity work.SyncStatusVector
+   SyncStatusVec_Inst : entity surf.SyncStatusVector
       generic map (
          TPD_G          => TPD_G,
          OUT_POLARITY_G => '1',

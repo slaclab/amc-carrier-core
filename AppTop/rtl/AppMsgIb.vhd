@@ -20,10 +20,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
 
 entity AppMsgIb is
    generic (
@@ -136,7 +138,7 @@ architecture rtl of AppMsgIb is
 
 begin
 
-   RX_FIFO : entity work.AxiStreamFifoV2
+   RX_FIFO : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -276,7 +278,7 @@ begin
    end process seq;
 
    GEN_CRC : if (EN_CRC_G = true) generate
-      U_Crc32 : entity work.Crc32Parallel
+      U_Crc32 : entity surf.Crc32Parallel
          generic map (
             TPD_G        => TPD_G,
             BYTE_WIDTH_G => 4)
@@ -289,7 +291,7 @@ begin
             crcOut       => crcResult);
    end generate;
 
-   TX_FIFO : entity work.SynchronizerFifo
+   TX_FIFO : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => DATA_WIDTH_G)

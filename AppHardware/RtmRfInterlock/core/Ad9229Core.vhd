@@ -27,7 +27,9 @@ use ieee.std_logic_unsigned.all;
 library UNISIM;
 use UNISIM.vcomponents.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 entity Ad9229Core is
    generic (
@@ -98,7 +100,7 @@ begin
    ----------------------------------------------------
    -- Clock out 
    ----------------------------------------------------   
-   U_ClkOutBufDiff : entity work.ClkOutBufDiff
+   U_ClkOutBufDiff : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
@@ -133,7 +135,7 @@ begin
          O  => s_serDiv2Clk);
 
    -- Divide clock reset sync
-   U_rstSync0 : entity work.RstSync
+   U_rstSync0 : entity surf.RstSync
       generic map (
          TPD_G           => TPD_G,
          RELEASE_DELAY_G => 5)

@@ -26,10 +26,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 use work.AppMpsPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
@@ -153,7 +155,7 @@ begin
    ---------------------
    -- AXI-Lite: Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -174,7 +176,7 @@ begin
    ----------------------------
    -- Encoder Logic
    ----------------------------
-   U_MpsCoreAsync : entity work.AxiLiteAsync
+   U_MpsCoreAsync : entity surf.AxiLiteAsync
       generic map (
          TPD_G           => TPD_G,
          COMMON_CLK_G    => false,

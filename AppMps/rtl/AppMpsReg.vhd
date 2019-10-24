@@ -22,8 +22,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 use work.AmcCarrierPkg.all;
 use work.AppMpsPkg.all;
 
@@ -74,7 +76,7 @@ architecture mapping of AppMpsReg is
 
 begin
 
-   U_XBAR_0 : entity work.AxiLiteCrossbar
+   U_XBAR_0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,  -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
@@ -114,7 +116,7 @@ begin
          axilWriteMaster => axilWriteMasters(0),
          axilWriteSlave  => axilWriteSlaves(0));
 
-   U_XBAR_1 : entity work.AxiLiteCrossbar
+   U_XBAR_1 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,  -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet

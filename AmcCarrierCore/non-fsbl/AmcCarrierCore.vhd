@@ -18,11 +18,13 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 
@@ -256,7 +258,7 @@ begin
          DIV     => "000",              -- Divide by 1
          O       => fabClk);
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map(
          TPD_G         => TPD_G,
          SIM_SPEEDUP_G => SIM_SPEEDUP_G)
@@ -264,7 +266,7 @@ begin
          clk    => fabClk,
          rstOut => fabRst);
 
-   U_AmcCorePll : entity work.ClockManagerUltraScale
+   U_AmcCorePll : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G             => TPD_G,
          TYPE_G            => "PLL",
@@ -288,7 +290,7 @@ begin
          rstOut(0) => reset);
 
    -- Help with meeting timing on the reset path
-   U_Rst : entity work.RstPipeline
+   U_Rst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (

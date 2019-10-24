@@ -20,13 +20,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
 use work.TimingPkg.all;
-use work.EthMacPkg.all;
+use surf.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
 
@@ -154,7 +156,7 @@ begin
    --------------------------
    -- AXI-Lite: Crossbar Core
    --------------------------  
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -266,7 +268,7 @@ begin
    -- Pass recovered clock through MMCM (maybe unnecessary?)
    ------------------------------------------------------------------------------------------------
    RX_CLK_MMCM_GEN : if (RX_CLK_MMCM_G) generate
-      U_ClockManager : entity work.ClockManagerUltraScale
+      U_ClockManager : entity surf.ClockManagerUltraScale
          generic map(
             TPD_G              => TPD_G,
             TYPE_G             => "MMCM",
@@ -296,7 +298,7 @@ begin
    rxUsrClk <= timingRecClk;
 
    -- Send a copy of the timing clock to the AMC's clock cleaner
-   ClkOutBufDiff_Inst : entity work.ClkOutBufDiff
+   ClkOutBufDiff_Inst : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")

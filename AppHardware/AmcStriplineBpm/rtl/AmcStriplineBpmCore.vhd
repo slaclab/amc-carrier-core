@@ -18,10 +18,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -291,7 +293,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -312,7 +314,7 @@ begin
    -----------------
    -- LMK SPI Module
    -----------------   
-   SPI_LMK : entity work.AxiSpiMaster
+   SPI_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 15,
@@ -359,7 +361,7 @@ begin
    -- ADC SPI Module
    -----------------   
    GEN_ADC_SPI : for i in 1 downto 0 generate
-      SPI_DAC : entity work.AxiSpiMaster
+      SPI_DAC : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -394,7 +396,7 @@ begin
    -----------------
    -- DAC SPI Module
    -----------------   
-   SPI_DAC_0 : entity work.AxiSpiMaster
+   SPI_DAC_0 : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,

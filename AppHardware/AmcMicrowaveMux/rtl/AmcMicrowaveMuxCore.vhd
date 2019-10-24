@@ -20,10 +20,12 @@ use ieee.std_logic_arith.all;
 library unisim;
 use unisim.vcomponents.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bPkg.all;
 
 entity AmcMicrowaveMuxCore is
    generic (
@@ -280,7 +282,7 @@ begin
    jtagSec(3) <= lmkSync;
 
    -- LMK CLKin0
-   U_LmkClk0 : entity work.ClkOutBufDiff
+   U_LmkClk0 : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          INVERT_G     => true,  -- Fix polarity swap in AMC card hardware
@@ -326,7 +328,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
    -------------------------------------------------------------------------------------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -345,7 +347,7 @@ begin
          mAxiReadSlaves      => locAxilReadSlaves);
 
 
-   U_XBAR1 : entity work.AxiLiteCrossbar
+   U_XBAR1 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -543,7 +545,7 @@ begin
    -- SPI interface ADC (ADC32R44)
    ----------------------------------------------------------------
    GEN_ADC : for i in 1 downto 0 generate
-      U_ADC : entity work.adc32rf45
+      U_ADC : entity surf.adc32rf45
          generic map (
             TPD_G             => TPD_G,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -586,7 +588,7 @@ begin
    -- SPI interface DAC (DAC38J84IAAV)
    ----------------------------------------------------------------
    GEN_DAC : for i in 1 downto 0 generate
-      U_DAC : entity work.AxiSpiMaster
+      U_DAC : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 7,
@@ -654,7 +656,7 @@ begin
    -------------------------------
    -- SPI interface LMK (LMK04828)
    -------------------------------
-   U_LMK : entity work.AxiSpiMaster
+   U_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 15,

@@ -16,8 +16,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -96,7 +98,7 @@ begin
    -------------------------        
    -- OutBound Clock Mapping
    -------------------------        
-   U_PLL : entity work.ClockManagerUltraScale
+   U_PLL : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G            => TPD_G,
          TYPE_G           => "PLL",
@@ -125,7 +127,7 @@ begin
 
    userValueIn(31 downto 1) <= (others => '0');
 
-   U_CLK : entity work.ClkOutBufDiff
+   U_CLK : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")

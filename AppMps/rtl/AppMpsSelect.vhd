@@ -20,8 +20,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 use work.AppMpsPkg.all;
 use work.AmcCarrierPkg.all;
 
@@ -75,7 +77,7 @@ begin
    --------------------------------- 
    -- Config Sync
    --------------------------------- 
-   U_SyncKickDet : entity work.SynchronizerVector
+   U_SyncKickDet : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 32)
@@ -178,7 +180,7 @@ begin
    end process;
 
    -- FIFO
-   U_SyncFifo : entity work.SynchronizerFifo
+   U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => MPS_SELECT_BITS_C)

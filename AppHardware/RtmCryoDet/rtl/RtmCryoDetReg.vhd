@@ -20,8 +20,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity RtmCryoDetReg is
    generic (
@@ -139,7 +141,7 @@ begin
       end if;
    end process seq;
 
-   Sync_selRamp : entity work.SynchronizerVector
+   Sync_selRamp : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 8)
@@ -156,7 +158,7 @@ begin
          dataOut(4)           => rtmReset,
          dataOut(7 downto 5)  => rtmClockDelay);
 
-   Sync_rampMaxCnt : entity work.SynchronizerVector
+   Sync_rampMaxCnt : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 32)
@@ -165,7 +167,7 @@ begin
          dataIn  => r.rampMaxCnt,
          dataOut => rampMaxCnt);
 
-   Sync_pulseWidth : entity work.SynchronizerVector
+   Sync_pulseWidth : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 16)
@@ -174,7 +176,7 @@ begin
          dataIn  => r.pulseWidth,
          dataOut => pulseWidth);
 
-   Sync_debounceWidth : entity work.SynchronizerVector
+   Sync_debounceWidth : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 16)
@@ -183,7 +185,7 @@ begin
          dataIn  => r.debounceWidth,
          dataOut => debounceWidth);
 
-   Sync_kRelaySync : entity work.SynchronizerVector
+   Sync_kRelaySync : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 2)
@@ -192,7 +194,7 @@ begin
          dataIn  => kRelay,
          dataOut => kRelaySync);
 
-   Sync_lowCycle : entity work.SynchronizerVector
+   Sync_lowCycle : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => CNT_WIDTH_G)
@@ -201,7 +203,7 @@ begin
          dataIn  => r.lowCycle,
          dataOut => lowCycle);
 
-   Sync_highCycle : entity work.SynchronizerVector
+   Sync_highCycle : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => CNT_WIDTH_G)

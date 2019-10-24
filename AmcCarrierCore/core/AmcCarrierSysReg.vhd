@@ -18,11 +18,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.I2cPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.I2cPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
 use work.FpgaTypePkg.all;
@@ -249,7 +251,7 @@ begin
    --------------------------
    -- AXI-Lite: Crossbar Core
    --------------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,
@@ -270,7 +272,7 @@ begin
    --------------------------
    -- AXI-Lite Version Module
    --------------------------
-   U_Version : entity work.AxiVersion
+   U_Version : entity surf.AxiVersion
       generic map (
          TPD_G           => TPD_G,
          BUILD_INFO_G    => BUILD_INFO_G,
@@ -325,7 +327,7 @@ begin
       end if;
    end process;
 
-   U_Iprog : entity work.Iprog
+   U_Iprog : entity surf.Iprog
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
@@ -357,7 +359,7 @@ begin
    ------------------------------
    -- AXI-Lite: Boot Flash Module
    ------------------------------
-   U_BootProm : entity work.AxiMicronN25QCore
+   U_BootProm : entity surf.AxiMicronN25QCore
       generic map (
          TPD_G           => TPD_G,
          MEM_ADDR_MASK_G => x"00000000",  -- Using hardware write protection
@@ -408,7 +410,7 @@ begin
    ----------------------------------
    -- AXI-Lite: Clock Crossbar Module
    ----------------------------------
-   U_Sy56040 : entity work.AxiSy56040Reg
+   U_Sy56040 : entity surf.AxiSy56040Reg
       generic map (
          TPD_G          => TPD_G,
          XBAR_DEFAULT_G => xbarDefault(APP_TYPE_G, MPS_SLOT_G),
@@ -431,7 +433,7 @@ begin
    ----------------------------------------
    -- AXI-Lite: Configuration Memory Module
    ----------------------------------------
---   AxiI2cRegMaster_0 : entity work.AxiI2cEeprom
+--   AxiI2cRegMaster_0 : entity surf.AxiI2cEeprom
 --      generic map (
 --         TPD_G          => TPD_G,
 --         ADDR_WIDTH_G   => 13,
@@ -454,7 +456,7 @@ begin
    ---------------------------------
    -- AXI-Lite: Clock Cleaner Module
    ---------------------------------
---   AxiI2cRegMaster_1 : entity work.AxiI2cRegMaster
+--   AxiI2cRegMaster_1 : entity surf.AxiI2cRegMaster
 --      generic map (
 --         TPD_G          => TPD_G,
 --         I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
@@ -476,7 +478,7 @@ begin
    -------------------------------
    -- AXI-Lite: DDR Monitor Module
    -------------------------------
---   AxiI2cRegMaster_2 : entity work.AxiI2cRegMaster
+--   AxiI2cRegMaster_2 : entity surf.AxiI2cRegMaster
 --      generic map (
 --         TPD_G          => TPD_G,
 --         I2C_SCL_FREQ_G => 400.0E+3,    -- units of Hz
@@ -531,7 +533,7 @@ begin
    -- AXI-Lite: PWR Monitor Module
    -------------------------------
    GEN_PWR_I2C : if (ULTRASCALE_PLUS_C) generate
-      AxiI2cRegMaster_3 : entity work.AxiI2cRegMaster
+      AxiI2cRegMaster_3 : entity surf.AxiI2cRegMaster
          generic map (
             TPD_G          => TPD_G,
             I2C_SCL_FREQ_G => 100.0E+3,  -- units of Hz

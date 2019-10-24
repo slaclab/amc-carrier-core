@@ -17,7 +17,9 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 library UNISIM;
 use UNISIM.vcomponents.all;
@@ -92,7 +94,7 @@ begin
    clkSerL <= not(clkSer);
 
    -- Slip sync and one shot
-   U_SyncOneShot: entity work.SynchronizerOneShot
+   U_SyncOneShot: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => false)
@@ -215,7 +217,7 @@ begin
    end process seq;
    
    -- Output synchronizer
-   U_SyncFifo : entity work.SynchronizerFifo
+   U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => oData'length

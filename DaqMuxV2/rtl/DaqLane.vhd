@@ -37,13 +37,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 use work.DaqMuxV2Pkg.all;
 
-use work.Jesd204bPkg.all;
+use surf.Jesd204bPkg.all;
 
 entity DaqLane is
    generic (
@@ -213,7 +215,7 @@ begin
       s_rateClk     <= s_sampValidTst;
    end generate GEN_N_DEC;
 
-   U_DspComparator : entity work.DspComparator
+   U_DspComparator : entity surf.DspComparator
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 32)

@@ -25,10 +25,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 use work.AppTopPkg.all;
-use work.Jesd204bPkg.all;
+use surf.Jesd204bPkg.all;
 
 entity  DacSigGenTb is
 
@@ -64,7 +66,7 @@ architecture Bhv of DacSigGenTb is
 begin  -- architecture Bhv
 
    -- Generate clocks and resets
-   ClkRst : entity work.ClkRst
+   ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset
@@ -76,7 +78,7 @@ begin  -- architecture Bhv
          rstL => open); 
          
       -- Generate clocks and resets
-   ClkRst_2x : entity work.ClkRst
+   ClkRst_2x : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_2X_PERIOD_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset
@@ -88,7 +90,7 @@ begin  -- architecture Bhv
          rstL => open); 
 
      -- Generate clocks and resets
-   ClkRst_axi : entity work.ClkRst
+   ClkRst_axi : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_AXI_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset

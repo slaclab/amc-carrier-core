@@ -25,9 +25,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.Pgp2bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.Pgp2bPkg.all;
 
 entity MpsPgpFrontEndGth is
    generic (
@@ -141,7 +143,7 @@ begin
    gtRxUserReset <= phyRxInit or pgpRst or pgpRxIn.resetRx;
    gtTxUserReset <= pgpRst;
 
-   U_Pgp2bLane : entity work.Pgp2bLane
+   U_Pgp2bLane : entity surf.Pgp2bLane
       generic map (
          LANE_CNT_G        => 1,
          VC_INTERLEAVE_G   => VC_INTERLEAVE_G,

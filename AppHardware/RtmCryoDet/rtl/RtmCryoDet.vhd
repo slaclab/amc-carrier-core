@@ -20,8 +20,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 use work.FpgaTypePkg.all;
 
 library unisim;
@@ -224,7 +226,7 @@ begin
          OB => rtmLsN(17));
    ---------------------------------------------
 
-   U_extTrig : entity work.Synchronizer
+   U_extTrig : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -232,7 +234,7 @@ begin
          dataIn  => extTrig,
          dataOut => extTrigSync);
 
-   U_TimingTrig : entity work.SynchronizerOneShot
+   U_TimingTrig : entity surf.SynchronizerOneShot
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -367,7 +369,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -454,7 +456,7 @@ begin
          mAxilWriteMaster => dacLutWriteMaster,
          mAxilWriteSlave  => dacLutWriteSlave);
 
-   U_DAC_LUT_XBAR : entity work.AxiLiteCrossbar
+   U_DAC_LUT_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,
@@ -479,7 +481,7 @@ begin
    ------------------
    -- MAX SPI Module
    ------------------
-   MAX_SPI : entity work.AxiSpiMaster   -- FPGA=Master and CPLD=SLAVE
+   MAX_SPI : entity surf.AxiSpiMaster   -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",

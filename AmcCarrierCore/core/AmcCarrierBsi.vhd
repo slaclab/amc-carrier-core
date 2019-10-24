@@ -20,9 +20,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.i2cPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.i2cPkg.all;
 use work.AmcCarrierPkg.all;
 
 library unisim;
@@ -172,7 +174,7 @@ begin
    -------------------
    -- I2c Slave @ 0x49
    -------------------
-   U_I2C_SLAVE_0x49 : entity work.i2cRegSlave
+   U_I2C_SLAVE_0x49 : entity surf.i2cRegSlave
       generic map (
          TPD_G                => TPD_G,
          TENBIT_G             => 0,
@@ -197,7 +199,7 @@ begin
    -------------------
    -- I2c Slave @ 0x51
    -------------------
-   U_I2C_SLAVE_0x51 : entity work.i2cRegSlave
+   U_I2C_SLAVE_0x51 : entity surf.i2cRegSlave
       generic map (
          TPD_G                => TPD_G,
          TENBIT_G             => 0,
@@ -222,7 +224,7 @@ begin
    ----------------
    -- Dual port RAM
    ----------------   
-   U_RAM : entity work.TrueDualPortRam
+   U_RAM : entity surf.TrueDualPortRam
       generic map (
          TPD_G        => TPD_G,
          MODE_G       => "read-first",

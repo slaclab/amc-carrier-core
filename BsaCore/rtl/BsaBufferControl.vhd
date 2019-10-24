@@ -22,14 +22,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.AxiDmaPkg.all;
 
-use work.TextUtilPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiDmaPkg.all;
+
+use surf.TextUtilPkg.all;
 
 use work.AmcCarrierPkg.all;
 --use work.AmcCarrierSysRegPkg.all;
@@ -195,7 +197,7 @@ architecture rtl of BsaBufferControl is
    
 begin
 
-   U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
+   U_AxiLiteCrossbar_1 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -217,7 +219,7 @@ begin
 
    -- Store timestamps during accumulate phase since we are already iterating over
    timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.timestampAddr));
-   U_AxiDualPortRam_TimeStamps : entity work.AxiDualPortRam
+   U_AxiDualPortRam_TimeStamps : entity surf.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
          SYNTH_MODE_G => "inferred",
@@ -245,7 +247,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Synchronize diagnostic bus to local clock
    -------------------------------------------------------------------------------------------------
-   SynchronizerFifo_1 : entity work.SynchronizerFifo
+   SynchronizerFifo_1 : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          BRAM_EN_G    => false,
@@ -307,7 +309,7 @@ begin
          bsaAxisSlaves(j*8+i) <= intBsaAxisSlaves(j);
       end generate mapping;
 
-      U_AxiStreamMux_INT : entity work.AxiStreamMux
+      U_AxiStreamMux_INT : entity surf.AxiStreamMux
          generic map (
             TPD_G          => TPD_G,
             NUM_SLAVES_G   => 8,
@@ -323,7 +325,7 @@ begin
             axisClk      => axiClk,                -- [in]
             axisRst      => axiRst);               -- [in]
 
-      U_AxiStreamFifo_INT : entity work.AxiStreamFifoV2
+      U_AxiStreamFifo_INT : entity surf.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
             INT_PIPE_STAGES_G   => 0,
@@ -351,7 +353,7 @@ begin
             mAxisSlave  => intAxisSlaves(i));     -- [in]
    end generate;
 
-   U_AxiStreamMux_LAST : entity work.AxiStreamMux
+   U_AxiStreamMux_LAST : entity surf.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
          NUM_SLAVES_G   => INT_AXIS_COUNT_C,
@@ -367,7 +369,7 @@ begin
          axisClk      => axiClk,             -- [in]
          axisRst      => axiRst);            -- [in]
 
-   U_AxiStreamFifo_LAST : entity work.AxiStreamFifoV2
+   U_AxiStreamFifo_LAST : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 0,
@@ -397,7 +399,7 @@ begin
 
    axisStatusMaster <= AXI_STREAM_MASTER_INIT_C;
 
-   U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
+   U_AxiStreamDmaRingWrite_1 : entity surf.AxiStreamDmaRingWrite
       generic map (
          TPD_G                => TPD_G,
          BUFFERS_G            => BSA_BUFFERS_G,

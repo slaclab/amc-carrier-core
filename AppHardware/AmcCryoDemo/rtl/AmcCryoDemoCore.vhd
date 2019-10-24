@@ -20,10 +20,12 @@ use ieee.std_logic_arith.all;
 library unisim;
 use unisim.vcomponents.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bPkg.all;
 
 entity AmcCryoDemoCore is
    generic (
@@ -204,7 +206,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
    -------------------------------------------------------------------------------------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -273,7 +275,7 @@ begin
    -- SPI interface ADCs and LMK 
    ----------------------------------------------------------------
    gen_dcSpiChips : for I in NUM_COMMON_SPI_CHIPS_C-1 downto 0 generate
-      AxiSpiMaster_INST : entity work.AxiSpiMaster
+      AxiSpiMaster_INST : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -328,7 +330,7 @@ begin
    ----------------------------------------------------------------
    -- SPI interface DAC
    ----------------------------------------------------------------  
-   U_dacAxiSpiMaster : entity work.AxiSpiMaster
+   U_dacAxiSpiMaster : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,

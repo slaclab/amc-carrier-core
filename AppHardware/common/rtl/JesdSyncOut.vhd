@@ -18,7 +18,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 use work.FpgaTypePkg.all;
 
 library unisim;
@@ -49,7 +51,7 @@ begin
 
    GEN_ASYNC : if (GEN_ASYNC_G = true) generate
 
-      U_Synchronizer : entity work.Synchronizer
+      U_Synchronizer : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (

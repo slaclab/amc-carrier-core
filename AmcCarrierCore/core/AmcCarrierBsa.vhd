@@ -23,11 +23,13 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
 use work.TimingPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
@@ -184,7 +186,7 @@ begin
 
    BSA_GEN : if (FSBL_G = false) generate
 
-      U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
+      U_AxiLiteCrossbar_1 : entity surf.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
             NUM_SLAVE_SLOTS_G  => 1,
@@ -278,7 +280,7 @@ begin
             axiReadMaster     => waveform1AxiReadMaster,    -- [out]
             axiReadSlave      => waveform1AxiReadSlave);    -- [in]
 
-      U_AxiStreamMux_WaveformStatus : entity work.AxiStreamMux
+      U_AxiStreamMux_WaveformStatus : entity surf.AxiStreamMux
          generic map (
             TPD_G          => TPD_G,
             NUM_SLAVES_G   => 2,
@@ -296,7 +298,7 @@ begin
             axisClk      => axilClk,    -- [in]
             axisRst      => axilRst);   -- [in]
 
-      U_AxiStreamMux_WaveformData : entity work.AxiStreamMux
+      U_AxiStreamMux_WaveformData : entity surf.AxiStreamMux
          generic map (
             TPD_G          => TPD_G,
             NUM_SLAVES_G   => 2,
@@ -359,7 +361,7 @@ begin
 --      -- Mem Read engine
 --      -----------------------------------------------------------------------------------------------
       GEN_EN_SRP : if (DISABLE_DDR_SRP_G = false) generate
-         U_SrpV3Axi_1 : entity work.SrpV3Axi
+         U_SrpV3Axi_1 : entity surf.SrpV3Axi
             generic map (
                TPD_G               => TPD_G,
                PIPE_STAGES_G       => 1,

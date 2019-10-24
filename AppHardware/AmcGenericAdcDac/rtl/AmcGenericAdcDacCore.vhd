@@ -20,10 +20,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -259,7 +261,7 @@ begin
    --------------------
    -- Application Ports
    --------------------
-   ClkBuf_0 : entity work.ClkOutBufDiff
+   ClkBuf_0 : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
@@ -277,7 +279,7 @@ begin
    end generate;
 
    TRIG_CLK : if (TRIG_CLK_G = true) generate
-      ClkBuf_1 : entity work.ClkOutBufDiff
+      ClkBuf_1 : entity surf.ClkOutBufDiff
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -296,7 +298,7 @@ begin
    end generate;
 
    CAL_CLK : if (CAL_CLK_G = true) generate
-      ClkBuf_2 : entity work.ClkOutBufDiff
+      ClkBuf_2 : entity surf.ClkOutBufDiff
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -375,7 +377,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -396,7 +398,7 @@ begin
    -----------------
    -- LMK SPI Module
    -----------------   
-   SPI_LMK : entity work.AxiSpiMaster
+   SPI_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 15,
@@ -426,7 +428,7 @@ begin
    -- Fast ADC SPI Module
    ----------------------   
    GEN_ADC_SPI : for i in 1 downto 0 generate
-      FAST_ADC_SPI : entity work.AxiSpiMaster
+      FAST_ADC_SPI : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -449,7 +451,7 @@ begin
    ----------------------
    -- Fast DAC SPI Module
    ----------------------     
-   FAST_SPI_DAC : entity work.AxiSpiMaster
+   FAST_SPI_DAC : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,

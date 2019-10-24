@@ -18,10 +18,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 use work.FpgaTypePkg.all;
 
 library unisim;
@@ -181,7 +183,7 @@ begin
    end generate;
 
    CLK_OUT : if (TIMING_TRIG_MODE_G = true) generate
-      U_CLK : entity work.ClkOutBufSingle
+      U_CLK : entity surf.ClkOutBufSingle
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -215,7 +217,7 @@ begin
    U_DOUT14 : OBUFDS port map (I => s_dacDataDly(14), O => syncOutP(0), OB => syncOutN(0));
    U_DOUT15 : OBUFDS port map (I => s_dacDataDly(15), O => syncOutP(3), OB => syncOutN(3));
 
-   U_CLK_DIFF_BUF : entity work.ClkOutBufDiff
+   U_CLK_DIFF_BUF : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")

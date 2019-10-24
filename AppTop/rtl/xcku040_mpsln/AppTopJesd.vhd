@@ -18,10 +18,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 use work.AppTopPkg.all;
 
 library unisim;
@@ -143,7 +145,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -193,7 +195,7 @@ begin
    refClk <= refClkVec(conv_integer(JESD_REF_SEL_G));
    amcClk <= amcClkVec(conv_integer(JESD_REF_SEL_G));
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map (
          TPD_G          => TPD_G,
          SIM_SPEEDUP_G  => SIMULATION_G,
@@ -203,7 +205,7 @@ begin
          clk    => amcClk,
          rstOut => amcRst);
 
-   U_ClockManager : entity work.ClockManagerUltraScale
+   U_ClockManager : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G              => TPD_G,
          TYPE_G             => "PLL",
@@ -241,7 +243,7 @@ begin
    jesdClk <= jesdClk185;
    jesdRst <= jesdRst185;
 
-   U_jesdUsrClk : entity work.ClockManagerUltraScale
+   U_jesdUsrClk : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G              => TPD_G,
          TYPE_G             => "PLL",
@@ -319,7 +321,7 @@ begin
    drpClk <= (others => axilClk);
    GTH_DRP : if (JESD_DRP_EN_G = true) generate
 
-      U_XBAR : entity work.AxiLiteCrossbar
+      U_XBAR : entity surf.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
             NUM_SLAVE_SLOTS_G  => 1,
@@ -338,7 +340,7 @@ begin
             mAxiReadSlaves      => gthReadSlaves);
 
       GEN_GTH_DRP : for i in (JESD_LANE_C-1) downto 0 generate
-         U_AxiLiteToDrp : entity work.AxiLiteToDrp
+         U_AxiLiteToDrp : entity surf.AxiLiteToDrp
             generic map (
                TPD_G            => TPD_G,
                COMMON_CLK_G     => true,

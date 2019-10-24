@@ -20,11 +20,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
 use work.AmcCarrierPkg.all;
 use work.AmcCarrierSysRegPkg.all;
 
@@ -127,7 +129,7 @@ begin
    -----------------------
    -- Zone2 10 GigE Module
    -----------------------
-   U_Xaui : entity work.XauiGthUltraScaleWrapper
+   U_Xaui : entity surf.XauiGthUltraScaleWrapper
       generic map (
          TPD_G         => TPD_G,
          EN_WDT_G      => true,
@@ -165,7 +167,7 @@ begin
    ----------------------
    -- Zone3 1 GigE Module
    ----------------------
-   U_Rtm : entity work.GigEthGthUltraScaleWrapper
+   U_Rtm : entity surf.GigEthGthUltraScaleWrapper
       generic map (
          TPD_G              => TPD_G,
          -- DMA/MAC Configurations
@@ -209,7 +211,7 @@ begin
       ----------------------
       -- IPv4/ARP/UDP Engine
       ----------------------
-      U_UdpEngineWrapper : entity work.UdpEngineWrapper
+      U_UdpEngineWrapper : entity surf.UdpEngineWrapper
          generic map (
             -- Simulation Generics
             TPD_G          => TPD_G,
@@ -244,7 +246,7 @@ begin
       --------------------------------------------------
       -- Legacy AXI-Lite Master without RSSI Server@8192
       --------------------------------------------------
-      U_SRPv0 : entity work.SrpV0AxiLite
+      U_SRPv0 : entity surf.SrpV0AxiLite
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,

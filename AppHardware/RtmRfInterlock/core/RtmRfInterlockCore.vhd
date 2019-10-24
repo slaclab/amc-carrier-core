@@ -20,8 +20,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 use work.TimingPkg.all;
 
 library unisim;
@@ -176,7 +178,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -198,7 +200,7 @@ begin
    -- Fast ADC
    -----------
    -- Divide the recovered timing clock by 2
-   U_ClockManager : entity work.ClockManagerUltraScale
+   U_ClockManager : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G              => 1 ns,
          TYPE_G             => "MMCM",
@@ -250,7 +252,7 @@ begin
          setDelay_i      => s_setDelay,
          setValid_i      => s_setValid);
 
-   U_SyncFifo : entity work.SynchronizerFifo
+   U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 48)
@@ -264,7 +266,7 @@ begin
    ---------------------
    -- CPLD SPI interface
    ---------------------
-   U_cpldSpi : entity work.AxiSpiMaster
+   U_cpldSpi : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",
@@ -290,7 +292,7 @@ begin
    -- constant PACKET_SIZE_C : positive := ite(MODE_G = "RW", 1, 0) + ADDRESS_SIZE_G + DATA_SIZE_G;
    ----------------------------------------------------------------         
    GEN_THR_SPI_CHIPS : for i in 1 downto 0 generate
-      U_thrSpi : entity work.AxiSpiMaster
+      U_thrSpi : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             MODE_G            => "WO",
@@ -407,7 +409,7 @@ begin
    s_bufferData(1) <= x"0" & s_hsAdcdataSync(47 downto 36) & x"0" & s_hsAdcdataSync(35 downto 24);
 
    GEN_RING_BUF : for i in 1 downto 0 generate
-      U_AxiLiteRingBuffer : entity work.AxiLiteRingBuffer
+      U_AxiLiteRingBuffer : entity surf.AxiLiteRingBuffer
          generic map (
             TPD_G            => TPD_G,
             DATA_WIDTH_G     => BUFFER_WIDTH_C,
