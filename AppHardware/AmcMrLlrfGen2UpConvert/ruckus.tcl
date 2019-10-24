@@ -10,7 +10,7 @@ if { $::env(AMC_TYPE_BAY0) == ${rootName} } {
 
 if { $::env(AMC_TYPE_BAY1) == ${rootName} } {
    # Load local Source Code and constraints
-   loadSource      -dir "$::DIR_PATH/core"
+   loadSource -lib amc_carrier_core      -dir "$::DIR_PATH/core"
    loadConstraints -dir "$::DIR_PATH/xdc"
 }
 

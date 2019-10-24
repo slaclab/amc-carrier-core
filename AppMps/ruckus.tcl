@@ -5,15 +5,15 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 set family [getFpgaFamily]
 
 # Load Source Code
-loadSource -dir "$::DIR_PATH/rtl"
-loadSource -dir "$::DIR_PATH/rtl/${family}"
+loadSource -lib amc_carrier_core -dir "$::DIR_PATH/rtl"
+loadSource -lib amc_carrier_core -dir "$::DIR_PATH/rtl/${family}"
 
-loadSource -path "$::DIR_PATH/coregen/${family}/MpsPgpGthCore.dcp"
+loadSource -lib amc_carrier_core -path "$::DIR_PATH/coregen/${family}/MpsPgpGthCore.dcp"
 # loadIpCore -path "$::DIR_PATH/coregen/${family}/MpsPgpGthCore.xci"
 
 if { ${family} eq {kintexuplus} } {
 
-   loadSource -path "$::DIR_PATH/coregen/${family}/MpsPgpGtyCore.dcp"
+   loadSource -lib amc_carrier_core -path "$::DIR_PATH/coregen/${family}/MpsPgpGtyCore.dcp"
    # loadIpCore -path "$::DIR_PATH/coregen/${family}/MpsPgpGtyCore.xci"
    
    loadConstraints -path "$::DIR_PATH/coregen/${family}/MpsPgpGtyCore.xdc"
