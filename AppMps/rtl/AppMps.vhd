@@ -32,9 +32,11 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 use work.TimingPkg.all;
 
 entity AppMps is
@@ -125,7 +127,7 @@ begin
    ------------------------------
    -- Backplane Clocks and Resets
    ------------------------------
-   U_Clk : entity work.AppMpsClk
+   U_Clk : entity amc_carrier_core.AppMpsClk
       generic map (
          TPD_G         => TPD_G,
          MPS_SLOT_G    => MPS_SLOT_G,
@@ -195,7 +197,7 @@ begin
          mAxiWriteMaster => encWriteMaster,
          mAxiWriteSlave  => encWriteSlave);
 
-   U_AppMpsEncoder : entity work.AppMpsEncoder
+   U_AppMpsEncoder : entity amc_carrier_core.AppMpsEncoder
       generic map (
          TPD_G           => TPD_G,
          AXI_BASE_ADDR_G => (others => '0'),  -- Only lower 16-bits of address are passed through the AxiLiteAsync
@@ -217,7 +219,7 @@ begin
    ---------------------------------         
    -- MPS Backplane SALT Transceiver
    ---------------------------------         
-   U_Salt : entity work.AppMpsSalt
+   U_Salt : entity amc_carrier_core.AppMpsSalt
       generic map (
          TPD_G        => TPD_G,
          SIMULATION_G => SIMULATION_G,

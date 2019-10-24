@@ -27,8 +27,10 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 use surf.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.FpgaTypePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.FpgaTypePkg.all;
 
 entity AmcCarrierRssi is
    generic (
@@ -178,7 +180,7 @@ begin
          axilWriteMaster   => axilWriteMasters(0),
          axilWriteSlave    => axilWriteSlaves(0));
          
-   U_RssiTspObFifo_0 : entity work.AmcCarrierRssiObFifo
+   U_RssiTspObFifo_0 : entity amc_carrier_core.AmcCarrierRssiObFifo
       generic map (
          TPD_G    => TPD_G,
          BYPASS_G => true) -- true to reduce logic footprint
@@ -321,7 +323,7 @@ begin
          axilWriteMaster   => axilWriteMasters(1),
          axilWriteSlave    => axilWriteSlaves(1));
 
-   U_RssiTspObFifo_1 : entity work.AmcCarrierRssiObFifo
+   U_RssiTspObFifo_1 : entity amc_carrier_core.AmcCarrierRssiObFifo
       generic map (
          TPD_G    => TPD_G,
          BYPASS_G => true) -- true to reduce logic footprint

@@ -31,6 +31,8 @@ use surf.I2cPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core; 
+
 entity AmcMrLlrfGen2UpConvert is
    generic (
       TPD_G              : time             := 1 ns;
@@ -212,7 +214,7 @@ architecture mapping of AmcMrLlrfGen2UpConvert is
 
 begin
 
-   U_AmcMapping : entity work.AmcMrLlrfGen2UpConvertMapping
+   U_AmcMapping : entity amc_carrier_core.AmcMrLlrfGen2UpConvertMapping
       generic map (
          TPD_G              => TPD_G,
          TIMING_TRIG_MODE_G => TIMING_TRIG_MODE_G)
@@ -383,7 +385,7 @@ begin
    -- Serial Attenuator modules
    -----------------------------
    GEN_ATT_CHIPS : for i in NUM_ATTN_CHIPS_C-1 downto 0 generate
-      U_Attn : entity work.AxiSerAttnMaster
+      U_Attn : entity amc_carrier_core.AxiSerAttnMaster
          generic map (
             TPD_G             => TPD_G,
             DATA_SIZE_G       => 6,

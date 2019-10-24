@@ -23,6 +23,8 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
+library amc_carrier_core; 
+
 entity AmcEmptyDualCore is
    generic (
       TPD_G : time := 1 ns);
@@ -67,7 +69,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcEmptyCore
+      U_AMC : entity amc_carrier_core.AmcEmptyCore
          generic map (
             TPD_G => TPD_G)
          port map(

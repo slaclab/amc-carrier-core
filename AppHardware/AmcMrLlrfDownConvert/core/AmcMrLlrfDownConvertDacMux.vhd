@@ -28,6 +28,8 @@ use surf.AxiLitePkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core; 
+
 entity AmcMrLlrfDownConvertDacMux is
    generic (
       TPD_G : time := 1 ns);
@@ -97,7 +99,7 @@ begin
    dacSclk_o <= dacSclk_i when(enable = '0') else r.sck;
    dacSdi_o  <= dacSdi_i  when(enable = '0') else r.din;
 
-   U_Reg : entity work.AmcMrLlrfDownConvertDacMuxReg
+   U_Reg : entity amc_carrier_core.AmcMrLlrfDownConvertDacMuxReg
       generic map (
          TPD_G => TPD_G)
       port map (

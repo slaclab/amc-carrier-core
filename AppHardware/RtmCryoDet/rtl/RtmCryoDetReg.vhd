@@ -25,6 +25,8 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
+library amc_carrier_core; 
+
 entity RtmCryoDetReg is
    generic (
       TPD_G       : time     := 1 ns;
@@ -212,7 +214,7 @@ begin
          dataIn  => r.highCycle,
          dataOut => highCycle);
 
-   U_ClkDiv : entity work.RtmCryoDetClkDiv
+   U_ClkDiv : entity amc_carrier_core.RtmCryoDetClkDiv
       generic map (
          TPD_G       => TPD_G,
          CNT_WIDTH_G => CNT_WIDTH_G)

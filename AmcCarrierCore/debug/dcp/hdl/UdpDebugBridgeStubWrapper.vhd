@@ -28,7 +28,9 @@ use ieee.numeric_std.all;
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
-use work.UdpDebugBridgePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.UdpDebugBridgePkg.all;
 
 -- AxisJtagDebugBridge Configured for AmcCarrierCore
 

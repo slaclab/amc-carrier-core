@@ -28,6 +28,8 @@ use surf.jesd204bpkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core; 
+
 entity AmcStriplineBpmCore is
    generic (
       TPD_G           : time             := 1 ns;
@@ -242,7 +244,7 @@ begin
    spareN(9)   <= clClkOe;
    spareP(9)   <= rfAmpOn;
    -- JESD
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -255,7 +257,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : entity work.JesdSyncOut
+   U_jesdRxSync0 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -268,7 +270,7 @@ begin
          jesdSyncP => jtagSec(0),
          jesdSyncN => jtagSec(1));
 
-   U_jesdRxSync1 : entity work.JesdSyncOut
+   U_jesdRxSync1 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -415,7 +417,7 @@ begin
          coreSDout      => dacMosiVec(0),
          coreCsb        => dacCsLVec(0));
 
-   SPI_DAC_1 : entity work.AmcBpmDacVcoSpi
+   SPI_DAC_1 : entity amc_carrier_core.AmcBpmDacVcoSpi
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -436,7 +438,7 @@ begin
    ---------------------
    -- BPM Control Module
    ---------------------
-   U_AmcBpmCtrl : entity work.AmcBpmCtrl
+   U_AmcBpmCtrl : entity amc_carrier_core.AmcBpmCtrl
       generic map (
          TPD_G          => TPD_G,
          AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)

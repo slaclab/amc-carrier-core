@@ -25,9 +25,11 @@ use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 use surf.AxiLitePkg.all;
 use surf.I2cPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
-use work.FpgaTypePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -340,7 +342,7 @@ begin
    --------------------------
    -- AXI-Lite: SYSMON Module
    --------------------------
-   U_SysMon : entity work.AmcCarrierSysMon
+   U_SysMon : entity amc_carrier_core.AmcCarrierSysMon
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -500,7 +502,7 @@ begin
    -----------------------
    -- AXI-Lite: BSI Module
    -----------------------
-   U_Bsi : entity work.AmcCarrierBsi
+   U_Bsi : entity amc_carrier_core.AmcCarrierBsi
       generic map (
          TPD_G        => TPD_G,
          BUILD_INFO_G => BUILD_INFO_G)

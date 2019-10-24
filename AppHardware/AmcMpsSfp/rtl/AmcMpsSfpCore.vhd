@@ -25,6 +25,8 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
+library amc_carrier_core; 
+
 entity AmcMpsSfpCore is
    generic (
       TPD_G            : time             := 1 ns;
@@ -149,7 +151,7 @@ begin
       pllLol <= lol;
       pllLos <= los;
 
-      U_PLL : entity work.Si5317a
+      U_PLL : entity amc_carrier_core.Si5317a
          generic map (
             TPD_G => TPD_G)
          port map(
@@ -195,7 +197,7 @@ begin
       pllLos <= syncInP(0);
       pllLol <= syncInP(1);
 
-      U_HSR : entity work.AmcMpsSfpHsRepeater
+      U_HSR : entity amc_carrier_core.AmcMpsSfpHsRepeater
          generic map (
             TPD_G           => TPD_G,
             AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,
@@ -218,7 +220,7 @@ begin
 
    end generate;
 
-   U_SfpMon : entity work.AmcMpsSfpMon
+   U_SfpMon : entity amc_carrier_core.AmcMpsSfpMon
       generic map (
          TPD_G           => TPD_G,
          AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,

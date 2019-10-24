@@ -29,8 +29,10 @@ use surf.AxiPkg.all;
 use surf.AxiLitePkg.all;
 use work.TimingPkg.all;
 use surf.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -196,7 +198,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Clock Buffers
    -------------------------------------------------------------------------------------------------
-   TIMING_REFCLK_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
+   TIMING_REFCLK_IBUFDS_GTE3 : entity amc_carrier_core.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O

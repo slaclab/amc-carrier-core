@@ -30,8 +30,10 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AppMpsPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AppMpsPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;

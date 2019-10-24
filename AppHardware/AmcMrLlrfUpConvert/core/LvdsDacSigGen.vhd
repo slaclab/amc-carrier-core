@@ -30,7 +30,9 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
-use work.AmcCarrierPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 entity LvdsDacSigGen is
    generic (
@@ -118,7 +120,7 @@ begin
    ---------------------------------
    -- DAQ control register interface
    ---------------------------------
-   U_REG : entity work.LvdsDacRegItf
+   U_REG : entity amc_carrier_core.LvdsDacRegItf
       generic map (
          TPD_G        => TPD_G,
          ADDR_WIDTH_G => ADDR_WIDTH_G)
@@ -147,7 +149,7 @@ begin
    -------------------------
    -- Signal generator lanes
    -------------------------
-   U_LANE : entity work.LvdsDacLane
+   U_LANE : entity amc_carrier_core.LvdsDacLane
       generic map (
          TPD_G        => TPD_G,
          ADDR_WIDTH_G => ADDR_WIDTH_G)

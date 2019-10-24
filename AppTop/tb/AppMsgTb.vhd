@@ -25,6 +25,8 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 
+library amc_carrier_core; 
+
 entity AppMsgTb is end AppMsgTb;
 
 architecture testbed of AppMsgTb is
@@ -77,7 +79,7 @@ begin
    ------------
    -- TX Module
    ------------
-   U_TX : entity work.AppMsgOb
+   U_TX : entity amc_carrier_core.AppMsgOb
       generic map (
          TPD_G       => TPD_C,
          HDR_SIZE_G  => HDR_SIZE_C,
@@ -101,7 +103,7 @@ begin
    ------------
    -- RX Module
    ------------
-   U_RX : entity work.AppMsgIb
+   U_RX : entity amc_carrier_core.AppMsgIb
       generic map (
          TPD_G       => TPD_C,
          HDR_SIZE_G  => HDR_SIZE_C,

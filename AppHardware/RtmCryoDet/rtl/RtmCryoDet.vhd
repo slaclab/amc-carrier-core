@@ -24,7 +24,9 @@ use ieee.std_logic_arith.all;
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
-use work.FpgaTypePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -390,7 +392,7 @@ begin
    --------------------------
    -- CRYO DET RTM REG Module
    --------------------------
-   U_Reg : entity work.RtmCryoDetReg
+   U_Reg : entity amc_carrier_core.RtmCryoDetReg
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -416,7 +418,7 @@ begin
    ------------------
    -- PIC SPI Module
    ------------------
-   PIC_SPI : entity work.RtmCryoSpiMaster  -- FPGA=Master and PIC=SLAVE
+   PIC_SPI : entity amc_carrier_core.RtmCryoSpiMaster  -- FPGA=Master and PIC=SLAVE
       generic map (
          TPD_G             => TPD_G,
          CPHA_G            => '0',      -- CPHA = 0
@@ -438,7 +440,7 @@ begin
    ------------------
    -- DAC LUT Module
    ------------------
-   DAC_LUT : entity work.RtmCryoDacLut
+   DAC_LUT : entity amc_carrier_core.RtmCryoDacLut
       generic map (
          TPD_G            => TPD_G,
          AXIL_BASE_ADDR_G => AXI_CONFIG_C(LUT_INDEX_C).baseAddr)

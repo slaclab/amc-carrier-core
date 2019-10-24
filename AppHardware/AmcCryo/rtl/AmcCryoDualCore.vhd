@@ -25,6 +25,8 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.jesd204bpkg.all;
 
+library amc_carrier_core; 
+
 entity AmcCryoDualCore is
    generic (
       TPD_G           : time             := 1 ns;
@@ -103,7 +105,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcCryoCore
+      U_AMC : entity amc_carrier_core.AmcCryoCore
          generic map (
             TPD_G           => TPD_G,
             AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,

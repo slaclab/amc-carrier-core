@@ -29,6 +29,8 @@ use work.TimingPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core; 
+
 entity RtmRfInterlockCore is
    generic (
       TPD_G            : time             := 1 ns;
@@ -221,7 +223,7 @@ begin
          rstOut(0) => s_recRstDiv2);
 
    -- Get the data from the ADC
-   U_Ad9229Core : entity work.Ad9229Core
+   U_Ad9229Core : entity amc_carrier_core.Ad9229Core
       generic map (
          TPD_G           => TPD_G,
          IODELAY_GROUP_G => IODELAY_GROUP_G,
@@ -330,7 +332,7 @@ begin
    ---------------------------------------
    -- Get Threshold SPI interface (AD7682)
    ---------------------------------------
-   U_AdcSpi : entity work.AxiSpiAd7682
+   U_AdcSpi : entity amc_carrier_core.AxiSpiAd7682
       generic map (
          TPD_G             => TPD_G,
          DATA_SIZE_G       => 16,
@@ -353,7 +355,7 @@ begin
    ----------------
    -- RTM registers
    ----------------
-   U_RtmLlrfMpsReg : entity work.RtmRfInterlockReg
+   U_RtmLlrfMpsReg : entity amc_carrier_core.RtmRfInterlockReg
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -389,7 +391,7 @@ begin
    --   - FWD_PWR_Data  
    --   - REFL_PWR_Data 
    ----------------------------------------------------------------          
-   U_RingBufferCtrl : entity work.RingBufferCtrl
+   U_RingBufferCtrl : entity amc_carrier_core.RingBufferCtrl
       generic map (
          TPD_G                    => TPD_G,
          RING_BUFFER_ADDR_WIDTH_G => BUFFER_ADDR_SIZE_C)

@@ -27,6 +27,8 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.jesd204bPkg.all;
 
+library amc_carrier_core; 
+
 entity AmcCryoCore is
    generic (
       TPD_G           : time             := 1 ns;
@@ -246,7 +248,7 @@ begin
          mAxiReadMasters     => locAxilReadMasters,
          mAxiReadSlaves      => locAxilReadSlaves);
 
-   U_Ctrl : entity work.AmcCryoCoreCtrl
+   U_Ctrl : entity amc_carrier_core.AmcCryoCoreCtrl
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -266,7 +268,7 @@ begin
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => true)  -- Note inverted because it is Swapped on the board
@@ -279,7 +281,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : entity work.JesdSyncOut
+   U_jesdRxSync0 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -292,7 +294,7 @@ begin
          jesdSyncP => jesdRxSyncP(0),
          jesdSyncN => jesdRxSyncN(0));
 
-   U_jesdRxSync1 : entity work.JesdSyncOut
+   U_jesdRxSync1 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => true)  -- Note inverted because it is Swapped on the board
@@ -305,7 +307,7 @@ begin
          jesdSyncP => jesdRxSyncP(1),
          jesdSyncN => jesdRxSyncN(1));
 
-   U_jesdTxSync0 : entity work.JesdSyncIn
+   U_jesdTxSync0 : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -318,7 +320,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdTxSyncRaw(0));
 
-   U_jesdTxSync1 : entity work.JesdSyncIn
+   U_jesdTxSync1 : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)

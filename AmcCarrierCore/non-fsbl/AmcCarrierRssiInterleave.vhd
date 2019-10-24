@@ -25,8 +25,10 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 use surf.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.FpgaTypePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.FpgaTypePkg.all;
 
 entity AmcCarrierRssiInterleave is
    generic (
@@ -145,7 +147,7 @@ begin
          axilWriteMaster   => axilWriteMaster,
          axilWriteSlave    => axilWriteSlave);
          
-   U_RssiTspObFifo : entity work.AmcCarrierRssiObFifo
+   U_RssiTspObFifo : entity amc_carrier_core.AmcCarrierRssiObFifo
       generic map (
          TPD_G    => TPD_G,
          BYPASS_G => false)

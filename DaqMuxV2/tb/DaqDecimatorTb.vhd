@@ -24,6 +24,8 @@ use ieee.std_logic_arith.all;
 library surf;
 use surf.StdRtlPkg.all;
 
+library amc_carrier_core; 
+
 entity DaqDecimatorTb is
 end entity;
 
@@ -64,7 +66,7 @@ begin
    ----------------------
    -- DaqDecimator Module
    ----------------------
-   U_DaqDecimator : entity work.DaqDecimator
+   U_DaqDecimator : entity amc_carrier_core.DaqDecimator
       generic map (
          TPD_G => TPD_C)
       port map (

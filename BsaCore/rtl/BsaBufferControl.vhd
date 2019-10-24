@@ -33,8 +33,10 @@ use surf.AxiDmaPkg.all;
 
 use surf.TextUtilPkg.all;
 
-use work.AmcCarrierPkg.all;
---use work.AmcCarrierSysRegPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+--use amc_carrier_core.AmcCarrierSysRegPkg.all;
 use work.TimingPkg.all;
 
 entity BsaBufferControl is
@@ -268,7 +270,7 @@ begin
    -- One accumulator per BSA buffer
    -------------------------------------------------------------------------------------------------
    BsaAccumulator_GEN : for i in BSA_BUFFERS_G-1 downto 0 generate
-      U_BsaAccumulator_1 : entity work.BsaAccumulator
+      U_BsaAccumulator_1 : entity amc_carrier_core.BsaAccumulator
          generic map (
             TPD_G               => TPD_G,
             BSA_NUMBER_G        => i,

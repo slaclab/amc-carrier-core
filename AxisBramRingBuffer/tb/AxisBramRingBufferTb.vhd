@@ -26,6 +26,8 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 
+library amc_carrier_core; 
+
 entity AxisBramRingBufferTb is
 end entity;
 
@@ -57,7 +59,7 @@ begin
    ----------------------
    -- Module to be tested
    ----------------------
-   U_Core : entity work.AxisBramFlashBuffer
+   U_Core : entity amc_carrier_core.AxisBramFlashBuffer
       generic map (
          TPD_G          => TPD_G,
          NUM_CH_G       => 4,

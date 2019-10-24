@@ -31,6 +31,8 @@ use surf.I2cPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core; 
+
 entity AmcMrLlrfUpConvertCore is
    generic (
       TPD_G              : time             := 1 ns;
@@ -215,7 +217,7 @@ architecture mapping of AmcMrLlrfUpConvertCore is
 
 begin
 
-   U_AmcMapping : entity work.AmcMrLlrfUpConvertMapping
+   U_AmcMapping : entity amc_carrier_core.AmcMrLlrfUpConvertMapping
       generic map (
          TPD_G              => TPD_G,
          TIMING_TRIG_MODE_G => TIMING_TRIG_MODE_G)
@@ -381,7 +383,7 @@ begin
    -- Serial Attenuator modules
    -----------------------------
    GEN_ATT_CHIPS : for i in NUM_ATTN_CHIPS_C-1 downto 0 generate
-      U_Attn : entity work.AxiSerAttnMaster
+      U_Attn : entity amc_carrier_core.AxiSerAttnMaster
          generic map (
             TPD_G             => TPD_G,
             DATA_SIZE_G       => 6,
@@ -425,7 +427,7 @@ begin
    ----------------------------
    -- LVDS DAC Signal generator
    ----------------------------
-   U_DAC_SIG_GEN : entity work.LvdsDacSigGen
+   U_DAC_SIG_GEN : entity amc_carrier_core.LvdsDacSigGen
       generic map (
          TPD_G           => TPD_G,
          AXI_BASE_ADDR_G => AXI_CONFIG_C(SIG_GEN_INDEX_C).baseAddr)
@@ -453,7 +455,7 @@ begin
 
    GEN_DLY_OUT :
    for i in 15 downto 0 generate
-      OutputTapDelay_INST : entity work.OutputTapDelay
+      OutputTapDelay_INST : entity amc_carrier_core.OutputTapDelay
          generic map (
             TPD_G              => TPD_G,
             IODELAY_GROUP_G    => IODELAY_GROUP_G,

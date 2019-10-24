@@ -26,8 +26,10 @@ use ieee.std_logic_arith.all;
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
-use work.AmcCarrierPkg.all;
-use work.AppMpsPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AppMpsPkg.all;
 
 entity AppMpsReg is
    generic (
@@ -95,7 +97,7 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   U_BaseReg : entity work.AppMpsRegBase
+   U_BaseReg : entity amc_carrier_core.AppMpsRegBase
       generic map (
          TPD_G        => TPD_G,
          APP_TYPE_G   => APP_TYPE_G,
@@ -137,7 +139,7 @@ begin
 
    GEN_VEC : for i in MPS_CHAN_COUNT_C-1 downto 0 generate
 
-      U_ChanReg : entity work.AppMpsRegAppCh
+      U_ChanReg : entity amc_carrier_core.AppMpsRegAppCh
          generic map (
             TPD_G         => TPD_G,
             CHAN_CONFIG_G => APP_CONFIG_G.CHAN_CONFIG_C(i))

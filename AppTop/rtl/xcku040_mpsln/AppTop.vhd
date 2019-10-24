@@ -36,10 +36,12 @@ use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 use surf.AxiLitePkg.all;
 use work.TimingPkg.all;
-use work.AmcCarrierPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 use surf.jesd204bpkg.all;
-use work.AppTopPkg.all;
-use work.AppMpsPkg.all;
+use amc_carrier_core.AppTopPkg.all;
+use amc_carrier_core.AppMpsPkg.all;
 
 entity AppTop is
    generic (
@@ -312,7 +314,7 @@ begin
       ------------------
       -- DAQ MUXV2 Module
       ------------------
-      U_DaqMuxV2 : entity work.DaqMuxV2
+      U_DaqMuxV2 : entity amc_carrier_core.DaqMuxV2
          generic map (
             TPD_G                  => TPD_G,
             DECIMATOR_EN_G         => DAQMUX_DECIMATOR_EN_G,
@@ -385,7 +387,7 @@ begin
       ------------
       -- JESD Core
       ------------
-      U_JesdCore : entity work.AppTopJesd
+      U_JesdCore : entity amc_carrier_core.AppTopJesd
          generic map (
             TPD_G              => TPD_G,
             SIM_SPEEDUP_G      => SIM_SPEEDUP_G,
@@ -456,7 +458,7 @@ begin
       jesdTxP(i)(6) <= intTxP(i)(4);
       jesdTxN(i)(6) <= intTxN(i)(4);      
 
-      U_DacSigGen : entity work.DacSigGen
+      U_DacSigGen : entity amc_carrier_core.DacSigGen
          generic map (
             TPD_G                => TPD_G,
             AXI_BASE_ADDR_G      => AXI_CONFIG_C(SIG_GEN0_INDEX_C+i).baseAddr,

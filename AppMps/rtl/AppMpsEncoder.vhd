@@ -25,8 +25,10 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 use surf.AxiLitePkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -148,7 +150,7 @@ begin
    --------------------------------- 
    -- Registers
    --------------------------------- 
-   U_AppMpsReg : entity work.AppMpsReg
+   U_AppMpsReg : entity amc_carrier_core.AppMpsReg
       generic map (
          TPD_G           => TPD_G,
          APP_TYPE_G      => APP_TYPE_G,
@@ -168,7 +170,7 @@ begin
    --------------------------------- 
    -- Pattern decode and threshold select
    --------------------------------- 
-   U_AppMpsSelect : entity work.AppMpsSelect
+   U_AppMpsSelect : entity amc_carrier_core.AppMpsSelect
       generic map (
          TPD_G        => TPD_G,
          APP_TYPE_G   => APP_TYPE_G,
@@ -295,7 +297,7 @@ begin
    --------------------------------- 
    -- MPS Message Generator
    --------------------------------- 
-   U_MsgGen : entity work.MpsMsgCore
+   U_MsgGen : entity amc_carrier_core.MpsMsgCore
       generic map (
          TPD_G            => TPD_G,
          SIM_ERROR_HALT_G => false)

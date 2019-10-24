@@ -27,8 +27,10 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 use surf.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierEth is
    generic (
@@ -332,7 +334,7 @@ begin
    -------------
    -- Xilinx XVC
    -------------
-   U_Debug : entity work.AmcCarrierXvcDebug
+   U_Debug : entity amc_carrier_core.AmcCarrierXvcDebug
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -380,7 +382,7 @@ begin
    -----------------------------------
    NONE_ILEAVE : if (RSSI_ILEAVE_EN_G = false) generate
 
-      U_RssiServer : entity work.AmcCarrierRssi
+      U_RssiServer : entity amc_carrier_core.AmcCarrierRssi
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
@@ -428,7 +430,7 @@ begin
 
    RSSI_ILEAVE : if (RSSI_ILEAVE_EN_G = true) generate
 
-      U_RssiServer : entity work.AmcCarrierRssiInterleave
+      U_RssiServer : entity amc_carrier_core.AmcCarrierRssiInterleave
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,

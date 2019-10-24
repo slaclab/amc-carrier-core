@@ -35,7 +35,9 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.Jesd204bPkg.all;
-use work.AppTopPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
 
 entity DacSigGenReg is
    generic (

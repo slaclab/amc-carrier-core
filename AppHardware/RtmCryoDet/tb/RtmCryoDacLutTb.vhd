@@ -23,6 +23,8 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
+library amc_carrier_core; 
+
 entity RtmCryoDacLutTb is end RtmCryoDacLutTb;
 
 architecture testbed of RtmCryoDacLutTb is
@@ -59,7 +61,7 @@ begin
    -----------------------
    -- Module to be tested
    -----------------------
-   U_RtmCryoDet : entity work.RtmCryoDet
+   U_RtmCryoDet : entity amc_carrier_core.RtmCryoDet
       generic map (
          TPD_G           => TPD_G,
          SIMULATION_G    => true,

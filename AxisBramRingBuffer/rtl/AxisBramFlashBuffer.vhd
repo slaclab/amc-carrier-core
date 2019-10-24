@@ -39,6 +39,8 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 
+library amc_carrier_core; 
+
 entity AxisBramFlashBuffer is
    generic (
       TPD_G              : time     := 1 ns;
@@ -108,7 +110,7 @@ begin
    -----------------
    -- BRAM Write FSM
    -----------------
-   U_WriteFsm : entity work.AxisBramFlashBufferWrFsm
+   U_WriteFsm : entity amc_carrier_core.AxisBramFlashBufferWrFsm
       generic map (
          TPD_G          => TPD_G,
          NUM_CH_G       => NUM_CH_G,
@@ -168,7 +170,7 @@ begin
    -----------------
    -- BRAM Read FSM
    -----------------
-   U_ReadFsm : entity work.AxisBramFlashBufferRdFsm
+   U_ReadFsm : entity amc_carrier_core.AxisBramFlashBufferRdFsm
       generic map (
          TPD_G              => TPD_G,
          NUM_CH_G           => NUM_CH_G,

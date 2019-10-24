@@ -27,6 +27,8 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 
+library amc_carrier_core; 
+
 entity DaqMuxV2Tb is
 end entity;
 
@@ -71,7 +73,7 @@ begin
    ----------------------
    -- Module to be tested
    ----------------------
-   U_DaqMuxV2 : entity work.DaqMuxV2
+   U_DaqMuxV2 : entity amc_carrier_core.DaqMuxV2
       generic map (
          TPD_G                  => TPD_G,
          N_DATA_IN_G            => N_DATA_IN_G,

@@ -24,8 +24,10 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.jesd204bpkg.all;
-use work.AppTopPkg.all;
-use work.AppTopPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
+use amc_carrier_core.AppTopPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -170,7 +172,7 @@ begin
    ----------------
    GEN_GTH_R_CLK : for i in 3 downto 0 generate
 
-      U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
+      U_IBUFDS_GTE3 : entity amc_carrier_core.AmcCarrierIbufGt
          generic map (
             REFCLK_EN_TX_PATH  => '0',
             REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
@@ -277,7 +279,7 @@ begin
    -------------
    -- JESD block
    -------------
-   U_Jesd : entity work.AppTopJesd204b
+   U_Jesd : entity amc_carrier_core.AppTopJesd204b
       generic map (
          TPD_G              => TPD_G,
          JESD_RX_LANE_G     => JESD_RX_LANE_G,

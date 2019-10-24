@@ -31,7 +31,9 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
-use work.AppMpsPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
 
 
 entity MpsMitMsgRx is

@@ -30,7 +30,9 @@ use ieee.std_logic_arith.all;
 
 library surf;
 use surf.StdRtlPkg.all;
-use work.DaqMuxV2Pkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.DaqMuxV2Pkg.all;
 
 entity DaqDecimator is
    generic (

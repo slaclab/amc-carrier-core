@@ -24,7 +24,9 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.jesd204bpkg.all;
-use work.FpgaTypePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -86,7 +88,7 @@ begin
    -----------------------
    -- Generalized Mapping 
    -----------------------
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -99,7 +101,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : entity work.JesdSyncOut
+   U_jesdRxSync0 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -112,7 +114,7 @@ begin
          jesdSyncP => syncOutP(4),
          jesdSyncN => syncOutN(4));
 
-   U_jesdRxSync1 : entity work.JesdSyncOut
+   U_jesdRxSync1 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -125,7 +127,7 @@ begin
          jesdSyncP => syncOutP(2),
          jesdSyncN => syncOutN(2));
 
-   U_jesdRxSync2 : entity work.JesdSyncOut
+   U_jesdRxSync2 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)

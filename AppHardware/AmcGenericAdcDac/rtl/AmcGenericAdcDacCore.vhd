@@ -30,6 +30,8 @@ use surf.jesd204bpkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core; 
+
 entity AmcGenericAdcDacCore is
    generic (
       TPD_G           : time             := 1 ns;
@@ -329,7 +331,7 @@ begin
 
    bcmL <= not(bcm);
 
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G       => TPD_G,
          GEN_ASYNC_G => false, -- Deskewed using LMK to get rid of race condition between jesdSysRefP/N and jesdClk
@@ -343,7 +345,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdSysRef);
 
-   U_jesdTxSync : entity work.JesdSyncIn
+   U_jesdTxSync : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -360,7 +362,7 @@ begin
 
    GEN_RX_SYNC :
    for i in 1 downto 0 generate
-      U_jesdRxSync : entity work.JesdSyncOut
+      U_jesdRxSync : entity amc_carrier_core.JesdSyncOut
          generic map (
             TPD_G    => TPD_G,
             INVERT_G => false)
@@ -473,7 +475,7 @@ begin
    ----------------------   
    -- SLOW DAC SPI Module
    ----------------------   
-   SLOW_SPI_DAC : entity work.AmcGenericAdcDacVcoSpi
+   SLOW_SPI_DAC : entity amc_carrier_core.AmcGenericAdcDacVcoSpi
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -493,7 +495,7 @@ begin
    -----------------------   
    -- Misc. Control Module
    ----------------------- 
-   U_Ctrl : entity work.AmcGenericAdcDacCtrl
+   U_Ctrl : entity amc_carrier_core.AmcGenericAdcDacCtrl
       generic map (
          TPD_G          => TPD_G,
          AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)

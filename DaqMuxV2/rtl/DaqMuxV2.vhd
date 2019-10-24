@@ -27,6 +27,8 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 
+library amc_carrier_core; 
+
 entity DaqMuxV2 is
    generic (
       TPD_G                  : time                  := 1 ns;
@@ -195,7 +197,7 @@ begin
    -- AXI lite
    ----------------------------------------------------------- 
    -- axiLite register interface
-   U_DaqRegItf : entity work.DaqRegItf
+   U_DaqRegItf : entity amc_carrier_core.DaqRegItf
       generic map (
          TPD_G        => TPD_G,
          N_DATA_IN_G  => N_DATA_IN_G,
@@ -241,7 +243,7 @@ begin
    -----------------------------------------------------------
    -- Trigger and rate
    -----------------------------------------------------------
-   U_DaqTrigger : entity work.DaqTrigger
+   U_DaqTrigger : entity amc_carrier_core.DaqTrigger
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -315,7 +317,7 @@ begin
 
    -- AXI stream interface two parallel lanes 
    GEN_OUT_LANES : for i in N_DATA_OUT_G-1 downto 0 generate
-      U_DaqLane : entity work.DaqLane
+      U_DaqLane : entity amc_carrier_core.DaqLane
          generic map (
             TPD_G          => TPD_G,
             BAY_INDEX_G    => BAY_INDEX_G,

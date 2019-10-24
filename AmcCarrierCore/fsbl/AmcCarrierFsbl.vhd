@@ -26,7 +26,9 @@ use surf.SsiPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiPkg.all;
 use work.TimingPkg.all;
-use work.AmcCarrierPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -215,7 +217,7 @@ begin
    --------------------------------
    -- Common Clock and Reset Module
    -------------------------------- 
-   U_IBUFDS : entity work.AmcCarrierIbufGt
+   U_IBUFDS : entity amc_carrier_core.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
@@ -277,7 +279,7 @@ begin
    ------------------
    -- Ethernet Module
    ------------------
-   U_Eth : entity work.AmcCarrierEthFsbl
+   U_Eth : entity amc_carrier_core.AmcCarrierEthFsbl
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -337,7 +339,7 @@ begin
    --------------
    -- Timing Core
    --------------
-   U_Timing : entity work.AmcCarrierTiming
+   U_Timing : entity amc_carrier_core.AmcCarrierTiming
       generic map (
          TPD_G             => TPD_G,
          TIME_GEN_APP_G    => false,
@@ -387,7 +389,7 @@ begin
    --------------
    -- BSA Core
    --------------
-   U_Bsa : entity work.AmcCarrierBsa
+   U_Bsa : entity amc_carrier_core.AmcCarrierBsa
       generic map (
          TPD_G                  => TPD_G,
          FSBL_G                 => true,
@@ -434,7 +436,7 @@ begin
    ------------------
    -- DDR Memory Core
    ------------------
-   U_DdrMem : entity work.AmcCarrierDdrMem
+   U_DdrMem : entity amc_carrier_core.AmcCarrierDdrMem
       generic map (
          TPD_G         => TPD_G,
          FSBL_G        => true,

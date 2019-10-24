@@ -26,6 +26,8 @@ use surf.AxiLitePkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core; 
+
 entity RtmMpsLinkNode is
    generic (
       TPD_G : time := 1 ns);
@@ -84,7 +86,7 @@ begin
 
    end generate GEN_DOUT;
 
-   U_Monitor : entity work.RtmMpsLinkNodeReg
+   U_Monitor : entity amc_carrier_core.RtmMpsLinkNodeReg
       generic map (
          TPD_G => TPD_G)
       port map (

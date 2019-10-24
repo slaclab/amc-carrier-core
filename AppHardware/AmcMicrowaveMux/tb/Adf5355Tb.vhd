@@ -23,6 +23,8 @@ use surf.StdRtlPkg.all;
 use surf.TextUtilPkg.all;
 use surf.AxiLitePkg.all;
 
+library amc_carrier_core; 
+
 entity Adf5355Tb is
 end entity Adf5355Tb;
 architecture tb of Adf5355Tb is
@@ -50,7 +52,7 @@ begin
          clkP => axilClk,
          rst  => axilRst);
 
-   U_PLL : entity work.adf5355
+   U_PLL : entity amc_carrier_core.adf5355
       generic map (
          TPD_G             => TPD_G)
       port map (

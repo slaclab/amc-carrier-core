@@ -31,8 +31,10 @@ use surf.SsiPkg.all;
 use surf.AxiPkg.all;
 use surf.AxiLitePkg.all;
 use work.TimingPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierBsa is
    generic (
@@ -214,7 +216,7 @@ begin
       ------------------------------------------------------------------------------------------------
       ibBsaSlaves(BSA_WAVEFORM_STATUS_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only.
       ibBsaSlaves(BSA_WAVEFORM_DATA_AXIS_INDEX_C)   <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only
-      BsaWaveformEngine_0 : entity work.BsaWaveformEngine
+      BsaWaveformEngine_0 : entity amc_carrier_core.BsaWaveformEngine
          generic map (
             TPD_G                  => TPD_G,
             WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
@@ -247,7 +249,7 @@ begin
             axiReadMaster     => waveform0AxiReadMaster,    -- [out]
             axiReadSlave      => waveform0AxiReadSlave);    -- [in]
 
-      BsaWaveformEngine_1 : entity work.BsaWaveformEngine
+      BsaWaveformEngine_1 : entity amc_carrier_core.BsaWaveformEngine
          generic map (
             TPD_G                  => TPD_G,
             WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
@@ -321,7 +323,7 @@ begin
       -------------------------------------------------------------------------------------------------
       ibBsaSlaves(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;
       BSA_EN_GEN : if (DISABLE_BSA_G = false) generate
-         BsaBufferControl_1 : entity work.BsaBufferControl
+         BsaBufferControl_1 : entity amc_carrier_core.BsaBufferControl
             generic map (
                TPD_G                   => TPD_G,
                AXIL_BASE_ADDR_G        => AXIL_CROSSBAR_CONFIG_C(BSA_BUFFER_AXIL_C).baseAddr,
@@ -408,7 +410,7 @@ begin
       -- Axi Interconnect
       -- Mux AXI busses, resize to 512 wide data words, buffer bursts
       ------------------------------------------------------------------------------------------------
-      U_BsaAxiInterconnectWrapper_1 : entity work.BsaAxiInterconnectWrapper
+      U_BsaAxiInterconnectWrapper_1 : entity amc_carrier_core.BsaAxiInterconnectWrapper
          port map (
             axiClk              => axiClk,                  -- [in]
             axiRst              => axiRst,                  -- [in]

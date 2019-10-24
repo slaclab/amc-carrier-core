@@ -29,7 +29,9 @@ use ieee.std_logic_arith.all;
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
-use work.AppTopPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
 use surf.Jesd204bPkg.all;
 
 entity  DacSigGenTb is
@@ -104,7 +106,7 @@ begin  -- architecture Bhv
   -----------------------------
   -- component instantiation 
   -----------------------------
-  DacSigGen_INST: entity work.DacSigGen
+  DacSigGen_INST: entity amc_carrier_core.DacSigGen
    generic map (
       TPD_G            => TPD_G,
       NUM_SIG_GEN_G    => 2,

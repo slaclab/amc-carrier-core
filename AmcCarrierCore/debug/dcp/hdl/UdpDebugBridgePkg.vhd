@@ -27,7 +27,9 @@ use ieee.numeric_std.all;
 
 library surf;
 use surf.StdRtlPkg.all;
-use work.AmcCarrierPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 use surf.EthMacPkg.all;
 
 -- Configuration constants (used for generics) for AxisJtagDebugBridge

@@ -43,7 +43,9 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
-use work.DaqMuxV2Pkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.DaqMuxV2Pkg.all;
 
 use surf.Jesd204bPkg.all;
 
@@ -170,7 +172,7 @@ begin
    s_trigDecimator <= trig_i and not r.busy;
 
    -- Applies test data if enabled  
-   U_DaqTestSig : entity work.DaqTestSig
+   U_DaqTestSig : entity amc_carrier_core.DaqTestSig
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -193,7 +195,7 @@ begin
    -- Decimates data,
    -- Averages decimated data
    GEN_DEC : if (DECIMATOR_EN_G = true) generate
-      Decimator_INST : entity work.DaqDecimator
+      Decimator_INST : entity amc_carrier_core.DaqDecimator
          generic map (
             TPD_G => TPD_G)
          port map (

@@ -23,6 +23,8 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
+library amc_carrier_core; 
+
 entity AmcMpsSfpDualCore is
    generic (
       TPD_G            : time             := 1 ns;
@@ -102,7 +104,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcMpsSfpCore
+      U_AMC : entity amc_carrier_core.AmcMpsSfpCore
          generic map (
             TPD_G            => TPD_G,
             EN_PLL_G         => EN_PLL_G,

@@ -26,8 +26,10 @@ use surf.SsiPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiPkg.all;
 use work.TimingPkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -227,7 +229,7 @@ begin
    ----------------------------------   
    -- Register Address Mapping Module
    ----------------------------------   
-   U_SysReg : entity work.AmcCarrierSysReg
+   U_SysReg : entity amc_carrier_core.AmcCarrierSysReg
       generic map (
          TPD_G            => TPD_G,
          BUILD_INFO_G     => BUILD_INFO_G,
@@ -310,7 +312,7 @@ begin
    ------------------
    -- Application MPS
    ------------------
-   U_AppMps : entity work.AppMps
+   U_AppMps : entity amc_carrier_core.AppMps
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_NULL_TYPE_C,
@@ -354,7 +356,7 @@ begin
    -------------------
    -- AMC Carrier Core
    -------------------
-   U_Core : entity work.AmcCarrierFsbl
+   U_Core : entity amc_carrier_core.AmcCarrierFsbl
       generic map (
          TPD_G => TPD_G)
       port map (

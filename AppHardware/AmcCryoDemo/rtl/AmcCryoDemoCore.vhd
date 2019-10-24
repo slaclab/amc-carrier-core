@@ -27,6 +27,8 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.jesd204bPkg.all;
 
+library amc_carrier_core; 
+
 entity AmcCryoDemoCore is
    generic (
       TPD_G           : time             := 1 ns;
@@ -227,7 +229,7 @@ begin
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -242,7 +244,7 @@ begin
 
    GEN_RX_SYNC :
    for i in 2 downto 0 generate
-      U_jesdRxSync : entity work.JesdSyncOut
+      U_jesdRxSync : entity amc_carrier_core.JesdSyncOut
          generic map (
             TPD_G    => TPD_G,
             INVERT_G => false)
@@ -256,7 +258,7 @@ begin
             jesdSyncN => jesdRxSyncN(i));
    end generate GEN_RX_SYNC;
 
-   U_jesdTxSync : entity work.JesdSyncIn
+   U_jesdTxSync : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)

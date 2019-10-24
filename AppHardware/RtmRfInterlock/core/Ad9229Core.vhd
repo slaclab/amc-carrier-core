@@ -31,6 +31,8 @@ use UNISIM.vcomponents.all;
 library surf;
 use surf.StdRtlPkg.all;
 
+library amc_carrier_core; 
+
 entity Ad9229Core is
    generic (
       TPD_G           : time := 1 ns;
@@ -157,7 +159,7 @@ begin
             IB => serDataN_i(i),
             O  => s_serData(i));
  
-      Ad9229Deserializer_INST: entity work.Ad9229Deserializer
+      Ad9229Deserializer_INST: entity amc_carrier_core.Ad9229Deserializer
          generic map (
             TPD_G             => TPD_G,
             IODELAY_GROUP_G   => IODELAY_GROUP_G,
@@ -190,7 +192,7 @@ begin
    ----------------------------------------------------   
    -- Frame clock Deserializer
    ---------------------------------------------------- 
-   Ad9229Deserializer_INST: entity work.Ad9229Deserializer
+   Ad9229Deserializer_INST: entity amc_carrier_core.Ad9229Deserializer
       generic map (
          TPD_G             => TPD_G,
          IODELAY_GROUP_G   => IODELAY_GROUP_G,

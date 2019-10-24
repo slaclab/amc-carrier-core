@@ -25,7 +25,9 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.AxiPkg.all;
 use surf.SsiPkg.all;
-use work.AmcCarrierPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 entity BsaWaveformEngine is
 

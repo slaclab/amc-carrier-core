@@ -24,6 +24,8 @@ use surf.AxiLitePkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core; 
+
 entity RtmDigitalDebugV2 is
    generic (
       TPD_G            : time                       := 1 ns;
@@ -158,7 +160,7 @@ begin
    ------------------------
    -- Digital Input Mapping
    ------------------------
-   U_DIN : entity work.RtmDigitalDebugDin
+   U_DIN : entity amc_carrier_core.RtmDigitalDebugDin
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -176,7 +178,7 @@ begin
    -------------------------
    -- Digital Output Mapping
    -------------------------         
-   U_DOUT : entity work.RtmDigitalDebugDout
+   U_DOUT : entity amc_carrier_core.RtmDigitalDebugDout
       generic map (
          TPD_G           => TPD_G,
          REG_DOUT_EN_G   => REG_DOUT_EN_G,
@@ -199,7 +201,7 @@ begin
    ---------------------
    -- Register Interface
    ---------------------
-   U_REG : entity work.Si5317a
+   U_REG : entity amc_carrier_core.Si5317a
       generic map (
          TPD_G => TPD_G)
       port map(

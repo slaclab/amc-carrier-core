@@ -34,6 +34,8 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
+library amc_carrier_core; 
+
 entity AxiSpiAd7682 is
    generic (
       TPD_G             : time     := 1 ns;
@@ -108,7 +110,7 @@ architecture rtl of AxiSpiAd7682 is
 begin
 
 
-   U_AxiSpiAd7682Reg : entity work.AxiSpiAd7682Reg
+   U_AxiSpiAd7682Reg : entity amc_carrier_core.AxiSpiAd7682Reg
       generic map (
          TPD_G             => TPD_G,
          AXIL_ADDR_WIDTH_G => 8,
