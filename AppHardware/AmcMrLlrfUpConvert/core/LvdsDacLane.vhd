@@ -2,7 +2,7 @@
 -- File       : LvdsDacLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-01-29
--- Last update: 2017-04-19
+-- Last update: 2019-10-14
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
 --               The module contains a AXI-Lite accessible block RAM where the 
@@ -83,9 +83,6 @@ begin
    U_RAM : entity work.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
-         BRAM_EN_G    => true,
-         REG_EN_G     => true,
-         MODE_G       => "write-first",
          ADDR_WIDTH_G => ADDR_WIDTH_G,
          DATA_WIDTH_G => 16,
          INIT_G       => "0")
