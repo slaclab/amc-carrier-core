@@ -71,7 +71,7 @@ package AppMpsPkg is
       inputType : sl;                   -- '0' Digital, '1' Analog      
       timeStamp : slv(15 downto 0);
       appId     : slv(15 downto 0);
-      message   : Slv8Array(31 downto 0);
+      message   : Slv8Array(MPS_CHAN_COUNT_C-1 downto 0);
       msgSize   : slv(7 downto 0);      -- In units of Bytes
    end record;
 
