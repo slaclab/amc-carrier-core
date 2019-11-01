@@ -2,7 +2,7 @@
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-02-04
--- Last update: 2018-03-14
+-- Last update: 2019-10-31
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -35,13 +35,13 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 use surf.AxiLitePkg.all;
+use surf.jesd204bpkg.all;
 
 library lcls_timing_core;
 use lcls_timing_core.TimingPkg.all;
 
 library amc_carrier_core;
 use amc_carrier_core.AmcCarrierPkg.all;
-use surf.jesd204bpkg.all;
 use amc_carrier_core.AppTopPkg.all;
 use amc_carrier_core.AppMpsPkg.all;
 
@@ -497,7 +497,7 @@ begin
    -------------------
    -- Application Core
    -------------------
-   U_AppCore : entity work.AppCore
+   U_AppCore : entity amc_carrier_core.AppCore
       generic map (
          TPD_G           => TPD_G,
          MR_LCLS_APP_G   => MR_LCLS_APP_G,
