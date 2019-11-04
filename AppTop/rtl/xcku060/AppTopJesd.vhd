@@ -18,12 +18,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
-use work.AppTopPkg.all;
-use work.AppTopPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
+use amc_carrier_core.AppTopPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -146,7 +150,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -169,7 +173,7 @@ begin
    ----------------
 
    -- Left column reference
-   U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
+   U_IBUFDS_GTE3 : entity amc_carrier_core.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
@@ -184,7 +188,7 @@ begin
    -- Choose Right coulumn reference
    GEN_GTH_R_CLK : for i in 2 downto 0 generate
 
-      U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
+      U_IBUFDS_GTE3 : entity amc_carrier_core.AmcCarrierIbufGt
          generic map (
             REFCLK_EN_TX_PATH  => '0',
             REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
@@ -211,7 +215,7 @@ begin
    refClkR <= refClkVec(conv_integer(JESD_REF_SEL_G));
    amcClk  <= amcClkVec(conv_integer(JESD_REF_SEL_G));
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map (
          TPD_G          => TPD_G,
          SIM_SPEEDUP_G  => SIMULATION_G,
@@ -221,7 +225,7 @@ begin
          clk    => amcClk,
          rstOut => amcRst);
 
-   U_ClockManager : entity work.ClockManagerUltraScale
+   U_ClockManager : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G              => TPD_G,
          TYPE_G             => "PLL",
@@ -249,7 +253,7 @@ begin
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
    GEN_RST : for i in 1 downto 0 generate
-      U_RstPipeline : entity work.RstPipeline
+      U_RstPipeline : entity surf.RstPipeline
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -269,7 +273,7 @@ begin
    jesdClk <= jesdClk1x;
    jesdRst <= jesdRst1x;
 
-   U_jesdUsrClk : entity work.ClockManagerUltraScale
+   U_jesdUsrClk : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G              => TPD_G,
          TYPE_G             => "PLL",
@@ -289,7 +293,7 @@ begin
    -------------
    -- JESD block
    -------------
-   U_Jesd : entity work.AppTopJesd204b
+   U_Jesd : entity amc_carrier_core.AppTopJesd204b
       generic map (
          TPD_G              => TPD_G,
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
@@ -348,7 +352,7 @@ begin
    drpClk <= (others => axilClk);
    GTH_DRP : if (JESD_DRP_EN_G = true) generate
 
-      U_XBAR : entity work.AxiLiteCrossbar
+      U_XBAR : entity surf.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
             NUM_SLAVE_SLOTS_G  => 1,
@@ -367,7 +371,7 @@ begin
             mAxiReadSlaves      => gthReadSlaves);
 
       GEN_GTH_DRP : for i in (JESD_LANE_C-1) downto 0 generate
-         U_AxiLiteToDrp : entity work.AxiLiteToDrp
+         U_AxiLiteToDrp : entity surf.AxiLiteToDrp
             generic map (
                TPD_G            => TPD_G,
                COMMON_CLK_G     => true,

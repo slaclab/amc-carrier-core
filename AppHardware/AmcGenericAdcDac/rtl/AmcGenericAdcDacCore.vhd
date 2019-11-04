@@ -20,13 +20,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core; 
 
 entity AmcGenericAdcDacCore is
    generic (
@@ -259,7 +263,7 @@ begin
    --------------------
    -- Application Ports
    --------------------
-   ClkBuf_0 : entity work.ClkOutBufDiff
+   ClkBuf_0 : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
@@ -277,7 +281,7 @@ begin
    end generate;
 
    TRIG_CLK : if (TRIG_CLK_G = true) generate
-      ClkBuf_1 : entity work.ClkOutBufDiff
+      ClkBuf_1 : entity surf.ClkOutBufDiff
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -296,7 +300,7 @@ begin
    end generate;
 
    CAL_CLK : if (CAL_CLK_G = true) generate
-      ClkBuf_2 : entity work.ClkOutBufDiff
+      ClkBuf_2 : entity surf.ClkOutBufDiff
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -327,7 +331,7 @@ begin
 
    bcmL <= not(bcm);
 
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G       => TPD_G,
          GEN_ASYNC_G => false, -- Deskewed using LMK to get rid of race condition between jesdSysRefP/N and jesdClk
@@ -341,7 +345,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdSysRef);
 
-   U_jesdTxSync : entity work.JesdSyncIn
+   U_jesdTxSync : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -358,7 +362,7 @@ begin
 
    GEN_RX_SYNC :
    for i in 1 downto 0 generate
-      U_jesdRxSync : entity work.JesdSyncOut
+      U_jesdRxSync : entity amc_carrier_core.JesdSyncOut
          generic map (
             TPD_G    => TPD_G,
             INVERT_G => false)
@@ -375,7 +379,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -396,7 +400,7 @@ begin
    -----------------
    -- LMK SPI Module
    -----------------   
-   SPI_LMK : entity work.AxiSpiMaster
+   SPI_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 15,
@@ -426,7 +430,7 @@ begin
    -- Fast ADC SPI Module
    ----------------------   
    GEN_ADC_SPI : for i in 1 downto 0 generate
-      FAST_ADC_SPI : entity work.AxiSpiMaster
+      FAST_ADC_SPI : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -449,7 +453,7 @@ begin
    ----------------------
    -- Fast DAC SPI Module
    ----------------------     
-   FAST_SPI_DAC : entity work.AxiSpiMaster
+   FAST_SPI_DAC : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,
@@ -471,7 +475,7 @@ begin
    ----------------------   
    -- SLOW DAC SPI Module
    ----------------------   
-   SLOW_SPI_DAC : entity work.AmcGenericAdcDacVcoSpi
+   SLOW_SPI_DAC : entity amc_carrier_core.AmcGenericAdcDacVcoSpi
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -491,7 +495,7 @@ begin
    -----------------------   
    -- Misc. Control Module
    ----------------------- 
-   U_Ctrl : entity work.AmcGenericAdcDacCtrl
+   U_Ctrl : entity amc_carrier_core.AmcGenericAdcDacCtrl
       generic map (
          TPD_G          => TPD_G,
          AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)

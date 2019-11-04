@@ -20,10 +20,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+
+library amc_carrier_core; 
 
 entity DaqMuxV2 is
    generic (
@@ -149,7 +153,7 @@ begin
    assert (1 <= N_DATA_OUT_G and N_DATA_OUT_G <= 16) report "N_DATA_OUT_G must be between 1 and 16"severity failure;
 
    -- Help with timing
-   U_rst : entity work.RstPipeline
+   U_rst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -162,7 +166,7 @@ begin
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
    -- Rationale: The timeStamp and the bsa are registered between the two timing strobes. So this signal is static for 1/360s.
    -----------------------------------------------------------    
-   U_SyncTimestamp : entity work.SynchronizerVector
+   U_SyncTimestamp : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 64)
@@ -171,7 +175,7 @@ begin
          dataIn  => timeStamp_i,
          dataOut => s_timeStampSync);
 
-   U_SyncBsa : entity work.SynchronizerVector
+   U_SyncBsa : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 128)
@@ -180,7 +184,7 @@ begin
          dataIn  => bsa_i,
          dataOut => s_bsaSync);
 
-   U_SyncDmd : entity work.SynchronizerVector
+   U_SyncDmd : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 192)
@@ -193,7 +197,7 @@ begin
    -- AXI lite
    ----------------------------------------------------------- 
    -- axiLite register interface
-   U_DaqRegItf : entity work.DaqRegItf
+   U_DaqRegItf : entity amc_carrier_core.DaqRegItf
       generic map (
          TPD_G        => TPD_G,
          N_DATA_IN_G  => N_DATA_IN_G,
@@ -239,7 +243,7 @@ begin
    -----------------------------------------------------------
    -- Trigger and rate
    -----------------------------------------------------------
-   U_DaqTrigger : entity work.DaqTrigger
+   U_DaqTrigger : entity amc_carrier_core.DaqTrigger
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -313,7 +317,7 @@ begin
 
    -- AXI stream interface two parallel lanes 
    GEN_OUT_LANES : for i in N_DATA_OUT_G-1 downto 0 generate
-      U_DaqLane : entity work.DaqLane
+      U_DaqLane : entity amc_carrier_core.DaqLane
          generic map (
             TPD_G          => TPD_G,
             BAY_INDEX_G    => BAY_INDEX_G,
@@ -365,7 +369,7 @@ begin
       s_daqStatus(i) <= s_pctCntVec(i) & s_enAxi(i) & s_LinkReadyVecMux(i) & s_errorVec(i) & rxAxisCtrlArr_i(i).overflow & rxAxisSlaveArr_i(i).tReady & rxAxisCtrlArr_i(i).pause;
 
       -- Synchronize stream with the output waveform clock
-      U_AsyncOutFifo : entity work.AxiStreamFifoV2
+      U_AsyncOutFifo : entity surf.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
@@ -392,7 +396,7 @@ begin
       -----------------------------------------------------------------
 
       -- Separately synchronize AXI Stream control
-      Sync_0 : entity work.Synchronizer
+      Sync_0 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -400,7 +404,7 @@ begin
             dataIn  => rxAxisCtrlArr_i(i).pause,
             dataOut => s_rxAxisCtrlArr(i).pause);
 
-      Sync_1 : entity work.Synchronizer
+      Sync_1 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -408,7 +412,7 @@ begin
             dataIn  => rxAxisCtrlArr_i(i).overflow,
             dataOut => s_rxAxisCtrlArr(i).overflow);
 
-      Sync_2 : entity work.Synchronizer
+      Sync_2 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (

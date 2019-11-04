@@ -21,12 +21,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiPkg.all;
-use work.AxiDmaPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiDmaPkg.all;
+use surf.AxiLitePkg.all;
 
 entity SsiAxiMaster is
    generic (
@@ -139,7 +141,7 @@ begin
    ----------------------------------
    -- Input FIFO 
    ----------------------------------
-   SlaveAxiStreamFifo : entity work.AxiStreamFifoV2
+   SlaveAxiStreamFifo : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => PIPE_STAGES_G,
@@ -171,7 +173,7 @@ begin
    ----------------------------------
    -- Output FIFO 
    ----------------------------------
-   MasterAxiStreamFifo : entity work.AxiStreamFifoV2
+   MasterAxiStreamFifo : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => PIPE_STAGES_G,
@@ -202,7 +204,7 @@ begin
 
 
    AXI_READ_ENABLED : if (AXI_READ_EN_G) generate
-      U_AxiStreamDmaRead_1 : entity work.AxiStreamDmaRead
+      U_AxiStreamDmaRead_1 : entity surf.AxiStreamDmaRead
          generic map (
             TPD_G           => TPD_G,
             AXIS_READY_EN_G => true,
@@ -231,7 +233,7 @@ begin
    end generate AXI_READ_DISABLED;
 
    AXI_WRITE_ENABLED : if (AXI_WRITE_EN_G) generate
-      U_AxiStreamDmaWrite_1 : entity work.AxiStreamDmaWrite
+      U_AxiStreamDmaWrite_1 : entity surf.AxiStreamDmaWrite
          generic map (
             TPD_G          => TPD_G,
             AXI_READY_EN_G => true,

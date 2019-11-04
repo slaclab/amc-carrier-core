@@ -27,7 +27,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 
 entity DaqTrigger is
@@ -101,7 +103,7 @@ architecture rtl of DaqTrigger is
    
 begin
    -- Sync one shots
-   U_SyncOneShotSw: entity work.SynchronizerOneShot
+   U_SyncOneShotSw: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => false)
@@ -111,7 +113,7 @@ begin
       dataIn  => trigSw_i,
       dataOut => s_trigSwRe);
 
-   U_SyncOneShotCasc: entity work.SynchronizerOneShot
+   U_SyncOneShotCasc: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => false)
@@ -121,7 +123,7 @@ begin
       dataIn  => trigCasc_i,
       dataOut => s_trigCascRe);      
 
-   U_SyncOneShotHw: entity work.SynchronizerOneShot
+   U_SyncOneShotHw: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => false)
@@ -131,7 +133,7 @@ begin
       dataIn  => trigHw_i,
       dataOut => s_trigHwRe);
       
-   U_SyncOneShotFreezeSw: entity work.SynchronizerOneShot
+   U_SyncOneShotFreezeSw: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => false)
@@ -141,7 +143,7 @@ begin
       dataIn  => freezeSw_i,
       dataOut => s_freezeSwRe);
 
-   U_SyncOneShotFreezeHw: entity work.SynchronizerOneShot
+   U_SyncOneShotFreezeHw: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => false)
@@ -152,7 +154,7 @@ begin
       dataOut => s_freezeHwRe);  
 
    -- One shots 
-   U_SyncOneShotArm: entity work.SynchronizerOneShot
+   U_SyncOneShotArm: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => true) -- No need to sync
@@ -163,7 +165,7 @@ begin
       dataOut => s_armRe);
       
    -- One shots 
-   U_SyncOneShotArmCasc: entity work.SynchronizerOneShot
+   U_SyncOneShotArmCasc: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => true) -- No need to sync
@@ -173,7 +175,7 @@ begin
       dataIn  => armCasc_i,
       dataOut => s_armCascRe); 
       
-   U_SyncOneShotClear: entity work.SynchronizerOneShot
+   U_SyncOneShotClear: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => true) -- No need to sync

@@ -20,8 +20,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity RtmCryoDacLut is
    generic (
@@ -116,7 +118,7 @@ architecture rtl of RtmCryoDacLut is
 
 begin
 
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -136,7 +138,7 @@ begin
 
    GEN_LUT :
    for i in NUM_CH_G-1 downto 0 generate
-      U_LUT : entity work.AxiDualPortRam
+      U_LUT : entity surf.AxiDualPortRam
          generic map (
             TPD_G         => TPD_G,
             SYNTH_MODE_G  => SYNTH_MODE_G,
@@ -355,7 +357,7 @@ begin
       end if;
    end process seq;
 
-   U_AxiLiteMaster : entity work.AxiLiteMaster
+   U_AxiLiteMaster : entity surf.AxiLiteMaster
       generic map (
          TPD_G => TPD_G)
       port map (

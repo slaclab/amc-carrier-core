@@ -20,9 +20,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.FpgaTypePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -224,7 +228,7 @@ begin
          OB => rtmLsN(17));
    ---------------------------------------------
 
-   U_extTrig : entity work.Synchronizer
+   U_extTrig : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -232,7 +236,7 @@ begin
          dataIn  => extTrig,
          dataOut => extTrigSync);
 
-   U_TimingTrig : entity work.SynchronizerOneShot
+   U_TimingTrig : entity surf.SynchronizerOneShot
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -367,7 +371,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -388,7 +392,7 @@ begin
    --------------------------
    -- CRYO DET RTM REG Module
    --------------------------
-   U_Reg : entity work.RtmCryoDetReg
+   U_Reg : entity amc_carrier_core.RtmCryoDetReg
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -414,7 +418,7 @@ begin
    ------------------
    -- PIC SPI Module
    ------------------
-   PIC_SPI : entity work.RtmCryoSpiMaster  -- FPGA=Master and PIC=SLAVE
+   PIC_SPI : entity amc_carrier_core.RtmCryoSpiMaster  -- FPGA=Master and PIC=SLAVE
       generic map (
          TPD_G             => TPD_G,
          CPHA_G            => '0',      -- CPHA = 0
@@ -436,7 +440,7 @@ begin
    ------------------
    -- DAC LUT Module
    ------------------
-   DAC_LUT : entity work.RtmCryoDacLut
+   DAC_LUT : entity amc_carrier_core.RtmCryoDacLut
       generic map (
          TPD_G            => TPD_G,
          AXIL_BASE_ADDR_G => AXI_CONFIG_C(LUT_INDEX_C).baseAddr)
@@ -454,7 +458,7 @@ begin
          mAxilWriteMaster => dacLutWriteMaster,
          mAxilWriteSlave  => dacLutWriteSlave);
 
-   U_DAC_LUT_XBAR : entity work.AxiLiteCrossbar
+   U_DAC_LUT_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,
@@ -479,7 +483,7 @@ begin
    ------------------
    -- MAX SPI Module
    ------------------
-   MAX_SPI : entity work.AxiSpiMaster   -- FPGA=Master and CPLD=SLAVE
+   MAX_SPI : entity surf.AxiSpiMaster   -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",

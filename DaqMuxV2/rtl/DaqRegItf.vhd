@@ -22,8 +22,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity DaqRegItf is
    generic (
@@ -126,7 +128,7 @@ architecture rtl of DaqRegItf is
 
 begin
 
-   U_SyncSampleValid : entity work.SynchronizerVector
+   U_SyncSampleValid : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => N_DATA_IN_G)
@@ -135,7 +137,7 @@ begin
          dataIn  => sampleValid_i,
          dataOut => s_sampleValid);
 
-   U_SyncLinkReady : entity work.SynchronizerVector
+   U_SyncLinkReady : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => N_DATA_IN_G)
@@ -145,7 +147,7 @@ begin
          dataOut => s_linkReady);
 
    -- Counts the number of trigger pulses
-   U_SyncStatusVector : entity work.SyncStatusVector
+   U_SyncStatusVector : entity surf.SyncStatusVector
       generic map (
          TPD_G          => TPD_G,
          OUT_POLARITY_G => '1',
@@ -295,7 +297,7 @@ begin
 
    -- Input assignment and synchronization
    GEN_IN_0 : for I in N_DATA_OUT_G-1 downto 0 generate
-      SyncFifo_IN : entity work.SynchronizerFifo
+      SyncFifo_IN : entity surf.SynchronizerFifo
          generic map (
             TPD_G        => TPD_G,
             DATA_WIDTH_G => 32)
@@ -306,7 +308,7 @@ begin
             dout   => s_daqStatus(I));
    end generate GEN_IN_0;
 
-   SyncFifo_IN0 : entity work.SynchronizerFifo
+   SyncFifo_IN0 : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 6)
@@ -316,7 +318,7 @@ begin
          rd_clk => axiClk_i,
          dout   => s_trigStatus);
 
-   SyncFifo_IN1 : entity work.SynchronizerFifo
+   SyncFifo_IN1 : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 64)
@@ -326,7 +328,7 @@ begin
          rd_clk => axiClk_i,
          dout   => s_timeStamp);
 
-   SyncFifo_IN2 : entity work.SynchronizerFifo
+   SyncFifo_IN2 : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 128)
@@ -339,7 +341,7 @@ begin
    ------------------------------------------------
    -- Output assignment and synchronization
    ------------------------------------------------   
-   Sync_OUT0 : entity work.Synchronizer
+   Sync_OUT0 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -348,7 +350,7 @@ begin
          dataIn  => r.control(0),
          dataOut => trigSw_o);
 
-   Sync_OUT1 : entity work.Synchronizer
+   Sync_OUT1 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -357,7 +359,7 @@ begin
          dataIn  => r.control(1),
          dataOut => trigCascMask_o);
 
-   Sync_OUT2 : entity work.Synchronizer
+   Sync_OUT2 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -366,7 +368,7 @@ begin
          dataIn  => r.control(2),
          dataOut => trigHwAutoRearm_o);
 
-   Sync_OUT3 : entity work.Synchronizer
+   Sync_OUT3 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -375,7 +377,7 @@ begin
          dataIn  => r.control(3),
          dataOut => trigHwArm_o);
 
-   Sync_OUT4 : entity work.Synchronizer
+   Sync_OUT4 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -384,7 +386,7 @@ begin
          dataIn  => r.control(4),
          dataOut => clearStatus_o);
 
-   Sync_OUT5 : entity work.Synchronizer
+   Sync_OUT5 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -394,7 +396,7 @@ begin
          dataIn  => r.control(5),
          dataOut => trigMode_o);
 
-   Sync_OUT6 : entity work.Synchronizer
+   Sync_OUT6 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -403,7 +405,7 @@ begin
          dataIn  => r.control(6),
          dataOut => headerEn_o);
 
-   Sync_OUT7 : entity work.Synchronizer
+   Sync_OUT7 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -412,7 +414,7 @@ begin
          dataIn  => r.control(7),
          dataOut => freezeSw_o);
 
-   Sync_OUT8 : entity work.Synchronizer
+   Sync_OUT8 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -421,7 +423,7 @@ begin
          dataIn  => r.control(8),
          dataOut => freezeHwMask_o);
 
-   SyncFifo_OUT0 : entity work.SynchronizerFifo
+   SyncFifo_OUT0 : entity surf.SynchronizerFifo
       generic map (
          TPD_G         => TPD_G,
          PIPE_STAGES_G => 1,
@@ -432,7 +434,7 @@ begin
          rd_clk => devClk_i,
          dout   => dataSize_o);
 
-   SyncFifo_OUT1 : entity work.SynchronizerFifo
+   SyncFifo_OUT1 : entity surf.SynchronizerFifo
       generic map (
          TPD_G         => TPD_G,
          PIPE_STAGES_G => 1,
@@ -444,7 +446,7 @@ begin
          dout   => rateDiv_o);
 
    GEN_OUT_0 : for I in N_DATA_OUT_G-1 downto 0 generate
-      SyncFifo_OUT : entity work.SynchronizerFifo
+      SyncFifo_OUT : entity surf.SynchronizerFifo
          generic map (
             TPD_G         => TPD_G,
             PIPE_STAGES_G => 1,
@@ -458,7 +460,7 @@ begin
 
 
    GEN_OUT_1 : for I in N_DATA_OUT_G-1 downto 0 generate
-      SyncFifo_OUT : entity work.SynchronizerFifo
+      SyncFifo_OUT : entity surf.SynchronizerFifo
          generic map (
             TPD_G         => TPD_G,
             PIPE_STAGES_G => 1,
@@ -469,7 +471,7 @@ begin
             rd_clk => devClk_i,
             dout   => signWidth_o(I));
 
-      Sync_OUT0 : entity work.Synchronizer
+      Sync_OUT0 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -478,7 +480,7 @@ begin
             dataIn  => r.dataFormat(I)(5),
             dataOut => data16or32_o(I));
 
-      Sync_OUT1 : entity work.Synchronizer
+      Sync_OUT1 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -487,7 +489,7 @@ begin
             dataIn  => r.dataFormat(I)(6),
             dataOut => signed_o(I));
 
-      Sync_OUT2 : entity work.Synchronizer
+      Sync_OUT2 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (

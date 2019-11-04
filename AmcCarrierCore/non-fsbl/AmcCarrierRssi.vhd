@@ -20,13 +20,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.FpgaTypePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.FpgaTypePkg.all;
 
 entity AmcCarrierRssi is
    generic (
@@ -107,7 +111,7 @@ begin
    --------------------------
    -- AXI-Lite: Crossbar Core
    --------------------------  
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -128,7 +132,7 @@ begin
    ------------------------------
    -- Software's RSSI Server@8193
    ------------------------------
-   U_RssiServer : entity work.RssiCoreWrapper
+   U_RssiServer : entity surf.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
          SYNTH_MODE_G        => "xpm",
@@ -176,7 +180,7 @@ begin
          axilWriteMaster   => axilWriteMasters(0),
          axilWriteSlave    => axilWriteSlaves(0));
          
-   U_RssiTspObFifo_0 : entity work.AmcCarrierRssiObFifo
+   U_RssiTspObFifo_0 : entity amc_carrier_core.AmcCarrierRssiObFifo
       generic map (
          TPD_G    => TPD_G,
          BYPASS_G => true) -- true to reduce logic footprint
@@ -194,7 +198,7 @@ begin
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
    ------------------------------------------------
-   U_SRPv3 : entity work.SrpV3AxiLite
+   U_SRPv3 : entity surf.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
@@ -247,7 +251,7 @@ begin
    --------------------------------
    ibAppDebugMaster <= rssiObMasters(4);
    rssiObSlaves(4)  <= ibAppDebugSlave;
-   U_IbLimiter : entity work.SsiFrameLimiter
+   U_IbLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,
@@ -274,7 +278,7 @@ begin
    ------------------------------
    -- Software's RSSI Server@8194
    ------------------------------
-   U_Temp : entity work.RssiCoreWrapper
+   U_Temp : entity surf.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
          SYNTH_MODE_G        => "xpm",
@@ -319,7 +323,7 @@ begin
          axilWriteMaster   => axilWriteMasters(1),
          axilWriteSlave    => axilWriteSlaves(1));
 
-   U_RssiTspObFifo_1 : entity work.AmcCarrierRssiObFifo
+   U_RssiTspObFifo_1 : entity amc_carrier_core.AmcCarrierRssiObFifo
       generic map (
          TPD_G    => TPD_G,
          BYPASS_G => true) -- true to reduce logic footprint

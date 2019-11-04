@@ -20,9 +20,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.I2cPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.I2cPkg.all;
 
 entity AmcMpsSfpHsRepeater is
    generic (
@@ -60,7 +62,7 @@ architecture mapping of AmcMpsSfpHsRepeater is
 
 begin
 
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -81,7 +83,7 @@ begin
    GEN_VEC :
    for i in 2 downto 0 generate
 
-      U_I2C : entity work.AxiI2cRegMaster
+      U_I2C : entity surf.AxiI2cRegMaster
          generic map (
             TPD_G          => TPD_G,
             I2C_SCL_FREQ_G => 100.0E+3,  -- units of Hz

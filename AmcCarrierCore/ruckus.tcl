@@ -5,10 +5,10 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 set family [getFpgaFamily]
 
 # Load local Source Code and constraints
-loadSource -dir  "$::DIR_PATH/core"
-loadSource -dir  "$::DIR_PATH/core/${family}"
+loadSource -lib amc_carrier_core -dir  "$::DIR_PATH/core"
+loadSource -lib amc_carrier_core -dir  "$::DIR_PATH/core/${family}"
 
-loadSource -path "$::DIR_PATH/ip/SysMonCore.dcp"
+loadSource -lib amc_carrier_core -path "$::DIR_PATH/ip/SysMonCore.dcp"
 # loadIpCore -path "$::DIR_PATH/ip/SysMonCore.xci"
 
 loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCorePorts.xdc"    
@@ -19,13 +19,13 @@ loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierAppPorts.xdc"
 # Check for FSBL
 if { [info exists ::env(AMC_FSBL)] == 1 }  {
 
-   loadSource      -dir "$::DIR_PATH/fsbl"
-   loadSource      -dir "$::DIR_PATH/fsbl/${family}"
+   loadSource -lib amc_carrier_core      -dir "$::DIR_PATH/fsbl"
+   loadSource -lib amc_carrier_core      -dir "$::DIR_PATH/fsbl/${family}"
    loadConstraints -dir "$::DIR_PATH/fsbl/${family}"
    
 } else {   
 
-   loadSource -dir "$::DIR_PATH/non-fsbl"
+   loadSource -lib amc_carrier_core -dir "$::DIR_PATH/non-fsbl"
    
    # Check if using zone2 or zone3 ETH interface
    if {  $::env(RTM_ETH)  == 1 } {
@@ -38,30 +38,30 @@ if { [info exists ::env(AMC_FSBL)] == 1 }  {
 
 # Load the FpgaTypePkg.vhd
 if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
-   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU040.vhd"
+   loadSource -lib amc_carrier_core -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU040.vhd"
 } elseif { $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} } {
-   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU060.vhd"
+   loadSource -lib amc_carrier_core -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU060.vhd"
 } elseif { $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {            
-   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU095.vhd"
+   loadSource -lib amc_carrier_core -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU095.vhd"
 } elseif { $::env(PRJ_PART) eq {XCKU11P-FFVA1156-2-E} } {  
-   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU11P.vhd"
+   loadSource -lib amc_carrier_core -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU11P.vhd"
 } elseif { $::env(PRJ_PART) eq {XCKU15P-FFVA1156-2-E} } {              
-   loadSource -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU15P.vhd"
+   loadSource -lib amc_carrier_core -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU15P.vhd"
 } else { 
 }
 
 # Load the XVC code
 if { [info exists ::env(USE_XVC_DEBUG)] != 1 || $::env(USE_XVC_DEBUG) == 0 } {
-	loadSource -path "$::DIR_PATH/debug/dcp/Stub/images/UdpDebugBridge.dcp"
+	loadSource -lib amc_carrier_core -path "$::DIR_PATH/debug/dcp/Stub/images/UdpDebugBridge.dcp"
    set_property IS_GLOBAL_INCLUDE {1} [get_files UdpDebugBridge.dcp]
 } elseif { $::env(USE_XVC_DEBUG) == -1 } {
 } else {
-	loadSource -path "$::DIR_PATH/debug/dcp/Impl/images/UdpDebugBridge.dcp"
+	loadSource -lib amc_carrier_core -path "$::DIR_PATH/debug/dcp/Impl/images/UdpDebugBridge.dcp"
    set_property IS_GLOBAL_INCLUDE {1} [get_files UdpDebugBridge.dcp]
 }
 
 
-loadSource   -path "$::DIR_PATH/ip/MigCore.dcp"
+loadSource -lib amc_carrier_core   -path "$::DIR_PATH/ip/MigCore.dcp"
 # loadIpCore -path "$::DIR_PATH/ip/MigCore.xci"
 
 # Check for Application Microblaze build

@@ -18,12 +18,16 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiPkg.all;
-use work.SsiPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiPkg.all;
+use surf.SsiPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 entity BsaWaveformEngine is
 
@@ -151,7 +155,7 @@ begin
    -- Input fifos
    -- These should probably be 4k bytes deep for best throughput
    AXIS_IN_FIFOS : for i in STREAMS_C-1 downto 0 generate
-      AxiStreamFifo : entity work.AxiStreamFifoV2
+      AxiStreamFifo : entity surf.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
@@ -179,7 +183,7 @@ begin
    end generate AXIS_IN_FIFOS;
 
    -- Mux of two streams
-   AxiStreamMux_INST : entity work.AxiStreamMux
+   AxiStreamMux_INST : entity surf.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
          NUM_SLAVES_G   => STREAMS_C,
@@ -196,7 +200,7 @@ begin
          axisRst      => axiRst);
 
    -- Extra buffer on output of mux
-   AxiStreamFifo_MUX_FIFO : entity work.AxiStreamFifoV2
+   AxiStreamFifo_MUX_FIFO : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
@@ -224,7 +228,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- AxiStreamDma Ring Buffers
    -------------------------------------------------------------------------------------------------
-   U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
+   U_AxiStreamDmaRingWrite_1 : entity surf.AxiStreamDmaRingWrite
       generic map (
          TPD_G                => TPD_G,
          BUFFERS_G            => STREAMS_C,
@@ -263,7 +267,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Route status message based on tdest
    -------------------------------------------------------------------------------------------------
-   U_AxiStreamDeMux_1 : entity work.AxiStreamDeMux
+   U_AxiStreamDeMux_1 : entity surf.AxiStreamDeMux
       generic map (
          TPD_G          => TPD_G,
          NUM_MASTERS_G  => 2,
@@ -287,7 +291,7 @@ begin
    -- AxiStreamDmaRingRead module optionally catches status messages from ring write
    -- Peforms the read itself and outputs the resulting data stream
    -------------------------------------------------------------------------------------------------
-   U_AxiStreamDmaRingRead_1 : entity work.AxiStreamDmaRingRead
+   U_AxiStreamDmaRingRead_1 : entity surf.AxiStreamDmaRingRead
       generic map (
          TPD_G                 => TPD_G,
          BUFFERS_G             => STREAMS_C,
@@ -319,7 +323,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Buffer the read dma data to transition to data clk 
    -------------------------------------------------------------------------------------------------
-   AxiStreamFifo_RD_DATA : entity work.AxiStreamFifoV2
+   AxiStreamFifo_RD_DATA : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
@@ -348,7 +352,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- AxiLite crossbar to allow AxiStreamDmaRingRead to access AxiStreamDmaRingWrite registers
    -------------------------------------------------------------------------------------------------
-   U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
+   U_AxiLiteCrossbar_1 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,
