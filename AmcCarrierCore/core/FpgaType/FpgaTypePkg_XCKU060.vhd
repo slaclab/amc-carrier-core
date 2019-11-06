@@ -1,10 +1,10 @@
 -------------------------------------------------------------------------------
 -- File       : FpgaTypePkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-08
--- Last update: 2018-07-21
 -------------------------------------------------------------------------------
--- Description: 
+-- Example .MCS: The GZ header (0x1F8B) starts at offset: 05700000 + 1DEC + 6 = 0x5701DF2
+-- :02   000004   0570   85
+-- :10   1DEC00   27 C3 BF C3 BF 27 1F 8B 08 00 6A DF C1 5D 00 03    79
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -22,8 +22,7 @@ use work.StdRtlPkg.all;
 
 package FpgaTypePkg is
 
-   -- constant CPSW_TARBALL_ADDR_C : slv(31 downto 0) := x"05701DEC";
-   constant CPSW_TARBALL_ADDR_C : slv(31 downto 0) := x"05701DF0";  -- Include ones.bin 4 byte offset
+   constant CPSW_TARBALL_ADDR_C : slv(31 downto 0) := x"05701DF2";
 
    constant ULTRASCALE_PLUS_C : boolean := false;
 

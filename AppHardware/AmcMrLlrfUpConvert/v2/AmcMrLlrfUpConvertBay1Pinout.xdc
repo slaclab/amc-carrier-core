@@ -50,6 +50,7 @@ set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][2]}] ; # jesdSync
 set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[1][2]}] ; # jesdSyncN[1][1]
 set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutP[1][1]}] ; # jesdSyncP[1][2]
 set_property -dict { IOSTANDARD LVDS } [get_ports {syncOutN[1][1]}] ; # jesdSyncN[1][2]
+set_property UNAVAILABLE_DURING_CALIBRATION TRUE [get_ports {syncOutP[1][1]}]
 
 # LMK and ADC SPI
 set_property -dict { IOSTANDARD LVCMOS25 PULLUP true} [get_ports {jtagPri[1][0]}] ; #spiSdio_io[1]
