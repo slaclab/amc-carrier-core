@@ -246,8 +246,8 @@ var NAVTREEINDEX20 =
 "classAxisBramRingBufferTb_1_1testbed.html#ace73f881572eb650976a7c6d8462eefc":[0,0,74,0,11],
 "classAxisBramRingBufferTb_1_1testbed.html#ad08db7dbbedf0898aaff893725e5a716":[0,0,74,0,9],
 "classAxisBramRingBufferTb_1_1testbed.html#add1e3edd67c8a9636f236d9d46e2bbd5":[0,0,74,0,4],
-"classBsaAccumulator.html":[0,0,78],
-"classBsaAccumulator.html#a0a6af6eef40212dbaf130d57ce711256":[0,0,78,23],
-"classBsaAccumulator.html#a12d5d7fbf1ce55536e77104afd242626":[0,0,78,12],
-"classBsaAccumulator.html#a1ebde357ae558805bfcd8b6a48c5d09a":[0,0,78,4]
+"classBldAxiStream.html":[0,0,78],
+"classBldAxiStream.html#a0a6af6eef40212dbaf130d57ce711256":[0,0,78,16],
+"classBldAxiStream.html#a0f5ecc6613f63d07f7963a97b1b26095":[0,0,78,19],
+"classBldAxiStream.html#a183b9cc61a615f1f660c134b30caf3e4":[0,0,78,2]
 };

@@ -1,12 +1,13 @@
 <map id="AmcCarrierFsbl" name="AmcCarrierFsbl">
-<area shape="rect" id="node11" href="$classAmcCarrierCoreFsbl.html" title="AmcCarrierCoreFsbl" alt="" coords="235,304,385,331"/>
+<area shape="rect" id="node12" href="$classAmcCarrierCoreFsbl.html" title="AmcCarrierCoreFsbl" alt="" coords="235,304,385,331"/>
 <area shape="rect" id="node2" href="$classAmcCarrierIbufGt.html" title="AmcCarrierIbufGt" alt="" coords="5,80,140,107"/>
 <area shape="rect" id="node4" href="$classAmcCarrierTiming.html" title="AmcCarrierTiming" alt="" coords="75,155,215,181"/>
 <area shape="rect" id="node3" href="$classAmcCarrierEthFsbl.html" title="AmcCarrierEthFsbl" alt="" coords="239,155,381,181"/>
 <area shape="rect" id="node5" href="$classAmcCarrierBsa.html" title="AmcCarrierBsa" alt="" coords="405,155,524,181"/>
-<area shape="rect" id="node6" href="$classBsaWaveformEngine.html" title="BsaWaveformEngine(2)" alt="" coords="200,80,375,107"/>
-<area shape="rect" id="node7" href="$classBsaBufferControl.html" title="BsaBufferControl" alt="" coords="399,80,531,107"/>
-<area shape="rect" id="node8" href="$classBsaAccumulator.html" title="BsaAccumulator" alt="" coords="401,5,529,32"/>
-<area shape="rect" id="node9" href="$classBsaAxiInterconnectWrapper.html" title="BsaAxiInterconnectWrapper" alt="" coords="555,80,758,107"/>
-<area shape="rect" id="node10" href="$classAmcCarrierDdrMem.html" title="AmcCarrierDdrMem" alt="" coords="548,155,699,181"/>
+<area shape="rect" id="node6" href="$classBsaWaveformEngine.html" title="BsaWaveformEngine(2)" alt="" coords="181,80,356,107"/>
+<area shape="rect" id="node7" href="$classBsaBufferControl.html" title="BsaBufferControl" alt="" coords="380,80,512,107"/>
+<area shape="rect" id="node8" href="$classBsaAccumulator.html" title="BsaAccumulator" alt="" coords="382,5,510,32"/>
+<area shape="rect" id="node9" href="$classBsaAxiInterconnectWrapper.html" title="BsaAxiInterconnectWrapper" alt="" coords="537,80,739,107"/>
+<area shape="rect" id="node10" href="$classBldAxiStream.html" title="BldAxiStream" alt="" coords="764,80,875,107"/>
+<area shape="rect" id="node11" href="$classAmcCarrierDdrMem.html" title="AmcCarrierDdrMem" alt="" coords="548,155,699,181"/>
 </map>

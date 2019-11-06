@@ -6,6 +6,7 @@ var classRtmDigitalDebugV2_1_1mapping =
     [ "userValueOut", "classRtmDigitalDebugV2_1_1mapping.html#a587319745900e771bc5656f94812bd6b", null ],
     [ "doutP", "classRtmDigitalDebugV2_1_1mapping.html#ab1e8096328cd1b7e60897b3f4fc639fd", null ],
     [ "doutN", "classRtmDigitalDebugV2_1_1mapping.html#a163b1697ab1d6799887b34f875f0d44f", null ],
+    [ "doutClk", "classRtmDigitalDebugV2_1_1mapping.html#ae4677645e737da3fd9564145d5fbc328", null ],
     [ "cleanClock", "classRtmDigitalDebugV2_1_1mapping.html#ac6f4731daf0af35831744c67e28f7b35", null ],
     [ "pllBwSel", "classRtmDigitalDebugV2_1_1mapping.html#ab6219ef04d9ab9c67ba2aef0f8ff6c03", null ],
     [ "pllFrqSel", "classRtmDigitalDebugV2_1_1mapping.html#a15e5bc1c3f61bd5f5d6803adee4b0c78", null ],

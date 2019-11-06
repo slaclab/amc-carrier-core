@@ -78,6 +78,7 @@ var annotated_dup =
     [ "AxiSerAttnMaster", "classAxiSerAttnMaster.html", "classAxiSerAttnMaster" ],
     [ "AxiSpiAd7682", "classAxiSpiAd7682.html", "classAxiSpiAd7682" ],
     [ "AxiSpiAd7682Reg", "classAxiSpiAd7682Reg.html", "classAxiSpiAd7682Reg" ],
+    [ "BldAxiStream", "classBldAxiStream.html", "classBldAxiStream" ],
     [ "BsaAccumulator", "classBsaAccumulator.html", "classBsaAccumulator" ],
     [ "BsaAxiInterconnectWrapper", "classBsaAxiInterconnectWrapper.html", "classBsaAxiInterconnectWrapper" ],
     [ "BsaBufferControl", "classBsaBufferControl.html", "classBsaBufferControl" ],

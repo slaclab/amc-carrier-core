@@ -32,16 +32,17 @@ var NAVTREEINDEX =
 "classAppTopJesd.html#a2af5bbe0ce44ade6dafa7825478f0a02",
 "classAppTopJesd_1_1mapping.html",
 "classAxiSpiAd7682.html#aa1cb22e959d47364391e5eb4ef86927c",
-"classBsaAccumulator.html#a2edc34402b573437d5f25fa90ba4013e",
-"classBsaWaveformEngine_1_1rtl.html#a1d85e38c5cc69daf5cda87d7daedf14d",
-"classDaqDecimator.html#a0f5ecc6613f63d07f7963a97b1b26095",
-"classDaqMuxV2_1_1rtl.html#ab321973352aa96770d116a584b4bfaa9",
-"classLvdsDacLane.html#a69d743b3dd8cbdad232716a7215dd894",
-"classMpsPgpFrontEndGty.html#a307dc86f4f11604a18d5b58f734895d1",
-"classRtmCryoDetReg.html#adfe38238e311007ad230f05acbed83da",
-"classRtmDigitalDebugV2.html#af98a1f0df20cf0e5f0fdb9f5999ad782",
-"classRtmRfInterlockCore_1_1mapping.html#a0c50918581df3b2191d4345f52ee56c7",
-"classSi5317a_1_1rtl.html#ae62147eb22676de9dc240171bfd23686"
+"classBldAxiStream.html#a22f8db74a5a4c77e7e2767279ca36e7f",
+"classBsaBufferControl_1_1rtl.html#a4363f9cf1bbc97f44fc2cc4f5bdacfa5",
+"classDacSigGenReg_1_1rtl.html#a0498304adc5e9a77df9df664a54ee3d3",
+"classDaqMuxV2.html#a89cae87f1ba23f3cd9858acd4a2f9976",
+"classDaqTrigger_1_1rtl.html#a0498304adc5e9a77df9df664a54ee3d3",
+"classMpsMsgCore.html#a5e055e2244f51a31f609da3af2c8a8c7",
+"classRtmCryoDacLut_1_1rtl.html#aa5ec87eb909fc8dfbe106f840f74cb90",
+"classRtmDigitalDebugDout.html#aeef44220d1f38b9057955532f90f3f47",
+"classRtmMpsLinkNode_1_1mapping.html#afdfeda3f667e7141b2cf3c6fafa69bf5",
+"classRtmRfInterlock_1_1mapping.html#ace46199855d588d38a9df34ab1f96e44",
+"classhmc305.html#a58fb135f6f4afc91501558682aa07e33"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
