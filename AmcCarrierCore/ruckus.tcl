@@ -50,17 +50,6 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
 } else { 
 }
 
-# Load the XVC code
-if { [info exists ::env(USE_XVC_DEBUG)] != 1 || $::env(USE_XVC_DEBUG) == 0 } {
-	loadSource -path "$::DIR_PATH/debug/dcp/Stub/images/UdpDebugBridge.dcp"
-   set_property IS_GLOBAL_INCLUDE {1} [get_files UdpDebugBridge.dcp]
-} elseif { $::env(USE_XVC_DEBUG) == -1 } {
-} else {
-	loadSource -path "$::DIR_PATH/debug/dcp/Impl/images/UdpDebugBridge.dcp"
-   set_property IS_GLOBAL_INCLUDE {1} [get_files UdpDebugBridge.dcp]
-}
-
-
 loadSource   -path "$::DIR_PATH/ip/MigCore.dcp"
 # loadIpCore -path "$::DIR_PATH/ip/MigCore.xci"
 
