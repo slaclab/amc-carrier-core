@@ -42,31 +42,36 @@ entity AmcCarrierBsa is
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);
    port (
       -- AXI-Lite Interface (axilClk domain)
-      axilClk         : in  sl;
-      axilRst         : in  sl;
-      axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType;
-      axilWriteMaster : in  AxiLiteWriteMasterType;
-      axilWriteSlave  : out AxiLiteWriteSlaveType;
+      axilClk              : in  sl;
+      axilRst              : in  sl;
+      axilReadMaster       : in  AxiLiteReadMasterType;
+      axilReadSlave        : out AxiLiteReadSlaveType;
+      axilWriteMaster      : in  AxiLiteWriteMasterType;
+      axilWriteSlave       : out AxiLiteWriteSlaveType;
       -- AXI4 Interface (axiClk domain)
-      axiClk          : in  sl;
-      axiRst          : in  sl;
-      axiWriteMaster  : out AxiWriteMasterType;
-      axiWriteSlave   : in  AxiWriteSlaveType;
-      axiReadMaster   : out AxiReadMasterType;
-      axiReadSlave    : in  AxiReadSlaveType;
+      axiClk               : in  sl;
+      axiRst               : in  sl;
+      axiWriteMaster       : out AxiWriteMasterType;
+      axiWriteSlave        : in  AxiWriteSlaveType;
+      axiReadMaster        : out AxiReadMasterType;
+      axiReadSlave         : in  AxiReadSlaveType;
+      -- External memory AXI4 Interface (axiClk domain)
+      extMemAxiWriteMaster : out AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+      extMemAxiWriteSlave  : in  AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
+      extMemAxiReadMaster  : out AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
+      extMemAxiReadSlave   : in  AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
       -- Ethernet Interface (axilClk domain)
-      obBsaMasters    : out AxiStreamMasterArray(3 downto 0);
-      obBsaSlaves     : in  AxiStreamSlaveArray(3 downto 0);
-      ibBsaMasters    : in  AxiStreamMasterArray(3 downto 0);
-      ibBsaSlaves     : out AxiStreamSlaveArray(3 downto 0);
+      obBsaMasters         : out AxiStreamMasterArray(3 downto 0);
+      obBsaSlaves          : in  AxiStreamSlaveArray(3 downto 0);
+      ibBsaMasters         : in  AxiStreamMasterArray(3 downto 0);
+      ibBsaSlaves          : out AxiStreamSlaveArray(3 downto 0);
       ----------------------
       -- Top Level Interface
       ----------------------      
       -- BSA Diagnostic Interface
-      diagnosticClk   : in  sl;
-      diagnosticRst   : in  sl;
-      diagnosticBus   : in  DiagnosticBusType;
+      diagnosticClk        : in  sl;
+      diagnosticRst        : in  sl;
+      diagnosticBus        : in  DiagnosticBusType;
 
       -- Waveform interface
       waveformClk          : in  sl;
@@ -75,10 +80,10 @@ entity AmcCarrierBsa is
       obAppWaveformSlaves  : out WaveformSlaveArrayType;
 
       -- Timing ETH MSG Interface (axilClk domain)
-      ibEthMsgMaster : in  AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
-      ibEthMsgSlave  : out AxiStreamSlaveType;
-      obEthMsgMaster : out AxiStreamMasterType;
-      obEthMsgSlave  : in  AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C);
+      ibEthMsgMaster       : in  AxiStreamMasterType := AXI_STREAM_MASTER_INIT_C;
+      ibEthMsgSlave        : out AxiStreamSlaveType;
+      obEthMsgMaster       : out AxiStreamMasterType;
+      obEthMsgSlave        : in  AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C);
 
 
 end AmcCarrierBsa;
@@ -395,8 +400,10 @@ begin
    GEN_DIS_SRP : if ( DISABLE_DDR_SRP_G = true ) generate
       ibBsaSlaves(BSA_MEM_AXIS_INDEX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
       obBsaMasters(BSA_MEM_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
-      memAxiWriteMaster                  <= AXI_WRITE_MASTER_INIT_C;
-      memAxiReadMaster                   <= AXI_READ_MASTER_INIT_C;
+      memAxiWriteMaster                  <= extMemAxiWriteMaster;
+      memAxiReadMaster                   <= extMemAxiReadMaster;
+      extMemAxiWriteSlave                <= memAxiWriteSlave;
+      extMemAxiReadSlave                 <= memAxiReadSlave;
    end generate GEN_DIS_SRP;
 
       ------------------------------------------------------------------------------------------------
