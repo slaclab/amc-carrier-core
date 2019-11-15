@@ -56,10 +56,10 @@ entity AmcCarrierBsa is
       axiReadMaster        : out AxiReadMasterType;
       axiReadSlave         : in  AxiReadSlaveType;
       -- External memory AXI4 Interface (axiClk domain)
-      extMemAxiWriteMaster : out AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
-      extMemAxiWriteSlave  : in  AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
-      extMemAxiReadMaster  : out AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
-      extMemAxiReadSlave   : in  AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
+      extMemAxiWriteMaster : in  AxiWriteMasterType := AXI_WRITE_MASTER_INIT_C;
+      extMemAxiWriteSlave  : out AxiWriteSlaveType  := AXI_WRITE_SLAVE_INIT_C;
+      extMemAxiReadMaster  : in  AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
+      extMemAxiReadSlave   : out AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
       -- Ethernet Interface (axilClk domain)
       obBsaMasters         : out AxiStreamMasterArray(3 downto 0);
       obBsaSlaves          : in  AxiStreamSlaveArray(3 downto 0);
