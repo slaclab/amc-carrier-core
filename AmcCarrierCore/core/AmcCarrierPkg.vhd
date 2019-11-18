@@ -28,66 +28,8 @@ use lcls_timing_core.TimingPkg.all;
 
 package AmcCarrierPkg is
 
-   ----------------
-   -- Revision Log:
-   ----------------
-   -- 04/15/2016 (0x00000001): Initial Build
-   -- 04/19/2016 (0x00000002): Added ETH status to BSI interface
-   -- 04/19/2016 (0x00000003): Added 10 second WDT to ETH Link Up
-   -- 04/19/2016 (0x00000004): In AmcCarrierEth, separating the RSSI's memory access and data paths 
-   --                          from the ASYNC messaging and register access as a work around until 
-   --                          AXIS packetizer (A.K.A. "chunker") supports interleaving of TDEST frames 
-   -- 04/19/2016 (0x00000005): In AmcCarrierRegPkg, defaulting MPS Link node's XBAR configurations to XBAR_TIME_GEN_C 
-   -- 04/21/2016 (0x00000006): Increased gtTxDiffCtrl from 0.95 Vppd to 1.08 Vppd
-   -- 04/21/2016 (0x00000007): Added Ethernet Uptime counter in the BSI interface
-   -- 07/08/2016 (0x00000008): Updated the I2C device configurations
-   -- 09/01/2016 (0x00000009): Backing up to 1.2 TAG
-   -- 12/05/2016 (0x0000000A): Adding more application types
-   -- 03/02/2017 (0x0000000B): Migration to GIT
-   -- 11/08/2017 (0x02000400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.4
-   -- 11/14/2017 (0x02000500): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.5
-   -- 11/17/2017 (0x02000600): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.6
-   -- 12/04/2017 (0x02000700): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.7
-   -- 12/11/2017 (0x02000700): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.0.8
-   -- 12/15/2017 (0x02010000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.0
-   -- 12/22/2017 (0x02010100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.1
-   -- 12/23/2017 (0x02010200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.2
-   -- 01/08/2018 (0x02010300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.3
-   -- 01/11/2018 (0x02010400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.4
-   -- 01/11/2018 (0x02010500): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.5
-   -- 02/12/2018 (0x02010600): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.1.6
-   -- 02/26/2018 (0x02020000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.0
-   -- 02/27/2018 (0x02020100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.1
-   -- 03/02/2018 (0x02020200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.2
-   -- 03/08/2018 (0x02020300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.3
-   -- 03/11/2018 (0x02020400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.2.4
-   -- 03/16/2018 (0x02030000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.3.0
-   -- 04/02/2018 (0x02030100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.3.1
-   -- 04/03/2018 (0x02030200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.3.2
-   -- 04/04/2018 (0x02030300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.3.3
-   -- 04/11/2018 (0x02030400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.3.4
-   -- 04/18/2018 (0x02040000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.0 
-   -- 04/21/2018 (0x02040100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.1   
-   -- 04/23/2018 (0x02040200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.2
-   -- 04/23/2018 (0x02040300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.3
-   -- 04/26/2018 (0x02040400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.4
-   -- 05/10/2018 (0x02040500): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.5
-   -- 05/17/2018 (0x02040600): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.6
-   -- 06/22/2018 (0x02040700): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.7
-   -- 07/21/2018 (0x02040800): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.4.8
-   -- 08/20/2018 (0x02050000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.5.0
-   -- 11/08/2018 (0x02050100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.5.1
-   -- 02/07/2019 (0x02050200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.5.2
-   -- 02/25/2019 (0x02050300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.5.3
-   -- 04/18/2019 (0x02060000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.0
-   -- 06/19/2019 (0x02060100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.1
-   -- 06/24/2019 (0x02060200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.2
-   -- 07/03/2019 (0x02060300): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.3
-   -- 08/05/2019 (0x02060400): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.4
-   -- 09/23/2019 (0x02060500): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.6.5
-   -- 10/20/2019 (0x02070000): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.7.0   
-   -- 11/05/2019 (0x02070100): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.7.1
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_07_01_00";
+   -- 11/14/2019 (0x02070200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.7.2
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_07_02_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
@@ -102,7 +44,7 @@ package AmcCarrierPkg is
    constant APP_LLRF_TYPE_C       : AppType := toSlv(13, AppType'length);
    constant APP_EXTREF_GEN_TYPE_C : AppType := toSlv(14, AppType'length);  --Timing Generator with external reference
    constant APP_FWS_TYPE_C        : AppType := toSlv(15, AppType'length);  --Fast Wire Scanner
-                                                     
+
    constant APP_BPM_STRIPLINE_TYPE_C : AppType := toSlv(100, AppType'length);
    constant APP_BPM_CAVITY_TYPE_C    : AppType := toSlv(101, AppType'length);
 

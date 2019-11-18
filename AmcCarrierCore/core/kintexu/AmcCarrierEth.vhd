@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-21
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -334,13 +331,13 @@ begin
    -------------
    -- Xilinx XVC
    -------------
-   U_Debug : entity amc_carrier_core.AmcCarrierXvcDebug
+   U_Debug : entity surf.UdpDebugBridgeWrapper
       generic map (
          TPD_G => TPD_G)
       port map (
          -- Clock and Reset
-         axilClk        => axilClk,
-         axilRst        => axilRst,
+         clk            => axilClk,
+         rst            => axilRst,
          -- UDP XVC Interface
          obServerMaster => obServerMasters(UDP_SRV_XVC_IDX_C),
          obServerSlave  => obServerSlaves(UDP_SRV_XVC_IDX_C),
