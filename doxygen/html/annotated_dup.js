@@ -23,7 +23,6 @@ var annotated_dup =
     [ "AmcCarrierSysMon", "classAmcCarrierSysMon.html", "classAmcCarrierSysMon" ],
     [ "AmcCarrierSysReg", "classAmcCarrierSysReg.html", "classAmcCarrierSysReg" ],
     [ "AmcCarrierTiming", "classAmcCarrierTiming.html", "classAmcCarrierTiming" ],
-    [ "AmcCarrierXvcDebug", "classAmcCarrierXvcDebug.html", "classAmcCarrierXvcDebug" ],
     [ "AmcCryoCore", "classAmcCryoCore.html", "classAmcCryoCore" ],
     [ "AmcCryoCoreCtrl", "classAmcCryoCoreCtrl.html", "classAmcCryoCoreCtrl" ],
     [ "AmcCryoDemoCore", "classAmcCryoDemoCore.html", "classAmcCryoDemoCore" ],
@@ -126,6 +125,5 @@ var annotated_dup =
     [ "RtmRfInterlockCore", "classRtmRfInterlockCore.html", "classRtmRfInterlockCore" ],
     [ "RtmRfInterlockReg", "classRtmRfInterlockReg.html", "classRtmRfInterlockReg" ],
     [ "Si5317a", "classSi5317a.html", "classSi5317a" ],
-    [ "SsiAxiMaster", "classSsiAxiMaster.html", "classSsiAxiMaster" ],
-    [ "UdpDebugBridge", "classUdpDebugBridge.html", "classUdpDebugBridge" ]
+    [ "SsiAxiMaster", "classSsiAxiMaster.html", "classSsiAxiMaster" ]
 ];

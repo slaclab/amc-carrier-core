@@ -25,7 +25,6 @@ var searchData=
   ['amccarriersysreg',['AmcCarrierSysReg',['../classAmcCarrierSysReg.html',1,'']]],
   ['amccarriersysregpkg',['AmcCarrierSysRegPkg',['../classAmcCarrierSysRegPkg.html',1,'']]],
   ['amccarriertiming',['AmcCarrierTiming',['../classAmcCarrierTiming.html',1,'']]],
-  ['amccarrierxvcdebug',['AmcCarrierXvcDebug',['../classAmcCarrierXvcDebug.html',1,'']]],
   ['amccryocore',['AmcCryoCore',['../classAmcCryoCore.html',1,'']]],
   ['amccryocorectrl',['AmcCryoCoreCtrl',['../classAmcCryoCoreCtrl.html',1,'']]],
   ['amccryodemocore',['AmcCryoDemoCore',['../classAmcCryoDemoCore.html',1,'']]],
