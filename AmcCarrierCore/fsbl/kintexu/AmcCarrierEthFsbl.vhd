@@ -2,7 +2,7 @@
 -- File       : AmcCarrierEthFsbl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-21
--- Last update: 2018-03-14
+-- Last update: 2019-11-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -253,7 +253,7 @@ begin
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
             EN_32BIT_ADDR_G     => true,
-            BRAM_EN_G           => true,
+            MEMORY_TYPE_G       => "block",
             GEN_SYNC_FIFO_G     => true,
             AXI_STREAM_CONFIG_G => EMAC_AXIS_CONFIG_C)
          port map (

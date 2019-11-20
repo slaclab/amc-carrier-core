@@ -2,7 +2,7 @@
 -- File       : BsaWaveformEngine.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-10-12
--- Last update: 2016-08-30
+-- Last update: 2019-11-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -39,10 +39,10 @@ entity BsaWaveformEngine is
       AXI_CONFIG_G           : AxiConfigType          := axiConfig(33, 16, 1, 8));
    port (
       -- Diagnostic data interface
-      waveformClk : in sl;
-      waveformRst : in sl;
+      waveformClk       : in  sl;
+      waveformRst       : in  sl;
       ibWaveformMasters : in  WaveformMasterType;
-      ibWaveformSlaves  : out WaveformSlaveType := (others=>WAVEFORM_SLAVE_REC_FORCE_C);
+      ibWaveformSlaves  : out WaveformSlaveType  := (others => WAVEFORM_SLAVE_REC_FORCE_C);
       -- AXI-Lite configuration interface
       axilClk           : in  sl;
       axilRst           : in  sl;
@@ -129,7 +129,7 @@ architecture rtl of BsaWaveformEngine is
       TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 2,
       TUSER_MODE_C  => TUSER_FIRST_LAST_C);
-   
+
    -- Data readout stream
    signal readDmaDataMaster : AxiStreamMasterType;
    signal readDmaDataSlave  : AxiStreamSlaveType;
@@ -160,14 +160,14 @@ begin
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
             VALID_THOLD_G       => 0,
-            BRAM_EN_G           => true,
+            MEMORY_TYPE_G       => "block",
             XIL_DEVICE_G        => "ULTRASCALE",
             USE_BUILT_IN_G      => false,
             GEN_SYNC_FIFO_G     => false,
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 9,
             FIFO_FIXED_THRESH_G => true,
-            FIFO_PAUSE_THRESH_G => 1,                       --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
+            FIFO_PAUSE_THRESH_G => 1,                    --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
             SLAVE_AXI_CONFIG_G  => WAVEFORM_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)  -- 128-bit
          port map (
@@ -205,7 +205,7 @@ begin
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => true,
+         MEMORY_TYPE_G       => "block",
          XIL_DEVICE_G        => "ULTRASCALE",
          USE_BUILT_IN_G      => false,
          GEN_SYNC_FIFO_G     => false,
@@ -328,7 +328,7 @@ begin
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => false,
+         MEMORY_TYPE_G       => "distributed",
          XIL_DEVICE_G        => "ULTRASCALE",
          USE_BUILT_IN_G      => false,
          GEN_SYNC_FIFO_G     => false,

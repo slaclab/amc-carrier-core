@@ -2,7 +2,7 @@
 -- File       : DaqMuxV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2016-07-12
--- Last update: 2018-03-14
+-- Last update: 2019-11-20
 -------------------------------------------------------------------------------
 -- Description: Data acquisition top module:
 --              https://confluence.slac.stanford.edu/display/ppareg/AmcAxisDaqV2+Requirements
@@ -27,7 +27,7 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity DaqMuxV2 is
    generic (
@@ -126,7 +126,7 @@ architecture rtl of DaqMuxV2 is
    signal s_freeze          : sl;
    signal s_headerEn        : sl;
    signal s_clearStatus     : sl;
-   
+
    signal devRst : sl;
 
    -- Data Format
@@ -159,8 +159,8 @@ begin
       port map (
          clk    => devClk_i,
          rstIn  => devRst_i,
-         rstOut => devRst);   
-   
+         rstOut => devRst);
+
    -----------------------------------------------------------
    -- Synchronize timestamp_i and bsa
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
@@ -374,7 +374,7 @@ begin
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
             VALID_THOLD_G       => 1,
-            BRAM_EN_G           => true,
+            MEMORY_TYPE_G       => "block",
             GEN_SYNC_FIFO_G     => false,
             CASCADE_SIZE_G      => 1,
             CASCADE_PAUSE_SEL_G => 0,

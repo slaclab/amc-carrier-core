@@ -2,7 +2,7 @@
 -- File       : AppMsgIb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-03-01
--- Last update: 2018-04-20
+-- Last update: 2019-11-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ entity AppMsgIb is
       HDR_SIZE_G         : positive := 1;
       DATA_SIZE_G        : positive := 1;
       EN_CRC_G           : boolean  := true;
-      BRAM_EN_G          : boolean  := true;
+      MEMORY_TYPE_G      : string   := "block";
       AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes
       FIFO_ADDR_WIDTH_G  : positive := 9);  -- units of bits
    port (
@@ -54,7 +54,7 @@ end AppMsgIb;
 architecture rtl of AppMsgIb is
 
    constant SIZE_C             : positive            := (2+HDR_SIZE_G+DATA_SIZE_G);  -- 64-bit timestamp + header + data
-   constant DATA_WIDTH_G       : positive            := (32*SIZE_C);  -- 32-bit words
+   constant DATA_WIDTH_G       : positive            := (32*SIZE_C);                 -- 32-bit words
    constant AXIS_CONFIG_C      : AxiStreamConfigType := ssiAxiStreamConfig(4, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);
    constant SLAVE_AXI_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(AXIS_TDATA_WIDTH_G, TKEEP_COMP_C, TUSER_FIRST_LAST_C, 8);
 
@@ -145,7 +145,7 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => BRAM_EN_G,
+         MEMORY_TYPE_G       => MEMORY_TYPE_G,
          GEN_SYNC_FIFO_G     => true,
          FIFO_ADDR_WIDTH_G   => FIFO_ADDR_WIDTH_G,
          -- AXI Stream Port Configurations

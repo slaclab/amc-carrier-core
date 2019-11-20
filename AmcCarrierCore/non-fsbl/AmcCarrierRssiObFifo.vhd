@@ -44,7 +44,7 @@ architecture mapping of AmcCarrierRssiObFifo is
 
    constant AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => EMAC_AXIS_CONFIG_C.TSTRB_EN_C,
-      TDATA_BYTES_C => 2,  -- 2Bytes x 156.25 MHz x 8b/B = 2.5 Gb/s throttle 
+      TDATA_BYTES_C => 2,               -- 2Bytes x 156.25 MHz x 8b/B = 2.5 Gb/s throttle 
       TDEST_BITS_C  => EMAC_AXIS_CONFIG_C.TDEST_BITS_C,
       TID_BITS_C    => EMAC_AXIS_CONFIG_C.TID_BITS_C,
       TKEEP_MODE_C  => EMAC_AXIS_CONFIG_C.TKEEP_MODE_C,
@@ -57,8 +57,8 @@ architecture mapping of AmcCarrierRssiObFifo is
 begin
 
    BYPASS_LOGIC : if (BYPASS_G = true) generate
-      ibServerMaster  <= obRssiTspMaster;
-      obRssiTspSlave  <= ibServerSlave;
+      ibServerMaster <= obRssiTspMaster;
+      obRssiTspSlave <= ibServerSlave;
    end generate;
 
    BUILD_LOGIC : if (BYPASS_G = false) generate
@@ -88,13 +88,13 @@ begin
             TPD_G               => TPD_G,
             PIPE_STAGES_G       => 1,
             SLAVE_READY_EN_G    => true,
-            VALID_THOLD_G       => 0,      -- 0 = "store and forward"
+            VALID_THOLD_G       => 0,         -- 0 = "store and forward"
             -- FIFO configurations
-            BRAM_EN_G           => true,
+            MEMORY_TYPE_G       => "block",
             GEN_SYNC_FIFO_G     => true,
             INT_WIDTH_SELECT_G  => "CUSTOM",  -- Force internal width
-            INT_DATA_WIDTH_G    => 16,     -- 128-bit         
-            FIFO_ADDR_WIDTH_G   => 10,  -- 16kB/FIFO = 128-bits x 1024 entries         
+            INT_DATA_WIDTH_G    => 16,        -- 128-bit         
+            FIFO_ADDR_WIDTH_G   => 10,        -- 16kB/FIFO = 128-bits x 1024 entries         
             -- AXI Stream Port Configurations
             SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
@@ -109,7 +109,7 @@ begin
             mAxisRst    => axilRst,
             mAxisMaster => ibServerMaster,
             mAxisSlave  => ibServerSlave);
-            
+
    end generate;
-   
+
 end mapping;

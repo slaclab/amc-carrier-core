@@ -2,7 +2,7 @@
 -- File       : AxisBramFlashBuffer.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-04-10
--- Last update: 2018-04-20
+-- Last update: 2019-11-20
 -------------------------------------------------------------------------------
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
@@ -39,7 +39,7 @@ use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AxisBramFlashBuffer is
    generic (
@@ -149,11 +149,11 @@ begin
    GEN_BRAM : for i in NUM_CH_G-1 downto 0 generate
       U_BRAM : entity surf.SimpleDualPortRam
          generic map (
-            TPD_G        => TPD_G,
-            BRAM_EN_G    => true,
-            DOB_REG_G    => true,       -- 2 cycle latency
-            DATA_WIDTH_G => 32,
-            ADDR_WIDTH_G => BUFFER_WIDTH_G)
+            TPD_G         => TPD_G,
+            MEMORY_TYPE_G => "block",
+            DOB_REG_G     => true,      -- 2 cycle latency
+            DATA_WIDTH_G  => 32,
+            ADDR_WIDTH_G  => BUFFER_WIDTH_G)
          port map (
             -- Port A     
             clka  => appClk,

@@ -2,7 +2,7 @@
 -- File       : AppMsgOb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2017-03-01
--- Last update: 2018-04-20
+-- Last update: 2019-11-20
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ entity AppMsgOb is
       HDR_SIZE_G         : positive := 1;
       DATA_SIZE_G        : positive := 1;
       EN_CRC_G           : boolean  := true;
-      BRAM_EN_G          : boolean  := true;
+      MEMORY_TYPE_G      : string   := "block";
       AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes
       FIFO_ADDR_WIDTH_G  : positive := 9);  -- units of bits
    port (
@@ -281,7 +281,7 @@ begin
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => BRAM_EN_G,
+         MEMORY_TYPE_G       => MEMORY_TYPE_G,
          GEN_SYNC_FIFO_G     => true,
          FIFO_ADDR_WIDTH_G   => FIFO_ADDR_WIDTH_G,
          -- AXI Stream Port Configurations
