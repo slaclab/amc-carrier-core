@@ -272,7 +272,7 @@ begin
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
             VALID_THOLD_G       => 1,
-            BRAM_EN_G           => true,
+            MEMORY_TYPE_G       => "block",
             USE_BUILT_IN_G      => false,
             GEN_SYNC_FIFO_G     => false,
             FIFO_ADDR_WIDTH_G   => 9,
