@@ -18,10 +18,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.jesd204bpkg.all;
-use work.AppTopPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.jesd204bpkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
 
 entity DacSigGen is
    generic (
@@ -90,7 +94,7 @@ begin
       ---------------------
       -- AXI-Lite Crossbar
       ---------------------
-      U_XBAR : entity work.AxiLiteCrossbar
+      U_XBAR : entity surf.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
             NUM_SLAVE_SLOTS_G  => 1,
@@ -109,7 +113,7 @@ begin
             mAxiReadSlaves      => axilReadSlaves);
 
       -- DAQ control register interface
-      U_DacSigGenReg : entity work.DacSigGenReg
+      U_DacSigGenReg : entity amc_carrier_core.DacSigGenReg
          generic map (
             TPD_G         => TPD_G,
             ADDR_WIDTH_G  => SIG_GEN_ADDR_WIDTH_G,
@@ -143,7 +147,7 @@ begin
          -- Triggers
          s_trig(i) <= dacSigCtrl.start(i) or s_trigSw(i);
 
-         U_DacSigGenLane : entity work.DacSigGenLane
+         U_DacSigGenLane : entity amc_carrier_core.DacSigGenLane
             generic map (
                TPD_G        => TPD_G,
                ADDR_WIDTH_G => SIG_GEN_ADDR_WIDTH_G,

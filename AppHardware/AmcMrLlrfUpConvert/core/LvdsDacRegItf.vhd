@@ -30,8 +30,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity LvdsDacRegItf is
    generic (
@@ -186,7 +188,7 @@ begin
 
    GEN_0 : for i in 15 downto 0 generate
 
-      Sync_tapDelayStat : entity work.SynchronizerVector
+      Sync_tapDelayStat : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 9)
@@ -197,7 +199,7 @@ begin
 
    end generate GEN_0;
 
-   Sync_enable : entity work.Synchronizer
+   Sync_enable : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -206,7 +208,7 @@ begin
          dataIn  => r.control(0),
          dataOut => enable_o);
 
-   Sync_load : entity work.SynchronizerVector
+   Sync_load : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 16)
@@ -215,7 +217,7 @@ begin
          dataIn  => r.load,
          dataOut => load_o);
 
-   Sync_periodSize : entity work.SynchronizerVector
+   Sync_periodSize : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => ADDR_WIDTH_G)
@@ -224,7 +226,7 @@ begin
          dataIn  => r.periodSize,
          dataOut => periodSize_o);
 
-   Sync_polarityMask : entity work.SynchronizerVector
+   Sync_polarityMask : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 16)
@@ -235,7 +237,7 @@ begin
 
    GEN_1 : for i in 15 downto 0 generate
 
-      Sync_tapDelaySet : entity work.SynchronizerVector
+      Sync_tapDelaySet : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 9)

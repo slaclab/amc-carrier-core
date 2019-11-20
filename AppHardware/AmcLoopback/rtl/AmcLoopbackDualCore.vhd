@@ -18,8 +18,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core; 
 
 entity AmcLoopbackDualCore is
    generic (
@@ -68,7 +72,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcLoopbackCore
+      U_AMC : entity amc_carrier_core.AmcLoopbackCore
          generic map (
             TPD_G => TPD_G)
          port map(

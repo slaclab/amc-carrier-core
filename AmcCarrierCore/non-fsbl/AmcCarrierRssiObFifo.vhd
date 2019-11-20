@@ -18,9 +18,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.EthMacPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
 
 entity AmcCarrierRssiObFifo is
    generic (
@@ -61,7 +63,7 @@ begin
 
    BUILD_LOGIC : if (BYPASS_G = false) generate
 
-      U_Choke : entity work.AxiStreamResize
+      U_Choke : entity surf.AxiStreamResize
          generic map (
             -- General Configurations
             TPD_G               => TPD_G,
@@ -80,7 +82,7 @@ begin
             mAxisMaster => chokeMaster,
             mAxisSlave  => chokeSlave);
 
-      U_Burst_Fifo : entity work.AxiStreamFifoV2
+      U_Burst_Fifo : entity surf.AxiStreamFifoV2
          generic map (
             -- General Configurations
             TPD_G               => TPD_G,

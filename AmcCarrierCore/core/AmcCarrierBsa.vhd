@@ -5,7 +5,7 @@
 -- Author     : Benjamin Reese <bareese@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-07-08
--- Last update: 2019-09-12
+-- Last update: 2019-11-01
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -23,14 +23,17 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiPkg.all;
-use work.AxiLitePkg.all;
-use work.TimingPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierBsa is
    generic (
@@ -184,7 +187,7 @@ begin
 
    BSA_GEN : if (FSBL_G = false) generate
 
-      U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
+      U_AxiLiteCrossbar_1 : entity surf.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
             NUM_SLAVE_SLOTS_G  => 1,
@@ -212,7 +215,7 @@ begin
       ------------------------------------------------------------------------------------------------
       ibBsaSlaves(BSA_WAVEFORM_STATUS_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only.
       ibBsaSlaves(BSA_WAVEFORM_DATA_AXIS_INDEX_C)   <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only
-      BsaWaveformEngine_0 : entity work.BsaWaveformEngine
+      BsaWaveformEngine_0 : entity amc_carrier_core.BsaWaveformEngine
          generic map (
             TPD_G                  => TPD_G,
             WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
@@ -245,7 +248,7 @@ begin
             axiReadMaster     => waveform0AxiReadMaster,    -- [out]
             axiReadSlave      => waveform0AxiReadSlave);    -- [in]
 
-      BsaWaveformEngine_1 : entity work.BsaWaveformEngine
+      BsaWaveformEngine_1 : entity amc_carrier_core.BsaWaveformEngine
          generic map (
             TPD_G                  => TPD_G,
             WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
@@ -278,7 +281,7 @@ begin
             axiReadMaster     => waveform1AxiReadMaster,    -- [out]
             axiReadSlave      => waveform1AxiReadSlave);    -- [in]
 
-      U_AxiStreamMux_WaveformStatus : entity work.AxiStreamMux
+      U_AxiStreamMux_WaveformStatus : entity surf.AxiStreamMux
          generic map (
             TPD_G          => TPD_G,
             NUM_SLAVES_G   => 2,
@@ -296,7 +299,7 @@ begin
             axisClk      => axilClk,    -- [in]
             axisRst      => axilRst);   -- [in]
 
-      U_AxiStreamMux_WaveformData : entity work.AxiStreamMux
+      U_AxiStreamMux_WaveformData : entity surf.AxiStreamMux
          generic map (
             TPD_G          => TPD_G,
             NUM_SLAVES_G   => 2,
@@ -319,7 +322,7 @@ begin
       -------------------------------------------------------------------------------------------------
       ibBsaSlaves(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;
       BSA_EN_GEN : if (DISABLE_BSA_G = false) generate
-         BsaBufferControl_1 : entity work.BsaBufferControl
+         BsaBufferControl_1 : entity amc_carrier_core.BsaBufferControl
             generic map (
                TPD_G                   => TPD_G,
                AXIL_BASE_ADDR_G        => AXIL_CROSSBAR_CONFIG_C(BSA_BUFFER_AXIL_C).baseAddr,
@@ -359,7 +362,7 @@ begin
 --      -- Mem Read engine
 --      -----------------------------------------------------------------------------------------------
       GEN_EN_SRP : if (DISABLE_DDR_SRP_G = false) generate
-         U_SrpV3Axi_1 : entity work.SrpV3Axi
+         U_SrpV3Axi_1 : entity surf.SrpV3Axi
             generic map (
                TPD_G               => TPD_G,
                PIPE_STAGES_G       => 1,
@@ -406,7 +409,7 @@ begin
       -- Axi Interconnect
       -- Mux AXI busses, resize to 512 wide data words, buffer bursts
       ------------------------------------------------------------------------------------------------
-      U_BsaAxiInterconnectWrapper_1 : entity work.BsaAxiInterconnectWrapper
+      U_BsaAxiInterconnectWrapper_1 : entity amc_carrier_core.BsaAxiInterconnectWrapper
          port map (
             axiClk              => axiClk,                  -- [in]
             axiRst              => axiRst,                  -- [in]
@@ -434,7 +437,7 @@ begin
    end generate BSA_GEN;
 
    BLD_ENABLE_GEN : if not DISABLE_BLD_G generate
-      U_BLD : entity work.BldAxiStream
+      U_BLD : entity amc_carrier_core.BldAxiStream
          generic map (
             TPD_G => TPD_G)
          port map (

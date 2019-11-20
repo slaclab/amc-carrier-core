@@ -23,9 +23,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -236,7 +238,7 @@ begin
    reset   <= axilRst or r.ddrReset;
    axiRstL <= not(sysRst);
 
-   U_RstSync : entity work.RstSync
+   U_RstSync : entity surf.RstSync
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -317,7 +319,7 @@ begin
 
    FSBL_GEN : if (FSBL_G = true) generate
 
-      U_AxiMemTester : entity work.AxiMemTester
+      U_AxiMemTester : entity surf.AxiMemTester
          generic map (
             TPD_G        => TPD_G,
             START_ADDR_G => START_ADDR_C,
@@ -356,7 +358,7 @@ begin
       ddrReadMaster  <= axiReadMaster;
       axiReadSlave   <= ddrReadSlave;
 
-      U_Sync : entity work.Synchronizer
+      U_Sync : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (

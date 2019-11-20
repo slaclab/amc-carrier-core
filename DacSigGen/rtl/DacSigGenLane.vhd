@@ -47,11 +47,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.FpgaTypePkg.all;
 
-use work.Jesd204bPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
+
+use surf.Jesd204bPkg.all;
 
 entity DacSigGenLane is
    generic (
@@ -142,7 +146,7 @@ begin
    devClk <= jesdClk2x when(RAM_CLK_G = '0') else jesdClk;
    devRst <= jesdRst2x when(RAM_CLK_G = '0') else jesdRst;
 
-   U_Sync : entity work.SynchronizerEdge
+   U_Sync : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -154,7 +158,7 @@ begin
          
    GEN_BRAM : if (not ULTRASCALE_PLUS_C) generate
             
-      U_RAM : entity work.AxiDualPortRam
+      U_RAM : entity surf.AxiDualPortRam
          generic map (
             TPD_G        => TPD_G,
             ADDR_WIDTH_G => ADDR_WIDTH_G,
@@ -178,7 +182,7 @@ begin
 
    GEN_URAM : if (ULTRASCALE_PLUS_C) generate
    
-      U_AxiLiteAsync : entity work.AxiLiteAsync
+      U_AxiLiteAsync : entity surf.AxiLiteAsync
          generic map (
             TPD_G            => TPD_G,
             NUM_ADDR_BITS_G  => (ADDR_WIDTH_G+2),
@@ -199,7 +203,7 @@ begin
             mAxiWriteMaster => writeMaster,
             mAxiWriteSlave  => writeSlave);   
             
-      U_URAM : entity work.AxiDualPortRam
+      U_URAM : entity surf.AxiDualPortRam
          generic map (
             TPD_G         => TPD_G,
             SYNTH_MODE_G  => "xpm",
@@ -313,7 +317,7 @@ begin
       GEN_32bit : if (INTERFACE_G = '0') generate
 
          -- Output sync and assignment      
-         U_Jesd16bTo32b : entity work.Jesd16bTo32b
+         U_Jesd16bTo32b : entity surf.Jesd16bTo32b
             generic map (
                TPD_G => TPD_G)
             port map (
@@ -328,7 +332,7 @@ begin
                validOut  => valid_o,
                dataOut   => dacSigValues_o);
 
-         U_Sync : entity work.Synchronizer
+         U_Sync : entity surf.Synchronizer
             generic map (
                TPD_G => TPD_G)
             port map (
@@ -337,7 +341,7 @@ begin
                dataIn  => r.runningD1,
                dataOut => running_o);
 
-         U_SyncOneShot : entity work.SynchronizerOneShot
+         U_SyncOneShot : entity surf.SynchronizerOneShot
             generic map (
                TPD_G => TPD_G)
             port map (

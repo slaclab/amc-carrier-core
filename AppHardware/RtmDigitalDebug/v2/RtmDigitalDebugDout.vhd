@@ -18,8 +18,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.FpgaTypePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -79,7 +83,7 @@ begin
          end generate;
 
          REG_CLK : if (REG_DOUT_MODE_G(i) = '1') generate
-            U_CLK : entity work.ClkOutBufDiff
+            U_CLK : entity surf.ClkOutBufDiff
                generic map (
                   TPD_G          => TPD_G,
                   RST_POLARITY_G => '1',

@@ -27,7 +27,11 @@ use ieee.std_logic_unsigned.all;
 library UNISIM;
 use UNISIM.vcomponents.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+
+library amc_carrier_core; 
 
 entity Ad9229Core is
    generic (
@@ -98,7 +102,7 @@ begin
    ----------------------------------------------------
    -- Clock out 
    ----------------------------------------------------   
-   U_ClkOutBufDiff : entity work.ClkOutBufDiff
+   U_ClkOutBufDiff : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
@@ -133,7 +137,7 @@ begin
          O  => s_serDiv2Clk);
 
    -- Divide clock reset sync
-   U_rstSync0 : entity work.RstSync
+   U_rstSync0 : entity surf.RstSync
       generic map (
          TPD_G           => TPD_G,
          RELEASE_DELAY_G => 5)
@@ -155,7 +159,7 @@ begin
             IB => serDataN_i(i),
             O  => s_serData(i));
  
-      Ad9229Deserializer_INST: entity work.Ad9229Deserializer
+      Ad9229Deserializer_INST: entity amc_carrier_core.Ad9229Deserializer
          generic map (
             TPD_G             => TPD_G,
             IODELAY_GROUP_G   => IODELAY_GROUP_G,
@@ -188,7 +192,7 @@ begin
    ----------------------------------------------------   
    -- Frame clock Deserializer
    ---------------------------------------------------- 
-   Ad9229Deserializer_INST: entity work.Ad9229Deserializer
+   Ad9229Deserializer_INST: entity amc_carrier_core.Ad9229Deserializer
       generic map (
          TPD_G             => TPD_G,
          IODELAY_GROUP_G   => IODELAY_GROUP_G,

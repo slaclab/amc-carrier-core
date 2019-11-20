@@ -18,11 +18,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
-use work.FpgaTypePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -91,7 +95,7 @@ begin
    -----------------------
    -- Generalized Mapping 
    -----------------------
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -104,7 +108,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : entity work.JesdSyncOut
+   U_jesdRxSync0 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -117,7 +121,7 @@ begin
          jesdSyncP => syncOutP(4),
          jesdSyncN => syncOutN(4));
 
-   U_jesdRxSync1 : entity work.JesdSyncOut
+   U_jesdRxSync1 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -130,7 +134,7 @@ begin
          jesdSyncP => syncOutP(2),
          jesdSyncN => syncOutN(2));
 
-   U_jesdRxSync2 : entity work.JesdSyncOut
+   U_jesdRxSync2 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -188,7 +192,7 @@ begin
    end generate;
 
    CLK_OUT : if (TIMING_TRIG_MODE_G = true) generate
-      U_CLK : entity work.ClkOutBufSingle
+      U_CLK : entity surf.ClkOutBufSingle
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -207,7 +211,7 @@ begin
    spareN(13) <= dacSdi;
    dacSdo     <= spareP(13);
 
-   U_jesdTxSync : entity work.JesdSyncIn
+   U_jesdTxSync : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => true)  -- Note inverted because it is Swapped on the board

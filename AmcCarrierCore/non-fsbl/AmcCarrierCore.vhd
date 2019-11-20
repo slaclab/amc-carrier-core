@@ -18,13 +18,19 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.TimingPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -234,7 +240,7 @@ begin
    --------------------------------
    -- Common Clock and Reset Module
    -------------------------------- 
-   U_IBUFDS : entity work.AmcCarrierIbufGt
+   U_IBUFDS : entity amc_carrier_core.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
@@ -256,7 +262,7 @@ begin
          DIV     => "000",              -- Divide by 1
          O       => fabClk);
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map(
          TPD_G         => TPD_G,
          SIM_SPEEDUP_G => SIM_SPEEDUP_G)
@@ -264,7 +270,7 @@ begin
          clk    => fabClk,
          rstOut => fabRst);
 
-   U_AmcCorePll : entity work.ClockManagerUltraScale
+   U_AmcCorePll : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G             => TPD_G,
          TYPE_G            => "PLL",
@@ -288,7 +294,7 @@ begin
          rstOut(0) => reset);
 
    -- Help with meeting timing on the reset path
-   U_Rst : entity work.RstPipeline
+   U_Rst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -299,7 +305,7 @@ begin
    ------------------
    -- Ethernet Module
    ------------------
-   U_Eth : entity work.AmcCarrierEth
+   U_Eth : entity amc_carrier_core.AmcCarrierEth
       generic map (
          TPD_G                 => TPD_G,
          RSSI_ILEAVE_EN_G      => RSSI_ILEAVE_EN_G,
@@ -363,7 +369,7 @@ begin
    --------------
    -- Timing Core
    --------------
-   U_Timing : entity work.AmcCarrierTiming
+   U_Timing : entity amc_carrier_core.AmcCarrierTiming
       generic map (
          TPD_G             => TPD_G,
          TIME_GEN_APP_G    => TIME_GEN_APP_G,
@@ -423,7 +429,7 @@ begin
    --------------
    -- BSA Core
    --------------
-   U_Bsa : entity work.AmcCarrierBsa
+   U_Bsa : entity amc_carrier_core.AmcCarrierBsa
       generic map (
          TPD_G                  => TPD_G,
          FSBL_G                 => FSBL_G,
@@ -473,7 +479,7 @@ begin
    ------------------
    -- DDR Memory Core
    ------------------
-   U_DdrMem : entity work.AmcCarrierDdrMem
+   U_DdrMem : entity amc_carrier_core.AmcCarrierDdrMem
       generic map (
          TPD_G         => TPD_G,
          FSBL_G        => FSBL_G,

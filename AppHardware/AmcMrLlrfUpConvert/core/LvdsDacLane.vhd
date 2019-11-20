@@ -25,10 +25,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 entity LvdsDacLane is
    generic (
@@ -80,7 +82,7 @@ architecture rtl of LvdsDacLane is
 
 begin
 
-   U_RAM : entity work.AxiDualPortRam
+   U_RAM : entity surf.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
          ADDR_WIDTH_G => ADDR_WIDTH_G,
@@ -134,7 +136,7 @@ begin
       end if;
    end process seq;
 
-   U_Jesd16bTo32b : entity work.Jesd16bTo32b
+   U_Jesd16bTo32b : entity surf.Jesd16bTo32b
       generic map (
          TPD_G => TPD_G)
       port map (
