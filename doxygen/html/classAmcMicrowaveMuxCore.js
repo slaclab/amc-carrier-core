@@ -34,8 +34,10 @@ var classAmcMicrowaveMuxCore =
     [ "std_logic_arith", "classAmcMicrowaveMuxCore.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
     [ "unisim", "classAmcMicrowaveMuxCore.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
     [ "vcomponents", "classAmcMicrowaveMuxCore.html#aa1cb22e959d47364391e5eb4ef86927c", null ],
+    [ "surf", "classAmcMicrowaveMuxCore.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAmcMicrowaveMuxCore.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classAmcMicrowaveMuxCore.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
     [ "AxiStreamPkg", "classAmcMicrowaveMuxCore.html#a776f7d1c3e4102d6af8db8ec00c215ce", null ],
-    [ "jesd204bPkg", "classAmcMicrowaveMuxCore.html#aeb14e1f3b0b3eb709daed8b4aa8c08e9", null ]
+    [ "jesd204bPkg", "classAmcMicrowaveMuxCore.html#aeb14e1f3b0b3eb709daed8b4aa8c08e9", null ],
+    [ "amc_carrier_core", "classAmcMicrowaveMuxCore.html#a5173e10093c3bf1b5d95f5240e060d43", null ]
 ];

@@ -31,8 +31,10 @@ var classDacSigGenLane =
     [ "std_logic_1164", "classDacSigGenLane.html#acd03516902501cd1c7296a98e22c6fcb", null ],
     [ "std_logic_unsigned", "classDacSigGenLane.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "std_logic_arith", "classDacSigGenLane.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
+    [ "surf", "classDacSigGenLane.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classDacSigGenLane.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classDacSigGenLane.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
+    [ "amc_carrier_core", "classDacSigGenLane.html#a5173e10093c3bf1b5d95f5240e060d43", null ],
     [ "FpgaTypePkg", "classDacSigGenLane.html#a2d2b0e40d47d57e9474d8be8077ecfa0", null ],
     [ "Jesd204bPkg", "classDacSigGenLane.html#acc9015ba5a43f2d3eb99da0fa161f0f3", null ]
 ];

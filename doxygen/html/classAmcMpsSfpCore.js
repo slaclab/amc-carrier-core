@@ -31,6 +31,8 @@ var classAmcMpsSfpCore =
     [ "std_logic_1164", "classAmcMpsSfpCore.html#acd03516902501cd1c7296a98e22c6fcb", null ],
     [ "std_logic_unsigned", "classAmcMpsSfpCore.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "std_logic_arith", "classAmcMpsSfpCore.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
+    [ "surf", "classAmcMpsSfpCore.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAmcMpsSfpCore.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
-    [ "AxiLitePkg", "classAmcMpsSfpCore.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ]
+    [ "AxiLitePkg", "classAmcMpsSfpCore.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
+    [ "amc_carrier_core", "classAmcMpsSfpCore.html#a5173e10093c3bf1b5d95f5240e060d43", null ]
 ];

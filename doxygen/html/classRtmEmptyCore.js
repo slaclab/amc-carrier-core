@@ -14,6 +14,7 @@ var classRtmEmptyCore =
     [ "genClkN", "classRtmEmptyCore.html#a33a477705987dc05aecce9b7d93c5141", null ],
     [ "ieee", "classRtmEmptyCore.html#a0a6af6eef40212dbaf130d57ce711256", null ],
     [ "std_logic_1164", "classRtmEmptyCore.html#acd03516902501cd1c7296a98e22c6fcb", null ],
+    [ "surf", "classRtmEmptyCore.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classRtmEmptyCore.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classRtmEmptyCore.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
     [ "unisim", "classRtmEmptyCore.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],

@@ -29,6 +29,7 @@ var classBsaBufferControl =
     [ "std_logic_1164", "classBsaBufferControl.html#acd03516902501cd1c7296a98e22c6fcb", null ],
     [ "std_logic_unsigned", "classBsaBufferControl.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "numeric_std", "classBsaBufferControl.html#a2edc34402b573437d5f25fa90ba4013e", null ],
+    [ "surf", "classBsaBufferControl.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classBsaBufferControl.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiStreamPkg", "classBsaBufferControl.html#a776f7d1c3e4102d6af8db8ec00c215ce", null ],
     [ "SsiPkg", "classBsaBufferControl.html#a8b54e22b2a07048034b61d5e4ba396e3", null ],
@@ -36,6 +37,8 @@ var classBsaBufferControl =
     [ "AxiPkg", "classBsaBufferControl.html#a2265afb78be50b98531f22e9da258a54", null ],
     [ "AxiDmaPkg", "classBsaBufferControl.html#a1158b81e0f7e37b65d3b1897e40a40fd", null ],
     [ "TextUtilPkg", "classBsaBufferControl.html#aa9c868aa3ebeb0772295885509c0d4f2", null ],
+    [ "amc_carrier_core", "classBsaBufferControl.html#a5173e10093c3bf1b5d95f5240e060d43", null ],
     [ "AmcCarrierPkg", "classBsaBufferControl.html#a8b57e2e356f8c95c835557378741f538", null ],
+    [ "lcls_timing_core", "classBsaBufferControl.html#a013c20dbecc6073fc352d07e596c4bea", null ],
     [ "TimingPkg", "classBsaBufferControl.html#aa5fefbb58d6204d5242dd2f4be3352e0", null ]
 ];

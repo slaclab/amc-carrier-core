@@ -17,6 +17,7 @@ var classAxiSpiAd7682Reg =
     [ "std_logic_1164", "classAxiSpiAd7682Reg.html#acd03516902501cd1c7296a98e22c6fcb", null ],
     [ "std_logic_unsigned", "classAxiSpiAd7682Reg.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "std_logic_arith", "classAxiSpiAd7682Reg.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
+    [ "surf", "classAxiSpiAd7682Reg.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAxiSpiAd7682Reg.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classAxiSpiAd7682Reg.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ]
 ];

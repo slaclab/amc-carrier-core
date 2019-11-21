@@ -25,5 +25,7 @@ var classAd9229Core =
     [ "std_logic_unsigned", "classAd9229Core.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "UNISIM", "classAd9229Core.html#afd13b50585152f6756d196bf3f1c52ac", null ],
     [ "vcomponents", "classAd9229Core.html#aa1cb22e959d47364391e5eb4ef86927c", null ],
-    [ "StdRtlPkg", "classAd9229Core.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ]
+    [ "surf", "classAd9229Core.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
+    [ "StdRtlPkg", "classAd9229Core.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
+    [ "amc_carrier_core", "classAd9229Core.html#a5173e10093c3bf1b5d95f5240e060d43", null ]
 ];

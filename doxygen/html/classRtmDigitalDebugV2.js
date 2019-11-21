@@ -35,8 +35,10 @@ var classRtmDigitalDebugV2 =
     [ "genClkN", "classRtmDigitalDebugV2.html#a7060b097a0669ca5359538ddb3d0380a", null ],
     [ "ieee", "classRtmDigitalDebugV2.html#a0a6af6eef40212dbaf130d57ce711256", null ],
     [ "std_logic_1164", "classRtmDigitalDebugV2.html#acd03516902501cd1c7296a98e22c6fcb", null ],
+    [ "surf", "classRtmDigitalDebugV2.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classRtmDigitalDebugV2.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classRtmDigitalDebugV2.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
     [ "unisim", "classRtmDigitalDebugV2.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
-    [ "vcomponents", "classRtmDigitalDebugV2.html#aa1cb22e959d47364391e5eb4ef86927c", null ]
+    [ "vcomponents", "classRtmDigitalDebugV2.html#aa1cb22e959d47364391e5eb4ef86927c", null ],
+    [ "amc_carrier_core", "classRtmDigitalDebugV2.html#a5173e10093c3bf1b5d95f5240e060d43", null ]
 ];

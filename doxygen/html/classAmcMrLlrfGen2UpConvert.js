@@ -38,11 +38,13 @@ var classAmcMrLlrfGen2UpConvert =
     [ "std_logic_1164", "classAmcMrLlrfGen2UpConvert.html#acd03516902501cd1c7296a98e22c6fcb", null ],
     [ "std_logic_unsigned", "classAmcMrLlrfGen2UpConvert.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "std_logic_arith", "classAmcMrLlrfGen2UpConvert.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
+    [ "surf", "classAmcMrLlrfGen2UpConvert.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAmcMrLlrfGen2UpConvert.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classAmcMrLlrfGen2UpConvert.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
     [ "AxiStreamPkg", "classAmcMrLlrfGen2UpConvert.html#a776f7d1c3e4102d6af8db8ec00c215ce", null ],
     [ "jesd204bpkg", "classAmcMrLlrfGen2UpConvert.html#ace4c6e685a39a4850aa4ff10e8c85cfe", null ],
     [ "I2cPkg", "classAmcMrLlrfGen2UpConvert.html#a3345a70e845069bf678d5aa1733529b6", null ],
     [ "unisim", "classAmcMrLlrfGen2UpConvert.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
-    [ "vcomponents", "classAmcMrLlrfGen2UpConvert.html#aa1cb22e959d47364391e5eb4ef86927c", null ]
+    [ "vcomponents", "classAmcMrLlrfGen2UpConvert.html#aa1cb22e959d47364391e5eb4ef86927c", null ],
+    [ "amc_carrier_core", "classAmcMrLlrfGen2UpConvert.html#a5173e10093c3bf1b5d95f5240e060d43", null ]
 ];

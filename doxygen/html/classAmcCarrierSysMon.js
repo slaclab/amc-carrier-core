@@ -12,6 +12,7 @@ var classAmcCarrierSysMon =
     [ "axilRst", "classAmcCarrierSysMon.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],
     [ "ieee", "classAmcCarrierSysMon.html#a0a6af6eef40212dbaf130d57ce711256", null ],
     [ "std_logic_1164", "classAmcCarrierSysMon.html#acd03516902501cd1c7296a98e22c6fcb", null ],
+    [ "surf", "classAmcCarrierSysMon.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAmcCarrierSysMon.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classAmcCarrierSysMon.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ]
 ];

@@ -6,7 +6,7 @@ var classBldAxiStream_1_1rtl =
     [ "toBldStatus", "classBldAxiStream_1_1rtl.html#ab583d868a23f1dc0d1315277ad2389ee", null ],
     [ "reg_comb", "classBldAxiStream_1_1rtl.html#ab37e460ee2c4f64c558375714e19782e", null ],
     [ "reg_seq", "classBldAxiStream_1_1rtl.html#a8daecb30bf34bcc7664d776d043f4b46", null ],
-    [ "comb", "classBldAxiStream_1_1rtl.html#a219e616d55f455cf6e110c48f5f11c91", null ],
+    [ "comb", "classBldAxiStream_1_1rtl.html#a60c7b44f16735819a92d1986fc0a4adb", null ],
     [ "seq", "classBldAxiStream_1_1rtl.html#a21c7bb08fa4dbf34b4328e12cebfa7e5", null ],
     [ "StateType", "classBldAxiStream_1_1rtl.html#af2402938dff7d7c073429c2b5db06f87", null ],
     [ "START_COUNT", "classBldAxiStream_1_1rtl.html#a637198988be3f79eaf7cabc9d687d2c9", null ],

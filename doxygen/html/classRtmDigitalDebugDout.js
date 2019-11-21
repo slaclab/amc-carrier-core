@@ -12,7 +12,9 @@ var classRtmDigitalDebugDout =
     [ "doutN", "classRtmDigitalDebugDout.html#a7983d2ca173ea154726595a036f94735", null ],
     [ "ieee", "classRtmDigitalDebugDout.html#a0a6af6eef40212dbaf130d57ce711256", null ],
     [ "std_logic_1164", "classRtmDigitalDebugDout.html#acd03516902501cd1c7296a98e22c6fcb", null ],
+    [ "surf", "classRtmDigitalDebugDout.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classRtmDigitalDebugDout.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
+    [ "amc_carrier_core", "classRtmDigitalDebugDout.html#a5173e10093c3bf1b5d95f5240e060d43", null ],
     [ "FpgaTypePkg", "classRtmDigitalDebugDout.html#a2d2b0e40d47d57e9474d8be8077ecfa0", null ],
     [ "unisim", "classRtmDigitalDebugDout.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
     [ "vcomponents", "classRtmDigitalDebugDout.html#aa1cb22e959d47364391e5eb4ef86927c", null ]

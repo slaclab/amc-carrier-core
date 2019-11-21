@@ -39,10 +39,12 @@ var classAmcMrLlrfUpConvertMapping =
     [ "std_logic_1164", "classAmcMrLlrfUpConvertMapping.html#acd03516902501cd1c7296a98e22c6fcb", null ],
     [ "std_logic_unsigned", "classAmcMrLlrfUpConvertMapping.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "std_logic_arith", "classAmcMrLlrfUpConvertMapping.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
+    [ "surf", "classAmcMrLlrfUpConvertMapping.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAmcMrLlrfUpConvertMapping.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classAmcMrLlrfUpConvertMapping.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
     [ "AxiStreamPkg", "classAmcMrLlrfUpConvertMapping.html#a776f7d1c3e4102d6af8db8ec00c215ce", null ],
     [ "jesd204bpkg", "classAmcMrLlrfUpConvertMapping.html#ace4c6e685a39a4850aa4ff10e8c85cfe", null ],
+    [ "amc_carrier_core", "classAmcMrLlrfUpConvertMapping.html#a5173e10093c3bf1b5d95f5240e060d43", null ],
     [ "FpgaTypePkg", "classAmcMrLlrfUpConvertMapping.html#a2d2b0e40d47d57e9474d8be8077ecfa0", null ],
     [ "unisim", "classAmcMrLlrfUpConvertMapping.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
     [ "vcomponents", "classAmcMrLlrfUpConvertMapping.html#aa1cb22e959d47364391e5eb4ef86927c", null ]

@@ -16,6 +16,7 @@ var classRtmLoopback =
     [ "genClkN", "classRtmLoopback.html#a7060b097a0669ca5359538ddb3d0380a", null ],
     [ "ieee", "classRtmLoopback.html#a0a6af6eef40212dbaf130d57ce711256", null ],
     [ "std_logic_1164", "classRtmLoopback.html#acd03516902501cd1c7296a98e22c6fcb", null ],
+    [ "surf", "classRtmLoopback.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classRtmLoopback.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classRtmLoopback.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
     [ "unisim", "classRtmLoopback.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],

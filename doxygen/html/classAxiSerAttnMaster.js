@@ -22,6 +22,7 @@ var classAxiSerAttnMaster =
     [ "std_logic_unsigned", "classAxiSerAttnMaster.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "unisim", "classAxiSerAttnMaster.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
     [ "vcomponents", "classAxiSerAttnMaster.html#aa1cb22e959d47364391e5eb4ef86927c", null ],
+    [ "surf", "classAxiSerAttnMaster.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAxiSerAttnMaster.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classAxiSerAttnMaster.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ]
 ];

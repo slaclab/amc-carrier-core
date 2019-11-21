@@ -40,6 +40,7 @@ var classAmcCarrierDdrMem =
     [ "ddrPwrEnL", "classAmcCarrierDdrMem.html#ad88fecf5645b72a9daa4a372f9911bb7", null ],
     [ "ieee", "classAmcCarrierDdrMem.html#a0a6af6eef40212dbaf130d57ce711256", null ],
     [ "std_logic_1164", "classAmcCarrierDdrMem.html#acd03516902501cd1c7296a98e22c6fcb", null ],
+    [ "surf", "classAmcCarrierDdrMem.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAmcCarrierDdrMem.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classAmcCarrierDdrMem.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
     [ "AxiPkg", "classAmcCarrierDdrMem.html#a2265afb78be50b98531f22e9da258a54", null ],

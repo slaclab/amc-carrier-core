@@ -25,5 +25,6 @@ var classDaqTrigger =
     [ "std_logic_1164", "classDaqTrigger.html#acd03516902501cd1c7296a98e22c6fcb", null ],
     [ "std_logic_unsigned", "classDaqTrigger.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "std_logic_arith", "classDaqTrigger.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
+    [ "surf", "classDaqTrigger.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classDaqTrigger.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ]
 ];

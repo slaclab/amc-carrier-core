@@ -17,6 +17,8 @@ var classDaqDecimator =
     [ "std_logic_1164", "classDaqDecimator.html#acd03516902501cd1c7296a98e22c6fcb", null ],
     [ "std_logic_unsigned", "classDaqDecimator.html#a598da929e807d58939b47499e8bc9fa8", null ],
     [ "std_logic_arith", "classDaqDecimator.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
+    [ "surf", "classDaqDecimator.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classDaqDecimator.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
+    [ "amc_carrier_core", "classDaqDecimator.html#a5173e10093c3bf1b5d95f5240e060d43", null ],
     [ "DaqMuxV2Pkg", "classDaqDecimator.html#aa045f1137dc309f0707a75d965bd1eaf", null ]
 ];
