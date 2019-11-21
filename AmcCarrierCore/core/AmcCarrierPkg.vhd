@@ -28,8 +28,8 @@ use lcls_timing_core.TimingPkg.all;
 
 package AmcCarrierPkg is
 
-   -- 11/14/2019 (0x02070200): https://github.com/slaclab/amc-carrier-core/releases/tag/v2.7.2
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"02_07_02_00";
+   -- 11/21/2019 (0x03000000): https://github.com/slaclab/amc-carrier-core/releases/tag/v3.0.0
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"03_00_00_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
