@@ -273,7 +273,6 @@ begin
             SLAVE_READY_EN_G    => true,
             VALID_THOLD_G       => 1,
             MEMORY_TYPE_G       => "block",
-            USE_BUILT_IN_G      => false,
             GEN_SYNC_FIFO_G     => false,
             FIFO_ADDR_WIDTH_G   => 9,
             SLAVE_AXI_CONFIG_G  => MPS_AXIS_CONFIG_C,
