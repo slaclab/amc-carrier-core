@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmRfInterlock.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-06-17
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C00
 ------------------------------------------------------------------------------
@@ -20,9 +17,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.FpgaTypePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -298,7 +299,7 @@ begin
    -------
    -- Core
    -------
-   U_CORE : entity work.RtmRfInterlockCore
+   U_CORE : entity amc_carrier_core.RtmRfInterlockCore
       generic map (
          TPD_G            => TPD_G,
          IODELAY_GROUP_G  => IODELAY_GROUP_G,

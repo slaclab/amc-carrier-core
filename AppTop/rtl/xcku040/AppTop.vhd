@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-04
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -23,13 +20,19 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.TimingPkg.all;
-use work.AmcCarrierPkg.all;
-use work.jesd204bpkg.all;
-use work.AppTopPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.jesd204bpkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AppTopPkg.all;
+use amc_carrier_core.AppMpsPkg.all;
 
 entity AppTop is
    generic (
@@ -267,7 +270,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -296,7 +299,7 @@ begin
       ------------------
       -- DAQ MUXV2 Module
       ------------------
-      U_DaqMuxV2 : entity work.DaqMuxV2
+      U_DaqMuxV2 : entity amc_carrier_core.DaqMuxV2
          generic map (
             TPD_G                  => TPD_G,
             DECIMATOR_EN_G         => DAQMUX_DECIMATOR_EN_G,
@@ -369,7 +372,7 @@ begin
       ------------
       -- JESD Core
       ------------
-      U_JesdCore : entity work.AppTopJesd
+      U_JesdCore : entity amc_carrier_core.AppTopJesd
          generic map (
             TPD_G              => TPD_G,
             SIM_SPEEDUP_G      => SIM_SPEEDUP_G,
@@ -431,7 +434,7 @@ begin
             jesdClkP        => jesdClkP(i),
             jesdClkN        => jesdClkN(i));
 
-      U_DacSigGen : entity work.DacSigGen
+      U_DacSigGen : entity amc_carrier_core.DacSigGen
          generic map (
             TPD_G                => TPD_G,
             AXI_BASE_ADDR_G      => AXI_CONFIG_C(SIG_GEN0_INDEX_C+i).baseAddr,
@@ -468,7 +471,7 @@ begin
    -------------------
    -- Application Core
    -------------------
-   U_AppCore : entity work.AppCore
+   U_AppCore : entity amc_carrier_core.AppCore
       generic map (
          TPD_G           => TPD_G,
          SIM_SPEEDUP_G   => SIM_SPEEDUP_G,

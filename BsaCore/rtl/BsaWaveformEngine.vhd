@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : BsaWaveformEngine.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-10-12
--- Last update: 2016-08-30
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -18,12 +15,16 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiPkg.all;
-use work.SsiPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiPkg.all;
+use surf.SsiPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 entity BsaWaveformEngine is
 
@@ -35,10 +36,10 @@ entity BsaWaveformEngine is
       AXI_CONFIG_G           : AxiConfigType          := axiConfig(33, 16, 1, 8));
    port (
       -- Diagnostic data interface
-      waveformClk : in sl;
-      waveformRst : in sl;
+      waveformClk       : in  sl;
+      waveformRst       : in  sl;
       ibWaveformMasters : in  WaveformMasterType;
-      ibWaveformSlaves  : out WaveformSlaveType := (others=>WAVEFORM_SLAVE_REC_FORCE_C);
+      ibWaveformSlaves  : out WaveformSlaveType  := (others => WAVEFORM_SLAVE_REC_FORCE_C);
       -- AXI-Lite configuration interface
       axilClk           : in  sl;
       axilRst           : in  sl;
@@ -125,7 +126,7 @@ architecture rtl of BsaWaveformEngine is
       TKEEP_MODE_C  => TKEEP_FIXED_C,
       TUSER_BITS_C  => 2,
       TUSER_MODE_C  => TUSER_FIRST_LAST_C);
-   
+
    -- Data readout stream
    signal readDmaDataMaster : AxiStreamMasterType;
    signal readDmaDataSlave  : AxiStreamSlaveType;
@@ -151,19 +152,17 @@ begin
    -- Input fifos
    -- These should probably be 4k bytes deep for best throughput
    AXIS_IN_FIFOS : for i in STREAMS_C-1 downto 0 generate
-      AxiStreamFifo : entity work.AxiStreamFifoV2
+      AxiStreamFifo : entity surf.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
             VALID_THOLD_G       => 0,
-            BRAM_EN_G           => true,
-            XIL_DEVICE_G        => "ULTRASCALE",
-            USE_BUILT_IN_G      => false,
+            MEMORY_TYPE_G       => "block",
             GEN_SYNC_FIFO_G     => false,
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 9,
             FIFO_FIXED_THRESH_G => true,
-            FIFO_PAUSE_THRESH_G => 1,                       --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
+            FIFO_PAUSE_THRESH_G => 1,                    --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
             SLAVE_AXI_CONFIG_G  => WAVEFORM_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)  -- 128-bit
          port map (
@@ -179,7 +178,7 @@ begin
    end generate AXIS_IN_FIFOS;
 
    -- Mux of two streams
-   AxiStreamMux_INST : entity work.AxiStreamMux
+   AxiStreamMux_INST : entity surf.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
          NUM_SLAVES_G   => STREAMS_C,
@@ -196,16 +195,13 @@ begin
          axisRst      => axiRst);
 
    -- Extra buffer on output of mux
-   AxiStreamFifo_MUX_FIFO : entity work.AxiStreamFifoV2
+   AxiStreamFifo_MUX_FIFO : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => true,
-         XIL_DEVICE_G        => "ULTRASCALE",
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
-         CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 9,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 2**9-32,
@@ -224,7 +220,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- AxiStreamDma Ring Buffers
    -------------------------------------------------------------------------------------------------
-   U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
+   U_AxiStreamDmaRingWrite_1 : entity surf.AxiStreamDmaRingWrite
       generic map (
          TPD_G                => TPD_G,
          BUFFERS_G            => STREAMS_C,
@@ -263,7 +259,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Route status message based on tdest
    -------------------------------------------------------------------------------------------------
-   U_AxiStreamDeMux_1 : entity work.AxiStreamDeMux
+   U_AxiStreamDeMux_1 : entity surf.AxiStreamDeMux
       generic map (
          TPD_G          => TPD_G,
          NUM_MASTERS_G  => 2,
@@ -287,7 +283,7 @@ begin
    -- AxiStreamDmaRingRead module optionally catches status messages from ring write
    -- Peforms the read itself and outputs the resulting data stream
    -------------------------------------------------------------------------------------------------
-   U_AxiStreamDmaRingRead_1 : entity work.AxiStreamDmaRingRead
+   U_AxiStreamDmaRingRead_1 : entity surf.AxiStreamDmaRingRead
       generic map (
          TPD_G                 => TPD_G,
          BUFFERS_G             => STREAMS_C,
@@ -319,16 +315,13 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Buffer the read dma data to transition to data clk 
    -------------------------------------------------------------------------------------------------
-   AxiStreamFifo_RD_DATA : entity work.AxiStreamFifoV2
+   AxiStreamFifo_RD_DATA : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => false,
-         XIL_DEVICE_G        => "ULTRASCALE",
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "distributed",
          GEN_SYNC_FIFO_G     => false,
-         CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 4,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 1,
@@ -348,7 +341,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- AxiLite crossbar to allow AxiStreamDmaRingRead to access AxiStreamDmaRingWrite registers
    -------------------------------------------------------------------------------------------------
-   U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
+   U_AxiLiteCrossbar_1 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,

@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppMsgTb.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-03-01
--- Last update: 2017-03-02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,8 +17,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+
+library amc_carrier_core; 
 
 entity AppMsgTb is end AppMsgTb;
 
@@ -63,7 +64,7 @@ begin
    -----------------------------
    -- Generate clocks and resets
    -----------------------------
-   U_ClkRst : entity work.ClkRst
+   U_ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_C,
          RST_START_DELAY_G => 0 ns,  -- Wait this long into simulation before asserting reset
@@ -75,7 +76,7 @@ begin
    ------------
    -- TX Module
    ------------
-   U_TX : entity work.AppMsgOb
+   U_TX : entity amc_carrier_core.AppMsgOb
       generic map (
          TPD_G       => TPD_C,
          HDR_SIZE_G  => HDR_SIZE_C,
@@ -99,7 +100,7 @@ begin
    ------------
    -- RX Module
    ------------
-   U_RX : entity work.AppMsgIb
+   U_RX : entity amc_carrier_core.AppMsgIb
       generic map (
          TPD_G       => TPD_C,
          HDR_SIZE_G  => HDR_SIZE_C,

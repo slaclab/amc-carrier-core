@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-11-11
--- Last update: 2018-05-04
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,11 +17,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.Jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.Jesd204bPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -207,7 +206,7 @@ begin
    -- JESD RX core
    ---------------
    EN_RX_CORE : if (JESD_RX_LANE_G /= 0) generate
-      U_Jesd204bRx : entity work.Jesd204bRx
+      U_Jesd204bRx : entity surf.Jesd204bRx
          generic map (
             TPD_G => TPD_G,
             F_G   => 2,
@@ -249,7 +248,7 @@ begin
    -- JESD TX core
    ---------------         
    EN_TX_CORE : if (JESD_TX_LANE_G /= 0) generate
-      U_Jesd204bTx : entity work.Jesd204bTx
+      U_Jesd204bTx : entity surf.Jesd204bTx
          generic map (
             TPD_G => TPD_G,
             F_G   => 2,
@@ -419,7 +418,7 @@ begin
 
    BYP_GT : if ((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) generate
 
-      U_TERM_GT : entity work.Gthe3ChannelDummy
+      U_TERM_GT : entity surf.Gthe3ChannelDummy
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 5)

@@ -1,9 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AxiSpiAd7682.vhd
--- Author     : Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-12
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:   
 --    The acquisition is continuous. Conversion time is defined by N_SPI_CYCLES_G. 
@@ -29,8 +25,12 @@ use ieee.std_logic_unsigned.all;
 library unisim;
 use unisim.vcomponents.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core; 
 
 entity AxiSpiAd7682 is
    generic (
@@ -106,7 +106,7 @@ architecture rtl of AxiSpiAd7682 is
 begin
 
 
-   U_AxiSpiAd7682Reg : entity work.AxiSpiAd7682Reg
+   U_AxiSpiAd7682Reg : entity amc_carrier_core.AxiSpiAd7682Reg
       generic map (
          TPD_G             => TPD_G,
          AXIL_ADDR_WIDTH_G => 8,
@@ -189,7 +189,7 @@ begin
       end if;
    end process seq;
 
-   SpiMaster_1 : entity work.SpiMaster
+   SpiMaster_1 : entity surf.SpiMaster
       generic map (
          TPD_G             => TPD_G,
          NUM_CHIPS_G       => 1,

@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : RtmCryoDacLutTb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Simulation Testbed for testing the RtmCryoDacLutTb module
@@ -18,8 +17,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core; 
 
 entity RtmCryoDacLutTb is end RtmCryoDacLutTb;
 
@@ -44,7 +47,7 @@ begin
    --------------------
    -- Clocks and Resets
    --------------------
-   U_axilClk : entity work.ClkRst
+   U_axilClk : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_G,
          RST_START_DELAY_G => 0 ns,
@@ -57,7 +60,7 @@ begin
    -----------------------
    -- Module to be tested
    -----------------------
-   U_RtmCryoDet : entity work.RtmCryoDet
+   U_RtmCryoDet : entity amc_carrier_core.RtmCryoDet
       generic map (
          TPD_G           => TPD_G,
          SIMULATION_G    => true,

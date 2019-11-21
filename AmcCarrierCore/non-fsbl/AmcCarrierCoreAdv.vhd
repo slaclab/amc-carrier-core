@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 
@@ -16,14 +15,20 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.TimingPkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -239,7 +244,7 @@ architecture mapping of AmcCarrierCoreAdv is
 begin
 
    axilClk <= ref156MHzClk;
-   U_Rst : entity work.RstPipeline
+   U_Rst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -253,7 +258,7 @@ begin
    ----------------------------------   
    -- Register Address Mapping Module
    ----------------------------------   
-   U_SysReg : entity work.AmcCarrierSysReg
+   U_SysReg : entity amc_carrier_core.AmcCarrierSysReg
       generic map (
          TPD_G        => TPD_G,
          BUILD_INFO_G => BUILD_INFO_G,
@@ -340,7 +345,7 @@ begin
 --   -- Application MPS
 --   ------------------
    GEN_EN_MPS : if (DISABLE_MPS_G = false) generate
-      U_AppMps : entity work.AppMps
+      U_AppMps : entity amc_carrier_core.AppMps
          generic map (
             TPD_G      => TPD_G,
             APP_TYPE_G => APP_TYPE_G,
@@ -395,7 +400,7 @@ begin
    -------------------
    -- AMC Carrier Core
    -------------------
-   U_Core : entity work.AmcCarrierCore
+   U_Core : entity amc_carrier_core.AmcCarrierCore
       generic map (
          TPD_G                  => TPD_G,
          WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,

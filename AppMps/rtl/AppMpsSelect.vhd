@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsSelect.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-04-01
--- Last update: 2017-04-13
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,10 +17,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -75,7 +76,7 @@ begin
    --------------------------------- 
    -- Config Sync
    --------------------------------- 
-   U_SyncKickDet : entity work.SynchronizerVector
+   U_SyncKickDet : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 32)
@@ -178,7 +179,7 @@ begin
    end process;
 
    -- FIFO
-   U_SyncFifo : entity work.SynchronizerFifo
+   U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => MPS_SELECT_BITS_C)

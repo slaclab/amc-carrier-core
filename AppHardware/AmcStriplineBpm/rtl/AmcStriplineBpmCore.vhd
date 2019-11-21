@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcStriplineBpmCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
@@ -18,13 +17,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core; 
 
 entity AmcStriplineBpmCore is
    generic (
@@ -240,7 +243,7 @@ begin
    spareN(9)   <= clClkOe;
    spareP(9)   <= rfAmpOn;
    -- JESD
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -253,7 +256,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : entity work.JesdSyncOut
+   U_jesdRxSync0 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -266,7 +269,7 @@ begin
          jesdSyncP => jtagSec(0),
          jesdSyncN => jtagSec(1));
 
-   U_jesdRxSync1 : entity work.JesdSyncOut
+   U_jesdRxSync1 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -291,7 +294,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -312,7 +315,7 @@ begin
    -----------------
    -- LMK SPI Module
    -----------------   
-   SPI_LMK : entity work.AxiSpiMaster
+   SPI_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 15,
@@ -359,7 +362,7 @@ begin
    -- ADC SPI Module
    -----------------   
    GEN_ADC_SPI : for i in 1 downto 0 generate
-      SPI_DAC : entity work.AxiSpiMaster
+      SPI_DAC : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -394,7 +397,7 @@ begin
    -----------------
    -- DAC SPI Module
    -----------------   
-   SPI_DAC_0 : entity work.AxiSpiMaster
+   SPI_DAC_0 : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,
@@ -413,7 +416,7 @@ begin
          coreSDout      => dacMosiVec(0),
          coreCsb        => dacCsLVec(0));
 
-   SPI_DAC_1 : entity work.AmcBpmDacVcoSpi
+   SPI_DAC_1 : entity amc_carrier_core.AmcBpmDacVcoSpi
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -434,7 +437,7 @@ begin
    ---------------------
    -- BPM Control Module
    ---------------------
-   U_AmcBpmCtrl : entity work.AmcBpmCtrl
+   U_AmcBpmCtrl : entity amc_carrier_core.AmcBpmCtrl
       generic map (
          TPD_G          => TPD_G,
          AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)

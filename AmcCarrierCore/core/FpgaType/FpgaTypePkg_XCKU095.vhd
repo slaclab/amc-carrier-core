@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : FpgaTypePkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Example .MCS: The GZ header (0x1F8B) starts at offset: 06220000 + ED24 + 6 = 0x622ED2A
@@ -18,7 +17,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 package FpgaTypePkg is
    

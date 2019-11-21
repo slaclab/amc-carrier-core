@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmLoopback.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-23
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_22_CXX
 -------------------------------------------------------------------------------
@@ -18,8 +15,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;

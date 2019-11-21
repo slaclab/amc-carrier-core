@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcBpmCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-10-29
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
@@ -20,10 +17,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -103,7 +102,7 @@ begin
 
    GEN_ADC :
    for i in 3 downto 0 generate
-      Sync_Adc : entity work.SynchronizerFifo
+      Sync_Adc : entity surf.SynchronizerFifo
          generic map (
             TPD_G        => TPD_G,
             DATA_WIDTH_G => 16)
@@ -116,7 +115,7 @@ begin
             dout   => adcDataSync(i));
    end generate GEN_ADC;
 
-   Sync_DacVco : entity work.SynchronizerFifo
+   Sync_DacVco : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 16)
@@ -128,7 +127,7 @@ begin
          rd_clk => axilClk,
          dout   => dacVcoCtrlSync);
 
-   U_SyncClockFreq : entity work.SyncClockFreq
+   U_SyncClockFreq : entity surf.SyncClockFreq
       generic map (
          TPD_G          => TPD_G,
          REF_CLK_FREQ_G => AXI_CLK_FREQ_G,
@@ -140,7 +139,7 @@ begin
          locClk  => axilClk,
          refClk  => axilClk);
 
-   Sync_Config : entity work.SynchronizerVector
+   Sync_Config : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 1)
@@ -149,7 +148,7 @@ begin
          dataIn(0)  => r.dacVcoEnable,
          dataOut(0) => dacVcoEnable);
 
-   Sync_DacVcoSckConfig : entity work.SynchronizerFifo
+   Sync_DacVcoSckConfig : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 16)
@@ -161,7 +160,7 @@ begin
          rd_clk => clk,
          dout   => dacVcoSckConfig);
 
-   U_SyncStatusVector : entity work.SyncStatusVector
+   U_SyncStatusVector : entity surf.SyncStatusVector
       generic map (
          TPD_G          => TPD_G,
          OUT_POLARITY_G => '1',

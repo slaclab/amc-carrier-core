@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-04-01
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
@@ -22,10 +19,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AmcCarrierPkg.all;
-use work.AppMpsPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AppMpsPkg.all;
 
 entity AppMpsReg is
    generic (
@@ -74,7 +75,7 @@ architecture mapping of AppMpsReg is
 
 begin
 
-   U_XBAR_0 : entity work.AxiLiteCrossbar
+   U_XBAR_0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,  -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
@@ -93,7 +94,7 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   U_BaseReg : entity work.AppMpsRegBase
+   U_BaseReg : entity amc_carrier_core.AppMpsRegBase
       generic map (
          TPD_G        => TPD_G,
          APP_TYPE_G   => APP_TYPE_G,
@@ -114,7 +115,7 @@ begin
          axilWriteMaster => axilWriteMasters(0),
          axilWriteSlave  => axilWriteSlaves(0));
 
-   U_XBAR_1 : entity work.AxiLiteCrossbar
+   U_XBAR_1 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          DEC_ERROR_RESP_G   => AXI_RESP_OK_C,  -- Always return OK because AppMpsThr.yaml doesn't support dynamic application types (specifically APP_NULL_TYPE_C) yet
@@ -135,7 +136,7 @@ begin
 
    GEN_VEC : for i in MPS_CHAN_COUNT_C-1 downto 0 generate
 
-      U_ChanReg : entity work.AppMpsRegAppCh
+      U_ChanReg : entity amc_carrier_core.AppMpsRegAppCh
          generic map (
             TPD_G         => TPD_G,
             CHAN_CONFIG_G => APP_CONFIG_G.CHAN_CONFIG_C(i))

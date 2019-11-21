@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcMpsSfpDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-28
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_09_C00
 -------------------------------------------------------------------------------
@@ -18,8 +15,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core; 
 
 entity AmcMpsSfpDualCore is
    generic (
@@ -78,7 +79,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -100,7 +101,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcMpsSfpCore
+      U_AMC : entity amc_carrier_core.AmcMpsSfpCore
          generic map (
             TPD_G            => TPD_G,
             EN_PLL_G         => EN_PLL_G,

@@ -1,10 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : BsaBufferControl.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-29
--- Last update: 2017-09-09
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,20 +15,25 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-use ieee.numeric_std.all;
+use ieee.numeric_std.all; -- TODO: Need to resolve this numeric_std dependence 
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.AxiDmaPkg.all;
 
-use work.TextUtilPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiDmaPkg.all;
+use surf.TextUtilPkg.all;
 
-use work.AmcCarrierPkg.all;
---use work.AmcCarrierSysRegPkg.all;
-use work.TimingPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+--use amc_carrier_core.AmcCarrierSysRegPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
 
 entity BsaBufferControl is
 
@@ -99,7 +99,7 @@ architecture rtl of BsaBufferControl is
       TDEST_BITS_C  => BSA_ADDR_BITS_C,
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,  --ite(BSA_STREAM_BYTE_WIDTH_G = 4, TKEEP_FIXED_C, TKEEP_COMP_C),
-      TUSER_BITS_C  => 2,    -- (OVFL, BSADONE)
+      TUSER_BITS_C  => 2,               -- (OVFL, BSADONE)
       TUSER_MODE_C  => TUSER_LAST_C);
 
    constant INT_STREAM_CONFIG_C : AxiStreamConfigType := (
@@ -117,7 +117,7 @@ architecture rtl of BsaBufferControl is
       TDEST_BITS_C  => BSA_ADDR_BITS_C,
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_FIXED_C,  --ite(AXI_CONFIG_G.DATA_BYTES_C = 4, TKEEP_FIXED_C, TKEEP_COMP_C),
-      TUSER_BITS_C  => 2,  -- (EOFE, TRIGGER)
+      TUSER_BITS_C  => 2,               -- (EOFE, TRIGGER)
       TUSER_MODE_C  => TUSER_LAST_C);
 
 --    constant AXI_CONFIG_C : AxiConfigType := (
@@ -144,13 +144,13 @@ architecture rtl of BsaBufferControl is
 
    -- Each accumulator maintains 128b header word + diagnostic output accumulations
 --   constant NUM_ACCUMULATIONS_C      : integer := DIAGNOSTIC_OUTPUTS_G;
-   constant NUM_ACCUMULATIONS_C      : integer := 31;
+   constant NUM_ACCUMULATIONS_C : integer := 31;
 
    type RegType is record
       diagnosticData : Slv32Array(NUM_ACCUMULATIONS_C downto 0);
       diagnosticSevr : Slv2Array (NUM_ACCUMULATIONS_C downto 0);
-      diagnosticFixd : slv       (NUM_ACCUMULATIONS_C downto 0);
-      dataSquare     : slv       (47 downto 0);
+      diagnosticFixd : slv (NUM_ACCUMULATIONS_C downto 0);
+      dataSquare     : slv (47 downto 0);
       excSquare      : sl;
       syncRdEn       : sl;
       timestampEn    : sl;
@@ -192,10 +192,10 @@ architecture rtl of BsaBufferControl is
    signal bufferClearEn : sl;
    signal bufferClear   : slv(BSA_ADDR_BITS_C-1 downto 0);
    signal bufferEnabled : slv(BSA_BUFFERS_G-1 downto 0);
-   
+
 begin
 
-   U_AxiLiteCrossbar_1 : entity work.AxiLiteCrossbar
+   U_AxiLiteCrossbar_1 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -217,16 +217,16 @@ begin
 
    -- Store timestamps during accumulate phase since we are already iterating over
    timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.timestampAddr));
-   U_AxiDualPortRam_TimeStamps : entity work.AxiDualPortRam
+   U_AxiDualPortRam_TimeStamps : entity surf.AxiDualPortRam
       generic map (
-         TPD_G        => TPD_G,
-         SYNTH_MODE_G => "inferred",
-         MEMORY_TYPE_G=> "distributed",
+         TPD_G          => TPD_G,
+         SYNTH_MODE_G   => "inferred",
+         MEMORY_TYPE_G  => "distributed",
          READ_LATENCY_G => 1,
-         AXI_WR_EN_G  => false,
-         SYS_WR_EN_G  => true,
-         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
-         DATA_WIDTH_G => 64)
+         AXI_WR_EN_G    => false,
+         SYS_WR_EN_G    => true,
+         ADDR_WIDTH_G   => BSA_ADDR_BITS_C,
+         DATA_WIDTH_G   => 64)
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -245,11 +245,11 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Synchronize diagnostic bus to local clock
    -------------------------------------------------------------------------------------------------
-   SynchronizerFifo_1 : entity work.SynchronizerFifo
+   SynchronizerFifo_1 : entity surf.SynchronizerFifo
       generic map (
-         TPD_G        => TPD_G,
-         BRAM_EN_G    => false,
-         DATA_WIDTH_G => DIAGNOSTIC_BUS_BITS_C)
+         TPD_G         => TPD_G,
+         MEMORY_TYPE_G => "distributed",
+         DATA_WIDTH_G  => DIAGNOSTIC_BUS_BITS_C)
       port map (
          rst    => diagnosticRst,
          wr_clk => diagnosticClk,
@@ -266,7 +266,7 @@ begin
    -- One accumulator per BSA buffer
    -------------------------------------------------------------------------------------------------
    BsaAccumulator_GEN : for i in BSA_BUFFERS_G-1 downto 0 generate
-      U_BsaAccumulator_1 : entity work.BsaAccumulator
+      U_BsaAccumulator_1 : entity amc_carrier_core.BsaAccumulator
          generic map (
             TPD_G               => TPD_G,
             BSA_NUMBER_G        => i,
@@ -307,7 +307,7 @@ begin
          bsaAxisSlaves(j*8+i) <= intBsaAxisSlaves(j);
       end generate mapping;
 
-      U_AxiStreamMux_INT : entity work.AxiStreamMux
+      U_AxiStreamMux_INT : entity surf.AxiStreamMux
          generic map (
             TPD_G          => TPD_G,
             NUM_SLAVES_G   => 8,
@@ -323,15 +323,14 @@ begin
             axisClk      => axiClk,                -- [in]
             axisRst      => axiRst);               -- [in]
 
-      U_AxiStreamFifo_INT : entity work.AxiStreamFifoV2
+      U_AxiStreamFifo_INT : entity surf.AxiStreamFifoV2
          generic map (
             TPD_G               => TPD_G,
             INT_PIPE_STAGES_G   => 0,
             PIPE_STAGES_G       => 1,
             SLAVE_READY_EN_G    => true,
             VALID_THOLD_G       => 1,
-            BRAM_EN_G           => true,
-            USE_BUILT_IN_G      => false,
+            MEMORY_TYPE_G       => "block",
             GEN_SYNC_FIFO_G     => true,
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 10,
@@ -351,7 +350,7 @@ begin
             mAxisSlave  => intAxisSlaves(i));     -- [in]
    end generate;
 
-   U_AxiStreamMux_LAST : entity work.AxiStreamMux
+   U_AxiStreamMux_LAST : entity surf.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
          NUM_SLAVES_G   => INT_AXIS_COUNT_C,
@@ -367,17 +366,15 @@ begin
          axisClk      => axiClk,             -- [in]
          axisRst      => axiRst);            -- [in]
 
-   U_AxiStreamFifo_LAST : entity work.AxiStreamFifoV2
+   U_AxiStreamFifo_LAST : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          INT_PIPE_STAGES_G   => 0,
          PIPE_STAGES_G       => 1,
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 0,
-         BRAM_EN_G           => true,
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
-         CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 10,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 1,
@@ -397,13 +394,13 @@ begin
 
    axisStatusMaster <= AXI_STREAM_MASTER_INIT_C;
 
-   U_AxiStreamDmaRingWrite_1 : entity work.AxiStreamDmaRingWrite
+   U_AxiStreamDmaRingWrite_1 : entity surf.AxiStreamDmaRingWrite
       generic map (
          TPD_G                => TPD_G,
          BUFFERS_G            => BSA_BUFFERS_G,
          BURST_SIZE_BYTES_G   => BSA_BURST_BYTES_G,
          ENABLE_UNALIGN_G     => true,
-         TRIGGER_USER_BIT_G   => 1,  -- EOFE is bit 0
+         TRIGGER_USER_BIT_G   => 1,                                 -- EOFE is bit 0
          AXIL_BASE_ADDR_G     => DMA_RING_BASE_ADDR_C,
          DATA_AXIS_CONFIG_G   => LAST_STREAM_CONFIG_C,
          STATUS_AXIS_CONFIG_G => ssiAxiStreamConfig(1),
@@ -444,54 +441,54 @@ begin
       v.headerEn     := '0';
 
       v.adderPhase := r.adderPhase+1;
-      
+
       ----------------------------------------------------------------------------------------------
       -- Accumulation stage - shift new diagnostic data through the accumulators
       ----------------------------------------------------------------------------------------------
-      if r.adderPhase="100" and r.adderEn='1' then
+      if r.adderPhase = "100" and r.adderEn = '1' then
 
-        v.adderPhase := "000";
-        v.adderCount := r.adderCount + 1;
+         v.adderPhase := "000";
+         v.adderCount := r.adderCount + 1;
 
-        v.diagnosticData := r.diagnosticData(0) & r.diagnosticData(r.diagnosticData'left downto 1);
-        v.diagnosticSevr := r.diagnosticSevr(0) & r.diagnosticSevr(r.diagnosticSevr'left downto 1);
-        v.diagnosticFixd := r.diagnosticFixd(0) & r.diagnosticFixd(r.diagnosticFixd'left downto 1);
+         v.diagnosticData := r.diagnosticData(0) & r.diagnosticData(r.diagnosticData'left downto 1);
+         v.diagnosticSevr := r.diagnosticSevr(0) & r.diagnosticSevr(r.diagnosticSevr'left downto 1);
+         v.diagnosticFixd := r.diagnosticFixd(0) & r.diagnosticFixd(r.diagnosticFixd'left downto 1);
 
-        v.dataSquare := x"000" &
-                        slv(signed(r.diagnosticData(0)(17 downto 0))*
-                            signed(r.diagnosticData(0)(17 downto 0)));
-        if (allBits(r.diagnosticData(0)(31 downto 17),'0') or
-            allBits(r.diagnosticData(0)(31 downto 17),'1')) then
-          v.excSquare := '0';
-        else
-          v.excSquare := '1';
-        end if;
+         v.dataSquare := x"000" &
+                         slv(signed(r.diagnosticData(0)(17 downto 0))*
+                             signed(r.diagnosticData(0)(17 downto 0)));
+         if (allBits(r.diagnosticData(0)(31 downto 17), '0') or
+             allBits(r.diagnosticData(0)(31 downto 17), '1')) then
+            v.excSquare := '0';
+         else
+            v.excSquare := '1';
+         end if;
 
-        v.lastEn  := '0';
-        if (r.adderCount = NUM_ACCUMULATIONS_C-1) then
-          v.lastEn   := '1';
-        end if;
-        if (r.adderCount < NUM_ACCUMULATIONS_C) then
-          v.accumulateEn := '1';
-        end if;
+         v.lastEn := '0';
+         if (r.adderCount = NUM_ACCUMULATIONS_C-1) then
+            v.lastEn := '1';
+         end if;
+         if (r.adderCount < NUM_ACCUMULATIONS_C) then
+            v.accumulateEn := '1';
+         end if;
 
-        if (r.adderCount = NUM_ACCUMULATIONS_C+1) then
-          v.adderEn     := '0';
-          v.syncRdEn    := '1';            
-        end if;
+         if (r.adderCount = NUM_ACCUMULATIONS_C+1) then
+            v.adderEn  := '0';
+            v.syncRdEn := '1';
+         end if;
 
       end if;
-      
+
       ----------------------------------------------------------------------------------------------
       -- Disable timestamps after iterating through all bsa indicies
       ----------------------------------------------------------------------------------------------
       if r.timestampEn = '1' then
-        v.timestampAddr := r.timestampAddr+1;
-        if r.timestampAddr = BSA_BUFFERS_G-1 then
-          v.timestampEn := '0';
-        end if;
+         v.timestampAddr := r.timestampAddr+1;
+         if r.timestampAddr = BSA_BUFFERS_G-1 then
+            v.timestampEn := '0';
+         end if;
       end if;
-      
+
       ----------------------------------------------------------------------------------------------
       -- Synchronization
       -- Wait for synchronized strobe signal, then latch the timing message onto the local clock      
@@ -500,25 +497,25 @@ begin
          --  Header data
          v.dataSquare := diagnosticBusSync.timingMessage.pulseId(63 downto 16);
          v.diagnosticData(NUM_ACCUMULATIONS_C) :=
-           diagnosticBusSync.timingMessage.pulseId(15 downto 0) &
-           toSlv(NUM_ACCUMULATIONS_C,16);
+            diagnosticBusSync.timingMessage.pulseId(15 downto 0) &
+            toSlv(NUM_ACCUMULATIONS_C, 16);
          v.diagnosticSevr(NUM_ACCUMULATIONS_C) := "00";
          v.diagnosticFixd(NUM_ACCUMULATIONS_C) := '1';
          --  Channel data
          v.diagnosticData(NUM_ACCUMULATIONS_C-1 downto 0) :=
-           diagnosticBusSync.data (NUM_ACCUMULATIONS_C-1 downto 0);
-         v.diagnosticSevr(NUM_ACCUMULATIONS_C-1 downto 0) := 
-           diagnosticBusSync.sevr (NUM_ACCUMULATIONS_C-1 downto 0);
+            diagnosticBusSync.data (NUM_ACCUMULATIONS_C-1 downto 0);
+         v.diagnosticSevr(NUM_ACCUMULATIONS_C-1 downto 0) :=
+            diagnosticBusSync.sevr (NUM_ACCUMULATIONS_C-1 downto 0);
          v.diagnosticFixd(NUM_ACCUMULATIONS_C-1 downto 0) :=
-           diagnosticBusSync.fixed(NUM_ACCUMULATIONS_C-1 downto 0);
+            diagnosticBusSync.fixed(NUM_ACCUMULATIONS_C-1 downto 0);
 
-         v.excSquare      := '0';
-         v.accumulateEn   := '1';
-         v.timestampEn    := '1';
-         v.timestampAddr  := (others => '0');
-         v.adderEn        := '1';
-         v.adderCount     := (others => '0');
-         v.adderPhase     := (others => '0');
+         v.excSquare     := '0';
+         v.accumulateEn  := '1';
+         v.timestampEn   := '1';
+         v.timestampAddr := (others => '0');
+         v.adderEn       := '1';
+         v.adderCount    := (others => '0');
+         v.adderPhase    := (others => '0');
       end if;
 
       ----------------------------------------------------------------------------------------------        

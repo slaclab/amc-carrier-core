@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : DaqDecimator.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2017-07-03
 -------------------------------------------------------------------------------
 -- Description: Reduces the sample rate:
 --                   averaging_i = '1':
@@ -27,8 +24,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.DaqMuxV2Pkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.DaqMuxV2Pkg.all;
 
 entity DaqDecimator is
    generic (

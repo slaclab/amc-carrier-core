@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsClk.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-07-08
--- Last update: 2018-08-09
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -24,7 +21,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -84,7 +83,7 @@ begin
       mpsClk <= axilClk;
       mpsRst <= axilRst;
 
-      U_ClkOutBufSingle : entity work.ClkOutBufSingle
+      U_ClkOutBufSingle : entity surf.ClkOutBufSingle
          generic map(
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -147,7 +146,7 @@ begin
          I => clkout0,
          O => mpsMmcmClkOut(0));
 
-   U_Rst625 : entity work.RstSync
+   U_Rst625 : entity surf.RstSync
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '0',
@@ -170,7 +169,7 @@ begin
          CLR => '0',
          O   => mpsMmcmClkOut(1));      -- 312.5 MHz
 
-   U_Rst312 : entity work.RstSync
+   U_Rst312 : entity surf.RstSync
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '0',
@@ -185,7 +184,7 @@ begin
          I => clkout1,
          O => mpsMmcmClkOut(2));
 
-   U_Rst125 : entity work.RstSync
+   U_Rst125 : entity surf.RstSync
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '0',
@@ -204,7 +203,7 @@ begin
    mps125MHzClk <= mpsMmcmClkOut(2);
    mps125MHzRst <= mpsMmcmRstOut(2);
 
-   Sync_locked : entity work.Synchronizer
+   Sync_locked : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -212,7 +211,7 @@ begin
          dataIn  => locked,
          dataOut => mpsPllLocked);
 
-   U_PLL : entity work.ClockManagerUltraScale
+   U_PLL : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G             => TPD_G,
          TYPE_G            => "PLL",

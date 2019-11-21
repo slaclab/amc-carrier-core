@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmCryoDetClkDiv.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-11-03
--- Last update: 2017-11-06
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -20,7 +17,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 entity RtmCryoDetClkDiv is
    generic (
@@ -54,7 +53,7 @@ architecture rtl of RtmCryoDetClkDiv is
 begin
 
 
-   U_CLOCK_DELAY : entity work.SlvDelay
+   U_CLOCK_DELAY : entity surf.SlvDelay
    generic map (
       TPD_G   => TPD_G,
       DELAY_G => 8,

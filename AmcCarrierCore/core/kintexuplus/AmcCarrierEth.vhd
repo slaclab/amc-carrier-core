@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-21
--- Last update: 2019-11-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,13 +17,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierEth is
    generic (
@@ -169,7 +170,7 @@ begin
    --------------------------
    -- AXI-Lite: Crossbar Core
    --------------------------  
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -191,7 +192,7 @@ begin
    -- Zone2 10 GigE Module
    -----------------------
    ETH_ZONE2 : if (RTM_ETH_G = false) generate
-      U_Xaui : entity work.XauiGtyUltraScaleWrapper
+      U_Xaui : entity surf.XauiGtyUltraScaleWrapper
          generic map (
             TPD_G         => TPD_G,
             EN_WDT_G      => true,
@@ -232,7 +233,7 @@ begin
    -- Zone3 1 GigE Module
    ----------------------
    ETH_ZONE3 : if (RTM_ETH_G = true) generate
-      U_Rtm : entity work.GigEthGtyUltraScaleWrapper
+      U_Rtm : entity surf.GigEthGtyUltraScaleWrapper
          generic map (
             TPD_G              => TPD_G,
             -- DMA/MAC Configurations
@@ -271,7 +272,7 @@ begin
       ethTxN(3 downto 1) <= "111";
    end generate;
 
-   U_Sync : entity work.Synchronizer
+   U_Sync : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -282,7 +283,7 @@ begin
    ----------------------
    -- IPv4/ARP/UDP Engine
    ----------------------
-   U_UdpEngineWrapper : entity work.UdpEngineWrapper
+   U_UdpEngineWrapper : entity surf.UdpEngineWrapper
       generic map (
          -- Simulation Generics
          TPD_G          => TPD_G,
@@ -330,7 +331,7 @@ begin
    -------------
    -- Xilinx XVC
    -------------
-   U_Debug : entity work.UdpDebugBridgeWrapper
+   U_Debug : entity surf.UdpDebugBridgeWrapper
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -346,12 +347,12 @@ begin
    --------------------------------------
    -- Legacy AXI-Lite Master without RSSI
    --------------------------------------
-   U_SRPv0 : entity work.SrpV0AxiLite
+   U_SRPv0 : entity surf.SrpV0AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          EN_32BIT_ADDR_G     => true,
-         BRAM_EN_G           => true,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
          AXI_STREAM_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
@@ -378,7 +379,7 @@ begin
    -----------------------------------
    NONE_ILEAVE : if (RSSI_ILEAVE_EN_G = false) generate
 
-      U_RssiServer : entity work.AmcCarrierRssi
+      U_RssiServer : entity amc_carrier_core.AmcCarrierRssi
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
@@ -426,7 +427,7 @@ begin
 
    RSSI_ILEAVE : if (RSSI_ILEAVE_EN_G = true) generate
 
-      U_RssiServer : entity work.AmcCarrierRssiInterleave
+      U_RssiServer : entity amc_carrier_core.AmcCarrierRssiInterleave
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
@@ -474,7 +475,7 @@ begin
    ----------------------
    -- BP Messenger Server
    ----------------------
-   U_Resize_Server : entity work.AxiStreamResize
+   U_Resize_Server : entity surf.AxiStreamResize
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -493,7 +494,7 @@ begin
          mAxisMaster => ibBpMsgServerMaster,
          mAxisSlave  => ibBpMsgServerSlave);
 
-   U_ServerLimiter : entity work.SsiFrameLimiter
+   U_ServerLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,
@@ -528,7 +529,7 @@ begin
    ----------------------
    -- BP Messenger Client
    ----------------------
-   U_Resize_Client : entity work.AxiStreamResize
+   U_Resize_Client : entity surf.AxiStreamResize
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
@@ -547,7 +548,7 @@ begin
          mAxisMaster => ibBpMsgClientMaster,
          mAxisSlave  => ibBpMsgClientSlave);
 
-   U_ClientLimiter : entity work.SsiFrameLimiter
+   U_ClientLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,

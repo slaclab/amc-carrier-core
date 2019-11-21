@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : DaqDecimatorTb.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2017-07-03
 -------------------------------------------------------------------------------
 -- Description: Simulation Testbed for DaqDecimator
 ------------------------------------------------------------------------------
@@ -20,7 +17,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+
+library amc_carrier_core; 
 
 entity DaqDecimatorTb is
 end entity;
@@ -48,7 +49,7 @@ begin
    -----------------------------
    -- Generate clocks and resets
    -----------------------------
-   U_ClkRst : entity work.ClkRst
+   U_ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_C,
          RST_START_DELAY_G => 1 ns,  -- Wait this long into simulation before asserting reset
@@ -62,7 +63,7 @@ begin
    ----------------------
    -- DaqDecimator Module
    ----------------------
-   U_DaqDecimator : entity work.DaqDecimator
+   U_DaqDecimator : entity amc_carrier_core.DaqDecimator
       generic map (
          TPD_G => TPD_C)
       port map (

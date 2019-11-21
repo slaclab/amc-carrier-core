@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : Si5317a.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
@@ -18,8 +17,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -136,7 +137,7 @@ begin
    pllLocked <= locked;
    locked    <= not(los) and not(lol);
 
-   U_pllLos : entity work.Debouncer
+   U_pllLos : entity surf.Debouncer
       generic map (
          TPD_G             => TPD_G,
          INPUT_POLARITY_G  => '1',
@@ -146,7 +147,7 @@ begin
          i   => pllLos,
          o   => los);
 
-   U_pllLol : entity work.Debouncer
+   U_pllLol : entity surf.Debouncer
       generic map (
          TPD_G             => TPD_G,
          INPUT_POLARITY_G  => '1',
@@ -334,7 +335,7 @@ begin
       end if;
    end process seq;
 
-   U_pllRst : entity work.PwrUpRst
+   U_pllRst : entity surf.PwrUpRst
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '1',         -- active HIGH input
