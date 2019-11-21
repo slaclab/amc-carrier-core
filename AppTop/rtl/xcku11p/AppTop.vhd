@@ -35,8 +35,6 @@ use amc_carrier_core.AmcCarrierPkg.all;
 use amc_carrier_core.AppTopPkg.all;
 use amc_carrier_core.AppMpsPkg.all;
 
-library xil_defaultlib;
-
 entity AppTop is
    generic (
       -- General Generics
@@ -506,7 +504,7 @@ begin
    -------------------
    -- Application Core
    -------------------
-   U_AppCore : entity xil_defaultlib.AppCore
+   U_AppCore : entity amc_carrier_core.AppCore
       generic map (
          TPD_G           => TPD_G,
          SIM_SPEEDUP_G   => SIM_SPEEDUP_G,
