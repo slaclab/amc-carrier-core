@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AxisBramFlashBufferWrFsm.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-04-10
--- Last update: 2018-04-12
 -------------------------------------------------------------------------------
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)

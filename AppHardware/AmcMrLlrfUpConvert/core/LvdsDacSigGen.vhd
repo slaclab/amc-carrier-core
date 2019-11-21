@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : LvdsDacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-14
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: Signal generator top module.
 --     Arbitrary signal generator

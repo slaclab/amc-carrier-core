@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcTimingDigitalDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-28
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------

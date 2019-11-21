@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : DaqRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for DAQ
 --

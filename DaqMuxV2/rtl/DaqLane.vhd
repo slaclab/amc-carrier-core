@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : DaqLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-02
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:   This module sends sample data to a single Lane.
 --                In non-continuous mode

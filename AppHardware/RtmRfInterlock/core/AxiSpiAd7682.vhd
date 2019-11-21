@@ -1,9 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AxiSpiAd7682.vhd
--- Author     : Uros Legat <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-12
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:   
 --    The acquisition is continuous. Conversion time is defined by N_SPI_CYCLES_G. 

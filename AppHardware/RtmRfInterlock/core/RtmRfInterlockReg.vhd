@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : RtmRfInterlockReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-06-21
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:  Register decoding
 --               0x00 (RW)- bit0 = mode

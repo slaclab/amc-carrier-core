@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : RtmDigitalDebugDout.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-07-26
--- Last update: 2017-07-26
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------

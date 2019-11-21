@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : DaqMuxV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-07-12
--- Last update: 2019-11-20
 -------------------------------------------------------------------------------
 -- Description: Data acquisition top module:
 --              https://confluence.slac.stanford.edu/display/ppareg/AmcAxisDaqV2+Requirements

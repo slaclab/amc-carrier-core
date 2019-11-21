@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : DaqTrigger.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2016-05-24
 -------------------------------------------------------------------------------
 -- Description: 
 --          Trigger Status

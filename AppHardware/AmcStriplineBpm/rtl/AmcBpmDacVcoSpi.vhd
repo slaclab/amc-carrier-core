@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcBpmDacVcoSpi.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-07-12
--- Last update: 2016-07-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------

@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : DaqTestSig.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2017-07-03
 -------------------------------------------------------------------------------
 -- Description: Reduces the sample rate:
 --                   test_i = '1' : Output counter test data

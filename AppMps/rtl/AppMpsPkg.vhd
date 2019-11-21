@@ -1,7 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppMpsPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-08
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 

@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppMpsRegBase.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-04-01
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing

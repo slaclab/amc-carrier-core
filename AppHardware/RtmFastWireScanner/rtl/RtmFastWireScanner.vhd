@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : RtmFastWireScanner.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-02-07
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/BBBODQ  
 ------------------------------------------------------------------------------

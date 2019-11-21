@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : RtmCryoDetClkDiv.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-11-03
--- Last update: 2017-11-06
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------

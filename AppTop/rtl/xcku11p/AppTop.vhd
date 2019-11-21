@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-04
--- Last update: 2019-11-01
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --

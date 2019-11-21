@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : Ad9228Core.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-08-09
--- Last update: 2016-08-09
 -------------------------------------------------------------------------------
 -- Description:
 -- ADC Readout Controller

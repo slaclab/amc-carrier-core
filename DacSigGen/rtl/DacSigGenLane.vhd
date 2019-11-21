@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : DacSigGenLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-11-16
--- Last update: 2018-02-16
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
 --               The module contains a AXI-Lite accessible block RAM where the 

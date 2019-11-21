@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AxiSpiAd7682Reg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:  Registers 
 --               0x00(RW)- CFG register - Default 0xFFFC(AD7682/AD7689 Data-sheet, Table 11)
