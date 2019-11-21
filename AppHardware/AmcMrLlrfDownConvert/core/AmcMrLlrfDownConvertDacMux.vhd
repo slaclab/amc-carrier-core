@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfDownConvertDacMux.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 

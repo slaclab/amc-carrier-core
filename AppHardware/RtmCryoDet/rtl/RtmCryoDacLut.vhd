@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : RtmCryoDacLut.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: SPI DAC LUT Module

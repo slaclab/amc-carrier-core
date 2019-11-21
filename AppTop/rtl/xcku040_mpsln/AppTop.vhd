@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level

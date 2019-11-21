@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfUpConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 

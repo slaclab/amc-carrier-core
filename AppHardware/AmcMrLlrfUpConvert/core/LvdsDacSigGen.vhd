@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : LvdsDacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Signal generator top module.

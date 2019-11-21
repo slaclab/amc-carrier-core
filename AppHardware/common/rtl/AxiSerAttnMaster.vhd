@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AxiSerAttnMaster.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:   This module handles SPI chips with only one setting (non addressable or readable over SPI)

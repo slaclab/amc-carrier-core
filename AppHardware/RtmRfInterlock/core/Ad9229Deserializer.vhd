@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : Ad9229Deserializer.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 12 bit DDR deserializer using Ultrascale IDELAYE3 and ISERDESE3.

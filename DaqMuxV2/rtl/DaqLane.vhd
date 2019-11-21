@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : DaqLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:   This module sends sample data to a single Lane.

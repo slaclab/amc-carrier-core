@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcGenericAdcDacCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX

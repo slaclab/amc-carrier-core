@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : Adf5355Tb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Testbench for design "AxiLiteAsync"

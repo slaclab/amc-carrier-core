@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : DaqRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for DAQ

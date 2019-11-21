@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : BsaAxiInterconnectWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Wrapper around AxiInterconnect Xilinx IP Core.

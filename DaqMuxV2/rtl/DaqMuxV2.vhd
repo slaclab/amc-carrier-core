@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : DaqMuxV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Data acquisition top module:

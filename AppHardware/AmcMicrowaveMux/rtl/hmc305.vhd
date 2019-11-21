@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : hmc305.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: SPI Master Wrapper for ADI HMC305 IC + 74HC238PWR MUX for LE

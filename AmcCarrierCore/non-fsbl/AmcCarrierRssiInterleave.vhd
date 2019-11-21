@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierRssiInterleave.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 

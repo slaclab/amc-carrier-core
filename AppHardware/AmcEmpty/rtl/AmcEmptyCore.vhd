@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcEmptyCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Module to terminate an empty AMC bay

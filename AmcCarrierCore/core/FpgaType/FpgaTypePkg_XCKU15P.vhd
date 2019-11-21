@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : FpgaTypePkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Example .MCS: The GZ header (0x1F8B) starts at offset: 062A0000 + 8D48 + 6 = 0x62A8D4E

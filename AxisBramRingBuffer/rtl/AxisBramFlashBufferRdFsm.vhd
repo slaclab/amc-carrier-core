@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AxisBramFlashBufferRdFsm.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Data Format:

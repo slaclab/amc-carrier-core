@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : adf5355.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: SPI Master Wrapper for ADI ADF5355 IC

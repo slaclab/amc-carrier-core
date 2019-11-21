@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : RtmRfInterlockReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:  Register decoding

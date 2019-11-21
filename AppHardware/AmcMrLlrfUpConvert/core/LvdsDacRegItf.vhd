@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : LvdsDacRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for Signal generator

@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : LvdsDacLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator

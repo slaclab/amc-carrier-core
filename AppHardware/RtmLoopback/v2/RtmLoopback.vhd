@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : RtmLoopback.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_22_CXX

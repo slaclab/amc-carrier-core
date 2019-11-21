@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : DaqTestSig.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Reduces the sample rate:

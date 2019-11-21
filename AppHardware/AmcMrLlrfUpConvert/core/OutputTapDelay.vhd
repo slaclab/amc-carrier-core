@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : OutputTapDelay.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: The ODELAYE3 Ultrascale

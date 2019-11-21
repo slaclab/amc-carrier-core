@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Common AMC Carrier Core VHDL package

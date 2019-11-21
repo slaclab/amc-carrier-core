@@ -1,7 +1,6 @@
 -------------------------------------------------------------------------------
 -- Title      : Memory Access Protocol (MAP) Protocol: https://confluence.slac.stanford.edu/x/dBmVD
 -------------------------------------------------------------------------------
--- File       : SsiAxiMaster.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:

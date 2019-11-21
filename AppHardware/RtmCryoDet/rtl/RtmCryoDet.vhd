@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    

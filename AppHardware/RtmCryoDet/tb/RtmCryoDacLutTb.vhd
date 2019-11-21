@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : RtmCryoDacLutTb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Simulation Testbed for testing the RtmCryoDacLutTb module

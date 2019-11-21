@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierRssiObFifo.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Adds a "store + forwarding" FIFO and throttling of the RSSI TSP outbound interface

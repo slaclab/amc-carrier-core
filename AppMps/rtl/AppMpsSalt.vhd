@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsSalt.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Application MPS SALT PHY Wrapper

@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfGen2UpConvertMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: 

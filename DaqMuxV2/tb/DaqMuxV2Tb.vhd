@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : DaqMuxV2Tb.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: Simulation Testbed for DaqMuxV2

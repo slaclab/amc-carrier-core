@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.

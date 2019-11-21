@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierBsi.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: BootStrap Interface (BSI) to the IPMI's controller (IPMC) 
