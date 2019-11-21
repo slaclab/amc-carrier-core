@@ -15,11 +15,11 @@
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
-
 
 library surf;
 use surf.StdRtlPkg.all;
@@ -33,7 +33,9 @@ use lcls_timing_core.TimingPkg.all;
 library amc_carrier_core;
 use amc_carrier_core.AmcCarrierPkg.all;
 use amc_carrier_core.AppTopPkg.all;
-use amc_carrier_core.AppTopPkg.all;
+use amc_carrier_core.AppMpsPkg.all;
+
+library xil_defaultlib;
 
 entity AppTop is
    generic (
@@ -490,7 +492,7 @@ begin
    -------------------
    -- Application Core
    -------------------
-   U_AppCore : entity work.AppCore
+   U_AppCore : entity xil_defaultlib.AppCore
       generic map (
          TPD_G           => TPD_G,
          SIM_SPEEDUP_G   => SIM_SPEEDUP_G,
