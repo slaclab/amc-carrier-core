@@ -497,7 +497,7 @@ begin
    -------------------
    -- Application Core
    -------------------
-   U_AppCore : entity amc_carrier_core.AppCore
+   U_AppCore : entity work.AppCore
       generic map (
          TPD_G           => TPD_G,
          MR_LCLS_APP_G   => MR_LCLS_APP_G,
