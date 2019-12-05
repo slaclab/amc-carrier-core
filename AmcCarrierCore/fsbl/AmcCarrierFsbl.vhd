@@ -344,6 +344,8 @@ begin
          TIME_GEN_APP_G    => false,
          TIME_GEN_EXTREF_G => false)
       port map (
+         stableClk            => fabClk,
+         stableRst            => fabRst,      
          -- AXI-Lite Interface (axilClk domain)
          axilClk              => axilClk,
          axilRst              => axilRst,
