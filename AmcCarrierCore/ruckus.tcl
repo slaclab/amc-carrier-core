@@ -1,15 +1,15 @@
 # Load RUCKUS environment and library
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
+# Load IP cores
+loadRuckusTcl "$::DIR_PATH/ip"
+
 # Get the family type
 set family [getFpgaFamily]
 
 # Load local Source Code and constraints
 loadSource -lib amc_carrier_core -dir  "$::DIR_PATH/core"
 loadSource -lib amc_carrier_core -dir  "$::DIR_PATH/core/${family}"
-
-loadSource -lib amc_carrier_core -path "$::DIR_PATH/ip/SysMonCore.dcp"
-# loadIpCore -path "$::DIR_PATH/ip/SysMonCore.xci"
 
 loadConstraints -path "$::DIR_PATH/xdc/${family}/AmcCarrierCorePorts.xdc"    
 loadConstraints -path "$::DIR_PATH/xdc/AmcCarrierCoreTiming.xdc" 
@@ -48,21 +48,6 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
 } elseif { $::env(PRJ_PART) eq {XCKU15P-FFVA1156-2-E} } {              
    loadSource -lib amc_carrier_core -path "$::DIR_PATH/core/FpgaType/FpgaTypePkg_XCKU15P.vhd"
 } else { 
-}
-
-loadSource -lib amc_carrier_core   -path "$::DIR_PATH/ip/MigCore.dcp"
-# loadIpCore -path "$::DIR_PATH/ip/MigCore.xci"
-
-# Check for Application Microblaze build
-if { [expr [info exists ::env(SDK_SRC_PATH)]] == 0 } {
-   ## Add the Microblaze Calibration Code
-   add_files -norecurse $::DIR_PATH/ip/MigCoreMicroblazeCalibration.elf
-   set_property SCOPED_TO_REF   {MigCore}                                                  [get_files -all -of_objects [get_fileset sources_1] {MigCoreMicroblazeCalibration.elf}]
-   set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/U0/microblaze_I} [get_files -all -of_objects [get_fileset sources_1] {MigCoreMicroblazeCalibration.elf}]
-
-   add_files -norecurse $::DIR_PATH/ip/MigCoreMicroblazeCalibration.bmm
-   set_property SCOPED_TO_REF   {MigCore}                                     [get_files -all -of_objects [get_fileset sources_1] {MigCoreMicroblazeCalibration.bmm}]
-   set_property SCOPED_TO_CELLS {inst/u_ddr3_mem_intfc/u_ddr_cal_riu/mcs0/U0} [get_files -all -of_objects [get_fileset sources_1] {MigCoreMicroblazeCalibration.bmm}]
 }
 
 # Place and Route strategies 
