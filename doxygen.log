@@ -23,6 +23,8 @@ Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/Amc
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/fsbl/kintexu
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/fsbl/kintexuplus
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/ip
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/ip/MigCore
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/ip/SysMonCore
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/non-fsbl
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/vivado
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/xdc
@@ -330,10 +332,7 @@ Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaAccumulator.v
 Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaAxiInterconnectWrapper.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaBufferControl.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaWaveformEngine.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/SsiAxiMaster.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/rtl/DacSigGen.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/rtl/DacSigGenLane.vhd...
-Reading /home/travis/build/sl
+Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/SsiAxiMast
 [AmcCarrierBsa.vhd:429:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::BSA_GEN:u_axilitecrossbar_1]
 
 [AmcCarrierBsa.vhd:429:Info: Elaborating entity BsaWaveformEngine for hierarchy bsawaveformengine::BSA_GEN:bsawaveformengine_0]
@@ -494,11 +493,11 @@ Reading /home/travis/build/sl
 
 [AmcCarrierFsbl.vhd:336:Info: Elaborating entity AmcCarrierEthFsbl for hierarchy amccarrierethfsbl::u_eth]
 
-[AmcCarrierFsbl.vhd:386:Info: Elaborating entity AmcCarrierTiming for hierarchy amccarriertiming::u_timing]
+[AmcCarrierFsbl.vhd:388:Info: Elaborating entity AmcCarrierTiming for hierarchy amccarriertiming::u_timing]
 
-[AmcCarrierFsbl.vhd:433:Info: Elaborating entity AmcCarrierBsa for hierarchy amccarrierbsa::u_bsa]
+[AmcCarrierFsbl.vhd:435:Info: Elaborating entity AmcCarrierBsa for hierarchy amccarrierbsa::u_bsa]
 
-[AmcCarrierFsbl.vhd:483:Info: Elaborating entity AmcCarrierDdrMem for hierarchy amccarrierddrmem::u_ddrmem]
+[AmcCarrierFsbl.vhd:485:Info: Elaborating entity AmcCarrierDdrMem for hierarchy amccarrierddrmem::u_ddrmem]
 
 [AmcCarrierEthFsbl.vhd:164:Info: Elaborating entity xauigthultrascalewrapper for hierarchy xauigthultrascalewrapper::u_xaui]
 
@@ -2836,7 +2835,10 @@ Reading /home/travis/build/sl
 /home/travis/build/slaclab/amc-carrier-core/AppTop/rtl/xcku11p/AppTopPkg.vhd:67: warning: documented symbol `slv' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppTop/rtl/xcku11p/AppTopPkg.vhd:69: warning: documented symbol `array' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppTop/rtl/xcku11p/AppTopPkg.vhd:70: warning: documented symbol `DacSigStatusType  :' was not declared or defined.
-aclab/amc-carrier-core/DacSigGen/rtl/DacSigGenReg.vhd...
+er.vhd...
+Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/rtl/DacSigGen.vhd...
+Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/rtl/DacSigGenLane.vhd...
+Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/rtl/DacSigGenReg.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/tb/DacSigGenTb.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/DaqMuxV2/rtl/DaqDecimator.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/DaqMuxV2/rtl/DaqLane.vhd...
