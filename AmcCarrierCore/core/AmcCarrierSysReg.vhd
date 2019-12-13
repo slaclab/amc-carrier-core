@@ -533,7 +533,7 @@ begin
    -------------------------------
    -- AXI-Lite: PWR Monitor Module
    -------------------------------
-   GEN_PWR_I2C : if (ULTRASCALE_PLUS_C) generate
+   GEN_PWR_I2C : if (ULTRASCALE_PLUS_C) and (FSBL_G = false) generate
       AxiI2cRegMaster_3 : entity surf.AxiI2cRegMaster
          generic map (
             TPD_G          => TPD_G,

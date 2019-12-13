@@ -9,13 +9,18 @@ loadSource -lib amc_carrier_core -dir  "$::DIR_PATH/rtl/"
 set family [getFpgaFamily]
 
 if { ${family} == "kintexuplus" } {
-   loadSource -lib amc_carrier_core -path  "$::DIR_PATH/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp"
+   loadSource -path "$::DIR_PATH/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp"
 }
 
 if { ${family} == "kintexu" } {
-   loadSource -lib amc_carrier_core -path  "$::DIR_PATH/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp"
+   loadSource -path "$::DIR_PATH/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp"
 }
 
 if { ${family} == "kintex7" } {
-   loadSource -lib amc_carrier_core -path  "$::DIR_PATH/cores/BsaAxiInterconnect/xilinx7/BsaAxiInterconnect.dcp"
+   loadSource -path "$::DIR_PATH/cores/BsaAxiInterconnect/xilinx7/BsaAxiInterconnect.dcp"
 }
+
+loadConstraints -path "$::DIR_PATH/cores/BsaAxiInterconnect/BsaAxiInterconnect_clocks.xdc"
+set_property PROCESSING_ORDER {LATE}               [get_files {BsaAxiInterconnect_clocks.xdc}]
+set_property SCOPED_TO_REF    {BsaAxiInterconnect} [get_files {BsaAxiInterconnect_clocks.xdc}]
+set_property SCOPED_TO_CELLS  {inst}               [get_files {BsaAxiInterconnect_clocks.xdc}]
