@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- File       : AmcMicrowaveMuxCoreCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-06-14
--- Last update: 2018-08-16
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
