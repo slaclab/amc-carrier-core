@@ -15,8 +15,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
-use ieee.numeric_std.all; -- TODO: Need to resolve this numeric_std dependence 
-
+use ieee.numeric_std.all;
 
 library surf;
 use surf.StdRtlPkg.all;
@@ -27,10 +26,8 @@ use surf.AxiPkg.all;
 use surf.AxiDmaPkg.all;
 use surf.TextUtilPkg.all;
 
-
 library amc_carrier_core;
 use amc_carrier_core.AmcCarrierPkg.all;
---use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 library lcls_timing_core;
 use lcls_timing_core.TimingPkg.all;
