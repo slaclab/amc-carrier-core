@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmMpsLinkNodeReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-11-10
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_07_CXX
 -------------------------------------------------------------------------------
@@ -20,8 +17,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity RtmMpsLinkNodeReg is
    generic (
@@ -61,7 +60,7 @@ architecture rtl of RtmMpsLinkNodeReg is
 
 begin
 
-   U_rtmDin : entity work.SynchronizerVector
+   U_rtmDin : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 32)
@@ -70,7 +69,7 @@ begin
          dataIn  => din,
          dataOut => rtmDin);
 
-   U_rtmDout : entity work.SynchronizerVector
+   U_rtmDout : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 8)

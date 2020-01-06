@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : AmcCryoDemoCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
@@ -20,10 +19,14 @@ use ieee.std_logic_arith.all;
 library unisim;
 use unisim.vcomponents.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bPkg.all;
+
+library amc_carrier_core; 
 
 entity AmcCryoDemoCore is
    generic (
@@ -204,7 +207,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
    -------------------------------------------------------------------------------------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -225,7 +228,7 @@ begin
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -240,7 +243,7 @@ begin
 
    GEN_RX_SYNC :
    for i in 2 downto 0 generate
-      U_jesdRxSync : entity work.JesdSyncOut
+      U_jesdRxSync : entity amc_carrier_core.JesdSyncOut
          generic map (
             TPD_G    => TPD_G,
             INVERT_G => false)
@@ -254,7 +257,7 @@ begin
             jesdSyncN => jesdRxSyncN(i));
    end generate GEN_RX_SYNC;
 
-   U_jesdTxSync : entity work.JesdSyncIn
+   U_jesdTxSync : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -273,7 +276,7 @@ begin
    -- SPI interface ADCs and LMK 
    ----------------------------------------------------------------
    gen_dcSpiChips : for I in NUM_COMMON_SPI_CHIPS_C-1 downto 0 generate
-      AxiSpiMaster_INST : entity work.AxiSpiMaster
+      AxiSpiMaster_INST : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -328,7 +331,7 @@ begin
    ----------------------------------------------------------------
    -- SPI interface DAC
    ----------------------------------------------------------------  
-   U_dacAxiSpiMaster : entity work.AxiSpiMaster
+   U_dacAxiSpiMaster : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,

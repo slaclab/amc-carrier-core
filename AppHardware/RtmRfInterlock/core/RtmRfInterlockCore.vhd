@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmRfInterlockCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-06-17
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_CXX
 ------------------------------------------------------------------------------
@@ -20,12 +17,18 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.TimingPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core; 
 
 entity RtmRfInterlockCore is
    generic (
@@ -176,7 +179,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -198,7 +201,7 @@ begin
    -- Fast ADC
    -----------
    -- Divide the recovered timing clock by 2
-   U_ClockManager : entity work.ClockManagerUltraScale
+   U_ClockManager : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G              => 1 ns,
          TYPE_G             => "MMCM",
@@ -219,7 +222,7 @@ begin
          rstOut(0) => s_recRstDiv2);
 
    -- Get the data from the ADC
-   U_Ad9229Core : entity work.Ad9229Core
+   U_Ad9229Core : entity amc_carrier_core.Ad9229Core
       generic map (
          TPD_G           => TPD_G,
          IODELAY_GROUP_G => IODELAY_GROUP_G,
@@ -250,7 +253,7 @@ begin
          setDelay_i      => s_setDelay,
          setValid_i      => s_setValid);
 
-   U_SyncFifo : entity work.SynchronizerFifo
+   U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 48)
@@ -264,7 +267,7 @@ begin
    ---------------------
    -- CPLD SPI interface
    ---------------------
-   U_cpldSpi : entity work.AxiSpiMaster
+   U_cpldSpi : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",
@@ -290,7 +293,7 @@ begin
    -- constant PACKET_SIZE_C : positive := ite(MODE_G = "RW", 1, 0) + ADDRESS_SIZE_G + DATA_SIZE_G;
    ----------------------------------------------------------------         
    GEN_THR_SPI_CHIPS : for i in 1 downto 0 generate
-      U_thrSpi : entity work.AxiSpiMaster
+      U_thrSpi : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             MODE_G            => "WO",
@@ -328,7 +331,7 @@ begin
    ---------------------------------------
    -- Get Threshold SPI interface (AD7682)
    ---------------------------------------
-   U_AdcSpi : entity work.AxiSpiAd7682
+   U_AdcSpi : entity amc_carrier_core.AxiSpiAd7682
       generic map (
          TPD_G             => TPD_G,
          DATA_SIZE_G       => 16,
@@ -351,7 +354,7 @@ begin
    ----------------
    -- RTM registers
    ----------------
-   U_RtmLlrfMpsReg : entity work.RtmRfInterlockReg
+   U_RtmLlrfMpsReg : entity amc_carrier_core.RtmRfInterlockReg
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -387,7 +390,7 @@ begin
    --   - FWD_PWR_Data  
    --   - REFL_PWR_Data 
    ----------------------------------------------------------------          
-   U_RingBufferCtrl : entity work.RingBufferCtrl
+   U_RingBufferCtrl : entity amc_carrier_core.RingBufferCtrl
       generic map (
          TPD_G                    => TPD_G,
          RING_BUFFER_ADDR_WIDTH_G => BUFFER_ADDR_SIZE_C)
@@ -407,7 +410,7 @@ begin
    s_bufferData(1) <= x"0" & s_hsAdcdataSync(47 downto 36) & x"0" & s_hsAdcdataSync(35 downto 24);
 
    GEN_RING_BUF : for i in 1 downto 0 generate
-      U_AxiLiteRingBuffer : entity work.AxiLiteRingBuffer
+      U_AxiLiteRingBuffer : entity surf.AxiLiteRingBuffer
          generic map (
             TPD_G            => TPD_G,
             DATA_WIDTH_G     => BUFFER_WIDTH_C,

@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : DaqMuxV2Pkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2016-05-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -18,7 +15,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 use ieee.numeric_std.all;
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 package DaqMuxV2Pkg is
 

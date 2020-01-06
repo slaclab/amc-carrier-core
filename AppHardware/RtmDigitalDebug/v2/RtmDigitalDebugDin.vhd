@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmDigitalDebugDin.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-07-26
--- Last update: 2017-07-26
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
@@ -18,7 +15,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;

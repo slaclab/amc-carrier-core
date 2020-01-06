@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcTimingDigitalDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-28
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
@@ -18,9 +15,13 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+
+library amc_carrier_core; 
 
 entity AmcTimingDigitalDualCore is
    generic (
@@ -71,7 +72,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcTimingDigitalCore
+      U_AMC : entity amc_carrier_core.AmcTimingDigitalCore
          generic map (
             TPD_G => TPD_G)
          port map(

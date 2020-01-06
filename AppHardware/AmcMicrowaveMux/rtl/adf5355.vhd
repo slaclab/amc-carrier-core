@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : adf5355.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: SPI Master Wrapper for ADI ADF5355 IC
@@ -18,14 +17,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity adf5355 is
    generic (
-      TPD_G             : time            := 1 ns;
-      CLK_PERIOD_G      : real            := (1.0/156.25E+6);
-      SPI_SCLK_PERIOD_G : real            := (1.0/10.0E+6));
+      TPD_G             : time := 1 ns;
+      CLK_PERIOD_G      : real := (1.0/156.25E+6);
+      SPI_SCLK_PERIOD_G : real := (1.0/10.0E+6));
    port (
       -- Clock and Reset
       axiClk         : in  sl;
@@ -167,7 +168,7 @@ begin
       end if;
    end process seq;
 
-   U_SpiMaster : entity work.SpiMaster
+   U_SpiMaster : entity surf.SpiMaster
       generic map (
          TPD_G             => TPD_G,
          NUM_CHIPS_G       => 1,
@@ -189,13 +190,13 @@ begin
          spiSdi    => coreSDout,
          spiSdo    => '1');
 
-   U_Cache : entity work.SimpleDualPortRam
+   U_Cache : entity surf.SimpleDualPortRam
       generic map(
-         TPD_G        => TPD_G,
-         BRAM_EN_G    => false,
-         DOB_REG_G    => false,
-         DATA_WIDTH_G => 28,
-         ADDR_WIDTH_G => 4)
+         TPD_G         => TPD_G,
+         MEMORY_TYPE_G => "distributed",
+         DOB_REG_G     => false,
+         DATA_WIDTH_G  => 28,
+         ADDR_WIDTH_G  => 4)
       port map (
          -- Port A
          clka  => axiClk,

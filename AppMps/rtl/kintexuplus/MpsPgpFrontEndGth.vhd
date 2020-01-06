@@ -1,13 +1,5 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
--- File       : MpsPgpFrontEndGth.vhd
--- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-16
--- Last update: 2018-08-25
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:
 -------------------------------------------------------------------------------
@@ -25,9 +17,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.Pgp2bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.Pgp2bPkg.all;
 
 entity MpsPgpFrontEndGth is
    generic (
@@ -132,7 +126,7 @@ END COMPONENT;
 
 begin
 
-   U_TxWatchDog : entity work.WatchDogRst
+   U_TxWatchDog : entity surf.WatchDogRst
       generic map(
          TPD_G      => TPD_G,
          DURATION_G => integer(156.25E+6 * 30.0E-3))  -- 30 ms (based on TimingGty_fixedlat_example_init.v from IP core)
@@ -143,7 +137,7 @@ begin
 
    resetAll <= pgpRst or rstAll;
 
-   -- U_RxWatchDog : entity work.WatchDogRst
+   -- U_RxWatchDog : entity surf.WatchDogRst
    -- generic map(
    -- TPD_G      => TPD_G,
    -- DURATION_G => integer(156.25E+6 * 130.0E-3))  -- 130 ms (based on TimingGty_fixedlat_example_init.v from IP core)
@@ -155,7 +149,7 @@ begin
 
    gtRxUserReset <= (phyRxInit or pgpRst or pgpRxIn.resetRx or rxRstWdt) and phyTxReady;
 
-   U_Pgp2bLane : entity work.Pgp2bLane
+   U_Pgp2bLane : entity surf.Pgp2bLane
       generic map (
          LANE_CNT_G        => 1,
          VC_INTERLEAVE_G   => VC_INTERLEAVE_G,

@@ -1,13 +1,5 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
--- File       : DacSigGenTb.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-24
--- Last update: 2016-02-24
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: Converts the 16-bit interface to 32-bit JESD interface
 -------------------------------------------------------------------------------
@@ -25,10 +17,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AppTopPkg.all;
-use work.Jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
+use surf.Jesd204bPkg.all;
 
 entity  DacSigGenTb is
 
@@ -64,7 +60,7 @@ architecture Bhv of DacSigGenTb is
 begin  -- architecture Bhv
 
    -- Generate clocks and resets
-   ClkRst : entity work.ClkRst
+   ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset
@@ -76,7 +72,7 @@ begin  -- architecture Bhv
          rstL => open); 
          
       -- Generate clocks and resets
-   ClkRst_2x : entity work.ClkRst
+   ClkRst_2x : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_2X_PERIOD_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset
@@ -88,7 +84,7 @@ begin  -- architecture Bhv
          rstL => open); 
 
      -- Generate clocks and resets
-   ClkRst_axi : entity work.ClkRst
+   ClkRst_axi : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_AXI_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset
@@ -102,7 +98,7 @@ begin  -- architecture Bhv
   -----------------------------
   -- component instantiation 
   -----------------------------
-  DacSigGen_INST: entity work.DacSigGen
+  DacSigGen_INST: entity amc_carrier_core.DacSigGen
    generic map (
       TPD_G            => TPD_G,
       NUM_SIG_GEN_G    => 2,

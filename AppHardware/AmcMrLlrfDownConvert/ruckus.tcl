@@ -2,7 +2,7 @@
 source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 
 # Load local Source Code and constraints
-loadSource -dir "$::DIR_PATH/core/"
+loadSource -lib amc_carrier_core -dir "$::DIR_PATH/core/"
 
 # Load AMC BAY[0] constraints files
 set rootName [file rootname [file tail $::DIR_PATH]]

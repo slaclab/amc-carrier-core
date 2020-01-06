@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmMpsLinkNode.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-23
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_07_CXX
 -------------------------------------------------------------------------------
@@ -18,11 +15,15 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core; 
 
 entity RtmMpsLinkNode is
    generic (
@@ -82,7 +83,7 @@ begin
 
    end generate GEN_DOUT;
 
-   U_Monitor : entity work.RtmMpsLinkNodeReg
+   U_Monitor : entity amc_carrier_core.RtmMpsLinkNodeReg
       generic map (
          TPD_G => TPD_G)
       port map (

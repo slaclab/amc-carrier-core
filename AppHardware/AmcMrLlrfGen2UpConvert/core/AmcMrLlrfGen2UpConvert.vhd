@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfGen2UpConvert.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-12-07
--- Last update: 2019-04-25
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,14 +17,18 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
-use work.I2cPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+use surf.I2cPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core; 
 
 entity AmcMrLlrfGen2UpConvert is
    generic (
@@ -210,7 +211,7 @@ architecture mapping of AmcMrLlrfGen2UpConvert is
 
 begin
 
-   U_AmcMapping : entity work.AmcMrLlrfGen2UpConvertMapping
+   U_AmcMapping : entity amc_carrier_core.AmcMrLlrfGen2UpConvertMapping
       generic map (
          TPD_G              => TPD_G,
          TIMING_TRIG_MODE_G => TIMING_TRIG_MODE_G)
@@ -265,7 +266,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -286,7 +287,7 @@ begin
    --------------------------
    -- I2C Temperature Sensors
    --------------------------
-   U_I2C : entity work.AxiI2cRegMaster
+   U_I2C : entity surf.AxiI2cRegMaster
       generic map (
          TPD_G          => TPD_G,
          I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
@@ -309,7 +310,7 @@ begin
    -- SPI interface ADCs and LMK
    ----------------------------------------------------------------
    GEN_SPI_CHIPS : for i in 3 downto 0 generate
-      U_AXI_SPI : entity work.AxiSpiMaster
+      U_AXI_SPI : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -332,7 +333,7 @@ begin
    ----------------------------------------------------------------
    -- Legacy SPI interface
    ----------------------------------------------------------------
-   U_AXI_SPI_DAC : entity work.AxiSpiMaster
+   U_AXI_SPI_DAC : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,
@@ -381,7 +382,7 @@ begin
    -- Serial Attenuator modules
    -----------------------------
    GEN_ATT_CHIPS : for i in NUM_ATTN_CHIPS_C-1 downto 0 generate
-      U_Attn : entity work.AxiSerAttnMaster
+      U_Attn : entity amc_carrier_core.AxiSerAttnMaster
          generic map (
             TPD_G             => TPD_G,
             DATA_SIZE_G       => 6,
@@ -425,7 +426,7 @@ begin
    ----------------------------
    -- SPI Interface to JESD DAC
    ----------------------------
-   U_SPI_DAC : entity work.AxiSpiMaster
+   U_SPI_DAC : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,

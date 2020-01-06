@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : hmc305.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description: SPI Master Wrapper for ADI HMC305 IC + 74HC238PWR MUX for LE
@@ -18,8 +17,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity hmc305 is
    generic (
@@ -194,7 +195,7 @@ begin
       end if;
    end process seq;
 
-   U_SpiMaster : entity work.SpiMaster
+   U_SpiMaster : entity surf.SpiMaster
       generic map (
          TPD_G             => TPD_G,
          NUM_CHIPS_G       => 1,

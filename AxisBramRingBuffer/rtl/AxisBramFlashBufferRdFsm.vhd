@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AxisBramFlashBufferRdFsm.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-04-10
--- Last update: 2018-04-20
 -------------------------------------------------------------------------------
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
@@ -33,10 +30,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
 
 entity AxisBramFlashBufferRdFsm is
    generic (
@@ -225,7 +224,7 @@ begin
    end process seq;
 
    GEN_SYNC : for i in NUM_CH_G-1 downto 0 generate
-      U_SyncTdest : entity work.SynchronizerVector
+      U_SyncTdest : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 8)
@@ -236,7 +235,7 @@ begin
    end generate GEN_SYNC;
 
    GEN_RESIZE : if (AXIS_TDATA_WIDTH_G /= 16) generate
-      U_Resize : entity work.AxiStreamResize
+      U_Resize : entity surf.AxiStreamResize
          generic map (
             TPD_G               => TPD_G,
             READY_EN_G          => true,

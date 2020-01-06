@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcEmptyCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-06
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: Module to terminate an empty AMC bay
 -------------------------------------------------------------------------------
@@ -18,8 +15,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity AmcEmptyCore is
    generic (

@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppTopPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-11-11
--- Last update: 2017-08-24
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -18,7 +15,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 package AppTopPkg is
 

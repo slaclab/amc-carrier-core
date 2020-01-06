@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierSysMon.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-07-09
--- Last update: 2019-06-21
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -18,8 +15,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity AmcCarrierSysMon is
    generic (

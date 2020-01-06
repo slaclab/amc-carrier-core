@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AxisBramFlashBuffer.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-04-10
--- Last update: 2018-04-20
 -------------------------------------------------------------------------------
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
@@ -33,9 +30,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+
+library amc_carrier_core;
 
 entity AxisBramFlashBuffer is
    generic (
@@ -106,7 +107,7 @@ begin
    -----------------
    -- BRAM Write FSM
    -----------------
-   U_WriteFsm : entity work.AxisBramFlashBufferWrFsm
+   U_WriteFsm : entity amc_carrier_core.AxisBramFlashBufferWrFsm
       generic map (
          TPD_G          => TPD_G,
          NUM_CH_G       => NUM_CH_G,
@@ -143,13 +144,13 @@ begin
    -- BRAM Buffers
    ---------------
    GEN_BRAM : for i in NUM_CH_G-1 downto 0 generate
-      U_BRAM : entity work.SimpleDualPortRam
+      U_BRAM : entity surf.SimpleDualPortRam
          generic map (
-            TPD_G        => TPD_G,
-            BRAM_EN_G    => true,
-            DOB_REG_G    => true,       -- 2 cycle latency
-            DATA_WIDTH_G => 32,
-            ADDR_WIDTH_G => BUFFER_WIDTH_G)
+            TPD_G         => TPD_G,
+            MEMORY_TYPE_G => "block",
+            DOB_REG_G     => true,      -- 2 cycle latency
+            DATA_WIDTH_G  => 32,
+            ADDR_WIDTH_G  => BUFFER_WIDTH_G)
          port map (
             -- Port A     
             clka  => appClk,
@@ -166,7 +167,7 @@ begin
    -----------------
    -- BRAM Read FSM
    -----------------
-   U_ReadFsm : entity work.AxisBramFlashBufferRdFsm
+   U_ReadFsm : entity amc_carrier_core.AxisBramFlashBufferRdFsm
       generic map (
          TPD_G              => TPD_G,
          NUM_CH_G           => NUM_CH_G,

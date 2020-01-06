@@ -1,5 +1,4 @@
 -------------------------------------------------------------------------------
--- File       : RtmDigitalDebugV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
@@ -16,11 +15,15 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core; 
 
 entity RtmDigitalDebugV2 is
    generic (
@@ -76,6 +79,7 @@ architecture mapping of RtmDigitalDebugV2 is
    signal userValueOut : slv(31 downto 0);
    signal doutP        : slv(7 downto 0);
    signal doutN        : slv(7 downto 0);
+   signal doutClk      : sl;
    signal cleanClock   : sl;
 
 
@@ -96,7 +100,7 @@ begin
    -------------------------        
    -- OutBound Clock Mapping
    -------------------------        
-   U_PLL : entity work.ClockManagerUltraScale
+   U_PLL : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G            => TPD_G,
          TYPE_G           => "PLL",
@@ -125,7 +129,7 @@ begin
 
    userValueIn(31 downto 1) <= (others => '0');
 
-   U_CLK : entity work.ClkOutBufDiff
+   U_CLK : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
@@ -156,7 +160,7 @@ begin
    ------------------------
    -- Digital Input Mapping
    ------------------------
-   U_DIN : entity work.RtmDigitalDebugDin
+   U_DIN : entity amc_carrier_core.RtmDigitalDebugDin
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -171,16 +175,18 @@ begin
          xDin(7) => rtmLsN(5),
          din     => din);
 
+   doutClk <= not clk(0);
+   
    -------------------------
    -- Digital Output Mapping
    -------------------------         
-   U_DOUT : entity work.RtmDigitalDebugDout
+   U_DOUT : entity amc_carrier_core.RtmDigitalDebugDout
       generic map (
          TPD_G           => TPD_G,
          REG_DOUT_EN_G   => REG_DOUT_EN_G,
          REG_DOUT_MODE_G => REG_DOUT_MODE_G)
       port map (
-         clk     => clk(0),             -- Used for REG_DOUT_EN_G(x) = '1')
+         clk     => doutClk,             -- Used for REG_DOUT_EN_G(x) = '1')
          disable => userValueOut(7 downto 0),
          -- Digital Output Interface
          dout    => dout,
@@ -197,7 +203,7 @@ begin
    ---------------------
    -- Register Interface
    ---------------------
-   U_REG : entity work.Si5317a
+   U_REG : entity amc_carrier_core.Si5317a
       generic map (
          TPD_G => TPD_G)
       port map(

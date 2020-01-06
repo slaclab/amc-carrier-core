@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfDownConvertDacMux.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-27
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,11 +17,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core; 
 
 entity AmcMrLlrfDownConvertDacMux is
    generic (
@@ -95,7 +96,7 @@ begin
    dacSclk_o <= dacSclk_i when(enable = '0') else r.sck;
    dacSdi_o  <= dacSdi_i  when(enable = '0') else r.din;
 
-   U_Reg : entity work.AmcMrLlrfDownConvertDacMuxReg
+   U_Reg : entity amc_carrier_core.AmcMrLlrfDownConvertDacMuxReg
       generic map (
          TPD_G => TPD_G)
       port map (

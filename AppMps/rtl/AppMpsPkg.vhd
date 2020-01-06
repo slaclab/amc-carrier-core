@@ -1,7 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsPkg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-08
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -17,10 +15,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 package AppMpsPkg is
 
@@ -29,6 +31,7 @@ package AppMpsPkg is
    ---------------------------------------------------   
    constant MPS_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(2);
    constant MPS_CHAN_COUNT_C  : integer             := 24;
+   --type SlvMaxChanArray is array (natural range <>) of slv(MPS_CHAN_COUNT_C/4 -1 downto 0);  --one extra
 
    ---------------------------------------------------
    -- Mitigation message record
@@ -67,7 +70,7 @@ package AppMpsPkg is
       inputType : sl;                   -- '0' Digital, '1' Analog      
       timeStamp : slv(15 downto 0);
       appId     : slv(15 downto 0);
-      message   : Slv8Array(31 downto 0);
+      message   : Slv8Array(MPS_CHAN_COUNT_C-1 downto 0);
       msgSize   : slv(7 downto 0);      -- In units of Bytes
    end record;
 
@@ -438,9 +441,9 @@ package body AppMpsPkg is
          when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
             ret.BYTE_COUNT_C  := 12;
             ret.LCLS1_COUNT_C := 12;
-            ret.LCLS2_COUNT_C := 6;
+            ret.LCLS2_COUNT_C := 12/2;
 
-            for i in 0 to 11 loop
+            for i in 0 to 12 - 1 loop
                ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 7;
                ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;

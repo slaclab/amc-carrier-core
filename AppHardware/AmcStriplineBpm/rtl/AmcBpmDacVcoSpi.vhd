@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcBpmDacVcoSpi.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-07-12
--- Last update: 2016-07-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
@@ -20,7 +17,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 entity AmcBpmDacVcoSpi is
    generic (

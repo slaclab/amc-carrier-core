@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RingBufferCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-19
--- Last update: 2016-08-19
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,7 +17,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 entity RingBufferCtrl is
    generic (

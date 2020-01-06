@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : BsaAxiInterconnectWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-10
--- Last update: 2016-07-13
 -------------------------------------------------------------------------------
 -- Description: Wrapper around AxiInterconnect Xilinx IP Core.
 -------------------------------------------------------------------------------
@@ -19,9 +16,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
 
 entity BsaAxiInterconnectWrapper is
    port (

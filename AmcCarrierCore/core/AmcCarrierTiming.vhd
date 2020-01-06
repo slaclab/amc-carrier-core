@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierTiming.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-07-08
--- Last update: 2018-08-05
 -------------------------------------------------------------------------------
 -- Description: 
 -------------------------------------------------------------------------------
@@ -20,15 +17,21 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiPkg.all;
-use work.AxiLitePkg.all;
-use work.TimingPkg.all;
-use work.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiLitePkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
+use surf.EthMacPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -154,7 +157,7 @@ begin
    --------------------------
    -- AXI-Lite: Crossbar Core
    --------------------------  
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -194,7 +197,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Clock Buffers
    -------------------------------------------------------------------------------------------------
-   TIMING_REFCLK_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
+   TIMING_REFCLK_IBUFDS_GTE3 : entity amc_carrier_core.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
@@ -222,7 +225,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- GTH Timing Receiver
    -------------------------------------------------------------------------------------------------
-   TimingGthCoreWrapper_1 : entity work.TimingGtCoreWrapper
+   TimingGthCoreWrapper_1 : entity lcls_timing_core.TimingGtCoreWrapper
       generic map (
          TPD_G             => TPD_G,
          AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_GTH_INDEX_C).baseAddr,
@@ -266,7 +269,7 @@ begin
    -- Pass recovered clock through MMCM (maybe unnecessary?)
    ------------------------------------------------------------------------------------------------
    RX_CLK_MMCM_GEN : if (RX_CLK_MMCM_G) generate
-      U_ClockManager : entity work.ClockManagerUltraScale
+      U_ClockManager : entity surf.ClockManagerUltraScale
          generic map(
             TPD_G              => TPD_G,
             TYPE_G             => "MMCM",
@@ -296,7 +299,7 @@ begin
    rxUsrClk <= timingRecClk;
 
    -- Send a copy of the timing clock to the AMC's clock cleaner
-   ClkOutBufDiff_Inst : entity work.ClkOutBufDiff
+   ClkOutBufDiff_Inst : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
@@ -309,7 +312,7 @@ begin
    -- Timing Core
    -- Decode timing message from GTH and distribute to system
    ------------------------------------------------------------------------------------------------
-   TimingCore_1 : entity work.TimingCore
+   TimingCore_1 : entity lcls_timing_core.TimingCore
       generic map (
          TPD_G             => TPD_G,
          TPGEN_G           => TIME_GEN_APP_G,
@@ -376,7 +379,7 @@ begin
    --  Core Triggers
    -----------------
    GEN_CORETRIG : if CORE_TRIGGERS_G > 0 generate
-      U_CoreTrig : entity work.EvrV2CoreTriggers
+      U_CoreTrig : entity lcls_timing_core.EvrV2CoreTriggers
          generic map (
             TPD_G           => TPD_G,
             NCHANNELS_G     => CORE_TRIGGERS_G,

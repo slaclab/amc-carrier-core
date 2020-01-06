@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : LvdsDacLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-29
--- Last update: 2017-04-19
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
 --               The module contains a AXI-Lite accessible block RAM where the 
@@ -25,10 +22,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 entity LvdsDacLane is
    generic (
@@ -80,12 +79,9 @@ architecture rtl of LvdsDacLane is
 
 begin
 
-   U_RAM : entity work.AxiDualPortRam
+   U_RAM : entity surf.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
-         BRAM_EN_G    => true,
-         REG_EN_G     => true,
-         MODE_G       => "write-first",
          ADDR_WIDTH_G => ADDR_WIDTH_G,
          DATA_WIDTH_G => 16,
          INIT_G       => "0")
@@ -137,7 +133,7 @@ begin
       end if;
    end process seq;
 
-   U_Jesd16bTo32b : entity work.Jesd16bTo32b
+   U_Jesd16bTo32b : entity surf.Jesd16bTo32b
       generic map (
          TPD_G => TPD_G)
       port map (

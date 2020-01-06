@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmRfInterlockReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-06-21
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:  Register decoding
 --               0x00 (RW)- bit0 = mode
@@ -33,8 +30,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity RtmRfInterlockReg is
    generic (
@@ -213,7 +212,7 @@ begin
    end process seq;
 
    -- Input assignment and synchronization
-   Sync_IN0 : entity work.SynchronizerVector
+   Sync_IN0 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => s_status'length
@@ -227,7 +226,7 @@ begin
          );
 
    GEN_IDELAY_IN : for i in 4 downto 0 generate
-      Sync_IN1 : entity work.SynchronizerVector
+      Sync_IN1 : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => curDelay_i(i)'length
@@ -240,7 +239,7 @@ begin
    end generate GEN_IDELAY_IN;
 
    -- Output assignment and synchronization
-   Sync_OUT0 : entity work.Synchronizer
+   Sync_OUT0 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -250,7 +249,7 @@ begin
          dataOut => mode_o
          );
 
-   Sync_OUT1 : entity work.Synchronizer
+   Sync_OUT1 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -260,7 +259,7 @@ begin
          dataOut => detuneSled_o
          );
 
-   Sync_OUT2 : entity work.Synchronizer
+   Sync_OUT2 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -270,7 +269,7 @@ begin
          dataOut => tuneSled_o
          );
 
-   Sync_OUT3 : entity work.SynchronizerEdge
+   Sync_OUT3 : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G
          )
@@ -280,7 +279,7 @@ begin
          risingEdge => softTrig_o       -- Rising edge
          );
 
-   Sync_OUT4 : entity work.SynchronizerEdge
+   Sync_OUT4 : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G
          )
@@ -290,7 +289,7 @@ begin
          risingEdge => softClear_o      -- Rising edge
          );
 
-   Sync_OUT5 : entity work.SynchronizerEdge
+   Sync_OUT5 : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G
          )
@@ -300,7 +299,7 @@ begin
          dataOut => loadDelay_o
          );
 
-   Sync_OUT6 : entity work.SynchronizerOneShot
+   Sync_OUT6 : entity surf.SynchronizerOneShot
       generic map (
          TPD_G         => TPD_G,
          PULSE_WIDTH_G => 119           -- 1 us
@@ -311,7 +310,7 @@ begin
          dataOut => faultClear_o        -- Rising edge
          );
 
-   Sync_OUT7 : entity work.SynchronizerEdge
+   Sync_OUT7 : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G
          )
@@ -322,7 +321,7 @@ begin
          );
 
    GEN_IDELAY_OUT : for i in 4 downto 0 generate
-      Sync_OUT4 : entity work.SynchronizerVector
+      Sync_OUT4 : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => r.setDelay(i)'length
