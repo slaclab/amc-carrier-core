@@ -534,24 +534,45 @@ begin
    -- AXI-Lite: PWR Monitor Module
    -------------------------------
    GEN_PWR_I2C : if (ULTRASCALE_PLUS_C) and (FSBL_G = false) generate
-      AxiI2cRegMaster_3 : entity surf.AxiI2cRegMaster
+   
+--      AxiI2cRegMaster_3 : entity surf.AxiI2cRegMaster
+--         generic map (
+--            TPD_G          => TPD_G,
+--            I2C_SCL_FREQ_G => 100.0E+3,  -- units of Hz
+--            DEVICE_MAP_G   => PWR_DEVICE_MAP_C,
+--            AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
+--         port map (
+--            -- I2C Ports
+--            scl            => pwrScl,
+--            sda            => pwrSda,
+--            -- AXI-Lite Register Interface
+--            axiReadMaster  => mAxilReadMasters(PWR_I2C_INDEX_C),
+--            axiReadSlave   => mAxilReadSlaves(PWR_I2C_INDEX_C),
+--            axiWriteMaster => mAxilWriteMasters(PWR_I2C_INDEX_C),
+--            axiWriteSlave  => mAxilWriteSlaves(PWR_I2C_INDEX_C),
+--            -- Clocks and Resets
+--            axiClk         => axilClk,
+--            axiRst         => axilRst);
+            
+      AxiI2cRegMaster_3 : entity surf.AxiLitePMbusMaster 
          generic map (
             TPD_G          => TPD_G,
+            I2C_ADDR_G     => "0001010",
             I2C_SCL_FREQ_G => 100.0E+3,  -- units of Hz
-            DEVICE_MAP_G   => PWR_DEVICE_MAP_C,
             AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
          port map (
             -- I2C Ports
             scl            => pwrScl,
             sda            => pwrSda,
             -- AXI-Lite Register Interface
-            axiReadMaster  => mAxilReadMasters(PWR_I2C_INDEX_C),
-            axiReadSlave   => mAxilReadSlaves(PWR_I2C_INDEX_C),
-            axiWriteMaster => mAxilWriteMasters(PWR_I2C_INDEX_C),
-            axiWriteSlave  => mAxilWriteSlaves(PWR_I2C_INDEX_C),
+            axilReadMaster  => mAxilReadMasters(PWR_I2C_INDEX_C),
+            axilReadSlave   => mAxilReadSlaves(PWR_I2C_INDEX_C),
+            axilWriteMaster => mAxilWriteMasters(PWR_I2C_INDEX_C),
+            axilWriteSlave  => mAxilWriteSlaves(PWR_I2C_INDEX_C),
             -- Clocks and Resets
-            axiClk         => axilClk,
-            axiRst         => axilRst);
+            axilClk         => axilClk,
+            axilRst         => axilRst);
+            
    end generate;
 
    --------------------------------------
