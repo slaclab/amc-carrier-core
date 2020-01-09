@@ -1645,23 +1645,23 @@ Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/SsiAxiMast
 
 [BsaAxiInterconnectWrapper.vhd:454:Info: Elaborating entity bsaaxiinterconnect for hierarchy bsaaxiinterconnect::u_bsaaxiinterconnect]
 
-[BsaBufferControl.vhd:216:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_axilitecrossbar_1]
+[BsaBufferControl.vhd:213:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_axilitecrossbar_1]
 
-[BsaBufferControl.vhd:242:Info: Elaborating entity axidualportram for hierarchy axidualportram::u_axidualportram_timestamps]
+[BsaBufferControl.vhd:239:Info: Elaborating entity axidualportram for hierarchy axidualportram::u_axidualportram_timestamps]
 
-[BsaBufferControl.vhd:261:Info: Elaborating entity synchronizerfifo for hierarchy synchronizerfifo::synchronizerfifo_1]
+[BsaBufferControl.vhd:258:Info: Elaborating entity synchronizerfifo for hierarchy synchronizerfifo::synchronizerfifo_1]
 
-[BsaBufferControl.vhd:293:Info: Elaborating entity BsaAccumulator for hierarchy bsaaccumulator::BsaAccumulator_GEN:u_bsaaccumulator_1]
+[BsaBufferControl.vhd:290:Info: Elaborating entity BsaAccumulator for hierarchy bsaaccumulator::BsaAccumulator_GEN:u_bsaaccumulator_1]
 
-[BsaBufferControl.vhd:351:Info: Elaborating entity axistreammux for hierarchy axistreammux::AxiStreamMux_INT:u_axistreammux_int]
+[BsaBufferControl.vhd:348:Info: Elaborating entity axistreammux for hierarchy axistreammux::AxiStreamMux_INT:u_axistreammux_int]
 
-[BsaBufferControl.vhd:351:Info: Elaborating entity axistreamfifov2 for hierarchy axistreamfifov2::AxiStreamMux_INT:u_axistreamfifo_int]
+[BsaBufferControl.vhd:348:Info: Elaborating entity axistreamfifov2 for hierarchy axistreamfifov2::AxiStreamMux_INT:u_axistreamfifo_int]
 
-[BsaBufferControl.vhd:367:Info: Elaborating entity axistreammux for hierarchy axistreammux::u_axistreammux_last]
+[BsaBufferControl.vhd:364:Info: Elaborating entity axistreammux for hierarchy axistreammux::u_axistreammux_last]
 
-[BsaBufferControl.vhd:393:Info: Elaborating entity axistreamfifov2 for hierarchy axistreamfifov2::u_axistreamfifo_last]
+[BsaBufferControl.vhd:390:Info: Elaborating entity axistreamfifov2 for hierarchy axistreamfifov2::u_axistreamfifo_last]
 
-[BsaBufferControl.vhd:427:Info: Elaborating entity axistreamdmaringwrite for hierarchy axistreamdmaringwrite::u_axistreamdmaringwrite_1]
+[BsaBufferControl.vhd:424:Info: Elaborating entity axistreamdmaringwrite for hierarchy axistreamdmaringwrite::u_axistreamdmaringwrite_1]
 
 [BsaWaveformEngine.vhd:178:Info: Elaborating entity axistreamfifov2 for hierarchy axistreamfifov2::AXIS_IN_FIFOS:axistreamfifo]
 
