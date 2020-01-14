@@ -3,6 +3,7 @@ import pyrogue as pr
 # Modules from surf
 import pyrogue as pr
 import surf.axi as axi
+import surf.devices.intel as intel
 import surf.devices.micron as micron
 import surf.devices.microchip as microchip
 import surf.devices.ti as ti
@@ -20,7 +21,8 @@ class AmcCarrierCore(pr.Device):
             name                = "AmcCarrierCore", 
             description         = "AmcCarrierCore", 
             rssiNotInterlaved   = True,
-            rssiInterlaved      = False,            
+            rssiInterlaved      = False,
+            enablePwrI2C        = False,
             enableBsa           = True,
             enableMps           = True,
             numWaveformBuffers  = 4,
@@ -179,6 +181,12 @@ class AmcCarrierCore(pr.Device):
                 offset =  0x0C000000, 
                 expand =  False
             ))            
+
+        if (enablePwrI2C):
+            self.add(intel.EM22xx(
+                offset =  0x0D000000,
+                expand =  False
+            ))
 
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)

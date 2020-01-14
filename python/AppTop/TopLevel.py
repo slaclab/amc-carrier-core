@@ -45,6 +45,7 @@ class TopLevel(pr.Device):
             sizeSigGen      = [0,0],
             modeSigGen      = [False,False],
             # General Parameters
+            enablePwrI2C    = False,
             enableBsa       = False,
             enableMps       = False,
             numWaveformBuffers  = 4,
@@ -142,6 +143,7 @@ class TopLevel(pr.Device):
             offset            = 0x00000000,
             rssiInterlaved    = rssiInterlaved,
             rssiNotInterlaved = rssiNotInterlaved,
+            enablePwrI2C      = enablePwrI2C,
             enableBsa         = enableBsa,
             enableMps         = enableMps,
             numWaveformBuffers= numWaveformBuffers,
