@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from AmcCarrierCore.AmcCarrierBsa import *
-from AmcCarrierCore.AmcCarrierBsi import *
-from AmcCarrierCore.AmcCarrierTiming import *
-from AmcCarrierCore.AmcCarrierCore import *
+from AmcCarrierCore._AmcCarrierBsa import *
+from AmcCarrierCore._AmcCarrierBsi import *
+from AmcCarrierCore._AmcCarrierTiming import *
+from AmcCarrierCore._AmcCarrierCore import *
