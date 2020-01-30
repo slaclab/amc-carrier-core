@@ -164,31 +164,32 @@ Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/ghd
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore
 Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/AmcCryo
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/AmcCryo/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/AmcCryoDemo
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/AmcCryoDemo/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/AmcGenericAdcDac
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/AmcGenericAdcDac/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/AmcMicrowaveMux
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/AmcMicrowaveMux/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/RtmCryoDet
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/RtmCryoDet/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/RtmDigitalDebug
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppHardware/RtmDigitalDebug/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppMps
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppMps/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppTop
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AppTop/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AxisBramRingBuffer
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AxisBramRingBuffer/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/BsaCore
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/BsaCore/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/DacSigGen
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/DacSigGen/__pycache__
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/DaqMuxV2
-Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/DaqMuxV2/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/AmcCryo
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/AmcCryo/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/AmcCryoDemo
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/AmcCryoDemo/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/AmcGenericAdcDac
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/AmcGenericAdcDac/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/AmcMicrowaveMux
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/AmcMicrowaveMux/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/RtmCryoDet
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/RtmCryoDet/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/RtmDigitalDebug
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppHardware/RtmDigitalDebug/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppMps
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppMps/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppTop
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AppTop/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AxisBramRingBuffer
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/AxisBramRingBuffer/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/BsaCore
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/BsaCore/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/DacSigGen
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/DacSigGen/__pycache__
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/DaqMuxV2
+Searching for files in directory /home/travis/build/slaclab/amc-carrier-core/python/AmcCarrierCore/DaqMuxV2/__pycache__
 Reading and parsing tag files
 Parsing files
 Reading /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/core/AmcCarrierBsa.vhd...
@@ -327,12 +328,7 @@ Reading /home/travis/build/slaclab/amc-carrier-core/AxisBramRingBuffer/rtl/AxisB
 Reading /home/travis/build/slaclab/amc-carrier-core/AxisBramRingBuffer/rtl/AxisBramFlashBufferRdFsm.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/AxisBramRingBuffer/rtl/AxisBramFlashBufferWrFsm.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/AxisBramRingBuffer/tb/AxisBramRingBufferTb.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BldAxiStream.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaAccumulator.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaAxiInterconnectWrapper.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaBufferControl.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaWaveformEngine.vhd...
-Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/SsiAxiMast
+Reading /home/travis
 [AmcCarrierBsa.vhd:429:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::BSA_GEN:u_axilitecrossbar_1]
 
 [AmcCarrierBsa.vhd:429:Info: Elaborating entity BsaWaveformEngine for hierarchy bsawaveformengine::BSA_GEN:bsawaveformengine_0]
@@ -397,7 +393,7 @@ Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/SsiAxiMast
 
 [AmcCarrierSysReg.vhd:531:Info: Elaborating entity AmcCarrierBsi for hierarchy amccarrierbsi::u_bsi]
 
-[AmcCarrierSysReg.vhd:555:Info: Elaborating entity axii2cregmaster for hierarchy axii2cregmaster::GEN_PWR_I2C:axii2cregmaster_3]
+[AmcCarrierSysReg.vhd:576:Info: Elaborating entity axilitepmbusmaster for hierarchy axilitepmbusmaster::GEN_PWR_I2C:axii2cregmaster_3]
 
 [AmcCarrierTiming.vhd:176:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
 
@@ -2835,7 +2831,12 @@ Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/SsiAxiMast
 /home/travis/build/slaclab/amc-carrier-core/AppTop/rtl/xcku11p/AppTopPkg.vhd:67: warning: documented symbol `slv' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppTop/rtl/xcku11p/AppTopPkg.vhd:69: warning: documented symbol `array' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppTop/rtl/xcku11p/AppTopPkg.vhd:70: warning: documented symbol `DacSigStatusType  :' was not declared or defined.
-er.vhd...
+/build/slaclab/amc-carrier-core/BsaCore/rtl/BldAxiStream.vhd...
+Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaAccumulator.vhd...
+Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaAxiInterconnectWrapper.vhd...
+Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaBufferControl.vhd...
+Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/BsaWaveformEngine.vhd...
+Reading /home/travis/build/slaclab/amc-carrier-core/BsaCore/rtl/SsiAxiMaster.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/rtl/DacSigGen.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/rtl/DacSigGenLane.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/DacSigGen/rtl/DacSigGenReg.vhd...
