@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 from AmcCarrierCore.AppHardware.RtmCryoDet._rtmCryoDet import *
 from AmcCarrierCore.AppHardware.RtmCryoDet._dacLut import *
