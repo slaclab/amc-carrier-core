@@ -22,7 +22,7 @@ requirements:
      - numpy
 
 about:
-   home: https://github.com/slaclab/lcls2-pgp-fw-lib
+   home: https://github.com/slaclab/amc-carrier-core
    license: SLAC Open License
    license_file: LICENSE.txt
    summary: AMC Carrier Core Firmware Library
