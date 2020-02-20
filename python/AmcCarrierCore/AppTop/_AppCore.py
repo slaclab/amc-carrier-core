@@ -17,12 +17,12 @@
 #-----------------------------------------------------------------------------
 import pyrogue as pr
 
-# A sub-class of this generic class should be added to 
+# A sub-class of this generic class should be added to
 # the AppTop class from the application python
 
-#  self.TopLevel.AppTop.add(appCore(offset       =  0x00000000,     
-#                                   numRxLanes   =  numRxLanes,     
-#                                   numTxLanes   =  numTxLanes,     
+#  self.TopLevel.AppTop.add(appCore(offset       =  0x00000000,
+#                                   numRxLanes   =  numRxLanes,
+#                                   numTxLanes   =  numTxLanes,
 #                                   expand       =  True))
 
 class AppCore(pr.Device):
@@ -46,4 +46,3 @@ class AppCore(pr.Device):
 
     def disable(self):
         pass
-

@@ -22,10 +22,10 @@ import surf.xilinx as xil
 import surf.protocols.jesd204b as jesd
 
 class AppTopJesd(pr.Device):
-    def __init__(   self, 
-            name        = "AppTopJesd", 
-            description = "Common Application Top Level JESD Module", 
-            numRxLanes  = 6, 
+    def __init__(   self,
+            name        = "AppTopJesd",
+            description = "Common Application Top Level JESD Module",
+            numRxLanes  = 6,
             numTxLanes  = 2,
             enJesdDrp   = False,
             expand      = False,
@@ -48,12 +48,12 @@ class AppTopJesd(pr.Device):
                 numTxLanes   = numTxLanes,
                 expand       = expand,
             ))
-        
+
         # Find max number of lanes
         maxlanes = numRxLanes
         if (numTxLanes>maxlanes):
             maxlanes = numTxLanes
-        
+
         # Check if DRP enabled and non-zero lane count
         if((maxlanes > 0) and enJesdDrp):
             for i in range(maxlanes):
@@ -61,4 +61,4 @@ class AppTopJesd(pr.Device):
                     name   = f'Gthe3Channel[{i}]',
                     offset =  0x03000000 + (i * 0x100000),
                     expand =  False,
-                ))            
+                ))

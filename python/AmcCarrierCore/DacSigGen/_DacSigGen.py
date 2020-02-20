@@ -17,14 +17,14 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import click 
+import click
 import csv
 
 class DacSigGen(pr.Device):
-    def __init__(   self, 
-            name        = "DacSigGen", 
-            description = "Signal generator module", 
-            numOfChs    = 2, 
+    def __init__(   self,
+            name        = "DacSigGen",
+            description = "Signal generator module",
+            numOfChs    = 2,
             buffSize    = 0x200,
             fillMode    = False, # False = 16-bit RAM, True = 32-bit RAM
             **kwargs):
@@ -32,11 +32,11 @@ class DacSigGen(pr.Device):
 
         self._numOfChs = numOfChs
         self._buffSize = (buffSize<<1) if (fillMode) else buffSize
-        
+
         ##############################
         # Variables
         ##############################
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "EnableMask",
             description  = "Mask Enable channels.",
             offset       =  0x00,
@@ -47,7 +47,7 @@ class DacSigGen(pr.Device):
             overlapEn    = True
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "ModeMask",
             description  = "Mask select Mode: 0 - Triggered Mode. 1 - Periodic Mode",
             offset       =  0x04,
@@ -58,7 +58,7 @@ class DacSigGen(pr.Device):
             overlapEn    = True
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "SignFormat",
             description  = "Mask select Sign: 0 - Signed 2's complement, 1 - Offset binary (Currently Applies only to zero data)",
             offset       =  0x08,
@@ -69,7 +69,7 @@ class DacSigGen(pr.Device):
             overlapEn    = True
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "SoftwareTrigger",
             description  = "Mask Software trigger (applies in triggered mode, Internal edge detector)",
             offset       =  0x0C,
@@ -81,7 +81,7 @@ class DacSigGen(pr.Device):
             overlapEn    = True
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "Running",
             description  = "Mask Running status",
             offset       =  0x20,
@@ -89,11 +89,11 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
-            pollInterval =  1,                            
+            pollInterval =  1,
             overlapEn    = True
         ))
-                        
-        self.add(pr.RemoteVariable(    
+
+        self.add(pr.RemoteVariable(
             name         = "Underflow",
             description  = "Mask Underflow status: 16bit to 32bit conversion underflow (applies in 32bit interface).",
             offset       =  0x24,
@@ -101,11 +101,11 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
-            pollInterval =  1,                            
+            pollInterval =  1,
             overlapEn    = True
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "Overflow",
             description  = "Mask Overflow status: 16bit to 32bit conversion underflow (applies in 32bit interface).",
             offset       =  0x28,
@@ -113,11 +113,11 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
-            pollInterval =  1,                            
+            pollInterval =  1,
             overlapEn    = True
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "MaxWaveformSize",
             description  = "Max Waveform size (2**ADDR_WIDTH_G)",
             offset       =  0x2C,
@@ -125,11 +125,11 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RO",
-            pollInterval =  1,                            
+            pollInterval =  1,
             overlapEn    = True
         ))
 
-        self.addRemoteVariables( 
+        self.addRemoteVariables(
             name         = "PeriodSize",
             description  = "In Periodic mode: Period size (Zero inclusive). In Triggered mode: Waveform size (Zero inclusive). Separate values for separate channels.",
             offset       =  0x40,
@@ -141,8 +141,8 @@ class DacSigGen(pr.Device):
             stride       =  4,
             overlapEn    = True
         )
-                
-        for i in range(self._numOfChs):  
+
+        for i in range(self._numOfChs):
             pr.MemoryDevice(
                 name        = ('Waveform[%d]' % i),
                 description = "Waveform data 16-bit samples.",
@@ -150,34 +150,34 @@ class DacSigGen(pr.Device):
                 size        = (2*self._buffSize),
                 wordBitSize = (16 if (fillMode) else 32),
                 stride      = (2  if (fillMode) else  4),
-            )        
-    
-        self.add(pr.LocalVariable(    
+            )
+
+        self.add(pr.LocalVariable(
             name         = "CsvFilePath",
             description  = "Used if command's argument is empty",
             mode         = "RW",
-            value        = "",            
+            value        = "",
         ))
-        
+
         ##############################
         # Commands
         ##############################
         # Define SW trigger command
         @self.command(description="Trigger waveform from software (All channels. Triggered mode).",)
         def SwTrigger():
-           trigAllCh = int(2**self._numOfChs)-1
-           self.SoftwareTrigger.set(trigAllCh)
-           self.SoftwareTrigger.set(0x00)        
-           
+            trigAllCh = int(2**self._numOfChs)-1
+            self.SoftwareTrigger.set(trigAllCh)
+            self.SoftwareTrigger.set(0x00)
+
         @self.command(value='',description="Load the .CSV",)
         def LoadCsvFile(arg):
-            # Check if non-empty argument 
+            # Check if non-empty argument
             if (arg != ""):
                 path = arg
             else:
                 # Use the variable path instead
                 path = self.CsvFilePath.get()
-            
+
             # Open the .CSV file
             with open(path) as csvfile:
                 reader = csv.reader(csvfile, delimiter=',', quoting=csv.QUOTE_NONE)
@@ -188,22 +188,22 @@ class DacSigGen(pr.Device):
                 for row in reader:
                     if ( idx<self._buffSize ):
                         entry = []
-                        for ch in range(self._numOfChs): 
+                        for ch in range(self._numOfChs):
                             entry.append(row[ch])
-                        csvData.append(entry)  
+                        csvData.append(entry)
                         # Increment the counter
-                        idx  += 1                
+                        idx  += 1
                     # Increment the counter
-                    cnt  += 1                
+                    cnt  += 1
                 # User friendly print message
                 click.secho( ('LoadCsvFile(): %d samples per channel found' % idx ), fg='green')
-                if ( cnt>idx ): 
+                if ( cnt>idx ):
                     click.secho( ('\tHowever %d of samples detected in the CSV file' % cnt ), fg='red')
                     click.secho( ('\tCSV data dropped because firmware only support up to %d samples' % idx ), fg='red')
-                # Check for 32-bit fill mode and odd number of samples    
+                # Check for 32-bit fill mode and odd number of samples
                 if (fillMode) and ( (cnt%2) == 1 ):
                     csvData.append(csvData[cnt-1])
-                    cnt += 1 
+                    cnt += 1
                 # Get the current enable mask value
                 enableMask = self.EnableMask.get()
                 # Reset the enable mask during the load

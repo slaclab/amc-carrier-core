@@ -19,13 +19,13 @@
 import pyrogue as pr
 
 class AmcCryoCtrl(pr.Device):
-    def __init__(   self, 
-            name        = "AmcCryoCtrl", 
-            description = "Debugging module", 
+    def __init__(   self,
+            name        = "AmcCryoCtrl",
+            description = "Debugging module",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-                        
-        self.add(pr.RemoteVariable(   
+
+        self.add(pr.RemoteVariable(
             name         = "txSyncRaw",
             description  = "txSyncRaw",
             offset       =  0x7F0,
@@ -33,9 +33,9 @@ class AmcCryoCtrl(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-        ))      
+        ))
 
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "txSync",
             description  = "txSync",
             offset       =  0x7F4,
@@ -43,9 +43,9 @@ class AmcCryoCtrl(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-        ))       
+        ))
 
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "rxSync",
             description  = "rxSync",
             offset       =  0x7F8,
@@ -53,9 +53,9 @@ class AmcCryoCtrl(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-        ))                               
-        
-        self.add(pr.RemoteVariable(   
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "txSyncMask",
             description  = "txSyncMask",
             offset       =  0x800,
@@ -63,5 +63,4 @@ class AmcCryoCtrl(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RW",
-        ))                           
-                        
+        ))

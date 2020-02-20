@@ -19,7 +19,7 @@
 import pyrogue as pr
 
 class AppMpsThr(pr.Device):
-    def __init__(   self,       
+    def __init__(   self,
             name        = "AppMpsThr",
             description = "AppMpsThr Module",
             **kwargs):
@@ -29,7 +29,7 @@ class AppMpsThr(pr.Device):
         # Variables
         ##############################
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "MpsAppId",
             description  = "Application ID",
             offset       =  0x00,
@@ -38,8 +38,8 @@ class AppMpsThr(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
         ))
-        
-        self.add(pr.RemoteVariable(    
+
+        self.add(pr.RemoteVariable(
             name         = "MpsEnable",
             description  = "Mps enable",
             offset       =  0x00,
@@ -47,9 +47,9 @@ class AppMpsThr(pr.Device):
             bitOffset    =  16,
             base         = pr.UInt,
             mode         = "RW",
-        ))  
+        ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "Lcls1Mode",
             description  = "True = LCLS1, False = LCLS2 mode",
             offset       =  0x00,
@@ -57,9 +57,9 @@ class AppMpsThr(pr.Device):
             bitOffset    =  17,
             base         = pr.UInt,
             mode         = "RW",
-        ))  
+        ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "MpsVersion",
             description  = "Mps Version",
             offset       =  0x00,
@@ -67,9 +67,9 @@ class AppMpsThr(pr.Device):
             bitOffset    =  24,
             base         = pr.UInt,
             mode         = "RW",
-        ))          
-        
-        self.add(pr.RemoteVariable(    
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "ByteCount",
             description  = "Number of bytes in MPS message",
             offset       =  0x04,
@@ -78,9 +78,9 @@ class AppMpsThr(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval = 1,
-        ))     
+        ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "DigitalEn",
             description  = "Application generates digital message",
             offset       =  0x04,
@@ -89,9 +89,9 @@ class AppMpsThr(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval = 1,
-        ))   
+        ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "BeamDestMask",
             description  = "One bit per destination for BPM or kicker not idle for idelEn=true",
             offset       =  0x08,
@@ -101,7 +101,7 @@ class AppMpsThr(pr.Device):
             mode         = "RW",
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "AltDestMask",
             description  = "One bit per destination for alternative table for altEn=true",
             offset       =  0x08,
@@ -110,4 +110,3 @@ class AppMpsThr(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
         ))
-        

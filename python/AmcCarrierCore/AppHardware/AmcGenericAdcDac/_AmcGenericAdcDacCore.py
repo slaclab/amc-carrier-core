@@ -22,12 +22,12 @@ import AmcCarrierCore.AppHardware     as appHw
 import rogue
 
 class AmcGenericAdcDacCore(pr.Device):
-    def __init__(   self, 
-            name        = "AmcGenericAdcDacCore", 
-            description = "Generic ADC/DAC Board", 
+    def __init__(   self,
+            name        = "AmcGenericAdcDacCore",
+            description = "Generic ADC/DAC Board",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-                
+
         #########
         # Devices
         #########
@@ -41,16 +41,17 @@ class AmcGenericAdcDacCore(pr.Device):
         def InitAmcCard():
             self.checkBlocks(recurse=True)
             self.LMK.Init()
-            self.DAC.Init()        
+            self.DAC.Init()
             self.ADC[0].CalibrateAdc()
             self.ADC[1].CalibrateAdc()
-            self.checkBlocks(recurse=True)  
-           
+            self.checkBlocks(recurse=True)
+
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """
         Write all of the blocks held by this Device to memory
         """
-        if not self.enable.get(): return
+        if not self.enable.get():
+            return
 
         # Process local blocks.
         if variable is not None:
@@ -63,17 +64,17 @@ class AmcGenericAdcDacCore(pr.Device):
 
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
-        
+
         # Note: Requires that AmcCryoCore: enable: 'True' in defaults.yml file
         self.enable.set(True)
         self.DBG.enable.set(True)
         self.DAC.enable.set(True)
         self.LMK.enable.set(True)
         self.ADC[0].enable.set(True)
-        self.ADC[1].enable.set(True)    
+        self.ADC[1].enable.set(True)
 
         self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
-        
+
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
@@ -81,6 +82,6 @@ class AmcGenericAdcDacCore(pr.Device):
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
         self.InitAmcCard()
-        
+
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
         self.checkBlocks(recurse=True)

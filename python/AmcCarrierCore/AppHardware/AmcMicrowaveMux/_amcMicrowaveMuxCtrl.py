@@ -20,13 +20,13 @@ import pyrogue as pr
 import time
 
 class AmcMicrowaveMuxCtrl(pr.Device):
-    def __init__(   self, 
-            name        = "AmcMicrowaveMuxCtrl", 
-            description = "Debugging module", 
+    def __init__(   self,
+            name        = "AmcMicrowaveMuxCtrl",
+            description = "Debugging module",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-                        
-        self.add(pr.RemoteVariable(   
+
+        self.add(pr.RemoteVariable(
             name         = "txSyncRaw",
             description  = "txSyncRaw",
             offset       =  0x7F0,
@@ -34,9 +34,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-        ))      
+        ))
 
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "txSync",
             description  = "txSync",
             offset       =  0x7F4,
@@ -44,9 +44,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-        ))       
+        ))
 
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "rxSync",
             description  = "rxSync",
             offset       =  0x7F8,
@@ -54,9 +54,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RO",
-        ))                               
-        
-        self.add(pr.RemoteVariable(   
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "txSyncMask",
             description  = "txSyncMask",
             offset       =  0x800,
@@ -64,9 +64,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RW",
-        ))                           
-                        
-        self.add(pr.RemoteVariable(   
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "dacReset[0]",
             description  = "dac(0) reset",
             offset       =  0x800,
@@ -74,9 +74,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  2,
             base         = pr.UInt,
             mode         = "RW",
-        ))                           
-                        
-        self.add(pr.RemoteVariable(   
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "dacReset[1]",
             description  = "dac(1) reset",
             offset       =  0x800,
@@ -84,9 +84,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  3,
             base         = pr.UInt,
             mode         = "RW",
-        ))                           
-                        
-        self.add(pr.RemoteVariable(   
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "dacJtagReset",
             description  = "dac JTAG reset",
             offset       =  0x800,
@@ -94,9 +94,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  4,
             base         = pr.UInt,
             mode         = "RW",
-        ))     
-        
-        self.add(pr.RemoteVariable(   
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "lmkSync",
             description  = "lmk SYNC request",
             offset       =  0x800,
@@ -104,9 +104,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  5,
             base         = pr.UInt,
             mode         = "RW",
-        ))   
+        ))
 
-        self.add(pr.RemoteVariable(   
+        self.add(pr.RemoteVariable(
             name         = "dacSpiMode",
             description  = "0 for original 3-wire SPI configuration, 1 for new 4-wire configuration",
             offset       =  0x800,
@@ -114,15 +114,14 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             bitOffset    =  6,
             base         = pr.UInt,
             mode         = "RW",
-        ))           
-        
-        @self.command(name= "Init", description  = "Initialize ADC/DAC")        
+        ))
+
+        @self.command(name= "Init", description  = "Initialize ADC/DAC")
         def Init():
-            # Reset DAC, active low 
+            # Reset DAC, active low
             self.dacReset[0].set(1)
             self.dacReset[1].set(1)
             time.sleep(0.1)
             self.dacReset[0].set(0)
             self.dacReset[1].set(0)
             self.lmkSync.set(0)
-            
