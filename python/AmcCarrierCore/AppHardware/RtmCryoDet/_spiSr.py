@@ -20,25 +20,12 @@ import pyrogue as pr
 import math
 
 class SpiSr(pr.Device):
-    def __init__(   self,
-        name        = "RtmSpiSr",
-        description = "RTM Flux Ramp SPI Interface",
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-        enabled     =  True,
+    def __init__(self,
+            name        = "RtmSpiSr",
+            description = "RTM Flux Ramp SPI Interface",
+             **kwargs):
 
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-            enabled     = enabled,
-        )
+        super().__init__(description=description, **kwargs)
 
         ##############################
         # Variables

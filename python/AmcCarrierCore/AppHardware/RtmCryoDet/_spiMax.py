@@ -19,25 +19,12 @@
 import pyrogue as pr
 
 class SpiMax(pr.Device):
-    def __init__(   self,
-        name        = "RtmSpiMax",
-        description = "RTM Bias DAC SPI Interface",
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-        enabled     =  True
+    def __init__(self,
+            name        = "RtmSpiMax",
+            description = "RTM Bias DAC SPI Interface",
+             **kwargs):
 
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-            enabled     = enabled,
-        )
+        super().__init__(description=description, **kwargs)
 
         ##############################
         # Variables
