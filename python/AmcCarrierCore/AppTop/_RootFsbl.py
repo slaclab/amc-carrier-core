@@ -24,11 +24,8 @@ from AmcCarrierCore.AppTop import TopLevel as FpgaTopLevel
 
 class RootFsbl(pyrogue.Root):
     def __init__(self, *, ipAddr='10.0.0.1', name='base', description = '', **kwargs):
-        pyrogue.Root.__init__(self,
-                         name         = name,
-                         description  = description,
-                         **kwargs
-                        )
+
+        pyrogue.Root.__init__(self, name=name, description=description, **kwargs)
 
         self.srp=pyrogue.interfaces.simulation.MemEmulate()
 

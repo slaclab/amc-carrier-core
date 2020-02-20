@@ -22,11 +22,8 @@ import rogue.protocols.srp
 
 class RootRssiInterleaved(pyrogue.Root):
     def __init__(self, *, ipAddr='10.0.0.1', name='base', description = '', **kwargs):
-        pyrogue.Root.__init__(self,
-                         name         = name,
-                         description  = description,
-                         **kwargs
-                        )
+
+        pyrogue.Root.__init__(self, name=name, description=description, **kwargs)
 
         # Create Interleaved RSSI interface
         self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ipAddr, port=8198, packVer = 2, jumbo = True)

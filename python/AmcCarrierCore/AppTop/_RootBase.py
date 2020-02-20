@@ -20,11 +20,8 @@ import pyrogue
 
 class RootBase(pyrogue.Root):
     def __init__(self, *, name='base', description = '', **kwargs):
-        pyrogue.Root.__init__(self,
-                         name         = name,
-                         description  = description,
-                         **kwargs
-        )
+
+        pyrogue.Root.__init__(self, name=name, description=description, **kwargs)
 
         self.srp    = None
         self.stream = None
