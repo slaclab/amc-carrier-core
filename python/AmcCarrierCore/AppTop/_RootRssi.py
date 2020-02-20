@@ -33,10 +33,10 @@ class RootRssi(pyrogue.Root):
 
         # Connect the SRPv3 to tDest = 0x0
         self.srp = rogue.protocols.srp.SrpV3()
-        pr.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
+        pyrogue.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
 
         # Create stream interface
-        self.stream = pr.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1, jumbo = False)
+        self.stream = pyrogue.protocols.UdpRssiPack( name='rudpData', host=ipAddr, port=8194, packVer = 1, jumbo = False)
 
         # Top level module should be added here.
         # Top level is a sub-class of AmcCarrierCore.AppTop.TopLevel

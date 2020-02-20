@@ -29,8 +29,6 @@ import pyrogue as pr
 import pyrogue.interfaces.simulation
 import pyrogue.protocols
 import pyrogue.utilities.fileio
-import rogue.hardware.axi
-import rogue.protocols.packetizer
 import AmcCarrierCore as amccCore
 from AmcCarrierCore.AppTop._AppTop import AppTop
 

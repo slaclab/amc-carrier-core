@@ -16,10 +16,10 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import time
 import pyrogue         as pr
 import surf.devices.ti as ti
 import AmcCarrierCore.AppHardware     as appHw
+import rogue
 
 class AmcCryoCore(pr.Device):
     def __init__(   self, 

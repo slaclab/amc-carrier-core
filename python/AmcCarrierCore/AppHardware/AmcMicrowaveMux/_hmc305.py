@@ -17,7 +17,6 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import time
 
 class Hmc305(pr.Device):
     def __init__(   self, 

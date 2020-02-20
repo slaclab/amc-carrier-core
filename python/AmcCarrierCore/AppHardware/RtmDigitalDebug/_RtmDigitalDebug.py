@@ -16,7 +16,6 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import time
 import pyrogue as pr
 
 class RtmDigitalDebug(pr.Device):

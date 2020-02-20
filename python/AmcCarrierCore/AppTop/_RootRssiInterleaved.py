@@ -33,7 +33,7 @@ class RootRssiInterleaved(pyrogue.Root):
         
         # Connect the SRPv3 to tDest = 0x0
         self.srp = rogue.protocols.srp.SrpV3()
-        pr.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
+        pyrogue.streamConnectBiDir( self.srp, self.rudp.application(dest=0x0) )
 
         # Top level module should be added here.
         # Top level is a sub-class of AmcCarrierCore.AppTop.TopLevel

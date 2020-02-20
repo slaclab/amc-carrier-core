@@ -1,14 +1,11 @@
 import pyrogue as pr
 
 # Modules from surf
-import pyrogue as pr
 import surf.axi as axi
 import surf.devices.intel as intel
 import surf.devices.micron as micron
 import surf.devices.microchip as microchip
-import surf.devices.ti as ti
 import surf.ethernet.udp as udp
-import surf.misc as misc
 import surf.protocols.rssi as rssi
 import surf.xilinx as xilinx
 
