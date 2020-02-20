@@ -34,6 +34,7 @@ addons:
       - doxygen-gui
       - graphviz
       - python3
+      - flake8
       # - ghdl
 
 stages:
@@ -65,6 +66,7 @@ jobs:
         - make
         - rm -rf ghdl-build
         - python3 -m compileall -f python/
+        - flake8 --count python/
       script:
         - ./generateDocumentationAndDeploy.sh 0
 

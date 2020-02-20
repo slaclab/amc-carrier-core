@@ -19,7 +19,7 @@
 import pyrogue as pr
 
 class AmcCarrierBsi(pr.Device):
-    def __init__(   self,       
+    def __init__(   self,
             name        = "AmcCarrierBsi",
             description = "AmcCarrier BSI Module",
             **kwargs):
@@ -29,7 +29,7 @@ class AmcCarrierBsi(pr.Device):
         # Variables
         ##############################
 
-        self.addRemoteVariables(  
+        self.addRemoteVariables(
             name         = "MAC",
             description  = "MAC Address[3:0]",
             offset       =  0x00,
@@ -41,7 +41,7 @@ class AmcCarrierBsi(pr.Device):
             stride       =  8,
         )
 
-        self.add(pr.RemoteVariable(     
+        self.add(pr.RemoteVariable(
             name         = "CrateId",
             description  = "ATCA Crate ID",
             offset       =  0x80,
@@ -51,7 +51,7 @@ class AmcCarrierBsi(pr.Device):
             mode         = "RO",
         ))
 
-        self.add(pr.RemoteVariable(     
+        self.add(pr.RemoteVariable(
             name         = "SlotNumber",
             description  = "ATCA Logical Slot Number",
             offset       =  0x84,
@@ -61,7 +61,7 @@ class AmcCarrierBsi(pr.Device):
             mode         = "RO",
         ))
 
-        self.add(pr.RemoteVariable(     
+        self.add(pr.RemoteVariable(
             name         = "BootStartAddress",
             description  = "Bootloader Start Address",
             offset       =  0x88,
@@ -71,7 +71,7 @@ class AmcCarrierBsi(pr.Device):
             mode         = "RO",
         ))
 
-        self.add(pr.RemoteVariable(     
+        self.add(pr.RemoteVariable(
             name         = "VersionMinor",
             description  = "BSI's Minor Version Number",
             offset       =  0x8C,
@@ -81,7 +81,7 @@ class AmcCarrierBsi(pr.Device):
             mode         = "RO",
         ))
 
-        self.add(pr.RemoteVariable(     
+        self.add(pr.RemoteVariable(
             name         = "VersionMajor",
             description  = "BSI's Major Version Number",
             offset       =  0x90,
@@ -91,7 +91,7 @@ class AmcCarrierBsi(pr.Device):
             mode         = "RO",
         ))
 
-        self.add(pr.RemoteVariable(     
+        self.add(pr.RemoteVariable(
             name         = "EthUpTime",
             description  = "ETH Uptime (units of sec)",
             offset       =  0x94,

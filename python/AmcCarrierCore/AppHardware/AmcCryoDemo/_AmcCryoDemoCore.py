@@ -16,17 +16,16 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import time
 import pyrogue         as pr
 import surf.devices.ti as ti
 
 class AmcCryoDemoCore(pr.Device):
-    def __init__(   self, 
-            name        = "AmcCryoDemoCore", 
-            description = "Cryo Amc Rf Demo Board Core", 
+    def __init__(   self,
+            name        = "AmcCryoDemoCore",
+            description = "Cryo Amc Rf Demo Board Core",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-        
+
         self.add(ti.Adc16Dx370(offset=0x00020000, name='ADC[0]', expand=False))
         self.add(ti.Adc16Dx370(offset=0x00040000, name='ADC[1]', expand=False))
         self.add(ti.Adc16Dx370(offset=0x00060000, name='ADC[2]', expand=False))
@@ -40,29 +39,28 @@ class AmcCryoDemoCore(pr.Device):
             self.ADC[1].CalibrateAdc()
             self.ADC[2].CalibrateAdc()
             self.LMK.Init()
-            self.DAC.Init()        
-            self.checkBlocks(recurse=True)  
-           
+            self.DAC.Init()
+            self.checkBlocks(recurse=True)
+
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)
-                        
+
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
-        
+
         self.enable.set(True)
         self.ADC[0].enable.set(True)
-        self.ADC[1].enable.set(True)         
-        self.ADC[2].enable.set(True)         
-        self.LMK.enable.set(True)        
+        self.ADC[1].enable.set(True)
+        self.ADC[2].enable.set(True)
+        self.LMK.enable.set(True)
         self.DAC.enable.set(True)
-        
+
         # Init the AMC card
         self.InitAmcCard()
-        
+
         # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
         self.ADC[0].enable.set(False)
-        self.ADC[1].enable.set(False)         
-        self.ADC[2].enable.set(False)         
-        self.DAC.enable.set(False)    
-        self.checkBlocks(recurse=True)        
-        
+        self.ADC[1].enable.set(False)
+        self.ADC[2].enable.set(False)
+        self.DAC.enable.set(False)
+        self.checkBlocks(recurse=True)
