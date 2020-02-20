@@ -149,7 +149,7 @@ class DacSigGen(pr.Device):
                 offset      = 0x01000000 + (i * 0x01000000),
                 size        = (2*self._buffSize),
                 wordBitSize = (16 if (fillMode) else 32),
-                stride      = (2  if (fillMode) else  4),
+                stride      = (2  if (fillMode) else 4),
             )
 
         self.add(pr.LocalVariable(
@@ -217,7 +217,7 @@ class DacSigGen(pr.Device):
                         offset      = (0x01000000 + (ch*0x01000000)),
                         data        = data,
                         base        = pr.Int,
-                        stride      = (2  if (fillMode) else  4),
+                        stride      = (2  if (fillMode) else 4),
                         wordBitSize = (16 if (fillMode) else 32)
                     )
                     v = getattr(self, 'PeriodSize[%i]'%ch)
@@ -227,7 +227,7 @@ class DacSigGen(pr.Device):
                         offset      = (0x01000000 + (ch*0x01000000)),
                         numWords    = cnt,
                         base        = pr.Int,
-                        stride      = (2  if (fillMode) else  4),
+                        stride      = (2  if (fillMode) else 4),
                         wordBitSize = (16 if (fillMode) else 32)
                     )
                     for i in range(cnt):

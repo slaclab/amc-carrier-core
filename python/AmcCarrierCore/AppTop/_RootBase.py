@@ -24,7 +24,7 @@ class RootBase(pyrogue.Root):
                          name         = name,
                          description  = description,
                          **kwargs
-                        )
+        )
 
         self.srp    = None
         self.stream = None

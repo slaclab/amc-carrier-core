@@ -26,7 +26,7 @@ class RootRssi(pyrogue.Root):
                          name         = name,
                          description  = description,
                          **kwargs
-                        )
+        )
 
         # Create SRP/ASYNC_MSG interface
         self.rudp = pyrogue.protocols.UdpRssiPack( name='rudpReg', host=ipAddr, port=8193, packVer = 1, jumbo = False)

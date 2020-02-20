@@ -72,8 +72,8 @@ class AmcCarrierCore(pr.Device):
                 OutputConfig[3] = 0x1: Connects Backplane DIST1 to FPGA_TIMING_IN\n\
                 OutputConfig[3] = 0x2: Connects Backplane DIST1 to BP_TIMING_IN\n\
                 OutputConfig[3] = 0x3: Connects Backplane DIST1 to RTM_TIMING_IN1\n\
-                -----------------------------------------------------------------\n"\
-            ))
+                -----------------------------------------------------------------\n"
+        ))
 
         # self.add(ti.AxiCdcm6208(
             # offset       =  0x05000000,
