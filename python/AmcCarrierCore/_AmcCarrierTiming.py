@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue AMC Carrier Timing Receiver Module
 #-----------------------------------------------------------------------------
@@ -21,9 +20,9 @@ import pyrogue        as pr
 import LclsTimingCore as timingCore
 
 class AmcCarrierTiming(pr.Device):
-    def __init__(   self, 
-            name          = "AmcCarrierTiming", 
-            description   = "AMC Carrier Timing Receiver Module", 
+    def __init__(   self,
+            name          = "AmcCarrierTiming",
+            description   = "AMC Carrier Timing Receiver Module",
             enableTpgMini = True,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
@@ -40,11 +39,11 @@ class AmcCarrierTiming(pr.Device):
             self.add(timingCore.TPGMiniCore(
                 offset = 0x00030000,
             ))
-        
+
         self.add(timingCore.EvrV2CoreTriggers(
             offset = 0x00040000,
-        ))        
+        ))
 
         self.add(timingCore.GthRxAlignCheck(
             offset = 0x00800000,
-        ))        
+        ))

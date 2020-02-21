@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue AmcMicrowaveMux Amc Core
 #-----------------------------------------------------------------------------
@@ -22,24 +21,24 @@ import pyrogue     as pr
 import AmcCarrierCore.AppHardware as appHw
 
 class RtmCryoDet(pr.Device):
-    def __init__(   self, 
-            name        = "RtmCryoDet", 
-            description = "RtmCryoDet Board", 
+    def __init__(   self,
+            name        = "RtmCryoDet",
+            description = "RtmCryoDet Board",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-                
+
         #########
         # Devices
         #########
-        self.add(appHw.RtmCryoDet.SpiCryo(offset=0x00100000, expand=False))    
-        self.add(appHw.RtmCryoDet.SpiMax( offset=0x00200000, expand=False))    
-        self.add(appHw.RtmCryoDet.SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax 
-        self.add(appHw.RtmCryoDet.DacLut( offset=0x00300000, BASE_ADDR_G=0x82200000, expand=False))    
-        
+        self.add(appHw.RtmCryoDet.SpiCryo(offset=0x00100000, expand=False))
+        self.add(appHw.RtmCryoDet.SpiMax( offset=0x00200000, expand=False))
+        self.add(appHw.RtmCryoDet.SpiSr(  offset=0x00200000, expand=False))   # moved to same offset as SpiMax
+        self.add(appHw.RtmCryoDet.DacLut( offset=0x00300000, BASE_ADDR_G=0x82200000, expand=False))
+
         ###########
         # Registers
-        ###########  
-        self.add(pr.RemoteVariable(    
+        ###########
+        self.add(pr.RemoteVariable(
             name         = "LowCycle",
             description  = "CPLD's clock: low cycle duration (zero inclusive)",
             offset       = 0x0,
@@ -48,9 +47,9 @@ class RtmCryoDet(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
             units        = "1/(307MHz)",
-        )) 
-        
-        self.add(pr.RemoteVariable(    
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "HighCycle",
             description  = "CPLD's clock: high cycle duration (zero inclusive)",
             offset       = 0x4,
@@ -60,8 +59,8 @@ class RtmCryoDet(pr.Device):
             mode         = "RW",
             units        = "1/(307MHz)",
         ))
-        
-        self.add(pr.RemoteVariable(    
+
+        self.add(pr.RemoteVariable(
             name         = "KRelay",
             description  = "kRelay bus from CPLD",
             offset       = 0xC,
@@ -69,9 +68,9 @@ class RtmCryoDet(pr.Device):
             bitOffset    = 0,
             base         = pr.UInt,
             mode         = "RO",
-        ))        
-        
-        self.add(pr.RemoteVariable(    
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "RampMaxCnt",
             description  = "Internal Ramp's maximum count",
             offset       = 0x10,
@@ -80,9 +79,9 @@ class RtmCryoDet(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
             units        = "1/(307MHz)",
-        )) 
-        
-        self.add(pr.RemoteVariable(    
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "SelectRamp",
             description  = "Select Ramp to the CPLD",
             offset       = 0x14,
@@ -90,9 +89,9 @@ class RtmCryoDet(pr.Device):
             bitOffset    = 0,
             base         = pr.UInt,
             mode         = "RW",
-        )) 
+        ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "EnableRampTrigger",
             description  = "Enables the Start Ramp Trigger pulses",
             offset       = 0x14,
@@ -100,9 +99,9 @@ class RtmCryoDet(pr.Device):
             bitOffset    = 1,
             base         = pr.UInt,
             mode         = "RW",
-        ))  
+        ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "RampStartMode",
             description  = "0x0 = internal start ramp pulses, 0x1 = timing system trigger, 0x2 = external start ramp pulses",
             offset       = 0x14,
@@ -112,7 +111,7 @@ class RtmCryoDet(pr.Device):
             mode         = "RW",
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "PulseWidth",
             description  = "Start Ramp Pulse width to the CPLD",
             offset       = 0x18,
@@ -121,9 +120,9 @@ class RtmCryoDet(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
             units        = "1/(307MHz)",
-        ))  
+        ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "DebounceWidth",
             description  = "Debounce width from the LEMO[1]",
             offset       = 0x1C,
@@ -132,9 +131,9 @@ class RtmCryoDet(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
             units        = "1/(307MHz)",
-        ))   
-        
-        self.add(pr.RemoteVariable(    
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "CpldReset",
             description  = "CpldReset",
             offset       = 0x20,
@@ -142,9 +141,9 @@ class RtmCryoDet(pr.Device):
             bitOffset    = 0,
             base         = pr.UInt,
             mode         = "RW",
-        ))   
+        ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "rtmClockDelay",
             description  = "deskew RTM clock",
             offset       = 0x20,
@@ -152,14 +151,14 @@ class RtmCryoDet(pr.Device):
             bitOffset    = 1,
             base         = pr.UInt,
             mode         = "RW",
-        ))   
+        ))
 
         @self.command(description="Reset RTM CPLD")
         def resetRtm():
-           # Toggle reset bit
-           self.CpldReset.set(0x1)
-           time.sleep(0.100)
-           self.CpldReset.set(0x0)
-           # Reset all registers
-           self.writeBlocks(force=True, recurse=True)
-           self.checkBlocks(recurse=True)
+            # Toggle reset bit
+            self.CpldReset.set(0x1)
+            time.sleep(0.100)
+            self.CpldReset.set(0x0)
+            # Reset all registers
+            self.writeBlocks(force=True, recurse=True)
+            self.checkBlocks(recurse=True)

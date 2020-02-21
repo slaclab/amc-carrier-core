@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue AMC Carrier Cryo Demo Board Application
 #-----------------------------------------------------------------------------
@@ -27,18 +26,16 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import pyrogue.interfaces.simulation
-import pyrogue.protocols
-import pyrogue.utilities.fileio
-import rogue.hardware.axi
-import rogue.protocols.packetizer
+# import pyrogue.interfaces.simulation
+# import pyrogue.protocols
+# import pyrogue.utilities.fileio
 import AmcCarrierCore as amccCore
 from AmcCarrierCore.AppTop._AppTop import AppTop
 
 class TopLevel(pr.Device):
-    def __init__(   self, 
+    def __init__(   self,
             name            = 'FpgaTopLevel',
-            description     = 'Container for FPGA Top-Level', 
+            description     = 'Container for FPGA Top-Level',
             # JESD Parameters
             numRxLanes      = [0,0],
             numTxLanes      = [0,0],
@@ -60,7 +57,7 @@ class TopLevel(pr.Device):
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
         self._numWaveformBuffers = numWaveformBuffers
-        
+
         # Add devices
         self.add(amccCore.AmcCarrierCore(
             offset            = 0x00000000,
@@ -85,7 +82,7 @@ class TopLevel(pr.Device):
         # Define SW trigger command
         @self.command(description="Software Trigger for DAQ MUX",)
         def SwDaqMuxTrig():
-            for i in range(2): 
+            for i in range(2):
                 self.AppTop.DaqMuxV2[i].TriggerDaq.call()
 
     def writeBlocks(self, **kwargs):
@@ -103,7 +100,7 @@ class TopLevel(pr.Device):
                     if ( (waveBuff.Enabled[j].get() > 0) and (waveBuff.EndAddr[j].get() > waveBuff.StartAddr[j].get()) ):
                         size[i][j] = waveBuff.EndAddr[j].get() - waveBuff.StartAddr[j].get()
 
-        # Calculate the 
+        # Calculate the
         minSize = [size[0][0],size[1][0]]
         for i in range(2):
             if ((self._numRxLanes[i] > 0) or (self._numTxLanes[i] > 0)):

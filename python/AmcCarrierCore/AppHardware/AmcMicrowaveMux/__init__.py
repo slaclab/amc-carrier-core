@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 from AmcCarrierCore.AppHardware.AmcMicrowaveMux._amcMicrowaveMuxCtrl import *
 from AmcCarrierCore.AppHardware.AmcMicrowaveMux._amcMicrowaveMuxCore import *

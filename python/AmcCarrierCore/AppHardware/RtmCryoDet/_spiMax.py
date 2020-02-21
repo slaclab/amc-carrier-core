@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue CRYO RTM: SPI MAX
 #-----------------------------------------------------------------------------
@@ -20,26 +19,13 @@
 import pyrogue as pr
 
 class SpiMax(pr.Device):
-    def __init__(   self, 
-        name        = "RtmSpiMax", 
-        description = "RTM Bias DAC SPI Interface", 
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-        enabled     =  True
-        
-    ):     
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-            enabled     = enabled,
-        )
-       
+    def __init__(self,
+            name        = "RtmSpiMax",
+            description = "RTM Bias DAC SPI Interface",
+             **kwargs):
+
+        super().__init__(description=description, **kwargs)
+
         ##############################
         # Variables
         ##############################
@@ -93,7 +79,7 @@ class SpiMax(pr.Device):
                 mode         = "RW",
             ))
 
-        # make waveform of DacNopRegChArray 
+        # make waveform of DacNopRegChArray
         self.add(pr.LinkVariable(
             name         = "TesBiasDacNopRegChArray",
             hidden       = True,
@@ -104,7 +90,7 @@ class SpiMax(pr.Device):
             typeStr      = "List[UInt20]",
         ))
 
-        # make waveform of DacDataRegChArray 
+        # make waveform of DacDataRegChArray
         self.add(pr.LinkVariable(
             name         = "TesBiasDacDataRegChArray",
             hidden       = True,
@@ -115,7 +101,7 @@ class SpiMax(pr.Device):
             typeStr      = "List[Int20]",
         ))
 
-        # make waveform of DacCtrlRegChArray 
+        # make waveform of DacCtrlRegChArray
         self.add(pr.LinkVariable(
             name         = "TesBiasDacCtrlRegChArray",
             hidden       = True,
@@ -126,7 +112,7 @@ class SpiMax(pr.Device):
             typeStr      = "List[UInt20]",
         ))
 
-        # make waveform of DacClrCRegChArray 
+        # make waveform of DacClrCRegChArray
         self.add(pr.LinkVariable(
             name         = "TesBiasDacClrCRegChArray",
             hidden       = True,
@@ -139,19 +125,19 @@ class SpiMax(pr.Device):
 
     @staticmethod
     def setArray(dev, var, value):
-       # workaround for rogue local variables
-       # list objects get written as string, not list of float when set by GUI
-       if isinstance(value, str):
-           value = eval(value)
-       for variable, setpoint in zip( var.dependencies, value ):
-           variable.set( setpoint, write=False )
-       dev.writeBlocks()
-       dev.verifyBlocks()
-       dev.checkBlocks()
+        # workaround for rogue local variables
+        # list objects get written as string, not list of float when set by GUI
+        if isinstance(value, str):
+            value = eval(value)
+        for variable, setpoint in zip( var.dependencies, value ):
+            variable.set( setpoint, write=False )
+        dev.writeBlocks()
+        dev.verifyBlocks()
+        dev.checkBlocks()
 
     @staticmethod
     def getArray(dev, var, read):
-       if read:
-          dev.readBlocks(variable=var.dependencies)
-          dev.checkBlocks(variable=var.dependencies)
-       return [variable.value() for variable in var.dependencies]
+        if read:
+            dev.readBlocks(variable=var.dependencies)
+            dev.checkBlocks(variable=var.dependencies)
+        return [variable.value() for variable in var.dependencies]
