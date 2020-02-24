@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue Cryo Amc Core
 #-----------------------------------------------------------------------------
@@ -18,15 +17,14 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import time
 
 class Hmc305(pr.Device):
-    def __init__(   self, 
-            name        = "Hmc305", 
-            description = "Hmc305 module", 
+    def __init__(   self,
+            name        = "Hmc305",
+            description = "Hmc305 module",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-           
+
         devConfig = [
             ['DC[1]', 0x1C],
             ['DC[2]', 0x08],
@@ -37,14 +35,13 @@ class Hmc305(pr.Device):
             ['UC[3]', 0x10],
             ['UC[4]', 0x0C],
         ]
-            
-        for i in range(8):     
+
+        for i in range(8):
             self.add(pr.RemoteVariable(
-                name        = devConfig[i][0], 
+                name        = devConfig[i][0],
                 description = 'Hmc305 Device: Note that firmware does an invert and bit order swap to make the software interface with a LSB of 0.5dB',
-                offset      = devConfig[i][1], 
-                bitSize     = 5, 
+                offset      = devConfig[i][1],
+                bitSize     = 5,
                 mode        = 'RW',
                 units       = '0.5dB',
             ))
-            

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue BSA Diagnostic Buffer Module
 #-----------------------------------------------------------------------------
@@ -21,9 +20,9 @@ import pyrogue  as pr
 import surf.axi as axi
 
 class BsaBufferControl(pr.Device):
-    def __init__(   self, 
-            name        = "BsaBufferControl", 
-            description = "Configuration and status of the BSA diagnostic buffers", 
+    def __init__(   self,
+            name        = "BsaBufferControl",
+            description = "Configuration and status of the BSA diagnostic buffers",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
@@ -36,12 +35,12 @@ class BsaBufferControl(pr.Device):
             description = '',
             offset      = 0x00,
             size        = (8*64), # Units of bytes
-            wordBitSize = 64, 
-            stride      = 8, 
+            wordBitSize = 64,
+            stride      = 8,
             verify      = False,
-            # mode        = "RO",                           
-        )        
-        
+            # mode        = "RO",
+        )
+
         self.add(axi.AxiStreamDmaRingWrite(
             offset     =  0x00001000,
             name       = "BsaBuffers",

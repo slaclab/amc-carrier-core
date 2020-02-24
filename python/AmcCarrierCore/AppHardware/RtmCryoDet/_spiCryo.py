@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue CRYO RTM: SPI CRYO
 #-----------------------------------------------------------------------------
@@ -20,9 +19,9 @@
 import pyrogue as pr
 
 class SpiCryo(pr.Device):
-    def __init__(   self, 
-            name        = "SpiCryo", 
-            description = "SpiCryo module", 
+    def __init__(   self,
+            name        = "SpiCryo",
+            description = "SpiCryo module",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
@@ -34,7 +33,7 @@ class SpiCryo(pr.Device):
             base        = pr.UInt,
             mode        = "WO",
         ))
-        
+
         self.add(pr.RemoteVariable(
             name        = "read",
             description = "read - 32 bits",

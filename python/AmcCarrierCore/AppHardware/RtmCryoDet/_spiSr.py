@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue CRYO RTM: SPI SR
 #-----------------------------------------------------------------------------
@@ -21,25 +20,12 @@ import pyrogue as pr
 import math
 
 class SpiSr(pr.Device):
-    def __init__(   self,
-        name        = "RtmSpiSr",
-        description = "RTM Flux Ramp SPI Interface",
-        memBase     =  None,
-        offset      =  0x00,
-        hidden      =  False,
-        expand      =  True,
-        enabled     =  True,
+    def __init__(self,
+            name        = "RtmSpiSr",
+            description = "RTM Flux Ramp SPI Interface",
+             **kwargs):
 
-    ):
-        super().__init__(
-            name        = name,
-            description = description,
-            memBase     = memBase,
-            offset      = offset,
-            hidden      = hidden,
-            expand      = expand,
-            enabled     = enabled,
-        )
+        super().__init__(description=description, **kwargs)
 
         ##############################
         # Variables
@@ -89,7 +75,7 @@ class SpiSr(pr.Device):
             overlapEn    = True,
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "FastSlowStepSizeLow",
             description  = "FluxRamp_Control_Reg5",
             offset       =  0x804,
@@ -99,7 +85,7 @@ class SpiSr(pr.Device):
             mode         = "RW",
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "FastSlowStepSizeHigh",
             description  = "FluxRamp_Control_Reg5",
             offset       =  0x808,
@@ -109,16 +95,16 @@ class SpiSr(pr.Device):
             mode         = "RW",
         ))
 
-        self.add(pr.LinkVariable(    
+        self.add(pr.LinkVariable(
             name         = "FastSlowStepSize",
             description  = "Flux ramp reset value, UInt32",
             dependencies = [self.FastSlowStepSizeLow, self.FastSlowStepSizeHigh],
             linkedGet    = self.fromReg,
-            linkedSet    = self.toReg, 
+            linkedSet    = self.toReg,
             typeStr      = "UInt32"
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "FastSlowRstValueLow",
             description  = "FluxRamp_Control_Reg6",
             offset       =  0x80C,
@@ -127,8 +113,8 @@ class SpiSr(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
         ))
-         
-        self.add(pr.RemoteVariable(    
+
+        self.add(pr.RemoteVariable(
             name         = "FastSlowRstValueHigh",
             description  = "FluxRamp_Control_Reg6",
             offset       =  0x810,
@@ -138,16 +124,16 @@ class SpiSr(pr.Device):
             mode         = "RW",
         ))
 
-        self.add(pr.LinkVariable(    
+        self.add(pr.LinkVariable(
             name         = "FastSlowRstValue",
             description  = "Flux ramp reset value, UInt32",
             dependencies = [self.FastSlowRstValueLow, self.FastSlowRstValueHigh],
             linkedGet    = self.fromReg,
-            linkedSet    = self.toReg, 
+            linkedSet    = self.toReg,
             typeStr      = "UInt32"
         ))
 
-        self.add(pr.RemoteVariable(    
+        self.add(pr.RemoteVariable(
             name         = "LTC1668RawDacData",
             description  = "FluxRamp_Control_Reg7",
             offset       =  0x814,
@@ -159,13 +145,13 @@ class SpiSr(pr.Device):
 
     @staticmethod
     def toReg(dev, var, value):
-       highVal = math.floor( value / 2**16 ) 
-       lowVal  = value - highVal*2**16
-       var.dependencies[0].set( lowVal )
-       var.dependencies[1].set( highVal )
- 
+        highVal = math.floor( value / 2**16 )
+        lowVal  = value - highVal*2**16
+        var.dependencies[0].set( lowVal )
+        var.dependencies[1].set( highVal )
+
     @staticmethod
     def fromReg(dev, var, read):
-       lowVal  = var.dependencies[0].get(read=read)
-       highVal = var.dependencies[1].get(read=read)
-       return highVal*2**16 + lowVal
+        lowVal  = var.dependencies[0].get(read=read)
+        highVal = var.dependencies[1].get(read=read)
+        return highVal*2**16 + lowVal

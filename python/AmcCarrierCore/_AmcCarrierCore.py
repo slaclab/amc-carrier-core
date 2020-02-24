@@ -1,14 +1,11 @@
 import pyrogue as pr
 
 # Modules from surf
-import pyrogue as pr
 import surf.axi as axi
 import surf.devices.intel as intel
 import surf.devices.micron as micron
 import surf.devices.microchip as microchip
-import surf.devices.ti as ti
 import surf.ethernet.udp as udp
-import surf.misc as misc
 import surf.protocols.rssi as rssi
 import surf.xilinx as xilinx
 
@@ -17,41 +14,41 @@ import AmcCarrierCore as amcc
 import AmcCarrierCore.AppMps as mps
 
 class AmcCarrierCore(pr.Device):
-    def __init__(   self, 
-            name                = "AmcCarrierCore", 
-            description         = "AmcCarrierCore", 
+    def __init__(   self,
+            name                = "AmcCarrierCore",
+            description         = "AmcCarrierCore",
             enablePwrI2C        = False,
             enableBsa           = True,
             enableMps           = True,
             numWaveformBuffers  = 4,
             enableTpgMini       = True,
-            expand	            = False,
+            expand              = False,
             **kwargs):
-        super().__init__(name=name, description=description, expand=expand, **kwargs)  
+        super().__init__(name=name, description=description, expand=expand, **kwargs)
 
         ##############################
         # Variables
-        ##############################                        
-        self.add(axi.AxiVersion(            
-            offset       =  0x00000000, 
+        ##############################
+        self.add(axi.AxiVersion(
+            offset       =  0x00000000,
             expand       =  False
         ))
 
-        self.add(xilinx.AxiSysMonUltraScale(   
-            offset       =  0x01000000, 
+        self.add(xilinx.AxiSysMonUltraScale(
+            offset       =  0x01000000,
             expand       =  False
         ))
-        
+
         self.add(micron.AxiMicronN25Q(
             name         = "MicronN25Q",
             offset       = 0x2000000,
-            addrMode     = True,                                    
-            expand       = False,                                    
-            hidden       = True,                                    
-        ))        
+            addrMode     = True,
+            expand       = False,
+            hidden       = True,
+        ))
 
-        self.add(microchip.AxiSy56040(    
-            offset       =  0x03000000, 
+        self.add(microchip.AxiSy56040(
+            offset       =  0x03000000,
             expand       =  False,
             description  = "\n\
                 Timing Crossbar:  https://confluence.slac.stanford.edu/x/m4H7D   \n\
@@ -75,34 +72,34 @@ class AmcCarrierCore(pr.Device):
                 OutputConfig[3] = 0x1: Connects Backplane DIST1 to FPGA_TIMING_IN\n\
                 OutputConfig[3] = 0x2: Connects Backplane DIST1 to BP_TIMING_IN\n\
                 OutputConfig[3] = 0x3: Connects Backplane DIST1 to RTM_TIMING_IN1\n\
-                -----------------------------------------------------------------\n"\
-            ))
-                            
-        # self.add(ti.AxiCdcm6208(     
-            # offset       =  0x05000000, 
+                -----------------------------------------------------------------\n"
+        ))
+
+        # self.add(ti.AxiCdcm6208(
+            # offset       =  0x05000000,
             # enabled      =  False,
             # hidden       =  True,
-            # expand       =  False,            
+            # expand       =  False,
         # ))
 
-        self.add(amcc.AmcCarrierBsi(   
-            offset       =  0x07000000, 
+        self.add(amcc.AmcCarrierBsi(
+            offset       =  0x07000000,
             expand       =  False,
         ))
 
         self.add(amcc.AmcCarrierTiming(
-            offset        =  0x08000000, 
+            offset        =  0x08000000,
             expand        =  False,
             enableTpgMini = enableTpgMini,
         ))
 
-        self.add(amcc.AmcCarrierBsa(   
-            offset             =  0x09000000, 
+        self.add(amcc.AmcCarrierBsa(
+            offset             =  0x09000000,
             enableBsa          =  enableBsa,
             numWaveformBuffers =  numWaveformBuffers,
             expand             =  False,
         ))
-                            
+
         self.add(udp.UdpEngineClient(
             name         = "BpUdpCltApp",
             offset       =  0x0A000000,
@@ -116,69 +113,69 @@ class AmcCarrierCore(pr.Device):
             description  = "Backplane UDP Server: Xilinx XVC",
             expand       =  False,
         ))
-        
+
         self.add(udp.UdpEngineServer(
             name         = "BpUdpSrvFsbl",
             offset       =  0x0A000808,
             description  = "Backplane UDP Server: FSBL Legacy SRPv0 register access",
             expand       =  False,
-        )) 
+        ))
 
         self.add(udp.UdpEngineServer(
             name         = "BpUdpSrvRssi[0]",
             offset       =  0x0A000810,
             description  = "Backplane UDP Server: Legacy Non-interleaved RSSI for Register access and ASYNC messages",
             expand       =  False,
-        )) 
+        ))
 
         self.add(udp.UdpEngineServer(
             name         = "BpUdpSrvRssi[1]",
             offset       =  0x0A000818,
             description  = "Backplane UDP Server: Legacy Non-interleaved RSSI for bulk data transfer",
             expand       =  False,
-        ))         
-        
+        ))
+
         self.add(udp.UdpEngineServer(
             name         = "BpUdpSrvRssi[2]",
             offset       =  0x0A000830,
             description  = "Backplane UDP Server: Interleaved RSSI",
             expand       =  False,
-        ))             
-        
+        ))
+
         self.add(udp.UdpEngineServer(
             name         = "BpUdpSrvApp",
             offset       =  0x0A000820,
             description  = "Backplane UDP Server for Application ASYNC Messaging",
             expand       =  False,
-        ))  
+        ))
 
         self.add(udp.UdpEngineServer(
             name         = "BpUdpSrvTiming",
             offset       =  0x0A000828,
             description  = "Backplane UDP Server for Timing ASYNC Messaging",
             expand       =  False,
-        ))          
-        
+        ))
+
         for i in range(2):
             self.add(rssi.RssiCore(
                 name         = f'SwRssiServer[{i}]',
                 offset       =  0x0A010000 + (i * 0x1000),
-                description  = "SwRssiServer Server: %i" % (i),                                
-                expand       =  False,                                    
-            ))       
-            
+                description  = "SwRssiServer Server: %i" % (i),
+                expand       =  False,
+            ))
+
         self.add(rssi.RssiCore(
             name         = "SwRssiServer[2]",
             offset       =  0x0A020000,
-            description  = "SwRssiServer Server",                                
-            expand       =  False,                                    
-        ))            
+            description  = "SwRssiServer Server",
+            expand       =  False,
+        ))
 
         if (enableMps):
-            self.add(mps.AppMps(      
-                offset =  0x0C000000, 
+            self.add(mps.AppMps(
+                offset =  0x0C000000,
                 expand =  False
-            ))            
+            ))
 
         if (enablePwrI2C):
             self.add(intel.EM22xx(
@@ -188,13 +185,12 @@ class AmcCarrierCore(pr.Device):
 
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)
-                        
+
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
-        
+
         for i in range(2):
             v = getattr(self.AmcCarrierBsa, f'BsaWaveformEngine[{i}]')
             v.WaveformEngineBuffers.Initialize()
-        
+
         self.checkBlocks(recurse=True)
-        

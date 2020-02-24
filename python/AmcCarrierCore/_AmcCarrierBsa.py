@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue AmcCarrier BSA Module
 #-----------------------------------------------------------------------------
@@ -21,14 +20,14 @@ import pyrogue as pr
 import AmcCarrierCore.BsaCore as bsa
 
 class AmcCarrierBsa(pr.Device):
-    def __init__( self, 
-            name        = "AmcCarrierBsa", 
-            description = "AmcCarrier BSA Module", 
+    def __init__( self,
+            name        = "AmcCarrierBsa",
+            description = "AmcCarrier BSA Module",
             enableBsa   = True,
             numWaveformBuffers  = 4,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-        
+
         ##############################
         # Variables
         ##############################

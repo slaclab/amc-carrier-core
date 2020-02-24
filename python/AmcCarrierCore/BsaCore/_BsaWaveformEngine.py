@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-----------------------------------------------------------------------------
 # Title      : PyRogue BSA Waveform Engine Module
 #-----------------------------------------------------------------------------
@@ -21,9 +20,9 @@ import pyrogue  as pr
 import surf.axi as axi
 
 class BsaWaveformEngine(pr.Device):
-    def __init__(   self, 
-            name        = "BsaWaveformEngine", 
-            description = "Configuration and status of the BSA dignosic buffers", 
+    def __init__(   self,
+            name        = "BsaWaveformEngine",
+            description = "Configuration and status of the BSA dignosic buffers",
             numBuffers  = 4,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
@@ -33,4 +32,3 @@ class BsaWaveformEngine(pr.Device):
             offset     = 0x00000000,
             numBuffers = numBuffers,
         ))
-        
