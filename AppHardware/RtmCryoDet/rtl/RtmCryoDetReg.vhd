@@ -189,7 +189,7 @@ begin
          TPD_G   => TPD_G,
          WIDTH_G => 2)
       port map (
-         clk     => jesdClk,
+         clk     => axilClk,
          dataIn  => kRelay,
          dataOut => kRelaySync);
 
