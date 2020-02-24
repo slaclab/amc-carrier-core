@@ -374,6 +374,7 @@ begin
       generic map (
          TPD_G => TPD_G)
       port map (
+         jesdClk         => jesdClk,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
