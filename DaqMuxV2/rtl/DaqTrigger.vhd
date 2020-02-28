@@ -165,7 +165,7 @@ begin
    U_SyncOneShotArmCasc: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
-      BYPASS_SYNC_G   => true) -- No need to sync
+      BYPASS_SYNC_G   => false)
    port map (
       clk     => clk,
       rst     => rst,

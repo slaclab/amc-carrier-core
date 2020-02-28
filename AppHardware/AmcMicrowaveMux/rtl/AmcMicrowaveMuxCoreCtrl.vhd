@@ -27,6 +27,7 @@ entity AmcMicrowaveMuxCoreCtrl is
    generic (
       TPD_G : time := 1 ns);
    port (
+      jesdClk         : in  sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -71,10 +72,49 @@ architecture rtl of AmcMicrowaveMuxCoreCtrl is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   signal rxSyncSync    : sl;
+   signal txSyncSync    : slv(1 downto 0);
+   signal txSyncRawSync : slv(1 downto 0);
+
 begin
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, r, rxSync, txSync,
-                   txSyncRaw) is
+   Sync_rxSync : entity surf.Synchronizer
+      generic map (
+         TPD_G   => TPD_G)
+      port map (
+         clk     => axilClk,
+         dataIn  => rxSync,
+         dataOut => rxSyncSync);
+
+   Sync_txSync : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
+      port map (
+         clk     => axilClk,
+         dataIn  => txSync,
+         dataOut => txSyncSync);
+
+   Sync_txSyncRaw : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
+      port map (
+         clk     => axilClk,
+         dataIn  => txSyncRaw,
+         dataOut => txSyncRawSync);
+
+   Sync_txSyncMask : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 2)
+      port map (
+         clk     => jesdClk,
+         dataIn  => r.txSyncMask,
+         dataOut => txSyncMask);
+
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, r, rxSyncSync, txSyncSync,
+                   txSyncRawSync) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;
    begin
@@ -85,9 +125,9 @@ begin
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Map the read only registers
-      axiSlaveRegisterR(regCon, x"7F0", 0, txSyncRaw);
-      axiSlaveRegisterR(regCon, x"7F4", 0, txSync);
-      axiSlaveRegisterR(regCon, x"7F8", 0, rxSync);
+      axiSlaveRegisterR(regCon, x"7F0", 0, txSyncRawSync);
+      axiSlaveRegisterR(regCon, x"7F4", 0, txSyncSync);
+      axiSlaveRegisterR(regCon, x"7F8", 0, rxSyncSync);
 
       -- Map the read/write registers
       axiSlaveRegister(regCon, x"800", 0, v.txSyncMask);
@@ -110,7 +150,6 @@ begin
       -- Outputs
       axilWriteSlave <= r.axilWriteSlave;
       axilReadSlave  <= r.axilReadSlave;
-      txSyncMask     <= r.txSyncMask;
       dacReset       <= r.dacReset;
       dacJtagReset   <= r.dacJtagReset;
       lmkSync        <= r.lmkSync;
