@@ -713,33 +713,41 @@ Reading /home/travis/build/slacl
 
 [AmcMicrowaveMuxCore.vhd:367:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar1]
 
-[AmcMicrowaveMuxCore.vhd:392:Info: Elaborating entity AmcMicrowaveMuxCoreCtrl for hierarchy amcmicrowavemuxcorectrl::u_ctrl]
+[AmcMicrowaveMuxCore.vhd:393:Info: Elaborating entity AmcMicrowaveMuxCoreCtrl for hierarchy amcmicrowavemuxcorectrl::u_ctrl]
 
-[AmcMicrowaveMuxCore.vhd:423:Info: Elaborating entity adf5355 for hierarchy adf5355::GEN_PLL:u_pll]
+[AmcMicrowaveMuxCore.vhd:424:Info: Elaborating entity adf5355 for hierarchy adf5355::GEN_PLL:u_pll]
 
-[AmcMicrowaveMuxCore.vhd:468:Info: Elaborating entity hmc305 for hierarchy hmc305::u_hmc305]
+[AmcMicrowaveMuxCore.vhd:469:Info: Elaborating entity hmc305 for hierarchy hmc305::u_hmc305]
 
-[AmcMicrowaveMuxCore.vhd:485:Info: Elaborating entity JesdSyncIn for hierarchy jesdsyncin::u_jesdsysref]
+[AmcMicrowaveMuxCore.vhd:486:Info: Elaborating entity JesdSyncIn for hierarchy jesdsyncin::u_jesdsysref]
 
-[AmcMicrowaveMuxCore.vhd:498:Info: Elaborating entity JesdSyncOut for hierarchy jesdsyncout::u_jesdrxsync0]
+[AmcMicrowaveMuxCore.vhd:499:Info: Elaborating entity JesdSyncOut for hierarchy jesdsyncout::u_jesdrxsync0]
 
-[AmcMicrowaveMuxCore.vhd:511:Info: Elaborating entity JesdSyncOut for hierarchy jesdsyncout::u_jesdrxsync1]
+[AmcMicrowaveMuxCore.vhd:512:Info: Elaborating entity JesdSyncOut for hierarchy jesdsyncout::u_jesdrxsync1]
 
-[AmcMicrowaveMuxCore.vhd:524:Info: Elaborating entity JesdSyncIn for hierarchy jesdsyncin::u_jesdtxsync0]
+[AmcMicrowaveMuxCore.vhd:525:Info: Elaborating entity JesdSyncIn for hierarchy jesdsyncin::u_jesdtxsync0]
 
-[AmcMicrowaveMuxCore.vhd:537:Info: Elaborating entity JesdSyncIn for hierarchy jesdsyncin::u_jesdtxsync1]
+[AmcMicrowaveMuxCore.vhd:538:Info: Elaborating entity JesdSyncIn for hierarchy jesdsyncin::u_jesdtxsync1]
 
-[AmcMicrowaveMuxCore.vhd:568:Info: Elaborating entity adc32rf45 for hierarchy adc32rf45::GEN_ADC:u_adc]
+[AmcMicrowaveMuxCore.vhd:569:Info: Elaborating entity adc32rf45 for hierarchy adc32rf45::GEN_ADC:u_adc]
 
-[AmcMicrowaveMuxCore.vhd:611:Info: Elaborating entity axispimaster for hierarchy axispimaster::GEN_DAC:u_dac]
+[AmcMicrowaveMuxCore.vhd:612:Info: Elaborating entity axispimaster for hierarchy axispimaster::GEN_DAC:u_dac]
 
-[AmcMicrowaveMuxCore.vhd:632:Info: Elaborating entity iobuf for hierarchy iobuf::iobuf_dac0]
+[AmcMicrowaveMuxCore.vhd:633:Info: Elaborating entity iobuf for hierarchy iobuf::iobuf_dac0]
 
-[AmcMicrowaveMuxCore.vhd:642:Info: Elaborating entity iobuf for hierarchy iobuf::iobuf_dac1]
+[AmcMicrowaveMuxCore.vhd:643:Info: Elaborating entity iobuf for hierarchy iobuf::iobuf_dac1]
 
-[AmcMicrowaveMuxCore.vhd:678:Info: Elaborating entity axispimaster for hierarchy axispimaster::u_lmk]
+[AmcMicrowaveMuxCore.vhd:679:Info: Elaborating entity axispimaster for hierarchy axispimaster::u_lmk]
 
-[AmcMicrowaveMuxCore.vhd:685:Info: Elaborating entity iobuf for hierarchy iobuf::iobuf_lmk]
+[AmcMicrowaveMuxCore.vhd:686:Info: Elaborating entity iobuf for hierarchy iobuf::iobuf_lmk]
+
+[AmcMicrowaveMuxCoreCtrl.vhd:87:Info: Elaborating entity synchronizer for hierarchy synchronizer::sync_rxsync]
+
+[AmcMicrowaveMuxCoreCtrl.vhd:96:Info: Elaborating entity synchronizervector for hierarchy synchronizervector::sync_txsync]
+
+[AmcMicrowaveMuxCoreCtrl.vhd:105:Info: Elaborating entity synchronizervector for hierarchy synchronizervector::sync_txsyncraw]
+
+[AmcMicrowaveMuxCoreCtrl.vhd:114:Info: Elaborating entity synchronizervector for hierarchy synchronizervector::sync_txsyncmask]
 
 [AmcMicrowaveMuxDualCore.vhd:103:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
 

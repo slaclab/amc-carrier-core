@@ -2,6 +2,7 @@ var classAmcMicrowaveMuxCoreCtrl =
 [
     [ "rtl", "classAmcMicrowaveMuxCoreCtrl_1_1rtl.html", "classAmcMicrowaveMuxCoreCtrl_1_1rtl" ],
     [ "TPD_G", "classAmcMicrowaveMuxCoreCtrl.html#a67a837684e4f18c2d236ac1d053b419b", null ],
+    [ "jesdClk", "classAmcMicrowaveMuxCoreCtrl.html#ab94c4142fc301d82f9adf064bf8d4b7d", null ],
     [ "axilClk", "classAmcMicrowaveMuxCoreCtrl.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
     [ "axilRst", "classAmcMicrowaveMuxCoreCtrl.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],
     [ "axilReadMaster", "classAmcMicrowaveMuxCoreCtrl.html#aada3e73ee8db4190524295bfa4dff085", null ],
