@@ -24,7 +24,7 @@ class SpiMax(pr.Device):
             description = "RTM Bias DAC SPI Interface",
              **kwargs):
 
-        super().__init__(description=description, **kwargs)
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables
