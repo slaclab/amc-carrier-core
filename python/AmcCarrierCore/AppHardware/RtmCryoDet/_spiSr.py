@@ -25,7 +25,7 @@ class SpiSr(pr.Device):
             description = "RTM Flux Ramp SPI Interface",
              **kwargs):
 
-        super().__init__(description=description, **kwargs)
+        super().__init__(name=name, description=description, **kwargs)
 
         ##############################
         # Variables
