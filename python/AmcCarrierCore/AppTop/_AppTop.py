@@ -96,7 +96,7 @@ class AppTop(pr.Device):
             for tx in jesdTxDevices:
                 rx.ResetGTs.set(1)
             self.checkBlocks(recurse=True)
-            time.sleep(0.5)
+            time.sleep(0.5) # TODO: Optimize this timeout
 
             # Execute the AppCore.Disable
             for core in appCore:
@@ -108,21 +108,27 @@ class AppTop(pr.Device):
             for tx in jesdTxDevices:
                 tx.ResetGTs.set(0)
             self.checkBlocks(recurse=True)
-            time.sleep(0.5)
+            time.sleep(0.5) # TODO: Optimize this timeout
 
             # Init the AppCore
             for core in appCore:
                 core.Init()
-            time.sleep(1.0)
+            time.sleep(1.0) # TODO: Optimize this timeout
 
             # Special DAC Init procedure
             for dac in dacDevices:
                 dac.EnableTx.set(0x0)
+                time.sleep(0.001) # TODO: Optimize this timeout
                 dac.InitJesd.set(0x1)
+                time.sleep(0.001) # TODO: Optimize this timeout
                 dac.JesdRstN.set(0x0)
+                time.sleep(0.001) # TODO: Optimize this timeout
                 dac.JesdRstN.set(0x1)
+                time.sleep(0.001) # TODO: Optimize this timeout
                 dac.InitJesd.set(0x0)
+                time.sleep(0.001) # TODO: Optimize this timeout
                 dac.EnableTx.set(0x1)
+                time.sleep(0.001) # TODO: Optimize this timeout
             if len(dacDevices) > 0:
                 for lmk in lmkDevices:
                     lmk.PwrUpSysRef()
