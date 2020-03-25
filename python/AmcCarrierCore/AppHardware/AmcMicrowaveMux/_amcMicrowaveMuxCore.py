@@ -63,12 +63,12 @@ class AmcMicrowaveMuxCore(pr.Device):
 #            self.ADC[0].Init()
 #            self.ADC[1].Init()
 
-            time.sleep(0.2) # TODO: Optimize this timeout
+            time.sleep(0.5) # TODO: Optimize this timeout
 
             self.ADC[0].DigRst()
             self.ADC[1].DigRst()
 
-            time.sleep(0.10) # TODO: Optimize this timeout
+            time.sleep(0.5) # TODO: Optimize this timeout
 
             # pulse SysRef
             self.LMK.PwrUpSysRef()
@@ -135,12 +135,12 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.ADC[0].HW_RST.set(0x1)
         self.ADC[1].HW_RST.set(0x1)
 
-        time.sleep(0.10) # TODO: Optimize this timeout
+        time.sleep(0.50) # TODO: Optimize this timeout
 
         self.ADC[0].HW_RST.set(0x0)
         self.ADC[1].HW_RST.set(0x0)
 
-        time.sleep(0.10) # TODO: Optimize this timeout
+        time.sleep(0.50) # TODO: Optimize this timeout
 
         # must pulse SYSREF before SPI to ADC
         self.LMK.Init()

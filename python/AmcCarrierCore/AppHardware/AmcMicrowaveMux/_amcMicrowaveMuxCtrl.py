@@ -124,6 +124,6 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             time.sleep(0.1) # TODO: Optimize this timeout
             self.dacReset[0].set(0)
             self.dacReset[1].set(0)
-            time.sleep(0.001) # TODO: Optimize this timeout
+            time.sleep(0.1) # TODO: Optimize this timeout
             self.lmkSync.set(0)
-            time.sleep(0.001) # TODO: Optimize this timeout
+            time.sleep(0.1) # TODO: Optimize this timeout
