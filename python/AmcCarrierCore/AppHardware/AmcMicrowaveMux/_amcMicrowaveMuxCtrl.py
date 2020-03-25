@@ -121,7 +121,9 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             # Reset DAC, active low
             self.dacReset[0].set(1)
             self.dacReset[1].set(1)
-            time.sleep(0.1)
+            time.sleep(0.1) # TODO: Optimize this timeout
             self.dacReset[0].set(0)
             self.dacReset[1].set(0)
+            time.sleep(0.001) # TODO: Optimize this timeout
             self.lmkSync.set(0)
+            time.sleep(0.001) # TODO: Optimize this timeout
