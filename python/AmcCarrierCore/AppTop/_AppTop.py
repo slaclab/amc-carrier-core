@@ -152,10 +152,10 @@ class AppTop(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
         self.checkBlocks(recurse=True)
-        
+
         # Add delay between YAML load and Init()
         time.sleep(1.0)
-        
+
         # Perform the device init
         self.Init()
 
