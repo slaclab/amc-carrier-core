@@ -217,10 +217,10 @@ class LutCtrl(pr.Device):
         ))
 
         self.add(pr.LinkVariable(
-            name         = RtmDacFrameRate,
+            name         = 'RtmDacFrameRate',
             mode         = 'RO',
             units        = 'Hz',
-            linkedGet    = getRtmDacFrameRate,
+            linkedGet    = self.getRtmDacFrameRate,
             disp         = '{:1.3f}',
             dependencies = [self.EnableCh],
         ))
