@@ -216,6 +216,37 @@ class LutCtrl(pr.Device):
             function    = lambda cmd: cmd.post(1),
         ))
 
+        self.add(pr.LinkVariable(
+            name         = RtmDacFrameRate,
+            mode         = 'RO',
+            units        = 'Hz',
+            linkedGet    = getRtmDacFrameRate,
+            disp         = '{:1.3f}',
+            dependencies = [self.EnableCh],
+        ))
+
+    @staticmethod
+    def getRtmDacFrameRate(var):
+
+        # Check for both channels enabled
+        if var.dependencies[0].value() == 0x3:
+            num_dacs = 2
+        elif var.dependencies[0].value() == 0x0:
+            return 0.0
+        else:
+            num_dacs = 1
+
+        # FW configure constants
+        spi_clock_rate_hz = 1.0e+6
+        spi_address_bits = 11.0
+        spi_data_bits = 20.0
+        spi_rw_bit = 1.0
+        spi_bits = spi_address_bits + spi_data_bits + spi_rw_bit
+        rtm_waveform_update_rate_hz = spi_clock_rate_hz/(spi_bits*num_dacs)
+
+        # Return the calculated value
+        return rtm_waveform_update_rate_hz
+
 class DacLut(pr.Device):
     def __init__(   self,
             name        = "LutCtrl",
