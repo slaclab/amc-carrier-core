@@ -230,11 +230,12 @@ class LutCtrl(pr.Device):
 
         # Check for both channels enabled
         if var.dependencies[0].value() == 0x3:
-            num_dacs = 2
+            num_dacs = 2.0
         elif var.dependencies[0].value() == 0x0:
+            # No channels enabled so return zero
             return 0.0
         else:
-            num_dacs = 1
+            num_dacs = 1.0
 
         # FW configure constants
         spi_clock_rate_hz = 1.0e+6
