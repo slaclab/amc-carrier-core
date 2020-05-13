@@ -45,7 +45,7 @@ entity RtmCryoDet is
       selectRamp      : out   sl;
       rampCnt         : out   slv(31 downto 0);
       -- Copy of RTM DAC Configuration
-      rtmDacwAddr     : in    slv(10 downto 0);
+      rtmDacAddr      : in    slv(10 downto 0);
       rtmDacData      : out   slv(19 downto 0);
       -- AXI-Lite
       axilClk         : in    sl;
@@ -503,7 +503,7 @@ begin
          axiWriteMaster => maxSpiWriteMaster,
          axiWriteSlave  => maxSpiWriteSlave,
          -- Copy of the shadow memory (SHADOW_EN_G=true)
-         shadowAddr     => rtmDacwAddr,
+         shadowAddr     => rtmDacAddr,
          shadowData     => rtmDacData,
          -- SPI Interface
          coreSclk       => maxSck,
