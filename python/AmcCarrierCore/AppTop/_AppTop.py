@@ -65,7 +65,7 @@ class AppTop(pr.Device):
                     numRxLanes   =  numRxLanes[i],
                     numTxLanes   =  numTxLanes[i],
                     enJesdDrp    =  enJesdDrp,
-                    expand       =  False,
+                    expand       =  True,
                 ))
 
         for i in range(2):
