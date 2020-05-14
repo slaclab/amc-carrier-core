@@ -65,7 +65,7 @@ class AppTop(pr.Device):
                     numRxLanes   =  numRxLanes[i],
                     numTxLanes   =  numTxLanes[i],
                     enJesdDrp    =  enJesdDrp,
-                    expand       =  False,
+                    expand       =  True,
                 ))
 
         for i in range(2):
@@ -90,42 +90,78 @@ class AppTop(pr.Device):
             appCore       = self.find(typ=AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
 
-            # Assert GTs Reset
-            for rx in jesdRxDevices:
-                rx.ResetGTs.set(1)
-            for tx in jesdTxDevices:
-                rx.ResetGTs.set(1)
-            self.checkBlocks(recurse=True)
-            time.sleep(0.5)
+            retryCnt = 0
+            retryCntMax = 8
+            while( retryCnt < retryCntMax ):
 
-            # Execute the AppCore.Disable
-            for core in appCore:
-                core.Disable()
+                # Assert GTs Reset
+                for rx in jesdRxDevices:
+                    rx.ResetGTs.set(1)
+                for tx in jesdTxDevices:
+                    rx.ResetGTs.set(1)
+                self.checkBlocks(recurse=True)
+                time.sleep(0.75) # TODO: Optimize this timeout
 
-            # Deassert GTs Reset
-            for rx in jesdRxDevices:
-                rx.ResetGTs.set(0)
-            for tx in jesdTxDevices:
-                tx.ResetGTs.set(0)
-            self.checkBlocks(recurse=True)
-            time.sleep(0.5)
+                for adc in adcDevices:
+                    adc.PDN_SYSREF.set(0x0)
 
-            # Init the AppCore
-            for core in appCore:
-                core.Init()
-            time.sleep(1.0)
+                # Execute the AppCore.Disable
+                for core in appCore:
+                    core.Disable()
 
-            # Special DAC Init procedure
-            for dac in dacDevices:
-                dac.EnableTx.set(0x0)
-                dac.InitJesd.set(0x1)
-                dac.JesdRstN.set(0x0)
-                dac.JesdRstN.set(0x1)
-                dac.InitJesd.set(0x0)
-                dac.EnableTx.set(0x1)
-            if len(dacDevices) > 0:
-                for lmk in lmkDevices:
-                    lmk.PwrUpSysRef()
+                # Deassert GTs Reset
+                for rx in jesdRxDevices:
+                    rx.ResetGTs.set(0)
+                for tx in jesdTxDevices:
+                    tx.ResetGTs.set(0)
+                self.checkBlocks(recurse=True)
+                time.sleep(0.75) # TODO: Optimize this timeout
+
+                # Init the AppCore
+                for core in appCore:
+                    core.Init()
+                time.sleep(1.0) # TODO: Optimize this timeout
+
+                # Special DAC Init procedure
+                for dac in dacDevices:
+                    dac.EnableTx.set(0x0)
+                    time.sleep(0.010) # TODO: Optimize this timeout
+                    dac.InitJesd.set(0x1)
+                    time.sleep(0.010) # TODO: Optimize this timeout
+                    dac.JesdRstN.set(0x0)
+                    time.sleep(0.010) # TODO: Optimize this timeout
+                    dac.JesdRstN.set(0x1)
+                    time.sleep(0.010) # TODO: Optimize this timeout
+                    dac.InitJesd.set(0x0)
+                    time.sleep(0.010) # TODO: Optimize this timeout
+                    dac.EnableTx.set(0x1)
+                    time.sleep(0.010) # TODO: Optimize this timeout
+                if len(dacDevices) > 0:
+                    for lmk in lmkDevices:
+                        lmk.PwrUpSysRef()
+
+                for adc in adcDevices:
+                    adc.PDN_SYSREF.set(0x1)
+                time.sleep(2.0) # TODO: Optimize this timeout
+
+                # Check the link locks
+                linkLock = True
+                for rx in jesdRxDevices:
+                    if( rx.DataValid.get() == 0 ):
+                        print(f'Link Not Locked: {rx.path}.DataValid = {rx.DataValid.get()} ')
+                        linkLock = False
+                for tx in jesdTxDevices:
+                    if( tx.DataValid.get() == 0 ):
+                        print(f'Link Not Locked: {tx.path}.DataValid = {tx.DataValid.get()} ')
+                        linkLock = False
+                if( linkLock ):
+                    break
+                else:
+                    retryCnt += 1
+                    if (retryCnt == retryCntMax):
+                        print('AppTop.Init(): Too many retries and giving up on retries')
+                    else:
+                        print(f'Re-executing AppTop.Init(): retryCnt = {retryCnt}')
 
             # Clear all error counters
             for rx in jesdRxDevices:
@@ -137,9 +173,6 @@ class AppTop(pr.Device):
                 dac.enable.set(True)
                 dac.ClearAlarms()
                 dac.enable.set(enable)
-
-            for adc in adcDevices:
-                adc.PDN_SYSREF.set(0x1)
 
             # Load the DAC signal generator
             for sigGen in sigGenDevices:
