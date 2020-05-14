@@ -155,7 +155,7 @@ class AppTop(pr.Device):
                         print(f'Link Not Locked: {tx.path}.DataValid = {tx.DataValid.get()} ')
                         linkLock = False
                 if( linkLock ):
-                    break;
+                    break
                 else:
                     retryCnt += 1
                     if (retryCnt == retryCntMax):
