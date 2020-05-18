@@ -11,6 +11,8 @@ var classRtmCryoDet =
     [ "startRamp", "classRtmCryoDet.html#ae58de4d11011a9fb600ce38913f86d35", null ],
     [ "selectRamp", "classRtmCryoDet.html#ae2689be17f8ab114a2f72ac342d94dec", null ],
     [ "rampCnt", "classRtmCryoDet.html#a9ceace6a2181a7797ad86438fc626060", null ],
+    [ "rtmDacAddr", "classRtmCryoDet.html#a3df431e6cf1a2face918918014d4811d", null ],
+    [ "rtmDacData", "classRtmCryoDet.html#abe3a899449093bec85bb8e95e32fda35", null ],
     [ "axilClk", "classRtmCryoDet.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
     [ "axilRst", "classRtmCryoDet.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],
     [ "axilReadMaster", "classRtmCryoDet.html#acd3440bbc91f595e14ebb565ef1e05c4", null ],

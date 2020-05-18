@@ -1,5 +1,7 @@
 var NAVTREEINDEX31 =
 {
+"classSi5317a_1_1rtl.html#a4054aec15703630fba1cd5ff57c4a200":[0,0,124,0,40],
+"classSi5317a_1_1rtl.html#a4063361c6d28d02b52a22c06d1105da8":[0,0,124,0,32],
 "classSi5317a_1_1rtl.html#a461fe0c6eae927e61d8120da155736e1":[0,0,124,0,27],
 "classSi5317a_1_1rtl.html#a480d5ba1ebb4c2fca98f7bb5f0778a7b":[0,0,124,0,34],
 "classSi5317a_1_1rtl.html#a536866f257acd4c2d9a8cfca9a6107ef":[0,0,124,0,11],

@@ -1079,33 +1079,33 @@ Reading /home/travis/build/slacl
 
 [RtmCryoDacLut.vhd:368:Info: Elaborating entity axilitemaster for hierarchy axilitemaster::u_axilitemaster]
 
-[RtmCryoDet.vhd:174:Info: Elaborating entity oddre1 for hierarchy oddre1::u_oreg_startramppulse0]
+[RtmCryoDet.vhd:177:Info: Elaborating entity oddre1 for hierarchy oddre1::u_oreg_startramppulse0]
 
-[RtmCryoDet.vhd:179:Info: Elaborating entity obuf for hierarchy obuf::u_obufds_startramppulse0]
+[RtmCryoDet.vhd:182:Info: Elaborating entity obuf for hierarchy obuf::u_obufds_startramppulse0]
 
-[RtmCryoDet.vhd:194:Info: Elaborating entity oddre1 for hierarchy oddre1::u_oreg_startramppulse1]
+[RtmCryoDet.vhd:197:Info: Elaborating entity oddre1 for hierarchy oddre1::u_oreg_startramppulse1]
 
-[RtmCryoDet.vhd:199:Info: Elaborating entity obuf for hierarchy obuf::u_obufds_startramppulse1]
+[RtmCryoDet.vhd:202:Info: Elaborating entity obuf for hierarchy obuf::u_obufds_startramppulse1]
 
-[RtmCryoDet.vhd:219:Info: Elaborating entity oddre1 for hierarchy oddre1::u_oreg_jesdclkdiv]
+[RtmCryoDet.vhd:222:Info: Elaborating entity oddre1 for hierarchy oddre1::u_oreg_jesdclkdiv]
 
-[RtmCryoDet.vhd:225:Info: Elaborating entity obufds for hierarchy obufds::u_obufds_jesdclkdiv]
+[RtmCryoDet.vhd:228:Info: Elaborating entity obufds for hierarchy obufds::u_obufds_jesdclkdiv]
 
-[RtmCryoDet.vhd:234:Info: Elaborating entity synchronizer for hierarchy synchronizer::u_exttrig]
+[RtmCryoDet.vhd:237:Info: Elaborating entity synchronizer for hierarchy synchronizer::u_exttrig]
 
-[RtmCryoDet.vhd:242:Info: Elaborating entity synchronizeroneshot for hierarchy synchronizeroneshot::u_timingtrig]
+[RtmCryoDet.vhd:245:Info: Elaborating entity synchronizeroneshot for hierarchy synchronizeroneshot::u_timingtrig]
 
-[RtmCryoDet.vhd:387:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
+[RtmCryoDet.vhd:390:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
 
-[RtmCryoDet.vhd:413:Info: Elaborating entity RtmCryoDetReg for hierarchy rtmcryodetreg::u_reg]
+[RtmCryoDet.vhd:416:Info: Elaborating entity RtmCryoDetReg for hierarchy rtmcryodetreg::u_reg]
 
-[RtmCryoDet.vhd:435:Info: Elaborating entity RtmCryoSpiMaster for hierarchy rtmcryospimaster::pic_spi]
+[RtmCryoDet.vhd:438:Info: Elaborating entity RtmCryoSpiMaster for hierarchy rtmcryospimaster::pic_spi]
 
-[RtmCryoDet.vhd:456:Info: Elaborating entity RtmCryoDacLut for hierarchy rtmcryodaclut::dac_lut]
+[RtmCryoDet.vhd:459:Info: Elaborating entity RtmCryoDacLut for hierarchy rtmcryodaclut::dac_lut]
 
-[RtmCryoDet.vhd:478:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_dac_lut_xbar]
+[RtmCryoDet.vhd:481:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_dac_lut_xbar]
 
-[RtmCryoDet.vhd:504:Info: Elaborating entity axispimaster for hierarchy axispimaster::max_spi]
+[RtmCryoDet.vhd:512:Info: Elaborating entity axispimaster for hierarchy axispimaster::max_spi]
 
 [RtmCryoDetClkDiv.vhd:65:Info: Elaborating entity slvdelay for hierarchy slvdelay::u_clock_delay]
 
@@ -2034,7 +2034,7 @@ Reading /home/travis/build/slacl
 /home/travis/build/slaclab/amc-carrier-core/AppHardware/AmcMrLlrfUpConvert/v2/AmcMrLlrfUpConvertMapping.vhd:28: warning: documented symbol `_use_ FpgaTypePkgFpgaTypePkg' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppHardware/AmcMrLlrfUpConvert/v2/AmcMrLlrfUpConvertMapping.vhd:30: warning: documented symbol `_library_ unisimunisim' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppHardware/AmcMrLlrfUpConvert/v2/AmcMrLlrfUpConvertMapping.vhd:31: warning: documented symbol `_use_ vcomponentsvcomponents' was not declared or defined.
-/home/travis/build/slaclab/amc-carrier-core/AppHardware/RtmCryoDet/rtl/RtmCryoDet.vhd:143: warning: documented symbol `slv' was not declared or defined.
+/home/travis/build/slaclab/amc-carrier-core/AppHardware/RtmCryoDet/rtl/RtmCryoDet.vhd:146: warning: documented symbol `slv' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppHardware/RtmCryoDet/rtl/RtmCryoDetReg.vhd:87: warning: documented symbol `slv' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppHardware/RtmCryoDet/rtl/RtmCryoDetReg.vhd:88: warning: documented symbol `slv' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AppHardware/RtmMpsLinkNode/v2/RtmMpsLinkNode.vhd:33: warning: documented symbol `in doutslv' was not declared or defined.
