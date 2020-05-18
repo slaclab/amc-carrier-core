@@ -41,8 +41,8 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.add(ti.Lmk04828(          offset=0x00020000,name='LMK',    expand=False))
         self.add(ti.Dac38J84(          offset=0x00040000,name='DAC[0]',numTxLanes=4, expand=False))
         self.add(ti.Dac38J84(          offset=0x00060000,name='DAC[1]',numTxLanes=4, expand=False))
-        self.add(ti.Adc32Rf45(         offset=0x00100000,name='ADC[0]', expand=False))
-        self.add(ti.Adc32Rf45(         offset=0x00180000,name='ADC[1]', expand=False))
+        self.add(ti.Adc32Rf45(         offset=0x00100000,name='ADC[0]', verify=True, expand=False))
+        self.add(ti.Adc32Rf45(         offset=0x00180000,name='ADC[1]', verify=True, expand=False))
 
         ##########
         # Commands
@@ -63,9 +63,12 @@ class AmcMicrowaveMuxCore(pr.Device):
 #            self.ADC[0].Init()
 #            self.ADC[1].Init()
 
-            time.sleep(0.2)
+            time.sleep(0.5) # TODO: Optimize this timeout
+
             self.ADC[0].DigRst()
             self.ADC[1].DigRst()
+
+            time.sleep(0.5) # TODO: Optimize this timeout
 
             # pulse SysRef
             self.LMK.PwrUpSysRef()
@@ -127,23 +130,31 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
-
         self._root.checkBlocks(recurse=True)
-        self.ADC[0].HW_RST.set(0x1)
-        self.ADC[1].HW_RST.set(0x1)
 
-        self.ADC[0].HW_RST.set(0x0)
-        self.ADC[1].HW_RST.set(0x0)
-
-        time.sleep(0.10)
-
-        # must pulse SYSREF before SPI to ADC
         self.LMK.Init()
+        time.sleep(5.0) # TODO: Optimize this timeout
 
-        self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+        for i in range(2):
+            self.ADC[i].RESET()
+            self.ADC[i].SYNC_TERM_DIS.set(1)
+            self.ADC[i].SYSREF_DEL_LO.set(0x5)
+            self.ADC[i].SYSREF_DEL_EN.set(0x1)
 
-        self._root.checkBlocks(recurse=True)
+            self.ADC[i].PDN_SYSREF.set(0x0)
+            self.ADC[i].SEL_SYSREF_REG.set(0x1)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x1)
+
+            self.ADC[i].PDN_SYSREF.set(0x1)
+            self.ADC[i].SEL_SYSREF_REG.set(0x0)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
+
+        for i in range(2):
+            self.ADC[i].PDN_SYSREF.set(0x0)
+            self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
+            self._root.checkBlocks(recurse=True)
+
         self.ADC[0].Init()
         self.ADC[1].Init()
 

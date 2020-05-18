@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
+-- Description: https://confluence.slac.stanford.edu/x/5WV4DQ
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -44,6 +44,9 @@ entity RtmCryoDet is
       startRamp       : out   sl;
       selectRamp      : out   sl;
       rampCnt         : out   slv(31 downto 0);
+      -- Copy of RTM DAC Configuration
+      rtmDacAddr      : in    slv(10 downto 0);
+      rtmDacData      : out   slv(19 downto 0);
       -- AXI-Lite
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -53,7 +56,7 @@ entity RtmCryoDet is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -165,7 +168,7 @@ begin
    ---------------------------------------------
    U_OREG_startRampPulse0 : ODDRE1
       generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => jesdClk,
          Q  => startRampPulseReg(0),
@@ -185,7 +188,7 @@ begin
    ---------------------------------------------
    U_OREG_startRampPulse1 : ODDRE1
       generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => jesdClk,
          Q  => startRampPulseReg(1),
@@ -210,7 +213,7 @@ begin
    ---------------------------------------------
    U_OREG_jesdClkDiv : ODDRE1
       generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => jesdClk,
          Q  => jesdClkDivReg,
@@ -282,7 +285,7 @@ begin
 
       ------------------------------------------------------------
       -- Debouncing External Triggering
-      ------------------------------------------------------------ 
+      ------------------------------------------------------------
 
       -- Check if external trigger has changed
       if (extTrigSync /= r.startRampExt) then
@@ -305,7 +308,7 @@ begin
 
       ------------------------------------------------------------
       -- Mux the triggers together
-      ------------------------------------------------------------ 
+      ------------------------------------------------------------
 
       -- Check if enabled
       if (enableRamp = '1') then
@@ -324,9 +327,9 @@ begin
 
       ------------------------------------------------------------
       -- Pulse Stretching
-      ------------------------------------------------------------       
+      ------------------------------------------------------------
 
-      -- Check if pulse stretching 
+      -- Check if pulse stretching
       if (r.startRamp = '1') or (r.pulseCnt /= 0) then
          -- Check the counter
          if (r.pulseCnt = pulseWidth) then
@@ -342,9 +345,9 @@ begin
          end if;
       end if;
 
-      ------------------------------------------------------------       
+      ------------------------------------------------------------
       -- Synchronous Reset
-      ------------------------------------------------------------       
+      ------------------------------------------------------------
       if (jesdRst = '1') then
          v := REG_INIT_C;
       end if;
@@ -492,15 +495,20 @@ begin
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
          SPI_SCLK_PERIOD_G => ite(SIMULATION_G, (1.0/AXI_CLK_FREQ_G), (1.0/1.0E+6)))  -- SCLK = 1MHz
       port map (
+         -- AXI-Lite Interface
          axiClk         => axilClk,
          axiRst         => axilRst,
          axiReadMaster  => axilReadMasters(MAX_INDEX_C),
          axiReadSlave   => axilReadSlaves(MAX_INDEX_C),
          axiWriteMaster => maxSpiWriteMaster,
          axiWriteSlave  => maxSpiWriteSlave,
+         -- Copy of the shadow memory (SHADOW_EN_G=true)
+         shadowAddr     => rtmDacAddr,
+         shadowData     => rtmDacData,
+         -- SPI Interface
          coreSclk       => maxSck,
          coreSDin       => maxSdo,
          coreSDout      => maxSdi,
          coreCsb        => maxCsL);
 
-end architecture mapping;
+end mapping;
