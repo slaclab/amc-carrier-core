@@ -41,7 +41,7 @@ repoList  =  [
     ['slaclab/lcls-ued-llrf',   ['thatweaver','jmdewart']],
     ['slaclab/lcls-pcav',       ['thatweaver','jmdewart']],
     ['slaclab/lcls2-pcav',      ['thatweaver','jmdewart']],
-    ['slaclab/lcls2-pcav-test', ['thatweaver','jmdewart']],
+    ['slaclab/lcls2-pcav-test', ['thatweaver','jmdewart','kukhee']],
     ['slaclab/lcls2-timing',    ['thatweaver','jmdewart']],
     ###############################
     # application engineer = ruck314
