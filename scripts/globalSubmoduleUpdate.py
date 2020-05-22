@@ -46,8 +46,8 @@ repoList  =  [
     ###############################
     # application engineer = ruck314
     ###############################
-    ['slaclab/amc-carrier-project-template',['ruck314']],
     ['slaclab/lcls2-llrf',                  ['ruck314']],
+    ['slaclab/amc-carrier-project-template',['ruck314']],
 ]
 
 #############################################################################################
@@ -205,7 +205,7 @@ if __name__ == '__main__':
         repo =  gh.get_repo(name)
 
         # Update Repo submodules
-        # updateRepoSubmodules(repo)
+        updateRepoSubmodules(repo)
 
     # Loop through repos
     for [name, reviewers] in repoList:
