@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ entity BsaBufferControl is
       AXI_CONFIG_G            : AxiConfigType             := AXI_CONFIG_INIT_C);
 
    port (
-      -- AXI-Lite Interface for local registers 
+      -- AXI-Lite Interface for local registers
       axilClk         : in  sl;
       axilRst         : in  sl;
       axilReadMaster  : in  AxiLiteReadMasterType;
@@ -63,7 +63,7 @@ entity BsaBufferControl is
       axisStatusMaster : out AxiStreamMasterType;
       axisStatusSlave  : in  AxiStreamSlaveType := AXI_STREAM_SLAVE_FORCE_C;
 
-      -- AXI4 Interface for DDR 
+      -- AXI4 Interface for DDR
       axiClk         : in  sl;
       axiRst         : in  sl;
       axiWriteMaster : out AxiWriteMasterType;
@@ -488,7 +488,7 @@ begin
 
       ----------------------------------------------------------------------------------------------
       -- Synchronization
-      -- Wait for synchronized strobe signal, then latch the timing message onto the local clock      
+      -- Wait for synchronized strobe signal, then latch the timing message onto the local clock
       ----------------------------------------------------------------------------------------------
       if (diagnosticBusSyncValid = '1' and r.accumulateEn = '0' and r.adderEn = '0' and r.syncRdEn = '0') then
          --  Header data
@@ -515,7 +515,7 @@ begin
          v.adderPhase    := (others => '0');
       end if;
 
-      ----------------------------------------------------------------------------------------------        
+      ----------------------------------------------------------------------------------------------
       -- Reset and output assignment
       ----------------------------------------------------------------------------------------------
       if (axiRst = '1') then

@@ -4,11 +4,11 @@
 -- Description: Module to terminate a dual empty AMC bay
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AmcEmptyDualCore is
    generic (

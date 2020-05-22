@@ -7,11 +7,11 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 AMC Carrier Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 AMC Carrier Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 AMC Carrier Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ entity AppTop is
       axilReadSlave        : out   AxiLiteReadSlaveType;
       axilWriteMaster      : in    AxiLiteWriteMasterType;
       axilWriteSlave       : out   AxiLiteWriteSlaveType;
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : out   sl;
       timingRst            : out   sl;
       timingBus            : in    TimingBusType;
@@ -149,7 +149,7 @@ entity AppTop is
       rtmHsRxN             : in    sl;
       rtmHsTxP             : out   sl;
       rtmHsTxN             : out   sl;
-      -- RTM's Clock Reference 
+      -- RTM's Clock Reference
       genClkP              : in    sl;
       genClkN              : in    sl);
 end AppTop;
@@ -205,11 +205,11 @@ architecture mapping of AppTop is
    signal dacSigStatus : DacSigStatusArray(1 downto 0);
    signal dacSigValids : Slv10Array(1 downto 0);
    signal dacSigValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
-   
-   type WaveMasterArray is array (natural range <>) of AxiStreamMasterArray(WAVEFORM_NUM_LANES_G-1 downto 0);   
-   type WaveSlaveArray is array (natural range <>) of AxiStreamSlaveArray(WAVEFORM_NUM_LANES_G-1 downto 0);   
-   type WaveCtrlArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0);   
-   
+
+   type WaveMasterArray is array (natural range <>) of AxiStreamMasterArray(WAVEFORM_NUM_LANES_G-1 downto 0);
+   type WaveSlaveArray is array (natural range <>) of AxiStreamSlaveArray(WAVEFORM_NUM_LANES_G-1 downto 0);
+   type WaveCtrlArray is array (natural range <>) of AxiStreamCtrlArray(WAVEFORM_NUM_LANES_G-1 downto 0);
+
    signal waveAxisMasterArr : WaveMasterArray(1 downto 0);
    signal waveAxisSlaveArr  : WaveSlaveArray(1 downto 0);
    signal waveAxisCtrlArr   : WaveCtrlArray(1 downto 0);
@@ -299,7 +299,7 @@ begin
 
    ---------------
    -- DAQ MUX Core
-   ---------------            
+   ---------------
    trigCascBay(2) <= trigCascBay(0);    -- to make cross and use generate
    armCascBay(2)  <= armCascBay(0);     -- to make cross and use generate
 
@@ -327,7 +327,7 @@ begin
             -- Cascaded Sw trigger for external connection between modules
             trigCasc_i          => trigCascBay(i+1),
             trigCasc_o          => trigCascBay(i),
-            -- Cascaded Arm trigger for external connection between modules 
+            -- Cascaded Arm trigger for external connection between modules
             armCasc_i           => armCascBay(i+1),
             armCasc_o           => armCascBay(i),
             -- Freeze buffers
@@ -341,7 +341,7 @@ begin
             axilReadSlave       => axilReadSlaves(DAQ_MUX0_INDEX_C+i),
             axilWriteMaster     => axilWriteMasters(DAQ_MUX0_INDEX_C+i),
             axilWriteSlave      => axilWriteSlaves(DAQ_MUX0_INDEX_C+i),
-            -- ADC Input 
+            -- ADC Input
             sampleDataArr_i(0)  => adcValues(i, 0),
             sampleDataArr_i(1)  => adcValues(i, 1),
             sampleDataArr_i(2)  => adcValues(i, 2),
@@ -352,7 +352,7 @@ begin
             sampleDataArr_i(7)  => adcValues(i, 7),
             sampleDataArr_i(8)  => adcValues(i, 8),
             sampleDataArr_i(9)  => adcValues(i, 9),
-            -- DAC Input 
+            -- DAC Input
             sampleDataArr_i(10) => dacValues(i, 0),
             sampleDataArr_i(11) => dacValues(i, 1),
             sampleDataArr_i(12) => dacValues(i, 2),
@@ -363,7 +363,7 @@ begin
             sampleDataArr_i(17) => dacValues(i, 7),
             sampleDataArr_i(18) => dacValues(i, 8),
             sampleDataArr_i(19) => dacValues(i, 9),
-            -- DBG Input             
+            -- DBG Input
             sampleDataArr_i(20) => debugValues(i, 0),
             sampleDataArr_i(21) => debugValues(i, 1),
             sampleDataArr_i(22) => debugValues(i, 2),
@@ -377,15 +377,15 @@ begin
             rxAxisMasterArr_o   => waveAxisMasterArr(i),
             rxAxisSlaveArr_i    => waveAxisSlaveArr(i),
             rxAxisCtrlArr_i     => waveAxisCtrlArr(i));
-            
-         
+
+
       U_WaveLane : for j in WAVEFORM_NUM_LANES_G-1 downto 0 generate
-         
+
          obAppWaveformMasters(i)(j) <= waveAxisMasterArr(i)(j);
-         
+
          waveAxisSlaveArr(i)(j) <= obAppWaveformSlaves(i)(j).slave;
          waveAxisCtrlArr(i)(j)  <= obAppWaveformSlaves(i)(j).ctrl;
-      
+
       end generate U_WaveLane;
 
 
@@ -511,14 +511,14 @@ begin
          AXI_BASE_ADDR_G => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
          JESD_USR_DIV_G  => JESD_USR_DIV_G)
       port map (
-         -- Clocks and resets   
+         -- Clocks and resets
          jesdClk             => jesdClk,
          jesdRst             => jesdRst,
          jesdClk2x           => jesdClk2x,
          jesdRst2x           => jesdRst2x,
          jesdUsrClk          => jesdUsrClk,
          jesdUsrRst          => jesdUsrRst,
-         -- DaqMux/Trig Interface (timingClk domain) 
+         -- DaqMux/Trig Interface (timingClk domain)
          freezeHw            => freezeHw,
          timingTrig          => timingTrig,
          trigHw              => trigHw,
@@ -541,7 +541,7 @@ begin
          dacSigStatus        => dacSigStatus,
          dacSigValids        => dacSigValids,
          dacSigValues        => dacSigValues,
-         -- AXI-Lite Interface (axilClk domain) 
+         -- AXI-Lite Interface (axilClk domain)
          axilClk             => axilClk,
          axilRst             => axilRst,
          axilReadMaster      => axilReadMasters(CORE_INDEX_C),
@@ -551,7 +551,7 @@ begin
          ----------------------
          -- Top Level Interface
          ----------------------
-         -- Timing Interface (timingClk domain)   
+         -- Timing Interface (timingClk domain)
          timingClk           => recTimingClk,
          timingRst           => recTimingRst,
          timingBus           => timingBus,
@@ -611,7 +611,7 @@ begin
          rtmHsRxN            => rtmHsRxN,
          rtmHsTxP            => rtmHsTxP,
          rtmHsTxN            => rtmHsTxN,
-         -- RTM's Clock Reference 
+         -- RTM's Clock Reference
          genClkP             => genClkP,
          genClkN             => genClkN);
 

@@ -4,11 +4,11 @@
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ use surf.jesd204bpkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AmcGenericAdcDacCore is
    generic (
@@ -66,7 +66,7 @@ entity AmcGenericAdcDacCore is
       bcm             : in    sl;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri         : inout slv(4 downto 0);
       jtagSec         : inout slv(4 downto 0);
@@ -166,7 +166,7 @@ architecture mapping of AmcGenericAdcDacCore is
    signal dacVcoSckN  : sl;
    signal dacVcoDinP  : sl;
    signal dacVcoDinN  : sl;
-   -- Pass through Interfaces      
+   -- Pass through Interfaces
    signal fpgaClockP  : sl;
    signal fpgaClockN  : sl;
    signal smaTrigP    : sl;
@@ -181,13 +181,13 @@ architecture mapping of AmcGenericAdcDacCore is
    signal bcmL        : sl;
    signal smaTrigMon  : sl;
    signal adcCalMon   : sl;
-   
-   signal locJesdTxSync : sl;   
+
+   signal locJesdTxSync : sl;
 
 begin
 
    -----------------------
-   -- Generalized Mapping 
+   -- Generalized Mapping
    -----------------------
 
    -- JESD Reference Ports
@@ -240,7 +240,7 @@ begin
    spareP(14) <= dacVcoDinP;
    spareN(14) <= dacVcoDinN;
 
-   -- Pass through Interfaces      
+   -- Pass through Interfaces
    fpgaClkP(0) <= fpgaClockP;
    fpgaClkN(0) <= fpgaClockN;
    syncOutP(3) <= smaTrigP;
@@ -354,8 +354,8 @@ begin
          jesdSyncN => jesdTxSyncN,
          -- JESD Low speed Interface
          jesdSync  => locJesdTxSync);
-         
-   jesdTxSync <= (others=>locJesdTxSync);    
+
+   jesdTxSync <= (others=>locJesdTxSync);
 
    GEN_RX_SYNC :
    for i in 1 downto 0 generate
@@ -396,7 +396,7 @@ begin
 
    -----------------
    -- LMK SPI Module
-   -----------------   
+   -----------------
    SPI_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
@@ -425,7 +425,7 @@ begin
 
    ----------------------
    -- Fast ADC SPI Module
-   ----------------------   
+   ----------------------
    GEN_ADC_SPI : for i in 1 downto 0 generate
       FAST_ADC_SPI : entity surf.AxiSpiMaster
          generic map (
@@ -449,7 +449,7 @@ begin
 
    ----------------------
    -- Fast DAC SPI Module
-   ----------------------     
+   ----------------------
    FAST_SPI_DAC : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
@@ -469,9 +469,9 @@ begin
          coreSDout      => dacMosi,
          coreCsb        => dacCsL);
 
-   ----------------------   
+   ----------------------
    -- SLOW DAC SPI Module
-   ----------------------   
+   ----------------------
    SLOW_SPI_DAC : entity amc_carrier_core.AmcGenericAdcDacVcoSpi
       generic map (
          TPD_G => TPD_G)
@@ -489,9 +489,9 @@ begin
          dacVcoDinP      => dacVcoDinP,
          dacVcoDinN      => dacVcoDinN);
 
-   -----------------------   
+   -----------------------
    -- Misc. Control Module
-   ----------------------- 
+   -----------------------
    U_Ctrl : entity amc_carrier_core.AmcGenericAdcDacCtrl
       generic map (
          TPD_G          => TPD_G,
@@ -521,7 +521,7 @@ begin
          axilWriteSlave  => axilWriteSlaves(CTRL_INDEX_C),
          -----------------------
          -- Application Ports --
-         -----------------------      
+         -----------------------
          -- LMK Ports
          lmkMuxSel       => lmkMuxSel,
          lmkClkSel       => lmkClkSel,
@@ -531,5 +531,5 @@ begin
 
    smaTrigMon <= '0' when(TRIG_CLK_G) else smaTrig;
    adcCalMon  <= '0' when(CAL_CLK_G) else adcCal;
-      
+
 end mapping;

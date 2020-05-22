@@ -7,11 +7,11 @@
 --               https://confluence.slac.stanford.edu/display/ppareg/AmcAxisDaqV2+Requirements
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -70,7 +70,7 @@ entity DaqRegItf is
       trigMode_o    : out sl;
       headerEn_o    : out sl;
 
-      -- DAQ parameters      
+      -- DAQ parameters
       dataSize_o : out slv(31 downto 0);
       rateDiv_o  : out slv(15 downto 0);
       muxSel_o   : out Slv5Array(N_DATA_OUT_G-1 downto 0);
@@ -154,9 +154,9 @@ begin
       port map (
          -- Input Status bit Signals (wrClk domain)
          statusIn(0) => trig_i,
-         -- Output Status bit Signals (rdClk domain)  
+         -- Output Status bit Signals (rdClk domain)
          statusOut   => open,
-         -- Status Bit Counters Signals (rdClk domain) 
+         -- Status Bit Counters Signals (rdClk domain)
          cntRstIn    => r.control(4),
          cntOut      => s_trigCnt,
          -- Clocks and Reset Ports
@@ -246,7 +246,7 @@ begin
                v.axilReadSlave.rdata(7 downto 0)   := toSlv(AXI_ADDR_WIDTH_G,8);
                v.axilReadSlave.rdata(15 downto 8)  := toSlv(N_DATA_IN_G,8);
                v.axilReadSlave.rdata(23 downto 16) := toSlv(N_DATA_OUT_G,8);
-               v.axilReadSlave.rdata(31 downto 24) := x"00";               
+               v.axilReadSlave.rdata(31 downto 24) := x"00";
             when 16#10# to 16#1F# =>    -- ADDR (0x40)
                for I in (N_DATA_OUT_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = I) then
@@ -337,7 +337,7 @@ begin
 
    ------------------------------------------------
    -- Output assignment and synchronization
-   ------------------------------------------------   
+   ------------------------------------------------
    Sync_OUT0 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)

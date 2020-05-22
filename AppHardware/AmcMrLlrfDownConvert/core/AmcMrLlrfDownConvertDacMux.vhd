@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ use surf.AxiLitePkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AmcMrLlrfDownConvertDacMux is
    generic (
@@ -133,7 +133,7 @@ begin
                   v.csL(r.chIndex) := '0';
 
                   -- Latch the value with respect to channel index
-                  -- Latch the value to be shifter in and the value for 
+                  -- Latch the value to be shifter in and the value for
                   -- comparison
                   v.shift                := dacValues(r.chIndex);
                   v.dacValues(r.chIndex) := dacValues(r.chIndex);
@@ -159,7 +159,7 @@ begin
             end if;
          ----------------------------------------------------------------------
          when SCK_HI_S =>
-            -- Set clock (gated with chip select) 
+            -- Set clock (gated with chip select)
             v.sck := not r.csL(r.chIndex);
             -- Increment the counter
             v.cnt := r.cnt + 1;

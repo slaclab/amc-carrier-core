@@ -16,10 +16,10 @@ if { $::env(AMC_TYPE_BAY0) eq {AmcMrLlrfUpConvert}  ||
      $::env(AMC_TYPE_BAY0) eq {AmcMpsSfp} } {
    set temp "$::env(AMC_TYPE_BAY0) uses special JESD mapping"
 } else {
-   loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay0.xdc"  
+   loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay0.xdc"
    if { $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} ||
-        $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {   
-      loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay0Ext.xdc"  
+        $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {
+      loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay0Ext.xdc"
    }
 }
 
@@ -32,9 +32,9 @@ if { $::env(AMC_TYPE_BAY1) eq {AmcMrLlrfUpConvert}  ||
      $::env(AMC_TYPE_BAY1) eq {AmcMpsSfp} } {
    set temp "$::env(AMC_TYPE_BAY1) uses special JESD mapping"
 } else {
-   loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay1.xdc"  
+   loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay1.xdc"
    if { $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} ||
-        $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {   
-      loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay1Ext.xdc"  
+        $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {
+      loadConstraints -path "$::DIR_PATH/xdc/${family}/StandardJesdMapBay1Ext.xdc"
    }
 }

@@ -4,11 +4,11 @@
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_23_C00
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 LLRF Development'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 LLRF Development', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -26,7 +26,7 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.jesd204bPkg.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AmcCryoCore is
    generic (
@@ -47,7 +47,7 @@ entity AmcCryoCore is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri         : inout slv(4 downto 0);
       jtagSec         : inout slv(4 downto 0);
@@ -141,9 +141,9 @@ architecture top_level_app of AmcCryoCore is
    signal jesdRxSyncL    : sl;
    -------------------------------------------------------------------------------------------------
    -- SPI
-   -------------------------------------------------------------------------------------------------   
+   -------------------------------------------------------------------------------------------------
 
-   -- ADC SPI config interface   
+   -- ADC SPI config interface
    signal adcCoreRst  : slv(1 downto 0) := "00";
    signal adcCoreClk  : slv(1 downto 0);
    signal adcCoreDout : slv(1 downto 0);
@@ -157,7 +157,7 @@ architecture top_level_app of AmcCryoCore is
    signal adcSpiDo  : sl;
    signal adcSpiCsb : slv(1 downto 0);
 
-   -- DAC SPI config interface 
+   -- DAC SPI config interface
    signal dacCoreClk  : slv(1 downto 0);
    signal dacCoreDout : slv(1 downto 0);
    signal dacCoreCsb  : slv(1 downto 0);
@@ -181,15 +181,15 @@ architecture top_level_app of AmcCryoCore is
 
 begin
    -----------------------
-   -- Generalized Mapping 
+   -- Generalized Mapping
    -----------------------
 
    -- JESD Reference Ports
    jesdSysRefP <= sysRefP(0);  -- Polarity swapped on page 2 of schematics
    jesdSysRefN <= sysRefN(0);
 
-   sysRefP(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna) 
-   sysRefN(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna) 
+   sysRefP(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna)
+   sysRefN(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna)
 
    -- JESD RX Sync Ports
    syncInP(3) <= jesdRxSyncP(0);
@@ -203,7 +203,7 @@ begin
    jesdTxSyncP(1) <= spareP(8);
    jesdTxSyncN(1) <= spareN(8);
 
-   -- ADC SPI 
+   -- ADC SPI
    spareP(2)   <= adcSpiDo;
    spareN(1)   <= adcSpiClk;
    spareN(2)   <= adcSpiCsb(0);
@@ -426,7 +426,7 @@ begin
 
    -----------------
    -- SPI interface LMK
-   -----------------   
+   -----------------
    U_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,

@@ -17,11 +17,11 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ entity AxisBramFlashBufferRdFsm is
    generic (
       TPD_G              : time     := 1 ns;
       NUM_CH_G           : positive := 1;
-      AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes      
+      AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes
       BUFFER_WIDTH_G     : positive := 8);  -- units of bits
    port (
       -- Write FSM Interface (axisClk domain)
@@ -160,7 +160,7 @@ begin
             if (v.txMaster.tValid = '0') and (v.rdLatecy = 0) then
                -- Increment the counter
                v.rdAddr := r.rdAddr + 1;
-               -- Check the counter               
+               -- Check the counter
                if v.rdAddr(1 downto 0) = "00" then
                   -- Update the data bus
                   v.txMaster.tData(31 downto 0) := rdData(r.idx);
@@ -179,7 +179,7 @@ begin
                   if (v.rdAddr = MAX_CNT_C) then
                      -- Set the EOF bit
                      v.txMaster.tLast := '1';
-                     -- Check for last channel 
+                     -- Check for last channel
                      if (r.idx = (NUM_CH_G-1)) then
                         -- Set the request flag
                         v.ack   := '1';

@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- Note: Do not forget to configure the ATCA crate to drive the clock from the slot#2 MPS link node
 -- For the 7-slot crate:
@@ -10,11 +10,11 @@
 --    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ end MpsMitMsgRx;
 
 architecture rtl of MpsMitMsgRx is
 
-   type StateType is (      
+   type StateType is (
       HEADER0_S,
       HEADER1_S,
       HEADER2_S,
@@ -80,7 +80,7 @@ architecture rtl of MpsMitMsgRx is
    signal rin : RegType;
 
 begin
-  
+
    -- State machine
    comb : process (rst, r, mpsMaster) is
       variable v : RegType;
@@ -105,9 +105,9 @@ begin
             -- Check mitigation flag
             -- Check message size
             -- Check SOF
-            if (mpsMaster.tData(15) /= '1'                            or 
-                mpsMaster.tData(7 downto 0) /= x"0E"                  or 
-                ssiGetUserSof(MPS_AXIS_CONFIG_C,mpsMaster) /= '1'       
+            if (mpsMaster.tData(15) /= '1'                            or
+                mpsMaster.tData(7 downto 0) /= x"0E"                  or
+                ssiGetUserSof(MPS_AXIS_CONFIG_C,mpsMaster) /= '1'
             ) then
                v.intError := '1';
             end if;
@@ -160,7 +160,7 @@ begin
             v.mitMessage.class(r.cnt+1)   := mpsMaster.tData(7  downto 4);
             v.mitMessage.class(r.cnt+2)   := mpsMaster.tData(11 downto 8);
             v.mitMessage.class(r.cnt+3)   := mpsMaster.tData(15 downto 12);
-            
+
             if mpsMaster.tValid = '1' then
                v.cnt := r.cnt + 4;
 

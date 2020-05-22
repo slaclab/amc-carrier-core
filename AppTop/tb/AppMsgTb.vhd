@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AppMsgTb is end AppMsgTb;
 
@@ -83,14 +83,14 @@ begin
          DATA_SIZE_G => DATA_SIZE_C,
          EN_CRC_G    => EN_CRC_C)
       port map (
-         -- Application Messaging Interface (clk domain)      
+         -- Application Messaging Interface (clk domain)
          clk         => clk,
          rst         => rst,
          strobe      => r.strobe,
          header      => r.header,
          timeStamp   => r.timeStamp,
          data        => r.data,
-         tDest       => r.timeStamp(7 downto 0),         
+         tDest       => r.timeStamp(7 downto 0),
          -- Backplane Messaging Interface  (axilClk domain)
          axilClk     => clk,
          axilRst     => rst,
@@ -107,7 +107,7 @@ begin
          DATA_SIZE_G => DATA_SIZE_C,
          EN_CRC_G    => EN_CRC_C)
       port map (
-         -- Application Messaging Interface (clk domain)      
+         -- Application Messaging Interface (clk domain)
          clk         => clk,
          rst         => rst,
          strobe      => rx.strobe,

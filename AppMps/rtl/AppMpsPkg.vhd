@@ -2,11 +2,11 @@
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -28,19 +28,19 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS: Configurations and Constants
-   ---------------------------------------------------   
+   ---------------------------------------------------
    constant MPS_AXIS_CONFIG_C : AxiStreamConfigType := ssiAxiStreamConfig(2);
    constant MPS_CHAN_COUNT_C  : integer             := 24;
    --type SlvMaxChanArray is array (natural range <>) of slv(MPS_CHAN_COUNT_C/4 -1 downto 0);  --one extra
 
    ---------------------------------------------------
    -- Mitigation message record
-   ---------------------------------------------------   
+   ---------------------------------------------------
    constant MPS_MITIGATION_BITS_C : integer := 98;
 
    type MpsMitigationMsgType is record
       strobe    : sl;                   -- valid
-      latchDiag : sl;  -- latch the beam diagnostics with 'tag' 
+      latchDiag : sl;  -- latch the beam diagnostics with 'tag'
       tag       : slv(15 downto 0);
       timeStamp : slv(15 downto 0);
       class     : Slv4Array(15 downto 0);  -- power class limits for each of 16 destinations
@@ -60,14 +60,14 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- Update message
-   ---------------------------------------------------   
+   ---------------------------------------------------
    constant MPS_MESSAGE_BITS_C : integer := 303;
 
    type MpsMessageType is record
       valid     : sl;
       version   : slv(4 downto 0);      -- Message version (wrong version is detected by MpsAppTimeout)
       lcls      : sl;                   -- '0' LCLS-II, '1' LCLS-I
-      inputType : sl;                   -- '0' Digital, '1' Analog      
+      inputType : sl;                   -- '0' Digital, '1' Analog
       timeStamp : slv(15 downto 0);
       appId     : slv(15 downto 0);
       message   : Slv8Array(MPS_CHAN_COUNT_C-1 downto 0);
@@ -78,7 +78,7 @@ package AppMpsPkg is
 
    constant MPS_MESSAGE_INIT_C : MpsMessageType := (
       valid     => '0',
-      version   => (others => '0'),      
+      version   => (others => '0'),
       lcls      => '0',
       inputType => '0',
       timeStamp => (others => '0'),
@@ -93,7 +93,7 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Channel Configuration Constants
-   ---------------------------------------------------   
+   ---------------------------------------------------
    type MpsChanConfigType is record
       THOLD_COUNT_C : integer range 0 to 8;
       LCLS1_EN_C    : boolean;
@@ -113,7 +113,7 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS App Configuration Constants
-   ---------------------------------------------------   
+   ---------------------------------------------------
    type MpsAppConfigType is record
       DIGITAL_EN_C  : boolean;          -- APP is digital
       BYTE_COUNT_C  : integer range 0 to MPS_CHAN_COUNT_C;  -- MPS message bytes max
@@ -131,7 +131,7 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Channel Thold Registers
-   ---------------------------------------------------   
+   ---------------------------------------------------
    type MpsChanTholdType is record
       minTholdEn : sl;
       maxTholdEn : sl;
@@ -149,7 +149,7 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Channel Registers
-   ---------------------------------------------------   
+   ---------------------------------------------------
    type MpsChanRegType is record
       stdTholds  : MpsChanTholdArray(7 downto 0);
       lcls1Thold : MpsChanTholdType;
@@ -169,7 +169,7 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Core Registers
-   ---------------------------------------------------   
+   ---------------------------------------------------
    constant MPS_CORE_REG_BITS_C : integer := 17;
 
    type MpsCoreRegType is record
@@ -192,7 +192,7 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Application Registers
-   ---------------------------------------------------   
+   ---------------------------------------------------
    type MpsAppRegType is record
       mpsCore      : MpsCoreRegType;
       beamDestMask : slv(15 downto 0);
@@ -210,7 +210,7 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Select Data
-   ---------------------------------------------------   
+   ---------------------------------------------------
    type MpsSelectType is record
       valid      : sl;
       timeStamp  : slv(15 downto 0);
@@ -234,7 +234,7 @@ package AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Configuration Function
-   ---------------------------------------------------   
+   ---------------------------------------------------
    function getMpsAppConfig (app : AppType) return MpsAppConfigType;
 
 end package AppMpsPkg;
@@ -243,7 +243,7 @@ package body AppMpsPkg is
 
    ---------------------------------------------------
    -- Mitigation message record
-   ---------------------------------------------------   
+   ---------------------------------------------------
    function toSlv (m : MpsMitigationMsgType) return slv is
       variable vector : slv(MPS_MITIGATION_BITS_C-1 downto 0) := (others => '0');
       variable i      : integer                               := 0;
@@ -278,7 +278,7 @@ package body AppMpsPkg is
 
    ---------------------------------------------------
    -- Update message
-   ---------------------------------------------------   
+   ---------------------------------------------------
    function toSlv (m : MpsMessageType) return slv is
       variable vector : slv(MPS_MESSAGE_BITS_C-1 downto 0) := (others => '0');
       variable i      : integer                            := 0;
@@ -328,7 +328,7 @@ package body AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Core Registers
-   ---------------------------------------------------   
+   ---------------------------------------------------
    function toSlv (m : MpsCoreRegType) return slv is
       variable vector : slv(MPS_CORE_REG_BITS_C-1 downto 0) := (others => '0');
       variable i      : integer                             := 0;
@@ -357,7 +357,7 @@ package body AppMpsPkg is
 
    ---------------------------------------------------
    -- MPS Configuration Function
-   ---------------------------------------------------   
+   ---------------------------------------------------
    -- See https://docs.google.com/spreadsheets/d/1BwDq9yZhAhpwpiJvPs6E53W_D4USY0Zc7HhFdv3SpEA/edit?usp=sharing
    -- for associated spreadsheet
    function getMpsAppConfig (app : AppType) return MpsAppConfigType is
@@ -456,7 +456,7 @@ package body AppMpsPkg is
 
         when others =>
             NULL;
-            
+
       end case;
 
       return ret;

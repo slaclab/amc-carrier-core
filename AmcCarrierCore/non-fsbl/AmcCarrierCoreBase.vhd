@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -58,8 +58,8 @@ entity AmcCarrierCoreBase is
       APP_TYPE_G             : AppType;
       WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
       WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
-      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB  
-      MPS_SLOT_G             : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
+      MPS_SLOT_G             : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -72,7 +72,7 @@ entity AmcCarrierCoreBase is
       axilReadSlave        : in    AxiLiteReadSlaveType;
       axilWriteMaster      : out   AxiLiteWriteMasterType;
       axilWriteSlave       : in    AxiLiteWriteSlaveType;
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : in    sl;
       timingRst            : in    sl;
       timingBus            : out   TimingBusType;
@@ -255,9 +255,9 @@ begin
    ethPhyReady <= ethLinkUp;
    timingBus   <= timingBusIntf;
 
-   ----------------------------------   
+   ----------------------------------
    -- Register Address Mapping Module
-   ----------------------------------   
+   ----------------------------------
    U_SysReg : entity amc_carrier_core.AmcCarrierSysReg
       generic map (
          TPD_G        => TPD_G,
@@ -306,7 +306,7 @@ begin
          ethLinkUp         => ethLinkUp,
          ----------------------
          -- Top Level Interface
-         ----------------------              
+         ----------------------
          -- Application AXI-Lite Interface
          appReadMaster     => axilReadMaster,
          appReadSlave      => axilReadSlave,
@@ -316,7 +316,7 @@ begin
          bsiBus            => bsiBus,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- Crossbar Ports
          xBarSin           => xBarSin,
          xBarSout          => xBarSout,
@@ -427,7 +427,7 @@ begin
          -----------------------
          -- Core Ports to AppTop
          -----------------------
-         -- Timing Interface (timingClk domain) 
+         -- Timing Interface (timingClk domain)
          timingClk            => timingClk,
          timingRst            => timingRst,
          timingBusIntf        => timingBusIntf,
@@ -470,9 +470,9 @@ begin
          gthFabClk            => gthFabClk,
          stableClk            => stableClk,
          stableRst            => stableRst,
-         ------------------------         
+         ------------------------
          -- Core Ports to Wrapper
-         ------------------------         
+         ------------------------
          -- AXI-Lite Master bus
          axilReadMasters      => axilReadMasters,
          axilReadSlaves       => axilReadSlaves,

@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -144,9 +144,9 @@ begin
    -- Output core reg
    mpsCoreReg <= mpsReg.mpsCore;
 
-   --------------------------------- 
+   ---------------------------------
    -- Registers
-   --------------------------------- 
+   ---------------------------------
    U_AppMpsReg : entity amc_carrier_core.AppMpsReg
       generic map (
          TPD_G           => TPD_G,
@@ -164,9 +164,9 @@ begin
          mpsMsgDrop      => mpsMsgDrop,
          mpsAppRegisters => mpsReg);
 
-   --------------------------------- 
+   ---------------------------------
    -- Pattern decode and threshold select
-   --------------------------------- 
+   ---------------------------------
    U_AppMpsSelect : entity amc_carrier_core.AppMpsSelect
       generic map (
          TPD_G        => TPD_G,
@@ -181,9 +181,9 @@ begin
          mpsReg        => mpsReg,
          mpsSelect     => mpsSelect);
 
-   --------------------------------- 
+   ---------------------------------
    -- Thresholds
-   --------------------------------- 
+   ---------------------------------
    comb : process (axilRst, mpsReg, mpsSelect, r) is
       variable v       : RegType;
       variable chan    : integer;
@@ -195,7 +195,7 @@ begin
 
       if mpsReg.mpsCore.lcls1Mode = '1' then
          v.mpsMessage := mpsMessageInit(APP_CONFIG_C.LCLS1_COUNT_C);
-      else 
+      else
          v.mpsMessage := mpsMessageInit(APP_CONFIG_C.LCLS2_COUNT_C);
       end if;
 
@@ -291,9 +291,9 @@ begin
       end if;
    end process seq;
 
-   --------------------------------- 
+   ---------------------------------
    -- MPS Message Generator
-   --------------------------------- 
+   ---------------------------------
    U_MsgGen : entity amc_carrier_core.MpsMsgCore
       generic map (
          TPD_G            => TPD_G,

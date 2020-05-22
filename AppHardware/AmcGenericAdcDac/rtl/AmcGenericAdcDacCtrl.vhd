@@ -4,11 +4,11 @@
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ entity AmcGenericAdcDacCtrl is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- LMK Ports
       lmkMuxSel       : out sl;
       lmkClkSel       : out slv(1 downto 0);
@@ -199,9 +199,9 @@ begin
          statusIn(7 downto 6) => lemoDin,
          statusIn(5 downto 4) => lemoDout,
          statusIn(3 downto 0) => adcValids,
-         -- Output Status bit Signals (rdClk domain)  
+         -- Output Status bit Signals (rdClk domain)
          statusOut            => statusOut,
-         -- Status Bit Counters Signals (rdClk domain) 
+         -- Status Bit Counters Signals (rdClk domain)
          cntRstIn             => r.cntRst,
          rollOverEnIn         => r.rollOverEn,
          cntOut               => statusCnt,

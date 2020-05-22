@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ package AmcCarrierSysRegPkg is
       3 => "00",   -- OUT[3] = IN[0], DIST1 = RTM0 (LCLS-I)
       2 => "00",   -- OUT[2] = IN[0], DIST0 = RTM0 (LCLS-I)
       1 => "00",   -- OUT[1] = IN[0], FPGA  = RTM0 (LCLS-I)
-      0 => "00");  -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)      
+      0 => "00");  -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)
 
    constant XBAR_APP_NODE_C : Slv2Array(3 downto 0) := (
       3 => "00",   -- OUT[3] = IN[0], DIST1 = RTM0

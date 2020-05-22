@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -67,8 +67,8 @@ entity AmcCarrierTiming is
       obTimingEthMsgSlave  : in  AxiStreamSlaveType;
       ----------------------
       -- Top Level Interface
-      ----------------------      
-      -- Timing Interface 
+      ----------------------
+      -- Timing Interface
       recTimingClk         : out sl;
       recTimingRst         : out sl;
       appTimingClk         : in  sl;
@@ -82,7 +82,7 @@ entity AmcCarrierTiming is
       appTimingTrig        : out TimingTrigType;
       ----------------
       -- Core Ports --
-      ----------------   
+      ----------------
       -- LCLS Timing Ports
       timingRxP            : in  sl;
       timingRxN            : in  sl;
@@ -156,7 +156,7 @@ begin
 
    --------------------------
    -- AXI-Lite: Crossbar Core
-   --------------------------  
+   --------------------------
    U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,

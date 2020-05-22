@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ end AmcCarrierRssi;
 
 architecture mapping of AmcCarrierRssi is
 
-   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
+   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
    constant WINDOW_ADDR_SIZE_C : positive := 3;
    constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
    constant MAX_RETRANS_CNT_C  : positive := ite((WINDOW_ADDR_SIZE_C > 1), WINDOW_ADDR_SIZE_C-1, 1);
@@ -107,7 +107,7 @@ begin
 
    --------------------------
    -- AXI-Lite: Crossbar Core
-   --------------------------  
+   --------------------------
    U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
@@ -133,14 +133,14 @@ begin
       generic map (
          TPD_G               => TPD_G,
          SYNTH_MODE_G        => "xpm",
-         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),            
+         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),
          APP_STREAMS_G       => 5,
          APP_STREAM_ROUTES_G => (
             0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
             1                => X"01",  -- TDEST 1 routed to stream 1 (loopback)
             2                => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
             3                => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
-            4                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
+            4                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
          CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G      => TIMEOUT_C,
          SERVER_G            => true,
@@ -176,7 +176,7 @@ begin
          axilReadSlave     => axilReadSlaves(0),
          axilWriteMaster   => axilWriteMasters(0),
          axilWriteSlave    => axilWriteSlaves(0));
-         
+
    U_RssiTspObFifo_0 : entity amc_carrier_core.AmcCarrierRssiObFifo
       generic map (
          TPD_G    => TPD_G,
@@ -190,7 +190,7 @@ begin
          obRssiTspSlave  => obRssiTspSlaves(0),
          -- Interface to UDP Server engine
          ibServerMaster  => ibServerMasters(0),
-         ibServerSlave   => ibServerSlaves(0));          
+         ibServerSlave   => ibServerSlaves(0));
 
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
@@ -208,7 +208,7 @@ begin
          sAxisRst         => axilRst,
          sAxisMaster      => rssiObMasters(0),
          sAxisSlave       => rssiObSlaves(0),
-         -- AXIS Master Interface (mAxisClk domain) 
+         -- AXIS Master Interface (mAxisClk domain)
          mAxisClk         => axilClk,
          mAxisRst         => axilRst,
          mAxisMaster      => rssiIbMasters(0),
@@ -279,7 +279,7 @@ begin
       generic map (
          TPD_G               => TPD_G,
          SYNTH_MODE_G        => "xpm",
-         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),              
+         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),
          APP_STREAMS_G       => 2,
          APP_STREAM_ROUTES_G => (
             0                => X"04",  -- TDEST 4 routed to stream 0 (MEM)
@@ -333,7 +333,7 @@ begin
          obRssiTspSlave  => obRssiTspSlaves(1),
          -- Interface to UDP Server engine
          ibServerMaster  => ibServerMasters(1),
-         ibServerSlave   => ibServerSlaves(1));  
+         ibServerSlave   => ibServerSlaves(1));
 
    -----------------------------
    -- Memory Access: TDEST = 0x4

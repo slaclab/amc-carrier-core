@@ -4,11 +4,11 @@
 -- Description: Simulation Testbed for testing the RtmCryoDacLutTb module
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity RtmCryoDacLutTb is end RtmCryoDacLutTb;
 
@@ -84,7 +84,7 @@ begin
          axilWriteSlave  => axilWriteSlave,
          -----------------------
          -- Application Ports --
-         -----------------------      
+         -----------------------
          -- RTM's Low Speed Ports
          rtmLsP          => rtmLsP,
          rtmLsN          => rtmLsN,
@@ -112,11 +112,11 @@ begin
       axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0048", x"0000_00FF", true);
 
       -- -- maxAddr = 0x0
-      -- axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0044", x"0000_0000", true);    
-      
+      -- axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0044", x"0000_0000", true);
+
       -- enableCh = 0x1
-      axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0044", x"0000_0001", true);          
-      
+      axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0044", x"0000_0001", true);
+
       -- continuous = 0x1
       axiLiteBusSimWrite (axilClk, axilWriteMaster, axilWriteSlave, x"0030_0040", x"0000_0001", true);
 
