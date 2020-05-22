@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ package AppTopPkg is
       start => (others => '0'));
 
    type DacSigStatusType is record
-      sow     : slv(4 downto 0);  -- Start of waveform strobe (running = '1' and RAM Address = 0x0)   
+      sow     : slv(4 downto 0);  -- Start of waveform strobe (running = '1' and RAM Address = 0x0)
       running : slv(4 downto 0);
    end record;
    type DacSigStatusArray is array (natural range <>) of DacSigStatusType;

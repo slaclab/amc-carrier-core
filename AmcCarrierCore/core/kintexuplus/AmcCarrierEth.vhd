@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ entity AmcCarrierEth is
    port (
       -- Local Configuration and status
       localMac             : in  slv(47 downto 0);  --  big-Endian configuration
-      localIp              : in  slv(31 downto 0);  --  big-Endian configuration   
+      localIp              : in  slv(31 downto 0);  --  big-Endian configuration
       ethPhyReady          : out sl;
       -- Master AXI-Lite Interface
       mAxilReadMasters     : out AxiLiteReadMasterArray(1 downto 0);
@@ -81,7 +81,7 @@ entity AmcCarrierEth is
       ibBpMsgServerSlave   : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
-      ----------------   
+      ----------------
       -- ETH Ports
       ethRxP               : in  slv(3 downto 0);
       ethRxN               : in  slv(3 downto 0);
@@ -107,7 +107,7 @@ architecture mapping of AmcCarrierEth is
 
    ------------------------------------------
    --     UDP Server Configurations        --
-   ------------------------------------------   
+   ------------------------------------------
 
    constant SERVER_SIZE_C : positive := 7;
 
@@ -120,17 +120,17 @@ architecture mapping of AmcCarrierEth is
    constant UDP_SRV_RSSI_ILEAVE_IDX_C : natural := 6;
 
    constant SERVER_PORTS_C : PositiveArray(SERVER_SIZE_C-1 downto 0) := (
-      UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC 
+      UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC
       UDP_SRV_SRPV0_IDX_C       => 8192,  -- Legacy SRPv0 register access (still used for remote FPGA reprogramming)
       UDP_SRV_RSSI0_IDX_C       => 8193,  -- Legacy Non-interleaved RSSI for Register access and ASYNC messages
       UDP_SRV_RSSI1_IDX_C       => 8194,  -- Legacy Non-interleaved RSSI for bulk data transfer
       UDP_SRV_BP_MGS_IDX_C      => 8195,  -- Backplane Messaging
       UDP_SRV_TIMING_IDX_C      => 8197,  -- Timing ASYNC Messaging
-      UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI 
+      UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI
 
    ------------------------------------------
    --     UDP Client Configurations        --
-   ------------------------------------------  
+   ------------------------------------------
 
    constant CLIENT_SIZE_C : positive := 1;
 
@@ -140,8 +140,8 @@ architecture mapping of AmcCarrierEth is
       UDP_CLT_BP_MGS_IDX_C => 8196);    -- Backplane Messaging
 
    ------------------------------------------
-   --                Signals               -- 
-   ------------------------------------------ 
+   --                Signals               --
+   ------------------------------------------
 
    signal ibMacMaster : AxiStreamMasterType;
    signal ibMacSlave  : AxiStreamSlaveType;
@@ -169,7 +169,7 @@ begin
 
    --------------------------
    -- AXI-Lite: Crossbar Core
-   --------------------------  
+   --------------------------
    U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
@@ -202,7 +202,7 @@ begin
          port map (
             -- Local Configurations
             localMac       => localMac,
-            -- Streaming DMA Interface 
+            -- Streaming DMA Interface
             dmaClk         => axilClk,
             dmaRst         => axilRst,
             dmaIbMaster    => obMacMaster,
@@ -243,13 +243,13 @@ begin
             CLKIN_PERIOD_G     => 6.4,   -- 156.25 MHz
             DIVCLK_DIVIDE_G    => 5,     -- 31.25 MHz = (156.25 MHz/5)
             CLKFBOUT_MULT_F_G  => 32.0,  -- 1 GHz = (32 x 31.25 MHz)
-            CLKOUT0_DIVIDE_F_G => 8.0,   -- 125 MHz = (1.0 GHz/8)         
+            CLKOUT0_DIVIDE_F_G => 8.0,   -- 125 MHz = (1.0 GHz/8)
             -- AXI Streaming Configurations
             AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
          port map (
             -- Local Configurations
             localMac(0)     => localMac,
-            -- Streaming DMA Interface 
+            -- Streaming DMA Interface
             dmaClk(0)       => axilClk,
             dmaRst(0)       => axilRst,
             dmaIbMasters(0) => obMacMaster,
@@ -298,8 +298,8 @@ begin
          -- IPv4/ARP Generics
          CLK_FREQ_G     => AXI_CLK_FREQ_C,  -- In units of Hz
          COMM_TIMEOUT_G => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
-         VLAN_G         => false,       -- no VLAN       
-         DHCP_G         => false)       -- no DHCP       
+         VLAN_G         => false,       -- no VLAN
+         DHCP_G         => false)       -- no DHCP
       port map (
          -- Local Configurations
          localMac        => localMac,
@@ -356,7 +356,7 @@ begin
          GEN_SYNC_FIFO_G     => true,
          AXI_STREAM_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
-         -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+         -- Streaming Slave (Rx) Interface (sAxisClk domain)
          sAxisClk            => axilClk,
          sAxisRst            => axilRst,
          sAxisMaster         => obServerMasters(UDP_SRV_SRPV0_IDX_C),

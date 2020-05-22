@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ entity AppMsgIb is
       AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes
       FIFO_ADDR_WIDTH_G  : positive := 9);  -- units of bits
    port (
-      -- Application Messaging Interface (clk domain)      
+      -- Application Messaging Interface (clk domain)
       clk         : in  sl;
       rst         : in  sl;
       strobe      : out sl;
@@ -131,7 +131,7 @@ architecture rtl of AppMsgIb is
    signal crcResult : slv(31 downto 0) := (others => '0');
 
    -- attribute dont_touch             : string;
-   -- attribute dont_touch of r        : signal is "TRUE";   
+   -- attribute dont_touch of r        : signal is "TRUE";
 
 begin
 
@@ -254,7 +254,7 @@ begin
       ----------------------------------------------------------------------
       end case;
 
-      -- Combinatorial outputs before the reset   
+      -- Combinatorial outputs before the reset
       rxSlave <= v.rxSlave;
 
       -- Reset
@@ -282,7 +282,7 @@ begin
          port map (
             crcClk       => axilClk,
             crcReset     => r.crcRst,
-            crcDataWidth => "011",      -- 4 bytes 
+            crcDataWidth => "011",      -- 4 bytes
             crcDataValid => r.crcValid,
             crcIn        => r.crcData,
             crcOut       => crcResult);

@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -58,23 +58,23 @@ entity AppTopJesd204b is
       -- Sample data output (Use if external data acquisition core is attached)
       sampleDataArr_o : out sampleDataArray(6 downto 0);
       dataValidVec_o  : out slv(6 downto 0);
-      -- Sample data input (Use if external data generator core is attached)      
+      -- Sample data input (Use if external data generator core is attached)
       sampleDataArr_i : in  sampleDataArray(6 downto 0);
       -------
       -- JESD
       -------
       -- Clocks
-      stableClk       : in  sl;  -- GT needs a stable clock to "boot up"(buffered refClkDiv2) 
-      refClk          : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer   
+      stableClk       : in  sl;  -- GT needs a stable clock to "boot up"(buffered refClkDiv2)
+      refClk          : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer
       devClk_i        : in  sl;         -- Device clock also rxUsrClkIn for MGT
-      devClk2_i       : in  sl;  -- Device clock divided by 2 also rxUsrClk2In for MGT       
-      devRst_i        : in  sl;         -- 
-      devClkActive_i  : in  sl                    := '1';  -- devClk_i MCMM locked      
+      devClk2_i       : in  sl;  -- Device clock divided by 2 also rxUsrClk2In for MGT
+      devRst_i        : in  sl;         --
+      devClkActive_i  : in  sl                    := '1';  -- devClk_i MCMM locked
       -- GTH Ports
       gtTxP           : out slv(6 downto 0);  -- GT Serial Transmit Positive
       gtTxN           : out slv(6 downto 0);  -- GT Serial Transmit Negative
       gtRxP           : in  slv(6 downto 0);  -- GT Serial Receive Positive
-      gtRxN           : in  slv(6 downto 0);  -- GT Serial Receive Negative      
+      gtRxN           : in  slv(6 downto 0);  -- GT Serial Receive Negative
       -- SYSREF for subclass 1 fixed latency
       sysRef_i        : in  sl;
       -- Synchronization output combined from all receivers to be connected to ADC/DAC chips
@@ -246,7 +246,7 @@ begin
 
    ---------------
    -- JESD TX core
-   ---------------         
+   ---------------
    EN_TX_CORE : if (JESD_TX_LANE_G /= 0) generate
       U_Jesd204bTx : entity surf.Jesd204bTx
          generic map (
@@ -286,7 +286,7 @@ begin
 
    -----------------
    -- GTH TX signals
-   -----------------   
+   -----------------
    TX_LANES_GEN : for i in 6 downto 0 generate
 
       process(devClk_i)
@@ -314,7 +314,7 @@ begin
       process(devClk_i)
       begin
          if rising_edge(devClk_i) then
-            -- Help with timing    
+            -- Help with timing
             r_jesdGtRxArr(i).data      <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
             r_jesdGtRxArr(i).dataK     <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
             r_jesdGtRxArr(i).dispErr   <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);

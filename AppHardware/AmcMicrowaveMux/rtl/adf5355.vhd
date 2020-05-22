@@ -4,11 +4,11 @@
 -- Description: SPI Master Wrapper for ADI ADF5355 IC
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ begin
 
       -- State Machine
       case (r.state) is
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when WAIT_AXI_TXN_S =>
             -- Reset the flag
             v.busyOut := '0';
@@ -119,15 +119,15 @@ begin
                -- Next state
                v.state := RD_RESP_S;
             end if;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when RD_RESP_S =>
             -- Reade the bit
             v.axiReadSlave.rdata := cacheData;
-            -- Send the response 
+            -- Send the response
             axiSlaveReadResponse(v.axiReadSlave);
             -- Next state
             v.state              := WAIT_AXI_TXN_S;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when WAIT_CYCLE_S =>
             -- Wait for rdEn to drop
             if (rdEn = '0') then
@@ -136,25 +136,25 @@ begin
                -- Next state
                v.state := WAIT_SPI_TXN_DONE_S;
             end if;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when WAIT_SPI_TXN_DONE_S =>
-            -- Check for read completion 
+            -- Check for read completion
             if (rdEn = '1') then
                -- Next state
                v.state := WAIT_AXI_TXN_S;
             end if;
-      ----------------------------------------------------------------------            
+      ----------------------------------------------------------------------
       end case;
 
-      -- Reset      
+      -- Reset
       if (axiRst = '1') then
          v := REG_INIT_C;
       end if;
 
-      -- Register the variable for next clock cycle      
+      -- Register the variable for next clock cycle
       rin <= v;
 
-      -- Outputs            
+      -- Outputs
       axiWriteSlave <= r.axiWriteSlave;
       axiReadSlave  <= r.axiReadSlave;
       busyOut       <= r.busyOut;

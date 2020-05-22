@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: BootStrap Interface (BSI) to the IPMI's controller (IPMC) 
+-- Description: BootStrap Interface (BSI) to the IPMI's controller (IPMC)
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ architecture rtl of AmcCarrierBsi is
       we             => '0',
       ramData        => x"00",
       bootReq        => '0',
-      bootAddr       => x"04000000",    -- Default to 2nd stage boot 
+      bootAddr       => x"04000000",    -- Default to 2nd stage boot
       slotNumber     => x"00",
       crateId        => x"0000",
       macAddress     => (others => (others => '0')),
@@ -222,7 +222,7 @@ begin
 
    ----------------
    -- Dual port RAM
-   ----------------   
+   ----------------
    U_RAM : entity surf.TrueDualPortRam
       generic map (
          TPD_G        => TPD_G,
@@ -230,7 +230,7 @@ begin
          DATA_WIDTH_G => 8,
          ADDR_WIDTH_G => 8)
       port map (
-         -- Port A     
+         -- Port A
          clka  => axilClk,
          wea   => i2cBramWr(0),
          addra => i2cBramAddr(0),
@@ -245,7 +245,7 @@ begin
 
    ------------------
    -- Single port ROM
-   ------------------ 
+   ------------------
    process (axilClk) is
    begin
       if (rising_edge(axilClk)) then
@@ -253,9 +253,9 @@ begin
       end if;
    end process;
 
-   --------------------- 
+   ---------------------
    -- AXI Lite Interface
-   --------------------- 
+   ---------------------
    comb : process (axilReadMaster, axilRst, axilWriteMaster, ddrMemError,
                    ddrMemReady, ethLinkUp, r, ramData, upTimeCnt) is
       variable v      : RegType;
@@ -320,7 +320,7 @@ begin
             when x"F6" => v.bootAddr(7 downto 0)   := ramData;
             ---------------------------------------
             -- Check for BUILD_INFO_C.fwVersion
-            ---------------------------------------            
+            ---------------------------------------
             when x"F5" =>
                v.we      := '1';
                v.ramData := BUILD_INFO_C.fwVersion(31 downto 24);
@@ -335,7 +335,7 @@ begin
                v.ramData := BUILD_INFO_C.fwVersion(7 downto 0);
             ---------------------------------------
             -- Check for DDR Memory Status
-            ---------------------------------------               
+            ---------------------------------------
             when x"F1" =>
                v.we         := '1';
                v.ramData(0) := ddrMemError;
@@ -345,7 +345,7 @@ begin
                v.ramData(0) := ddrMemReady;
             ----------------------------------------
             -- Check for AxiVersion's Uptime Counter
-            ----------------------------------------            
+            ----------------------------------------
             when x"EF" =>
                v.we      := '1';
                v.ramData := upTimeCnt(31 downto 24);
@@ -360,7 +360,7 @@ begin
                v.ramData := upTimeCnt(7 downto 0);
             --------------------------------------
             -- Check for Ethernet's Uptime Counter
-            --------------------------------------            
+            --------------------------------------
             when x"EB" =>
                v.we      := '1';
                v.ramData := r.ethUpTimeCnt(31 downto 24);

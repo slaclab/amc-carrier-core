@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ entity AmcMrLlrfGen2UpConvertMapping is
       recRst        : in    sl;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri       : inout slv(4 downto 0);
       jtagSec       : inout slv(4 downto 0);
@@ -87,12 +87,12 @@ architecture mapping of AmcMrLlrfGen2UpConvertMapping is
 
    signal timingTrigReg : sl;
 
-   signal locJesdTxSync : sl;   
+   signal locJesdTxSync : sl;
 
 begin
 
    -----------------------
-   -- Generalized Mapping 
+   -- Generalized Mapping
    -----------------------
    U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
@@ -177,7 +177,7 @@ begin
    DATA_OUT : if (TIMING_TRIG_MODE_G = false) generate
       U_ODDR : ODDRE1
          generic map (
-            SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))      
+            SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
          port map (
             C  => recClk,
             Q  => timingTrigReg,
@@ -222,7 +222,7 @@ begin
          jesdSyncN => spareN(9),
          -- JESD Low speed Interface
          jesdSync  => locJesdTxSync);
-         
-   jesdTxSync <= (others=>locJesdTxSync);    
+
+   jesdTxSync <= (others=>locJesdTxSync);
 
 end mapping;

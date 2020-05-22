@@ -1,20 +1,20 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description:   
---    The acquisition is continuous. Conversion time is defined by N_SPI_CYCLES_G. 
+-- Description:
+--    The acquisition is continuous. Conversion time is defined by N_SPI_CYCLES_G.
 --    The AXI lite reads Inputs using internal sequencer mode one at a time.
---    First two reads after power up are invalid. 
+--    First two reads after power up are invalid.
 --    Reading/writing after conversion (RAC)
 --    Default configuration is s_cfgReg[15:0] = 0xFFFC
---    
+--
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -30,7 +30,7 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AxiSpiAd7682 is
    generic (
@@ -39,7 +39,7 @@ entity AxiSpiAd7682 is
       CLK_PERIOD_G      : real     := 6.4E-9;
       SPI_SCLK_PERIOD_G : real     := 100.0E-6;
       N_INPUTS_G        : positive := 4;  -- 4-AD7682, 8-AD7689
-      N_SPI_CYCLES_G    : positive := 32  -- Number of SPI clock cycles between two acquisitions      
+      N_SPI_CYCLES_G    : positive := 32  -- Number of SPI clock cycles between two acquisitions
       );
    port (
       axiClk : in sl;
@@ -75,7 +75,7 @@ architecture rtl of AxiSpiAd7682 is
       perCnt    : integer range 0 to SPI_CLK_PERIOD_CYCLES_C;
       sckCnt    : integer range 0 to N_SPI_CYCLES_G;
       inDataCnt : integer range 0 to N_INPUTS_G;
-      --      
+      --
       state     : StateType;
    end record RegType;
 
@@ -86,7 +86,7 @@ architecture rtl of AxiSpiAd7682 is
       wrEn      => '0',
       inDataArr => (others => (others => '0')),
       writeCfg  => '0',
-      -- 
+      --
       perCnt    => 0,
       sckCnt    => 0,
       inDataCnt => 2,  -- To align data at powerup since first two acquisitions are invalid

@@ -4,11 +4,11 @@
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C00
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ entity RtmRfInterlock is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -211,7 +211,7 @@ begin
 
    U_stndbyTrigReg : ODDRE1
       generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => recClk,
          Q  => stndbyTrigLReg,
@@ -227,7 +227,7 @@ begin
 
    U_accelTrigReg : ODDRE1
       generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))     
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => recClk,
          Q  => accelTrigReg,
@@ -288,7 +288,7 @@ begin
          OB => rtmLsN(4));
 
    ----------------------------------
-   -- Note inverted because of HW bug   
+   -- Note inverted because of HW bug
    ----------------------------------
    stndbyTrigL <= not(stndbyTrig);
    tuneSledL   <= not(tuneSled);

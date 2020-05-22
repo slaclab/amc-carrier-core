@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -182,7 +182,7 @@ begin
          IB    => jesdClkN(3),
          CEB   => '0',
          ODIV2 => open,  -- 185 MHz, Frequency the same as jesdRefClk
-         O     => refClkL);             -- 185 MHz    
+         O     => refClkL);             -- 185 MHz
 
    -- Choose Right coulumn reference
    GEN_GTH_R_CLK : for i in 2 downto 0 generate
@@ -197,7 +197,7 @@ begin
             IB    => jesdClkN(i),
             CEB   => '0',
             ODIV2 => refClkDiv2Vec(i),  -- 185 MHz, Frequency the same as jesdRefClk
-            O     => refClkVec(i));     -- 185 MHz     
+            O     => refClkVec(i));     -- 185 MHz
 
       U_BUFG_GT : BUFG_GT
          port map (
@@ -243,7 +243,7 @@ begin
          clkOut          => clkOut,
          rstOut          => resetOut,
          locked          => locked,
-         -- AXI-Lite Interface 
+         -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
          axilReadMaster  => axilReadMasters(MMCM_INDEX_C),

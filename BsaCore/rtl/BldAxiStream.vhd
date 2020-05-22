@@ -1,14 +1,14 @@
 -----------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Timing Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Timing Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Timing Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -430,7 +430,7 @@ begin
             when IDLE_S =>
                v.master.tValid := '0';
                if (csync.enable = '1' and
---                             intAxisCtrl.pause = '0' and 
+--                             intAxisCtrl.pause = '0' and
                    diagnosticBus.strobe = '1' and
                    diagnosticBus.timingMessage.beamRequest(0) = '1') then
                   v.channelMaskL := csync.channelMask;

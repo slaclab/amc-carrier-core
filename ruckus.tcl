@@ -7,26 +7,26 @@ proc MyVersionCheck { } {
    set VersionNumber [version -short]
    set supported "2017.4 2018.1 2018.2 2018.3 2019.1 2019.2"
    set retVar -1
-   
+
    # Generate error message
    set errMsg "\n\n*********************************************************\n"
    set errMsg "${errMsg}Your Vivado Version Vivado   = ${VersionNumber}\n"
    set errMsg "${errMsg}However, Vivado Version Lock = ${supported}\n"
    set errMsg "${errMsg}You need to change your Vivado software to one of these versions\n"
-   set errMsg "${errMsg}*********************************************************\n\n"  
-   
+   set errMsg "${errMsg}*********************************************************\n\n"
+
    # Loop through the different support version list
    foreach pntr ${supported} {
       if { ${VersionNumber} == ${pntr} } {
-         set retVar 0      
+         set retVar 0
       }
    }
-   
+
    # Check for no support version detected
    if  { ${retVar} < 0 } {
       puts ${errMsg}
    }
-   
+
    return ${retVar}
 }
 
@@ -52,11 +52,11 @@ if { ${family} == "kintexuplus" } {
       exit -1
    }
 # Check Kintex Ultrascale
-} elseif { ${family} == "kintexu" } {  
+} elseif { ${family} == "kintexu" } {
    if { [MyVersionCheck] < 0 } {
       exit -1
    }
-} else { 
+} else {
    puts "\n\nERROR: Invalid PRJ_PART was defined in the Makefile\n\n"; exit -1
 }
 

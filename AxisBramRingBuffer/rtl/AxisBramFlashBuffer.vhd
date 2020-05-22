@@ -17,11 +17,11 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ entity AxisBramFlashBuffer is
    generic (
       TPD_G              : time     := 1 ns;
       NUM_CH_G           : positive := 1;
-      AXIS_TDATA_WIDTH_G : positive := 8;   -- units of bytes            
+      AXIS_TDATA_WIDTH_G : positive := 8;   -- units of bytes
       BUFFER_WIDTH_G     : positive := 8);  -- DEPTH_G = 2**WIDTH_G
    port (
       -- Input Data Interface (appClk domain)
@@ -152,7 +152,7 @@ begin
             DATA_WIDTH_G  => 32,
             ADDR_WIDTH_G  => BUFFER_WIDTH_G)
          port map (
-            -- Port A     
+            -- Port A
             clka  => appClk,
             wea   => wrEn,
             addra => wrAddr,
@@ -192,9 +192,9 @@ begin
          axisMaster => axisMaster,
          axisSlave  => axisSlave);
 
-   --------------------- 
+   ---------------------
    -- AXI Lite Interface
-   --------------------- 
+   ---------------------
    comb : process (axilReadMaster, axilRst, axilWriteMaster, r) is
       variable v      : RegType;
       variable regCon : AxiLiteEndPointType;

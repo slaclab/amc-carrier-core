@@ -4,11 +4,11 @@
 -- Description: Adds a "store + forwarding" FIFO and throttling of the RSSI TSP outbound interface
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ architecture mapping of AmcCarrierRssiObFifo is
 
    constant AXIS_CONFIG_C : AxiStreamConfigType := (
       TSTRB_EN_C    => EMAC_AXIS_CONFIG_C.TSTRB_EN_C,
-      TDATA_BYTES_C => 2,               -- 2Bytes x 156.25 MHz x 8b/B = 2.5 Gb/s throttle 
+      TDATA_BYTES_C => 2,               -- 2Bytes x 156.25 MHz x 8b/B = 2.5 Gb/s throttle
       TDEST_BITS_C  => EMAC_AXIS_CONFIG_C.TDEST_BITS_C,
       TID_BITS_C    => EMAC_AXIS_CONFIG_C.TID_BITS_C,
       TKEEP_MODE_C  => EMAC_AXIS_CONFIG_C.TKEEP_MODE_C,
@@ -92,8 +92,8 @@ begin
             MEMORY_TYPE_G       => "block",
             GEN_SYNC_FIFO_G     => true,
             INT_WIDTH_SELECT_G  => "CUSTOM",  -- Force internal width
-            INT_DATA_WIDTH_G    => 16,        -- 128-bit         
-            FIFO_ADDR_WIDTH_G   => 10,        -- 16kB/FIFO = 128-bits x 1024 entries         
+            INT_DATA_WIDTH_G    => 16,        -- 128-bit
+            FIFO_ADDR_WIDTH_G   => 10,        -- 16kB/FIFO = 128-bits x 1024 entries
             -- AXI Stream Port Configurations
             SLAVE_AXI_CONFIG_G  => AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)

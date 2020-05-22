@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ entity AmcCarrierBsa is
       DISABLE_BLD_G          : boolean                := false;
       DISABLE_DDR_SRP_G      : boolean                := false;
       WAVEFORM_NUM_LANES_G   : positive range 1 to 4  := 4;  -- Number of Waveform lanes per DaqMuxV2
-      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);  -- Waveform stream's tData width (in units of bytes)      
+      WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);  -- Waveform stream's tData width (in units of bytes)
    port (
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
@@ -58,7 +58,7 @@ entity AmcCarrierBsa is
       ibBsaSlaves     : out AxiStreamSlaveArray(3 downto 0);
       ----------------------
       -- Top Level Interface
-      ----------------------      
+      ----------------------
       -- BSA Diagnostic Interface
       diagnosticClk   : in  sl;
       diagnosticRst   : in  sl;
@@ -408,19 +408,19 @@ begin
             sAxiWriteMasters(0) => memAxiWriteMaster,       -- [in]
             sAxiWriteMasters(1) => bsaAxiWriteMaster,       -- [in]
             sAxiWriteMasters(2) => waveform0AxiWriteMaster,  -- [in]
-            sAxiWriteMasters(3) => waveform1AxiWriteMaster,  -- [in]            
+            sAxiWriteMasters(3) => waveform1AxiWriteMaster,  -- [in]
             sAxiWriteSlaves(0)  => memAxiWriteSlave,        -- [out]
             sAxiWriteSlaves(1)  => bsaAxiWriteSlave,        -- [out]
             sAxiWriteSlaves(2)  => waveform0AxiWriteSlave,  -- [out]
-            sAxiWriteSlaves(3)  => waveform1AxiWriteSlave,  -- [out]            
+            sAxiWriteSlaves(3)  => waveform1AxiWriteSlave,  -- [out]
             sAxiReadMasters(0)  => memAxiReadMaster,        -- [in]
-            sAxiReadMasters(1)  => AXI_READ_MASTER_INIT_C,  -- [in]         
+            sAxiReadMasters(1)  => AXI_READ_MASTER_INIT_C,  -- [in]
             sAxiReadMasters(2)  => waveform0AxiReadMaster,  -- [in]
             sAxiReadMasters(3)  => waveform1AxiReadMaster,  -- [in]
             sAxiReadSlaves(0)   => memAxiReadSlave,         -- [out]
-            sAxiReadSlaves(1)   => bsaAxiReadSlave,         -- [out]         
-            sAxiReadSlaves(2)   => waveform0AxiReadSlave,   -- [out]         
-            sAxiReadSlaves(3)   => waveform1AxiReadSlave,   -- [out]         
+            sAxiReadSlaves(1)   => bsaAxiReadSlave,         -- [out]
+            sAxiReadSlaves(2)   => waveform0AxiReadSlave,   -- [out]
+            sAxiReadSlaves(3)   => waveform1AxiReadSlave,   -- [out]
             mAxiWriteMasters    => axiWriteMaster,          -- [out]
             mAxiWriteSlaves     => axiWriteSlave,           -- [in]
             mAxiReadMasters     => axiReadMaster,           -- [out]

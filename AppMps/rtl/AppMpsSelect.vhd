@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -73,9 +73,9 @@ architecture mapping of AppMpsSelect is
 
 begin
 
-   --------------------------------- 
+   ---------------------------------
    -- Config Sync
-   --------------------------------- 
+   ---------------------------------
    U_SyncKickDet : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
@@ -88,9 +88,9 @@ begin
          dataOut(15 downto 0)  => beamDestInt,
          dataOut(31 downto 16) => altDestInt);
 
-   --------------------------------- 
+   ---------------------------------
    -- Thresholds
-   --------------------------------- 
+   ---------------------------------
    comb : process (altDestInt, beamDestInt, diagnosticBus, diagnosticRst, r) is
       variable v         : RegType;
       variable chan      : integer;
@@ -124,7 +124,7 @@ begin
 
       -- Alt table decode
       v.mpsSelect.selectAlt := ite(((beamDest and altDestInt) /= 0),'1','0');
-      
+
       -- Digital APP
       v.mpsSelect.digitalBus(3 downto 0) := diagnosticBus.data(30)(3 downto 0);
       v.mpsSelect.digitalBus(7 downto 4) := diagnosticBus.data(31)(3 downto 0);
@@ -146,9 +146,9 @@ begin
       end if;
    end process seq;
 
-   ------------------------------------ 
+   ------------------------------------
    -- Output Synchronization Module
-   ------------------------------------ 
+   ------------------------------------
 
    -- Data Input
    process(r.mpsSelect) is

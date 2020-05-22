@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -93,13 +93,13 @@ architecture rtl of BsaWaveformEngine is
 
    constant WRITE_AXIS_MASTER_INIT_C : AxiStreamMasterType := axiStreamMasterInit(WRITE_AXIS_CONFIG_C);
 
-   -- Mux in 
+   -- Mux in
    signal muxInAxisMaster : AxiStreamMasterArray(STREAMS_C-1 downto 0) :=
       (others => WRITE_AXIS_MASTER_INIT_C);
    signal muxInAxisSlave : AxiStreamSlaveArray(STREAMS_C-1 downto 0) :=
       (others => AXI_STREAM_SLAVE_INIT_C);
 
-   -- Mux out    
+   -- Mux out
    signal muxOutAxisMaster : AxiStreamMasterType := WRITE_AXIS_MASTER_INIT_C;
    signal muxOutAxisSlave  : AxiStreamSlaveType  := AXI_STREAM_SLAVE_INIT_C;
 
@@ -274,9 +274,9 @@ begin
          sAxisMaster     => axisStatusMasterInt,   -- [in]
          sAxisSlave      => axisStatusSlaveInt,    -- [out]
          mAxisMasters(0) => axisStatusMaster,      -- [out]
-         mAxisMasters(1) => axisStatusMasterRead,  -- [out]         
+         mAxisMasters(1) => axisStatusMasterRead,  -- [out]
          mAxisSlaves(0)  => axisStatusSlave,       -- [in]
-         mAxisSlaves(1)  => axisStatusSlaveRead);  -- [in]         
+         mAxisSlaves(1)  => axisStatusSlaveRead);  -- [in]
 
 
    -------------------------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ begin
          axiReadSlave    => axiReadSlave);         -- [in]
 
    -------------------------------------------------------------------------------------------------
-   -- Buffer the read dma data to transition to data clk 
+   -- Buffer the read dma data to transition to data clk
    -------------------------------------------------------------------------------------------------
    AxiStreamFifo_RD_DATA : entity surf.AxiStreamFifoV2
       generic map (
@@ -363,7 +363,7 @@ begin
          mAxiWriteMasters(0) => locAxilWriteMaster,  -- [out]
          mAxiWriteSlaves(0)  => locAxilWriteSlave,   -- [in]
          mAxiReadMasters(0)  => locAxilReadMaster,   -- [out]
-         mAxiReadSlaves(0)   => locAxilReadSlave);   -- [in]   
+         mAxiReadSlaves(0)   => locAxilReadSlave);   -- [in]
 
 
 end architecture rtl;

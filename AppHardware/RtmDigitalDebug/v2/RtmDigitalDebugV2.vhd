@@ -4,11 +4,11 @@
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ use surf.AxiLitePkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity RtmDigitalDebugV2 is
    generic (
@@ -38,7 +38,7 @@ entity RtmDigitalDebugV2 is
       CLKOUT1_PHASE_G  : real range -360.0 to 360.0 := 0.0);
    port (
       -- Digital I/O Interface
-      din             : out   slv(7 downto 0);  -- digital inputs from the RTM: ASYNC (not registered in FPGA or RTM)  
+      din             : out   slv(7 downto 0);  -- digital inputs from the RTM: ASYNC (not registered in FPGA or RTM)
       dout            : in    slv(7 downto 0);  -- digital outputs to the RTM: If REG_DOUT_MODE_G[x] = '0', then dout[x] SYNC to recClkOut(0) domain else DOUT driven as clock output.
       cout            : in    slv(7 downto 0);  -- clock outputs to the RTM (REG_DOUT_EN_G(x) = '1' and REG_DOUT_MODE_G(x) = '1')
       -- Clock Jitter Cleaner Interface
@@ -62,7 +62,7 @@ entity RtmDigitalDebugV2 is
       pllWriteSlave   : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -97,9 +97,9 @@ architecture mapping of RtmDigitalDebugV2 is
 
 begin
 
-   -------------------------        
+   -------------------------
    -- OutBound Clock Mapping
-   -------------------------        
+   -------------------------
    U_PLL : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G            => TPD_G,
@@ -119,7 +119,7 @@ begin
          clkOut          => clk,
          rstOut          => rst,
          locked          => userValueIn(0),
-         -- AXI-Lite Interface 
+         -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
          axilReadMaster  => pllReadMaster,
@@ -141,9 +141,9 @@ begin
    recClkOut <= clk;
    recRstOut <= rst;
 
-   -------------------------        
+   -------------------------
    -- Inbound Clock Mapping
-   -------------------------               
+   -------------------------
    U_IBUFDS : IBUFDS
       generic map (
          DIFF_TERM => true)
@@ -176,10 +176,10 @@ begin
          din     => din);
 
    doutClk <= not clk(0);
-   
+
    -------------------------
    -- Digital Output Mapping
-   -------------------------         
+   -------------------------
    U_DOUT : entity amc_carrier_core.RtmDigitalDebugDout
       generic map (
          TPD_G           => TPD_G,

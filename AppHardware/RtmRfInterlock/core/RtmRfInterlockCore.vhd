@@ -4,11 +4,11 @@
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_CXX
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ use lcls_timing_core.TimingPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity RtmRfInterlockCore is
    generic (
@@ -92,7 +92,7 @@ end RtmRfInterlockCore;
 architecture mapping of RtmRfInterlockCore is
 
    constant BUFFER_WIDTH_C     : natural := 32;
-   constant BUFFER_ADDR_SIZE_C : natural := 9;  -- 512 samples after trigger 
+   constant BUFFER_ADDR_SIZE_C : natural := 9;  -- 512 samples after trigger
    constant NUM_AXI_MASTERS_C  : natural := 7;
 
    constant CPLD_INDEX_C    : natural := 0;
@@ -291,7 +291,7 @@ begin
    -- Set Threshold SPI interfaces (TPL0202)
    -- 8 bit Address & 8 bit data
    -- constant PACKET_SIZE_C : positive := ite(MODE_G = "RW", 1, 0) + ADDRESS_SIZE_G + DATA_SIZE_G;
-   ----------------------------------------------------------------         
+   ----------------------------------------------------------------
    GEN_THR_SPI_CHIPS : for i in 1 downto 0 generate
       U_thrSpi : entity surf.AxiSpiMaster
          generic map (
@@ -338,7 +338,7 @@ begin
          CLK_PERIOD_G      => 6.4E-9,
          SPI_SCLK_PERIOD_G => 1.0E-6,
          N_INPUTS_G        => 4,        -- 4-AD7682, 8-AD7689
-         N_SPI_CYCLES_G    => 32)  -- Number of SPI clock cycles between two acquisitions      
+         N_SPI_CYCLES_G    => 32)  -- Number of SPI clock cycles between two acquisitions
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -385,11 +385,11 @@ begin
    ----------------------------------------------------------------
    -- ADC data Ring buffers for:
    -- Save the 128 samples after dataTrig trigger
-   --   - Beam_V_Data   
-   --   - Beam_I_Data   
-   --   - FWD_PWR_Data  
-   --   - REFL_PWR_Data 
-   ----------------------------------------------------------------          
+   --   - Beam_V_Data
+   --   - Beam_I_Data
+   --   - FWD_PWR_Data
+   --   - REFL_PWR_Data
+   ----------------------------------------------------------------
    U_RingBufferCtrl : entity amc_carrier_core.RingBufferCtrl
       generic map (
          TPD_G                    => TPD_G,
@@ -404,7 +404,7 @@ begin
          debugLogEn  => s_ringWrEn,
          debugLogClr => s_ringClr);
 
-   -- Beam_I_Data & Beam_V_Data 
+   -- Beam_I_Data & Beam_V_Data
    s_bufferData(0) <= x"0" & s_hsAdcdataSync(23 downto 12) & x"0" & s_hsAdcdataSync(11 downto 0);
    -- FWD_PWR_Data & REFL_PWR_Data
    s_bufferData(1) <= x"0" & s_hsAdcdataSync(47 downto 36) & x"0" & s_hsAdcdataSync(35 downto 24);

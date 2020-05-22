@@ -7,6 +7,6 @@ if { $::env(RTM_INTF)  == "Version2" } {
    loadConstraints      -dir "$::DIR_PATH/xdc"
    loadSource -lib amc_carrier_core -sim_only -dir "$::DIR_PATH/tb"
 } else {
-   puts "\n\n $::env(RTM_INTF) is an invalid RTM_INTF name. RTM_INTF can be Version2. Please fixed your target/makefile's.\n\n"   
+   puts "\n\n $::env(RTM_INTF) is an invalid RTM_INTF name. RTM_INTF can be Version2. Please fixed your target/makefile's.\n\n"
    exit -1
 }

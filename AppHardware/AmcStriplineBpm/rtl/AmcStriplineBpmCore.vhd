@@ -4,11 +4,11 @@
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ use surf.jesd204bpkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AmcStriplineBpmCore is
    generic (
@@ -35,7 +35,7 @@ entity AmcStriplineBpmCore is
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
-      -- Analog Control Ports 
+      -- Analog Control Ports
       attn1A          : in    slv(4 downto 0);
       attn1B          : in    slv(4 downto 0);
       attn2A          : in    slv(4 downto 0);
@@ -179,7 +179,7 @@ begin
    spareP(12) <= dacCsL;
    spareN(13) <= dacSck;
    spareN(12) <= dacMosi;
-   -- Analog Control Ports 
+   -- Analog Control Ports
    sysRefN(0) <= attn1A(0);
    sysRefP(0) <= attn1A(1);
    syncInN(0) <= attn1A(2);
@@ -314,7 +314,7 @@ begin
 
    -----------------
    -- LMK SPI Module
-   -----------------   
+   -----------------
    SPI_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
@@ -360,7 +360,7 @@ begin
 
    -----------------
    -- ADC SPI Module
-   -----------------   
+   -----------------
    GEN_ADC_SPI : for i in 1 downto 0 generate
       SPI_DAC : entity surf.AxiSpiMaster
          generic map (
@@ -396,7 +396,7 @@ begin
 
    -----------------
    -- DAC SPI Module
-   -----------------   
+   -----------------
    SPI_DAC_0 : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
@@ -461,7 +461,7 @@ begin
          axilWriteSlave  => axilWriteSlaves(CTRL_INDEX_C),
          -----------------------
          -- Application Ports --
-         -----------------------      
+         -----------------------
          -- LMK Ports
          lmkClkSel       => lmkClkSel,
          lmkRst          => lmkRst,

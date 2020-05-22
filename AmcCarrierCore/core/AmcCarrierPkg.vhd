@@ -4,11 +4,11 @@
 -- Description: Common AMC Carrier Core VHDL package
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ package AmcCarrierPkg is
    constant TIMING_MODE_119MHZ_C : boolean := ite(TIMING_MODE_186MHZ_C, false, true);
 
    constant AXI_CLK_FREQ_C   : real := 156.25E+6;             -- In units of Hz
-   constant AXI_CLK_PERIOD_C : real := (1.0/AXI_CLK_FREQ_C);  -- In units of seconds      
+   constant AXI_CLK_PERIOD_C : real := (1.0/AXI_CLK_FREQ_C);  -- In units of seconds
 
    constant APP_REG_BASE_ADDR_C : slv(31 downto 0) := x"80000000";
 
@@ -112,7 +112,7 @@ package AmcCarrierPkg is
    type BsiBusType is record
       slotNumber : slv(7 downto 0);
       crateId    : slv(15 downto 0);
-      macAddress : Slv48Array(BSI_MAC_SIZE_C-1 downto 1);  --  big-Endian format 
+      macAddress : Slv48Array(BSI_MAC_SIZE_C-1 downto 1);  --  big-Endian format
    end record;
    constant BSI_BUS_INIT_C : BsiBusType := (
       slotNumber => x"00",

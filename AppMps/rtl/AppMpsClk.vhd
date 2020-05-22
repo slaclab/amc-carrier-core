@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- Note: Do not forget to configure the ATCA crate to drive the clock from the slot#2 MPS link node
 -- For the 7-slot crate:
@@ -10,11 +10,11 @@
 --    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ entity AppMpsClk is
       MPS_SLOT_G    : boolean := false;
       SIM_SPEEDUP_G : boolean := false);
    port (
-      -- Stable Clock and Reset 
+      -- Stable Clock and Reset
       axilClk      : in  sl;
       axilRst      : in  sl;
       -- MPS Clocks and Resets
@@ -50,7 +50,7 @@ entity AppMpsClk is
       mpsPllRst    : in  sl;
       ----------------
       -- Core Ports --
-      ----------------   
+      ----------------
       -- Backplane MPS Ports
       mpsClkIn     : in  sl;
       mpsClkOut    : out sl);

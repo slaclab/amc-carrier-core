@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ use unisim.vcomponents.all;
 entity AmcCarrierCoreFsbl is
    generic (
       TPD_G        : time := 1 ns;
-      BUILD_INFO_G : BuildInfoType);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      BUILD_INFO_G : BuildInfoType);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -49,7 +49,7 @@ entity AmcCarrierCoreFsbl is
       axilReadSlave        : in    AxiLiteReadSlaveType;
       axilWriteMaster      : out   AxiLiteWriteMasterType;
       axilWriteSlave       : in    AxiLiteWriteSlaveType;
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : in    sl;
       timingRst            : in    sl;
       timingBus            : out   TimingBusType;
@@ -58,7 +58,7 @@ entity AmcCarrierCoreFsbl is
       timingPhyRst         : out   sl;
       timingRefClk         : out   sl;
       timingRefClkDiv2     : out   sl;
-      timingTrig           : out   TimingTrigType;      
+      timingTrig           : out   TimingTrigType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -225,9 +225,9 @@ begin
    ethPhyReady <= ethLinkUp;
    timingBus   <= timingBusIntf;
 
-   ----------------------------------   
+   ----------------------------------
    -- Register Address Mapping Module
-   ----------------------------------   
+   ----------------------------------
    U_SysReg : entity amc_carrier_core.AmcCarrierSysReg
       generic map (
          TPD_G            => TPD_G,
@@ -276,7 +276,7 @@ begin
          ethLinkUp         => ethLinkUp,
          ----------------------
          -- Top Level Interface
-         ----------------------              
+         ----------------------
          -- Application AXI-Lite Interface
          appReadMaster     => axilReadMaster,
          appReadSlave      => axilReadSlave,
@@ -286,7 +286,7 @@ begin
          bsiBus            => bsiBus,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- Crossbar Ports
          xBarSin           => xBarSin,
          xBarSout          => xBarSout,
@@ -362,7 +362,7 @@ begin
          -----------------------
          -- Core Ports to AppTop
          -----------------------
-         -- Timing Interface (timingClk domain) 
+         -- Timing Interface (timingClk domain)
          timingClk            => timingClk,
          timingRst            => timingRst,
          timingBusIntf        => timingBusIntf,
@@ -403,9 +403,9 @@ begin
          ref156MHzClk         => ref156MHzClk,
          ref156MHzRst         => ref156MHzRst,
          gthFabClk            => gthFabClk,
-         ------------------------         
+         ------------------------
          -- Core Ports to Wrapper
-         ------------------------         
+         ------------------------
          -- AXI-Lite Master bus
          axilReadMasters      => axilReadMasters,
          axilReadSlaves       => axilReadSlaves,
