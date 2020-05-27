@@ -105,6 +105,10 @@ class AppTop(pr.Device):
                 for adc in adcDevices:
                     adc.PDN_SYSREF.set(0x0)
 
+                for lmk in lmkDevices:
+                    lmk.PwrDwnLmkChip()
+                    lmk.PwrUpLmkChip()
+
                 # Execute the AppCore.Disable
                 for core in appCore:
                     core.Disable()
