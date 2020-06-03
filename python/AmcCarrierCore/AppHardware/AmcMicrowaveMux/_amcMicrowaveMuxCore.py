@@ -71,7 +71,7 @@ class AmcMicrowaveMuxCore(pr.Device):
             time.sleep(0.5) # TODO: Optimize this timeout
 
             # pulse SysRef
-            self.LMK.PwrUpSysRef()
+            # self.LMK.PwrUpSysRef()
             self.checkBlocks(recurse=True)
 
         @self.command(description="Select internal LMK reference",)
