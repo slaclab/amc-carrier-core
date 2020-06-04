@@ -94,37 +94,46 @@ class AppTop(pr.Device):
             retryCntMax = 8
             while( retryCnt < retryCntMax ):
 
+                for rx in jesdRxDevices:
+                    rx.ResetGTs.set(1)
+                for tx in jesdTxDevices:
+                    tx.ResetGTs.set(1)
+            
                 for adc in adcDevices:
+                    adc.ASSERT_SYSREF_REG.set(0x0)
+                    adc.SEL_SYSREF_REG.set(0x0)
                     adc.PDN_SYSREF.set(0x0)
 
                 for lmk in lmkDevices:
                     lmk.PwrDwnLmkChip()
                     lmk.PwrDwnSysRef()
 
-                # Assert GTs Reset
-                for rx in jesdRxDevices:
-                    rx.ResetGTs.set(1)
-                for tx in jesdTxDevices:
-                    rx.ResetGTs.set(1)
-
-                # Execute the AppCore.Disable
-                for core in appCore:
-                    core.Disable()
-
-                time.sleep(0.100) # TODO: Optimize this timeout
-
-                # Deassert GTs Reset
-                for rx in jesdRxDevices:
-                    rx.ResetGTs.set(0)
-                for tx in jesdTxDevices:
-                    tx.ResetGTs.set(0)
-
-                time.sleep(0.100) # TODO: Optimize this timeout
-
-                # Init the AppCore
                 for core in appCore:
                     core.Init()
 
+                for lmk in lmkDevices:
+                    lmk.PwrUpLmkChip()
+                    
+                time.sleep(1.000) # TODO: Optimize this timeout
+
+                for lmk in lmkDevices:
+                    lmk.PwrUpSysRef()
+
+                time.sleep(0.010) # TODO: Optimize this timeout
+                
+                for adc in adcDevices:
+                    adc.PDN_SYSREF.set(0x1)
+
+                for tx in jesdTxDevices:
+                    tx.ResetGTs.set(0)
+                for rx in jesdRxDevices:
+                    rxEnable = rx.Enable.get()
+                    rx.Enable.set(0)
+                    rx.ResetGTs.set(0)
+                    time.sleep(0.100) # TODO: Optimize this timeout
+                    rx.CmdClearErrors()
+                    rx.Enable.set(rxEnable)
+                    
                 # Special DAC Init procedure
                 for dac in dacDevices:
                     dac.EnableTx.set(0x0)
@@ -138,26 +147,14 @@ class AppTop(pr.Device):
                     dac.InitJesd.set(0x0)
                     time.sleep(0.010) # TODO: Optimize this timeout
                     dac.EnableTx.set(0x1)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-
-                for lmk in lmkDevices:
-                    lmk.PwrUpLmkChip()
-                time.sleep(1.000) # TODO: Optimize this timeout
-
-                for lmk in lmkDevices:
-                    lmk.PwrUpSysRef()
-                time.sleep(0.100) # TODO: Optimize this timeout
-
-                for adc in adcDevices:
-                    adc.PDN_SYSREF.set(0x1)
-                time.sleep(2.0) # TODO: Optimize this timeout
-
+                    time.sleep(0.010) # TODO: Optimize this timeout                    
+                    
                 # Check the link locks
                 linkLock = True
                 for i in range(10):
 
                     for rx in jesdRxDevices:
-                        if( rx.DataValid.get() == 0 ):
+                        if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
                             print(f'Link Not Locked: {rx.path}.DataValid = {rx.DataValid.get()} ')
                             linkLock = False
 
