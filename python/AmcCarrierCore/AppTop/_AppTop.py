@@ -98,7 +98,7 @@ class AppTop(pr.Device):
                     rx.ResetGTs.set(1)
                 for tx in jesdTxDevices:
                     tx.ResetGTs.set(1)
-            
+
                 for adc in adcDevices:
                     adc.ASSERT_SYSREF_REG.set(0x0)
                     adc.SEL_SYSREF_REG.set(0x0)
@@ -113,14 +113,14 @@ class AppTop(pr.Device):
 
                 for lmk in lmkDevices:
                     lmk.PwrUpLmkChip()
-                    
+
                 time.sleep(1.000) # TODO: Optimize this timeout
 
                 for lmk in lmkDevices:
                     lmk.PwrUpSysRef()
 
                 time.sleep(0.010) # TODO: Optimize this timeout
-                
+
                 for adc in adcDevices:
                     adc.PDN_SYSREF.set(0x1)
 
@@ -133,7 +133,7 @@ class AppTop(pr.Device):
                     time.sleep(0.100) # TODO: Optimize this timeout
                     rx.CmdClearErrors()
                     rx.Enable.set(rxEnable)
-                    
+
                 # Special DAC Init procedure
                 for dac in dacDevices:
                     dac.EnableTx.set(0x0)
@@ -147,8 +147,8 @@ class AppTop(pr.Device):
                     dac.InitJesd.set(0x0)
                     time.sleep(0.010) # TODO: Optimize this timeout
                     dac.EnableTx.set(0x1)
-                    time.sleep(0.010) # TODO: Optimize this timeout                    
-                    
+                    time.sleep(0.010) # TODO: Optimize this timeout
+
                 # Check the link locks
                 linkLock = True
                 for i in range(10):
