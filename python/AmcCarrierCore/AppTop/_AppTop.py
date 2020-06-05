@@ -148,6 +148,10 @@ class AppTop(pr.Device):
                     time.sleep(0.010) # TODO: Optimize this timeout
                     dac.EnableTx.set(0x1)
                     time.sleep(0.010) # TODO: Optimize this timeout
+                    ##################################################################
+                    # Release sequence above with "dac.NcoSync()" on next SURF release
+                    ##################################################################
+                    # dac.NcoSync()
 
                 # Check the link locks
                 linkLock = True
@@ -177,11 +181,17 @@ class AppTop(pr.Device):
                     else:
                         print(f'Re-executing AppTop.Init(): retryCnt = {retryCnt}')
 
+            for adc in adcDevices:
+                adc.PDN_SYSREF.set(0x0)
+                time.sleep(0.010) # TODO: Optimize this timeout
+                adc.PDN_SYSREF.set(0x1)
+                time.sleep(0.010) # TODO: Optimize this timeout
+
             # Clear all error counters
-            for rx in jesdRxDevices:
-                rx.CmdClearErrors()
             for tx in jesdTxDevices:
                 tx.CmdClearErrors()
+            for rx in jesdRxDevices:
+                rx.CmdClearErrors()
             for dac in dacDevices:
                 enable = dac.enable.get()
                 dac.enable.set(True)
