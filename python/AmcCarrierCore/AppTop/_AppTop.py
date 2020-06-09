@@ -172,6 +172,15 @@ class AppTop(pr.Device):
                     else:
                         break
 
+                for tx in jesdTxDevices:
+                    tx.CmdClearErrors()
+                    if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
+                        linkLock = False
+                for rx in jesdRxDevices:
+                    rx.CmdClearErrors()
+                    if (tx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
+                        linkLock = False
+
                 if( linkLock ):
                     break
                 else:
