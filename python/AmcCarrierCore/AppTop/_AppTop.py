@@ -1,9 +1,6 @@
 #-----------------------------------------------------------------------------
 # Title      : PyRogue Common Application Top Level
 #-----------------------------------------------------------------------------
-# File       : AppTop.py
-# Created    : 2017-04-03
-#-----------------------------------------------------------------------------
 # Description:
 # PyRogue Common Application Top Level
 #-----------------------------------------------------------------------------
@@ -113,16 +110,21 @@ class AppTop(pr.Device):
 
                 for lmk in lmkDevices:
                     lmk.PwrUpLmkChip()
-
                 time.sleep(1.000) # TODO: Optimize this timeout
 
                 for lmk in lmkDevices:
                     lmk.PwrUpSysRef()
-
-                time.sleep(0.010) # TODO: Optimize this timeout
+                time.sleep(0.250) # TODO: Optimize this timeout
 
                 for adc in adcDevices:
                     adc.PDN_SYSREF.set(0x1)
+                    time.sleep(0.100) # TODO: Optimize this timeout
+                for adc in adcDevices:
+                    adc.PDN_SYSREF.set(0x0)
+                    time.sleep(0.100) # TODO: Optimize this timeout
+                for adc in adcDevices:
+                    adc.PDN_SYSREF.set(0x1)
+                    time.sleep(0.100) # TODO: Optimize this timeout
 
                 for tx in jesdTxDevices:
                     tx.ResetGTs.set(0)
@@ -159,12 +161,12 @@ class AppTop(pr.Device):
 
                     for rx in jesdRxDevices:
                         if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
-                            print(f'Link Not Locked: {rx.path}.DataValid = {rx.DataValid.get()} ')
+                            print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
                             linkLock = False
 
                     for tx in jesdTxDevices:
                         if( tx.DataValid.get() == 0 ):
-                            print(f'Link Not Locked: {tx.path}.DataValid = {tx.DataValid.get()} ')
+                            print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
                             linkLock = False
 
                     if( linkLock ):
@@ -175,10 +177,12 @@ class AppTop(pr.Device):
                 for tx in jesdTxDevices:
                     tx.CmdClearErrors()
                     if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
+                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
                         linkLock = False
                 for rx in jesdRxDevices:
                     rx.CmdClearErrors()
-                    if (tx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
+                    if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
+                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
                         linkLock = False
 
                 if( linkLock ):
@@ -186,21 +190,12 @@ class AppTop(pr.Device):
                 else:
                     retryCnt += 1
                     if (retryCnt == retryCntMax):
-                        print('AppTop.Init(): Too many retries and giving up on retries')
+                        raise pr.DeviceError('AppTop.Init(): Too many retries and giving up on retries')
                     else:
                         print(f'Re-executing AppTop.Init(): retryCnt = {retryCnt}')
 
-            for adc in adcDevices:
-                adc.PDN_SYSREF.set(0x0)
-                time.sleep(0.010) # TODO: Optimize this timeout
-                adc.PDN_SYSREF.set(0x1)
-                time.sleep(0.010) # TODO: Optimize this timeout
-
-            # Clear all error counters
             for tx in jesdTxDevices:
                 tx.CmdClearErrors()
-            for rx in jesdRxDevices:
-                rx.CmdClearErrors()
             for dac in dacDevices:
                 enable = dac.enable.get()
                 dac.enable.set(True)
