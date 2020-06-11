@@ -1,9 +1,6 @@
 #-----------------------------------------------------------------------------
 # Title      : PyRogue Common Application Top Level
 #-----------------------------------------------------------------------------
-# File       : AppTop.py
-# Created    : 2017-04-03
-#-----------------------------------------------------------------------------
 # Description:
 # PyRogue Common Application Top Level
 #-----------------------------------------------------------------------------
@@ -94,37 +91,51 @@ class AppTop(pr.Device):
             retryCntMax = 8
             while( retryCnt < retryCntMax ):
 
-                # Assert GTs Reset
                 for rx in jesdRxDevices:
                     rx.ResetGTs.set(1)
                 for tx in jesdTxDevices:
-                    rx.ResetGTs.set(1)
-                self.checkBlocks(recurse=True)
-                time.sleep(0.75) # TODO: Optimize this timeout
+                    tx.ResetGTs.set(1)
 
                 for adc in adcDevices:
+                    adc.ASSERT_SYSREF_REG.set(0x0)
+                    adc.SEL_SYSREF_REG.set(0x0)
                     adc.PDN_SYSREF.set(0x0)
 
                 for lmk in lmkDevices:
                     lmk.PwrDwnLmkChip()
-                    lmk.PwrUpLmkChip()
+                    lmk.PwrDwnSysRef()
 
-                # Execute the AppCore.Disable
-                for core in appCore:
-                    core.Disable()
-
-                # Deassert GTs Reset
-                for rx in jesdRxDevices:
-                    rx.ResetGTs.set(0)
-                for tx in jesdTxDevices:
-                    tx.ResetGTs.set(0)
-                self.checkBlocks(recurse=True)
-                time.sleep(0.75) # TODO: Optimize this timeout
-
-                # Init the AppCore
                 for core in appCore:
                     core.Init()
-                time.sleep(1.0) # TODO: Optimize this timeout
+
+                for lmk in lmkDevices:
+                    lmk.PwrUpLmkChip()
+                time.sleep(1.000) # TODO: Optimize this timeout
+
+                for lmk in lmkDevices:
+                    lmk.PwrUpSysRef()
+                time.sleep(0.250) # TODO: Optimize this timeout
+
+                for adc in adcDevices:
+                    adc.PDN_SYSREF.set(0x1)
+                    time.sleep(0.100) # TODO: Optimize this timeout
+                for adc in adcDevices:
+                    adc.PDN_SYSREF.set(0x0)
+                    time.sleep(0.100) # TODO: Optimize this timeout
+                for adc in adcDevices:
+                    adc.PDN_SYSREF.set(0x1)
+                    time.sleep(0.100) # TODO: Optimize this timeout
+
+                for tx in jesdTxDevices:
+                    tx.CmdClearErrors()
+                    tx.ResetGTs.set(0)
+                for rx in jesdRxDevices:
+                    rxEnable = rx.Enable.get()
+                    rx.Enable.set(0)
+                    rx.ResetGTs.set(0)
+                    time.sleep(0.100) # TODO: Optimize this timeout
+                    rx.CmdClearErrors()
+                    rx.Enable.set(rxEnable)
 
                 # Special DAC Init procedure
                 for dac in dacDevices:
@@ -140,38 +151,48 @@ class AppTop(pr.Device):
                     time.sleep(0.010) # TODO: Optimize this timeout
                     dac.EnableTx.set(0x1)
                     time.sleep(0.010) # TODO: Optimize this timeout
-                if len(dacDevices) > 0:
-                    for lmk in lmkDevices:
-                        lmk.PwrUpSysRef()
-
-                for adc in adcDevices:
-                    adc.PDN_SYSREF.set(0x1)
-                time.sleep(2.0) # TODO: Optimize this timeout
+                    ##################################################################
+                    # Release sequence above with "dac.NcoSync()" on next SURF release
+                    ##################################################################
+                    # dac.NcoSync()
 
                 # Check the link locks
                 linkLock = True
-                for rx in jesdRxDevices:
-                    if( rx.DataValid.get() == 0 ):
-                        print(f'Link Not Locked: {rx.path}.DataValid = {rx.DataValid.get()} ')
-                        linkLock = False
+                for i in range(10):
+
+                    for rx in jesdRxDevices:
+                        if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
+                            print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
+                            linkLock = False
+
+                    for tx in jesdTxDevices:
+                        if( tx.DataValid.get() == 0 ):
+                            print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
+                            linkLock = False
+
+                    if( linkLock ):
+                        time.sleep(0.100) # TODO: Optimize this timeout
+                    else:
+                        break
+
                 for tx in jesdTxDevices:
-                    if( tx.DataValid.get() == 0 ):
-                        print(f'Link Not Locked: {tx.path}.DataValid = {tx.DataValid.get()} ')
+                    if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
+                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
                         linkLock = False
+                for rx in jesdRxDevices:
+                    if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
+                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
+                        linkLock = False
+
                 if( linkLock ):
                     break
                 else:
                     retryCnt += 1
                     if (retryCnt == retryCntMax):
-                        print('AppTop.Init(): Too many retries and giving up on retries')
+                        raise pr.DeviceError('AppTop.Init(): Too many retries and giving up on retries')
                     else:
                         print(f'Re-executing AppTop.Init(): retryCnt = {retryCnt}')
 
-            # Clear all error counters
-            for rx in jesdRxDevices:
-                rx.CmdClearErrors()
-            for tx in jesdTxDevices:
-                tx.CmdClearErrors()
             for dac in dacDevices:
                 enable = dac.enable.get()
                 dac.enable.set(True)
