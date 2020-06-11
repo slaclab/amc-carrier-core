@@ -1,4 +1,5 @@
 <map id="AmcCryoCoreCtrl" name="AmcCryoCoreCtrl">
-<area shape="rect" id="node2" href="$classAmcCryoCore.html" title="AmcCryoCore" alt="" coords="21,80,131,107"/>
-<area shape="rect" id="node3" href="$classAmcCryoDualCore.html" title="AmcCryoDualCore" alt="" coords="5,155,147,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="9,5,143,32"/>
+<area shape="rect" id="node2" href="$classAmcCryoCore.html" title=" " alt="" coords="21,80,131,107"/>
+<area shape="rect" id="node3" href="$classAmcCryoDualCore.html" title=" " alt="" coords="5,155,147,181"/>
 </map>

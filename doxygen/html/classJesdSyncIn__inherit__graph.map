@@ -1,17 +1,18 @@
 <map id="JesdSyncIn" name="JesdSyncIn">
-<area shape="rect" id="node2" href="$classAmcCryoCore.html" title="AmcCryoCore" alt="" coords="213,5,324,32"/>
-<area shape="rect" id="node4" href="$classAmcCryoDemoCore.html" title="AmcCryoDemoCore" alt="" coords="193,56,344,83"/>
-<area shape="rect" id="node6" href="$classAmcGenericAdcDacCore.html" title="AmcGenericAdcDacCore" alt="" coords="179,107,359,133"/>
-<area shape="rect" id="node8" href="$classAmcMicrowaveMuxCore.html" title="AmcMicrowaveMuxCore" alt="" coords="179,157,358,184"/>
-<area shape="rect" id="node10" href="$classAmcMrLlrfDownConvertCore.html" title="AmcMrLlrfDownConvertCore" alt="" coords="165,208,372,235"/>
-<area shape="rect" id="node11" href="$classAmcMrLlrfGen2UpConvertMapping.html" title="AmcMrLlrfGen2UpConvertMapping" alt="" coords="145,259,392,285"/>
-<area shape="rect" id="node13" href="$classAmcMrLlrfUpConvertMapping.html" title="AmcMrLlrfUpConvertMapping" alt="" coords="163,309,375,336"/>
-<area shape="rect" id="node15" href="$classAmcStriplineBpmCore.html" title="AmcStriplineBpmCore" alt="" coords="186,360,351,387"/>
-<area shape="rect" id="node3" href="$classAmcCryoDualCore.html" title="AmcCryoDualCore" alt="" coords="475,5,616,32"/>
-<area shape="rect" id="node5" href="$classAmcCryoDemoDualCore.html" title="AmcCryoDemoDualCore" alt="" coords="455,56,635,83"/>
-<area shape="rect" id="node7" href="$classAmcGenericAdcDacDualCore.html" title="AmcGenericAdcDacDualCore" alt="" coords="440,107,651,133"/>
-<area shape="rect" id="node9" href="$classAmcMicrowaveMuxDualCore.html" title="AmcMicrowaveMuxDualCore" alt="" coords="441,157,649,184"/>
-<area shape="rect" id="node12" href="$classAmcMrLlrfGen2UpConvert.html" title="AmcMrLlrfGen2UpConvert" alt="" coords="450,259,641,285"/>
-<area shape="rect" id="node14" href="$classAmcMrLlrfUpConvertCore.html" title="AmcMrLlrfUpConvertCore" alt="" coords="452,309,639,336"/>
-<area shape="rect" id="node16" href="$classAmcStriplineBpmDualCore.html" title="AmcStriplineBpmDualCore" alt="" coords="448,360,643,387"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,183,97,209"/>
+<area shape="rect" id="node2" href="$classAmcCryoCore.html" title=" " alt="" coords="214,5,325,32"/>
+<area shape="rect" id="node4" href="$classAmcCryoDemoCore.html" title=" " alt="" coords="194,56,345,83"/>
+<area shape="rect" id="node6" href="$classAmcGenericAdcDacCore.html" title=" " alt="" coords="179,107,359,133"/>
+<area shape="rect" id="node8" href="$classAmcMicrowaveMuxCore.html" title=" " alt="" coords="179,157,359,184"/>
+<area shape="rect" id="node10" href="$classAmcMrLlrfDownConvertCore.html" title=" " alt="" coords="166,208,373,235"/>
+<area shape="rect" id="node11" href="$classAmcMrLlrfGen2UpConvertMapping.html" title=" " alt="" coords="145,259,393,285"/>
+<area shape="rect" id="node13" href="$classAmcMrLlrfUpConvertMapping.html" title=" " alt="" coords="162,309,377,336"/>
+<area shape="rect" id="node15" href="$classAmcStriplineBpmCore.html" title=" " alt="" coords="187,360,352,387"/>
+<area shape="rect" id="node3" href="$classAmcCryoDualCore.html" title=" " alt="" coords="476,5,617,32"/>
+<area shape="rect" id="node5" href="$classAmcCryoDemoDualCore.html" title=" " alt="" coords="457,56,637,83"/>
+<area shape="rect" id="node7" href="$classAmcGenericAdcDacDualCore.html" title=" " alt="" coords="441,107,652,133"/>
+<area shape="rect" id="node9" href="$classAmcMicrowaveMuxDualCore.html" title=" " alt="" coords="441,157,652,184"/>
+<area shape="rect" id="node12" href="$classAmcMrLlrfGen2UpConvert.html" title=" " alt="" coords="451,259,643,285"/>
+<area shape="rect" id="node14" href="$classAmcMrLlrfUpConvertCore.html" title=" " alt="" coords="453,309,641,336"/>
+<area shape="rect" id="node16" href="$classAmcStriplineBpmDualCore.html" title=" " alt="" coords="449,360,644,387"/>
 </map>

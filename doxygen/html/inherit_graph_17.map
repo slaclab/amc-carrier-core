@@ -1,10 +1,10 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classAd9229Deserializer.html" title="Ad9229Deserializer" alt="" coords="5,5,155,32"/>
-<area shape="rect" id="node2" href="$classAd9229Core.html" title="Ad9229Core" alt="" coords="224,5,325,32"/>
-<area shape="rect" id="node3" href="$classRtmRfInterlockCore.html" title="RtmRfInterlockCore" alt="" coords="395,81,545,108"/>
-<area shape="rect" id="node4" href="$classRtmRfInterlock.html" title="RtmRfInterlock" alt="" coords="593,81,713,108"/>
-<area shape="rect" id="node5" href="$classAxiSpiAd7682Reg.html" title="AxiSpiAd7682Reg" alt="" coords="12,56,148,83"/>
-<area shape="rect" id="node6" href="$classAxiSpiAd7682.html" title="AxiSpiAd7682" alt="" coords="219,56,331,83"/>
-<area shape="rect" id="node7" href="$classRingBufferCtrl.html" title="RingBufferCtrl" alt="" coords="218,107,331,133"/>
-<area shape="rect" id="node8" href="$classRtmRfInterlockReg.html" title="RtmRfInterlockReg" alt="" coords="203,157,347,184"/>
+<area shape="rect" id="node1" href="$classAd9229Deserializer.html" title=" " alt="" coords="5,5,155,32"/>
+<area shape="rect" id="node2" href="$classAd9229Core.html" title=" " alt="" coords="225,5,326,32"/>
+<area shape="rect" id="node3" href="$classRtmRfInterlockCore.html" title=" " alt="" coords="396,81,547,108"/>
+<area shape="rect" id="node4" href="$classRtmRfInterlock.html" title=" " alt="" coords="595,81,715,108"/>
+<area shape="rect" id="node5" href="$classAxiSpiAd7682Reg.html" title=" " alt="" coords="11,56,149,83"/>
+<area shape="rect" id="node6" href="$classAxiSpiAd7682.html" title=" " alt="" coords="219,56,331,83"/>
+<area shape="rect" id="node7" href="$classRingBufferCtrl.html" title=" " alt="" coords="219,107,332,133"/>
+<area shape="rect" id="node8" href="$classRtmRfInterlockReg.html" title=" " alt="" coords="203,157,348,184"/>
 </map>

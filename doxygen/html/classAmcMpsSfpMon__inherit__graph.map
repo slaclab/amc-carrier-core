@@ -1,4 +1,5 @@
 <map id="AmcMpsSfpMon" name="AmcMpsSfpMon">
-<area shape="rect" id="node2" href="$classAmcMpsSfpCore.html" title="AmcMpsSfpCore" alt="" coords="21,80,149,107"/>
-<area shape="rect" id="node3" href="$classAmcMpsSfpDualCore.html" title="AmcMpsSfpDualCore" alt="" coords="5,155,164,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="21,5,148,32"/>
+<area shape="rect" id="node2" href="$classAmcMpsSfpCore.html" title=" " alt="" coords="20,80,149,107"/>
+<area shape="rect" id="node3" href="$classAmcMpsSfpDualCore.html" title=" " alt="" coords="5,155,164,181"/>
 </map>

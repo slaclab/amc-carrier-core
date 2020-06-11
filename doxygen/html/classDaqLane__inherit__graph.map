@@ -1,7 +1,8 @@
 <map id="DaqLane" name="DaqLane">
-<area shape="rect" id="node4" href="$classDaqMuxV2.html" title="DaqMuxV2" alt="" coords="71,155,163,181"/>
-<area shape="rect" id="node2" href="$classDaqTestSig.html" title="DaqTestSig" alt="" coords="5,5,100,32"/>
-<area shape="rect" id="node3" href="$classDaqDecimator.html" title="DaqDecimator" alt="" coords="124,5,240,32"/>
-<area shape="rect" id="node5" href="$classAppTop.html" title="AppTop" alt="" coords="26,229,95,256"/>
-<area shape="rect" id="node6" href="$classDaqMuxV2Tb.html" title="DaqMuxV2Tb" alt="" coords="120,229,228,256"/>
+<area shape="rect" id="node1" title=" " alt="" coords="77,80,156,107"/>
+<area shape="rect" id="node4" href="$classDaqMuxV2.html" title=" " alt="" coords="70,155,163,181"/>
+<area shape="rect" id="node2" href="$classDaqTestSig.html" title=" " alt="" coords="5,5,100,32"/>
+<area shape="rect" id="node3" href="$classDaqDecimator.html" title=" " alt="" coords="124,5,240,32"/>
+<area shape="rect" id="node5" href="$classAppTop.html" title=" " alt="" coords="26,229,95,256"/>
+<area shape="rect" id="node6" href="$classDaqMuxV2Tb.html" title=" " alt="" coords="119,229,229,256"/>
 </map>

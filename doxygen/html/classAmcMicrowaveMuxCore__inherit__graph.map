@@ -1,8 +1,9 @@
 <map id="AmcMicrowaveMuxCore" name="AmcMicrowaveMuxCore">
-<area shape="rect" id="node7" href="$classAmcMicrowaveMuxDualCore.html" title="AmcMicrowaveMuxDualCore" alt="" coords="263,155,471,181"/>
-<area shape="rect" id="node2" href="$classAmcMicrowaveMuxCoreCtrl.html" title="AmcMicrowaveMuxCoreCtrl" alt="" coords="5,5,207,32"/>
-<area shape="rect" id="node3" href="$classadf5355.html" title="adf5355" alt="" coords="231,5,306,32"/>
-<area shape="rect" id="node4" href="$classhmc305.html" title="hmc305" alt="" coords="330,5,405,32"/>
-<area shape="rect" id="node5" href="$classJesdSyncIn.html" title="JesdSyncIn(3)" alt="" coords="429,5,540,32"/>
-<area shape="rect" id="node6" href="$classJesdSyncOut.html" title="JesdSyncOut(2)" alt="" coords="564,5,685,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="278,80,458,107"/>
+<area shape="rect" id="node7" href="$classAmcMicrowaveMuxDualCore.html" title=" " alt="" coords="263,155,473,181"/>
+<area shape="rect" id="node2" href="$classAmcMicrowaveMuxCoreCtrl.html" title=" " alt="" coords="5,5,208,32"/>
+<area shape="rect" id="node3" href="$classadf5355.html" title=" " alt="" coords="232,5,307,32"/>
+<area shape="rect" id="node4" href="$classhmc305.html" title=" " alt="" coords="331,5,405,32"/>
+<area shape="rect" id="node5" href="$classJesdSyncIn.html" title=" " alt="" coords="430,5,541,32"/>
+<area shape="rect" id="node6" href="$classJesdSyncOut.html" title=" " alt="" coords="565,5,686,32"/>
 </map>

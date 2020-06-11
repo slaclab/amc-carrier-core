@@ -1,4 +1,5 @@
 <map id="RtmCryoDacLut" name="RtmCryoDacLut">
-<area shape="rect" id="node2" href="$classRtmCryoDet.html" title="RtmCryoDet" alt="" coords="24,80,127,107"/>
-<area shape="rect" id="node3" href="$classRtmCryoDacLutTb.html" title="RtmCryoDacLutTb" alt="" coords="5,155,145,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="13,5,137,32"/>
+<area shape="rect" id="node2" href="$classRtmCryoDet.html" title=" " alt="" coords="24,80,127,107"/>
+<area shape="rect" id="node3" href="$classRtmCryoDacLutTb.html" title=" " alt="" coords="5,155,145,181"/>
 </map>

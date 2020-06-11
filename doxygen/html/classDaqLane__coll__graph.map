@@ -1,4 +1,5 @@
 <map id="DaqLane" name="DaqLane">
-<area shape="rect" id="node2" href="$classDaqTestSig.html" title="DaqTestSig" alt="" coords="5,5,100,32"/>
-<area shape="rect" id="node3" href="$classDaqDecimator.html" title="DaqDecimator" alt="" coords="124,5,240,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="77,80,156,107"/>
+<area shape="rect" id="node2" href="$classDaqTestSig.html" title=" " alt="" coords="5,5,100,32"/>
+<area shape="rect" id="node3" href="$classDaqDecimator.html" title=" " alt="" coords="124,5,240,32"/>
 </map>

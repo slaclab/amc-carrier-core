@@ -1,4 +1,5 @@
 <map id="AppMsgTb" name="AppMsgTb">
-<area shape="rect" id="node2" href="$classAppMsgOb.html" title="AppMsgOb" alt="" coords="5,5,96,32"/>
-<area shape="rect" id="node3" href="$classAppMsgIb.html" title="AppMsgIb" alt="" coords="120,5,205,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="62,80,153,107"/>
+<area shape="rect" id="node2" href="$classAppMsgOb.html" title=" " alt="" coords="5,5,97,32"/>
+<area shape="rect" id="node3" href="$classAppMsgIb.html" title=" " alt="" coords="121,5,208,32"/>
 </map>

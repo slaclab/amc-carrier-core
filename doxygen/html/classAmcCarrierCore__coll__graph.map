@@ -1,16 +1,17 @@
 <map id="AmcCarrierCore" name="AmcCarrierCore">
-<area shape="rect" id="node2" href="$classAmcCarrierIbufGt.html" title="AmcCarrierIbufGt" alt="" coords="271,5,405,32"/>
-<area shape="rect" id="node8" href="$classAmcCarrierTiming.html" title="AmcCarrierTiming" alt="" coords="495,56,635,83"/>
-<area shape="rect" id="node3" href="$classAmcCarrierEth.html" title="AmcCarrierEth" alt="" coords="507,107,623,133"/>
-<area shape="rect" id="node4" href="$classAmcCarrierRssi.html" title="AmcCarrierRssi(2)" alt="" coords="268,56,408,83"/>
-<area shape="rect" id="node5" href="$classAmcCarrierRssiObFifo.html" title="AmcCarrierRssiObFifo(2)" alt="" coords="5,56,187,83"/>
-<area shape="rect" id="node6" href="$classAmcCarrierRssiInterleave.html" title="AmcCarrierRssiInterleave(2)" alt="" coords="235,107,441,133"/>
-<area shape="rect" id="node7" href="$classAmcCarrierRssiObFifo.html" title="AmcCarrierRssiObFifo" alt="" coords="15,107,177,133"/>
-<area shape="rect" id="node9" href="$classAmcCarrierBsa.html" title="AmcCarrierBsa" alt="" coords="505,183,624,209"/>
-<area shape="rect" id="node10" href="$classBsaWaveformEngine.html" title="BsaWaveformEngine(2)" alt="" coords="251,157,425,184"/>
-<area shape="rect" id="node11" href="$classBsaBufferControl.html" title="BsaBufferControl" alt="" coords="272,208,404,235"/>
-<area shape="rect" id="node12" href="$classBsaAccumulator.html" title="BsaAccumulator" alt="" coords="32,208,160,235"/>
-<area shape="rect" id="node13" href="$classBsaAxiInterconnectWrapper.html" title="BsaAxiInterconnectWrapper" alt="" coords="237,259,439,285"/>
-<area shape="rect" id="node14" href="$classBldAxiStream.html" title="BldAxiStream" alt="" coords="283,309,393,336"/>
-<area shape="rect" id="node15" href="$classAmcCarrierDdrMem.html" title="AmcCarrierDdrMem" alt="" coords="489,233,640,260"/>
+<area shape="rect" id="node1" title=" " alt="" coords="689,107,815,133"/>
+<area shape="rect" id="node2" href="$classAmcCarrierIbufGt.html" title=" " alt="" coords="272,5,407,32"/>
+<area shape="rect" id="node8" href="$classAmcCarrierTiming.html" title=" " alt="" coords="496,56,636,83"/>
+<area shape="rect" id="node3" href="$classAmcCarrierEth.html" title=" " alt="" coords="508,107,624,133"/>
+<area shape="rect" id="node4" href="$classAmcCarrierRssi.html" title=" " alt="" coords="269,56,409,83"/>
+<area shape="rect" id="node5" href="$classAmcCarrierRssiObFifo.html" title=" " alt="" coords="5,56,188,83"/>
+<area shape="rect" id="node6" href="$classAmcCarrierRssiInterleave.html" title=" " alt="" coords="236,107,443,133"/>
+<area shape="rect" id="node7" href="$classAmcCarrierRssiObFifo.html" title=" " alt="" coords="15,107,179,133"/>
+<area shape="rect" id="node9" href="$classAmcCarrierBsa.html" title=" " alt="" coords="507,183,625,209"/>
+<area shape="rect" id="node10" href="$classBsaWaveformEngine.html" title=" " alt="" coords="252,157,427,184"/>
+<area shape="rect" id="node11" href="$classBsaBufferControl.html" title=" " alt="" coords="273,208,405,235"/>
+<area shape="rect" id="node12" href="$classBsaAccumulator.html" title=" " alt="" coords="33,208,161,235"/>
+<area shape="rect" id="node13" href="$classBsaAxiInterconnectWrapper.html" title=" " alt="" coords="238,259,441,285"/>
+<area shape="rect" id="node14" href="$classBldAxiStream.html" title=" " alt="" coords="284,309,395,336"/>
+<area shape="rect" id="node15" href="$classAmcCarrierDdrMem.html" title=" " alt="" coords="491,233,641,260"/>
 </map>

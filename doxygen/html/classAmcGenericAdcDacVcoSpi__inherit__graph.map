@@ -1,4 +1,5 @@
 <map id="AmcGenericAdcDacVcoSpi" name="AmcGenericAdcDacVcoSpi">
-<area shape="rect" id="node2" href="$classAmcGenericAdcDacCore.html" title="AmcGenericAdcDacCore" alt="" coords="21,80,201,107"/>
-<area shape="rect" id="node3" href="$classAmcGenericAdcDacDualCore.html" title="AmcGenericAdcDacDualCore" alt="" coords="5,155,216,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="13,5,208,32"/>
+<area shape="rect" id="node2" href="$classAmcGenericAdcDacCore.html" title=" " alt="" coords="21,80,201,107"/>
+<area shape="rect" id="node3" href="$classAmcGenericAdcDacDualCore.html" title=" " alt="" coords="5,155,216,181"/>
 </map>

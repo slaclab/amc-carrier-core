@@ -1,4 +1,5 @@
 <map id="AmcCarrierSysReg" name="AmcCarrierSysReg">
-<area shape="rect" id="node2" href="$classAmcCarrierSysMon.html" title="AmcCarrierSysMon" alt="" coords="5,5,151,32"/>
-<area shape="rect" id="node3" href="$classAmcCarrierBsi.html" title="AmcCarrierBsi" alt="" coords="175,5,290,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="85,80,227,107"/>
+<area shape="rect" id="node2" href="$classAmcCarrierSysMon.html" title=" " alt="" coords="5,5,152,32"/>
+<area shape="rect" id="node3" href="$classAmcCarrierBsi.html" title=" " alt="" coords="176,5,291,32"/>
 </map>

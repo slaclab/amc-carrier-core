@@ -1,4 +1,5 @@
 <map id="AmcCarrierEthFsbl" name="AmcCarrierEthFsbl">
-<area shape="rect" id="node2" href="$classAmcCarrierFsbl.html" title="AmcCarrierFsbl" alt="" coords="20,80,141,107"/>
-<area shape="rect" id="node3" href="$classAmcCarrierCoreFsbl.html" title="AmcCarrierCoreFsbl" alt="" coords="5,155,156,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="10,5,153,32"/>
+<area shape="rect" id="node2" href="$classAmcCarrierFsbl.html" title=" " alt="" coords="20,80,143,107"/>
+<area shape="rect" id="node3" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="5,155,157,181"/>
 </map>

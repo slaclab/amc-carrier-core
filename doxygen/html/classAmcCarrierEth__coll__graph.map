@@ -1,6 +1,7 @@
 <map id="AmcCarrierEth" name="AmcCarrierEth">
-<area shape="rect" id="node2" href="$classAmcCarrierRssi.html" title="AmcCarrierRssi(2)" alt="" coords="26,80,166,107"/>
-<area shape="rect" id="node3" href="$classAmcCarrierRssiObFifo.html" title="AmcCarrierRssiObFifo(2)" alt="" coords="5,5,187,32"/>
-<area shape="rect" id="node4" href="$classAmcCarrierRssiInterleave.html" title="AmcCarrierRssiInterleave(2)" alt="" coords="190,80,397,107"/>
-<area shape="rect" id="node5" href="$classAmcCarrierRssiObFifo.html" title="AmcCarrierRssiObFifo" alt="" coords="212,5,375,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="137,155,253,181"/>
+<area shape="rect" id="node2" href="$classAmcCarrierRssi.html" title=" " alt="" coords="27,80,167,107"/>
+<area shape="rect" id="node3" href="$classAmcCarrierRssiObFifo.html" title=" " alt="" coords="5,5,188,32"/>
+<area shape="rect" id="node4" href="$classAmcCarrierRssiInterleave.html" title=" " alt="" coords="191,80,397,107"/>
+<area shape="rect" id="node5" href="$classAmcCarrierRssiObFifo.html" title=" " alt="" coords="212,5,376,32"/>
 </map>

@@ -1,6 +1,7 @@
 <map id="AmcMpsSfpDualCore" name="AmcMpsSfpDualCore">
-<area shape="rect" id="node2" href="$classAmcMpsSfpCore.html" title="AmcMpsSfpCore" alt="" coords="127,80,255,107"/>
-<area shape="rect" id="node3" href="$classSi5317a.html" title="Si5317a" alt="" coords="5,5,80,32"/>
-<area shape="rect" id="node4" href="$classAmcMpsSfpHsRepeater.html" title="AmcMpsSfpHsRepeater" alt="" coords="104,5,277,32"/>
-<area shape="rect" id="node5" href="$classAmcMpsSfpMon.html" title="AmcMpsSfpMon" alt="" coords="301,5,427,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="113,155,271,181"/>
+<area shape="rect" id="node2" href="$classAmcMpsSfpCore.html" title=" " alt="" coords="127,80,257,107"/>
+<area shape="rect" id="node3" href="$classSi5317a.html" title=" " alt="" coords="5,5,80,32"/>
+<area shape="rect" id="node4" href="$classAmcMpsSfpHsRepeater.html" title=" " alt="" coords="105,5,279,32"/>
+<area shape="rect" id="node5" href="$classAmcMpsSfpMon.html" title=" " alt="" coords="303,5,430,32"/>
 </map>

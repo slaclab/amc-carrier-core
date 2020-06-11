@@ -1,6 +1,7 @@
 <map id="DaqTestSig" name="DaqTestSig">
-<area shape="rect" id="node2" href="$classDaqLane.html" title="DaqLane" alt="" coords="57,80,135,107"/>
-<area shape="rect" id="node3" href="$classDaqMuxV2.html" title="DaqMuxV2" alt="" coords="50,155,142,181"/>
-<area shape="rect" id="node4" href="$classAppTop.html" title="AppTop" alt="" coords="5,229,75,256"/>
-<area shape="rect" id="node5" href="$classDaqMuxV2Tb.html" title="DaqMuxV2Tb" alt="" coords="99,229,207,256"/>
+<area shape="rect" id="node1" title=" " alt="" coords="49,5,143,32"/>
+<area shape="rect" id="node2" href="$classDaqLane.html" title=" " alt="" coords="57,80,135,107"/>
+<area shape="rect" id="node3" href="$classDaqMuxV2.html" title=" " alt="" coords="49,155,143,181"/>
+<area shape="rect" id="node4" href="$classAppTop.html" title=" " alt="" coords="5,229,75,256"/>
+<area shape="rect" id="node5" href="$classDaqMuxV2Tb.html" title=" " alt="" coords="99,229,208,256"/>
 </map>
