@@ -10,11 +10,11 @@
 --    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -501,12 +501,12 @@ begin
          CNT_WIDTH_G    => 32,
          WIDTH_G        => STATUS_SIZE_C)
       port map (
-         -- Input Status bit Signals (wrClk domain)                  
+         -- Input Status bit Signals (wrClk domain)
          statusIn(14 downto 1) => mpsRxLinkUp,
          statusIn(0)           => mpsTxLinkUp,
-         -- Output Status bit Signals (rdClk domain)           
+         -- Output Status bit Signals (rdClk domain)
          statusOut             => statusOut,
-         -- Status Bit Counters Signals (rdClk domain) 
+         -- Status Bit Counters Signals (rdClk domain)
          cntRstIn              => r.cntRst,
          rollOverEnIn          => r.rollOverEn,
          cntOut                => cntOut,

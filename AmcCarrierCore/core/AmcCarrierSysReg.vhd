@@ -38,7 +38,7 @@ entity AmcCarrierSysReg is
       TPD_G        : time    := 1 ns;
       BUILD_INFO_G : BuildInfoType;
       APP_TYPE_G   : AppType := APP_NULL_TYPE_C;
-      MPS_SLOT_G   : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      MPS_SLOT_G   : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
       FSBL_G       : boolean := false);
    port (
       -- Primary AXI-Lite Interface
@@ -221,8 +221,8 @@ architecture mapping of AmcCarrierSysReg is
          i2cAddress  => "0001010",  -- EM2280P01QI: ADDR1=0Ohm, ADDR0=10kOhm --> Address=0x0A
          dataSize    => 16,             -- in units of bits
          addrSize    => 8,              -- in units of bits
-         repeatStart => '1',            -- repeated start 
-         endianness  => '0'));          -- Little endian         
+         repeatStart => '1',            -- repeated start
+         endianness  => '0'));          -- Little endian
 
    signal mAxilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
    signal mAxilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
@@ -534,7 +534,7 @@ begin
    -- AXI-Lite: PWR Monitor Module
    -------------------------------
    GEN_PWR_I2C : if (ULTRASCALE_PLUS_C) and (FSBL_G = false) generate
-   
+
 --      AxiI2cRegMaster_3 : entity surf.AxiI2cRegMaster
 --         generic map (
 --            TPD_G          => TPD_G,
@@ -553,8 +553,8 @@ begin
 --            -- Clocks and Resets
 --            axiClk         => axilClk,
 --            axiRst         => axilRst);
-            
-      AxiI2cRegMaster_3 : entity surf.AxiLitePMbusMaster 
+
+      AxiI2cRegMaster_3 : entity surf.AxiLitePMbusMaster
          generic map (
             TPD_G          => TPD_G,
             I2C_ADDR_G     => "0001010",
@@ -572,7 +572,7 @@ begin
             -- Clocks and Resets
             axilClk         => axilClk,
             axilRst         => axilRst);
-            
+
    end generate;
 
    --------------------------------------

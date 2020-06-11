@@ -1,8 +1,8 @@
 # This will run on Travis' 'new' container-based infrastructure
 sudo: true
 
-# Setup for Ubuntu Bionic (18.04)
-dist: bionic
+# Setup for Ubuntu Focal (20.04)
+dist: focal
 
 # Blacklist
 branches:
@@ -35,7 +35,7 @@ addons:
       - graphviz
       - python3
       - flake8
-      # - ghdl
+      - ghdl
 
 stages:
     - name: gen_release
@@ -63,8 +63,6 @@ jobs:
       before_script:
         - cd $TRAVIS_BUILD_DIR
         - chmod +x generateDocumentationAndDeploy.sh
-        - chmod +x ghdl-travis-install.sh
-        - ./ghdl-travis-install.sh > /dev/null 2>&1
         - make
         - rm -rf ghdl-build
         - python3 -m compileall -f python/

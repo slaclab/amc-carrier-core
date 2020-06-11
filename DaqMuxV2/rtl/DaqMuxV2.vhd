@@ -5,11 +5,11 @@
 --              https://confluence.slac.stanford.edu/display/ppareg/AmcAxisDaqV2+Requirements
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -43,7 +43,7 @@ entity DaqMuxV2 is
       axiClk : in sl;
       axiRst : in sl;
 
-      -- Clocks and Resets   
+      -- Clocks and Resets
       devClk_i : in sl;
       devRst_i : in sl;
 
@@ -54,7 +54,7 @@ entity DaqMuxV2 is
       trigCasc_i : in  sl;
       trigCasc_o : out sl;
 
-      -- Cascaded Arm trigger for external connection between modules      
+      -- Cascaded Arm trigger for external connection between modules
       armCasc_i : in  sl := '0';
       armCasc_o : out sl;
 
@@ -72,7 +72,7 @@ entity DaqMuxV2 is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
 
-      -- Sample data input 
+      -- Sample data input
       sampleDataArr_i  : in slv32Array(N_DATA_IN_G-1 downto 0);
       sampleValidVec_i : in slv(N_DATA_IN_G-1 downto 0);
       linkReadyVec_i   : in slv(N_DATA_IN_G-1 downto 0);
@@ -96,7 +96,7 @@ architecture rtl of DaqMuxV2 is
    signal s_sampleValidVecMux : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
    signal s_LinkReadyVecMux   : slv(N_DATA_OUT_G-1 downto 0)        := (others => '0');
 
-   -- DAQ signals 
+   -- DAQ signals
    signal s_enAxi         : slv(N_DATA_OUT_G-1 downto 0);
    signal s_enTest        : slv(N_DATA_OUT_G-1 downto 0);
    signal s_dataSize      : slv(31 downto 0);
@@ -162,7 +162,7 @@ begin
    -- Synchronize timestamp_i and bsa
    -- Warning: Not optimal Sync vector used instead of fifo because no input fifo clock available here.
    -- Rationale: The timeStamp and the bsa are registered between the two timing strobes. So this signal is static for 1/360s.
-   -----------------------------------------------------------    
+   -----------------------------------------------------------
    U_SyncTimestamp : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
@@ -192,7 +192,7 @@ begin
 
    -----------------------------------------------------------
    -- AXI lite
-   ----------------------------------------------------------- 
+   -----------------------------------------------------------
    -- axiLite register interface
    U_DaqRegItf : entity amc_carrier_core.DaqRegItf
       generic map (
@@ -272,7 +272,7 @@ begin
    armCasc_o  <= s_trigHwArm;
    -----------------------------------------------------------
    -- Sync MULTIPLEXER logic
-   -----------------------------------------------------------    
+   -----------------------------------------------------------
    sync : process (devClk_i) is
    begin
       if rising_edge(devClk_i) then
@@ -312,7 +312,7 @@ begin
 
    s_header <= "00000" & s_trigHeader;
 
-   -- AXI stream interface two parallel lanes 
+   -- AXI stream interface two parallel lanes
    GEN_OUT_LANES : for i in N_DATA_OUT_G-1 downto 0 generate
       U_DaqLane : entity amc_carrier_core.DaqLane
          generic map (
@@ -346,7 +346,7 @@ begin
             signWidth_i => s_signWidth(i),
             signed_i    => s_signed(i),
 
-            -- Status 
+            -- Status
             error_o  => s_errorVec(i),
             pctCnt_o => s_pctCntVec(i),
             busy_o   => s_daqBusyVec(i),
@@ -421,5 +421,5 @@ begin
    s_daqBusy <= uOr(s_daqBusyVec);
 
 
-------------------------------------- 
+-------------------------------------
 end rtl;

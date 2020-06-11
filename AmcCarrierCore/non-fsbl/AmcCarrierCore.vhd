@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ use unisim.vcomponents.all;
 entity AmcCarrierCore is
    generic (
       TPD_G                  : time     := 1 ns;
-      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB   
+      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
       WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
       WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
       RSSI_ILEAVE_EN_G       : boolean  := false;
@@ -59,7 +59,7 @@ entity AmcCarrierCore is
       -----------------------
       -- Core Ports to AppTop
       -----------------------
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : in    sl;
       timingRst            : in    sl;
       timingBusIntf        : out   TimingBusType;
@@ -102,9 +102,9 @@ entity AmcCarrierCore is
       stableClk            : out   sl;
       stableRst            : out   sl;
       gthFabClk            : out   sl;
-      ------------------------         
+      ------------------------
       -- Core Ports to Wrapper
-      ------------------------         
+      ------------------------
       -- AXI-Lite Master bus
       axilReadMasters      : out   AxiLiteReadMasterArray(1 downto 0);
       axilReadSlaves       : in    AxiLiteReadSlaveArray(1 downto 0);
@@ -236,7 +236,7 @@ begin
 
    --------------------------------
    -- Common Clock and Reset Module
-   -------------------------------- 
+   --------------------------------
    U_IBUFDS : entity amc_carrier_core.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
@@ -354,7 +354,7 @@ begin
          ibBpMsgServerSlave   => ibBpMsgServerSlave,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- ETH Ports
          ethRxP               => ethRxP,
          ethRxN               => ethRxN,
@@ -396,8 +396,8 @@ begin
          ibTimingEthMsgSlave  => ibTimingEthMsgSlave,
          ----------------------
          -- Top Level Interface
-         ----------------------         
-         -- Timing Interface 
+         ----------------------
+         -- Timing Interface
          recTimingClk         => recTimingClk,
          recTimingRst         => recTimingRst,
          appTimingClk         => timingClk,
@@ -411,7 +411,7 @@ begin
          appTimingRefClkDiv2  => timingRefClkDiv2,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- LCLS Timing Ports
          timingRxP            => timingRxP,
          timingRxN            => timingRxN,
@@ -457,7 +457,7 @@ begin
          ibBsaSlaves          => ibBsaSlaves,
          ----------------------
          -- Top Level Interface
-         ----------------------         
+         ----------------------
          -- Diagnostic Interface
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
@@ -500,7 +500,7 @@ begin
          axiReadSlave    => axiReadSlave,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- DDR3L SO-DIMM Ports
          ddrClkP         => ddrClkP,
          ddrClkN         => ddrClkN,

@@ -8,14 +8,14 @@
 --                         Averages the samples with the window size of rateDiv_i
 --                   averaging_i = '0':
 --                         rateDiv_i
---                         0 - SR, 1 - SR, 2 - SR/2, 3 - SR/3, 4 - SR/4 etc. up to 2^16-1             
+--                         0 - SR, 1 - SR, 2 - SR/2, 3 - SR/3, 4 - SR/4 etc. up to 2^16-1
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ begin
 
       -- Throttle rate to the inbound data valid
       if (sampleValid_i = '1') then
-         -- rateDiv clock generator 
+         -- rateDiv clock generator
          if (r.cntPeriod = 0) or (r.enable = '0') then
             v.cnt    := (others => '0');
             v.divClk := '1';
@@ -178,7 +178,7 @@ begin
          end if;
       end if;
 
-      -- Bypass average if disabled 
+      -- Bypass average if disabled
       if (averaging_i = '0') then
          v.average := r.sampleData;
       elsif (r.divClk = '1') then

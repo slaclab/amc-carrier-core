@@ -4,11 +4,11 @@
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ architecture rtl of AmcGenericAdcDacVcoSpi is
       IDLE_S,
       SCK_LO_S,
       SCK_HI_S,
-      CS_HIGH_S);    
+      CS_HIGH_S);
 
    type RegType is record
       csL        : sl;
@@ -76,14 +76,14 @@ architecture rtl of AmcGenericAdcDacVcoSpi is
 
    -- attribute dont_touch               : string;
    -- attribute dont_touch of r          : signal is "TRUE";
-   
+
 begin
 
    OBUFDS_DacVcoCs : OBUFDS
       port map (
          I  => r.csL,
          O  => dacVcoCsP,
-         OB => dacVcoCsN);   
+         OB => dacVcoCsN);
 
    OBUFDS_DacVcoSck : OBUFDS
       port map (
@@ -95,7 +95,7 @@ begin
       port map (
          I  => r.din,
          O  => dacVcoDinP,
-         OB => dacVcoDinN);      
+         OB => dacVcoDinN);
 
    comb : process (dacVcoCtrl, dacVcoEnable, dacVcoSckConfig, r, rst) is
       variable v : regType;
@@ -186,7 +186,7 @@ begin
 
       -- Register the variable for next clock cycle
       rin <= v;
-      
+
    end process comb;
 
    seq : process (clk) is
@@ -195,5 +195,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 end rtl;

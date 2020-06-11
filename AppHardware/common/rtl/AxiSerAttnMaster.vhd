@@ -9,18 +9,18 @@
 --                to multiple AXI crossbar slaves and use Chip select outputs
 --                (coreCsb) to multiplex select the addressed outputs (coreSDout and
 --                coreSclk).
---                The coreCsb is active low. And active only if the corresponding 
+--                The coreCsb is active low. And active only if the corresponding
 --                Axi Crossbar Slave is addressed.
 --
 --                Outputs a latch enable signal (For Attenuator chips) after the data is written
 --                the latch enable stays high for one SPI_CLK_PERIOD_CYCLES_C.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -128,7 +128,7 @@ begin
             end if;
 
             if (axiStatus.writeEnable = '1') then
-               -- Write data to Attn chip 
+               -- Write data to Attn chip
                v.wrData := axiWriteMaster.wdata(DATA_SIZE_G-1 downto 0);
                v.wrEn   := '1';
                v.state  := WAIT_CYCLE_S;

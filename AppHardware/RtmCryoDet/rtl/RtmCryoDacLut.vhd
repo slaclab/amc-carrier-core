@@ -4,11 +4,11 @@
 -- Description: SPI DAC LUT Module
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -228,8 +228,8 @@ begin
                   -- Increment the trigger counter
                   v.trigCnt := r.trigCnt + 1;
                end if;
-               
-               -- Count each iteration 
+
+               -- Count each iteration
                v.eventCnt := r.eventCnt + 1;
 
                -- Next state
@@ -238,7 +238,7 @@ begin
             end if;
          ----------------------------------------------------------------------
          when WAIT_S =>
-            -- Check for timeout 
+            -- Check for timeout
             if (r.timer = 0) then
                -- Next state
                v.state := REQ_S;
@@ -250,7 +250,7 @@ begin
 
                -- Setup the AXI-Lite Master request
                v.req.request := r.enableCh(r.index);
-               v.req.rnw     := '0';    -- 0: write     
+               v.req.rnw     := '0';    -- 0: write
                v.req.address := r.dacAxilAddr(r.index);
                v.req.wrData  := ramData(r.index);
 
@@ -271,10 +271,10 @@ begin
 
                -- Reset the flag
                v.req.request := '0';
-               
+
                if (r.req.request = '1') and (ack.resp /= AXI_RESP_OK_C) then
                   -- Increment the address
-                  v.errorCnt := r.errorCnt + 1;               
+                  v.errorCnt := r.errorCnt + 1;
                end if;
 
                -- Check if last channel

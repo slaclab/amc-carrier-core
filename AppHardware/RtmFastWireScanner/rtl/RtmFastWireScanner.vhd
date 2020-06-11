@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: https://confluence.slac.stanford.edu/x/BBBODQ  
+-- Description: https://confluence.slac.stanford.edu/x/BBBODQ
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ entity RtmFastWireScanner is
    generic (
       TPD_G : time := 1 ns);
    port (
-      -- Digital I/O Interface      
+      -- Digital I/O Interface
 --      encAmadIn       : in    slv(3 downto 0);
 --      encAmadTri      : in    slv(3 downto 0);
       encAmadOut      : out   slv(3 downto 0);
@@ -54,7 +54,7 @@ entity RtmFastWireScanner is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -69,7 +69,7 @@ begin
 
    ---------------------
    -- ABS/INC_[A,B,C,D]
-   ---------------------      
+   ---------------------
    rtmLsN(0)  <= absInc(0);
    rtmLsN(3)  <= absInc(1);
    rtmLsN(11) <= absInc(2);
@@ -77,7 +77,7 @@ begin
 
    ---------------------
    -- OK_[A,B,C,D]
-   ---------------------    
+   ---------------------
    ok(0) <= rtmLsP(0);
    ok(1) <= rtmLsP(3);
    ok(2) <= rtmLsP(11);
@@ -85,7 +85,7 @@ begin
 
    ---------------------
    -- LIMIT_[A,B,C,D]
-   ---------------------   
+   ---------------------
    limit(0) <= rtmLsN(1);
    limit(1) <= rtmLsN(4);
    limit(2) <= rtmLsN(12);
@@ -98,7 +98,7 @@ begin
    encAmadOut(1) <= rtmLsP(5);
    encAmadOut(2) <= rtmLsP(13);
    encAmadOut(3) <= rtmLsP(19);
-   
+
    -- ONLY INPUT CAN BE USED
    -- U_encAmad_0 : IOBUF
       -- port map (
@@ -135,7 +135,7 @@ begin
    encBmodOut(1) <= rtmLsN(5);
    encBmodOut(2) <= rtmLsN(13);
    encBmodOut(3) <= rtmLsN(19);
-   
+
    -- ONLY INPUT CAN BE USED
    -- U_encBmod_0 : IOBUF
       -- port map (
@@ -172,7 +172,7 @@ begin
    encIsldOut(1) <= rtmLsP(4);
    encIsldOut(2) <= rtmLsP(12);
    encIsldOut(3) <= rtmLsP(18);
-   
+
    -- ONLY INPUT CAN BE USED
    -- U_encIsld_0 : IOBUF
       -- port map (
@@ -202,7 +202,7 @@ begin
          -- O  => encIsldOut(3),
          -- IO => rtmLsP(18));
 
-		 
+
 		    ---------------------
    -- SPARE_[A,B,C,D]
    ---------------------
@@ -233,7 +233,7 @@ begin
          T  => spareTri(3),
          O  => spareOut(3),
          IO => rtmLsP(16));
-		 
+
    --------------------------------
    -- Terminate Unused AXI-Lite Bus
    --------------------------------

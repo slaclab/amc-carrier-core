@@ -21,6 +21,7 @@ class AmcCarrierCore(pr.Device):
             enableBsa           = True,
             enableMps           = True,
             numWaveformBuffers  = 4,
+            numCoreTrigs        = 16,
             enableTpgMini       = True,
             expand              = False,
             **kwargs):
@@ -91,6 +92,7 @@ class AmcCarrierCore(pr.Device):
             offset        =  0x08000000,
             expand        =  False,
             enableTpgMini = enableTpgMini,
+            numCoreTrigs  = numCoreTrigs,
         ))
 
         self.add(amcc.AmcCarrierBsa(

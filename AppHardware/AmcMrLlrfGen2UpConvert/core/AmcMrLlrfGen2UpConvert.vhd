@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ use surf.I2cPkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity AmcMrLlrfGen2UpConvert is
    generic (
@@ -60,7 +60,7 @@ entity AmcMrLlrfGen2UpConvert is
       recRst          : in    sl;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri         : inout slv(4 downto 0);
       jtagSec         : inout slv(4 downto 0);
@@ -106,7 +106,7 @@ architecture mapping of AmcMrLlrfGen2UpConvert is
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
          endianness => '1',             -- Big endian
-         repeatStart=> '1'));           -- Enable repeated start  
+         repeatStart=> '1'));           -- Enable repeated start
 
    constant NUM_AXI_MASTERS_C      : natural               := 11;
    constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 5;
@@ -244,7 +244,7 @@ begin
          recRst        => recRst,
          -----------------------
          -- Application Ports --
-         -----------------------      
+         -----------------------
          -- AMC's JTAG Ports
          jtagPri       => jtagPri,
          jtagSec       => jtagSec,
@@ -352,7 +352,7 @@ begin
          coreSDout      => doutVec(4),
          coreCsb        => csbVec(4));
 
-   -- Input mux from "IO" port if LMK and from "I" port for ADCs 
+   -- Input mux from "IO" port if LMK and from "I" port for ADCs
    muxSDin <= lmkSDin when csbVec = "10111" else spiSdo_i;
 
    -- Output mux
@@ -371,7 +371,7 @@ begin
       doutVec(3)             when "10111",
       doutVec(4)             when "01111",
       '0'                    when others;
-   -- Outputs 
+   -- Outputs
    spiSclk_o <= muxSclk;
    spiSdi_o  <= muxSDout;
 
@@ -417,7 +417,7 @@ begin
       attDoutVec(3)                when "0111",
       '0'                          when others;
 
-   -- Outputs                   
+   -- Outputs
    attSclk_o    <= attMuxSclk;
    attSdi_o     <= attMuxSDout;
    --attLatchEn_o   <= attCsbVec;

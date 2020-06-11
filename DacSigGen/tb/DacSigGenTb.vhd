@@ -4,11 +4,11 @@
 -- Description: Converts the 16-bit interface to 32-bit JESD interface
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ end entity ;
 
 architecture Bhv of DacSigGenTb is
   -----------------------------
-  -- Port Signals 
+  -- Port Signals
   -----------------------------
    constant TPD_G            : time := 1 ns;
 
@@ -69,8 +69,8 @@ begin  -- architecture Bhv
          clkP => jesdClk,
          clkN => open,
          rst  => jesdRst,--rst,
-         rstL => open); 
-         
+         rstL => open);
+
       -- Generate clocks and resets
    ClkRst_2x : entity surf.ClkRst
       generic map (
@@ -81,7 +81,7 @@ begin  -- architecture Bhv
          clkP => jesdClk2x,
          clkN => open,
          rst  => jesdRst2x,--rst2x,
-         rstL => open); 
+         rstL => open);
 
      -- Generate clocks and resets
    ClkRst_axi : entity surf.ClkRst
@@ -96,7 +96,7 @@ begin  -- architecture Bhv
          rstL => open);
 
   -----------------------------
-  -- component instantiation 
+  -- component instantiation
   -----------------------------
   DacSigGen_INST: entity amc_carrier_core.DacSigGen
    generic map (
@@ -120,7 +120,7 @@ begin  -- architecture Bhv
       axilWriteMaster => axilWriteMaster,
       axilWriteSlave  => axilWriteSlave);
 
-	
+
   StimuliProcess : process
   begin
       wait until jesdRst2x = '0';
@@ -139,7 +139,7 @@ begin  -- architecture Bhv
       wait for 100*CLK_2X_PERIOD_C;
       dacSigCtrl.start <= (others => '1');
       wait for 10*CLK_2X_PERIOD_C;
-      dacSigCtrl.start <= (others => '0');      
+      dacSigCtrl.start <= (others => '0');
   end process StimuliProcess;
-  
+
 end architecture Bhv;

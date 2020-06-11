@@ -5,7 +5,7 @@
 --               0x00 (RW)- Control Register
 --                              Bit0: Enable DAC signal generator
 --                              Bit1: Load TAP delays from registers tapDelayIn_o
---               0x01 (RW)- Polarity of the corresponding LVDS output (15 downto 0) 
+--               0x01 (RW)- Polarity of the corresponding LVDS output (15 downto 0)
 --                            - '0' Regular
 --                            - '1' Inverted
 --               0x02 (RW)- Signal period size. In number of Block RAM addresses (two samples per address). Zero inclusive.
@@ -15,11 +15,11 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -49,7 +49,7 @@ entity LvdsDacRegItf is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
-      -- Control generation  (devClk_i domain)  
+      -- Control generation  (devClk_i domain)
       devClk_i        : in  sl;
       devRst_i        : in  sl;
       enable_o        : out sl;

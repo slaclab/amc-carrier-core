@@ -24,6 +24,7 @@ class AmcCarrierTiming(pr.Device):
             name          = "AmcCarrierTiming",
             description   = "AMC Carrier Timing Receiver Module",
             enableTpgMini = True,
+            numCoreTrigs  = 16,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
@@ -41,7 +42,8 @@ class AmcCarrierTiming(pr.Device):
             ))
 
         self.add(timingCore.EvrV2CoreTriggers(
-            offset = 0x00040000,
+            offset  = 0x00040000,
+            numTrig = numCoreTrigs,
         ))
 
         self.add(timingCore.GthRxAlignCheck(

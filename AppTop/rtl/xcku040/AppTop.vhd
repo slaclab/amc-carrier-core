@@ -7,11 +7,11 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 AMC Carrier Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 AMC Carrier Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 AMC Carrier Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ entity AppTop is
       axilReadSlave        : out   AxiLiteReadSlaveType;
       axilWriteMaster      : in    AxiLiteWriteMasterType;
       axilWriteSlave       : out   AxiLiteWriteSlaveType;
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : out   sl;
       timingRst            : out   sl;
       timingBus            : in    TimingBusType;
@@ -148,7 +148,7 @@ entity AppTop is
       rtmHsRxN             : in    sl;
       rtmHsTxP             : out   sl;
       rtmHsTxN             : out   sl;
-      -- RTM's Clock Reference 
+      -- RTM's Clock Reference
       genClkP              : in    sl;
       genClkN              : in    sl);
 end AppTop;
@@ -290,7 +290,7 @@ begin
 
    ---------------
    -- DAQ MUX Core
-   ---------------            
+   ---------------
    trigCascBay(2) <= trigCascBay(0);    -- to make cross and use generate
    armCascBay(2)  <= armCascBay(0);     -- to make cross and use generate
 
@@ -318,7 +318,7 @@ begin
             -- Cascaded Sw trigger for external connection between modules
             trigCasc_i          => trigCascBay(i+1),
             trigCasc_o          => trigCascBay(i),
-            -- Cascaded Arm trigger for external connection between modules 
+            -- Cascaded Arm trigger for external connection between modules
             armCasc_i           => armCascBay(i+1),
             armCasc_o           => armCascBay(i),
             -- Freeze buffers
@@ -332,7 +332,7 @@ begin
             axilReadSlave       => axilReadSlaves(DAQ_MUX0_INDEX_C+i),
             axilWriteMaster     => axilWriteMasters(DAQ_MUX0_INDEX_C+i),
             axilWriteSlave      => axilWriteSlaves(DAQ_MUX0_INDEX_C+i),
-            -- Sample data input 
+            -- Sample data input
             sampleDataArr_i(0)  => adcValues(i, 0),
             sampleDataArr_i(1)  => adcValues(i, 1),
             sampleDataArr_i(2)  => adcValues(i, 2),
@@ -479,14 +479,14 @@ begin
          AXI_BASE_ADDR_G => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
          JESD_USR_DIV_G  => JESD_USR_DIV_G)
       port map (
-         -- Clocks and resets   
+         -- Clocks and resets
          jesdClk             => jesdClk,
          jesdRst             => jesdRst,
          jesdClk2x           => jesdClk2x,
          jesdRst2x           => jesdRst2x,
          jesdUsrClk          => jesdUsrClk,
          jesdUsrRst          => jesdUsrRst,
-         -- DaqMux/Trig Interface (timingClk domain) 
+         -- DaqMux/Trig Interface (timingClk domain)
          freezeHw            => freezeHw,
          timingTrig          => timingTrig,
          trigHw              => trigHw,
@@ -509,7 +509,7 @@ begin
          dacSigStatus        => dacSigStatus,
          dacSigValids        => dacSigValids,
          dacSigValues        => dacSigValues,
-         -- AXI-Lite Interface (axilClk domain) 
+         -- AXI-Lite Interface (axilClk domain)
          axilClk             => axilClk,
          axilRst             => axilRst,
          axilReadMaster      => axilReadMasters(CORE_INDEX_C),
@@ -519,7 +519,7 @@ begin
          ----------------------
          -- Top Level Interface
          ----------------------
-         -- Timing Interface (timingClk domain)   
+         -- Timing Interface (timingClk domain)
          timingClk           => recTimingClk,
          timingRst           => recTimingRst,
          timingBus           => timingBus,
@@ -579,7 +579,7 @@ begin
          rtmHsRxN            => rtmHsRxN,
          rtmHsTxP            => rtmHsTxP,
          rtmHsTxN            => rtmHsTxN,
-         -- RTM's Clock Reference 
+         -- RTM's Clock Reference
          genClkP             => genClkP,
          genClkN             => genClkN);
 

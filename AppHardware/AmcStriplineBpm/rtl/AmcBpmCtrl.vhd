@@ -4,11 +4,11 @@
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ entity AmcBpmCtrl is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- LMK Ports
       lmkClkSel       : out slv(1 downto 0);
       lmkRst          : out sl;
@@ -171,9 +171,9 @@ begin
          -- Input Status bit Signals (wrClk domain)
          statusIn(4)          => lemoTrig,
          statusIn(3 downto 0) => adcValids,
-         -- Output Status bit Signals (rdClk domain)  
+         -- Output Status bit Signals (rdClk domain)
          statusOut            => statusOut,
-         -- Status Bit Counters Signals (rdClk domain) 
+         -- Status Bit Counters Signals (rdClk domain)
          cntRstIn             => r.cntRst,
          rollOverEnIn         => r.rollOverEn,
          cntOut               => statusCnt,
@@ -195,7 +195,7 @@ begin
       -- Determine the transaction type
       axiSlaveWaitTxn(regCon, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
-      -- Map the read only registers      
+      -- Map the read only registers
       axiSlaveRegisterR(regCon, x"000", 0, muxSlVectorArray(statusCnt, 0));
       axiSlaveRegisterR(regCon, x"004", 0, muxSlVectorArray(statusCnt, 1));
       axiSlaveRegisterR(regCon, x"008", 0, muxSlVectorArray(statusCnt, 2));

@@ -7,11 +7,11 @@
 -- Block for Register protocol.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ entity SsiAxiMaster is
       AXI_WRITE_EN_G      : boolean             := false);
    port (
 
-      -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+      -- Streaming Slave (Rx) Interface (sAxisClk domain)
       sAxisClk    : in  sl;
       sAxisRst    : in  sl := '0';
       sAxisMaster : in  AxiStreamMasterType;
@@ -134,7 +134,7 @@ begin
    -- AXI_BUS_CONFIG_G.DATA_BYTES_C must be 4 (or 8?)
 
    ----------------------------------
-   -- Input FIFO 
+   -- Input FIFO
    ----------------------------------
    SlaveAxiStreamFifo : entity surf.AxiStreamFifoV2
       generic map (
@@ -161,7 +161,7 @@ begin
          mAxisSlave  => sFifoAxisSlave);
 
    ----------------------------------
-   -- Output FIFO 
+   -- Output FIFO
    ----------------------------------
    MasterAxiStreamFifo : entity surf.AxiStreamFifoV2
       generic map (

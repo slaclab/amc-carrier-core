@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description:  Registers 
+-- Description:  Registers
 --               0x00(RW)- CFG register - Default 0xFFFC(AD7682/AD7689 Data-sheet, Table 11)
 --                   bit15-CFG
 --                   bit14-INCC
@@ -21,14 +21,14 @@
 --                   bit00-XX
 --
 --               0x10-1X(RO)- ADC values (0-3)
---                   
+--
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -69,7 +69,7 @@ end AxiSpiAd7682Reg;
 architecture rtl of AxiSpiAd7682Reg is
 
    type RegType is record
-      -- 
+      --
       cfgReg : slv(cfgReg_o'range);
       we     : sl;
 
@@ -82,7 +82,7 @@ architecture rtl of AxiSpiAd7682Reg is
       --
       cfgReg         => x"FFFC",
       we             => '0',
-      -- AXI lite 
+      -- AXI lite
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 

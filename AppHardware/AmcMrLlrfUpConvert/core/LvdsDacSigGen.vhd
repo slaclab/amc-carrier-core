@@ -3,17 +3,17 @@
 -------------------------------------------------------------------------------
 -- Description: Signal generator top module.
 --     Arbitrary signal generator
---     Module has its own AxiLite register interface and access to AXI lite and 
+--     Module has its own AxiLite register interface and access to AXI lite and
 --     AXIlite RAM module for signal definition,
 --     Adjustable period s_periodSize,
---     Polarity can be bitwise reversed s_polarityMask. 
+--     Polarity can be bitwise reversed s_polarityMask.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -57,7 +57,7 @@ entity LvdsDacSigGen is
       load_o          : out slv(15 downto 0);
       tapDelaySet_o   : out Slv9Array(15 downto 0);
       tapDelayStat_i  : in  Slv9Array(15 downto 0);
-      -- Sample data output 
+      -- Sample data output
       sampleData_o    : out Slv2Array(15 downto 0));
 end LvdsDacSigGen;
 
@@ -133,7 +133,7 @@ begin
          axilReadSlave   => locAxilReadSlaves(DAC_AXIL_INDEX_C),
          axilWriteMaster => locAxilWriteMasters(DAC_AXIL_INDEX_C),
          axilWriteSlave  => locAxilWriteSlaves(DAC_AXIL_INDEX_C),
-         -- Control generation  (devClk_i domain)  
+         -- Control generation  (devClk_i domain)
          devClk_i        => devClk_i,
          devRst_i        => devRst_i,
          enable_o        => s_laneEn,
@@ -167,7 +167,7 @@ begin
          devClk_i        => devClk_i,
          devRst_i        => devRst_i,
          extData_i       => extData_i,
-         -- Control generation  (devClk_i domain)      
+         -- Control generation  (devClk_i domain)
          enable_i        => s_laneEn,
          periodSize_i    => s_periodSize,
          -- Parallel data out  (devClk_i domain)

@@ -4,11 +4,11 @@
 -- Description: Simulation Testbed for DaqMuxV2
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 ------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
 use surf.SsiPkg.all;
 
-library amc_carrier_core; 
+library amc_carrier_core;
 
 entity DaqMuxV2Tb is
 end entity;
@@ -218,9 +218,9 @@ begin
 
       wait for CLK_PERIOD_C*500;
 
-      ---------------------------------------------------------      
+      ---------------------------------------------------------
       -- Decimation 2
-      ---------------------------------------------------------      
+      ---------------------------------------------------------
       axiLiteBusSimWrite(clk_i, axilWriteMaster, axilWriteSlave, x"0000_0008", x"0000_0002");
 
       wait for CLK_PERIOD_C*1000;
@@ -229,9 +229,9 @@ begin
       trigHw_i <= '0';
       wait for CLK_PERIOD_C*500;
 
-      ---------------------------------------------------------      
+      ---------------------------------------------------------
       -- Decimation 4
-      ---------------------------------------------------------      
+      ---------------------------------------------------------
       axiLiteBusSimWrite(clk_i, axilWriteMaster, axilWriteSlave, x"0000_0008", x"0000_0004");
 
       wait for CLK_PERIOD_C*1000;
