@@ -127,6 +127,7 @@ class AppTop(pr.Device):
                     time.sleep(0.100) # TODO: Optimize this timeout
 
                 for tx in jesdTxDevices:
+                    tx.CmdClearErrors()
                     tx.ResetGTs.set(0)
                 for rx in jesdRxDevices:
                     rxEnable = rx.Enable.get()
@@ -175,12 +176,10 @@ class AppTop(pr.Device):
                         break
 
                 for tx in jesdTxDevices:
-                    tx.CmdClearErrors()
                     if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
                         print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
                         linkLock = False
                 for rx in jesdRxDevices:
-                    rx.CmdClearErrors()
                     if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
                         print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
                         linkLock = False
@@ -194,8 +193,6 @@ class AppTop(pr.Device):
                     else:
                         print(f'Re-executing AppTop.Init(): retryCnt = {retryCnt}')
 
-            for tx in jesdTxDevices:
-                tx.CmdClearErrors()
             for dac in dacDevices:
                 enable = dac.enable.get()
                 dac.enable.set(True)
