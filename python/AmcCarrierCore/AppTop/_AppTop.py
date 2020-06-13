@@ -127,13 +127,28 @@ class AppTop(pr.Device):
                     time.sleep(0.100) # TODO: Optimize this timeout
 
                 for tx in jesdTxDevices:
-                    tx.CmdClearErrors()
-                    tx.ResetGTs.set(0)
+                    txEnable = tx.Enable.get()
+                    tx.Enable.set(0)
+                    tx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
+
                 for rx in jesdRxDevices:
                     rxEnable = rx.Enable.get()
                     rx.Enable.set(0)
-                    rx.ResetGTs.set(0)
-                    time.sleep(0.100) # TODO: Optimize this timeout
+                    rx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
+
+                time.sleep(0.250) # TODO: Optimize this timeout
+
+                for dac in dacDevices:
+                    enable = dac.enable.get()
+                    dac.enable.set(True)
+                    dac.ClearAlarms()
+                    dac.enable.set(enable)
+
+                for tx in jesdTxDevices:
+                    tx.CmdClearErrors()
+                    tx.Enable.set(txEnable)
+
+                for rx in jesdRxDevices:
                     rx.CmdClearErrors()
                     rx.Enable.set(rxEnable)
 
@@ -192,12 +207,6 @@ class AppTop(pr.Device):
                         raise pr.DeviceError('AppTop.Init(): Too many retries and giving up on retries')
                     else:
                         print(f'Re-executing AppTop.Init(): retryCnt = {retryCnt}')
-
-            for dac in dacDevices:
-                enable = dac.enable.get()
-                dac.enable.set(True)
-                dac.ClearAlarms()
-                dac.enable.set(enable)
 
             # Load the DAC signal generator
             for sigGen in sigGenDevices:
