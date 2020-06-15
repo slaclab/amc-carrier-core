@@ -138,12 +138,6 @@ class AppTop(pr.Device):
 
                 time.sleep(0.250) # TODO: Optimize this timeout
 
-                for dac in dacDevices:
-                    enable = dac.enable.get()
-                    dac.enable.set(True)
-                    dac.ClearAlarms()
-                    dac.enable.set(enable)
-
                 for tx in jesdTxDevices:
                     tx.CmdClearErrors()
                     tx.Enable.set(txEnable)
@@ -197,6 +191,16 @@ class AppTop(pr.Device):
             for sigGen in sigGenDevices:
                 if ( sigGen.CsvFilePath.get() != "" ):
                     sigGen.LoadCsvFile("")
+
+            # Special DAC Init procedure
+            for dac in dacDevices:
+                dac.NcoSync()
+
+            for dac in dacDevices:
+                enable = dac.enable.get()
+                dac.enable.set(True)
+                dac.ClearAlarms()
+                dac.enable.set(enable)
 
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)
