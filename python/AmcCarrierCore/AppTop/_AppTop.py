@@ -154,22 +154,7 @@ class AppTop(pr.Device):
 
                 # Special DAC Init procedure
                 for dac in dacDevices:
-                    dac.EnableTx.set(0x0)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.InitJesd.set(0x1)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.JesdRstN.set(0x0)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.JesdRstN.set(0x1)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.InitJesd.set(0x0)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.EnableTx.set(0x1)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    ##################################################################
-                    # Release sequence above with "dac.NcoSync()" on next SURF release
-                    ##################################################################
-                    # dac.NcoSync()
+                    dac.NcoSync()
 
                 # Check the link locks
                 linkLock = True
