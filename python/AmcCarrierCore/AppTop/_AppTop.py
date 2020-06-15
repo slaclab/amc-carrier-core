@@ -127,34 +127,28 @@ class AppTop(pr.Device):
                     time.sleep(0.100) # TODO: Optimize this timeout
 
                 for tx in jesdTxDevices:
-                    tx.CmdClearErrors()
-                    tx.ResetGTs.set(0)
+                    txEnable = tx.Enable.get()
+                    tx.Enable.set(0)
+                    tx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
+
                 for rx in jesdRxDevices:
                     rxEnable = rx.Enable.get()
                     rx.Enable.set(0)
-                    rx.ResetGTs.set(0)
-                    time.sleep(0.100) # TODO: Optimize this timeout
+                    rx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
+
+                time.sleep(0.250) # TODO: Optimize this timeout
+
+                for tx in jesdTxDevices:
+                    tx.CmdClearErrors()
+                    tx.Enable.set(txEnable)
+
+                for rx in jesdRxDevices:
                     rx.CmdClearErrors()
                     rx.Enable.set(rxEnable)
 
                 # Special DAC Init procedure
                 for dac in dacDevices:
-                    dac.EnableTx.set(0x0)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.InitJesd.set(0x1)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.JesdRstN.set(0x0)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.JesdRstN.set(0x1)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.InitJesd.set(0x0)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    dac.EnableTx.set(0x1)
-                    time.sleep(0.010) # TODO: Optimize this timeout
-                    ##################################################################
-                    # Release sequence above with "dac.NcoSync()" on next SURF release
-                    ##################################################################
-                    # dac.NcoSync()
+                    dac.NcoSync()
 
                 # Check the link locks
                 linkLock = True
@@ -193,16 +187,20 @@ class AppTop(pr.Device):
                     else:
                         print(f'Re-executing AppTop.Init(): retryCnt = {retryCnt}')
 
+            # Load the DAC signal generator
+            for sigGen in sigGenDevices:
+                if ( sigGen.CsvFilePath.get() != "" ):
+                    sigGen.LoadCsvFile("")
+
+            # Special DAC Init procedure
+            for dac in dacDevices:
+                dac.NcoSync()
+
             for dac in dacDevices:
                 enable = dac.enable.get()
                 dac.enable.set(True)
                 dac.ClearAlarms()
                 dac.enable.set(enable)
-
-            # Load the DAC signal generator
-            for sigGen in sigGenDevices:
-                if ( sigGen.CsvFilePath.get() != "" ):
-                    sigGen.LoadCsvFile("")
 
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)
