@@ -87,6 +87,9 @@ class AppTop(pr.Device):
             appCore       = self.find(typ=AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
 
+            rxEnables = [rx.Enable.get() for rx in jesdRxDevices]
+            txEnables = [tx.Enable.get() for tx in jesdTxDevices]
+
             retryCnt = 0
             retryCntMax = 8
             while( retryCnt < retryCntMax ):
@@ -127,24 +130,22 @@ class AppTop(pr.Device):
                     time.sleep(0.100) # TODO: Optimize this timeout
 
                 for tx in jesdTxDevices:
-                    txEnable = tx.Enable.get()
                     tx.Enable.set(0)
                     tx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
 
                 for rx in jesdRxDevices:
-                    rxEnable = rx.Enable.get()
                     rx.Enable.set(0)
                     rx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
 
                 time.sleep(0.250) # TODO: Optimize this timeout
 
-                for tx in jesdTxDevices:
+                for en, tx in zip(txEnables, jesdTxDevices):
                     tx.CmdClearErrors()
-                    tx.Enable.set(txEnable)
+                    tx.Enable.set(en)
 
-                for rx in jesdRxDevices:
+                for en, rx in zip(rxEnables, jesdRxDevices):
                     rx.CmdClearErrors()
-                    rx.Enable.set(rxEnable)
+                    rx.Enable.set(en)
 
                 # Special DAC Init procedure
                 for dac in dacDevices:
