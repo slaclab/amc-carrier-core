@@ -40,11 +40,11 @@ AmcCarrierTiming: &AmcCarrierTiming
         offset: 0x00040000
       children:
         EvrV2TriggerReg:
-	  children:
-	    Delay:
-	      sizeBits: 19
-	    Width:
-	      sizeBits: 19
+          children:
+            Delay:
+              sizeBits: 19
+            Width:
+              sizeBits: 19
     ##################################################
     GthRxAlignCheck:
       <<: *GthRxAlignCheck
