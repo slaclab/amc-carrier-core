@@ -42,6 +42,7 @@ repoList  =  [
     ['slaclab/lcls-pcav',       ['thatweaver','jmdewart']],
     ['slaclab/lcls2-pcav',      ['thatweaver','jmdewart']],
     ['slaclab/lcls2-pcav-test', ['thatweaver','jmdewart','kukhee']],
+    ['slaclab/llrf-hls',        ['jmdewart','kukhee']],
     ['slaclab/lcls2-timing',    ['thatweaver','jmdewart']],
     ###############################
     # application engineer = ruck314
@@ -58,10 +59,10 @@ repoList  =  [
 ########################################
 
 submoduleConfig  =  [
-    ['amc-carrier-core','v3.3.0'],
+    ['amc-carrier-core','v3.5.2'],
     ['lcls-timing-core','v2.0.0'],
-    ['ruckus',          'v2.5.0'],
-    ['surf',            'v2.5.0'],
+    ['ruckus',          'v2.5.2'],
+    ['surf',            'v2.6.1'],
 ]
 
 #############################################################################################
