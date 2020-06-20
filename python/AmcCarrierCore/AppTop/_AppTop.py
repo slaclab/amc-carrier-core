@@ -15,7 +15,7 @@
 
 import time
 import pyrogue   as pr
-from AmcCarrierCore.AppTop._AppCore    import AppCore
+# from AmcCarrierCore.AppTop._AppCore    import AppCore
 from AmcCarrierCore.AppTop._AppTopJesd import AppTopJesd
 import AmcCarrierCore.DacSigGen as dacSigGen
 import AmcCarrierCore.DaqMuxV2  as daqMuxV2
