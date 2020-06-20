@@ -78,13 +78,15 @@ class AppTop(pr.Device):
 
         @self.command(description  = "AppTop Init() cmd")
         def Init():
+            #############
             # Get devices
+            #############
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
-            adcDevices    = self.find(typ=ti.Adc32Rf45)
-            lmkDevices    = self.find(typ=ti.Lmk04828)
-            appCore       = self.find(typ=AppCore)
+            #adcDevices    = self.find(typ=ti.Adc32Rf45)
+            #lmkDevices    = self.find(typ=ti.Lmk04828)
+            #appCore       = self.find(typ=AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
 
             rxEnables = [rx.Enable.get() for rx in jesdRxDevices]
