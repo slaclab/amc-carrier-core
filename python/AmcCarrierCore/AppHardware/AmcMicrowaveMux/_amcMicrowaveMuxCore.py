@@ -88,40 +88,45 @@ class AmcMicrowaveMuxCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
 
+        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
-        self.DBG.DacReset()
 
-        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
         self.LMK.Init()
         time.sleep(5.000) # TODO: Optimize this timeout
 
         for i in range(4):
             self.PLL[i].writeBlocks(force=force, recurse=recurse, variable=variable)
+            self._root.checkBlocks(recurse=True)
+
         for i in range(2):
             self.DAC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
+            self._root.checkBlocks(recurse=True)
 
         for i in range(2):
             self.ADC[i].RESET()
 
         for i in range(2):
-            self.ADC[i].PDN_SYSREF.set(0x0)
-            self.ADC[i].SYNCB_POL.set(0x1)
-            self.ADC[i].SYSREF_DEL_EN.set(0x1)
-            self.ADC[i].SYSREF_DEL_HI.set(0x0)
+            self.ADC[i].RESET()
+            self.ADC[i].SYNC_TERM_DIS.set(1)
             self.ADC[i].SYSREF_DEL_LO.set(0x5)
-            self.ADC[i].SLOW_SP_EN1.set(0x1)
-            self.ADC[i].SLOW_SP_EN2.set(0x1)
-            self.ADC[i].JESD_OUTPUT_SWING.set(0x4)
+            self.ADC[i].SYSREF_DEL_EN.set(0x1)
+
+            self.ADC[i].PDN_SYSREF.set(0x0)
+            self.ADC[i].SEL_SYSREF_REG.set(0x1)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x1)
+
+            self.ADC[i].PDN_SYSREF.set(0x1)
+            self.ADC[i].SEL_SYSREF_REG.set(0x0)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
 
         for i in range(2):
+            self.ADC[i].PDN_SYSREF.set(0x0)
             self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
 
         for i in range(2):
-            self.ADC[i].DigRst()
             self.ADC[i].Init()
             self.ADC[i].DigRst()
 
@@ -133,9 +138,7 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         for i in range(2):
             self.DAC[i].Init()
-            self.DAC[i].Init()
         for i in range(2):
-            self.DAC[i].NcoSync()
             self.DAC[i].NcoSync()
 
         for i in range(4):
