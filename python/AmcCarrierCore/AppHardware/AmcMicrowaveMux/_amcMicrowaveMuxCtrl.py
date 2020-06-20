@@ -116,14 +116,19 @@ class AmcMicrowaveMuxCtrl(pr.Device):
             mode         = "RW",
         ))
 
-        @self.command(name= "Init", description  = "Initialize ADC/DAC")
-        def Init():
+        @self.command(name= "DacReset", description  = "DacReset")
+        def DacReset():
             # Reset DAC, active low
             self.dacReset[0].set(1)
             self.dacReset[1].set(1)
             time.sleep(0.1) # TODO: Optimize this timeout
             self.dacReset[0].set(0)
             self.dacReset[1].set(0)
+            time.sleep(0.1) # TODO: Optimize this timeout
+
+        @self.command(name= "LmkSync", description  = "LmkSync")
+        def LmkSync():
+            self.lmkSync.set(1)
             time.sleep(0.1) # TODO: Optimize this timeout
             self.lmkSync.set(0)
             time.sleep(0.1) # TODO: Optimize this timeout
