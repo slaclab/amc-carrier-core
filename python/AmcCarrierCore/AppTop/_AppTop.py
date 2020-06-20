@@ -91,7 +91,7 @@ class AppTop(pr.Device):
             txEnables = [tx.Enable.get() for tx in jesdTxDevices]
 
             retryCnt = 0
-            retryCntMax = 8
+            retryCntMax = 16
             while( retryCnt < retryCntMax ):
 
                 for rx in jesdRxDevices:
@@ -104,7 +104,7 @@ class AppTop(pr.Device):
                 for tx in jesdTxDevices:
                     tx.ResetGTs.set(1) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
 
-                time.sleep(0.100)
+                time.sleep(1.000)
 
                 for tx in jesdTxDevices:
                     tx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
@@ -113,18 +113,34 @@ class AppTop(pr.Device):
 
                 time.sleep(1.000)
 
-                for dac in dacDevices:
-                    dac.ClearAlarms()
+                for i in range(10):
+
+                    for tx in jesdTxDevices:
+                        tx.Enable.set(0)
+
+                    for dac in dacDevices:
+                        dac.Init()
+                        dac.NcoSync()
+                        dac.ClearAlarms()
+
+                    time.sleep(0.250)
+
+                    for en, tx in zip(txEnables, jesdTxDevices):
+                        tx.CmdClearErrors()
+                        tx.Enable.set(en)
+
+                    linkLock = True
+                    for tx in jesdTxDevices:
+                        if( tx.DataValid.get() == 0 ):
+                            linkLock = False
+                    if( linkLock ):
+                        break
 
                 for en, rx in zip(rxEnables, jesdRxDevices):
                     rx.CmdClearErrors()
                     rx.Enable.set(en)
 
-                for en, tx in zip(txEnables, jesdTxDevices):
-                    tx.CmdClearErrors()
-                    tx.Enable.set(en)
-
-                time.sleep(1.000)
+                time.sleep(2.000)
 
                 # Check the link locks
                 linkLock = True
@@ -141,7 +157,7 @@ class AppTop(pr.Device):
                             linkLock = False
 
                     if( linkLock ):
-                        time.sleep(0.100) # TODO: Optimize this timeout
+                        time.sleep(0.100)
                     else:
                         break
 

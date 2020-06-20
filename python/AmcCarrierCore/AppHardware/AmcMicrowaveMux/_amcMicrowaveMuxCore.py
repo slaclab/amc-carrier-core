@@ -133,7 +133,9 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         for i in range(2):
             self.DAC[i].Init()
+            self.DAC[i].Init()
         for i in range(2):
+            self.DAC[i].NcoSync()
             self.DAC[i].NcoSync()
 
         for i in range(4):

@@ -80,7 +80,6 @@ class AmcGenericAdcDacCore(pr.Device):
         for i in range(2):
             self.ADC[i].CalibrateAdc()
         self.DAC.Init()
-        self.DAC.NcoSync()
 
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
