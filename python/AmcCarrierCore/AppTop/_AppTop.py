@@ -91,7 +91,7 @@ class AppTop(pr.Device):
             txEnables = [tx.Enable.get() for tx in jesdTxDevices]
 
             retryCnt = 0
-            retryCntMax = 16
+            retryCntMax = 8
             while( retryCnt < retryCntMax ):
 
                 for rx in jesdRxDevices:
@@ -123,11 +123,11 @@ class AppTop(pr.Device):
                         dac.NcoSync()
                         dac.ClearAlarms()
 
-                    time.sleep(0.250)
-
                     for en, tx in zip(txEnables, jesdTxDevices):
                         tx.CmdClearErrors()
                         tx.Enable.set(en)
+
+                    time.sleep(0.250)
 
                     linkLock = True
                     for tx in jesdTxDevices:
