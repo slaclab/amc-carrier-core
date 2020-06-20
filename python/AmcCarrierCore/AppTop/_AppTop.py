@@ -15,7 +15,7 @@
 
 import time
 import pyrogue   as pr
-from AmcCarrierCore.AppTop._AppCore    import AppCore
+# from AmcCarrierCore.AppTop._AppCore    import AppCore
 from AmcCarrierCore.AppTop._AppTopJesd import AppTopJesd
 import AmcCarrierCore.DacSigGen as dacSigGen
 import AmcCarrierCore.DaqMuxV2  as daqMuxV2
@@ -78,13 +78,15 @@ class AppTop(pr.Device):
 
         @self.command(description  = "AppTop Init() cmd")
         def Init():
+            #############
             # Get devices
+            #############
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
-            adcDevices    = self.find(typ=ti.Adc32Rf45)
-            lmkDevices    = self.find(typ=ti.Lmk04828)
-            appCore       = self.find(typ=AppCore)
+            #adcDevices    = self.find(typ=ti.Adc32Rf45)
+            #lmkDevices    = self.find(typ=ti.Lmk04828)
+            #appCore       = self.find(typ=AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
 
             rxEnables = [rx.Enable.get() for rx in jesdRxDevices]
@@ -95,61 +97,52 @@ class AppTop(pr.Device):
             while( retryCnt < retryCntMax ):
 
                 for rx in jesdRxDevices:
-                    rx.ResetGTs.set(1)
-                for tx in jesdTxDevices:
-                    tx.ResetGTs.set(1)
-
-                for adc in adcDevices:
-                    adc.ASSERT_SYSREF_REG.set(0x0)
-                    adc.SEL_SYSREF_REG.set(0x0)
-                    adc.PDN_SYSREF.set(0x0)
-
-                for lmk in lmkDevices:
-                    lmk.PwrDwnLmkChip()
-                    lmk.PwrDwnSysRef()
-
-                for core in appCore:
-                    core.Init()
-
-                for lmk in lmkDevices:
-                    lmk.PwrUpLmkChip()
-                time.sleep(1.000) # TODO: Optimize this timeout
-
-                for lmk in lmkDevices:
-                    lmk.PwrUpSysRef()
-                time.sleep(0.250) # TODO: Optimize this timeout
-
-                for adc in adcDevices:
-                    adc.PDN_SYSREF.set(0x1)
-                    time.sleep(0.100) # TODO: Optimize this timeout
-                for adc in adcDevices:
-                    adc.PDN_SYSREF.set(0x0)
-                    time.sleep(0.100) # TODO: Optimize this timeout
-                for adc in adcDevices:
-                    adc.PDN_SYSREF.set(0x1)
-                    time.sleep(0.100) # TODO: Optimize this timeout
-
+                    rx.Enable.set(0)
                 for tx in jesdTxDevices:
                     tx.Enable.set(0)
-                    tx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
 
                 for rx in jesdRxDevices:
-                    rx.Enable.set(0)
+                    rx.ResetGTs.set(1) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
+                for tx in jesdTxDevices:
+                    tx.ResetGTs.set(1) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
+
+                time.sleep(1.000)
+
+                for tx in jesdTxDevices:
+                    tx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
+                for rx in jesdRxDevices:
                     rx.ResetGTs.set(0) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
 
-                time.sleep(0.250) # TODO: Optimize this timeout
+                time.sleep(1.000)
 
-                for en, tx in zip(txEnables, jesdTxDevices):
-                    tx.CmdClearErrors()
-                    tx.Enable.set(en)
+                for i in range(10):
+
+                    for tx in jesdTxDevices:
+                        tx.Enable.set(0)
+
+                    for dac in dacDevices:
+                        dac.Init()
+                        dac.NcoSync()
+                        dac.ClearAlarms()
+
+                    for en, tx in zip(txEnables, jesdTxDevices):
+                        tx.CmdClearErrors()
+                        tx.Enable.set(en)
+
+                    time.sleep(0.250)
+
+                    linkLock = True
+                    for tx in jesdTxDevices:
+                        if( tx.DataValid.get() == 0 ):
+                            linkLock = False
+                    if( linkLock ):
+                        break
 
                 for en, rx in zip(rxEnables, jesdRxDevices):
                     rx.CmdClearErrors()
                     rx.Enable.set(en)
 
-                # Special DAC Init procedure
-                for dac in dacDevices:
-                    dac.NcoSync()
+                time.sleep(2.000)
 
                 # Check the link locks
                 linkLock = True
@@ -166,18 +159,9 @@ class AppTop(pr.Device):
                             linkLock = False
 
                     if( linkLock ):
-                        time.sleep(0.100) # TODO: Optimize this timeout
+                        time.sleep(0.100)
                     else:
                         break
-
-                for tx in jesdTxDevices:
-                    if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
-                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
-                        linkLock = False
-                for rx in jesdRxDevices:
-                    if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
-                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
-                        linkLock = False
 
                 if( linkLock ):
                     break
@@ -192,16 +176,6 @@ class AppTop(pr.Device):
             for sigGen in sigGenDevices:
                 if ( sigGen.CsvFilePath.get() != "" ):
                     sigGen.LoadCsvFile("")
-
-            # Special DAC Init procedure
-            for dac in dacDevices:
-                dac.NcoSync()
-
-            for dac in dacDevices:
-                enable = dac.enable.get()
-                dac.enable.set(True)
-                dac.ClearAlarms()
-                dac.enable.set(enable)
 
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)
