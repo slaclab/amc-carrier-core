@@ -16,6 +16,7 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
+import time
 import pyrogue         as pr
 import surf.devices.ti as ti
 import AmcCarrierCore.AppHardware     as appHw
@@ -39,12 +40,9 @@ class AmcGenericAdcDacCore(pr.Device):
 
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            self.checkBlocks(recurse=True)
-            self.LMK.Init()
             self.DAC.Init()
-            self.ADC[0].CalibrateAdc()
-            self.ADC[1].CalibrateAdc()
-            self.checkBlocks(recurse=True)
+            for i in range(2):
+                self.ADC[i].CalibrateAdc()
 
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
         """
@@ -65,23 +63,24 @@ class AmcGenericAdcDacCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
 
-        # Note: Requires that AmcCryoCore: enable: 'True' in defaults.yml file
-        self.enable.set(True)
-        self.DBG.enable.set(True)
-        self.DAC.enable.set(True)
-        self.LMK.enable.set(True)
-        self.ADC[0].enable.set(True)
-        self.ADC[1].enable.set(True)
+        self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
+
+        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
+        self.LMK.Init()
+        time.sleep(5.000) # TODO: Optimize this timeout
 
         self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
-
-        self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
+        for i in range(2):
+            self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
 
-        self.InitAmcCard()
+        for i in range(2):
+            self.ADC[i].CalibrateAdc()
+        self.DAC.Init()
+        self.DAC.NcoSync()
 
-        # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
+        self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
