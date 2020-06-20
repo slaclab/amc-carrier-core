@@ -49,30 +49,9 @@ class AmcMicrowaveMuxCore(pr.Device):
         ##########
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            # Enable devices
-            self.DBG.enable.set(True)
-            self.LMK.enable.set(True)
-            self.DAC[0].enable.set(True)
-            self.DAC[1].enable.set(True)
-            self.ADC[0].enable.set(True)
-            self.ADC[1].enable.set(True)
-
-            self.DBG.Init()
-            self.DAC[0].Init()
-            self.DAC[1].Init()
-#            self.ADC[0].Init()
-#            self.ADC[1].Init()
-
-            time.sleep(0.5) # TODO: Optimize this timeout
-
-            self.ADC[0].DigRst()
-            self.ADC[1].DigRst()
-
-            time.sleep(0.5) # TODO: Optimize this timeout
-
-            # pulse SysRef
-            # self.LMK.PwrUpSysRef()
-            self.checkBlocks(recurse=True)
+            for i in range(2):
+                self.ADC[i].DigRst()
+                self.DAC[i].NcoSync()
 
         @self.command(description="Select internal LMK reference",)
         def SelExtRef():
@@ -109,72 +88,56 @@ class AmcMicrowaveMuxCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
 
-        # Note: Requires that AmcMicrowaveMuxCore: enable: 'True' in defaults.yml file
-        self.enable.set(True)
-        self.DBG.enable.set(True)
-        self.PLL[0].enable.set(True)
-        self.PLL[1].enable.set(True)
-        self.PLL[2].enable.set(True)
-        self.PLL[3].enable.set(True)
-        self.LMK.enable.set(True)
-        self.DAC[0].enable.set(True)
-        self.DAC[1].enable.set(True)
-        self.ADC[0].enable.set(True)
-        self.ADC[1].enable.set(True)
-
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.PLL[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.PLL[1].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.PLL[2].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.PLL[3].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.DAC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self.DAC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
+        self.DBG.DacReset()
 
+        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
         self.LMK.Init()
-        time.sleep(5.0) # TODO: Optimize this timeout
+        time.sleep(5.000) # TODO: Optimize this timeout
+
+        for i in range(4):
+            self.PLL[i].writeBlocks(force=force, recurse=recurse, variable=variable)
+        for i in range(2):
+            self.DAC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
 
         for i in range(2):
             self.ADC[i].RESET()
-            self.ADC[i].SYNC_TERM_DIS.set(1)
-            self.ADC[i].SYSREF_DEL_LO.set(0x5)
-            self.ADC[i].SYSREF_DEL_EN.set(0x1)
-
-            self.ADC[i].PDN_SYSREF.set(0x0)
-            self.ADC[i].SEL_SYSREF_REG.set(0x1)
-            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
-            self.ADC[i].ASSERT_SYSREF_REG.set(0x1)
-
-            self.ADC[i].PDN_SYSREF.set(0x1)
-            self.ADC[i].SEL_SYSREF_REG.set(0x0)
-            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
 
         for i in range(2):
             self.ADC[i].PDN_SYSREF.set(0x0)
+            self.ADC[i].SYNCB_POL.set(0x1)
+            self.ADC[i].SYSREF_DEL_EN.set(0x1)
+            self.ADC[i].SYSREF_DEL_HI.set(0x0)
+            self.ADC[i].SYSREF_DEL_LO.set(0x5)
+            self.ADC[i].SLOW_SP_EN1.set(0x1)
+            self.ADC[i].SLOW_SP_EN2.set(0x1)
+            self.ADC[i].JESD_OUTPUT_SWING.set(0x4)
+
+        for i in range(2):
             self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
 
-        self.ADC[0].Init()
-        self.ADC[1].Init()
+        for i in range(2):
+            self.ADC[i].DigRst()
+            self.ADC[i].Init()
+            self.ADC[i].DigRst()
 
-        self.ADC[0].DigRst()
-        self.ADC[1].DigRst()
+        for i in range(2):
+            for j in range(2):
+                self.ADC[i].CH[j].MASK_NCO_SYSREF.set(0x1)
+                self.ADC[i].CH[j].MASK_CLKDIV_SYSREF.set(0x1)
+            self.ADC[i].PDN_SYSREF.set(0x1)
 
-        self.PLL[0].RegInitSeq()
-        self.PLL[1].RegInitSeq()
-        self.PLL[2].RegInitSeq()
-        self.PLL[3].RegInitSeq()
+        for i in range(2):
+            self.DAC[i].Init()
+        for i in range(2):
+            self.DAC[i].NcoSync()
 
-        # Stop SPI transactions after configuration to minimize digital crosstalk to ADC/DAC
-        # self.DAC[0].enable.set(False)
-        # self.DAC[1].enable.set(False)
-        # self.ADC[0].enable.set(False)
-        # self.ADC[1].enable.set(False)
-        # self.PLL[0].enable.set(False)
-        # self.PLL[1].enable.set(False)
-        # self.PLL[2].enable.set(False)
-        # self.PLL[3].enable.set(False)
+        for i in range(4):
+            self.PLL[i].RegInitSeq()
 
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
