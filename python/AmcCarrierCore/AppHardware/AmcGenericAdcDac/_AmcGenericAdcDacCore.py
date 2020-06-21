@@ -17,9 +17,9 @@
 #-----------------------------------------------------------------------------
 
 import time
-import pyrogue         as pr
-import surf.devices.ti as ti
-import AmcCarrierCore.AppHardware     as appHw
+import pyrogue                    as pr
+import surf.devices.ti            as ti
+import AmcCarrierCore.AppHardware as appHw
 import rogue
 
 class AmcGenericAdcDacCore(pr.Device):
@@ -63,23 +63,27 @@ class AmcGenericAdcDacCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
 
-        self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
-
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
         self.LMK.Init()
-        time.sleep(5.000) # TODO: Optimize this timeout
+        time.sleep(2.000)
+
+        self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
 
         self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
+
         self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
-        for i in range(2):
-            self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
 
         for i in range(2):
-            self.ADC[i].CalibrateAdc()
+            self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
+            self._root.checkBlocks(recurse=True)
+
         self.DAC.Init()
+
+        for i in range(2):
+            self.ADC[i].CalibrateAdc()
 
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)

@@ -49,9 +49,7 @@ class AmcMicrowaveMuxCore(pr.Device):
         ##########
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            for i in range(2):
-                self.ADC[i].DigRst()
-                self.DAC[i].NcoSync()
+            pass
 
         @self.command(description="Select internal LMK reference",)
         def SelExtRef():
@@ -93,7 +91,13 @@ class AmcMicrowaveMuxCore(pr.Device):
         self._root.checkBlocks(recurse=True)
 
         self.LMK.Init()
-        time.sleep(5.000) # TODO: Optimize this timeout
+        time.sleep(1.000) # TODO: Optimize this timeout
+
+        self.LMK.PwrDwnSysRef()
+        time.sleep(0.100) # TODO: Optimize this timeout
+
+        self.LMK.PwrUpSysRef()
+        time.sleep(0.100) # TODO: Optimize this timeout
 
         for i in range(4):
             self.PLL[i].writeBlocks(force=force, recurse=recurse, variable=variable)
@@ -104,9 +108,7 @@ class AmcMicrowaveMuxCore(pr.Device):
             self._root.checkBlocks(recurse=True)
 
         for i in range(2):
-            self.ADC[i].RESET()
-
-        for i in range(2):
+            self.ADC[i].HW_RST.set(0x0)
             self.ADC[i].RESET()
             self.ADC[i].SYNC_TERM_DIS.set(1)
             self.ADC[i].SYSREF_DEL_LO.set(0x5)
@@ -131,14 +133,17 @@ class AmcMicrowaveMuxCore(pr.Device):
             self.ADC[i].DigRst()
 
         for i in range(2):
-            for j in range(2):
-                self.ADC[i].CH[j].MASK_NCO_SYSREF.set(0x1)
-                self.ADC[i].CH[j].MASK_CLKDIV_SYSREF.set(0x1)
+            self.ADC[i].PDN_SYSREF.set(0x1)
+
+        for i in range(2):
+            self.ADC[i].PDN_SYSREF.set(0x0)
+            time.sleep(0.100) # TODO: Optimize this timeout
+
+        for i in range(2):
             self.ADC[i].PDN_SYSREF.set(0x1)
 
         for i in range(2):
             self.DAC[i].Init()
-        for i in range(2):
             self.DAC[i].NcoSync()
 
         for i in range(4):

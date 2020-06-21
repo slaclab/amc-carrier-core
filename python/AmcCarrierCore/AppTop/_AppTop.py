@@ -15,7 +15,7 @@
 
 import time
 import pyrogue   as pr
-# from AmcCarrierCore.AppTop._AppCore    import AppCore
+from AmcCarrierCore.AppTop._AppCore    import AppCore
 from AmcCarrierCore.AppTop._AppTopJesd import AppTopJesd
 import AmcCarrierCore.DacSigGen as dacSigGen
 import AmcCarrierCore.DaqMuxV2  as daqMuxV2
@@ -78,16 +78,15 @@ class AppTop(pr.Device):
 
         @self.command(description  = "AppTop Init() cmd")
         def Init():
+            print(f'{self.path}.Init()')
             #############
             # Get devices
             #############
             jesdRxDevices = self.find(typ=jesd.JesdRx)
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
-            #adcDevices    = self.find(typ=ti.Adc32Rf45)
-            #lmkDevices    = self.find(typ=ti.Lmk04828)
-            #appCore       = self.find(typ=AppCore)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
+            appCore       = self.find(typ=AppCore)
 
             rxEnables = [rx.Enable.get() for rx in jesdRxDevices]
             txEnables = [tx.Enable.get() for tx in jesdTxDevices]
@@ -115,28 +114,15 @@ class AppTop(pr.Device):
 
                 time.sleep(1.000)
 
-                for i in range(10):
+                for core in appCore:
+                    core.Init()
 
-                    for tx in jesdTxDevices:
-                        tx.Enable.set(0)
+                for dac in dacDevices:
+                    dac.ClearAlarms()
 
-                    for dac in dacDevices:
-                        dac.Init()
-                        dac.NcoSync()
-                        dac.ClearAlarms()
-
-                    for en, tx in zip(txEnables, jesdTxDevices):
-                        tx.CmdClearErrors()
-                        tx.Enable.set(en)
-
-                    time.sleep(0.250)
-
-                    linkLock = True
-                    for tx in jesdTxDevices:
-                        if( tx.DataValid.get() == 0 ):
-                            linkLock = False
-                    if( linkLock ):
-                        break
+                for en, tx in zip(txEnables, jesdTxDevices):
+                    tx.CmdClearErrors()
+                    tx.Enable.set(en)
 
                 for en, rx in zip(rxEnables, jesdRxDevices):
                     rx.CmdClearErrors()
@@ -144,7 +130,26 @@ class AppTop(pr.Device):
 
                 time.sleep(2.000)
 
+                #####################
+                # Check SYSREF Period
+                #####################
+                linkLock = True
+                for tx in jesdTxDevices:
+                    if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
+                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
+                        linkLock = False
+
+                for rx in jesdRxDevices:
+                    if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
+                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
+                        linkLock = False
+
+                if( not linkLock ):
+                    raise pr.DeviceError('AppTop.Init(): Too many retries and giving up on retries')
+
+                ######################
                 # Check the link locks
+                ######################
                 linkLock = True
                 for i in range(10):
 
@@ -178,6 +183,7 @@ class AppTop(pr.Device):
                     sigGen.LoadCsvFile("")
 
     def writeBlocks(self, **kwargs):
+        print(f'{self.path}.writeBlocks()')
         super().writeBlocks(**kwargs)
 
         # Retire any in-flight transactions before starting
