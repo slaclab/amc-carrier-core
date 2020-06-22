@@ -1418,7 +1418,7 @@ Reading /home/travis/build/slaclab/amc-carrier-core/Ax
 
 [AppMpsSelect.vhd:89:Info: Elaborating entity synchronizervector for hierarchy synchronizervector::u_synckickdet]
 
-[AppMpsSelect.vhd:195:Info: Elaborating entity synchronizerfifo for hierarchy synchronizerfifo::u_syncfifo]
+[AppMpsSelect.vhd:193:Info: Elaborating entity synchronizerfifo for hierarchy synchronizerfifo::u_syncfifo]
 
 [MpsPgpFrontEndGth.vhd:164:Info: Elaborating entity pgp2blane for hierarchy pgp2blane::u_pgp2blane]
 
