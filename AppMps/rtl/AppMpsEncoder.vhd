@@ -213,7 +213,7 @@ begin
       if APP_CONFIG_C.DIGITAL_EN_C = true then
          v.mpsMessage.inputType := '0';
 
-         for b in 0 to 7 loop
+         for b in 0 to APP_CONFIG_C.BYTE_COUNT_C*8-1 loop
             digitalBit (mpsSelect.digitalBus(b), b, r.tholdMem(0, b), v.tholdMem(0, b), msgData);
          end loop;
 
