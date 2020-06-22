@@ -68,6 +68,7 @@ class AmcMicrowaveMuxCore(pr.Device):
             self.LMK.LmkReg_0x011F.set(0x0)
 
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
+        print(f'{self.path}.writeBlocks()')
         """
         Write all of the blocks held by this Device to memory
         """
@@ -87,17 +88,13 @@ class AmcMicrowaveMuxCore(pr.Device):
         self._root.checkBlocks(recurse=True)
 
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
+
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
 
         self.LMK.Init()
-        time.sleep(1.000) # TODO: Optimize this timeout
-
-        self.LMK.PwrDwnSysRef()
-        time.sleep(0.100) # TODO: Optimize this timeout
-
-        self.LMK.PwrUpSysRef()
-        time.sleep(0.100) # TODO: Optimize this timeout
+        time.sleep(2.000) # TODO: Optimize this timeout
 
         for i in range(4):
             self.PLL[i].writeBlocks(force=force, recurse=recurse, variable=variable)
@@ -108,7 +105,14 @@ class AmcMicrowaveMuxCore(pr.Device):
             self._root.checkBlocks(recurse=True)
 
         for i in range(2):
+            self.ADC[i].HW_RST.set(0x1)
+            time.sleep(0.001) # TODO: Optimize this timeout
+
+        for i in range(2):
             self.ADC[i].HW_RST.set(0x0)
+            time.sleep(0.001) # TODO: Optimize this timeout
+
+        for i in range(2):
             self.ADC[i].RESET()
             self.ADC[i].SYNC_TERM_DIS.set(1)
             self.ADC[i].SYSREF_DEL_LO.set(0x5)
@@ -131,13 +135,6 @@ class AmcMicrowaveMuxCore(pr.Device):
         for i in range(2):
             self.ADC[i].Init()
             self.ADC[i].DigRst()
-
-        for i in range(2):
-            self.ADC[i].PDN_SYSREF.set(0x1)
-
-        for i in range(2):
-            self.ADC[i].PDN_SYSREF.set(0x0)
-            time.sleep(0.100) # TODO: Optimize this timeout
 
         for i in range(2):
             self.ADC[i].PDN_SYSREF.set(0x1)

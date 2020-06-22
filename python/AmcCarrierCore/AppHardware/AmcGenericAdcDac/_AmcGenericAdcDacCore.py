@@ -45,6 +45,7 @@ class AmcGenericAdcDacCore(pr.Device):
                 self.ADC[i].CalibrateAdc()
 
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
+        print(f'{self.path}.writeBlocks()')
         """
         Write all of the blocks held by this Device to memory
         """
@@ -66,7 +67,7 @@ class AmcGenericAdcDacCore(pr.Device):
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
         self.LMK.Init()
-        time.sleep(2.000)
+        time.sleep(2.000) # TODO: Optimize this timeout
 
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
