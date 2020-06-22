@@ -216,7 +216,7 @@ package AppMpsPkg is
       timeStamp  : slv(15 downto 0);
       selectIdle : sl;
       selectAlt  : sl;
-      digitalBus : slv(7 downto 0);
+      digitalBus : slv(15 downto 0);
       mpsError   : slv(MPS_CHAN_COUNT_C-1 downto 0);
       mpsIgnore  : slv(MPS_CHAN_COUNT_C-1 downto 0);
       chanData   : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
@@ -436,7 +436,7 @@ package body AppMpsPkg is
 
          when APP_LLRF_TYPE_C =>
             ret.DIGITAL_EN_C := true;
-            ret.BYTE_COUNT_C := 1;
+            ret.BYTE_COUNT_C := 2;
 
          when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
             ret.BYTE_COUNT_C  := 12;

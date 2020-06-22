@@ -49,9 +49,7 @@ class AmcMicrowaveMuxCore(pr.Device):
         ##########
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            for i in range(2):
-                self.ADC[i].DigRst()
-                self.DAC[i].NcoSync()
+            pass
 
         @self.command(description="Select internal LMK reference",)
         def SelExtRef():
@@ -70,6 +68,7 @@ class AmcMicrowaveMuxCore(pr.Device):
             self.LMK.LmkReg_0x011F.set(0x0)
 
     def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
+        print(f'{self.path}.writeBlocks()')
         """
         Write all of the blocks held by this Device to memory
         """
@@ -88,54 +87,60 @@ class AmcMicrowaveMuxCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
 
-        self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
-        self.DBG.DacReset()
-
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
+
+        self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
+
         self.LMK.Init()
-        time.sleep(5.000) # TODO: Optimize this timeout
+        time.sleep(2.000) # TODO: Optimize this timeout
 
         for i in range(4):
             self.PLL[i].writeBlocks(force=force, recurse=recurse, variable=variable)
+            self._root.checkBlocks(recurse=True)
+
         for i in range(2):
             self.DAC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
+            self._root.checkBlocks(recurse=True)
+
+        for i in range(2):
+            self.ADC[i].HW_RST.set(0x1)
+            time.sleep(0.001) # TODO: Optimize this timeout
+
+        for i in range(2):
+            self.ADC[i].HW_RST.set(0x0)
+            time.sleep(0.001) # TODO: Optimize this timeout
 
         for i in range(2):
             self.ADC[i].RESET()
+            self.ADC[i].SYNC_TERM_DIS.set(1)
+            self.ADC[i].SYSREF_DEL_LO.set(0x5)
+            self.ADC[i].SYSREF_DEL_EN.set(0x1)
+
+            self.ADC[i].PDN_SYSREF.set(0x0)
+            self.ADC[i].SEL_SYSREF_REG.set(0x1)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x1)
+
+            self.ADC[i].PDN_SYSREF.set(0x1)
+            self.ADC[i].SEL_SYSREF_REG.set(0x0)
+            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
 
         for i in range(2):
             self.ADC[i].PDN_SYSREF.set(0x0)
-            self.ADC[i].SYNCB_POL.set(0x1)
-            self.ADC[i].SYSREF_DEL_EN.set(0x1)
-            self.ADC[i].SYSREF_DEL_HI.set(0x0)
-            self.ADC[i].SYSREF_DEL_LO.set(0x5)
-            self.ADC[i].SLOW_SP_EN1.set(0x1)
-            self.ADC[i].SLOW_SP_EN2.set(0x1)
-            self.ADC[i].JESD_OUTPUT_SWING.set(0x4)
-
-        for i in range(2):
             self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
 
         for i in range(2):
-            self.ADC[i].DigRst()
             self.ADC[i].Init()
             self.ADC[i].DigRst()
 
         for i in range(2):
-            for j in range(2):
-                self.ADC[i].CH[j].MASK_NCO_SYSREF.set(0x1)
-                self.ADC[i].CH[j].MASK_CLKDIV_SYSREF.set(0x1)
             self.ADC[i].PDN_SYSREF.set(0x1)
 
         for i in range(2):
             self.DAC[i].Init()
-            self.DAC[i].Init()
-        for i in range(2):
-            self.DAC[i].NcoSync()
             self.DAC[i].NcoSync()
 
         for i in range(4):
