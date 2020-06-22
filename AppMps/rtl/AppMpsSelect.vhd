@@ -53,7 +53,7 @@ architecture mapping of AppMpsSelect is
    -- Compute select record size
    -- 16 bits + 8 bits for digital
    -- 16 bits + 34 * byte count for analog
-   constant MPS_SELECT_BITS_C : integer := 18 + ite(APP_CONFIG_G.DIGITAL_EN_C, 8, APP_CONFIG_G.BYTE_COUNT_C*34);
+   constant MPS_SELECT_BITS_C : integer := 18 + ite(APP_CONFIG_G.DIGITAL_EN_C, APP_CONFIG_G.BYTE_COUNT_C*8, APP_CONFIG_G.BYTE_COUNT_C*34);
 
    type RegType is record
       mpsSelect  : MpsSelectType;
@@ -126,9 +126,7 @@ begin
       v.mpsSelect.selectAlt := ite(((beamDest and altDestInt) /= 0),'1','0');
       
       -- Digital APP
-      v.mpsSelect.digitalBus(3 downto 0) := diagnosticBus.data(30)(3 downto 0);
-      v.mpsSelect.digitalBus(7 downto 4) := diagnosticBus.data(31)(3 downto 0);
-
+      v.mpsSelect.digitalBus(15 downto 0) := diagnosticBus.data(30)(15 downto 0);
       -- Synchronous Reset
       if (diagnosticRst = '1') then
          v := REG_INIT_C;
@@ -164,7 +162,7 @@ begin
       assignSlv(i,vec,r.mpsSelect.selectAlt);
 
       if APP_CONFIG_G.DIGITAL_EN_C then
-         assignSlv(i,vec,r.mpsSelect.digitalBus);
+         assignSlv(i,vec,r.mpsSelect.digitalBus(APP_CONFIG_G.BYTE_COUNT_C*8-1 downto 0));
       else
          for j in 0 to MPS_CHAN_COUNT_C-1 loop
             if APP_CONFIG_G.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
@@ -209,7 +207,7 @@ begin
       assignRecord(i,mpsSelDout,m.selectAlt);
 
       if APP_CONFIG_G.DIGITAL_EN_C then
-         assignRecord(i,mpsSelDout,m.digitalBus);
+         assignRecord(i,mpsSelDout,m.digitalBus(APP_CONFIG_G.BYTE_COUNT_C*8-1 downto 0));
       else
          for j in 0 to MPS_CHAN_COUNT_C-1 loop
             if APP_CONFIG_G.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
