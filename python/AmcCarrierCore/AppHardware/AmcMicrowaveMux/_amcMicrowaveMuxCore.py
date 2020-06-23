@@ -87,64 +87,35 @@ class AmcMicrowaveMuxCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
 
-        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
-
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
 
+        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
+
         self.LMK.Init()
-        time.sleep(2.000) # TODO: Optimize this timeout
+        time.sleep(3.000)
 
         for i in range(4):
             self.PLL[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
+            self.PLL[i].RegInitSeq()
 
         for i in range(2):
             self.DAC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
-
-        for i in range(2):
-            self.ADC[i].HW_RST.set(0x1)
-            time.sleep(0.001) # TODO: Optimize this timeout
-
-        for i in range(2):
-            self.ADC[i].HW_RST.set(0x0)
-            time.sleep(0.001) # TODO: Optimize this timeout
-
-        for i in range(2):
-            self.ADC[i].RESET()
-            self.ADC[i].SYNC_TERM_DIS.set(1)
-            self.ADC[i].SYSREF_DEL_LO.set(0x5)
-            self.ADC[i].SYSREF_DEL_EN.set(0x1)
-
-            self.ADC[i].PDN_SYSREF.set(0x0)
-            self.ADC[i].SEL_SYSREF_REG.set(0x1)
-            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
-            self.ADC[i].ASSERT_SYSREF_REG.set(0x1)
-
-            self.ADC[i].PDN_SYSREF.set(0x1)
-            self.ADC[i].SEL_SYSREF_REG.set(0x0)
-            self.ADC[i].ASSERT_SYSREF_REG.set(0x0)
-
-        for i in range(2):
-            self.ADC[i].PDN_SYSREF.set(0x0)
-            self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
-            self._root.checkBlocks(recurse=True)
-
-        for i in range(2):
-            self.ADC[i].Init()
-            self.ADC[i].DigRst()
-
-        for i in range(2):
-            self.ADC[i].PDN_SYSREF.set(0x1)
-
-        for i in range(2):
             self.DAC[i].Init()
             self.DAC[i].NcoSync()
 
-        for i in range(4):
-            self.PLL[i].RegInitSeq()
+        for i in range(2):
+            self.ADC[i].HW_RST.set(0x1)
+            time.sleep(0.010)
+            self.ADC[i].HW_RST.set(0x0)
+            time.sleep(0.010)
+            self.ADC[i].Powerup_AnalogConfig()
+            self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
+            self._root.checkBlocks(recurse=True)
+            self.ADC[i].Init()
 
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
