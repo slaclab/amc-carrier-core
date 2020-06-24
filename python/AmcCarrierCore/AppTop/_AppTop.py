@@ -117,6 +117,8 @@ class AppTop(pr.Device):
                 for core in appCore:
                     core.Init()
 
+                time.sleep(1.000)
+
                 for dac in dacDevices:
                     dac.ClearAlarms()
 
