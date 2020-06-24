@@ -90,11 +90,22 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
 
+        for i in range(2):
+            self.ADC[i].HW_RST.set(0x1)
+            self.DBG.dacReset[i].set(0x1)
+
+        self.LMK.RESET.set(0x1)
+        self.LMK.RESET.set(0x0)
+
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
+        time.sleep(2.000)
 
         self.LMK.Init()
-        time.sleep(3.000)
+        for i in range(2):
+            self.ADC[i].HW_RST.set(0x0)
+            self.DBG.dacReset[i].set(0x0)
+        time.sleep(2.000)
 
         for i in range(4):
             self.PLL[i].writeBlocks(force=force, recurse=recurse, variable=variable)
@@ -108,10 +119,6 @@ class AmcMicrowaveMuxCore(pr.Device):
             self.DAC[i].NcoSync()
 
         for i in range(2):
-            self.ADC[i].HW_RST.set(0x1)
-            time.sleep(0.010)
-            self.ADC[i].HW_RST.set(0x0)
-            time.sleep(0.010)
             self.ADC[i].Powerup_AnalogConfig()
             self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
