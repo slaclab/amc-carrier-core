@@ -132,43 +132,39 @@ class AppTop(pr.Device):
 
                 time.sleep(2.000)
 
-                #####################
-                # Check SYSREF Period
-                #####################
+                ###########################
+                # JESD Link Health Checking
+                ###########################
                 linkLock = True
                 for tx in jesdTxDevices:
+
                     if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
                         print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
                         linkLock = False
 
+                    if( tx.DataValid.get() == 0 ):
+                        print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
+                        linkLock = False
+
+                    for ch in tx.StatusValidCnt:
+                        if (tx.StatusValidCnt[ch].get() > 4):
+                            print(f'AppTop.Init(): {tx.path}.StatusValidCnt[{ch}] = {tx.StatusValidCnt[ch].value()}')
+                            linkLock = False
+
                 for rx in jesdRxDevices:
+
                     if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
                         print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
                         linkLock = False
 
-                if( not linkLock ):
-                    raise pr.DeviceError('AppTop.Init(): Too many retries and giving up on retries')
+                    if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
+                        print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
+                        linkLock = False
 
-                ######################
-                # Check the link locks
-                ######################
-                linkLock = True
-                for i in range(10):
-
-                    for rx in jesdRxDevices:
-                        if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
-                            print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
+                    for ch in rx.StatusValidCnt:
+                        if (rx.StatusValidCnt[ch].get() > 4):
+                            print(f'AppTop.Init(): {rx.path}.StatusValidCnt[{ch}] = {rx.StatusValidCnt[ch].value()}')
                             linkLock = False
-
-                    for tx in jesdTxDevices:
-                        if( tx.DataValid.get() == 0 ):
-                            print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
-                            linkLock = False
-
-                    if( linkLock ):
-                        time.sleep(0.100)
-                    else:
-                        break
 
                 if( linkLock ):
                     break
