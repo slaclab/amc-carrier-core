@@ -2,7 +2,6 @@
 # Title      : PyRogue AmcMicrowaveMux Amc Core
 #-----------------------------------------------------------------------------
 # File       : AmcMicrowaveMuxCore.py
-# Created    : 2017-04-03
 #-----------------------------------------------------------------------------
 # Description:
 # PyRogue Cryo Amc Core
@@ -50,11 +49,9 @@ class AmcMicrowaveMuxCore(pr.Device):
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
             for i in range(2):
-                self.ADC[i].PDN_SYSREF.set(0x0)
-            for i in range(2):
-                self.ADC[i].DigRst()
-            for i in range(2):
-                self.ADC[i].PDN_SYSREF.set(0x1)
+                self.ADC[i].Init()
+                self.DAC[i].Init()
+                self.DAC[i].NcoSync()
 
         @self.command(description="Select internal LMK reference",)
         def SelExtRef():
