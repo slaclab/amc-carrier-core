@@ -64,26 +64,27 @@ class AmcGenericAdcDacCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
 
-        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
-        self.LMK.Init()
-        time.sleep(2.000) # TODO: Optimize this timeout
-
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
 
-        self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
+        self.LMK.RESET.set(0x1)
+        self.LMK.RESET.set(0x0)
 
+        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+        self._root.checkBlocks(recurse=True)
+        time.sleep(5.000)
+
+        self.LMK.Init()
+        time.sleep(1.000)
+
+        self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
         self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
+        self.DAC.Init()
 
         for i in range(2):
             self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
-
-        self.DAC.Init()
-
-        for i in range(2):
             self.ADC[i].CalibrateAdc()
 
         self.readBlocks(recurse=True)
