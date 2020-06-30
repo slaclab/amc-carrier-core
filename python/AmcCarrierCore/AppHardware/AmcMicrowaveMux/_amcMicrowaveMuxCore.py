@@ -117,7 +117,6 @@ class AmcMicrowaveMuxCore(pr.Device):
         for i in range(2):
             self.DAC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
-            self.DAC[i].NcoSync()
             self.DAC[i].Init()
 
         for i in range(2):
