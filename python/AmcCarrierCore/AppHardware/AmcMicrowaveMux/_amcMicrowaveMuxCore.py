@@ -50,8 +50,8 @@ class AmcMicrowaveMuxCore(pr.Device):
         def InitAmcCard():
             for i in range(2):
                 self.ADC[i].Init()
+            for i in range(2):
                 self.DAC[i].Init()
-                self.DAC[i].NcoSync()
 
         @self.command(description="Select internal LMK reference",)
         def SelExtRef():
@@ -118,7 +118,6 @@ class AmcMicrowaveMuxCore(pr.Device):
             self.DAC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
             self.DAC[i].Init()
-            self.DAC[i].NcoSync()
 
         for i in range(2):
             self.ADC[i].Powerup_AnalogConfig()
