@@ -129,6 +129,8 @@ class AppTop(pr.Device):
                 for dac in dacDevices:
                     dac.Init()
                     dac.ClearAlarms()
+                    dac.NcoSync()
+                    dac.ClearAlarms()
 
                 for tx in jesdTxDevices:
                     tx.CmdClearErrors()
