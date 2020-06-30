@@ -114,21 +114,24 @@ class AppTop(pr.Device):
 
                 time.sleep(1.000)
 
+                for en, tx in zip(txEnables, jesdTxDevices):
+                    tx.Enable.set(en)
+
                 for core in appCore:
                     core.Init()
-
-                time.sleep(1.000)
-
-                for dac in dacDevices:
-                    dac.ClearAlarms()
-
-                for en, tx in zip(txEnables, jesdTxDevices):
-                    tx.CmdClearErrors()
-                    tx.Enable.set(en)
 
                 for en, rx in zip(rxEnables, jesdRxDevices):
                     rx.CmdClearErrors()
                     rx.Enable.set(en)
+
+                time.sleep(2.000)
+
+                for dac in dacDevices:
+                    dac.Init()
+                    dac.ClearAlarms()
+
+                for tx in jesdTxDevices:
+                    tx.CmdClearErrors()
 
                 time.sleep(2.000)
 
@@ -165,6 +168,62 @@ class AppTop(pr.Device):
                         if (rx.StatusValidCnt[ch].get() > 4):
                             print(f'AppTop.Init(): {rx.path}.StatusValidCnt[{ch}] = {rx.StatusValidCnt[ch].value()}')
                             linkLock = False
+
+                for dac in dacDevices:
+                    for ch in dac.LinkErrCnt:
+                        ######################################################################
+                        if (dac.LinkErrCnt[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.LinkErrCnt[{ch}] = {dac.LinkErrCnt[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.ReadFifoEmpty[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.ReadFifoEmpty[{ch}] = {dac.ReadFifoEmpty[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.ReadFifoUnderflow[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.ReadFifoUnderflow[{ch}] = {dac.ReadFifoUnderflow[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.ReadFifoFull[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.ReadFifoFull[{ch}] = {dac.ReadFifoFull[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.ReadFifoOverflow[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.ReadFifoOverflow[{ch}] = {dac.ReadFifoOverflow[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.DispErr[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.DispErr[{ch}] = {dac.DispErr[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.NotitableErr[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.NotitableErr[{ch}] = {dac.NotitableErr[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.CodeSyncErr[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.CodeSyncErr[{ch}] = {dac.CodeSyncErr[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.FirstDataMatchErr[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.FirstDataMatchErr[{ch}] = {dac.FirstDataMatchErr[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.ElasticBuffOverflow[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.ElasticBuffOverflow[{ch}] = {dac.ElasticBuffOverflow[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.LinkConfigErr[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.LinkConfigErr[{ch}] = {dac.LinkConfigErr[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.FrameAlignErr[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.FrameAlignErr[{ch}] = {dac.FrameAlignErr[ch].value()}')
+                            linkLock = False
+                        ######################################################################
+                        if (dac.MultiFrameAlignErr[ch].get() != 0):
+                            print(f'AppTop.Init(): {dac.path}.MultiFrameAlignErr[{ch}] = {dac.MultiFrameAlignErr[ch].value()}')
+                            linkLock = False
+                        ######################################################################
 
                 if( linkLock ):
                     break
