@@ -100,6 +100,9 @@ class AppTop(pr.Device):
                 for tx in jesdTxDevices:
                     tx.Enable.set(0)
 
+                for core in appCore:
+                    core.Init()
+
                 for rx in jesdRxDevices:
                     rx.ResetGTs.set(1) # tx.ResetGTs/rx.ResetGTs OR'd together in FW
                 for tx in jesdTxDevices:
@@ -116,9 +119,6 @@ class AppTop(pr.Device):
 
                 for en, tx in zip(txEnables, jesdTxDevices):
                     tx.Enable.set(en)
-
-                for core in appCore:
-                    core.Init()
 
                 for en, rx in zip(rxEnables, jesdRxDevices):
                     rx.CmdClearErrors()
@@ -141,35 +141,6 @@ class AppTop(pr.Device):
                 # JESD Link Health Checking
                 ###########################
                 linkLock = True
-                for tx in jesdTxDevices:
-
-                    if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
-                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
-                        linkLock = False
-
-                    if( tx.DataValid.get() == 0 ):
-                        print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
-                        linkLock = False
-
-                    for ch in tx.StatusValidCnt:
-                        if (tx.StatusValidCnt[ch].get() > 4):
-                            print(f'AppTop.Init(): {tx.path}.StatusValidCnt[{ch}] = {tx.StatusValidCnt[ch].value()}')
-                            linkLock = False
-
-                for rx in jesdRxDevices:
-
-                    if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
-                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
-                        linkLock = False
-
-                    if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
-                        print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
-                        linkLock = False
-
-                    for ch in rx.StatusValidCnt:
-                        if (rx.StatusValidCnt[ch].get() > 4):
-                            print(f'AppTop.Init(): {rx.path}.StatusValidCnt[{ch}] = {rx.StatusValidCnt[ch].value()}')
-                            linkLock = False
 
                 for dac in dacDevices:
                     for ch in dac.LinkErrCnt:
@@ -226,6 +197,35 @@ class AppTop(pr.Device):
                             print(f'AppTop.Init(): {dac.path}.MultiFrameAlignErr[{ch}] = {dac.MultiFrameAlignErr[ch].value()}')
                             linkLock = False
                         ######################################################################
+
+                for tx in jesdTxDevices:
+                    if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
+                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
+                        linkLock = False
+
+                    if( tx.DataValid.get() == 0 ):
+                        print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
+                        linkLock = False
+
+                    for ch in tx.StatusValidCnt:
+                        if (tx.StatusValidCnt[ch].get() > 4):
+                            print(f'AppTop.Init(): {tx.path}.StatusValidCnt[{ch}] = {tx.StatusValidCnt[ch].value()}')
+                            linkLock = False
+
+                for rx in jesdRxDevices:
+
+                    if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
+                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
+                        linkLock = False
+
+                    if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
+                        print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
+                        linkLock = False
+
+                    for ch in rx.StatusValidCnt:
+                        if (rx.StatusValidCnt[ch].get() > 4):
+                            print(f'AppTop.Init(): {rx.path}.StatusValidCnt[{ch}] = {rx.StatusValidCnt[ch].value()}')
+                            linkLock = False
 
                 if( linkLock ):
                     break

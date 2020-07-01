@@ -40,6 +40,8 @@ class AmcGenericAdcDacCore(pr.Device):
 
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
+            self.LMK.Init()
+            time.sleep(1.000)
             for i in range(2):
                 self.ADC[i].CalibrateAdc()
             self.DAC.Init()
@@ -72,14 +74,14 @@ class AmcGenericAdcDacCore(pr.Device):
 
         self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
-        time.sleep(5.000)
-
+        time.sleep(0.100)
         self.LMK.Init()
-        time.sleep(1.000)
+        time.sleep(0.100)
 
-        self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
-        self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
+        for x in range(2):
+            self.DAC.DacReg[2].set(0x2080) # Setup the SPI configuration
+            self.DAC.writeBlocks(force=force, recurse=recurse, variable=variable)
+            self._root.checkBlocks(recurse=True)
         self.DAC.Init()
 
         for i in range(2):

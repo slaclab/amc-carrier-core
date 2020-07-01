@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -17,7 +17,7 @@ DaqMuxV2: &DaqMuxV2
   class: MMIODev
   configPrio: 1
   metadata:
-    - numOutPorts: 4              
+    - numOutPorts: 4
   children:
     #########################################################
     TriggerSw:
@@ -201,7 +201,7 @@ DaqMuxV2: &DaqMuxV2
       mode: RO
       description: Combined Trigger Status (Registered on first trigger until cleared
         by TriggerClearStatus).
-    #########################################################    
+    #########################################################
     FreezeStatus:
       at:
         offset: 0x004
@@ -212,7 +212,7 @@ DaqMuxV2: &DaqMuxV2
       mode: RO
       description: Freeze Buffers Status (Registered on first freeze until cleared
         by TriggerClearStatus)
-    #########################################################      
+    #########################################################
     DecimationRateDiv:
       at:
         offset: 0x008
@@ -269,7 +269,7 @@ DaqMuxV2: &DaqMuxV2
       name: DbgInputValid
       sizeBits: 32
       mode: RO
-      description:  "Input Valid bus for debugging"   
+      description:  "Input Valid bus for debugging"
     #########################################################
     DbgLinkReady:
       at:
@@ -278,13 +278,13 @@ DaqMuxV2: &DaqMuxV2
       name: DbgInputValid
       sizeBits: 32
       mode: RO
-      description:  "Input LinkReady bus for debugging"         
+      description:  "Input LinkReady bus for debugging"
     #########################################################
     InputMuxSel:
       at:
         offset: 0x040
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: InputMuxSel
       sizeBits: 5
@@ -392,7 +392,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x080
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: StreamPause
       sizeBits: 1
@@ -403,7 +403,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x080
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: StreamReady
       sizeBits: 1
@@ -415,7 +415,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x080
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: StreamOverflow
       sizeBits: 1
@@ -427,7 +427,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x080
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: StreamError
       sizeBits: 1
@@ -440,7 +440,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x080
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: InputDataValid
       sizeBits: 1
@@ -452,7 +452,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x080
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: StreamEnabled
       sizeBits: 1
@@ -464,7 +464,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x080
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: FrameCnt
       sizeBits: 26
@@ -476,7 +476,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x0C0
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: FormatSignWidth
       sizeBits: 5
@@ -488,7 +488,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x0C0
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: FormatDataWidth
       sizeBits: 1
@@ -507,7 +507,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x0C0
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: FormatSign
       sizeBits: 1
@@ -527,7 +527,7 @@ DaqMuxV2: &DaqMuxV2
       at:
         offset: 0x0C0
         stride: 4
-        nelms: 4                  
+        nelms: 4
       class: IntField
       name: DecimationAveraging
       sizeBits: 1
