@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -27,8 +27,8 @@ Si5317a: &Si5317a
       # sizeBits: 1
       lsBit: 0
       # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
-      sizeBits: 32          
-      description: pllRst    
+      sizeBits: 32
+      description: pllRst
     #########################################################
     pllInc:
       at:
@@ -38,7 +38,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 1
       lsBit: 1
-      description: pllInc    
+      description: pllInc
     #########################################################
     pllDec:
       at:
@@ -48,7 +48,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 1
       lsBit: 2
-      description: pllDec    
+      description: pllDec
     #########################################################
     pllLos:
       at:
@@ -58,7 +58,7 @@ Si5317a: &Si5317a
       mode: RO
       sizeBits: 1
       lsBit: 3
-      description: pllLos    
+      description: pllLos
     #########################################################
     pllLol:
       at:
@@ -68,7 +68,7 @@ Si5317a: &Si5317a
       mode: RO
       sizeBits: 1
       lsBit: 4
-      description: pllLol 
+      description: pllLol
     #########################################################
     pllLocked:
       at:
@@ -78,7 +78,7 @@ Si5317a: &Si5317a
       mode: RO
       sizeBits: 1
       lsBit: 5
-      description: pllLocked       
+      description: pllLocked
     #########################################################
     pllDbl2By:
       at:
@@ -88,7 +88,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 1
       lsBit: 0
-      description: pllDbl2By    
+      description: pllDbl2By
     #########################################################
     pllDbl2ByTri:
       at:
@@ -98,7 +98,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 1
       lsBit: 1
-      description: pllDbl2ByTri    
+      description: pllDbl2ByTri
     #########################################################
     pllFrqTbl:
       at:
@@ -108,7 +108,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 1
       lsBit: 2
-      description: pllFrqTbl    
+      description: pllFrqTbl
     #########################################################
     pllFrqTblTri:
       at:
@@ -118,7 +118,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 1
       lsBit: 3
-      description: pllFrqTblTri    
+      description: pllFrqTblTri
     #########################################################
     pllRate:
       at:
@@ -128,7 +128,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 2
       lsBit: 4
-      description: pllRate    
+      description: pllRate
     #########################################################
     pllRateTri:
       at:
@@ -138,7 +138,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 2
       lsBit: 6
-      description: pllRateTri    
+      description: pllRateTri
     #########################################################
     pllSFout:
       at:
@@ -148,7 +148,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 2
       lsBit: 0
-      description: pllSFout    
+      description: pllSFout
     #########################################################
     pllSFoutTri:
       at:
@@ -158,7 +158,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 2
       lsBit: 2
-      description: pllSFoutTri    
+      description: pllSFoutTri
     #########################################################
     pllBwSel:
       at:
@@ -168,7 +168,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 2
       lsBit: 4
-      description: pllBwSel    
+      description: pllBwSel
     #########################################################
     pllBwSelTri:
       at:
@@ -178,7 +178,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 2
       lsBit: 6
-      description: pllBwSelTri    
+      description: pllBwSelTri
     #########################################################
     pllFrqSel:
       at:
@@ -188,7 +188,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 4
       lsBit: 0
-      description: pllFrqSel    
+      description: pllFrqSel
     #########################################################
     pllFrqSelTri:
       at:
@@ -198,7 +198,7 @@ Si5317a: &Si5317a
       mode: RW
       sizeBits: 4
       lsBit: 4
-      description: pllFrqSelTri    
+      description: pllFrqSelTri
     #########################################################
     cntLos:
       at:
@@ -207,7 +207,7 @@ Si5317a: &Si5317a
       name: cntLos
       mode: RO
       sizeBits: 32
-      description: status counter for los   
+      description: status counter for los
     #########################################################
     cntLol:
       at:
@@ -216,7 +216,7 @@ Si5317a: &Si5317a
       name: cntLol
       mode: RO
       sizeBits: 32
-      description: status counter for los        
+      description: status counter for los
     #########################################################
     cntLocked:
       at:
@@ -225,7 +225,7 @@ Si5317a: &Si5317a
       name: cntLocked
       mode: RO
       sizeBits: 32
-      description: status counter for pllLocked  
+      description: status counter for pllLocked
     #########################################################
     cntPllRst:
       at:
@@ -234,7 +234,7 @@ Si5317a: &Si5317a
       name: cntPllRst
       mode: RO
       sizeBits: 32
-      description: status counter for pllRst        
+      description: status counter for pllRst
     #########################################################
     cntRst:
       at:
@@ -245,6 +245,6 @@ Si5317a: &Si5317a
       # sizeBits: 1
       lsBit: 0
       # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
-      sizeBits: 32         
-      description: cntRst      
+      sizeBits: 32
+      description: cntRst
     #########################################################

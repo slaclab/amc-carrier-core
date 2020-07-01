@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -56,7 +56,7 @@ AppMpsSalt: &AppMpsSalt
       name: MpsRxPktRcvdCnt
       mode: RO
       sizeBits: 32
-      description: MPS RX Packet Received Counter[13:0]  
+      description: MPS RX Packet Received Counter[13:0]
     #########################################################
     MpsTxEofeSentCnt:
       at:
@@ -65,7 +65,7 @@ AppMpsSalt: &AppMpsSalt
       name: MpsTxEofeSentCnt
       mode: RO
       sizeBits: 32
-      description: MPS TX EOFE Sent Counter    
+      description: MPS TX EOFE Sent Counter
     #########################################################
     MpsRxErrDetCnt:
       at:
@@ -76,7 +76,7 @@ AppMpsSalt: &AppMpsSalt
       name: MpsRxErrDetCnt
       mode: RO
       sizeBits: 32
-      description: MPS RX Error Detected Counter[13:0]        
+      description: MPS RX Error Detected Counter[13:0]
     #########################################################
     MpsTxPktPeriod:
       at:
@@ -96,7 +96,7 @@ AppMpsSalt: &AppMpsSalt
       name: MpsRxPktPeriod
       mode: RO
       sizeBits: 32
-      description: Min MPS RX[13:0] Period between packets    
+      description: Min MPS RX[13:0] Period between packets
     #########################################################
     MpsTxPktPeriodMax:
       at:
@@ -116,8 +116,8 @@ AppMpsSalt: &AppMpsSalt
       name: MpsRxPktPeriodMax
       mode: RO
       sizeBits: 32
-      description: Max MPS RX[13:0] Period between packets    
-    #########################################################  
+      description: Max MPS RX[13:0] Period between packets
+    #########################################################
     MpsTxPktPeriodMin:
       at:
         offset: 0x280
@@ -136,8 +136,8 @@ AppMpsSalt: &AppMpsSalt
       name: MpsRxPktPeriodMin
       mode: RO
       sizeBits: 32
-      description: Min MPS RX[13:0] Period between packets    
-    #########################################################      
+      description: Min MPS RX[13:0] Period between packets
+    #########################################################
     MpsTxLinkUP:
       at:
         offset: 0x700
@@ -196,7 +196,7 @@ AppMpsSalt: &AppMpsSalt
       mode: RO
       lsBit: 0
       sizeBits: 32
-      description: Counts the diagnostic strobes     
+      description: Counts the diagnostic strobes
     #########################################################
     RollOverEn:
       at:
@@ -217,7 +217,7 @@ AppMpsSalt: &AppMpsSalt
       lsBit: 0
       # sizeBits: 1
       # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
-      sizeBits: 32          
+      sizeBits: 32
       description: Status Counter Reset
     #########################################################
     PllRst:
@@ -229,8 +229,8 @@ AppMpsSalt: &AppMpsSalt
       lsBit: 0
       # sizeBits: 1
       # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
-      sizeBits: 32          
-      description: PLL Reset      
+      sizeBits: 32
+      description: PLL Reset
     #########################################################
     RstCnt:
       name: RstCnt
@@ -240,7 +240,7 @@ AppMpsSalt: &AppMpsSalt
       description: Reset all the status counters
       sequence:
       - entry: CntRst
-        value: 0x1      
+        value: 0x1
     #########################################################
     RstPll:
       name: RstPll
@@ -250,5 +250,5 @@ AppMpsSalt: &AppMpsSalt
       description: PLL Reset Command
       sequence:
       - entry: PllRst
-        value: 0x1      
+        value: 0x1
     #########################################################

@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -14,7 +14,7 @@
 #include AmcBpmCtrl.yaml
 #include GenericMemory.yaml
 
-AmcBpmCore: &AmcBpmCore 
+AmcBpmCore: &AmcBpmCore
   description: Generic ADC/DAC AMC Core
   class: MMIODev
   configPrio: 1
@@ -22,50 +22,50 @@ AmcBpmCore: &AmcBpmCore
   ########
   children:
   ########
-    ##################################################     
+    ##################################################
     AmcBpmCtrl:
       <<: *AmcBpmCtrl
       at:
-        offset: 0x00000000              
-    ##################################################     
+        offset: 0x00000000
+    ##################################################
     Lmk04828:
       <<: *Lmk04828
       at:
-        offset: 0x00020000 
-    ##################################################     
+        offset: 0x00020000
+    ##################################################
     Adc16Dx370:
       <<: *Adc16Dx370
       at:
-        offset: 0x00040000 
-        stride: 0x00020000              
+        offset: 0x00040000
+        stride: 0x00020000
         nelms: 2
-    ##################################################  
+    ##################################################
     InitAmcCard:
       description: Initialization for AMC card's JESD modules
       at:
         offset: 0x0
       class: SequenceCommand
       sequence:
-                    
+
         # Calibrate the JESD ADCs
         - entry: Adc16Dx370/CalibrateAdc
-          value: 0x1       
+          value: 0x1
         # 100 ms sleep
         - entry: usleep
-          value: 100000       
+          value: 100000
 
         # Power up the LMK's SYSREF
         - entry: Lmk04828/PwrUpSysRef
-          value: 0x1       
+          value: 0x1
         # 1000 ms sleep
         - entry: usleep
-          value: 1000000          
+          value: 1000000
 
         # Clear the Alarms
-        - entry: Lmk04828/InitLmk          
-          value: 0x1 
-                    
+        - entry: Lmk04828/InitLmk
+          value: 0x1
+
         # Reset status counters
-        - entry: AmcBpmCtrl/CntRst          
-          value: 0x1           
+        - entry: AmcBpmCtrl/CntRst
+          value: 0x1
     ##################################################

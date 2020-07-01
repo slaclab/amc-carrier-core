@@ -1,17 +1,17 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
 #once RtmRfInterlock.yaml
 #include GenericMemory.yaml
 
-RtmRfInterlock: &RtmRfInterlock 
+RtmRfInterlock: &RtmRfInterlock
   class: MMIODev
   configPrio: 1
   description: "LLRF RTM interlock core"
@@ -266,7 +266,7 @@ RtmRfInterlock: &RtmRfInterlock
       lsBit: 0
       sizeBits: 1
       mode: RO
-      description: "Fault from RTM status"        
+      description: "Fault from RTM status"
     #########################################################
     AdcLocked:
       class: IntField
@@ -323,7 +323,7 @@ RtmRfInterlock: &RtmRfInterlock
       description: "Get value of the Frame clock iDelay(On AdcIDelayLoad)."
     #########################################################
     #    BUFFER 0 (32bit word) x"0" & Beam_I_Data  x"0" & Beam_V_Data
-    #    BUFFER 1 (32bit word) x"0" & FWD_PWR_Data x"0" & REFL_PWR_Data    
+    #    BUFFER 1 (32bit word) x"0" & FWD_PWR_Data x"0" & REFL_PWR_Data
     #########################################################
     RtmAdcBuffer:
       class: MMIODev
@@ -331,8 +331,8 @@ RtmRfInterlock: &RtmRfInterlock
         offset: 0x2000
         stride: 0x1000
         nelms: 2
-      size: 0x1000       
-      description: "BUFFER 0 (32 bit word) 0x0 & Beam_I_Data 0x0 & Beam_V_Data BUFFER 1 (32 bit word) 0x0 & FWD_PWR_Data 0x0 & REFL_PWR_Data"     
+      size: 0x1000
+      description: "BUFFER 0 (32 bit word) 0x0 & Beam_I_Data 0x0 & Beam_V_Data BUFFER 1 (32 bit word) 0x0 & FWD_PWR_Data 0x0 & REFL_PWR_Data"
       children:
         MemoryArray:
           <<: *MemoryArray
@@ -340,7 +340,7 @@ RtmRfInterlock: &RtmRfInterlock
           mode: RO
           at:
             offset: 0x0
-            nelms: 0x200   
+            nelms: 0x200
     #########################################################
     #    Commands
     #########################################################
@@ -349,7 +349,7 @@ RtmRfInterlock: &RtmRfInterlock
       class: SequenceCommand
       at:
         offset: 0x0
-      description: Send Soft buffer clear to reinitialize soft buffers. 
+      description: Send Soft buffer clear to reinitialize soft buffers.
       sequence:
       - entry: SoftBufferClear
         value: 0x1
@@ -361,7 +361,7 @@ RtmRfInterlock: &RtmRfInterlock
       class: SequenceCommand
       at:
         offset: 0x0
-      description: Trigger the buffer readout from software. 
+      description: Trigger the buffer readout from software.
       sequence:
       - entry: SoftBufferTrigger
         value: 0x1
