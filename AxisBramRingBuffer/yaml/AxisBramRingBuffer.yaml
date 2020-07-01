@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -20,9 +20,9 @@ AxisBramRingBuffer: &AxisBramRingBuffer
     numAppCh: &numAppCh 1
   #########
   children:
-  #########  
-    #########################################################      
-    TDEST:        
+  #########
+    #########################################################
+    TDEST:
       at:
         offset: 0x0
         stride: 4
@@ -33,7 +33,7 @@ AxisBramRingBuffer: &AxisBramRingBuffer
       lsBit: 0
       mode: RW
       description: "AXI stream TDEST"
-    #########################################################          
+    #########################################################
     SwTrig:
       at:
         offset: 0xF8
@@ -43,9 +43,9 @@ AxisBramRingBuffer: &AxisBramRingBuffer
       lsBit: 0
       mode: WO
       # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
-      sizeBits: 32          
-      description: "Software Trigger"      
-    #########################################################          
+      sizeBits: 32
+      description: "Software Trigger"
+    #########################################################
     Enable:
       at:
         offset: 0xFC
@@ -66,4 +66,3 @@ AxisBramRingBuffer: &AxisBramRingBuffer
       - entry: SwTrig
         value: 0x1
     #########################################################
-    
