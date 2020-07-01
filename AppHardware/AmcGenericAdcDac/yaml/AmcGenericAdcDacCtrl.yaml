@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'SLAC Firmware Standard Library'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'SLAC Firmware Standard Library', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'SLAC Firmware Standard Library', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -13,8 +13,8 @@
 AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
   name: AmcGenericAdcDacCtrl
   description: Generic ADC/DAC AMC Control Module
-  class: MMIODev 
-  size: 0x400 
+  class: MMIODev
+  size: 0x400
   children:
     #########################################################
     AdcValidCnt:
@@ -33,7 +33,7 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       class: IntField
       name: lemoDoutCnt
       mode: RO
-      description: LEMO DOUT Transistion Counter[1:0]      
+      description: LEMO DOUT Transistion Counter[1:0]
     #########################################################
     lemoDinCnt:
       at:
@@ -42,7 +42,7 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       class: IntField
       name: lemoDinCnt
       mode: RO
-      description: LEMO DIN Transistion Counter[1:0]   
+      description: LEMO DIN Transistion Counter[1:0]
     #########################################################
     BcmCnt:
       at:
@@ -50,7 +50,7 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       class: IntField
       name: BcmCnt
       mode: RO
-      description: BCM Transistion Counter    
+      description: BCM Transistion Counter
     #########################################################
     AdcCalCnt:
       at:
@@ -58,7 +58,7 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       class: IntField
       name: AdcCalCnt
       mode: RO
-      description: ADC_CAL Transistion Counter 
+      description: ADC_CAL Transistion Counter
     #########################################################
     SmaTrigCnt:
       at:
@@ -247,6 +247,6 @@ AmcGenericAdcDacCtrl: &AmcGenericAdcDacCtrl
       # sizeBits: 1
       mode: WO
       # CPSW requires all WO variables to be 32-bit size and 32-bit aligned
-      sizeBits: 32      
+      sizeBits: 32
       description: Status counter reset
     #########################################################
