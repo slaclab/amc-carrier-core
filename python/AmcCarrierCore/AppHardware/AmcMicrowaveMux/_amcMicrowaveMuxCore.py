@@ -48,10 +48,16 @@ class AmcMicrowaveMuxCore(pr.Device):
         ##########
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
+
             for i in range(2):
+                self.ADC[i].enable.set(True)
                 self.ADC[i].Init()
+                self.ADC[i].enable.set(False)
+
             for i in range(2):
+                self.DAC[i].enable.set(True)
                 self.DAC[i].Init()
+                # self.DAC[i].enable.set(False)
 
         @self.command(description="Select internal LMK reference",)
         def SelExtRef():
@@ -89,7 +95,18 @@ class AmcMicrowaveMuxCore(pr.Device):
         # Retire any in-flight transactions before starting
         self._root.checkBlocks(recurse=True)
 
+        # Enables
+        self.DBG.enable.set(True)
+        self.ATT.enable.set(True)
+        self.LMK.enable.set(True)
+        for i in range(2):
+            self.ADC[i].enable.set(True)
+            self.DAC[i].enable.set(True)
+        for i in range(4):
+            self.PLL[i].enable.set(True)
+
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
+        # self.ATT.writeBlocks(force=force, recurse=recurse, variable=variable) # ESROGUE-452
         self._root.checkBlocks(recurse=True)
 
         for i in range(2):
@@ -99,10 +116,11 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.LMK.RESET.set(0x1)
         self.LMK.RESET.set(0x0)
 
-        self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
+        for x in range(2):
+            self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
+            self._root.checkBlocks(recurse=True)
 
-        time.sleep(1.000)
+        time.sleep(5.000)
         self.LMK.Init()
         time.sleep(0.100)
 
@@ -131,6 +149,15 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         for i in range(2):
             self.DAC[i].Init()
+
+        # self.DBG.enable.set(False)
+        # self.ATT.enable.set(False)
+        self.LMK.enable.set(False)
+        for i in range(2):
+            self.ADC[i].enable.set(False)
+            # self.DAC[i].enable.set(False)
+        # for i in range(4):
+            # self.PLL[i].enable.set(False)
 
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
