@@ -88,8 +88,9 @@ class AppTop(pr.Device):
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
             appCore       = self.find(typ=AppCore)
 
-            rxEnables = [rx.Enable.get() for rx in jesdRxDevices]
-            txEnables = [tx.Enable.get() for tx in jesdTxDevices]
+            rxEnables  = [rx.Enable.get()  for rx  in jesdRxDevices]
+            txEnables  = [tx.Enable.get()  for tx  in jesdTxDevices]
+            dacEnables = [dac.enable.get() for dac in dacDevices]
 
             retryCnt = 0
             retryCntMax = 8
@@ -126,11 +127,13 @@ class AppTop(pr.Device):
 
                 time.sleep(2.000)
 
-                for dac in dacDevices:
+                for en, dac in zip(dacEnables,dacDevices):
+                    dac.enable.set(True)
                     dac.Init()
                     dac.ClearAlarms()
                     dac.NcoSync()
                     dac.ClearAlarms()
+                    dac.enable.set(en)
 
                 for tx in jesdTxDevices:
                     tx.CmdClearErrors()
@@ -142,7 +145,8 @@ class AppTop(pr.Device):
                 ###########################
                 linkLock = True
 
-                for dac in dacDevices:
+                for en, dac in zip(dacEnables,dacDevices):
+                    dac.enable.set(True)
                     for ch in dac.LinkErrCnt:
                         ######################################################################
                         if (dac.LinkErrCnt[ch].get() != 0):
@@ -197,35 +201,43 @@ class AppTop(pr.Device):
                             print(f'AppTop.Init(): {dac.path}.MultiFrameAlignErr[{ch}] = {dac.MultiFrameAlignErr[ch].value()}')
                             linkLock = False
                         ######################################################################
+                    dac.enable.set(en)
+
+                time.sleep(2.000)
 
                 for tx in jesdTxDevices:
+                    ######################################################################
                     if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
                         print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
                         linkLock = False
-
+                    ######################################################################
                     if( tx.DataValid.get() == 0 ):
                         print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
                         linkLock = False
-
+                    ######################################################################
                     for ch in tx.StatusValidCnt:
-                        if (tx.StatusValidCnt[ch].get() > 4):
+                        if (tx.StatusValidCnt[ch].get() > 0):
                             print(f'AppTop.Init(): {tx.path}.StatusValidCnt[{ch}] = {tx.StatusValidCnt[ch].value()}')
                             linkLock = False
+                    ######################################################################
+                    tx.CmdClearErrors()
 
                 for rx in jesdRxDevices:
-
+                    ######################################################################
                     if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
                         print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
                         linkLock = False
-
+                    ######################################################################
                     if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
                         print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
                         linkLock = False
-
+                    ######################################################################
                     for ch in rx.StatusValidCnt:
                         if (rx.StatusValidCnt[ch].get() > 4):
                             print(f'AppTop.Init(): {rx.path}.StatusValidCnt[{ch}] = {rx.StatusValidCnt[ch].value()}')
                             linkLock = False
+                    ######################################################################
+                    rx.CmdClearErrors()
 
                 if( linkLock ):
                     break
