@@ -255,6 +255,16 @@ class AppTop(pr.Device):
 
     def writeBlocks(self, **kwargs):
         print(f'{self.path}.writeBlocks()')
+
+        # Put GTs into reset before LMK configured and initialized
+        jesdRxDevices = self.find(typ=jesd.JesdRx)
+        jesdTxDevices = self.find(typ=jesd.JesdTx)
+        for rx in jesdRxDevices:
+            rx.ResetGTs.set(1)
+        for tx in jesdTxDevices:
+            tx.ResetGTs.set(1)
+
+        # Load the YAML configuration
         super().writeBlocks(**kwargs)
 
         # Retire any in-flight transactions before starting
