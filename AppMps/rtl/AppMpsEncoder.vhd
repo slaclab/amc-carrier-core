@@ -102,7 +102,7 @@ architecture mapping of AppMpsEncoder is
 
          message(config.BYTE_MAP_C)(bitPos) := '1';
 
-      -- Threhold was exceeded within the last 15 clocks
+      -- Threshold was exceeded within the last 15 clocks
       elsif tholdMemIn /= 0 then
          if valid = '1' then
             tholdMemOut := tholdMemIn - 1;
@@ -209,12 +209,14 @@ begin
       -- Init message data
       msgData := (others => (others => '0'));
 
-      -- Digtal Application
+      -- Digital Application
       if APP_CONFIG_C.DIGITAL_EN_C = true then
          v.mpsMessage.inputType := '0';
 
-         for b in 0 to APP_CONFIG_C.BYTE_COUNT_C*8-1 loop
-            digitalBit (mpsSelect.digitalBus(b), b, r.tholdMem(0, b), v.tholdMem(0, b), msgData);
+         for i in 0 to APP_CONFIG_C.BYTE_COUNT_C-1 loop
+            for j in 0 to 7 loop
+               digitalBit (mpsSelect.digitalBus((8*i)+j), j, r.tholdMem(i, j), v.tholdMem(i, j), msgData);
+            end loop;
          end loop;
 
       -- Analog Process each enabled channel
