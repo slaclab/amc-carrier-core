@@ -57,7 +57,7 @@ class AmcMicrowaveMuxCore(pr.Device):
             for i in range(2):
                 self.DAC[i].enable.set(True)
                 self.DAC[i].Init()
-                # self.DAC[i].enable.set(False)
+                self.DAC[i].enable.set(False)
 
         @self.command(description="Select internal LMK reference",)
         def SelExtRef():
@@ -106,7 +106,7 @@ class AmcMicrowaveMuxCore(pr.Device):
             self.PLL[i].enable.set(True)
 
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
-        # self.ATT.writeBlocks(force=force, recurse=recurse, variable=variable) # ESROGUE-452
+        self.ATT.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.checkBlocks(recurse=True)
 
         for i in range(2):
@@ -144,20 +144,16 @@ class AmcMicrowaveMuxCore(pr.Device):
             self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
             self._root.checkBlocks(recurse=True)
 
-        for i in range(2):
-            self.ADC[i].Init()
-
-        for i in range(2):
-            self.DAC[i].Init()
-
-        # self.DBG.enable.set(False)
+        self.DBG.enable.set(False)
         # self.ATT.enable.set(False)
         self.LMK.enable.set(False)
         for i in range(2):
             self.ADC[i].enable.set(False)
-            # self.DAC[i].enable.set(False)
-        # for i in range(4):
-            # self.PLL[i].enable.set(False)
+            self.DAC[i].enable.set(False)
+        for i in range(4):
+            self.PLL[i].enable.set(False)
+
+        self.InitAmcCard()
 
         self.readBlocks(recurse=True)
         self.checkBlocks(recurse=True)
