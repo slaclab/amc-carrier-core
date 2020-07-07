@@ -1372,7 +1372,7 @@ Reading /home/travis/build/slaclab/amc-carrier-core/Ax
 
 [AppMpsEncoder.vhd:182:Info: Elaborating entity AppMpsSelect for hierarchy appmpsselect::u_appmpsselect]
 
-[AppMpsEncoder.vhd:307:Info: Elaborating entity MpsMsgCore for hierarchy mpsmsgcore::u_msggen]
+[AppMpsEncoder.vhd:309:Info: Elaborating entity MpsMsgCore for hierarchy mpsmsgcore::u_msggen]
 
 [AppMpsReg.vhd:95:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar_0]
 
