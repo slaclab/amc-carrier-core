@@ -354,14 +354,14 @@ set_property -dict { PACKAGE_PIN C28 IOSTANDARD LVCMOS18 } [get_ports {rtmLsN[19
 ## Application Timing Constraints ##
 ####################################
 
-create_clock -name jesdClk00 -period 3.255 [get_ports {jesdClkP[0][0]}]
-create_clock -name jesdClk01 -period 3.255 [get_ports {jesdClkP[0][1]}]
-create_clock -name jesdClk02 -period 3.255 [get_ports {jesdClkP[0][2]}]
-create_clock -name jesdClk03 -period 3.255 [get_ports {jesdClkP[0][3]}]
-create_clock -name jesdClk10 -period 3.255 [get_ports {jesdClkP[1][0]}]
-create_clock -name jesdClk11 -period 3.255 [get_ports {jesdClkP[1][1]}]
-create_clock -name jesdClk12 -period 3.255 [get_ports {jesdClkP[1][2]}]
-create_clock -name jesdClk13 -period 3.255 [get_ports {jesdClkP[1][3]}]
+create_clock -name jesdClk00 -period 3.200 [get_ports {jesdClkP[0][0]}]
+create_clock -name jesdClk01 -period 3.200 [get_ports {jesdClkP[0][1]}]
+create_clock -name jesdClk02 -period 3.200 [get_ports {jesdClkP[0][2]}]
+create_clock -name jesdClk03 -period 3.200 [get_ports {jesdClkP[0][3]}]
+create_clock -name jesdClk10 -period 3.200 [get_ports {jesdClkP[1][0]}]
+create_clock -name jesdClk11 -period 3.200 [get_ports {jesdClkP[1][1]}]
+create_clock -name jesdClk12 -period 3.200 [get_ports {jesdClkP[1][2]}]
+create_clock -name jesdClk13 -period 3.200 [get_ports {jesdClkP[1][3]}]
 create_clock -name mpsClkIn  -period 8.000 [get_ports {mpsClkIn}]
 
 create_generated_clock -name mpsClk625MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_MpsSerdesPll/CLKOUT0}] 
