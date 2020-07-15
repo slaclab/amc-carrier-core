@@ -85,9 +85,13 @@ class AppTop(pr.Device):
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
 
-            rxEnables  = [rx.Enable.get()  for rx  in jesdRxDevices]
-            txEnables  = [tx.Enable.get()  for tx  in jesdTxDevices]
             dacEnables = [dac.enable.get() for dac in dacDevices]
+
+            ##################
+            ## Local Variables
+            ##################
+            init     = True if (arg != '') else False
+            maxRxCnt = 4 if (init) else 0
 
             ###########################
             # JESD Link Health Checking
@@ -152,7 +156,7 @@ class AppTop(pr.Device):
                     ######################################################################
                 dac.enable.set(en)
 
-            if (arg != ''):
+            if (init):
                 time.sleep(2.000)
 
             for tx in jesdTxDevices:
@@ -170,7 +174,7 @@ class AppTop(pr.Device):
                         print(f'AppTop.Init(): {tx.path}.StatusValidCnt[{ch}] = {tx.StatusValidCnt[ch].value()}')
                         linkLock = False
                 ######################################################################
-                if (arg != ''):
+                if (init):
                     tx.CmdClearErrors()
 
             for rx in jesdRxDevices:
@@ -184,11 +188,11 @@ class AppTop(pr.Device):
                     linkLock = False
                 ######################################################################
                 for ch in rx.StatusValidCnt:
-                    if (rx.StatusValidCnt[ch].get() > 4):
+                    if (rx.StatusValidCnt[ch].get() > maxRxCnt):
                         print(f'AppTop.Init(): {rx.path}.StatusValidCnt[{ch}] = {rx.StatusValidCnt[ch].value()}')
                         linkLock = False
                 ######################################################################
-                if (arg != ''):
+                if (init):
                     rx.CmdClearErrors()
 
             # Return the result
