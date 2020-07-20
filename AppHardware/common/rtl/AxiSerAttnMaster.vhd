@@ -119,7 +119,6 @@ begin
 
             if (axiStatus.readEnable = '1') then
                -- Just return previously written value
-               v.axiReadSlave.rdata                         := (others => '0');
                v.axiReadSlave.rdata(DATA_SIZE_G-1 downto 0) := r.wrData;
                axiSlaveReadResponse(v.axiReadSlave);
 
