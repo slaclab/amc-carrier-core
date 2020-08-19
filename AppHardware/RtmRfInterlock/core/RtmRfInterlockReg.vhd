@@ -67,9 +67,10 @@ entity RtmRfInterlockReg is
       bypassMode_o : out sl;
 
       -- Status Register
-      rfOff_i   : in sl;
-      fault_i   : in sl;
-      adcLock_i : in sl;
+      rfOff_i        : in sl;
+      fault_i        : in sl;
+      adcLock_i      : in sl;
+      writePointer_i : slv(10 downto 0);
 
       -- IDelay control
       curDelay_i : in  Slv9Array(4 downto 0);
@@ -113,6 +114,8 @@ architecture rtl of RtmRfInterlockReg is
    -- Read-only synced
    signal s_status   : slv(2 downto 0);
    signal s_curDelay : Slv9Array(4 downto 0);
+
+   signal s_writePointer : slv(10 downto 0) := (others => '0');
 --
 begin
 
@@ -121,7 +124,7 @@ begin
    s_WrAddr <= conv_integer(axilWriteMaster.awaddr(AXIL_ADDR_WIDTH_G-1 downto 2));
 
    comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr,
-                   s_WrAddr, s_curDelay, s_status) is
+                   s_WrAddr, s_curDelay, s_status, s_writePointer) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -171,6 +174,8 @@ begin
                v.axilReadSlave.rdata(r.control'range) := r.control;
             when 16#10# =>              -- ADDR (0x40)
                v.axilReadSlave.rdata(s_status'range) := s_status;
+            when 16#11# =>              -- ADDR (0x44)
+               v.axilReadSlave.rdata(s_writePointer'range) := s_writePointer;
             when 16#20# to 16#2F# =>    -- ADDR (0x80)
                for i in 4 downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = i) then
@@ -223,6 +228,15 @@ begin
          clk       => axiClk_i,
          dataOut   => s_status
          );
+
+   SYNC_IN1 : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => s_writePointer'length)
+      port map (
+         clk     => axiClk_i,
+         dataIn  => writePointer_i,
+         dataOut => s_writePointer);
 
    GEN_IDELAY_IN : for i in 4 downto 0 generate
       Sync_IN1 : entity surf.SynchronizerVector
