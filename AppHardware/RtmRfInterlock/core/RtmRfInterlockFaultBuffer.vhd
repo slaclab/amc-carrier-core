@@ -165,7 +165,7 @@ begin
          mAxisMaster => axisMaster,
          mAxisSlave  => axisSlave);
 
-comb : process(trigOs, faultSync, txCtrl, timestamp) is
+comb : process(trigOs, faultSync, txCtrl, timestamp, r) is
    variable v : RegType;
 begin
    -- Latch the current value
