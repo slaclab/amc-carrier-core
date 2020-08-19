@@ -92,8 +92,18 @@ architecture mapping of RtmRfInterlockFaultBuffer is
    signal txCtrl     : AxiStreamCtrlType;
    signal streamData : Slv32Array(1 downto 0) := (others => (others => '0'));
    signal faultSync  : sl := '0';
+   signal trigOs     : sl := '0';
 
 begin
+
+   U_SYNC_OS_TRIG : entity surf.SynchronizerOneShot
+      generic map (
+         TPD_G   => TPD_G)
+      port map (
+         clk     => clk,
+	 dataIn  => trig,
+	 dataOut => trigOs);
+
    U_SYNC_FAULT : entity surf.Synchronizer
       generic map (
          TPD_G   => TPD_G)
@@ -155,7 +165,7 @@ begin
          mAxisMaster => axisMaster,
          mAxisSlave  => axisSlave);
 
-comb : process(trig, faultSync, txCtrl, timestamp) is
+comb : process(trigOs, faultSync, txCtrl, timestamp) is
    variable v : RegType;
 begin
    -- Latch the current value
@@ -167,13 +177,13 @@ begin
 
    case (r.state) is
       when IDLE_S  =>
-         if (trig = '1') then
+         if (faultSync = '1') then
+            -- send packet letting SW know about fault
+            v.state := SEND_PKT_S;
+         elsif (trigOs = '1') then
             v.txMaster.tData(63 downto 0) := timestamp;
             v.we    := '1';
             v.state := FILL_S;
-         elsif (faultSync = '1') then
-            -- send packet letting SW know about fault
-            v.state := SEND_PKT_S;
          end if;
           
       when FILL_S  =>
