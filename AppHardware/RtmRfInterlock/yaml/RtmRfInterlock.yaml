@@ -259,6 +259,15 @@ RtmRfInterlock: &RtmRfInterlock
       mode: RW
       description: "Bypass mode."
     #########################################################
+    StreamEnable:
+      class: IntField
+      at:
+        offset: 0x1010
+      lsBit: 0
+      sizeBits: 1
+      mode: RW
+      description: "Fault stream enable"
+    #########################################################
     FaultOut:
       class: IntField
       at:
@@ -330,6 +339,16 @@ RtmRfInterlock: &RtmRfInterlock
       sizeBits: 9
       mode: RO
       description: "Get value of the Frame clock iDelay(On AdcIDelayLoad)."
+    #########################################################
+    timestampBuffer:
+      class: IntField
+      at:
+        offset: 0x1100
+        stride: 4
+        nelms: 8
+      sizeBits: 32
+      mode: RO
+      description: "Timestamp history buffer"
     #########################################################
     #    BUFFER 0 (32bit word) x"0" & Beam_I_Data  x"0" & Beam_V_Data
     #    BUFFER 1 (32bit word) x"0" & FWD_PWR_Data x"0" & REFL_PWR_Data

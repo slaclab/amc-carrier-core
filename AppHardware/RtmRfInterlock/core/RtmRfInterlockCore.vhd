@@ -195,6 +195,8 @@ architecture mapping of RtmRfInterlockCore is
 
    -- Fault history buffer write pointer
    signal s_writePointer : slv(BUFFER_ADDR_SIZE_C+2-1 downto 0);
+   signal s_timestamp    : Slv64Array(3 downto 0) := (others => (others => '0'));
+   signal s_streamEn     : sl := '0';
 
 
 begin
@@ -407,7 +409,9 @@ begin
          setDelay_o      => s_setDelay,
          loadDelay_o     => s_setValid,
          -- Fault history buffer write pointer
-         writePointer_i  => s_writePointer);
+         writePointer_i  => s_writePointer,
+         timestamp_i     => s_timestamp,
+         streamEn_o      => s_streamEn);
 
    ----------------------------------------------------------------
    -- ADC data Ring buffers for:
@@ -483,6 +487,8 @@ begin
          timestamp          => timestamp,
          bufferData         => s_bufferData,
          writePointer       => s_writePointer,
+         timestampBuffer    => s_timestamp,
+         streamEnable       => s_streamEn,
          -- AXI Stream Interface (axisClk domain)
          axisClk            => axisClk,
          axisRst            => axisRst,

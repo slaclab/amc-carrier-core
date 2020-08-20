@@ -65,12 +65,14 @@ entity RtmRfInterlockReg is
       loadDelay_o  : out sl;
       faultClear_o : out sl;
       bypassMode_o : out sl;
+      streamEn_o   : out sl;
 
       -- Status Register
       rfOff_i        : in sl;
       fault_i        : in sl;
       adcLock_i      : in sl;
       writePointer_i : slv(10 downto 0);
+      timestamp_i    : Slv64Array(3 downto 0);
 
       -- IDelay control
       curDelay_i : in  Slv9Array(4 downto 0);
@@ -87,6 +89,7 @@ architecture rtl of RtmRfInterlockReg is
       mode       : sl;
       control    : slv(4 downto 0);
       setDelay   : Slv9Array(4 downto 0);
+      streamEn   : sl;
 
       -- AXI lite
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -99,6 +102,7 @@ architecture rtl of RtmRfInterlockReg is
       mode       => '0',
       control    => (others => '0'),
       setDelay   => (others => (others => '0')),
+      streamEn   => '0',
 
       -- AXI lite
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
@@ -116,6 +120,7 @@ architecture rtl of RtmRfInterlockReg is
    signal s_curDelay : Slv9Array(4 downto 0);
 
    signal s_writePointer : slv(10 downto 0) := (others => '0');
+   signal s_timestamp    : Slv32Array(7 downto 0) := (others => (others => '0'));
 --
 begin
 
@@ -124,7 +129,7 @@ begin
    s_WrAddr <= conv_integer(axilWriteMaster.awaddr(AXIL_ADDR_WIDTH_G-1 downto 2));
 
    comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr,
-                   s_WrAddr, s_curDelay, s_status, s_writePointer) is
+                   s_WrAddr, s_curDelay, s_status, s_writePointer, s_timestamp) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -149,6 +154,8 @@ begin
                v.detuneSled := axilWriteMaster.wdata(0);
             when 16#03# =>              -- ADDR (0xC)
                v.control := axilWriteMaster.wdata(r.control'range);
+            when 16#04# =>              -- ADDR (0x10)
+               v.streamEn := axilWriteMaster.wdata(0);
             when 16#20# to 16#2F# =>
                for i in 4 downto 0 loop
                   if (axilWriteMaster.awaddr(5 downto 2) = i) then
@@ -172,6 +179,8 @@ begin
                v.axilReadSlave.rdata(0) := r.detuneSled;
             when 16#03# =>              -- ADDR (0xc)
                v.axilReadSlave.rdata(r.control'range) := r.control;
+            when 16#04# =>              -- ADDR (0x10)
+               v.axilReadSlave.rdata(0) := r.streamEn;
             when 16#10# =>              -- ADDR (0x40)
                v.axilReadSlave.rdata(s_status'range) := s_status;
             when 16#11# =>              -- ADDR (0x44)
@@ -186,6 +195,12 @@ begin
                for i in 4 downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = i) then
                      v.axilReadSlave.rdata(s_curDelay(i)'range) := s_curDelay(i);
+                  end if;
+               end loop;
+            when 16#40# to 16#4F# =>    -- ADDR (0x100)
+               for i in 7 downto 0 loop
+                  if (axilReadMaster.araddr(5 downto 2) = i) then
+                     v.axilReadSlave.rdata(s_timestamp(i)'range) := s_timestamp(i);
                   end if;
                end loop;
             when others =>
@@ -216,6 +231,25 @@ begin
    end process seq;
 
    -- Input assignment and synchronization
+   Sync_TIMESTAMP : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 256)
+      port map (
+         dataIn(63 downto 0)     => timestamp_i(0),
+         dataIn(127 downto 64)   => timestamp_i(1),
+         dataIn(191 downto 128)  => timestamp_i(2),
+         dataIn(255 downto 192)  => timestamp_i(3),
+         clk                     => axiClk_i,
+         dataOut(31 downto 0)    => s_timestamp(0),
+         dataOut(63 downto 32)   => s_timestamp(1),
+         dataOut(95 downto 64)   => s_timestamp(2),
+         dataOut(127 downto 96)  => s_timestamp(3),
+         dataOut(159 downto 128) => s_timestamp(4),
+         dataOut(191 downto 160) => s_timestamp(5),
+         dataOut(223 downto 192) => s_timestamp(6),
+         dataOut(255 downto 224) => s_timestamp(7));
+
    Sync_IN0 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,

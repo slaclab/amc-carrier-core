@@ -51,8 +51,10 @@ entity RtmRfInterlockFaultBuffer is
       fault           : in  sl;
       trig            : in  sl;
       timestamp       : in  slv(63 downto 0);
+      streamEnable    : in  sl;
       bufferData      : Slv32Array(1 downto 0);
       writePointer    : out slv(BUFFER_ADDR_SIZE_G+2-1 downto 0);
+      timestampBuffer : out Slv64Array(3 downto 0);
       -- AXI Stream Interface (axisClk domain)
       axisClk         : in  sl;
       axisRst         : in  sl;
@@ -76,6 +78,7 @@ architecture mapping of RtmRfInterlockFaultBuffer is
    type RegType is record
        we           : sl;
        writePointer : unsigned(BRAM_SIZE_C - 1 downto 0);
+       timestamp    : Slv64Array(3 downto 0);
        txMaster     : AxiStreamMasterType;
        state        : StateType;
    end record;
@@ -83,16 +86,18 @@ architecture mapping of RtmRfInterlockFaultBuffer is
    constant REG_INIT_C : RegType := (
       we           => '0',
       writePointer => (others => '0'),
+      timestamp    => (others => (others => '0')),
       txMaster     => AXI_STREAM_MASTER_INIT_C,
       state        => IDLE_S);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal txCtrl     : AxiStreamCtrlType;
-   signal streamData : Slv32Array(1 downto 0) := (others => (others => '0'));
-   signal faultSync  : sl := '0';
-   signal trigOs     : sl := '0';
+   signal txCtrl           : AxiStreamCtrlType;
+   signal streamData       : Slv32Array(1 downto 0) := (others => (others => '0'));
+   signal faultSync        : sl := '0';
+   signal streamEnableSync : sl := '0';
+   signal trigOs           : sl := '0';
 
 begin
 
@@ -111,6 +116,14 @@ begin
          clk     => clk,
          dataIn  => fault,
          dataOut => faultSync);
+
+   U_SYNC_EN : entity surf.Synchronizer
+      generic map (
+         TPD_G   => TPD_G)
+      port map (
+         clk     => clk,
+         dataIn  => streamEnable,
+         dataOut => streamEnableSync);
 
    GEN_RING_BUF : for i in 1 downto 0 generate
       U_RAM : entity surf.AxiDualPortRam
@@ -165,11 +178,14 @@ begin
          mAxisMaster => axisMaster,
          mAxisSlave  => axisSlave);
 
-comb : process(trigOs, faultSync, txCtrl, timestamp, r) is
-   variable v : RegType;
+comb : process(trigOs, faultSync, txCtrl, timestamp, streamEnableSync, r) is
+   variable v   : RegType;
+   variable idx : natural;
 begin
    -- Latch the current value
    v := r;
+
+   idx := to_integer(r.writePointer(BUFFER_ADDR_SIZE_G - 1 downto 0));
 
    v.txMaster.tDest  := TDEST_G;
    v.txMaster.tValid := '0';
@@ -179,9 +195,14 @@ begin
       when IDLE_S  =>
          if (faultSync = '1') then
             -- send packet letting SW know about fault
-            v.state := SEND_PKT_S;
+            if (streamEnableSync = '1') then
+               v.state := SEND_PKT_S;
+            else
+               v.state := FAULT_S;
+            end if;
          elsif (trigOs = '1') then
             v.txMaster.tData(63 downto 0) := timestamp;
+            v.timestamp(idx)              := timestamp;
             v.we    := '1';
             v.state := FILL_S;
          end if;
@@ -220,7 +241,8 @@ begin
    rin <= v;
 
 -- outputs
-   writePointer <= std_logic_vector(r.writePointer);
+   writePointer    <= std_logic_vector(r.writePointer);
+   timestampBuffer <= r.timestamp;
 
 end process comb;
 
