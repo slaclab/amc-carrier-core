@@ -37,11 +37,11 @@ if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
 } elseif {  $::env(PRJ_PART) eq {XCKU11P-FFVA1156-2-E} ||
             $::env(PRJ_PART) eq {XCKU15P-FFVA1156-2-E} } {
 
-   loadSource -lib amc_carrier_core      -dir  "$::DIR_PATH/rtl/xcku11p"
+   loadSource -lib amc_carrier_core      -dir  "$::DIR_PATH/rtl/xcku15p"
    loadConstraints -path "$::DIR_PATH/xdc/AppTop_gen2.xdc"
 
-   loadSource -lib amc_carrier_core  -path "$::DIR_PATH/coregen/xcku11p/AppTopJesd204bCoregen.dcp"
-   # loadIpCore -path "$::DIR_PATH/coregen/xcku11p/AppTopJesd204bCoregen.xci"
+   loadSource -lib amc_carrier_core  -path "$::DIR_PATH/coregen/xcku15p/AppTopJesd204bCoregen.dcp"
+   # loadIpCore -path "$::DIR_PATH/coregen/xcku15p/AppTopJesd204bCoregen.xci"
 
 } else {
    puts "\n\nERROR: Invalid PRJ_PART was defined in the Makefile\n\n"; exit -1
