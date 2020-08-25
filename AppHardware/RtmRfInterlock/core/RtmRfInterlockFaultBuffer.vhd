@@ -185,7 +185,8 @@ begin
    -- Latch the current value
    v := r;
 
-   idx := to_integer(r.writePointer(BUFFER_ADDR_SIZE_G - 1 downto 0));
+   -- page number 0...3
+   idx := to_integer(r.writePointer(BRAM_SIZE_C - 1 downto BRAM_SIZE_C - 2));
 
    v.txMaster.tDest  := TDEST_G;
    v.txMaster.tValid := '0';
