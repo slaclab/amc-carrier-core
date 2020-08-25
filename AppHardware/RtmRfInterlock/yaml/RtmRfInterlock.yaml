@@ -15,7 +15,7 @@ RtmRfInterlock: &RtmRfInterlock
   class: MMIODev
   configPrio: 1
   description: "LLRF RTM interlock core"
-  size: 0x4000
+  size: 0x10000
   #########
   children:
   #########
