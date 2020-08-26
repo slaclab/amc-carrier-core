@@ -221,6 +221,8 @@ begin
       axilReadSlave  <= r.axilReadSlave;
       axilWriteSlave <= r.axilWriteSlave;
 
+      streamEn_o     <= r.streamEn;
+
    end process comb;
 
    seq : process (axiClk_i) is
