@@ -21,6 +21,8 @@ use ieee.std_logic_arith.all;
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
 
 library amc_carrier_core;
 use amc_carrier_core.FpgaTypePkg.all;
@@ -30,9 +32,11 @@ use unisim.vcomponents.all;
 
 entity RtmRfInterlock is
    generic (
-      TPD_G            : time             := 1 ns;
-      IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";
-      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
+      TPD_G            : time                := 1 ns;
+      IODELAY_GROUP_G  : string              := "RTM_DELAY_GROUP";
+      AXIL_BASE_ADDR_G : slv(31 downto 0)    := (others => '0');
+      TDEST_G          : slv(7 downto 0)     := x"00";
+      AXIS_CONFIG_G    : AxiStreamConfigType := EMAC_AXIS_CONFIG_C);
    port (
       -- Recovered EVR clock
       recClk          : in    sl;
@@ -41,6 +45,7 @@ entity RtmRfInterlock is
       stndbyTrig      : in    sl;
       accelTrig       : in    sl;
       dataTrig        : in    sl;
+      timestamp       : in    slv(63 downto 0) := (others => '0');
       -- AXI-Lite
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -48,6 +53,11 @@ entity RtmRfInterlock is
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- AXI Stream Interface (axisClk domain)
+      axisClk         : in  sl;
+      axisRst         : in  sl;
+      axisMaster      : out AxiStreamMasterType;
+      axisSlave       : in  AxiStreamSlaveType;
       -----------------------
       -- Application Ports --
       -----------------------
@@ -189,13 +199,16 @@ begin
       generic map (
          TPD_G            => TPD_G,
          IODELAY_GROUP_G  => IODELAY_GROUP_G,
-         AXIL_BASE_ADDR_G => AXIL_BASE_ADDR_G)
+         AXIL_BASE_ADDR_G => AXIL_BASE_ADDR_G,
+         TDEST_G          => TDEST_G,
+         AXIS_CONFIG_G    => AXIS_CONFIG_G)
       port map (
          -- Recovered EVR clock
          recClk          => recClk,
          recRst          => recRst,
          -- Timing triggers
          dataTrig        => dataTrig,
+         timestamp       => timestamp,
          -- AXI-Lite
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -203,6 +216,11 @@ begin
          axilReadSlave   => axilReadSlave,
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave,
+         -- AXI Stream Interface (axisClk domain)
+         axisClk         => axisClk,
+         axisRst         => axisRst,
+         axisMaster      => axisMaster,
+         axisSlave       => axisSlave,
          -- High speed ADC status data (data rate is 6x recClk DDR)
          hsAdcBeamIP     => hsAdcBeamIP,
          hsAdcBeamIN     => hsAdcBeamIN,

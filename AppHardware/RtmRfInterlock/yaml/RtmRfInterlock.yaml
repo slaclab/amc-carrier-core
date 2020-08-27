@@ -15,7 +15,7 @@ RtmRfInterlock: &RtmRfInterlock
   class: MMIODev
   configPrio: 1
   description: "LLRF RTM interlock core"
-  size: 0x4000
+  size: 0x10000
   #########
   children:
   #########
@@ -259,6 +259,15 @@ RtmRfInterlock: &RtmRfInterlock
       mode: RW
       description: "Bypass mode."
     #########################################################
+    StreamEnable:
+      class: IntField
+      at:
+        offset: 0x1010
+      lsBit: 0
+      sizeBits: 1
+      mode: RW
+      description: "Fault stream enable"
+    #########################################################
     FaultOut:
       class: IntField
       at:
@@ -267,6 +276,15 @@ RtmRfInterlock: &RtmRfInterlock
       sizeBits: 1
       mode: RO
       description: "Fault from RTM status"
+    #########################################################
+    WritePointer:
+      class: IntField
+      at:
+        offset: 0x1044
+      lsBit: 0
+      sizeBits: 11
+      mode: RO
+      description: "Write pointer for interal fault buffers"
     #########################################################
     AdcLocked:
       class: IntField
@@ -322,6 +340,16 @@ RtmRfInterlock: &RtmRfInterlock
       mode: RO
       description: "Get value of the Frame clock iDelay(On AdcIDelayLoad)."
     #########################################################
+    timestampBuffer:
+      class: IntField
+      at:
+        offset: 0x1100
+        stride: 4
+        nelms: 8
+      sizeBits: 32
+      mode: RO
+      description: "Timestamp history buffer"
+    #########################################################
     #    BUFFER 0 (32bit word) x"0" & Beam_I_Data  x"0" & Beam_V_Data
     #    BUFFER 1 (32bit word) x"0" & FWD_PWR_Data x"0" & REFL_PWR_Data
     #########################################################
@@ -341,6 +369,26 @@ RtmRfInterlock: &RtmRfInterlock
           at:
             offset: 0x0
             nelms: 0x200
+    #########################################################
+    #    BUFFER 0 (32bit word) x"0" & Beam_I_Data  x"0" & Beam_V_Data
+    #    BUFFER 1 (32bit word) x"0" & FWD_PWR_Data x"0" & REFL_PWR_Data
+    #########################################################
+    RtmAdcHistoryBuffer:
+      class: MMIODev
+      at:
+        offset: 0x4000
+        stride: 0x4000
+        nelms: 2
+      size: 0x4000
+      description: "BUFFER 0 (32 bit word) 0x0 & Beam_I_Data 0x0 & Beam_V_Data BUFFER 1 (32 bit word) 0x0 & FWD_PWR_Data 0x0 & REFL_PWR_Data"
+      children:
+        MemoryArray:
+          <<: *MemoryArray
+          sizeBits: 32
+          mode: RO
+          at:
+            offset: 0x0
+            nelms: 0x800
     #########################################################
     #    Commands
     #########################################################
