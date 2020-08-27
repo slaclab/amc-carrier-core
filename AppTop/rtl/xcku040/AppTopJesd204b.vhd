@@ -60,7 +60,7 @@ entity AppTopJesd204b is
       dataValidVec_o  : out slv(6 downto 0);
       -- Sample data input (Use if external data generator core is attached)
       sampleDataArr_i : in  sampleDataArray(6 downto 0);
-      dacReady_o      : out slv(6 downto 0)       := (others=>'0')
+      dacReady_o      : out slv(6 downto 0)       := (others=>'0');
       -------
       -- JESD
       -------
