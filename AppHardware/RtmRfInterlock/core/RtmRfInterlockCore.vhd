@@ -485,6 +485,7 @@ begin
          fault              => fault,
          trig               => dataTrig,
          timestamp          => timestamp,
+         bufferValid        => s_hsAdcValid,
          bufferData         => s_bufferData,
          writePointer       => s_writePointer,
          timestampBuffer    => s_timestamp,
