@@ -60,6 +60,7 @@ entity AppTopJesd204b is
       dataValidVec_o  : out slv(9 downto 0);
       -- Sample data input (Use if external data generator core is attached)
       sampleDataArr_i : in  sampleDataArray(9 downto 0);
+      dacReady_o      : out slv(9 downto 0)       := (others=>'0')
       -------
       -- JESD
       -------
@@ -346,6 +347,7 @@ begin
             axilWriteMaster      => txWriteMaster,
             axilWriteSlave       => txWriteSlave,
             extSampleDataArray_i => sampleDataArr_i(JESD_TX_LANE_G-1 downto 0),
+            dacReady_o           => dacReady_o(JESD_TX_LANE_G-1 downto 0),
             devClk_i             => devClk_i,
             devRst_i             => devRst_i,
             sysRef_i             => s_sysRef,
