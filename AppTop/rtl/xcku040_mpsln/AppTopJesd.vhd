@@ -61,6 +61,7 @@ entity AppTopJesd is
       adcValues       : out sampleDataArray(4 downto 0);
       -- DAC interface
       dacValids       : in  slv(4 downto 0);
+      dacReadys       : out slv(4 downto 0);
       dacValues       : in  sampleDataArray(4 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -130,6 +131,7 @@ architecture mapping of AppTopJesd is
 
    signal adcEn : slv(4 downto 0)             := (others => '0');
    signal adc   : sampleDataArray(4 downto 0) := (others => (others => '0'));
+   signal dacEn : slv(4 downto 0)             := (others => '0');
    signal dac   : sampleDataArray(4 downto 0) := (others => (others => '0'));
 
 begin
@@ -139,6 +141,7 @@ begin
       adcValids(i) <= adcEn(JESD_RX_ROUTES_G(i));
       adcValues(i) <= adc(JESD_RX_ROUTES_G(i));
 
+      dacReadys(i)             <= dacEn(JESD_TX_ROUTES_G(i));
       dac(JESD_TX_ROUTES_G(i)) <= dacValues(i);
 
    end generate GEN_ROUTE;
@@ -294,6 +297,7 @@ begin
          -- Sample data output (Use if external data acquisition core is attached)
          dataValidVec_o  => adcEn,
          sampleDataArr_o => adc,
+         dacReady_o      => dacEn,
          sampleDataArr_i => dac,
          -------
          -- JESD

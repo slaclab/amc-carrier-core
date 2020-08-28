@@ -207,7 +207,7 @@ begin
             v.we    := '1';
             v.state := FILL_S;
          end if;
-          
+
       when FILL_S  =>
          v.writePointer := r.writePointer + 1;
          if r.writePointer(BUFFER_ADDR_SIZE_G - 1 downto 0) = MAX_PAGE_CNT_C then
@@ -235,7 +235,7 @@ begin
 
       when others  =>
           v.state := IDLE_S;
-          
+
    end case;
 
 -- Register the variable for the next clock cycle

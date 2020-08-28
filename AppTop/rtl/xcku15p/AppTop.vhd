@@ -193,6 +193,7 @@ architecture mapping of AppTop is
    signal adcValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
    signal dacValids : Slv10Array(1 downto 0);
+   signal dacReadys : Slv10Array(1 downto 0);
    signal dacValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
    signal debugValids : Slv4Array(1 downto 0);
@@ -435,6 +436,7 @@ begin
             adcValues(9)    => adcValues(i, 9),
             -- DAC Interface
             dacValids       => dacValids(i),
+            dacReadys       => dacReadys(i),
             dacValues(0)    => dacValues(i, 0),
             dacValues(1)    => dacValues(i, 1),
             dacValues(2)    => dacValues(i, 2),
@@ -531,6 +533,7 @@ begin
          adcValids           => adcValids,
          adcValues           => adcValues,
          dacValids           => dacValids,
+         dacReadys           => dacReadys,
          dacValues           => dacValues,
          debugValids         => debugValids,
          debugValues         => debugValues,
