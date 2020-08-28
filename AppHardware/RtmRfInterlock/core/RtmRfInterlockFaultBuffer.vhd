@@ -52,6 +52,7 @@ entity RtmRfInterlockFaultBuffer is
       trig            : in  sl;
       timestamp       : in  slv(63 downto 0);
       streamEnable    : in  sl;
+      bufferValid     : in  sl;
       bufferData      : Slv32Array(1 downto 0);
       writePointer    : out slv(BUFFER_ADDR_SIZE_G+2-1 downto 0);
       timestampBuffer : out Slv64Array(3 downto 0);
@@ -178,7 +179,7 @@ begin
          mAxisMaster => axisMaster,
          mAxisSlave  => axisSlave);
 
-comb : process(trigOs, faultSync, txCtrl, timestamp, streamEnableSync, r) is
+comb : process(trigOs, faultSync, txCtrl, timestamp, streamEnableSync, bufferValid, r) is
    variable v   : RegType;
    variable idx : natural;
 begin
@@ -209,12 +210,16 @@ begin
          end if;
 
       when FILL_S  =>
-         v.writePointer := r.writePointer + 1;
-         if r.writePointer(BUFFER_ADDR_SIZE_G - 1 downto 0) = MAX_PAGE_CNT_C then
-             v.we    := '0';
-             v.state := IDLE_S;
+         if bufferValid = '1' then
+             v.writePointer := r.writePointer + 1;
+             if r.writePointer(BUFFER_ADDR_SIZE_G - 1 downto 0) = MAX_PAGE_CNT_C then
+                 v.we    := '0';
+                 v.state := IDLE_S;
+             else
+                 v.we    := '1';
+             end if;
          else
-             v.we    := '1';
+             v.we    := '0';
          end if;
 
       when SEND_PKT_S =>
