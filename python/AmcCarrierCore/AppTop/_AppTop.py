@@ -37,13 +37,24 @@ class AppTop(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
+        ##############################
+        # Variables
+        ##############################
+
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
         self._numSigGen  = numSigGen
         self._sizeSigGen = sizeSigGen
 
+        self.add(pr.LocalVariable(
+            name         = "BypassSysRefMinMax",
+            description  = "Used to override the SysRefPeriodmin != SysRefPeriodmax error flag",
+            mode         = "RW",
+            value        = False,
+        ))
+
         ##############################
-        # Variables
+        # Devices
         ##############################
 
         for i in range(2):
@@ -162,8 +173,11 @@ class AppTop(pr.Device):
             for tx in jesdTxDevices:
                 ######################################################################
                 if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
-                    print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
-                    linkLock = False
+                    if self.BypassSysRefMinMax.value() is False:
+                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
+                        linkLock = False
+                    else:
+                        print(f'AppTop.Init().{tx.path}: Warning: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
                 ######################################################################
                 if( tx.DataValid.get() == 0 ):
                     print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
@@ -180,8 +194,11 @@ class AppTop(pr.Device):
             for rx in jesdRxDevices:
                 ######################################################################
                 if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
-                    print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
-                    linkLock = False
+                    if self.BypassSysRefMinMax.value() is False:
+                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
+                        linkLock = False
+                    else:
+                        print(f'AppTop.Init().{rx.path}: Warning: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
                 ######################################################################
                 if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
                     print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
