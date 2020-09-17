@@ -123,6 +123,7 @@ var annotated_dup =
     [ "RtmMpsLinkNodeReg", "classRtmMpsLinkNodeReg.html", "classRtmMpsLinkNodeReg" ],
     [ "RtmRfInterlock", "classRtmRfInterlock.html", "classRtmRfInterlock" ],
     [ "RtmRfInterlockCore", "classRtmRfInterlockCore.html", "classRtmRfInterlockCore" ],
+    [ "RtmRfInterlockFaultBuffer", "classRtmRfInterlockFaultBuffer.html", "classRtmRfInterlockFaultBuffer" ],
     [ "RtmRfInterlockReg", "classRtmRfInterlockReg.html", "classRtmRfInterlockReg" ],
     [ "Si5317a", "classSi5317a.html", "classSi5317a" ],
     [ "SsiAxiMaster", "classSsiAxiMaster.html", "classSsiAxiMaster" ]

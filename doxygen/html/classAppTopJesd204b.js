@@ -26,6 +26,7 @@ var classAppTopJesd204b =
     [ "sampleDataArr_o", "classAppTopJesd204b.html#afc1c53c4c1fa7ab8c6c2fa9e7a52a821", null ],
     [ "dataValidVec_o", "classAppTopJesd204b.html#aaabb2ac2f85dd3c00c3a2650b08054eb", null ],
     [ "sampleDataArr_i", "classAppTopJesd204b.html#a5838cc95092943eacd9300efb7f8adbc", null ],
+    [ "dacReady_o", "classAppTopJesd204b.html#a641d821f05d070b208d1933d47099bf7", null ],
     [ "stableClk", "classAppTopJesd204b.html#a99bde91ce6737f250f72c51ea41e8bc4", null ],
     [ "refClk", "classAppTopJesd204b.html#ac4171903b015d49f213cc19bd668670d", null ],
     [ "devClk_i", "classAppTopJesd204b.html#ae538849f57901c16c39cd71d1e3237cc", null ],

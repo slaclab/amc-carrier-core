@@ -1,5 +1,15 @@
 var NAVTREEINDEX24 =
 {
+"classDaqDecimatorTb.html#acd03516902501cd1c7296a98e22c6fcb":[0,0,87,2],
+"classDaqDecimatorTb.html#af2fe75efbe0a68c3fb806bb88b1a81ba":[0,0,87,6],
+"classDaqDecimatorTb_1_1tb.html":[0,0,87,0],
+"classDaqDecimatorTb_1_1tb.html#a0d26aad2514646d19f49374e319ad060":[0,0,87,0,6],
+"classDaqDecimatorTb_1_1tb.html#a22e67b8689e53a2e698445f134037394":[0,0,87,0,15],
+"classDaqDecimatorTb_1_1tb.html#a32a89d2a6c820e7e8681b87dd5211457":[0,0,87,0,11],
+"classDaqDecimatorTb_1_1tb.html#a37c74baf1256a3263289c70fbcc40f55":[0,0,87,0,4],
+"classDaqDecimatorTb_1_1tb.html#a4a94881bb7317c304b750c88b2d085d1":[0,0,87,0,16],
+"classDaqDecimatorTb_1_1tb.html#a4d2c38fb42e8188a69afe17f7e66cec2":[0,0,87,0,9],
+"classDaqDecimatorTb_1_1tb.html#a70e55cf841c2937028848499824b2006":[0,0,87,0,0],
 "classDaqDecimatorTb_1_1tb.html#a750714045cb53a33b1e80a7e12c75fbc":[0,0,87,0,10],
 "classDaqDecimatorTb_1_1tb.html#a750ca4b5742213536dd1dec15e9c65b7":[0,0,87,0,12],
 "classDaqDecimatorTb_1_1tb.html#a8499c1423b1b5edd4d0802cbdec0560c":[0,0,87,0,7],
@@ -239,15 +249,5 @@ var NAVTREEINDEX24 =
 "classDaqMuxV2_1_1rtl.html#ae8242c75a403e880401d095758ff3a43":[0,0,89,0,33],
 "classDaqMuxV2_1_1rtl.html#ae85eb3183560ac4d910138b2676d2281":[0,0,89,0,49],
 "classDaqMuxV2_1_1rtl.html#ae87a7085375ec1e77eb98ea1eb44d7c3":[0,0,89,0,11],
-"classDaqMuxV2_1_1rtl.html#aec0c97d5e0b52a2efdc9cd6400b27d9d":[0,0,89,0,9],
-"classDaqMuxV2_1_1rtl.html#aedda85ac121f35a08ecdd9d69fd50e04":[0,0,89,0,35],
-"classDaqMuxV2_1_1rtl.html#aeffc7ad8a24307cdeb498444d109644a":[0,0,89,0,0],
-"classDaqMuxV2_1_1rtl.html#af64db7445cb2d477dda4601ebb4f9ddc":[0,0,89,0,2],
-"classDaqMuxV2_1_1rtl.html#af964a32efaa7f7fe10f1f6a64cbed87d":[0,0,89,0,41],
-"classDaqMuxV2_1_1rtl.html#afb23f954755094e06a4dfd2c249c04fb":[0,0,89,0,13],
-"classDaqRegItf.html":[0,0,91],
-"classDaqRegItf.html#a08233a14d9e23d819851a5c0a91199f1":[0,0,91,2],
-"classDaqRegItf.html#a098d451675edaf0e9e00e6a31fdce5fc":[0,0,91,32],
-"classDaqRegItf.html#a0a6af6eef40212dbaf130d57ce711256":[0,0,91,36],
-"classDaqRegItf.html#a0f5ecc6613f63d07f7963a97b1b26095":[0,0,91,39]
+"classDaqMuxV2_1_1rtl.html#aec0c97d5e0b52a2efdc9cd6400b27d9d":[0,0,89,0,9]
 };

@@ -1,0 +1,28 @@
+var classRtmRfInterlockFaultBuffer_1_1mapping =
+[
+    [ "comb", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a2c4c986262f7ccc2dbe0acbe89bdbfe2", null ],
+    [ "seq", "classRtmRfInterlockFaultBuffer_1_1mapping.html#ae8896e195ae00ae797895c15b647ba41", null ],
+    [ "BRAM_SIZE_C", "classRtmRfInterlockFaultBuffer_1_1mapping.html#ad7c42cd181efb716d2d1369a561e8499", null ],
+    [ "MAX_PAGE_CNT_C", "classRtmRfInterlockFaultBuffer_1_1mapping.html#abe9076c6d91f0161c8cbfd916f699c42", null ],
+    [ "AXIS_CONFIG_C", "classRtmRfInterlockFaultBuffer_1_1mapping.html#abedfbadbfb9fd6e57bdc3a1e6a765a10", null ],
+    [ "StateType", "classRtmRfInterlockFaultBuffer_1_1mapping.html#adb5dcc6bd814e6ed6eafa356f1833df6", null ],
+    [ "RegType", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a35f0a6888bd1c2e56754f97c77a534b9", null ],
+    [ "we", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a8c45deddb73e42384a9742641721678b", null ],
+    [ "writePointer", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a1bb05299b3bf4777730d31150465b2f1", null ],
+    [ "timestamp", "classRtmRfInterlockFaultBuffer_1_1mapping.html#ae7fe9bc1653a735f4aae45dff82e442d", null ],
+    [ "txMaster", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a7a964b03c09c24747235fe40bb21ea35", null ],
+    [ "state", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a4d1aa26dcfa648e02cbb0964cddbdbfe", null ],
+    [ "REG_INIT_C", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a89f03ba31714629bb33fc26b1eb8d2a4", null ],
+    [ "r", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a0498304adc5e9a77df9df664a54ee3d3", null ],
+    [ "rin", "classRtmRfInterlockFaultBuffer_1_1mapping.html#ade4de2a008a5f96235206eb18081481c", null ],
+    [ "txCtrl", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a96fcd4c5b9ce591c5cdf3a04e1a8402f", null ],
+    [ "streamData", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a7222c4c6fc5b1a3462669987b4de3660", null ],
+    [ "faultSync", "classRtmRfInterlockFaultBuffer_1_1mapping.html#abe98280e9c258dd7ae6709bfa4650d37", null ],
+    [ "streamEnableSync", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a10d19880546c70bcdc26a1c6da2407b8", null ],
+    [ "trigOs", "classRtmRfInterlockFaultBuffer_1_1mapping.html#ad5c1ed0ece5bd9af389c649c9219c969", null ],
+    [ "u_sync_os_trig", "classRtmRfInterlockFaultBuffer_1_1mapping.html#aa1a10dccb9a0a2d12d2684db2ca16df9", null ],
+    [ "u_sync_fault", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a823bb1db972150bebf8c0910398db33e", null ],
+    [ "u_sync_en", "classRtmRfInterlockFaultBuffer_1_1mapping.html#aaa524f55fa13eac9f8419c8c3da70bda", null ],
+    [ "u_ram", "classRtmRfInterlockFaultBuffer_1_1mapping.html#af775eb600febaabef2e5c67257c103b2", null ],
+    [ "u_obfifo", "classRtmRfInterlockFaultBuffer_1_1mapping.html#a0de4fa73dd147d5eee27270bbb331ec7", null ]
+];

@@ -5,6 +5,7 @@ var classAmcCarrierSysReg =
     [ "BUILD_INFO_G", "classAmcCarrierSysReg.html#a6ff6d0dd29c82d329f8f2caa9e4b1811", null ],
     [ "APP_TYPE_G", "classAmcCarrierSysReg.html#ac9684d06f6f9071ad431f275e8227e5a", null ],
     [ "MPS_SLOT_G", "classAmcCarrierSysReg.html#ad00e9b1bfd0f20f4f3ba02c9906537fa", null ],
+    [ "GEN_PWR_I2C_G", "classAmcCarrierSysReg.html#a22a20a5a28390acd2efad0920cb95a93", null ],
     [ "FSBL_G", "classAmcCarrierSysReg.html#af04728c810b62b0c0807031e438c5163", null ],
     [ "axilClk", "classAmcCarrierSysReg.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
     [ "axilRst", "classAmcCarrierSysReg.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],

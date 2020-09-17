@@ -2,7 +2,7 @@ var classRtmRfInterlockCore_1_1mapping =
 [
     [ "BUFFER_WIDTH_C", "classRtmRfInterlockCore_1_1mapping.html#ac07de2dcab1a3b254015f8f4a8cebe37", null ],
     [ "BUFFER_ADDR_SIZE_C", "classRtmRfInterlockCore_1_1mapping.html#abe4c2b4c48cdee81127df857a90088c6", null ],
-    [ "NUM_AXI_MASTERS_C", "classRtmRfInterlockCore_1_1mapping.html#a2e9c701c33deb3a985a040c5abafe606", null ],
+    [ "NUM_AXI_MASTERS_C", "classRtmRfInterlockCore_1_1mapping.html#a0d399bfea08cc375d139e84cea6f6231", null ],
     [ "CPLD_INDEX_C", "classRtmRfInterlockCore_1_1mapping.html#a7dbd47a6dc127e695cef9b1844ac6daa", null ],
     [ "THR_KLY_INDEX_C", "classRtmRfInterlockCore_1_1mapping.html#a0fe230b290eefa04852e3b002d174ccd", null ],
     [ "THR_MOD_INDEX_C", "classRtmRfInterlockCore_1_1mapping.html#a8457c5ef8de64a92a1e101dd1b39e2e1", null ],
@@ -10,6 +10,8 @@ var classRtmRfInterlockCore_1_1mapping =
     [ "RTM_REG_INDEX_C", "classRtmRfInterlockCore_1_1mapping.html#a96c9cd10f9cda4f20feed55c1af03000", null ],
     [ "BUF0_INDEX_C", "classRtmRfInterlockCore_1_1mapping.html#a37c70c0f57d588460b5821cc529c83ba", null ],
     [ "BUF1_INDEX_C", "classRtmRfInterlockCore_1_1mapping.html#a99682b789f35fe40e6e1d72324220f35", null ],
+    [ "BUF0_HIST_INDEX_C", "classRtmRfInterlockCore_1_1mapping.html#ae93ae14af17df5a42a6c3523a2091bc3", null ],
+    [ "BUF1_HIST_INDEX_C", "classRtmRfInterlockCore_1_1mapping.html#aca9dca9c6a2471694155279886cad2a7", null ],
     [ "CPLD_ADDRESS_C", "classRtmRfInterlockCore_1_1mapping.html#ae5d5ee9c837174295adcfbec2f31ea26", null ],
     [ "THR_KLY_BASE_ADDR_C", "classRtmRfInterlockCore_1_1mapping.html#a0c50918581df3b2191d4345f52ee56c7", null ],
     [ "THR_MOD_BASE_ADDR_C", "classRtmRfInterlockCore_1_1mapping.html#abab0403f2b7b49c0d4069b70c805b11f", null ],
@@ -17,7 +19,9 @@ var classRtmRfInterlockCore_1_1mapping =
     [ "RTM_REG_BASE_ADDR_C", "classRtmRfInterlockCore_1_1mapping.html#a01bdf2ae7b64b03ad9e761a5db4ce289", null ],
     [ "BUF0_BASE_ADDR_C", "classRtmRfInterlockCore_1_1mapping.html#a4eb8df9ef8690ce7e0e17349420cfa1c", null ],
     [ "BUF1_BASE_ADDR_C", "classRtmRfInterlockCore_1_1mapping.html#a394d0f0698093943f2dbd9afd4d822cb", null ],
-    [ "AXI_CONFIG_C", "classRtmRfInterlockCore_1_1mapping.html#a9bad7a97919c8582f3da4c90e4049593", null ],
+    [ "BUF0_HIST_BASE_ADDR_C", "classRtmRfInterlockCore_1_1mapping.html#afb49838ddef9b504c1caeebddbbea9ae", null ],
+    [ "BUF1_HIST_BASE_ADDR_C", "classRtmRfInterlockCore_1_1mapping.html#aff406881f8efd0ec5ea8243f3f361be1", null ],
+    [ "AXI_CONFIG_C", "classRtmRfInterlockCore_1_1mapping.html#ae895d7f8b9548fbe2b3c7901dbc043f2", null ],
     [ "writeMasters", "classRtmRfInterlockCore_1_1mapping.html#a1af949f9b0889fd5d8100d751daf02ae", null ],
     [ "writeSlaves", "classRtmRfInterlockCore_1_1mapping.html#acf5495fbda004b2e989b0eb07d1a3c4b", null ],
     [ "readMasters", "classRtmRfInterlockCore_1_1mapping.html#aa6d8e79d196a9a6cc1de0c2cfa018631", null ],
@@ -41,6 +45,9 @@ var classRtmRfInterlockCore_1_1mapping =
     [ "s_doutVec", "classRtmRfInterlockCore_1_1mapping.html#afb4ae3cfe5ed337667844418c43a4ca1", null ],
     [ "s_csbVec", "classRtmRfInterlockCore_1_1mapping.html#aede354af0437046adcc8a6854553e240", null ],
     [ "s_muxSClk", "classRtmRfInterlockCore_1_1mapping.html#a4a06f14132ace6008abc035765227920", null ],
+    [ "s_writePointer", "classRtmRfInterlockCore_1_1mapping.html#a0e288ec67ece74be3a061aac5098394f", null ],
+    [ "s_timestamp", "classRtmRfInterlockCore_1_1mapping.html#abc13d72e0f32bbad5625332411bcbbd4", null ],
+    [ "s_streamEn", "classRtmRfInterlockCore_1_1mapping.html#a2006933b04afb4c76bea433e87c005f5", null ],
     [ "u_xbar", "classRtmRfInterlockCore_1_1mapping.html#a5df5f0eba02f3e58776cb180da69bf4a", null ],
     [ "u_clockmanager", "classRtmRfInterlockCore_1_1mapping.html#a3753ac6c58617c8518efe5c1c8bd24e0", null ],
     [ "u_ad9229core", "classRtmRfInterlockCore_1_1mapping.html#a9880ccece38aa4b4dc40219420735a16", null ],
@@ -50,5 +57,6 @@ var classRtmRfInterlockCore_1_1mapping =
     [ "u_adcspi", "classRtmRfInterlockCore_1_1mapping.html#a31ef830b485de8d8e3c4b56722b9c4de", null ],
     [ "u_rtmllrfmpsreg", "classRtmRfInterlockCore_1_1mapping.html#adfdec67316d874e79579d5984be4cd6b", null ],
     [ "u_ringbufferctrl", "classRtmRfInterlockCore_1_1mapping.html#a6a72624eb6b8306bd26b76d583f9714f", null ],
-    [ "u_axiliteringbuffer", "classRtmRfInterlockCore_1_1mapping.html#a175045c0d6f10488f67484729eced9b0", null ]
+    [ "u_axiliteringbuffer", "classRtmRfInterlockCore_1_1mapping.html#a175045c0d6f10488f67484729eced9b0", null ],
+    [ "u_hist_buf", "classRtmRfInterlockCore_1_1mapping.html#a1343283259c72ff639617f12f3a6b4a1", null ]
 ];

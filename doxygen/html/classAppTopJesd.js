@@ -26,6 +26,7 @@ var classAppTopJesd =
     [ "adcValids", "classAppTopJesd.html#a48b92547a8f3fb3af94baa8f0fe70645", null ],
     [ "adcValues", "classAppTopJesd.html#a8db975b3be6bcf5e1cdd59592ef6af13", null ],
     [ "dacValids", "classAppTopJesd.html#aeabd2d9eca8db2a4cfe5c147c22fd1c5", null ],
+    [ "dacReadys", "classAppTopJesd.html#af5ca57dfc93120b6104f658a01fdaffd", null ],
     [ "dacValues", "classAppTopJesd.html#a0004771f697fe0f6008fe77a4df1625b", null ],
     [ "axilClk", "classAppTopJesd.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
     [ "axilRst", "classAppTopJesd.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],

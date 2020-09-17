@@ -26,6 +26,7 @@ var classAmcCarrierCoreBase =
     [ "WAVEFORM_TDATA_BYTES_G", "classAmcCarrierCoreBase.html#afcd1380bd60c6b2b65e97c4e075440f2", null ],
     [ "ETH_USR_FRAME_LIMIT_G", "classAmcCarrierCoreBase.html#a670984cb9c63c78429d062853025e550", null ],
     [ "MPS_SLOT_G", "classAmcCarrierCoreBase.html#ad00e9b1bfd0f20f4f3ba02c9906537fa", null ],
+    [ "GEN_PWR_I2C_G", "classAmcCarrierCoreBase.html#a22a20a5a28390acd2efad0920cb95a93", null ],
     [ "axilClk", "classAmcCarrierCoreBase.html#a8b2386340b5fb993545f13b8fe3831d1", null ],
     [ "axilRst", "classAmcCarrierCoreBase.html#acdacf063e0d332277aad133dfa47e6b5", null ],
     [ "axilReadMaster", "classAmcCarrierCoreBase.html#ac4860d1e38b433d4d699788bbd2e6996", null ],
