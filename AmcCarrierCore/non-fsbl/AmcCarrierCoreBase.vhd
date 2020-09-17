@@ -59,7 +59,8 @@ entity AmcCarrierCoreBase is
       WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
       WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
-      MPS_SLOT_G             : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
+      MPS_SLOT_G             : boolean  := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
+      GEN_PWR_I2C_G          : boolean  := true);
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -260,11 +261,12 @@ begin
    ----------------------------------
    U_SysReg : entity amc_carrier_core.AmcCarrierSysReg
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         APP_TYPE_G   => APP_TYPE_G,
-         MPS_SLOT_G   => MPS_SLOT_G,
-         FSBL_G       => false)
+         TPD_G         => TPD_G,
+         BUILD_INFO_G  => BUILD_INFO_G,
+         APP_TYPE_G    => APP_TYPE_G,
+         MPS_SLOT_G    => MPS_SLOT_G,
+         GEN_PWR_I2C_G => GEN_PWR_I2C_G,
+         FSBL_G        => false)
       port map (
          -- Primary AXI-Lite Interface
          axilClk           => ref156MHzClk,

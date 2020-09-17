@@ -200,6 +200,7 @@ architecture mapping of AppTop is
    signal adcValues : sampleDataVectorArray(1 downto 0, 6 downto 0);
 
    signal dacValids : Slv7Array(1 downto 0);
+   signal dacReadys : Slv7Array(1 downto 0);
    signal dacValues : sampleDataVectorArray(1 downto 0, 6 downto 0);
 
    signal debugValids : Slv4Array(1 downto 0);
@@ -420,6 +421,7 @@ begin
             adcValues(4)    => adcValues(i, 4),
             -- DAC Interface
             dacValids       => dacValids(i)(4 downto 0),
+            dacReadys       => dacReadys(i)(4 downto 0),
             dacValues(0)    => dacValues(i, 0),
             dacValues(1)    => dacValues(i, 1),
             dacValues(2)    => dacValues(i, 2),
@@ -522,6 +524,7 @@ begin
          adcValids           => adcValids,
          adcValues           => adcValues,
          dacValids           => dacValids,
+--         dacReadys           => dacReadys, -- Placeholder for amc-carrier-core v4.0.0 that will break existing builds
          dacValues           => dacValues,
          debugValids         => debugValids,
          debugValues         => debugValues,

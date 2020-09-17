@@ -62,6 +62,7 @@ entity AppTopJesd is
       adcValues       : out sampleDataArray(9 downto 0);
       -- DAC interface
       dacValids       : in  slv(9 downto 0);
+      dacReadys       : out slv(9 downto 0);
       dacValues       : in  sampleDataArray(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -131,18 +132,20 @@ architecture mapping of AppTopJesd is
    signal drpDi   : slv(10*16-1 downto 0) := (others => '0');
    signal drpDo   : slv(10*16-1 downto 0) := (others => '0');
 
-   signal rawAdcValids : slv(9 downto 0)             := (others => '0');
-   signal rawAdcValues : sampleDataArray(9 downto 0) := (others => (others => '0'));
-   signal rawDacValues : sampleDataArray(9 downto 0) := (others => (others => '0'));
+   signal adcEn : slv(9 downto 0)             := (others => '0');
+   signal adc   : sampleDataArray(9 downto 0) := (others => (others => '0'));
+   signal dacEn : slv(9 downto 0)             := (others => '0');
+   signal dac   : sampleDataArray(9 downto 0) := (others => (others => '0'));
 
 begin
 
    GEN_ROUTE : for i in 9 downto 0 generate
 
-      adcValids(i) <= rawAdcValids(JESD_RX_ROUTES_G(i));
-      adcValues(i) <= rawAdcValues(JESD_RX_ROUTES_G(i));
+      adcValids(i) <= adcEn(JESD_RX_ROUTES_G(i));
+      adcValues(i) <= adc(JESD_RX_ROUTES_G(i));
 
-      rawDacValues(JESD_TX_ROUTES_G(i)) <= dacValues(i);
+      dacReadys(i)             <= dacEn(JESD_TX_ROUTES_G(i));
+      dac(JESD_TX_ROUTES_G(i)) <= dacValues(i);
 
    end generate GEN_ROUTE;
 
@@ -320,9 +323,10 @@ begin
          txWriteMaster   => axilWriteMasters(JESD_TX_INDEX_C),
          txWriteSlave    => axilWriteSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         dataValidVec_o  => rawAdcValids,
-         sampleDataArr_o => rawAdcValues,
-         sampleDataArr_i => rawDacValues,
+         dataValidVec_o  => adcEn,
+         sampleDataArr_o => adc,
+         dacReady_o      => dacEn,
+         sampleDataArr_i => dac,
          -------
          -- JESD
          -------

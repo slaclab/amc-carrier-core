@@ -37,13 +37,24 @@ class AppTop(pr.Device):
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
+        ##############################
+        # Variables
+        ##############################
+
         self._numRxLanes = numRxLanes
         self._numTxLanes = numTxLanes
         self._numSigGen  = numSigGen
         self._sizeSigGen = sizeSigGen
 
+        self.add(pr.LocalVariable(
+            name         = "BypassSysRefMinMax",
+            description  = "Used to override the SysRefPeriodmin != SysRefPeriodmax error flag",
+            mode         = "RW",
+            value        = False,
+        ))
+
         ##############################
-        # Variables
+        # Devices
         ##############################
 
         for i in range(2):
@@ -75,6 +86,134 @@ class AppTop(pr.Device):
                     fillMode     =  modeSigGen[i],
                     expand       =  False,
                 ))
+
+        @self.command(value='',description="AppTop JesdHealth() cmd")
+        def JesdHealth(arg):
+            #############
+            # Get devices
+            #############
+            jesdRxDevices = self.find(typ=jesd.JesdRx)
+            jesdTxDevices = self.find(typ=jesd.JesdTx)
+            dacDevices    = self.find(typ=ti.Dac38J84)
+
+            dacEnables = [dac.enable.get() for dac in dacDevices]
+
+            ##################
+            ## Local Variables
+            ##################
+            init     = True if (arg != '') else False
+            maxRxCnt = 4 if (init) else 0
+
+            ###########################
+            # JESD Link Health Checking
+            ###########################
+            linkLock = True
+
+            for en, dac in zip(dacEnables,dacDevices):
+                dac.enable.set(True)
+                for ch in dac.LinkErrCnt:
+                    ######################################################################
+                    if (dac.LinkErrCnt[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.LinkErrCnt[{ch}] = {dac.LinkErrCnt[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.ReadFifoEmpty[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.ReadFifoEmpty[{ch}] = {dac.ReadFifoEmpty[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.ReadFifoUnderflow[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.ReadFifoUnderflow[{ch}] = {dac.ReadFifoUnderflow[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.ReadFifoFull[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.ReadFifoFull[{ch}] = {dac.ReadFifoFull[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.ReadFifoOverflow[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.ReadFifoOverflow[{ch}] = {dac.ReadFifoOverflow[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.DispErr[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.DispErr[{ch}] = {dac.DispErr[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.NotitableErr[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.NotitableErr[{ch}] = {dac.NotitableErr[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.CodeSyncErr[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.CodeSyncErr[{ch}] = {dac.CodeSyncErr[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.FirstDataMatchErr[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.FirstDataMatchErr[{ch}] = {dac.FirstDataMatchErr[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.ElasticBuffOverflow[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.ElasticBuffOverflow[{ch}] = {dac.ElasticBuffOverflow[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.LinkConfigErr[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.LinkConfigErr[{ch}] = {dac.LinkConfigErr[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.FrameAlignErr[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.FrameAlignErr[{ch}] = {dac.FrameAlignErr[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                    if (dac.MultiFrameAlignErr[ch].get() != 0):
+                        print(f'AppTop.Init(): {dac.path}.MultiFrameAlignErr[{ch}] = {dac.MultiFrameAlignErr[ch].value()}')
+                        linkLock = False
+                    ######################################################################
+                dac.enable.set(en)
+
+            if (init):
+                time.sleep(2.000)
+
+            for tx in jesdTxDevices:
+                ######################################################################
+                if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
+                    if self.BypassSysRefMinMax.value() is False:
+                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
+                        linkLock = False
+                    else:
+                        print(f'AppTop.Init().{tx.path}: Warning: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
+                ######################################################################
+                if( tx.DataValid.get() == 0 ):
+                    print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
+                    linkLock = False
+                ######################################################################
+                for ch in tx.StatusValidCnt:
+                    if (tx.StatusValidCnt[ch].get() > 0):
+                        print(f'AppTop.Init(): {tx.path}.StatusValidCnt[{ch}] = {tx.StatusValidCnt[ch].value()}')
+                        linkLock = False
+                ######################################################################
+                if (init):
+                    tx.CmdClearErrors()
+
+            for rx in jesdRxDevices:
+                ######################################################################
+                if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
+                    if self.BypassSysRefMinMax.value() is False:
+                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
+                        linkLock = False
+                    else:
+                        print(f'AppTop.Init().{rx.path}: Warning: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
+                ######################################################################
+                if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
+                    print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
+                    linkLock = False
+                ######################################################################
+                for ch in rx.StatusValidCnt:
+                    if (rx.StatusValidCnt[ch].get() > maxRxCnt):
+                        print(f'AppTop.Init(): {rx.path}.StatusValidCnt[{ch}] = {rx.StatusValidCnt[ch].value()}')
+                        linkLock = False
+                ######################################################################
+                if (init):
+                    rx.CmdClearErrors()
+
+            # Return the result
+            return linkLock
 
         @self.command(description  = "AppTop Init() cmd")
         def Init():
@@ -140,106 +279,7 @@ class AppTop(pr.Device):
 
                 time.sleep(2.000)
 
-                ###########################
-                # JESD Link Health Checking
-                ###########################
-                linkLock = True
-
-                for en, dac in zip(dacEnables,dacDevices):
-                    dac.enable.set(True)
-                    for ch in dac.LinkErrCnt:
-                        ######################################################################
-                        if (dac.LinkErrCnt[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.LinkErrCnt[{ch}] = {dac.LinkErrCnt[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.ReadFifoEmpty[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.ReadFifoEmpty[{ch}] = {dac.ReadFifoEmpty[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.ReadFifoUnderflow[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.ReadFifoUnderflow[{ch}] = {dac.ReadFifoUnderflow[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.ReadFifoFull[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.ReadFifoFull[{ch}] = {dac.ReadFifoFull[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.ReadFifoOverflow[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.ReadFifoOverflow[{ch}] = {dac.ReadFifoOverflow[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.DispErr[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.DispErr[{ch}] = {dac.DispErr[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.NotitableErr[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.NotitableErr[{ch}] = {dac.NotitableErr[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.CodeSyncErr[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.CodeSyncErr[{ch}] = {dac.CodeSyncErr[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.FirstDataMatchErr[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.FirstDataMatchErr[{ch}] = {dac.FirstDataMatchErr[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.ElasticBuffOverflow[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.ElasticBuffOverflow[{ch}] = {dac.ElasticBuffOverflow[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.LinkConfigErr[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.LinkConfigErr[{ch}] = {dac.LinkConfigErr[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.FrameAlignErr[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.FrameAlignErr[{ch}] = {dac.FrameAlignErr[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                        if (dac.MultiFrameAlignErr[ch].get() != 0):
-                            print(f'AppTop.Init(): {dac.path}.MultiFrameAlignErr[{ch}] = {dac.MultiFrameAlignErr[ch].value()}')
-                            linkLock = False
-                        ######################################################################
-                    dac.enable.set(en)
-
-                time.sleep(2.000)
-
-                for tx in jesdTxDevices:
-                    ######################################################################
-                    if (tx.SysRefPeriodmin.get() != tx.SysRefPeriodmax.get()):
-                        print(f'AppTop.Init().{tx.path}: Link Not Locked: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
-                        linkLock = False
-                    ######################################################################
-                    if( tx.DataValid.get() == 0 ):
-                        print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
-                        linkLock = False
-                    ######################################################################
-                    for ch in tx.StatusValidCnt:
-                        if (tx.StatusValidCnt[ch].get() > 0):
-                            print(f'AppTop.Init(): {tx.path}.StatusValidCnt[{ch}] = {tx.StatusValidCnt[ch].value()}')
-                            linkLock = False
-                    ######################################################################
-                    tx.CmdClearErrors()
-
-                for rx in jesdRxDevices:
-                    ######################################################################
-                    if (rx.SysRefPeriodmin.get() != rx.SysRefPeriodmax.get()):
-                        print(f'AppTop.Init().{rx.path}: Link Not Locked: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
-                        linkLock = False
-                    ######################################################################
-                    if (rx.DataValid.get() == 0) or (rx.PositionErr.get() != 0) or (rx.AlignErr.get() != 0):
-                        print(f'AppTop.Init().{rx.path}: Link Not Locked: DataValid = {rx.DataValid.value()}, PositionErr = {rx.PositionErr.value()}, AlignErr = {rx.AlignErr.value()}')
-                        linkLock = False
-                    ######################################################################
-                    for ch in rx.StatusValidCnt:
-                        if (rx.StatusValidCnt[ch].get() > 4):
-                            print(f'AppTop.Init(): {rx.path}.StatusValidCnt[{ch}] = {rx.StatusValidCnt[ch].value()}')
-                            linkLock = False
-                    ######################################################################
-                    rx.CmdClearErrors()
-
-                if( linkLock ):
+                if( self.JesdHealth(True) ):
                     break
                 else:
                     retryCnt += 1

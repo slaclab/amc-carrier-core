@@ -35,11 +35,12 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierSysReg is
    generic (
-      TPD_G        : time    := 1 ns;
-      BUILD_INFO_G : BuildInfoType;
-      APP_TYPE_G   : AppType := APP_NULL_TYPE_C;
-      MPS_SLOT_G   : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
-      FSBL_G       : boolean := false);
+      TPD_G         : time    := 1 ns;
+      BUILD_INFO_G  : BuildInfoType;
+      APP_TYPE_G    : AppType := APP_NULL_TYPE_C;
+      MPS_SLOT_G    : boolean := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
+      GEN_PWR_I2C_G : boolean := true;
+      FSBL_G        : boolean := false);
    port (
       -- Primary AXI-Lite Interface
       axilClk           : in    sl;
@@ -533,7 +534,7 @@ begin
    -------------------------------
    -- AXI-Lite: PWR Monitor Module
    -------------------------------
-   GEN_PWR_I2C : if (ULTRASCALE_PLUS_C) and (FSBL_G = false) generate
+   GEN_PWR_I2C : if (GEN_PWR_I2C_G) and (ULTRASCALE_PLUS_C) and (FSBL_G = false) generate
 
 --      AxiI2cRegMaster_3 : entity surf.AxiI2cRegMaster
 --         generic map (

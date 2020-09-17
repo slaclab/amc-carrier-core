@@ -21,6 +21,8 @@ use ieee.std_logic_arith.all;
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
 
 library lcls_timing_core;
 use lcls_timing_core.TimingPkg.all;
@@ -32,15 +34,18 @@ library amc_carrier_core;
 
 entity RtmRfInterlockCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";
-      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
+      TPD_G              : time                  := 1 ns;
+      IODELAY_GROUP_G    : string                := "RTM_DELAY_GROUP";
+      AXIL_BASE_ADDR_G   : slv(31 downto 0)      := (others => '0');
+      TDEST_G            : slv(7 downto 0)     := x"00";
+      AXIS_CONFIG_G      : AxiStreamConfigType := EMAC_AXIS_CONFIG_C);
    port (
       -- Recovered EVR clock
       recClk          : in  sl;
       recRst          : in  sl;
       -- Timing triggers
       dataTrig        : in  sl;
+      timestamp       : in  slv(63 downto 0) := (others => '0');
       -- AXI-Lite
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -48,6 +53,11 @@ entity RtmRfInterlockCore is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
+      -- AXI Stream Interface (axisClk domain)
+      axisClk         : in  sl;
+      axisRst         : in  sl;
+      axisMaster      : out AxiStreamMasterType;
+      axisSlave       : in  AxiStreamSlaveType;
       -- High speed ADC status data (data rate is 6x recClk DDR)
       hsAdcBeamIP     : in  sl;
       hsAdcBeamIN     : in  sl;
@@ -93,23 +103,27 @@ architecture mapping of RtmRfInterlockCore is
 
    constant BUFFER_WIDTH_C     : natural := 32;
    constant BUFFER_ADDR_SIZE_C : natural := 9;  -- 512 samples after trigger
-   constant NUM_AXI_MASTERS_C  : natural := 7;
+   constant NUM_AXI_MASTERS_C  : natural := 9;
 
-   constant CPLD_INDEX_C    : natural := 0;
-   constant THR_KLY_INDEX_C : natural := 1;
-   constant THR_MOD_INDEX_C : natural := 2;
-   constant THR_ADC_INDEX_C : natural := 3;
-   constant RTM_REG_INDEX_C : natural := 4;
-   constant BUF0_INDEX_C    : natural := 5;
-   constant BUF1_INDEX_C    : natural := 6;
+   constant CPLD_INDEX_C      : natural := 0;
+   constant THR_KLY_INDEX_C   : natural := 1;
+   constant THR_MOD_INDEX_C   : natural := 2;
+   constant THR_ADC_INDEX_C   : natural := 3;
+   constant RTM_REG_INDEX_C   : natural := 4;
+   constant BUF0_INDEX_C      : natural := 5;
+   constant BUF1_INDEX_C      : natural := 6;
+   constant BUF0_HIST_INDEX_C : natural := 7;
+   constant BUF1_HIST_INDEX_C : natural := 8;
 
-   constant CPLD_ADDRESS_C      : slv(31 downto 0) := x"0000_0000" + AXIL_BASE_ADDR_G;
-   constant THR_KLY_BASE_ADDR_C : slv(31 downto 0) := x"0000_0400" + AXIL_BASE_ADDR_G;
-   constant THR_MOD_BASE_ADDR_C : slv(31 downto 0) := x"0000_0800" + AXIL_BASE_ADDR_G;
-   constant THR_ADC_BASE_ADDR_C : slv(31 downto 0) := x"0000_0C00" + AXIL_BASE_ADDR_G;
-   constant RTM_REG_BASE_ADDR_C : slv(31 downto 0) := x"0000_1000" + AXIL_BASE_ADDR_G;
-   constant BUF0_BASE_ADDR_C    : slv(31 downto 0) := x"0000_2000" + AXIL_BASE_ADDR_G;
-   constant BUF1_BASE_ADDR_C    : slv(31 downto 0) := x"0000_3000" + AXIL_BASE_ADDR_G;
+   constant CPLD_ADDRESS_C           : slv(31 downto 0) := x"0000_0000" + AXIL_BASE_ADDR_G;
+   constant THR_KLY_BASE_ADDR_C      : slv(31 downto 0) := x"0000_0400" + AXIL_BASE_ADDR_G;
+   constant THR_MOD_BASE_ADDR_C      : slv(31 downto 0) := x"0000_0800" + AXIL_BASE_ADDR_G;
+   constant THR_ADC_BASE_ADDR_C      : slv(31 downto 0) := x"0000_0C00" + AXIL_BASE_ADDR_G;
+   constant RTM_REG_BASE_ADDR_C      : slv(31 downto 0) := x"0000_1000" + AXIL_BASE_ADDR_G;
+   constant BUF0_BASE_ADDR_C         : slv(31 downto 0) := x"0000_2000" + AXIL_BASE_ADDR_G;
+   constant BUF1_BASE_ADDR_C         : slv(31 downto 0) := x"0000_3000" + AXIL_BASE_ADDR_G;
+   constant BUF0_HIST_BASE_ADDR_C    : slv(31 downto 0) := x"0000_4000" + AXIL_BASE_ADDR_G;
+   constant BUF1_HIST_BASE_ADDR_C    : slv(31 downto 0) := x"0000_8000" + AXIL_BASE_ADDR_G;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       CPLD_INDEX_C    => (
@@ -139,6 +153,14 @@ architecture mapping of RtmRfInterlockCore is
       BUF1_INDEX_C    => (
          baseAddr     => BUF1_BASE_ADDR_C,
          addrBits     => 12,
+         connectivity => x"FFFF"),
+      BUF0_HIST_INDEX_C    => (
+         baseAddr     => BUF0_HIST_BASE_ADDR_C,
+         addrBits     => 14,
+         connectivity => x"FFFF"),
+      BUF1_HIST_INDEX_C    => (
+         baseAddr     => BUF1_HIST_BASE_ADDR_C,
+         addrBits     => 14,
          connectivity => x"FFFF"));
 
    signal writeMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -170,6 +192,11 @@ architecture mapping of RtmRfInterlockCore is
    signal s_doutVec : slv(1 downto 0);
    signal s_csbVec  : slv(1 downto 0);
    signal s_muxSClk : sl;
+
+   -- Fault history buffer write pointer
+   signal s_writePointer : slv(BUFFER_ADDR_SIZE_C+2-1 downto 0);
+   signal s_timestamp    : Slv64Array(3 downto 0) := (others => (others => '0'));
+   signal s_streamEn     : sl := '0';
 
 
 begin
@@ -380,7 +407,11 @@ begin
          adcLock_i       => s_hsAdcLocked,
          curDelay_i      => s_curDelay,
          setDelay_o      => s_setDelay,
-         loadDelay_o     => s_setValid);
+         loadDelay_o     => s_setValid,
+         -- Fault history buffer write pointer
+         writePointer_i  => s_writePointer,
+         timestamp_i     => s_timestamp,
+         streamEn_o      => s_streamEn);
 
    ----------------------------------------------------------------
    -- ADC data Ring buffers for:
@@ -429,5 +460,40 @@ begin
             axilWriteMaster => writeMasters(BUF0_INDEX_C+i),
             axilWriteSlave  => writeSlaves(BUF0_INDEX_C+i));
    end generate GEN_RING_BUF;
+
+   U_HIST_BUF : entity amc_carrier_core.RtmRfInterlockFaultBuffer
+      generic map (
+         TPD_G               => TPD_G,
+         BUFFER_ADDR_SIZE_G  => BUFFER_ADDR_SIZE_C,
+         TDEST_G             => TDEST_G,
+         AXIS_CONFIG_G       => AXIS_CONFIG_G)
+      port map (
+         -- AXI interface
+         axiClk             => axilClk,
+         axiRst             => axilRst,
+         axiReadMasters(0)  => readMasters(BUF0_HIST_INDEX_C),
+         axiReadMasters(1)  => readMasters(BUF1_HIST_INDEX_C),
+         axiReadSlaves(0)   => readSlaves(BUF0_HIST_INDEX_C),
+         axiReadSlaves(1)   => readSlaves(BUF1_HIST_INDEX_C),
+         axiWriteMasters(0) => writeMasters(BUF0_HIST_INDEX_C),
+         axiWriteMasters(1) => writeMasters(BUF1_HIST_INDEX_C),
+         axiWriteSlaves(0)  => writeSlaves(BUF0_HIST_INDEX_C),
+         axiWriteSlaves(1)  => writeSlaves(BUF1_HIST_INDEX_C),
+         -- RTM interface
+         clk                => recClk,
+         rst                => recRst,
+         fault              => fault,
+         trig               => dataTrig,
+         timestamp          => timestamp,
+         bufferValid        => s_hsAdcValid,
+         bufferData         => s_bufferData,
+         writePointer       => s_writePointer,
+         timestampBuffer    => s_timestamp,
+         streamEnable       => s_streamEn,
+         -- AXI Stream Interface (axisClk domain)
+         axisClk            => axisClk,
+         axisRst            => axisRst,
+         axisMaster         => axisMaster,
+         axisSlave          => axisSlave);
 
 end architecture mapping;
