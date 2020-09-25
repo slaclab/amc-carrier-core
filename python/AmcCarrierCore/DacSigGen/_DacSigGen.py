@@ -206,7 +206,7 @@ class DacSigGen(pr.Device):
                     for row in csvData:
                         data.append(int(row[ch]))
 
-                    self.Waveform[ch].set(0x000000000,data)
+                    self.Waveform[ch].set(0x000000000,data,write=True)
 
                     v = getattr(self, 'PeriodSize[%i]'%ch)
                     v.set(((cnt>>1)-1) if (fillMode) else (cnt-1))
