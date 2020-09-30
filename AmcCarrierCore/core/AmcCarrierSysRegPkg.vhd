@@ -15,7 +15,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-
 library surf;
 use surf.StdRtlPkg.all;
 
@@ -44,10 +43,10 @@ package AmcCarrierSysRegPkg is
    constant APP_ADDR_C        : slv(31 downto 0) := x"80000000";
 
    constant XBAR_TIME_GEN_C : Slv2Array(3 downto 0) := (
-      3 => "01",   -- OUT[3] = IN[1], DIST1 = FPGA
-      2 => "01",   -- OUT[2] = IN[1], DIST0 = FPGA
+      3 => "01",                        -- OUT[3] = IN[1], DIST1 = FPGA
+      2 => "01",                        -- OUT[2] = IN[1], DIST0 = FPGA
       1 => "01",   -- OUT[1] = IN[1], FPGA  = FPGA (loopback)
-      0 => "01");  -- OUT[0] = IN[1], RTM0  = FPGA
+      0 => "01");                       -- OUT[0] = IN[1], RTM0  = FPGA
 
    constant XBAR_MPS_II_LINK_C : Slv2Array(3 downto 0) := (
       3 => "11",   -- OUT[3] = IN[3], DIST1 = RTM1 (LCLS-II)
@@ -62,9 +61,9 @@ package AmcCarrierSysRegPkg is
       0 => "00");  -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)
 
    constant XBAR_APP_NODE_C : Slv2Array(3 downto 0) := (
-      3 => "00",   -- OUT[3] = IN[0], DIST1 = RTM0
-      2 => "00",   -- OUT[2] = IN[0], DIST0 = RTM0
-      1 => "10",   -- OUT[1] = IN[2], FPGA  = backplane
+      3 => "00",                        -- OUT[3] = IN[0], DIST1 = RTM0
+      2 => "00",                        -- OUT[2] = IN[0], DIST0 = RTM0
+      1 => "10",                        -- OUT[1] = IN[2], FPGA  = backplane
       0 => "00");  -- OUT[0] = IN[0], RTM0  = RTM0 (loopback)
 
    function xbarDefault(app : AppType; mpsLinkNode : boolean) return Slv2Array;

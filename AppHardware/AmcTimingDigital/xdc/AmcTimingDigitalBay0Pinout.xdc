@@ -1,19 +1,19 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareP[0][0]}] ; 
-set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareN[0][0]}] ; 
-set_property -dict { IOSTANDARD LVDS } [get_ports {spareP[0][1]}] ; 
-set_property -dict { IOSTANDARD LVDS } [get_ports {spareN[0][1]}] ; 
-set_property -dict { IOSTANDARD LVDS } [get_ports {spareP[0][2]}] ; 
-set_property -dict { IOSTANDARD LVDS } [get_ports {spareN[0][2]}] ; 
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareP[0][0]}] ;
+set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {spareN[0][0]}] ;
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareP[0][1]}] ;
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareN[0][1]}] ;
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareP[0][2]}] ;
+set_property -dict { IOSTANDARD LVDS } [get_ports {spareN[0][2]}] ;
 
 # JESD ADC Sync Ports
 set_property -dict { IOSTANDARD LVDS DIFF_TERM_ADV TERM_100 } [get_ports {syncOutP[0][0]}] ; #jesdRxSyncP[0][0]

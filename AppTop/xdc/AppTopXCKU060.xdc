@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 AMC Carrier Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 AMC Carrier Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 AMC Carrier Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #######################
@@ -39,8 +39,8 @@
 # set_property PACKAGE_PIN E33 [get_ports {jesdRxP[1][9]}] ; #
 # set_property PACKAGE_PIN E34 [get_ports {jesdRxN[1][9]}] ; #
 
-set_property PACKAGE_PIN N29 [get_ports {jesdClkP[0][3]}] ; #P11 PIN88 
-set_property PACKAGE_PIN N30 [get_ports {jesdClkN[0][3]}] ; #P11 PIN87 
+set_property PACKAGE_PIN N29 [get_ports {jesdClkP[0][3]}] ; #P11 PIN88
+set_property PACKAGE_PIN N30 [get_ports {jesdClkN[0][3]}] ; #P11 PIN87
 set_property PACKAGE_PIN J29 [get_ports {jesdClkP[1][3]}] ; #P13 PIN88
 set_property PACKAGE_PIN J30 [get_ports {jesdClkN[1][3]}] ; #P13 PIN87
 
