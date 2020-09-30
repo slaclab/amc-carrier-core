@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 # JESD High Speed Ports
@@ -61,8 +61,8 @@ set_property -dict { IOSTANDARD LVCMOS25 PULLUP true } [get_ports {jtagPri[0][1]
 set_property -dict { IOSTANDARD LVCMOS25 PULLUP true } [get_ports {jtagPri[0][3]}]; #adcMiso P11 PIN168
 set_property -dict { IOSTANDARD LVCMOS25 PULLUP true } [get_ports {jtagPri[0][2]}]; #adcMosi P11 PIN167
 
-# Slow DAC's SPI Ports    
-set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports {spareP[0][12]}]; #dacCsL P12 PIN142                                                                 
+# Slow DAC's SPI Ports
+set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports {spareP[0][12]}]; #dacCsL P12 PIN142
 set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports {spareN[0][13]}]; #dacSck P12 PIN144
 set_property -dict { IOSTANDARD LVCMOS18 PULLUP true } [get_ports {spareN[0][12]}]; #dacMosi P12 PIN141
 
@@ -84,37 +84,37 @@ set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncInP[0][2]}]; #attn2A[
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {sysRefN[0][3]}]; #attn2A[0][2] P11 PIN111
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {sysRefP[0][3]}]; #attn2A[0][3] P11 PIN112
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncInN[0][3]}]; #attn2A[0][4] P11 PIN114
-                                                                   
+
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncInP[0][3]}]; #attn2B[0][0] P11 PIN115
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][0]}]; #attn2B[0][1] P11 PIN117
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][0]}]; #attn2B[0][2] P11 PIN118
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][1]}]; #attn2B[0][3] P11 PIN120
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][1]}]; #attn2B[0][4] P11 PIN121
-                                                                               
+
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][2]}]; #attn3A[0][0] P11 PIN123
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][2]}]; #attn3A[0][1] P11 PIN124
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][3]}]; #attn3A[0][2] P11 PIN126
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][3]}]; #attn3A[0][3] P11 PIN127
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][4]}]; #attn3A[0][4] P11 PIN129
-                                                                               
+
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][4]}]; #attn3B[0][0] P11 PIN130
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][5]}]; #attn3B[0][1] P11 PIN132
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][5]}]; #attn3B[0][2] P11 PIN133
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][8]}]; #attn3B[0][3] P11 PIN141
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][8]}]; #attn3B[0][4] P11 PIN142
-                                                                               
+
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][9]}]; #attn4A[0][0] P11 PIN144
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][9]}]; #attn4A[0][1] P11 PIN145
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[0][0]}]; #attn4A[0][2] P11 PIN147
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[0][0]}]; #attn4A[0][3] P11 PIN148
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[0][1]}]; #attn4A[0][4] P11 PIN151
-                                                                               
+
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[0][2]}]; #attn4B[0][0] P11 PIN153
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[0][2]}]; #attn4B[0][1] P11 PIN154
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[0][3]}]; #attn4B[0][2] P11 PIN156
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[0][4]}]; #attn4B[0][3] P11 PIN159
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[0][4]}]; #attn4B[0][4] P11 PIN160
-                                                                               
+
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[0][6]}]; #attn5A[0][0] P12 PIN117
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareP[0][6]}]; #attn5A[0][1] P12 PIN118
 set_property -dict { IOSTANDARD LVCMOS18 } [get_ports {spareN[0][7]}]; #attn5A[0][2] P12 PIN120

@@ -17,7 +17,6 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
@@ -38,18 +37,18 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierTiming is
    generic (
-      TPD_G             : time     := 1 ns;
-      TIME_GEN_APP_G    : boolean  := false;
-      TIME_GEN_EXTREF_G : boolean  := false;
-      DISABLE_TIME_GT_G : boolean  := false;
-      CORE_TRIGGERS_G   : natural  := 16;
-      TRIG_PIPE_G       : natural  := 0;
-      CLKSEL_MODE_G     : string   := "SELECT"; -- "LCLSI","LCLSII"
-      STREAM_L1_G       : boolean  := true;
-      AXIL_RINGB_G      : boolean  := true;
-      ASYNC_G           : boolean  := true;
-      RX_CLK_MMCM_G     : boolean  := false;
-      USE_TPGMINI_G     : boolean  := true);
+      TPD_G             : time    := 1 ns;
+      TIME_GEN_APP_G    : boolean := false;
+      TIME_GEN_EXTREF_G : boolean := false;
+      DISABLE_TIME_GT_G : boolean := false;
+      CORE_TRIGGERS_G   : natural := 16;
+      TRIG_PIPE_G       : natural := 0;
+      CLKSEL_MODE_G     : string  := "SELECT";   -- "LCLSI","LCLSII"
+      STREAM_L1_G       : boolean := true;
+      AXIL_RINGB_G      : boolean := true;
+      ASYNC_G           : boolean := true;
+      RX_CLK_MMCM_G     : boolean := false;
+      USE_TPGMINI_G     : boolean := true);
    port (
       stableClk            : in  sl;
       stableRst            : in  sl;
@@ -319,37 +318,37 @@ begin
          STREAM_L1_G       => STREAM_L1_G,
          ETHMSG_AXIS_CFG_G => EMAC_AXIS_CONFIG_C,
          AXIL_BASE_ADDR_G  => AXI_CROSSBAR_MASTERS_CONFIG_C(AXIL_CORE_INDEX_C).baseAddr,
-	 AXIL_RINGB_G      => AXIL_RINGB_G,
-	 ASYNC_G           => ASYNC_G,
-	 CLKSEL_MODE_G     => CLKSEL_MODE_G,
+         AXIL_RINGB_G      => AXIL_RINGB_G,
+         ASYNC_G           => ASYNC_G,
+         CLKSEL_MODE_G     => CLKSEL_MODE_G,
          USE_TPGMINI_G     => USE_TPGMINI_G)
       port map (
-         gtTxUsrClk      => txUsrClk,
-         gtTxUsrRst      => txUsrRst,
-         gtRxRecClk      => timingRecClk,
-         gtRxData        => rxData,
-         gtRxDataK       => rxDataK,
-         gtRxDispErr     => rxDispErr,
-         gtRxDecErr      => rxDecErr,
-         gtRxControl     => rxControl,
-         gtRxStatus      => rxStatus,
-         gtLoopback      => loopback,
-         appTimingClk    => appTimingClk,
-         appTimingRst    => appTimingRst,
-         appTimingMode   => appTimingMode,
-         appTimingBus    => appBus,
-         timingPhy       => coreTimingPhy,
-         timingClkSel    => timingClockSel,
-         axilClk         => axilClk,
-         axilRst         => axilRst,
-         axilReadMaster  => axilReadMasters (AXIL_CORE_INDEX_C),
-         axilReadSlave   => axilReadSlaves (AXIL_CORE_INDEX_C),
-         axilWriteMaster => axilWriteMasters(AXIL_CORE_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves (AXIL_CORE_INDEX_C),
-         obEthMsgMaster  => obTimingEthMsgMaster,
-         obEthMsgSlave   => obTimingEthMsgSlave,
-         ibEthMsgMaster  => ibTimingEthMsgMaster,
-         ibEthMsgSlave   => ibTimingEthMsgSlave);
+         gtTxUsrClk       => txUsrClk,
+         gtTxUsrRst       => txUsrRst,
+         gtRxRecClk       => timingRecClk,
+         gtRxData         => rxData,
+         gtRxDataK        => rxDataK,
+         gtRxDispErr      => rxDispErr,
+         gtRxDecErr       => rxDecErr,
+         gtRxControl      => rxControl,
+         gtRxStatus       => rxStatus,
+         gtLoopback       => loopback,
+         appTimingClk     => appTimingClk,
+         appTimingRst     => appTimingRst,
+         appTimingMode    => appTimingMode,
+         appTimingBus     => appBus,
+         tpgMiniTimingPhy => coreTimingPhy,
+         timingClkSel     => timingClockSel,
+         axilClk          => axilClk,
+         axilRst          => axilRst,
+         axilReadMaster   => axilReadMasters (AXIL_CORE_INDEX_C),
+         axilReadSlave    => axilReadSlaves (AXIL_CORE_INDEX_C),
+         axilWriteMaster  => axilWriteMasters(AXIL_CORE_INDEX_C),
+         axilWriteSlave   => axilWriteSlaves (AXIL_CORE_INDEX_C),
+         obEthMsgMaster   => obTimingEthMsgMaster,
+         obEthMsgSlave    => obTimingEthMsgSlave,
+         ibEthMsgMaster   => ibTimingEthMsgMaster,
+         ibEthMsgSlave    => ibTimingEthMsgSlave);
 
    process(appTimingClk)
    begin
@@ -363,9 +362,9 @@ begin
    process(appBus, timingStrobe, timingValid)
       variable v : TimingBusType;
    begin
-      v        := appBus;
-      v.strobe := timingStrobe;
-      v.valid  := timingValid;
+      v            := appBus;
+      v.strobe     := timingStrobe;
+      v.valid      := timingValid;
       appTimingBus <= v;
    end process;
 

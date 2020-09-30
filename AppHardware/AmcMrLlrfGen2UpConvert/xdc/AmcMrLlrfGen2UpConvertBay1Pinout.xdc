@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 LLRF Development'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 LLRF Development', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 LLRF Development', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 set_property PACKAGE_PIN F6 [get_ports {jesdTxP[1][0]}]
@@ -15,7 +15,7 @@ set_property PACKAGE_PIN D6 [get_ports {jesdTxP[1][1]}]
 set_property PACKAGE_PIN D5 [get_ports {jesdTxN[1][1]}]
 set_property PACKAGE_PIN D2 [get_ports {jesdRxP[1][1]}]
 set_property PACKAGE_PIN D1 [get_ports {jesdRxN[1][1]}]
-                           
+
 set_property PACKAGE_PIN N4 [get_ports {jesdTxP[1][2]}]
 set_property PACKAGE_PIN N3 [get_ports {jesdTxN[1][2]}]
 set_property PACKAGE_PIN M2 [get_ports {jesdRxP[1][2]}]
@@ -24,7 +24,7 @@ set_property PACKAGE_PIN L4 [get_ports {jesdTxP[1][3]}]
 set_property PACKAGE_PIN L3 [get_ports {jesdTxN[1][3]}]
 set_property PACKAGE_PIN K2 [get_ports {jesdRxP[1][3]}]
 set_property PACKAGE_PIN K1 [get_ports {jesdRxN[1][3]}]
-                           
+
 set_property PACKAGE_PIN J4 [get_ports {jesdTxP[1][4]}]
 set_property PACKAGE_PIN J3 [get_ports {jesdTxN[1][4]}]
 set_property PACKAGE_PIN H2 [get_ports {jesdRxP[1][4]}]
