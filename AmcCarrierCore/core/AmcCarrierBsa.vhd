@@ -15,7 +15,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
@@ -403,28 +402,28 @@ begin
       ------------------------------------------------------------------------------------------------
       U_BsaAxiInterconnectWrapper_1 : entity amc_carrier_core.BsaAxiInterconnectWrapper
          port map (
-            axiClk              => axiClk,                  -- [in]
-            axiRst              => axiRst,                  -- [in]
-            sAxiWriteMasters(0) => memAxiWriteMaster,       -- [in]
-            sAxiWriteMasters(1) => bsaAxiWriteMaster,       -- [in]
+            axiClk              => axiClk,                   -- [in]
+            axiRst              => axiRst,                   -- [in]
+            sAxiWriteMasters(0) => memAxiWriteMaster,        -- [in]
+            sAxiWriteMasters(1) => bsaAxiWriteMaster,        -- [in]
             sAxiWriteMasters(2) => waveform0AxiWriteMaster,  -- [in]
             sAxiWriteMasters(3) => waveform1AxiWriteMaster,  -- [in]
-            sAxiWriteSlaves(0)  => memAxiWriteSlave,        -- [out]
-            sAxiWriteSlaves(1)  => bsaAxiWriteSlave,        -- [out]
-            sAxiWriteSlaves(2)  => waveform0AxiWriteSlave,  -- [out]
-            sAxiWriteSlaves(3)  => waveform1AxiWriteSlave,  -- [out]
-            sAxiReadMasters(0)  => memAxiReadMaster,        -- [in]
-            sAxiReadMasters(1)  => AXI_READ_MASTER_INIT_C,  -- [in]
-            sAxiReadMasters(2)  => waveform0AxiReadMaster,  -- [in]
-            sAxiReadMasters(3)  => waveform1AxiReadMaster,  -- [in]
-            sAxiReadSlaves(0)   => memAxiReadSlave,         -- [out]
-            sAxiReadSlaves(1)   => bsaAxiReadSlave,         -- [out]
-            sAxiReadSlaves(2)   => waveform0AxiReadSlave,   -- [out]
-            sAxiReadSlaves(3)   => waveform1AxiReadSlave,   -- [out]
-            mAxiWriteMasters    => axiWriteMaster,          -- [out]
-            mAxiWriteSlaves     => axiWriteSlave,           -- [in]
-            mAxiReadMasters     => axiReadMaster,           -- [out]
-            mAxiReadSlaves      => axiReadSlave);           -- [in]
+            sAxiWriteSlaves(0)  => memAxiWriteSlave,         -- [out]
+            sAxiWriteSlaves(1)  => bsaAxiWriteSlave,         -- [out]
+            sAxiWriteSlaves(2)  => waveform0AxiWriteSlave,   -- [out]
+            sAxiWriteSlaves(3)  => waveform1AxiWriteSlave,   -- [out]
+            sAxiReadMasters(0)  => memAxiReadMaster,         -- [in]
+            sAxiReadMasters(1)  => AXI_READ_MASTER_INIT_C,   -- [in]
+            sAxiReadMasters(2)  => waveform0AxiReadMaster,   -- [in]
+            sAxiReadMasters(3)  => waveform1AxiReadMaster,   -- [in]
+            sAxiReadSlaves(0)   => memAxiReadSlave,          -- [out]
+            sAxiReadSlaves(1)   => bsaAxiReadSlave,          -- [out]
+            sAxiReadSlaves(2)   => waveform0AxiReadSlave,    -- [out]
+            sAxiReadSlaves(3)   => waveform1AxiReadSlave,    -- [out]
+            mAxiWriteMasters    => axiWriteMaster,           -- [out]
+            mAxiWriteSlaves     => axiWriteSlave,            -- [in]
+            mAxiReadMasters     => axiReadMaster,            -- [out]
+            mAxiReadSlaves      => axiReadSlave);            -- [in]
 
    end generate BSA_GEN;
 

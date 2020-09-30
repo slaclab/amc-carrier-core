@@ -1,15 +1,15 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
 # JESD Reference Ports
-set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {sysRefP[0][0]}] ; #jesdSysRefP 
+set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {sysRefP[0][0]}] ; #jesdSysRefP
 set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {sysRefN[0][0]}] ; #jesdSysRefN
 
 # JESD ADC Sync Ports
@@ -56,7 +56,7 @@ set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[0][9]}] 
 set_property -dict { IOSTANDARD LVCMOS25 PULLUP true } [get_ports {jtagSec[0][3]}]  ; # lmkSync
 
 # LMK CLKin0
-set_property -dict {IOSTANDARD LVDS } [get_ports {fpgaClkP[0][0]}] ; #LMK.CLKin0 
+set_property -dict {IOSTANDARD LVDS } [get_ports {fpgaClkP[0][0]}] ; #LMK.CLKin0
 set_property -dict {IOSTANDARD LVDS } [get_ports {fpgaClkN[0][0]}] ; #LMK.CLKin0
 
 # PLL SPI

@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
@@ -39,7 +39,7 @@ set_property PACKAGE_PIN E34 [get_ports {rtmHsRxN}]
 #############################
 
 create_generated_clock -name ethPhyClk    [get_pins {U_Core/U_Core/U_Eth/U_Xaui/XauiGtyUltraScale_Inst/U_XauiGtyUltraScaleCore/U0/XauiGtyUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gtye4_top.XauiGtyUltraScale156p25MHz10GigECore_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[0].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[0].GTYE4_CHANNEL_PRIM_INST/TXOUTCLK}]
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethPhyClk}] 
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethPhyClk}]
 set_false_path -to   [get_cells -hierarchical -filter {NAME =~ *plllocked_sync_i/sync1_r_reg[0]}]
 set_false_path -from [get_cells -hierarchical -filter {NAME =~ *uclk_mgt_tx_reset_reg}] -to [get_cells -hierarchical -filter {NAME =~ *mgt_tx_reset_pulse_stretcher_i/sync_r_reg[*]}]
 set_false_path -from [get_cells -hierarchical -filter {NAME =~ *uclk_mgt_rx_reset_reg}] -to [get_cells -hierarchical -filter {NAME =~ *mgt_rx_reset_pulse_stretcher_i/sync_r_reg[*]}]
@@ -61,13 +61,13 @@ set_clock_groups -asynchronous -group [get_clocks {ethPhyClk}] -group [get_clock
 set_clock_groups -asynchronous -group [get_clocks {ethPhyClk}] -group [get_clocks -of_objects [get_pins {U_Core/U_Core/U_Eth/U_Xaui/XauiGtyUltraScale_Inst/U_XauiGtyUltraScaleCore/U0/XauiGtyUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gtye4_top.XauiGtyUltraScale156p25MHz10GigECore_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[0].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[2].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
 set_clock_groups -asynchronous -group [get_clocks {ethPhyClk}] -group [get_clocks -of_objects [get_pins {U_Core/U_Core/U_Eth/U_Xaui/XauiGtyUltraScale_Inst/U_XauiGtyUltraScaleCore/U0/XauiGtyUltraScale156p25MHz10GigECore_gt_i/inst/gen_gtwizard_gtye4_top.XauiGtyUltraScale156p25MHz10GigECore_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[0].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[3].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]]
 
-create_generated_clock -name ethClk125MHz  [get_pins {U_Core/U_Core/U_Eth/U_Rtm/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0}] 
-create_generated_clock -name ethClk62p5MHz [get_pins {U_Core/U_Core/U_Eth/U_Rtm/U_MMCM/MmcmGen.U_Mmcm/CLKOUT1}] 
-set_clock_groups -asynchronous -group [get_clocks {ethRef}] -group [get_clocks {ethClk125MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {ethRef}] -group [get_clocks {ethClk62p5MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethClk125MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethClk62p5MHz}] 
-set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethRef}] 
+create_generated_clock -name ethClk125MHz  [get_pins {U_Core/U_Core/U_Eth/U_Rtm/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0}]
+create_generated_clock -name ethClk62p5MHz [get_pins {U_Core/U_Core/U_Eth/U_Rtm/U_MMCM/MmcmGen.U_Mmcm/CLKOUT1}]
+set_clock_groups -asynchronous -group [get_clocks {ethRef}] -group [get_clocks {ethClk125MHz}]
+set_clock_groups -asynchronous -group [get_clocks {ethRef}] -group [get_clocks {ethClk62p5MHz}]
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethClk125MHz}]
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethClk62p5MHz}]
+set_clock_groups -asynchronous -group [get_clocks {axilClk}] -group [get_clocks {ethRef}]
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_Core/U_Core/U_Eth/U_Rtm/GEN_LANE[0].U_GigEthGtyUltraScale/U_GigEthGtyUltraScaleCore/U0/transceiver_inst/GigEthGtyUltraScaleCore_gt_i/inst/gen_gtwizard_gtye4_top.GigEthGtyUltraScaleCore_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[2].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[0].GTYE4_CHANNEL_PRIM_INST/TXOUTCLK}]] -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_Eth/U_Rtm/U_MMCM/MmcmGen.U_Mmcm/CLKOUT1]]
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_Eth/U_Rtm/U_MMCM/MmcmGen.U_Mmcm/CLKOUT1]] -group [get_clocks -of_objects [get_pins {U_Core/U_Core/U_Eth/U_Rtm/GEN_LANE[0].U_GigEthGtyUltraScale/U_GigEthGtyUltraScaleCore/U0/transceiver_inst/GigEthGtyUltraScaleCore_gt_i/inst/gen_gtwizard_gtye4_top.GigEthGtyUltraScaleCore_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[2].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[0].GTYE4_CHANNEL_PRIM_INST/TXOUTCLK}]]

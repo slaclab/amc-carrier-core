@@ -17,7 +17,6 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
@@ -563,8 +562,8 @@ begin
             AXI_CLK_FREQ_G => AXI_CLK_FREQ_C)
          port map (
             -- I2C Ports
-            scl            => pwrScl,
-            sda            => pwrSda,
+            scl             => pwrScl,
+            sda             => pwrSda,
             -- AXI-Lite Register Interface
             axilReadMaster  => mAxilReadMasters(PWR_I2C_INDEX_C),
             axilReadSlave   => mAxilReadSlaves(PWR_I2C_INDEX_C),
