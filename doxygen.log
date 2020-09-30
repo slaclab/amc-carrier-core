@@ -332,89 +332,89 @@ Reading /home/travis/build/slaclab/amc-carrier-core/AppTop/rtl/xcku15p/AppTopPkg
 Reading /home/travis/build/slaclab/amc-carrier-core/AppTop/tb/AppMsgTb.vhd...
 Reading /home/travis/build/slaclab/amc-carrier-core/AxisBramRingBuffer/rtl/AxisBramFlashBuffer.vhd...
 Reading /home/travis/build/slaclab/amc-carri
-[AmcCarrierBsa.vhd:429:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::BSA_GEN:u_axilitecrossbar_1]
+[AmcCarrierBsa.vhd:428:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::BSA_GEN:u_axilitecrossbar_1]
 
-[AmcCarrierBsa.vhd:429:Info: Elaborating entity BsaWaveformEngine for hierarchy bsawaveformengine::BSA_GEN:bsawaveformengine_0]
+[AmcCarrierBsa.vhd:428:Info: Elaborating entity BsaWaveformEngine for hierarchy bsawaveformengine::BSA_GEN:bsawaveformengine_0]
 
-[AmcCarrierBsa.vhd:429:Info: Elaborating entity BsaWaveformEngine for hierarchy bsawaveformengine::BSA_GEN:bsawaveformengine_1]
+[AmcCarrierBsa.vhd:428:Info: Elaborating entity BsaWaveformEngine for hierarchy bsawaveformengine::BSA_GEN:bsawaveformengine_1]
 
-[AmcCarrierBsa.vhd:429:Info: Elaborating entity axistreammux for hierarchy axistreammux::BSA_GEN:u_axistreammux_waveformstatus]
+[AmcCarrierBsa.vhd:428:Info: Elaborating entity axistreammux for hierarchy axistreammux::BSA_GEN:u_axistreammux_waveformstatus]
 
-[AmcCarrierBsa.vhd:429:Info: Elaborating entity axistreammux for hierarchy axistreammux::BSA_GEN:u_axistreammux_waveformdata]
+[AmcCarrierBsa.vhd:428:Info: Elaborating entity axistreammux for hierarchy axistreammux::BSA_GEN:u_axistreammux_waveformdata]
 
-[AmcCarrierBsa.vhd:429:Info: Elaborating entity BsaBufferControl for hierarchy bsabuffercontrol::BSA_GEN:BSA_EN_GEN:bsabuffercontrol_1]
+[AmcCarrierBsa.vhd:428:Info: Elaborating entity BsaBufferControl for hierarchy bsabuffercontrol::BSA_GEN:BSA_EN_GEN:bsabuffercontrol_1]
 
-[AmcCarrierBsa.vhd:429:Info: Elaborating entity srpv3axi for hierarchy srpv3axi::BSA_GEN:GEN_EN_SRP:u_srpv3axi_1]
+[AmcCarrierBsa.vhd:428:Info: Elaborating entity srpv3axi for hierarchy srpv3axi::BSA_GEN:GEN_EN_SRP:u_srpv3axi_1]
 
-[AmcCarrierBsa.vhd:429:Info: Elaborating entity BsaAxiInterconnectWrapper for hierarchy bsaaxiinterconnectwrapper::BSA_GEN:u_bsaaxiinterconnectwrapper_1]
+[AmcCarrierBsa.vhd:428:Info: Elaborating entity BsaAxiInterconnectWrapper for hierarchy bsaaxiinterconnectwrapper::BSA_GEN:u_bsaaxiinterconnectwrapper_1]
 
-[AmcCarrierBsa.vhd:452:Info: Elaborating entity BldAxiStream for hierarchy bldaxistream::BLD_ENABLE_GEN:u_bld]
+[AmcCarrierBsa.vhd:451:Info: Elaborating entity BldAxiStream for hierarchy bldaxistream::BLD_ENABLE_GEN:u_bld]
 
-[AmcCarrierBsi.vhd:151:Info: Elaborating entity iobuf for hierarchy iobuf::u_i2cscl]
+[AmcCarrierBsi.vhd:150:Info: Elaborating entity iobuf for hierarchy iobuf::u_i2cscl]
 
-[AmcCarrierBsi.vhd:158:Info: Elaborating entity iobuf for hierarchy iobuf::u_i2csda]
+[AmcCarrierBsi.vhd:157:Info: Elaborating entity iobuf for hierarchy iobuf::u_i2csda]
 
-[AmcCarrierBsi.vhd:196:Info: Elaborating entity i2cregslave for hierarchy i2cregslave::u_i2c_slave_0x49]
+[AmcCarrierBsi.vhd:195:Info: Elaborating entity i2cregslave for hierarchy i2cregslave::u_i2c_slave_0x49]
 
-[AmcCarrierBsi.vhd:221:Info: Elaborating entity i2cregslave for hierarchy i2cregslave::u_i2c_slave_0x51]
+[AmcCarrierBsi.vhd:220:Info: Elaborating entity i2cregslave for hierarchy i2cregslave::u_i2c_slave_0x51]
 
-[AmcCarrierBsi.vhd:244:Info: Elaborating entity truedualportram for hierarchy truedualportram::u_ram]
+[AmcCarrierBsi.vhd:243:Info: Elaborating entity truedualportram for hierarchy truedualportram::u_ram]
 
-[AmcCarrierDdrMem.vhd:206:Info: Elaborating entity ibuf for hierarchy ibuf::u_ddrpg]
+[AmcCarrierDdrMem.vhd:205:Info: Elaborating entity ibuf for hierarchy ibuf::u_ddrpg]
 
-[AmcCarrierDdrMem.vhd:211:Info: Elaborating entity ibuf for hierarchy ibuf::u_ddralertl]
+[AmcCarrierDdrMem.vhd:210:Info: Elaborating entity ibuf for hierarchy ibuf::u_ddralertl]
 
-[AmcCarrierDdrMem.vhd:217:Info: Elaborating entity obuf for hierarchy obuf::u_ddrpwrenl]
+[AmcCarrierDdrMem.vhd:216:Info: Elaborating entity obuf for hierarchy obuf::u_ddrpwrenl]
 
-[AmcCarrierDdrMem.vhd:223:Info: Elaborating entity ibufds for hierarchy ibufds::ibufds_inst]
+[AmcCarrierDdrMem.vhd:222:Info: Elaborating entity ibufds for hierarchy ibufds::ibufds_inst]
 
-[AmcCarrierDdrMem.vhd:228:Info: Elaborating entity bufg for hierarchy bufg::bufg_inst]
+[AmcCarrierDdrMem.vhd:227:Info: Elaborating entity bufg for hierarchy bufg::bufg_inst]
 
-[AmcCarrierDdrMem.vhd:239:Info: Elaborating entity rstsync for hierarchy rstsync::u_rstsync]
+[AmcCarrierDdrMem.vhd:238:Info: Elaborating entity rstsync for hierarchy rstsync::u_rstsync]
 
-[AmcCarrierDdrMem.vhd:302:Info: Elaborating entity migcore for hierarchy migcore::migcore_inst]
+[AmcCarrierDdrMem.vhd:301:Info: Elaborating entity migcore for hierarchy migcore::migcore_inst]
 
-[AmcCarrierDdrMem.vhd:343:Info: Elaborating entity aximemtester for hierarchy aximemtester::FSBL_GEN:u_aximemtester]
+[AmcCarrierDdrMem.vhd:342:Info: Elaborating entity aximemtester for hierarchy aximemtester::FSBL_GEN:u_aximemtester]
 
-[AmcCarrierDdrMem.vhd:423:Info: Elaborating entity synchronizer for hierarchy synchronizer::NORMAL_GEN:u_sync]
+[AmcCarrierDdrMem.vhd:422:Info: Elaborating entity synchronizer for hierarchy synchronizer::NORMAL_GEN:u_sync]
 
-[AmcCarrierSysMon.vhd:109:Info: Elaborating entity sysmoncore for hierarchy sysmoncore::sysmoncore_inst]
+[AmcCarrierSysMon.vhd:108:Info: Elaborating entity sysmoncore for hierarchy sysmoncore::sysmoncore_inst]
 
-[AmcCarrierSysReg.vhd:272:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
+[AmcCarrierSysReg.vhd:271:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
 
-[AmcCarrierSysReg.vhd:294:Info: Elaborating entity axiversion for hierarchy axiversion::u_version]
+[AmcCarrierSysReg.vhd:293:Info: Elaborating entity axiversion for hierarchy axiversion::u_version]
 
-[AmcCarrierSysReg.vhd:340:Info: Elaborating entity iprog for hierarchy iprog::u_iprog]
+[AmcCarrierSysReg.vhd:339:Info: Elaborating entity iprog for hierarchy iprog::u_iprog]
 
-[AmcCarrierSysReg.vhd:359:Info: Elaborating entity AmcCarrierSysMon for hierarchy amccarriersysmon::u_sysmon]
+[AmcCarrierSysReg.vhd:358:Info: Elaborating entity AmcCarrierSysMon for hierarchy amccarriersysmon::u_sysmon]
 
-[AmcCarrierSysReg.vhd:383:Info: Elaborating entity aximicronn25qcore for hierarchy aximicronn25qcore::u_bootprom]
+[AmcCarrierSysReg.vhd:382:Info: Elaborating entity aximicronn25qcore for hierarchy aximicronn25qcore::u_bootprom]
 
-[AmcCarrierSysReg.vhd:406:Info: Elaborating entity startupe3 for hierarchy startupe3::u_startupe3]
+[AmcCarrierSysReg.vhd:405:Info: Elaborating entity startupe3 for hierarchy startupe3::u_startupe3]
 
-[AmcCarrierSysReg.vhd:433:Info: Elaborating entity axisy56040reg for hierarchy axisy56040reg::u_sy56040]
+[AmcCarrierSysReg.vhd:432:Info: Elaborating entity axisy56040reg for hierarchy axisy56040reg::u_sy56040]
 
-[AmcCarrierSysReg.vhd:532:Info: Elaborating entity AmcCarrierBsi for hierarchy amccarrierbsi::u_bsi]
+[AmcCarrierSysReg.vhd:531:Info: Elaborating entity AmcCarrierBsi for hierarchy amccarrierbsi::u_bsi]
 
-[AmcCarrierSysReg.vhd:577:Info: Elaborating entity axilitepmbusmaster for hierarchy axilitepmbusmaster::GEN_PWR_I2C:axii2cregmaster_3]
+[AmcCarrierSysReg.vhd:576:Info: Elaborating entity axilitepmbusmaster for hierarchy axilitepmbusmaster::GEN_PWR_I2C:axii2cregmaster_3]
 
-[AmcCarrierTiming.vhd:176:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
+[AmcCarrierTiming.vhd:175:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
 
-[AmcCarrierTiming.vhd:210:Info: Elaborating entity AmcCarrierIbufGt for hierarchy amccarrieribufgt::timing_refclk_ibufds_gte3]
+[AmcCarrierTiming.vhd:209:Info: Elaborating entity AmcCarrierIbufGt for hierarchy amccarrieribufgt::timing_refclk_ibufds_gte3]
 
-[AmcCarrierTiming.vhd:220:Info: Elaborating entity bufg_gt for hierarchy bufg_gt::u_bufg_gt_div2]
+[AmcCarrierTiming.vhd:219:Info: Elaborating entity bufg_gt for hierarchy bufg_gt::u_bufg_gt_div2]
 
-[AmcCarrierTiming.vhd:266:Info: Elaborating entity timinggtcorewrapper for hierarchy timinggtcorewrapper::timinggthcorewrapper_1]
+[AmcCarrierTiming.vhd:265:Info: Elaborating entity timinggtcorewrapper for hierarchy timinggtcorewrapper::timinggthcorewrapper_1]
 
-[AmcCarrierTiming.vhd:292:Info: Elaborating entity clockmanagerultrascale for hierarchy clockmanagerultrascale::RX_CLK_MMCM_GEN:u_clockmanager]
+[AmcCarrierTiming.vhd:291:Info: Elaborating entity clockmanagerultrascale for hierarchy clockmanagerultrascale::RX_CLK_MMCM_GEN:u_clockmanager]
 
-[AmcCarrierTiming.vhd:309:Info: Elaborating entity clkoutbufdiff for hierarchy clkoutbufdiff::clkoutbufdiff_inst]
+[AmcCarrierTiming.vhd:308:Info: Elaborating entity clkoutbufdiff for hierarchy clkoutbufdiff::clkoutbufdiff_inst]
 
-[AmcCarrierTiming.vhd:352:Info: Elaborating entity timingcore for hierarchy timingcore::timingcore_1]
+[AmcCarrierTiming.vhd:351:Info: Elaborating entity timingcore for hierarchy timingcore::timingcore_1]
 
-[AmcCarrierTiming.vhd:376:Info: Elaborating entity obuf for hierarchy obuf::u_timingclksel]
+[AmcCarrierTiming.vhd:375:Info: Elaborating entity obuf for hierarchy obuf::u_timingclksel]
 
-[AmcCarrierTiming.vhd:403:Info: Elaborating entity evrv2coretriggers for hierarchy evrv2coretriggers::GEN_CORETRIG:u_coretrig]
+[AmcCarrierTiming.vhd:402:Info: Elaborating entity evrv2coretriggers for hierarchy evrv2coretriggers::GEN_CORETRIG:u_coretrig]
 
 [AmcCarrierEth.vhd:189:Info: Elaborating entity axilitecrossbar for hierarchy axilitecrossbar::u_xbar]
 
@@ -1853,7 +1853,7 @@ Reading /home/travis/build/slaclab/amc-carri
 [DaqMuxV2Tb.vhd:68:Info: Elaborating entity clkrst for hierarchy clkrst::u_clkrst]
 
 [DaqMuxV2Tb.vhd:103:Info: Elaborating entity DaqMuxV2 for hierarchy daqmuxv2::u_daqmuxv2]
-/home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/core/AmcCarrierBsi.vhd:138: warning: documented symbol 'slv' was not declared or defined.
+/home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/core/AmcCarrierBsi.vhd:137: warning: documented symbol 'slv' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/core/FpgaType/FpgaTypePkg_XCKU060.vhd:17: warning: documented symbol '_library_ ieeeieee' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/core/FpgaType/FpgaTypePkg_XCKU060.vhd:18: warning: documented symbol '_use_ std_logic_1164std_logic_1164' was not declared or defined.
 /home/travis/build/slaclab/amc-carrier-core/AmcCarrierCore/core/FpgaType/FpgaTypePkg_XCKU060.vhd:21: warning: documented symbol '_library_ surfsurf' was not declared or defined.
