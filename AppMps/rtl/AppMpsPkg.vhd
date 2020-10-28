@@ -438,7 +438,7 @@ package body AppMpsPkg is
             ret.DIGITAL_EN_C := true;
             ret.BYTE_COUNT_C := 2;
 
-         when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
+         when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C | APP_MPS_DN_TYPE_C =>
             ret.BYTE_COUNT_C  := 12;
             ret.LCLS1_COUNT_C := 12;
             ret.LCLS2_COUNT_C := 12/2;
