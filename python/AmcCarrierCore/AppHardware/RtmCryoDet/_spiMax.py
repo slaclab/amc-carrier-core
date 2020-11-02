@@ -123,6 +123,13 @@ class SpiMax(pr.Device):
             typeStr      = "List[UInt20]",
         ))
 
+        @self.command(description="Set all DACs to 0")
+        def initializeAllDac():
+            enable = [2 for _ in range(32)]
+            val    = [0 for _ in range(32)]
+            self.TesBiasDacCtrlRegChArray.set(enable, write=True)
+            self.TesBiasDacDataRegChArray.set(val, write=True)
+
     @staticmethod
     def setArray(dev, var, value):
         # workaround for rogue local variables
