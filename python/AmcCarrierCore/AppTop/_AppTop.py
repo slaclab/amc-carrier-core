@@ -214,7 +214,7 @@ class AppTop(pr.Device):
                 ######################################################################
                 if( rx.DataValid.get() == 0 ):
                     print(f'AppTop.Init(): Link Not Locked: {rx.path}.DataValid = {rx.DataValid.value()} ')
-                    linkLock = False                
+                    linkLock = False
                 ######################################################################
                 if (self._init):
                     ##################################################################
