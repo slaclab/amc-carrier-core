@@ -188,7 +188,7 @@ class AppTop(pr.Device):
                     else:
                         print(f'AppTop.Init().{tx.path}: Warning: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
                 ######################################################################
-                if( tx.DataValid.get() == 0 ):
+                if( tx.DataValid.get() != tx.Enable.get() ):
                     print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
                     linkLock = False
                 ######################################################################
@@ -212,7 +212,7 @@ class AppTop(pr.Device):
                     else:
                         print(f'AppTop.Init().{rx.path}: Warning: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
                 ######################################################################
-                if( rx.DataValid.get() == 0 ):
+                if( rx.DataValid.get() != rx.Enable.get() ):
                     print(f'AppTop.Init(): Link Not Locked: {rx.path}.DataValid = {rx.DataValid.value()} ')
                     linkLock = False
                 ######################################################################
