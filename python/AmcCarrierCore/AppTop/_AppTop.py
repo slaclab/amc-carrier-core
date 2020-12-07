@@ -59,7 +59,7 @@ class AppTop(pr.Device):
             mode         = 'RO',
             localGet     = lambda: self.JesdHealth(),
             value        = False,
-            pollInterval = 5,
+            pollInterval = 0, # 0 by default for SMuRF because already have a function to check this status which is called from the high level application
         ))
 
         ##############################
