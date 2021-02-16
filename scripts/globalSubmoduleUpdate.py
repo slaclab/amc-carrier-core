@@ -177,10 +177,10 @@ def createPullRequest(repo,reviewers):
 
     # Create the pull request
     pr = repo.create_pull(
-        title     = 'Updating sumodule configuration',
+        title     = 'Updating submodule configuration',
         body      = msg,
         head      = 'submodule-update',
-        base      = 'master',
+        base      = 'main',
     )
 
     # Check that I am not the reviewer
