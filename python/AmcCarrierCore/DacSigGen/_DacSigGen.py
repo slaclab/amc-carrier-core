@@ -28,7 +28,7 @@ class DacSigGen(pr.Device):
             buffSize    = 0x200,
             fillMode    = False, # False = 16-bit RAM, True = 32-bit RAM
             **kwargs):
-        super().__init__(name=name, description=description, size=0x10000000, **kwargs)
+        super().__init__(name=name, description=description, **kwargs)
 
         self._numOfChs = numOfChs
         self._buffSize = (buffSize<<1) if (fillMode) else buffSize
@@ -44,7 +44,6 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
-            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(
@@ -55,7 +54,6 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
-            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(
@@ -66,7 +64,6 @@ class DacSigGen(pr.Device):
             bitOffset    =  0x00,
             base         = pr.UInt,
             mode         = "RW",
-            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(
@@ -78,7 +75,6 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
             hidden       = True,
-            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(
@@ -90,7 +86,6 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,
-            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(
@@ -102,7 +97,6 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,
-            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(
@@ -114,7 +108,6 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,
-            overlapEn    = True
         ))
 
         self.add(pr.RemoteVariable(
@@ -126,7 +119,6 @@ class DacSigGen(pr.Device):
             base         = pr.UInt,
             mode         = "RO",
             pollInterval =  1,
-            overlapEn    = True
         ))
 
         self.addRemoteVariables(
@@ -139,7 +131,6 @@ class DacSigGen(pr.Device):
             mode         = "RW",
             number       =  self._numOfChs,
             stride       =  4,
-            overlapEn    = True
         )
 
         for i in range(self._numOfChs):
@@ -150,6 +141,7 @@ class DacSigGen(pr.Device):
                 size        = (2*self._buffSize),
                 wordBitSize = (16 if (fillMode) else 32),
                 stride      = (2  if (fillMode) else 4),
+                base        = pr.Int,
             )
 
         self.add(pr.LocalVariable(
@@ -213,25 +205,11 @@ class DacSigGen(pr.Device):
                     data = []
                     for row in csvData:
                         data.append(int(row[ch]))
-                    self._rawWrite(
-                        offset      = (0x01000000 + (ch*0x01000000)),
-                        data        = data,
-                        base        = pr.Int,
-                        stride      = (2  if (fillMode) else 4),
-                        wordBitSize = (16 if (fillMode) else 32)
-                    )
+
+                    self.Waveform[ch].set(0x000000000,data,write=True)
+
                     v = getattr(self, 'PeriodSize[%i]'%ch)
                     v.set(((cnt>>1)-1) if (fillMode) else (cnt-1))
-                    # Let's verify the data
-                    readBack = self._rawRead(
-                        offset      = (0x01000000 + (ch*0x01000000)),
-                        numWords    = cnt,
-                        base        = pr.Int,
-                        stride      = (2  if (fillMode) else 4),
-                        wordBitSize = (16 if (fillMode) else 32)
-                    )
-                    for i in range(cnt):
-                        if ( data[i] != readBack[i] ):
-                            click.secho( ('LoadCsvFile(): Failed verification: data[%d] = %d != readBack[%d] = %d' % (i,data[i],i,readBack[i])), fg='red')
+
                 # Restore the enable mask value
                 self.EnableMask.set(enableMask)
