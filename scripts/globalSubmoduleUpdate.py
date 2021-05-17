@@ -59,10 +59,10 @@ repoList  =  [
 ########################################
 
 submoduleConfig  =  [
-    ['amc-carrier-core','v4.0.1'],
-    ['lcls-timing-core','v3.2.2'],
-    ['ruckus',          'v2.7.4'],
-    ['surf',            'v2.11.1'],
+    ['amc-carrier-core','v4.2.0'],
+    ['lcls-timing-core','v3.3.0'],
+    ['ruckus',          'v3.0.1'],
+    ['surf',            'v2.18.1'],
 ]
 
 #############################################################################################
@@ -177,10 +177,10 @@ def createPullRequest(repo,reviewers):
 
     # Create the pull request
     pr = repo.create_pull(
-        title     = 'Updating sumodule configuration',
+        title     = 'Updating submodule configuration',
         body      = msg,
         head      = 'submodule-update',
-        base      = 'master',
+        base      = 'main',
     )
 
     # Check that I am not the reviewer

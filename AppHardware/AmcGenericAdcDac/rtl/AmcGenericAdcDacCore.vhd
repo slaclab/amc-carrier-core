@@ -266,15 +266,15 @@ begin
          XIL_DEVICE_G => "ULTRASCALE")
       port map (
          clkIn   => fpgaClk,
-         clkOutP => fpgaClkP(0),
-         clkOutN => fpgaClkN(0));
+         clkOutP => fpgaClockP,
+         clkOutN => fpgaClockN);
 
    TRIG_SIGNAL : if (TRIG_CLK_G = false) generate
       OBUFDS_1 : OBUFDS
          port map (
             I  => smaTrig,
-            O  => syncOutP(3),
-            OB => syncOutN(3));
+            O  => smaTrigP,
+            OB => smaTrigN);
    end generate;
 
    TRIG_CLK : if (TRIG_CLK_G = true) generate
@@ -284,16 +284,16 @@ begin
             XIL_DEVICE_G => "ULTRASCALE")
          port map (
             clkIn   => smaTrig,
-            clkOutP => syncOutP(3),
-            clkOutN => syncOutN(3));
+            clkOutP => smaTrigP,
+            clkOutN => smaTrigN);
    end generate;
 
    CAL_SIGNAL : if (CAL_CLK_G = false) generate
       OBUFDS_2 : OBUFDS
          port map (
             I  => adcCal,
-            O  => syncOutP(4),
-            OB => syncOutN(4));
+            O  => adcCalP,
+            OB => adcCalN);
    end generate;
 
    CAL_CLK : if (CAL_CLK_G = true) generate
@@ -303,8 +303,8 @@ begin
             XIL_DEVICE_G => "ULTRASCALE")
          port map (
             clkIn   => adcCal,
-            clkOutP => syncOutP(4),
-            clkOutN => syncOutN(4));
+            clkOutP => adcCalP,
+            clkOutN => adcCalN);
    end generate;
 
    GEN_LEMO :
@@ -313,13 +313,13 @@ begin
       OBUFDS_LemoDout : OBUFDS
          port map (
             I  => lemoDout(i),
-            O  => syncOutP(5+i),
-            OB => syncOutN(5+i));
+            O  => lemoDoutP(i),
+            OB => lemoDoutN(i));
 
       IBUFDS_LemoDin : IBUFDS
          port map (
-            I  => syncInP(i),
-            IB => syncInN(i),
+            I  => lemoDinP(i),
+            IB => lemoDinN(i),
             O  => lemoDinput(i));
 
    end generate GEN_LEMO;
