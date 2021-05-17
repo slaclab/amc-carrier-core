@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierEth.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-21
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,13 +17,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierEth is
    generic (
@@ -37,7 +38,7 @@ entity AmcCarrierEth is
    port (
       -- Local Configuration and status
       localMac             : in  slv(47 downto 0);  --  big-Endian configuration
-      localIp              : in  slv(31 downto 0);  --  big-Endian configuration   
+      localIp              : in  slv(31 downto 0);  --  big-Endian configuration
       ethPhyReady          : out sl;
       -- Master AXI-Lite Interface
       mAxilReadMasters     : out AxiLiteReadMasterArray(1 downto 0);
@@ -80,7 +81,7 @@ entity AmcCarrierEth is
       ibBpMsgServerSlave   : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
-      ----------------   
+      ----------------
       -- ETH Ports
       ethRxP               : in  slv(3 downto 0);
       ethRxN               : in  slv(3 downto 0);
@@ -106,7 +107,7 @@ architecture mapping of AmcCarrierEth is
 
    ------------------------------------------
    --     UDP Server Configurations        --
-   ------------------------------------------   
+   ------------------------------------------
 
    constant SERVER_SIZE_C : positive := 7;
 
@@ -119,17 +120,17 @@ architecture mapping of AmcCarrierEth is
    constant UDP_SRV_RSSI_ILEAVE_IDX_C : natural := 6;
 
    constant SERVER_PORTS_C : PositiveArray(SERVER_SIZE_C-1 downto 0) := (
-      UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC 
+      UDP_SRV_XVC_IDX_C         => 2542,  -- Xilinx XVC
       UDP_SRV_SRPV0_IDX_C       => 8192,  -- Legacy SRPv0 register access (still used for remote FPGA reprogramming)
       UDP_SRV_RSSI0_IDX_C       => 8193,  -- Legacy Non-interleaved RSSI for Register access and ASYNC messages
       UDP_SRV_RSSI1_IDX_C       => 8194,  -- Legacy Non-interleaved RSSI for bulk data transfer
       UDP_SRV_BP_MGS_IDX_C      => 8195,  -- Backplane Messaging
       UDP_SRV_TIMING_IDX_C      => 8197,  -- Timing ASYNC Messaging
-      UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI 
+      UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI
 
    ------------------------------------------
    --     UDP Client Configurations        --
-   ------------------------------------------  
+   ------------------------------------------
 
    constant CLIENT_SIZE_C : positive := 1;
 
@@ -139,8 +140,8 @@ architecture mapping of AmcCarrierEth is
       UDP_CLT_BP_MGS_IDX_C => 8196);    -- Backplane Messaging
 
    ------------------------------------------
-   --                Signals               -- 
-   ------------------------------------------ 
+   --                Signals               --
+   ------------------------------------------
 
    signal ibMacMaster : AxiStreamMasterType;
    signal ibMacSlave  : AxiStreamSlaveType;
@@ -168,8 +169,8 @@ begin
 
    --------------------------
    -- AXI-Lite: Crossbar Core
-   --------------------------  
-   U_XBAR : entity work.AxiLiteCrossbar
+   --------------------------
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -191,7 +192,7 @@ begin
    -- Zone2 10 GigE Module
    -----------------------
    ETH_ZONE2 : if (RTM_ETH_G = false) generate
-      U_Xaui : entity work.XauiGthUltraScaleWrapper
+      U_Xaui : entity surf.XauiGthUltraScaleWrapper
          generic map (
             TPD_G         => TPD_G,
             EN_WDT_G      => true,
@@ -201,7 +202,7 @@ begin
          port map (
             -- Local Configurations
             localMac       => localMac,
-            -- Streaming DMA Interface 
+            -- Streaming DMA Interface
             dmaClk         => axilClk,
             dmaRst         => axilRst,
             dmaIbMaster    => obMacMaster,
@@ -232,7 +233,7 @@ begin
    -- Zone3 1 GigE Module
    ----------------------
    ETH_ZONE3 : if (RTM_ETH_G = true) generate
-      U_Rtm : entity work.GigEthGthUltraScaleWrapper
+      U_Rtm : entity surf.GigEthGthUltraScaleWrapper
          generic map (
             TPD_G              => TPD_G,
             -- DMA/MAC Configurations
@@ -242,13 +243,13 @@ begin
             CLKIN_PERIOD_G     => 6.4,   -- 156.25 MHz
             DIVCLK_DIVIDE_G    => 5,     -- 31.25 MHz = (156.25 MHz/5)
             CLKFBOUT_MULT_F_G  => 32.0,  -- 1 GHz = (32 x 31.25 MHz)
-            CLKOUT0_DIVIDE_F_G => 8.0,   -- 125 MHz = (1.0 GHz/8)         
+            CLKOUT0_DIVIDE_F_G => 8.0,   -- 125 MHz = (1.0 GHz/8)
             -- AXI Streaming Configurations
             AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
          port map (
             -- Local Configurations
             localMac(0)     => localMac,
-            -- Streaming DMA Interface 
+            -- Streaming DMA Interface
             dmaClk(0)       => axilClk,
             dmaRst(0)       => axilRst,
             dmaIbMasters(0) => obMacMaster,
@@ -271,7 +272,7 @@ begin
       ethTxN(3 downto 1) <= "111";
    end generate;
 
-   U_Sync : entity work.Synchronizer
+   U_Sync : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -282,7 +283,7 @@ begin
    ----------------------
    -- IPv4/ARP/UDP Engine
    ----------------------
-   U_UdpEngineWrapper : entity work.UdpEngineWrapper
+   U_UdpEngineWrapper : entity surf.UdpEngineWrapper
       generic map (
          -- Simulation Generics
          TPD_G          => TPD_G,
@@ -297,8 +298,8 @@ begin
          -- IPv4/ARP Generics
          CLK_FREQ_G     => AXI_CLK_FREQ_C,  -- In units of Hz
          COMM_TIMEOUT_G => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
-         VLAN_G         => false,       -- no VLAN       
-         DHCP_G         => false)       -- no DHCP       
+         VLAN_G         => false,       -- no VLAN
+         DHCP_G         => false)       -- no DHCP
       port map (
          -- Local Configurations
          localMac        => localMac,
@@ -330,13 +331,13 @@ begin
    -------------
    -- Xilinx XVC
    -------------
-   U_Debug : entity work.AmcCarrierXvcDebug
+   U_Debug : entity surf.UdpDebugBridgeWrapper
       generic map (
          TPD_G => TPD_G)
       port map (
          -- Clock and Reset
-         axilClk        => axilClk,
-         axilRst        => axilRst,
+         clk            => axilClk,
+         rst            => axilRst,
          -- UDP XVC Interface
          obServerMaster => obServerMasters(UDP_SRV_XVC_IDX_C),
          obServerSlave  => obServerSlaves(UDP_SRV_XVC_IDX_C),
@@ -346,16 +347,16 @@ begin
    --------------------------------------
    -- Legacy AXI-Lite Master without RSSI
    --------------------------------------
-   U_SRPv0 : entity work.SrpV0AxiLite
+   U_SRPv0 : entity surf.SrpV0AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          EN_32BIT_ADDR_G     => true,
-         BRAM_EN_G           => true,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => true,
          AXI_STREAM_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
-         -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+         -- Streaming Slave (Rx) Interface (sAxisClk domain)
          sAxisClk            => axilClk,
          sAxisRst            => axilRst,
          sAxisMaster         => obServerMasters(UDP_SRV_SRPV0_IDX_C),
@@ -378,7 +379,7 @@ begin
    -----------------------------------
    NONE_ILEAVE : if (RSSI_ILEAVE_EN_G = false) generate
 
-      U_RssiServer : entity work.AmcCarrierRssi
+      U_RssiServer : entity amc_carrier_core.AmcCarrierRssi
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
@@ -426,7 +427,7 @@ begin
 
    RSSI_ILEAVE : if (RSSI_ILEAVE_EN_G = true) generate
 
-      U_RssiServer : entity work.AmcCarrierRssiInterleave
+      U_RssiServer : entity amc_carrier_core.AmcCarrierRssiInterleave
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
@@ -474,20 +475,37 @@ begin
    ----------------------
    -- BP Messenger Server
    ----------------------
-   ibBpMsgServerMaster                  <= obServerMasters(UDP_SRV_BP_MGS_IDX_C);
-   obServerSlaves(UDP_SRV_BP_MGS_IDX_C) <= ibBpMsgServerSlave;
-   U_ServerLimiter : entity work.SsiFrameLimiter
+   U_Resize_Server : entity surf.AxiStreamResize
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         READY_EN_G          => true,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+      port map (
+         -- Clock and reset
+         axisClk     => axilClk,
+         axisRst     => axilRst,
+         -- Slave Port
+         sAxisMaster => obServerMasters(UDP_SRV_BP_MGS_IDX_C),
+         sAxisSlave  => obServerSlaves(UDP_SRV_BP_MGS_IDX_C),
+         -- Master Port
+         mAxisMaster => ibBpMsgServerMaster,
+         mAxisSlave  => ibBpMsgServerSlave);
+
+   U_ServerLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => 1.0E-3,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
@@ -511,20 +529,37 @@ begin
    ----------------------
    -- BP Messenger Client
    ----------------------
-   ibBpMsgClientMaster                  <= obClientMasters(UDP_CLT_BP_MGS_IDX_C);
-   obClientSlaves(UDP_CLT_BP_MGS_IDX_C) <= ibBpMsgClientSlave;
-   U_ClientLimiter : entity work.SsiFrameLimiter
+   U_Resize_Client : entity surf.AxiStreamResize
+      generic map (
+         -- General Configurations
+         TPD_G               => TPD_G,
+         READY_EN_G          => true,
+         -- AXI Stream Port Configurations
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
+      port map (
+         -- Clock and reset
+         axisClk     => axilClk,
+         axisRst     => axilRst,
+         -- Slave Port
+         sAxisMaster => obClientMasters(UDP_CLT_BP_MGS_IDX_C),
+         sAxisSlave  => obClientSlaves(UDP_CLT_BP_MGS_IDX_C),
+         -- Master Port
+         mAxisMaster => ibBpMsgClientMaster,
+         mAxisSlave  => ibBpMsgClientSlave);
+
+   U_ClientLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => 1.0E-3,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/16),
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/EMAC_AXIS_CONFIG_C.TDATA_BYTES_C),
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => EMAC_AXIS_CONFIG_C,
+         MASTER_AXI_CONFIG_G => EMAC_AXIS_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,

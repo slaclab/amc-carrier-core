@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AxisBramFlashBufferWrFsm.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-04-10
--- Last update: 2018-04-12
 -------------------------------------------------------------------------------
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
@@ -20,11 +17,11 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -33,7 +30,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 entity AxisBramFlashBufferWrFsm is
    generic (
@@ -194,7 +193,7 @@ begin
       end if;
    end process seq;
 
-   U_RstSync : entity work.RstSync
+   U_RstSync : entity surf.RstSync
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -202,7 +201,7 @@ begin
          asyncRst => axisRst,
          syncRst  => axisRstSync);
 
-   U_SyncEnable : entity work.Synchronizer
+   U_SyncEnable : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -210,7 +209,7 @@ begin
          dataIn  => enable,
          dataOut => enableSync);
 
-   U_SyncSwTrig : entity work.SynchronizerOneShot
+   U_SyncSwTrig : entity surf.SynchronizerOneShot
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -218,7 +217,7 @@ begin
          dataIn  => swTrig,
          dataOut => swTrigSync);
 
-   U_SyncTrigDet : entity work.SynchronizerOneShot
+   U_SyncTrigDet : entity surf.SynchronizerOneShot
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -226,7 +225,7 @@ begin
          dataIn  => r.trigDet,
          dataOut => trigDetSync);
 
-   U_SyncTrigTimestamp : entity work.SynchronizerFifo
+   U_SyncTrigTimestamp : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 64)
@@ -241,7 +240,7 @@ begin
          rd_clk => axisClk,
          dout   => timestamp);
 
-   U_SyncOut : entity work.SynchronizerFifo
+   U_SyncOut : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => NUM_CH_G)
@@ -257,7 +256,7 @@ begin
          valid  => req,
          dout   => valid);
 
-   U_SyncIn : entity work.SynchronizerOneShot
+   U_SyncIn : entity surf.SynchronizerOneShot
       generic map (
          TPD_G => TPD_G)
       port map (

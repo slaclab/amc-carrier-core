@@ -1,27 +1,28 @@
 -------------------------------------------------------------------------------
--- File       : AmcMicrowaveMuxDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-05-11
--- Last update: 2018-08-28
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+
+library amc_carrier_core;
 
 entity AmcMicrowaveMuxDualCore is
    generic (
@@ -29,14 +30,14 @@ entity AmcMicrowaveMuxDualCore is
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk       : in    sl;
       timingRst       : in    sl;
       -- JESD Interface
       jesdClk         : in    slv(1 downto 0);
       jesdSysRef      : out   slv(1 downto 0);
       jesdRxSync      : in    slv(1 downto 0);
-      jesdTxSync      : out   slv(1 downto 0);
+      jesdTxSync      : out   Slv10Array(1 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -83,7 +84,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -105,13 +106,13 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcMicrowaveMuxCore
+      U_AMC : entity amc_carrier_core.AmcMicrowaveMuxCore
          generic map (
             TPD_G           => TPD_G,
             AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,
             AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map(
-            -- Timing Interface (timingClk domain) 
+            -- Timing Interface (timingClk domain)
             timingClk       => timingClk,
             timingRst       => timingRst,
             -- JESD SYNC Interface

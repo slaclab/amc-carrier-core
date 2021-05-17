@@ -1,25 +1,26 @@
 -------------------------------------------------------------------------------
--- File       : Adf5355Tb.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-05-11
--- Last update: 2017-10-03
 -------------------------------------------------------------------------------
 -- Description: Testbench for design "AxiLiteAsync"
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
-use work.StdRtlPkg.all;
-use work.TextUtilPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.TextUtilPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
 
 entity Adf5355Tb is
 end entity Adf5355Tb;
@@ -37,7 +38,7 @@ architecture tb of Adf5355Tb is
 
 begin
 
-   U_ClkRst : entity work.ClkRst
+   U_ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => 10 ns,
          CLK_DELAY_G       => 1 ns,
@@ -48,7 +49,7 @@ begin
          clkP => axilClk,
          rst  => axilRst);
 
-   U_PLL : entity work.adf5355
+   U_PLL : entity amc_carrier_core.adf5355
       generic map (
          TPD_G             => TPD_G)
       port map (

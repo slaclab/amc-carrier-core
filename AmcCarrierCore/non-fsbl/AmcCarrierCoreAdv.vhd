@@ -1,31 +1,34 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierCoreAdv.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-04
--- Last update: 2018-08-24
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.TimingPkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -45,12 +48,19 @@ entity AmcCarrierCoreAdv is
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
       DISABLE_TIME_GT_G      : boolean  := false;  -- false = normal application, true = doesn't build the Timing GT
       CORE_TRIGGERS_G        : positive := 16;
-      TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
+      TRIG_PIPE_G            : natural  := 0;      -- no trigger pipeline by default
+      USE_TPGMINI_G          : boolean  := true;   -- Build TPG Mini by default
+      CLKSEL_MODE_G          : string   := "SELECT"; -- "LCLSI","LCLSII"
+      STREAM_L1_G            : boolean  := true;
+      AXIL_RINGB_G           : boolean  := true;
+      ASYNC_G                : boolean  := true;
       FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G             : AppType;
-      WAVEFORM_TDATA_BYTES_G : positive := 4;
-      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB  
-      MPS_SLOT_G             : boolean  := false);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
+      WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
+      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
+      MPS_SLOT_G             : boolean  := false; -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
+      GEN_PWR_I2C_G          : boolean  := true);
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -63,7 +73,7 @@ entity AmcCarrierCoreAdv is
       axilReadSlave        : in    AxiLiteReadSlaveType;
       axilWriteMaster      : out   AxiLiteWriteMasterType;
       axilWriteSlave       : in    AxiLiteWriteSlaveType;
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : in    sl;
       timingRst            : in    sl;
       timingBus            : out   TimingBusType;
@@ -107,7 +117,7 @@ entity AmcCarrierCoreAdv is
       recTimingRst         : out   sl;
       gthFabClk            : out   sl;
       stableClk            : out   sl;
-      stableRst            : out   sl;      
+      stableRst            : out   sl;
       -- Misc. Interface (axilClk domain)
       ipmiBsi              : out   BsiBusType;
       ethPhyReady          : out   sl;
@@ -156,6 +166,9 @@ entity AmcCarrierCoreAdv is
       -- Configuration PROM Ports
       calScl               : inout sl;
       calSda               : inout sl;
+      -- VCCINT DC/DC Ports
+      pwrScl               : inout sl                               := 'Z';
+      pwrSda               : inout sl                               := 'Z';
       -- DDR3L SO-DIMM Ports
       ddrClkP              : in    sl;
       ddrClkN              : in    sl;
@@ -220,7 +233,7 @@ architecture mapping of AmcCarrierCoreAdv is
    signal ddrMemError       : sl;
    --  MPS Interface
    signal mpsReadMaster     : AxiLiteReadMasterType;
-   signal mpsReadSlave      : AxiLiteReadSlaveType := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
+   signal mpsReadSlave      : AxiLiteReadSlaveType  := AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
    signal mpsWriteMaster    : AxiLiteWriteMasterType;
    signal mpsWriteSlave     : AxiLiteWriteSlaveType := AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
 
@@ -232,7 +245,7 @@ architecture mapping of AmcCarrierCoreAdv is
 begin
 
    axilClk <= ref156MHzClk;
-   U_Rst : entity work.RstPipeline
+   U_Rst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -243,16 +256,17 @@ begin
    ethPhyReady <= ethLinkUp;
    timingBus   <= timingBusIntf;
 
-   ----------------------------------   
+   ----------------------------------
    -- Register Address Mapping Module
-   ----------------------------------   
-   U_SysReg : entity work.AmcCarrierSysReg
+   ----------------------------------
+   U_SysReg : entity amc_carrier_core.AmcCarrierSysReg
       generic map (
-         TPD_G        => TPD_G,
-         BUILD_INFO_G => BUILD_INFO_G,
-         APP_TYPE_G   => APP_TYPE_G,
-         MPS_SLOT_G   => MPS_SLOT_G,
-         FSBL_G       => false)
+         TPD_G         => TPD_G,
+         BUILD_INFO_G  => BUILD_INFO_G,
+         APP_TYPE_G    => APP_TYPE_G,
+         MPS_SLOT_G    => MPS_SLOT_G,
+         GEN_PWR_I2C_G => GEN_PWR_I2C_G,
+         FSBL_G        => false)
       port map (
          -- Primary AXI-Lite Interface
          axilClk           => ref156MHzClk,
@@ -294,7 +308,7 @@ begin
          ethLinkUp         => ethLinkUp,
          ----------------------
          -- Top Level Interface
-         ----------------------              
+         ----------------------
          -- Application AXI-Lite Interface
          appReadMaster     => axilReadMaster,
          appReadSlave      => axilReadSlave,
@@ -304,7 +318,7 @@ begin
          bsiBus            => bsiBus,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- Crossbar Ports
          xBarSin           => xBarSin,
          xBarSout          => xBarSout,
@@ -316,6 +330,9 @@ begin
          -- Configuration PROM Ports
          calScl            => calScl,
          calSda            => calSda,
+         -- VCCINT DC/DC Ports
+         pwrScl            => pwrScl,
+         pwrSda            => pwrSda,
          -- Clock Cleaner Ports
          timingClkScl      => timingClkScl,
          timingClkSda      => timingClkSda,
@@ -329,8 +346,8 @@ begin
 --   ------------------
 --   -- Application MPS
 --   ------------------
-   GEN_EN_MPS : if ( DISABLE_MPS_G = false ) generate
-      U_AppMps : entity work.AppMps
+   GEN_EN_MPS : if (DISABLE_MPS_G = false) generate
+      U_AppMps : entity amc_carrier_core.AppMps
          generic map (
             TPD_G      => TPD_G,
             APP_TYPE_G => APP_TYPE_G,
@@ -372,7 +389,7 @@ begin
             mpsTxN          => mpsTxN);
    end generate GEN_EN_MPS;
 
-   GEN_DIS_MPS : if ( DISABLE_MPS_G = true ) generate
+   GEN_DIS_MPS : if (DISABLE_MPS_G = true) generate
       mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
       mpsClkOut    <= '0';
       U_OBUFDS : OBUFDS
@@ -385,9 +402,10 @@ begin
    -------------------
    -- AMC Carrier Core
    -------------------
-   U_Core : entity work.AmcCarrierCore
+   U_Core : entity amc_carrier_core.AmcCarrierCore
       generic map (
          TPD_G                  => TPD_G,
+         WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
          WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
          ETH_USR_FRAME_LIMIT_G  => ETH_USR_FRAME_LIMIT_G,
          RSSI_ILEAVE_EN_G       => RSSI_ILEAVE_EN_G,
@@ -401,12 +419,17 @@ begin
          DISABLE_TIME_GT_G      => DISABLE_TIME_GT_G,
          CORE_TRIGGERS_G        => CORE_TRIGGERS_G,
          TRIG_PIPE_G            => TRIG_PIPE_G,
+         USE_TPGMINI_G          => USE_TPGMINI_G,
+	 CLKSEL_MODE_G          => CLKSEL_MODE_G,
+	 STREAM_L1_G            => STREAM_L1_G,
+	 AXIL_RINGB_G           => AXIL_RINGB_G,
+	 ASYNC_G                => ASYNC_G,
          FSBL_G                 => FSBL_G)
       port map (
          -----------------------
          -- Core Ports to AppTop
          -----------------------
-         -- Timing Interface (timingClk domain) 
+         -- Timing Interface (timingClk domain)
          timingClk            => timingClk,
          timingRst            => timingRst,
          timingBusIntf        => timingBusIntf,
@@ -449,9 +472,9 @@ begin
          gthFabClk            => gthFabClk,
          stableClk            => stableClk,
          stableRst            => stableRst,
-         ------------------------         
+         ------------------------
          -- Core Ports to Wrapper
-         ------------------------         
+         ------------------------
          -- AXI-Lite Master bus
          axilReadMasters      => axilReadMasters,
          axilReadSlaves       => axilReadSlaves,

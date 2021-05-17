@@ -1,10 +1,7 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsClk.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-07-08
--- Last update: 2018-08-09
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- Note: Do not forget to configure the ATCA crate to drive the clock from the slot#2 MPS link node
 -- For the 7-slot crate:
@@ -13,18 +10,20 @@
 --    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -35,7 +34,7 @@ entity AppMpsClk is
       MPS_SLOT_G    : boolean := false;
       SIM_SPEEDUP_G : boolean := false);
    port (
-      -- Stable Clock and Reset 
+      -- Stable Clock and Reset
       axilClk      : in  sl;
       axilRst      : in  sl;
       -- MPS Clocks and Resets
@@ -51,7 +50,7 @@ entity AppMpsClk is
       mpsPllRst    : in  sl;
       ----------------
       -- Core Ports --
-      ----------------   
+      ----------------
       -- Backplane MPS Ports
       mpsClkIn     : in  sl;
       mpsClkOut    : out sl);
@@ -84,7 +83,7 @@ begin
       mpsClk <= axilClk;
       mpsRst <= axilRst;
 
-      U_ClkOutBufSingle : entity work.ClkOutBufSingle
+      U_ClkOutBufSingle : entity surf.ClkOutBufSingle
          generic map(
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -147,7 +146,7 @@ begin
          I => clkout0,
          O => mpsMmcmClkOut(0));
 
-   U_Rst625 : entity work.RstSync
+   U_Rst625 : entity surf.RstSync
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '0',
@@ -170,7 +169,7 @@ begin
          CLR => '0',
          O   => mpsMmcmClkOut(1));      -- 312.5 MHz
 
-   U_Rst312 : entity work.RstSync
+   U_Rst312 : entity surf.RstSync
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '0',
@@ -185,7 +184,7 @@ begin
          I => clkout1,
          O => mpsMmcmClkOut(2));
 
-   U_Rst125 : entity work.RstSync
+   U_Rst125 : entity surf.RstSync
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '0',
@@ -204,7 +203,7 @@ begin
    mps125MHzClk <= mpsMmcmClkOut(2);
    mps125MHzRst <= mpsMmcmRstOut(2);
 
-   Sync_locked : entity work.Synchronizer
+   Sync_locked : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -212,7 +211,7 @@ begin
          dataIn  => locked,
          dataOut => mpsPllLocked);
 
-   U_PLL : entity work.ClockManagerUltraScale
+   U_PLL : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G             => TPD_G,
          TYPE_G            => "PLL",

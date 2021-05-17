@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcCryoDemoCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-09-09
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_02_C00
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 LLRF Development'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 LLRF Development', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -22,10 +19,14 @@ use ieee.std_logic_arith.all;
 library unisim;
 use unisim.vcomponents.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bPkg.all;
+
+library amc_carrier_core;
 
 entity AmcCryoDemoCore is
    generic (
@@ -39,7 +40,7 @@ entity AmcCryoDemoCore is
       -- JESD Interface
       jesdSysRef : out sl;
       jesdRxSync : in  sl;
-      jesdTxSync : out sl;
+      jesdTxSync : out slv(9 downto 0);
 
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -51,7 +52,7 @@ entity AmcCryoDemoCore is
 
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri  : inout slv(4 downto 0);
       jtagSec  : inout slv(4 downto 0);
@@ -133,11 +134,13 @@ architecture top_level_app of AmcCryoDemoCore is
    signal jesdTxSyncP : sl;
    signal jesdTxSyncN : sl;
 
+   signal locJesdTxSync : sl;
+
    -------------------------------------------------------------------------------------------------
    -- SPI
-   -------------------------------------------------------------------------------------------------   
+   -------------------------------------------------------------------------------------------------
 
-   -- ADC and LMK SPI config interface   
+   -- ADC and LMK SPI config interface
    constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 4;
    signal coreSclk                 : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
    signal coreSDout                : slv(NUM_COMMON_SPI_CHIPS_C-1 downto 0);
@@ -165,7 +168,7 @@ architecture top_level_app of AmcCryoDemoCore is
 
 begin
    -----------------------
-   -- Generalized Mapping 
+   -- Generalized Mapping
    -----------------------
 
    -- JESD Reference Ports
@@ -183,7 +186,7 @@ begin
    jesdTxSyncP <= syncInP(0);
    jesdTxSyncN <= syncInN(0);
 
-   -- SPI 
+   -- SPI
    jtagPri(0) <= spiSdio;
    jtagPri(1) <= spiSclk;
    jtagPri(2) <= spiSdi;
@@ -204,7 +207,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
    -------------------------------------------------------------------------------------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -225,32 +228,55 @@ begin
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
-   IBUFDS_SysRef : IBUFDS
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdSysRefP,
-         IB => jesdSysRefN,
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdSysRefP,
+         jesdSyncN => jesdSysRefN,
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
    GEN_RX_SYNC :
    for i in 2 downto 0 generate
-      OBUFDS_RxSync : OBUFDS
+      U_jesdRxSync : entity amc_carrier_core.JesdSyncOut
+         generic map (
+            TPD_G    => TPD_G,
+            INVERT_G => false)
          port map (
-            I  => jesdRxSync,
-            O  => jesdRxSyncP(i),
-            OB => jesdRxSyncN(i));
+            -- Clock
+            jesdClk   => jesdClk,
+            -- JESD Low speed Interface
+            jesdSync  => jesdRxSync,
+            -- JESD Low speed Ports
+            jesdSyncP => jesdRxSyncP(i),
+            jesdSyncN => jesdRxSyncN(i));
    end generate GEN_RX_SYNC;
 
-   IBUFDS_TxSync : IBUFDS
+   U_jesdTxSync : entity amc_carrier_core.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdTxSyncP,
-         IB => jesdTxSyncN,
-         O  => jesdTxSync);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdTxSyncP,
+         jesdSyncN => jesdTxSyncN,
+         -- JESD Low speed Interface
+         jesdSync  => locJesdTxSync);
+
+   jesdTxSync <= (others=>locJesdTxSync);
 
    ----------------------------------------------------------------
-   -- SPI interface ADCs and LMK 
+   -- SPI interface ADCs and LMK
    ----------------------------------------------------------------
    gen_dcSpiChips : for I in NUM_COMMON_SPI_CHIPS_C-1 downto 0 generate
-      AxiSpiMaster_INST : entity work.AxiSpiMaster
+      AxiSpiMaster_INST : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -270,7 +296,7 @@ begin
             coreCsb        => coreCsb(I));
    end generate gen_dcSpiChips;
 
-   -- Input mux from "IO" port if LMK and from "I" port for ADCs 
+   -- Input mux from "IO" port if LMK and from "I" port for ADCs
    muxSDin <= lmkSDin when coreCsb = "0111" else spiSdo;
 
    -- Output mux
@@ -288,7 +314,7 @@ begin
       coreSDout(3)             when "0111",
       '0'                      when others;
 
-   -- Outputs 
+   -- Outputs
    spiSclk <= muxSclk;
    spiSdi  <= muxSDout;
 
@@ -304,8 +330,8 @@ begin
 
    ----------------------------------------------------------------
    -- SPI interface DAC
-   ----------------------------------------------------------------  
-   U_dacAxiSpiMaster : entity work.AxiSpiMaster
+   ----------------------------------------------------------------
+   U_dacAxiSpiMaster : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,

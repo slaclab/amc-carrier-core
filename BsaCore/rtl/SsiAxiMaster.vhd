@@ -1,17 +1,17 @@
 -------------------------------------------------------------------------------
--- File       : SsiAxiMaster.vhd
--- Created    : 2014-04-09
--- Last update: 2016-02-09
+-- Title      : Memory Access Protocol (MAP) Protocol: https://confluence.slac.stanford.edu/x/dBmVD
+-------------------------------------------------------------------------------
+-- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- Description:
 -- Block for Register protocol.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,26 +20,24 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiPkg.all;
-use work.AxiDmaPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiPkg.all;
+use surf.AxiDmaPkg.all;
+use surf.AxiLitePkg.all;
 
 entity SsiAxiMaster is
    generic (
       -- General Config
       TPD_G         : time                  := 1 ns;
       PIPE_STAGES_G : natural range 0 to 16 := 0;
-      
+
       -- FIFO Config
       SLAVE_READY_EN_G    : boolean                    := true;
-      BRAM_EN_G           : boolean                    := true;
-      XIL_DEVICE_G        : string                     := "7SERIES";  --Xilinx only generic parameter    
-      USE_BUILT_IN_G      : boolean                    := false;  --if set to true, this module is only Xilinx compatible only!!!
-      ALTERA_SYN_G        : boolean                    := false;
-      ALTERA_RAM_G        : string                     := "M9K";
+      MEMORY_TYPE_G       : string                     := "block";
       GEN_SYNC_FIFO_G     : boolean                    := false;
       FIFO_ADDR_WIDTH_G   : integer range 4 to 48      := 9;
       FIFO_PAUSE_THRESH_G : integer range 1 to (2**24) := 2**8;
@@ -51,7 +49,7 @@ entity SsiAxiMaster is
       AXI_WRITE_EN_G      : boolean             := false);
    port (
 
-      -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+      -- Streaming Slave (Rx) Interface (sAxisClk domain)
       sAxisClk    : in  sl;
       sAxisRst    : in  sl := '0';
       sAxisMaster : in  AxiStreamMasterType;
@@ -136,21 +134,16 @@ begin
    -- AXI_BUS_CONFIG_G.DATA_BYTES_C must be 4 (or 8?)
 
    ----------------------------------
-   -- Input FIFO 
+   -- Input FIFO
    ----------------------------------
-   SlaveAxiStreamFifo : entity work.AxiStreamFifoV2
+   SlaveAxiStreamFifo : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => PIPE_STAGES_G,
          SLAVE_READY_EN_G    => SLAVE_READY_EN_G,
          VALID_THOLD_G       => 1,      -- Must have entire frame
-         BRAM_EN_G           => BRAM_EN_G,
-         XIL_DEVICE_G        => XIL_DEVICE_G,
-         USE_BUILT_IN_G      => USE_BUILT_IN_G,
+         MEMORY_TYPE_G       => MEMORY_TYPE_G,
          GEN_SYNC_FIFO_G     => GEN_SYNC_FIFO_G,
-         ALTERA_SYN_G        => ALTERA_SYN_G,
-         ALTERA_RAM_G        => ALTERA_RAM_G,
-         CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => FIFO_ADDR_WIDTH_G,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => FIFO_PAUSE_THRESH_G,
@@ -168,21 +161,16 @@ begin
          mAxisSlave  => sFifoAxisSlave);
 
    ----------------------------------
-   -- Output FIFO 
+   -- Output FIFO
    ----------------------------------
-   MasterAxiStreamFifo : entity work.AxiStreamFifoV2
+   MasterAxiStreamFifo : entity surf.AxiStreamFifoV2
       generic map (
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => PIPE_STAGES_G,
          SLAVE_READY_EN_G    => true,   -- Use ready and not ctrl
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => BRAM_EN_G,
-         XIL_DEVICE_G        => XIL_DEVICE_G,
-         USE_BUILT_IN_G      => USE_BUILT_IN_G,
+         MEMORY_TYPE_G       => MEMORY_TYPE_G,
          GEN_SYNC_FIFO_G     => GEN_SYNC_FIFO_G,
-         ALTERA_SYN_G        => ALTERA_SYN_G,
-         ALTERA_RAM_G        => ALTERA_RAM_G,
-         CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => FIFO_ADDR_WIDTH_G,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => FIFO_PAUSE_THRESH_G,
@@ -201,7 +189,7 @@ begin
 
 
    AXI_READ_ENABLED : if (AXI_READ_EN_G) generate
-      U_AxiStreamDmaRead_1 : entity work.AxiStreamDmaRead
+      U_AxiStreamDmaRead_1 : entity surf.AxiStreamDmaRead
          generic map (
             TPD_G           => TPD_G,
             AXIS_READY_EN_G => true,
@@ -230,7 +218,7 @@ begin
    end generate AXI_READ_DISABLED;
 
    AXI_WRITE_ENABLED : if (AXI_WRITE_EN_G) generate
-      U_AxiStreamDmaWrite_1 : entity work.AxiStreamDmaWrite
+      U_AxiStreamDmaWrite_1 : entity surf.AxiStreamDmaWrite
          generic map (
             TPD_G          => TPD_G,
             AXI_READY_EN_G => true,
@@ -423,10 +411,10 @@ begin
             v.state := IDLE_S;
 
       end case;
-      
+
       -- Combinatorial outputs before the reset
-      rdDmaAxisSlave  <= v.rdDmaAxisSlave;
-      sFifoAxisSlave  <= v.sFifoAxisSlave;
+      rdDmaAxisSlave <= v.rdDmaAxisSlave;
+      sFifoAxisSlave <= v.sFifoAxisSlave;
 
       -- Reset
       if (axiRst = '1') then

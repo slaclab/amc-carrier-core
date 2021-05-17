@@ -1,25 +1,27 @@
 -------------------------------------------------------------------------------
--- File       : RtmDigitalDebugV1.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-23
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -43,7 +45,7 @@ entity RtmDigitalDebugV1 is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -92,6 +94,8 @@ begin
 
          REG_DATA : if (REG_DOUT_MODE_G(i) = '0') generate
             U_ODDR : ODDRE1
+               generic map (
+                  SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
                port map (
                   C  => doutClk(i),
                   Q  => doutReg(i),
@@ -106,7 +110,7 @@ begin
          end generate;
 
          REG_CLK : if (REG_DOUT_MODE_G(i) = '1') generate
-            U_CLK : entity work.ClkOutBufDiff
+            U_CLK : entity surf.ClkOutBufDiff
                generic map (
                   TPD_G          => TPD_G,
                   RST_POLARITY_G => '1',
@@ -139,7 +143,7 @@ begin
       -- Determine the transaction type
       axiSlaveWaitTxn(axilEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
-      -- Map the registers 
+      -- Map the registers
       axiSlaveRegister(axilEp, x"0", 0, v.doutDisable);
       axiSlaveRegisterR(axilEp, x"8", 0, x"00000000");  -- Added this register to be forward compatible with v2
 

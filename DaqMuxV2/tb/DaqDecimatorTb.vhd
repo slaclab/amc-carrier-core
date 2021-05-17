@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : DaqDecimatorTb.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2017-07-03
 -------------------------------------------------------------------------------
 -- Description: Simulation Testbed for DaqDecimator
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 ------------------------------------------------------------------------------
 
@@ -20,7 +17,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+
+library amc_carrier_core;
 
 entity DaqDecimatorTb is
 end entity;
@@ -33,7 +34,7 @@ architecture tb of DaqDecimatorTb is
 
    constant dec16or32_c : sl               := '1';  -- '0' = 32b format, '1' = 16b format
    constant averaging_c : sl               := '1';  -- '0' = no averaging, '1' = averaging
-   constant rateDiv_c   : slv(15 downto 0) := x"0004";  -- rate divide by 
+   constant rateDiv_c   : slv(15 downto 0) := x"0004";  -- rate divide by
 
    signal clk_i         : sl               := '0';
    signal rst_i         : sl               := '0';
@@ -48,7 +49,7 @@ begin
    -----------------------------
    -- Generate clocks and resets
    -----------------------------
-   U_ClkRst : entity work.ClkRst
+   U_ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_C,
          RST_START_DELAY_G => 1 ns,  -- Wait this long into simulation before asserting reset
@@ -62,7 +63,7 @@ begin
    ----------------------
    -- DaqDecimator Module
    ----------------------
-   U_DaqDecimator : entity work.DaqDecimator
+   U_DaqDecimator : entity amc_carrier_core.DaqDecimator
       generic map (
          TPD_G => TPD_C)
       port map (

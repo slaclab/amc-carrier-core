@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AppTopJesd204b.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-11-11
--- Last update: 2018-05-04
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,11 +17,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.Jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.Jesd204bPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -59,29 +58,30 @@ entity AppTopJesd204b is
       -- Sample data output (Use if external data acquisition core is attached)
       sampleDataArr_o : out sampleDataArray(9 downto 0);
       dataValidVec_o  : out slv(9 downto 0);
-      -- Sample data input (Use if external data generator core is attached)      
+      -- Sample data input (Use if external data generator core is attached)
       sampleDataArr_i : in  sampleDataArray(9 downto 0);
+      dacReady_o      : out slv(9 downto 0)       := (others=>'0');
       -------
       -- JESD
       -------
       -- Clocks
-      stableClk       : in  sl;  -- GT needs a stable clock to "boot up"(buffered refClkDiv2) 
+      stableClk       : in  sl;  -- GT needs a stable clock to "boot up"(buffered refClkDiv2)
       refClkR         : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer Right
-      refClkL         : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer Left 
+      refClkL         : in  sl;  -- GT Reference clock directly from GT GTH diff. input buffer Left
       devClk_i        : in  sl;         -- Device clock also rxUsrClkIn for MGT
-      devClk2_i       : in  sl;  -- Device clock divided by 2 also rxUsrClk2In for MGT       
-      devRst_i        : in  sl;         -- 
-      devClkActive_i  : in  sl                    := '1';  -- devClk_i MCMM locked      
+      devClk2_i       : in  sl;  -- Device clock divided by 2 also rxUsrClk2In for MGT
+      devRst_i        : in  sl;         --
+      devClkActive_i  : in  sl                    := '1';  -- devClk_i MCMM locked
       -- GTH Ports
       gtTxP           : out slv(9 downto 0);  -- GT Serial Transmit Positive
       gtTxN           : out slv(9 downto 0);  -- GT Serial Transmit Negative
       gtRxP           : in  slv(9 downto 0);  -- GT Serial Receive Positive
-      gtRxN           : in  slv(9 downto 0);  -- GT Serial Receive Negative      
+      gtRxN           : in  slv(9 downto 0);  -- GT Serial Receive Negative
       -- SYSREF for subclass 1 fixed latency
       sysRef_i        : in  sl;
       -- Synchronization output combined from all receivers to be connected to ADC/DAC chips
-      nSync_o         : out sl                    := '0';  -- Active HIGH
-      nSync_i         : in  sl);        -- Active HIGH
+      nSync_o         : out sl                    := '0';
+      nSync_i         : in  slv(9 downto 0));
 end AppTopJesd204b;
 
 architecture mapping of AppTopJesd204b is
@@ -288,7 +288,7 @@ begin
    -- JESD RX core
    ---------------
    EN_RX_CORE : if (JESD_RX_LANE_G /= 0) generate
-      U_Jesd204bRx : entity work.Jesd204bRx
+      U_Jesd204bRx : entity surf.Jesd204bRx
          generic map (
             TPD_G => TPD_G,
             F_G   => 2,
@@ -329,9 +329,9 @@ begin
 
    ---------------
    -- JESD TX core
-   ---------------         
+   ---------------
    EN_TX_CORE : if (JESD_TX_LANE_G /= 0) generate
-      U_Jesd204bTx : entity work.Jesd204bTx
+      U_Jesd204bTx : entity surf.Jesd204bTx
          generic map (
             TPD_G        => TPD_G,
             INPUT_REG_G  => true,
@@ -347,10 +347,11 @@ begin
             axilWriteMaster      => txWriteMaster,
             axilWriteSlave       => txWriteSlave,
             extSampleDataArray_i => sampleDataArr_i(JESD_TX_LANE_G-1 downto 0),
+            dacReady_o           => dacReady_o(JESD_TX_LANE_G-1 downto 0),
             devClk_i             => devClk_i,
             devRst_i             => devRst_i,
             sysRef_i             => s_sysRef,
-            nSync_i              => nSync_i,
+            nSync_i              => nSync_i(JESD_TX_LANE_G-1 downto 0),
             gtTxReady_i          => s_gtTxReady(JESD_TX_LANE_G-1 downto 0),
             gtTxReset_o          => s_gtTxUserReset(JESD_TX_LANE_G-1 downto 0),
             r_jesdGtTxArr        => r_jesdGtTxArr(JESD_TX_LANE_G-1 downto 0),
@@ -372,7 +373,7 @@ begin
 
    -----------------
    -- GTH TX signals
-   -----------------   
+   -----------------
    TX_LANES_GEN : for i in 9 downto 0 generate
 
       process(devClk_i)
@@ -400,7 +401,7 @@ begin
       process(devClk_i)
       begin
          if rising_edge(devClk_i) then
-            -- Help with timing   
+            -- Help with timing
             r_jesdGtRxArr(i).data    <= s_rxData(i*(GT_WORD_SIZE_C*8)+31 downto i*(GT_WORD_SIZE_C*8));
             r_jesdGtRxArr(i).dataK   <= s_rxctrl0(i*16+GT_WORD_SIZE_C-1 downto i*16);
             r_jesdGtRxArr(i).dispErr <= s_rxctrl1(i*16+GT_WORD_SIZE_C-1 downto i*16);
@@ -575,7 +576,7 @@ begin
 
    BYP_GT : if ((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) generate
 
-      U_TERM_GT : entity work.Gthe3ChannelDummy
+      U_TERM_GT : entity surf.Gthe3ChannelDummy
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 10)
@@ -593,7 +594,7 @@ begin
    begin
       v := r;
 
-      -- Register/Delay for 1 clock cycle 
+      -- Register/Delay for 1 clock cycle
       v.jesdGtRxArr := r_jesdGtRxArr;
 
       if (devRst_i = '1') then

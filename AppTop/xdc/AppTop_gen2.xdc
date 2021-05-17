@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 AMC Carrier Firmware'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 AMC Carrier Firmware', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 AMC Carrier Firmware', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
@@ -27,7 +27,7 @@
 # set_property PACKAGE_PIN AL3 [get_ports {jesdTxN[0][0]}] ; #
 # set_property PACKAGE_PIN AK2 [get_ports {jesdRxP[0][0]}] ; #
 # set_property PACKAGE_PIN AK1 [get_ports {jesdRxN[0][0]}] ; #
-# set_property PACKAGE_PIN AK6 [get_ports {jesdTxP[0][1]}] ; # 
+# set_property PACKAGE_PIN AK6 [get_ports {jesdTxP[0][1]}] ; #
 # set_property PACKAGE_PIN AK5 [get_ports {jesdTxN[0][1]}] ; #
 # set_property PACKAGE_PIN AJ4 [get_ports {jesdRxP[0][1]}] ; #
 # set_property PACKAGE_PIN AJ3 [get_ports {jesdRxN[0][1]}] ; #
@@ -111,13 +111,13 @@ set_property PACKAGE_PIN T6  [get_ports {jesdClkP[0][0]}] ; #P11 PIN20
 set_property PACKAGE_PIN T5  [get_ports {jesdClkN[0][0]}] ; #P11 PIN21
 set_property PACKAGE_PIN AB6 [get_ports {jesdClkP[0][1]}] ; #P11 PIN23
 set_property PACKAGE_PIN AB5 [get_ports {jesdClkN[0][1]}] ; #P11 PIN24
-set_property PACKAGE_PIN Y6  [get_ports {jesdClkP[0][2]}] ; #P11 PIN88 
-set_property PACKAGE_PIN Y5  [get_ports {jesdClkN[0][2]}] ; #P11 PIN87 
-set_property PACKAGE_PIN AF6 [get_ports {jesdClkP[0][3]}] ; #P11 PIN88 
-set_property PACKAGE_PIN AF5 [get_ports {jesdClkN[0][3]}] ; #P11 PIN87 
+set_property PACKAGE_PIN Y6  [get_ports {jesdClkP[0][2]}] ; #P11 PIN88
+set_property PACKAGE_PIN Y5  [get_ports {jesdClkN[0][2]}] ; #P11 PIN87
+set_property PACKAGE_PIN AF6 [get_ports {jesdClkP[0][3]}] ; #P11 PIN88
+set_property PACKAGE_PIN AF5 [get_ports {jesdClkN[0][3]}] ; #P11 PIN87
 
-set_property PACKAGE_PIN V6  [get_ports {jesdClkP[1][0]}] ; #P13 PIN20 
-set_property PACKAGE_PIN V5  [get_ports {jesdClkN[1][0]}] ; #P13 PIN21 
+set_property PACKAGE_PIN V6  [get_ports {jesdClkP[1][0]}] ; #P13 PIN20
+set_property PACKAGE_PIN V5  [get_ports {jesdClkN[1][0]}] ; #P13 PIN21
 set_property PACKAGE_PIN P6  [get_ports {jesdClkP[1][1]}] ; #P13 PIN23
 set_property PACKAGE_PIN P5  [get_ports {jesdClkN[1][1]}] ; #P13 PIN24
 set_property PACKAGE_PIN M6  [get_ports {jesdClkP[1][2]}] ; #P13 PIN88
@@ -131,25 +131,25 @@ set_property -dict { PACKAGE_PIN AL8  IOSTANDARD LVCMOS25 } [get_ports {jtagPri[
 set_property -dict { PACKAGE_PIN AP11 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[0][2]}] ; #P11 PIN167 TRST
 set_property -dict { PACKAGE_PIN AJ9  IOSTANDARD LVCMOS25 } [get_ports {jtagPri[0][3]}] ; #P11 PIN168 TDO
 set_property -dict { PACKAGE_PIN AJ8  IOSTANDARD LVCMOS25 } [get_ports {jtagPri[0][4]}] ; #P11 PIN169 TDI
-                                                                                         
+
 set_property -dict { PACKAGE_PIN AN8  IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][0]}] ; #P12 PIN165 TCK
 set_property -dict { PACKAGE_PIN AP8  IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][1]}] ; #P12 PIN166 TMS
 set_property -dict { PACKAGE_PIN AK10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][2]}] ; #P12 PIN167 TRST
 set_property -dict { PACKAGE_PIN AL9  IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][3]}] ; #P12 PIN168 TDO
 set_property -dict { PACKAGE_PIN AF10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[0][4]}] ; #P12 PIN169 TDI
-                                                                                          
+
 set_property -dict { PACKAGE_PIN AG10 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][0]}] ; #P13 PIN165 TCK
 set_property -dict { PACKAGE_PIN AG11 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][1]}] ; #P13 PIN166 TMS
 set_property -dict { PACKAGE_PIN AH11 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][2]}] ; #P13 PIN167 TRST
 set_property -dict { PACKAGE_PIN AG12 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][3]}] ; #P13 PIN168 TDO
 set_property -dict { PACKAGE_PIN AH12 IOSTANDARD LVCMOS25 } [get_ports {jtagPri[1][4]}] ; #P13 PIN169 TDI
-                                                                                         
+
 set_property -dict { PACKAGE_PIN AD11 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][0]}] ; #P14 PIN165 TCK
 set_property -dict { PACKAGE_PIN AE11 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][1]}] ; #P14 PIN166 TMS
 set_property -dict { PACKAGE_PIN AE12 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][2]}] ; #P14 PIN167 TRST
 set_property -dict { PACKAGE_PIN AF12 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][3]}] ; #P14 PIN168 TDO
 set_property -dict { PACKAGE_PIN AP10 IOSTANDARD LVCMOS25 } [get_ports {jtagSec[1][4]}] ; #P14 PIN169 TDI
-  
+
 # AMC's FPGA Clock Ports
 set_property -dict { PACKAGE_PIN V33 IOSTANDARD LVCMOS18 } [get_ports {fpgaClkP[0][0]}] ; #P11 PIN74
 set_property -dict { PACKAGE_PIN W34 IOSTANDARD LVCMOS18 } [get_ports {fpgaClkN[0][0]}] ; #P11 PIN75
@@ -219,10 +219,10 @@ set_property -dict { PACKAGE_PIN AG21 IOSTANDARD LVCMOS18 } [get_ports {syncOutP
 set_property -dict { PACKAGE_PIN AH21 IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][8]}] ; #P11 PIN141
 set_property -dict { PACKAGE_PIN AD20 IOSTANDARD LVCMOS18 } [get_ports {syncOutP[0][9]}] ; #P11 PIN145
 set_property -dict { PACKAGE_PIN AE20 IOSTANDARD LVCMOS18 } [get_ports {syncOutN[0][9]}] ; #P11 PIN144
-                                                                                                               
-set_property -dict { PACKAGE_PIN AF20 IOSTANDARD LVCMOS18 } [get_ports {syncOutP[1][0]}] ; #P13 PIN118  
-set_property -dict { PACKAGE_PIN AG20 IOSTANDARD LVCMOS18 } [get_ports {syncOutN[1][0]}] ; #P13 PIN117  
-set_property -dict { PACKAGE_PIN AD21 IOSTANDARD LVCMOS18 } [get_ports {syncOutP[1][1]}] ; #P13 PIN121  
+
+set_property -dict { PACKAGE_PIN AF20 IOSTANDARD LVCMOS18 } [get_ports {syncOutP[1][0]}] ; #P13 PIN118
+set_property -dict { PACKAGE_PIN AG20 IOSTANDARD LVCMOS18 } [get_ports {syncOutN[1][0]}] ; #P13 PIN117
+set_property -dict { PACKAGE_PIN AD21 IOSTANDARD LVCMOS18 } [get_ports {syncOutP[1][1]}] ; #P13 PIN121
 set_property -dict { PACKAGE_PIN AE21 IOSTANDARD LVCMOS18 } [get_ports {syncOutN[1][1]}] ; #P13 PIN120
 set_property -dict { PACKAGE_PIN AE32 IOSTANDARD LVCMOS18 } [get_ports {syncOutP[1][2]}] ; #P13 PIN124
 set_property -dict { PACKAGE_PIN AF32 IOSTANDARD LVCMOS18 } [get_ports {syncOutN[1][2]}] ; #P13 PIN123
@@ -354,19 +354,19 @@ set_property -dict { PACKAGE_PIN C28 IOSTANDARD LVCMOS18 } [get_ports {rtmLsN[19
 ## Application Timing Constraints ##
 ####################################
 
-create_clock -name jesdClk00 -period 3.255 [get_ports {jesdClkP[0][0]}]
-create_clock -name jesdClk01 -period 3.255 [get_ports {jesdClkP[0][1]}]
-create_clock -name jesdClk02 -period 3.255 [get_ports {jesdClkP[0][2]}]
-create_clock -name jesdClk03 -period 3.255 [get_ports {jesdClkP[0][3]}]
-create_clock -name jesdClk10 -period 3.255 [get_ports {jesdClkP[1][0]}]
-create_clock -name jesdClk11 -period 3.255 [get_ports {jesdClkP[1][1]}]
-create_clock -name jesdClk12 -period 3.255 [get_ports {jesdClkP[1][2]}]
-create_clock -name jesdClk13 -period 3.255 [get_ports {jesdClkP[1][3]}]
+create_clock -name jesdClk00 -period 3.200 [get_ports {jesdClkP[0][0]}]
+create_clock -name jesdClk01 -period 3.200 [get_ports {jesdClkP[0][1]}]
+create_clock -name jesdClk02 -period 3.200 [get_ports {jesdClkP[0][2]}]
+create_clock -name jesdClk03 -period 3.200 [get_ports {jesdClkP[0][3]}]
+create_clock -name jesdClk10 -period 3.200 [get_ports {jesdClkP[1][0]}]
+create_clock -name jesdClk11 -period 3.200 [get_ports {jesdClkP[1][1]}]
+create_clock -name jesdClk12 -period 3.200 [get_ports {jesdClkP[1][2]}]
+create_clock -name jesdClk13 -period 3.200 [get_ports {jesdClkP[1][3]}]
 create_clock -name mpsClkIn  -period 8.000 [get_ports {mpsClkIn}]
 
-create_generated_clock -name mpsClk625MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_MpsSerdesPll/CLKOUT0}] 
-create_generated_clock -name mpsClk312MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_Bufg312/O}] 
-create_generated_clock -name mpsClk125MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_Bufg125/O}] 
+create_generated_clock -name mpsClk625MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_MpsSerdesPll/CLKOUT0}]
+create_generated_clock -name mpsClk312MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_Bufg312/O}]
+create_generated_clock -name mpsClk125MHz  [get_pins {U_Core/U_AppMps/U_Clk/U_Bufg125/O}]
 create_clock           -name mpsClkThresh  -period 16.000 [get_pins {U_Core/U_AppMps/U_Clk/U_PLL/PllGen.U_Pll/CLKOUT0}]
 
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {mpsClk625MHz}]
@@ -375,11 +375,11 @@ set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_cl
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {axilClk}]
 set_clock_groups -asynchronous -group [get_clocks {mpsClkThresh}] -group [get_clocks {recTimingClk}]
 
-create_generated_clock -name jesd0_185MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
-create_generated_clock -name jesd0_370MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
+create_generated_clock -name jesd0_185MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/PllGen.U_Pll/CLKOUT0}]
+create_generated_clock -name jesd0_370MHz [get_pins {U_AppTop/U_AmcBay[0].U_JesdCore/U_ClockManager/PllGen.U_Pll/CLKOUT1}]
 
-create_generated_clock -name jesd1_185MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT0}]
-create_generated_clock -name jesd1_370MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/MmcmGen.U_Mmcm/CLKOUT1}]
+create_generated_clock -name jesd1_185MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/PllGen.U_Pll/CLKOUT0}]
+create_generated_clock -name jesd1_370MHz [get_pins {U_AppTop/U_AmcBay[1].U_JesdCore/U_ClockManager/PllGen.U_Pll/CLKOUT1}]
 
 set_clock_groups -asynchronous -group [get_clocks {jesd0_185MHz}] -group [get_clocks {jesd1_185MHz}]
 set_clock_groups -asynchronous -group [get_clocks {jesd0_370MHz}] -group [get_clocks {jesd1_370MHz}]
@@ -392,11 +392,11 @@ set_clock_groups -asynchronous \
     -group [get_clocks -include_generated_clocks {mpsClkIn}] \
     -group [get_clocks -include_generated_clocks {jesd0_185MHz}] \
     -group [get_clocks -include_generated_clocks {jesd1_185MHz}]
-    
+
 set_clock_groups -asynchronous \
     -group [get_clocks -include_generated_clocks {fabClk}] \
     -group [get_clocks -include_generated_clocks {jesd0_370MHz}] \
-    -group [get_clocks -include_generated_clocks {jesd1_370MHz}]  
+    -group [get_clocks -include_generated_clocks {jesd1_370MHz}]
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {mpsClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks {ddrClkIn}] -group [get_clocks -include_generated_clocks {fabClk}]

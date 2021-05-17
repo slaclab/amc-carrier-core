@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : hmc305.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-05-26
--- Last update: 2018-07-24
 -------------------------------------------------------------------------------
 -- Description: SPI Master Wrapper for ADI HMC305 IC + 74HC238PWR MUX for LE
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,8 +17,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity hmc305 is
    generic (
@@ -106,13 +105,13 @@ begin
       if (axiStatus.readEnable = '1') then
          -- Read back the cache
          v.axiReadSlave.rdata(4 downto 0) := r.data(rdAddr);
-         -- Send the response 
+         -- Send the response
          axiSlaveReadResponse(v.axiReadSlave);
       end if;
 
       -- State Machine
       case (r.state) is
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when IDLE_S =>
             -- Check for a write transaction
             if (axiStatus.writeEnable = '1') then
@@ -128,7 +127,7 @@ begin
                -- Next state
                v.state        := REQ_S;
             end if;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when REQ_S =>
             -- Wait for rdEn to drop
             if (rdEn = '0') then
@@ -137,14 +136,14 @@ begin
                -- Next state
                v.state := ACK_S;
             end if;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when ACK_S =>
-            -- Check for read completion 
+            -- Check for read completion
             if (rdEn = '1') then
                -- Next state
                v.state := LE_HIGH_S;
             end if;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when LE_HIGH_S =>
             -- Set the flag
             v.devLe := '1';
@@ -157,7 +156,7 @@ begin
             else
                v.cnt := r.cnt + 1;
             end if;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when LE_LOW_S =>
             -- Set the flag
             v.devLe := '0';
@@ -170,18 +169,18 @@ begin
             else
                v.cnt := r.cnt + 1;
             end if;
-      ----------------------------------------------------------------------            
+      ----------------------------------------------------------------------
       end case;
 
-      -- Reset      
+      -- Reset
       if (axiRst = '1') then
          v := REG_INIT_C;
       end if;
 
-      -- Register the variable for next clock cycle      
+      -- Register the variable for next clock cycle
       rin <= v;
 
-      -- Outputs            
+      -- Outputs
       axiWriteSlave <= r.axiWriteSlave;
       axiReadSlave  <= r.axiReadSlave;
       devAddr       <= r.devAddr;
@@ -196,7 +195,7 @@ begin
       end if;
    end process seq;
 
-   U_SpiMaster : entity work.SpiMaster
+   U_SpiMaster : entity surf.SpiMaster
       generic map (
          TPD_G             => TPD_G,
          NUM_CHIPS_G       => 1,

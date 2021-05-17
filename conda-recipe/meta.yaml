@@ -1,0 +1,29 @@
+package:
+  name: amc_carrier_core
+  version: {{ GIT_DESCRIBE_TAG }}
+
+source:
+   path: ..
+
+build:
+   number: {{ GIT_DESCRIBE_NUMBER|int }}
+
+requirements:
+   build:
+     - python<3.8
+     - rogue
+     - git
+     - gitpython
+     - numpy
+
+   run:
+     - python
+     - rogue
+     - numpy
+
+about:
+   home: https://github.com/slaclab/amc-carrier-core
+   license: SLAC Open License
+   license_file: LICENSE.txt
+   summary: AMC Carrier Core Firmware Library
+

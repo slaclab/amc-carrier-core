@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -26,15 +26,15 @@
 #include AppMps.yaml
 #include AxiCdcm6208.yaml
 
-AmcCarrierCore: &AmcCarrierCore 
+AmcCarrierCore: &AmcCarrierCore
   name: AmcCarrierCore
   description: AmcCarrierCore
   class: MMIODev
   configPrio: 1
   size: 0x80000000 # 2GB address space for core firmware
-  ######### 
+  #########
   children:
-  ######### 
+  #########
     ##################################################
     AMC_CARRIER_CORE_VERSION_C:
       at:
@@ -63,12 +63,12 @@ AmcCarrierCore: &AmcCarrierCore
     AxiMicronN25Q:
       <<: *AxiMicronN25Q
       at:
-        offset: 0x02000000  
+        offset: 0x02000000
     ##################################################
     AxiSy56040:
       <<: *AxiSy56040
       at:
-        offset: 0x03000000      
+        offset: 0x03000000
       children:
         OutputConfig:
           enums:
@@ -88,7 +88,7 @@ AmcCarrierCore: &AmcCarrierCore
         OutputConfig[1] = 0x0: Connects FPGA_TIMING_OUT to RTM_TIMING_IN0
         OutputConfig[1] = 0x1: Connects FPGA_TIMING_OUT to FPGA_TIMING_IN
         OutputConfig[1] = 0x2: Connects FPGA_TIMING_OUT to BP_TIMING_IN
-        OutputConfig[1] = 0x3: Connects FPGA_TIMING_OUT to RTM_TIMING_IN1 
+        OutputConfig[1] = 0x3: Connects FPGA_TIMING_OUT to RTM_TIMING_IN1
         -----------------------------------------------------------------
         OutputConfig[2] = 0x0: Connects Backplane DIST0 to RTM_TIMING_IN0
         OutputConfig[2] = 0x1: Connects Backplane DIST0 to FPGA_TIMING_IN
@@ -101,48 +101,48 @@ AmcCarrierCore: &AmcCarrierCore
         OutputConfig[3] = 0x3: Connects Backplane DIST1 to RTM_TIMING_IN1
         -----------------------------------------------------------------
     ##################################################
-    Axi24LC64FT:
-      at:
-        offset: 0x04000000
-      class: MMIODev
-      size: 0x2000
-      description: AMC Carrier core's Non-volatile memory (100k endurance)
-      children:
-        MemoryArray:
-          <<: *MemoryArray
-          at:
-            offset: 0x0
-            nelms: 0x800
-            stride: 4
-          sizeBits: 32
-      instantiate: false          
+    # Axi24LC64FT:
+      # at:
+        # offset: 0x04000000
+      # class: MMIODev
+      # size: 0x2000
+      # description: AMC Carrier core's Non-volatile memory (100k endurance)
+      # children:
+        # MemoryArray:
+          # <<: *MemoryArray
+          # at:
+            # offset: 0x0
+            # nelms: 0x800
+            # stride: 4
+          # sizeBits: 32
+      # instantiate: false
    ##################################################
-    AxiCdcm6208:
-      <<: *AxiCdcm6208
-      at:
-        offset: 0x05000000
+    # AxiCdcm6208:
+      # <<: *AxiCdcm6208
+      # at:
+        # offset: 0x05000000
     ##################################################
-    DdrSpd:
-      at:
-        offset: 0x06000000
-      size: 0x400
-      class: MMIODev
-      description: Lookup tool at www.micron.com/spd
-      children:
-        MemoryArray:
-          <<: *MemoryArray
-          at:
-            offset: 0x0
-            nelms: 0x100
-            stride: 4
-          sizeBits: 8
-          mode: RO # Read only
+    # DdrSpd:
+      # at:
+        # offset: 0x06000000
+      # size: 0x400
+      # class: MMIODev
+      # description: Lookup tool at www.micron.com/spd
+      # children:
+        # MemoryArray:
+          # <<: *MemoryArray
+          # at:
+            # offset: 0x0
+            # nelms: 0x100
+            # stride: 4
+          # sizeBits: 8
+          # mode: RO # Read only
     ##################################################
     AmcCarrierBsi:
       <<: *AmcCarrierBsi
       at:
         offset: 0x07000000
-    ##################################################  
+    ##################################################
     AmcCarrierTiming:
       <<: *AmcCarrierTiming
       at:
@@ -163,25 +163,25 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *UdpEngineServer
       at:
         offset: 0x0A000800
-      description: "Backplane UDP Server: Xilinx XVC"  
+      description: "Backplane UDP Server: Xilinx XVC"
     ##################################################
     BpUdpSrvFsbl:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000808
-      description: "Backplane UDP Server: FSBL Legacy SRPv0 register access"    
+      description: "Backplane UDP Server: FSBL Legacy SRPv0 register access"
     ##################################################
     BpUdpSrvRssiAsyncMsg:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000810
-      description: "Backplane UDP Server: Legacy Non-interleaved RSSI for Register access and ASYNC messages"          
+      description: "Backplane UDP Server: Legacy Non-interleaved RSSI for Register access and ASYNC messages"
     ##################################################
     BpUdpSrvRssiData:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000818
-      description: "Backplane UDP Server: Legacy Non-interleaved RSSI for bulk data transfer"          
+      description: "Backplane UDP Server: Legacy Non-interleaved RSSI for bulk data transfer"
     ##################################################
     BpUdpSrvRssiInterleaved:
       <<: *UdpEngineServer
@@ -193,35 +193,35 @@ AmcCarrierCore: &AmcCarrierCore
       <<: *UdpEngineServer
       at:
         offset: 0x0A000820
-      description: "Backplane UDP Server for Application ASYNC Messaging"    
+      description: "Backplane UDP Server for Application ASYNC Messaging"
     ##################################################
     TimingUdpServer:
       <<: *UdpEngineServer
       at:
         offset: 0x0A000828
-      description: "Backplane UDP Server for Timing ASYNC Messaging"       
+      description: "Backplane UDP Server for Timing ASYNC Messaging"
     ##################################################
     SwRssiServer:
       <<: *RssiCore
       at:
-        offset: 0x0A010000 
+        offset: 0x0A010000
         nelms: 2
-        stride: 0x1000   
+        stride: 0x1000
       description: "Backplane UDP Server: Legacy Non-interleaved RSSI"
     ##################################################
     RssiServerInterleaved:
       <<: *RssiCore
       at:
-        offset: 0x0A020000 
-      description: "Backplane UDP Server: Interleaved RSSI"   
+        offset: 0x0A020000
+      description: "Backplane UDP Server: Interleaved RSSI"
     ##################################################
     AxiMemTester:
       <<: *AxiMemTester
       at:
-        offset: 0x0B000000  
-    ##################################################   
+        offset: 0x0B000000
+    ##################################################
     AppMps:
       <<: *AppMps
       at:
-        offset: 0x0C000000   
-    ##################################################   
+        offset: 0x0C000000
+    ##################################################

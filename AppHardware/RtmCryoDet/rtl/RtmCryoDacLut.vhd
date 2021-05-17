@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : RtmCryoDacLut.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-07-27
--- Last update: 2019-04-15
 -------------------------------------------------------------------------------
 -- Description: SPI DAC LUT Module
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,8 +17,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity RtmCryoDacLut is
    generic (
@@ -116,7 +115,7 @@ architecture rtl of RtmCryoDacLut is
 
 begin
 
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -136,7 +135,7 @@ begin
 
    GEN_LUT :
    for i in NUM_CH_G-1 downto 0 generate
-      U_LUT : entity work.AxiDualPortRam
+      U_LUT : entity surf.AxiDualPortRam
          generic map (
             TPD_G         => TPD_G,
             SYNTH_MODE_G  => SYNTH_MODE_G,
@@ -229,8 +228,8 @@ begin
                   -- Increment the trigger counter
                   v.trigCnt := r.trigCnt + 1;
                end if;
-               
-               -- Count each iteration 
+
+               -- Count each iteration
                v.eventCnt := r.eventCnt + 1;
 
                -- Next state
@@ -239,7 +238,7 @@ begin
             end if;
          ----------------------------------------------------------------------
          when WAIT_S =>
-            -- Check for timeout 
+            -- Check for timeout
             if (r.timer = 0) then
                -- Next state
                v.state := REQ_S;
@@ -251,7 +250,7 @@ begin
 
                -- Setup the AXI-Lite Master request
                v.req.request := r.enableCh(r.index);
-               v.req.rnw     := '0';    -- 0: write     
+               v.req.rnw     := '0';    -- 0: write
                v.req.address := r.dacAxilAddr(r.index);
                v.req.wrData  := ramData(r.index);
 
@@ -272,10 +271,10 @@ begin
 
                -- Reset the flag
                v.req.request := '0';
-               
+
                if (r.req.request = '1') and (ack.resp /= AXI_RESP_OK_C) then
                   -- Increment the address
-                  v.errorCnt := r.errorCnt + 1;               
+                  v.errorCnt := r.errorCnt + 1;
                end if;
 
                -- Check if last channel
@@ -355,7 +354,7 @@ begin
       end if;
    end process seq;
 
-   U_AxiLiteMaster : entity work.AxiLiteMaster
+   U_AxiLiteMaster : entity surf.AxiLiteMaster
       generic map (
          TPD_G => TPD_G)
       port map (

@@ -1,30 +1,33 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-07-08
--- Last update: 2018-08-28
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.TimingPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -32,8 +35,9 @@ use unisim.vcomponents.all;
 entity AmcCarrierCore is
    generic (
       TPD_G                  : time     := 1 ns;
-      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB   
-      WAVEFORM_TDATA_BYTES_G : positive := 4;
+      ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
+      WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
+      WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
       RSSI_ILEAVE_EN_G       : boolean  := false;
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
       DISABLE_BSA_G          : boolean  := false;  -- false = includes BSA engine, true = doesn't build the BSA engine
@@ -44,13 +48,18 @@ entity AmcCarrierCore is
       TIME_GEN_EXTREF_G      : boolean  := false;  -- false = normal application, true = timing generator using external reference
       DISABLE_TIME_GT_G      : boolean  := false;  -- false = normal application, true = doesn't build the Timing GT
       CORE_TRIGGERS_G        : natural  := 16;
-      TRIG_PIPE_G            : natural  := 0;  -- no trigger pipeline by default
-      FSBL_G                 : boolean  := false);  -- false = Normal Operation, true = First Stage Boot loader
+      TRIG_PIPE_G            : natural  := 0;      -- no trigger pipeline by default
+      USE_TPGMINI_G          : boolean  := true;   -- build TPG Mini by default
+      CLKSEL_MODE_G          : string   := "SELECT"; -- "LCLSI","LCLSII"
+      STREAM_L1_G            : boolean  := true;
+      AXIL_RINGB_G           : boolean  := true;
+      ASYNC_G                : boolean  := true;
+      FSBL_G                 : boolean  := false); -- false = Normal Operation, true = First Stage Boot loader
    port (
       -----------------------
       -- Core Ports to AppTop
       -----------------------
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : in    sl;
       timingRst            : in    sl;
       timingBusIntf        : out   TimingBusType;
@@ -93,9 +102,9 @@ entity AmcCarrierCore is
       stableClk            : out   sl;
       stableRst            : out   sl;
       gthFabClk            : out   sl;
-      ------------------------         
+      ------------------------
       -- Core Ports to Wrapper
-      ------------------------         
+      ------------------------
       -- AXI-Lite Master bus
       axilReadMasters      : out   AxiLiteReadMasterArray(1 downto 0);
       axilReadSlaves       : in    AxiLiteReadSlaveArray(1 downto 0);
@@ -227,8 +236,8 @@ begin
 
    --------------------------------
    -- Common Clock and Reset Module
-   -------------------------------- 
-   U_IBUFDS : entity work.AmcCarrierIbufGt
+   --------------------------------
+   U_IBUFDS : entity amc_carrier_core.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "01",  -- 2'b01: ODIV2 = Divide-by-2 version of O
@@ -250,7 +259,7 @@ begin
          DIV     => "000",              -- Divide by 1
          O       => fabClk);
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map(
          TPD_G         => TPD_G,
          SIM_SPEEDUP_G => SIM_SPEEDUP_G)
@@ -258,7 +267,7 @@ begin
          clk    => fabClk,
          rstOut => fabRst);
 
-   U_AmcCorePll : entity work.ClockManagerUltraScale
+   U_AmcCorePll : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G             => TPD_G,
          TYPE_G            => "PLL",
@@ -282,7 +291,7 @@ begin
          rstOut(0) => reset);
 
    -- Help with meeting timing on the reset path
-   U_Rst : entity work.RstPipeline
+   U_Rst : entity surf.RstPipeline
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -293,7 +302,7 @@ begin
    ------------------
    -- Ethernet Module
    ------------------
-   U_Eth : entity work.AmcCarrierEth
+   U_Eth : entity amc_carrier_core.AmcCarrierEth
       generic map (
          TPD_G                 => TPD_G,
          RSSI_ILEAVE_EN_G      => RSSI_ILEAVE_EN_G,
@@ -345,7 +354,7 @@ begin
          ibBpMsgServerSlave   => ibBpMsgServerSlave,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- ETH Ports
          ethRxP               => ethRxP,
          ethRxN               => ethRxN,
@@ -357,7 +366,7 @@ begin
    --------------
    -- Timing Core
    --------------
-   U_Timing : entity work.AmcCarrierTiming
+   U_Timing : entity amc_carrier_core.AmcCarrierTiming
       generic map (
          TPD_G             => TPD_G,
          TIME_GEN_APP_G    => TIME_GEN_APP_G,
@@ -365,7 +374,11 @@ begin
          DISABLE_TIME_GT_G => DISABLE_TIME_GT_G,
          CORE_TRIGGERS_G   => CORE_TRIGGERS_G,
          TRIG_PIPE_G       => TRIG_PIPE_G,
-         STREAM_L1_G       => true)
+	 CLKSEL_MODE_G     => CLKSEL_MODE_G,
+	 STREAM_L1_G       => STREAM_L1_G,
+	 AXIL_RINGB_G      => AXIL_RINGB_G,
+	 ASYNC_G           => ASYNC_G,
+         USE_TPGMINI_G     => USE_TPGMINI_G)
       port map (
          stableClk            => fabClk,
          stableRst            => fabRst,
@@ -383,8 +396,8 @@ begin
          ibTimingEthMsgSlave  => ibTimingEthMsgSlave,
          ----------------------
          -- Top Level Interface
-         ----------------------         
-         -- Timing Interface 
+         ----------------------
+         -- Timing Interface
          recTimingClk         => recTimingClk,
          recTimingRst         => recTimingRst,
          appTimingClk         => timingClk,
@@ -398,7 +411,7 @@ begin
          appTimingRefClkDiv2  => timingRefClkDiv2,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- LCLS Timing Ports
          timingRxP            => timingRxP,
          timingRxN            => timingRxN,
@@ -413,13 +426,14 @@ begin
    --------------
    -- BSA Core
    --------------
-   U_Bsa : entity work.AmcCarrierBsa
+   U_Bsa : entity amc_carrier_core.AmcCarrierBsa
       generic map (
          TPD_G                  => TPD_G,
          FSBL_G                 => FSBL_G,
          DISABLE_BSA_G          => DISABLE_BSA_G,
          DISABLE_BLD_G          => DISABLE_BLD_G,
          DISABLE_DDR_SRP_G      => DISABLE_DDR_SRP_G,
+         WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
          WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G)
       port map (
          -- AXI-Lite Interface (axilClk domain)
@@ -443,7 +457,7 @@ begin
          ibBsaSlaves          => ibBsaSlaves,
          ----------------------
          -- Top Level Interface
-         ----------------------         
+         ----------------------
          -- Diagnostic Interface
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
@@ -462,7 +476,7 @@ begin
    ------------------
    -- DDR Memory Core
    ------------------
-   U_DdrMem : entity work.AmcCarrierDdrMem
+   U_DdrMem : entity amc_carrier_core.AmcCarrierDdrMem
       generic map (
          TPD_G         => TPD_G,
          FSBL_G        => FSBL_G,
@@ -486,7 +500,7 @@ begin
          axiReadSlave    => axiReadSlave,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- DDR3L SO-DIMM Ports
          ddrClkP         => ddrClkP,
          ddrClkN         => ddrClkN,

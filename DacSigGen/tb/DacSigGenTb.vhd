@@ -1,22 +1,14 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
--- File       : DacSigGenTb.vhd
--- Author     : Uros Legat  <ulegat@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-24
--- Last update: 2016-02-24
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description: Converts the 16-bit interface to 32-bit JESD interface
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -25,10 +17,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AppTopPkg.all;
-use work.Jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
+use surf.Jesd204bPkg.all;
 
 entity  DacSigGenTb is
 
@@ -38,7 +34,7 @@ end entity ;
 
 architecture Bhv of DacSigGenTb is
   -----------------------------
-  -- Port Signals 
+  -- Port Signals
   -----------------------------
    constant TPD_G            : time := 1 ns;
 
@@ -64,7 +60,7 @@ architecture Bhv of DacSigGenTb is
 begin  -- architecture Bhv
 
    -- Generate clocks and resets
-   ClkRst : entity work.ClkRst
+   ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset
@@ -73,10 +69,10 @@ begin  -- architecture Bhv
          clkP => jesdClk,
          clkN => open,
          rst  => jesdRst,--rst,
-         rstL => open); 
-         
+         rstL => open);
+
       -- Generate clocks and resets
-   ClkRst_2x : entity work.ClkRst
+   ClkRst_2x : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_2X_PERIOD_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset
@@ -85,10 +81,10 @@ begin  -- architecture Bhv
          clkP => jesdClk2x,
          clkN => open,
          rst  => jesdRst2x,--rst2x,
-         rstL => open); 
+         rstL => open);
 
      -- Generate clocks and resets
-   ClkRst_axi : entity work.ClkRst
+   ClkRst_axi : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_AXI_C,
          RST_START_DELAY_G => 1 ns,     -- Wait this long into simulation before asserting reset
@@ -100,9 +96,9 @@ begin  -- architecture Bhv
          rstL => open);
 
   -----------------------------
-  -- component instantiation 
+  -- component instantiation
   -----------------------------
-  DacSigGen_INST: entity work.DacSigGen
+  DacSigGen_INST: entity amc_carrier_core.DacSigGen
    generic map (
       TPD_G            => TPD_G,
       NUM_SIG_GEN_G    => 2,
@@ -124,7 +120,7 @@ begin  -- architecture Bhv
       axilWriteMaster => axilWriteMaster,
       axilWriteSlave  => axilWriteSlave);
 
-	
+
   StimuliProcess : process
   begin
       wait until jesdRst2x = '0';
@@ -143,7 +139,7 @@ begin  -- architecture Bhv
       wait for 100*CLK_2X_PERIOD_C;
       dacSigCtrl.start <= (others => '1');
       wait for 10*CLK_2X_PERIOD_C;
-      dacSigCtrl.start <= (others => '0');      
+      dacSigCtrl.start <= (others => '0');
   end process StimuliProcess;
-  
+
 end architecture Bhv;

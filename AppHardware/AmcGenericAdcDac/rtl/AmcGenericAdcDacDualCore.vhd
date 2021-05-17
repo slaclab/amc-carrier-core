@@ -1,27 +1,28 @@
 -------------------------------------------------------------------------------
--- File       : AmcGenericAdcDacDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-12-04
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+
+library amc_carrier_core;
 
 entity AmcGenericAdcDacDualCore is
    generic (
@@ -36,7 +37,7 @@ entity AmcGenericAdcDacDualCore is
       jesdRst         : in    slv(1 downto 0);
       jesdSysRef      : out   slv(1 downto 0);
       jesdRxSync      : in    slv(1 downto 0);
-      jesdTxSync      : out   slv(1 downto 0);
+      jesdTxSync      : out   Slv10Array(1 downto 0);
       -- ADC/DAC Interface (jesdClk domain)
       adcValids       : in    Slv7Array(1 downto 0);
       adcValues       : in    sampleDataVectorArray(1 downto 0, 6 downto 0);
@@ -94,7 +95,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -116,7 +117,7 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcGenericAdcDacCore
+      U_AMC : entity amc_carrier_core.AmcGenericAdcDacCore
          generic map (
             TPD_G           => TPD_G,
             TRIG_CLK_G      => TRIG_CLK_G,

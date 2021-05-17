@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AppMsgTb.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-03-01
--- Last update: 2017-03-02
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,8 +17,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+
+library amc_carrier_core;
 
 entity AppMsgTb is end AppMsgTb;
 
@@ -63,7 +64,7 @@ begin
    -----------------------------
    -- Generate clocks and resets
    -----------------------------
-   U_ClkRst : entity work.ClkRst
+   U_ClkRst : entity surf.ClkRst
       generic map (
          CLK_PERIOD_G      => CLK_PERIOD_C,
          RST_START_DELAY_G => 0 ns,  -- Wait this long into simulation before asserting reset
@@ -75,21 +76,21 @@ begin
    ------------
    -- TX Module
    ------------
-   U_TX : entity work.AppMsgOb
+   U_TX : entity amc_carrier_core.AppMsgOb
       generic map (
          TPD_G       => TPD_C,
          HDR_SIZE_G  => HDR_SIZE_C,
          DATA_SIZE_G => DATA_SIZE_C,
          EN_CRC_G    => EN_CRC_C)
       port map (
-         -- Application Messaging Interface (clk domain)      
+         -- Application Messaging Interface (clk domain)
          clk         => clk,
          rst         => rst,
          strobe      => r.strobe,
          header      => r.header,
          timeStamp   => r.timeStamp,
          data        => r.data,
-         tDest       => r.timeStamp(7 downto 0),         
+         tDest       => r.timeStamp(7 downto 0),
          -- Backplane Messaging Interface  (axilClk domain)
          axilClk     => clk,
          axilRst     => rst,
@@ -99,14 +100,14 @@ begin
    ------------
    -- RX Module
    ------------
-   U_RX : entity work.AppMsgIb
+   U_RX : entity amc_carrier_core.AppMsgIb
       generic map (
          TPD_G       => TPD_C,
          HDR_SIZE_G  => HDR_SIZE_C,
          DATA_SIZE_G => DATA_SIZE_C,
          EN_CRC_G    => EN_CRC_C)
       port map (
-         -- Application Messaging Interface (clk domain)      
+         -- Application Messaging Interface (clk domain)
          clk         => clk,
          rst         => rst,
          strobe      => rx.strobe,

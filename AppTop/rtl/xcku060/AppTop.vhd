@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AppTop.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-04
--- Last update: 2018-05-02
 -------------------------------------------------------------------------------
 -- Description: Application's Top Level
 --
@@ -10,26 +7,32 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 AMC Carrier Firmware'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 AMC Carrier Firmware', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 AMC Carrier Firmware', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.TimingPkg.all;
-use work.AmcCarrierPkg.all;
-use work.jesd204bpkg.all;
-use work.AppTopPkg.all;
-use work.AppTopPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.jesd204bpkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AppTopPkg.all;
+use amc_carrier_core.AppMpsPkg.all;
 
 entity AppTop is
    generic (
@@ -67,7 +70,7 @@ entity AppTop is
       axilReadSlave        : out   AxiLiteReadSlaveType;
       axilWriteMaster      : in    AxiLiteWriteMasterType;
       axilWriteSlave       : out   AxiLiteWriteSlaveType;
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : out   sl;
       timingRst            : out   sl;
       timingBus            : in    TimingBusType;
@@ -145,7 +148,7 @@ entity AppTop is
       rtmHsRxN             : in    sl;
       rtmHsTxP             : out   sl;
       rtmHsTxN             : out   sl;
-      -- RTM's Clock Reference 
+      -- RTM's Clock Reference
       genClkP              : in    sl;
       genClkN              : in    sl);
 end AppTop;
@@ -183,12 +186,13 @@ architecture mapping of AppTop is
    signal jesdRst2x  : slv(1 downto 0);
    signal jesdSysRef : slv(1 downto 0);
    signal jesdRxSync : slv(1 downto 0);
-   signal jesdTxSync : slv(1 downto 0);
+   signal jesdTxSync : Slv10Array(1 downto 0);
 
    signal adcValids : Slv10Array(1 downto 0);
    signal adcValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
    signal dacValids : Slv10Array(1 downto 0);
+   signal dacReadys : Slv10Array(1 downto 0);
    signal dacValues : sampleDataVectorArray(1 downto 0, 9 downto 0);
 
    signal debugValids : Slv4Array(1 downto 0);
@@ -267,7 +271,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -287,7 +291,7 @@ begin
 
    ---------------
    -- DAQ MUX Core
-   ---------------            
+   ---------------
    trigCascBay(2) <= trigCascBay(0);    -- to make cross and use generate
    armCascBay(2)  <= armCascBay(0);     -- to make cross and use generate
 
@@ -296,7 +300,7 @@ begin
       ------------------
       -- DAQ MUXV2 Module
       ------------------
-      U_DaqMuxV2 : entity work.DaqMuxV2
+      U_DaqMuxV2 : entity amc_carrier_core.DaqMuxV2
          generic map (
             TPD_G                  => TPD_G,
             DECIMATOR_EN_G         => DAQMUX_DECIMATOR_EN_G,
@@ -315,7 +319,7 @@ begin
             -- Cascaded Sw trigger for external connection between modules
             trigCasc_i          => trigCascBay(i+1),
             trigCasc_o          => trigCascBay(i),
-            -- Cascaded Arm trigger for external connection between modules 
+            -- Cascaded Arm trigger for external connection between modules
             armCasc_i           => armCascBay(i+1),
             armCasc_o           => armCascBay(i),
             -- Freeze buffers
@@ -329,7 +333,7 @@ begin
             axilReadSlave       => axilReadSlaves(DAQ_MUX0_INDEX_C+i),
             axilWriteMaster     => axilWriteMasters(DAQ_MUX0_INDEX_C+i),
             axilWriteSlave      => axilWriteSlaves(DAQ_MUX0_INDEX_C+i),
-            -- ADC Input 
+            -- ADC Input
             sampleDataArr_i(0)  => adcValues(i, 0),
             sampleDataArr_i(1)  => adcValues(i, 1),
             sampleDataArr_i(2)  => adcValues(i, 2),
@@ -340,7 +344,7 @@ begin
             sampleDataArr_i(7)  => adcValues(i, 7),
             sampleDataArr_i(8)  => adcValues(i, 8),
             sampleDataArr_i(9)  => adcValues(i, 9),
-            -- DAC Input 
+            -- DAC Input
             sampleDataArr_i(10) => dacValues(i, 0),
             sampleDataArr_i(11) => dacValues(i, 1),
             sampleDataArr_i(12) => dacValues(i, 2),
@@ -351,7 +355,7 @@ begin
             sampleDataArr_i(17) => dacValues(i, 7),
             sampleDataArr_i(18) => dacValues(i, 8),
             sampleDataArr_i(19) => dacValues(i, 9),
-            -- DBG Input             
+            -- DBG Input
             sampleDataArr_i(20) => debugValues(i, 0),
             sampleDataArr_i(21) => debugValues(i, 1),
             sampleDataArr_i(22) => debugValues(i, 2),
@@ -378,7 +382,7 @@ begin
       ------------
       -- JESD Core
       ------------
-      U_JesdCore : entity work.AppTopJesd
+      U_JesdCore : entity amc_carrier_core.AppTopJesd
          generic map (
             TPD_G              => TPD_G,
             SIM_SPEEDUP_G      => SIM_SPEEDUP_G,
@@ -418,6 +422,7 @@ begin
             adcValues(9)    => adcValues(i, 9),
             -- DAC Interface
             dacValids       => dacValids(i),
+            dacReadys       => dacReadys(i),
             dacValues(0)    => dacValues(i, 0),
             dacValues(1)    => dacValues(i, 1),
             dacValues(2)    => dacValues(i, 2),
@@ -446,7 +451,7 @@ begin
             jesdClkP        => jesdClkP(i),
             jesdClkN        => jesdClkN(i));
 
-      U_DacSigGen : entity work.DacSigGen
+      U_DacSigGen : entity amc_carrier_core.DacSigGen
          generic map (
             TPD_G                => TPD_G,
             AXI_BASE_ADDR_G      => AXI_CONFIG_C(SIG_GEN0_INDEX_C+i).baseAddr,
@@ -486,7 +491,7 @@ begin
    -------------------
    -- Application Core
    -------------------
-   U_AppCore : entity work.AppCore
+   U_AppCore : entity amc_carrier_core.AppCore
       generic map (
          TPD_G           => TPD_G,
          SIM_SPEEDUP_G   => SIM_SPEEDUP_G,
@@ -494,14 +499,14 @@ begin
          AXI_BASE_ADDR_G => AXI_CONFIG_C(CORE_INDEX_C).baseAddr,
          JESD_USR_DIV_G  => JESD_USR_DIV_G)
       port map (
-         -- Clocks and resets   
+         -- Clocks and resets
          jesdClk             => jesdClk,
          jesdRst             => jesdRst,
          jesdClk2x           => jesdClk2x,
          jesdRst2x           => jesdRst2x,
          jesdUsrClk          => jesdUsrClk,
          jesdUsrRst          => jesdUsrRst,
-         -- DaqMux/Trig Interface (timingClk domain) 
+         -- DaqMux/Trig Interface (timingClk domain)
          freezeHw            => freezeHw,
          timingTrig          => timingTrig,
          trigHw              => trigHw,
@@ -514,6 +519,7 @@ begin
          adcValids           => adcValids,
          adcValues           => adcValues,
          dacValids           => dacValids,
+--         dacReadys           => dacReadys, -- Placeholder for amc-carrier-core v4.0.0 that will break existing builds
          dacValues           => dacValues,
          debugValids         => debugValids,
          debugValues         => debugValues,
@@ -524,7 +530,7 @@ begin
          dacSigStatus        => dacSigStatus,
          dacSigValids        => dacSigValids,
          dacSigValues        => dacSigValues,
-         -- AXI-Lite Interface (axilClk domain) 
+         -- AXI-Lite Interface (axilClk domain)
          axilClk             => axilClk,
          axilRst             => axilRst,
          axilReadMaster      => axilReadMasters(CORE_INDEX_C),
@@ -534,7 +540,7 @@ begin
          ----------------------
          -- Top Level Interface
          ----------------------
-         -- Timing Interface (timingClk domain)   
+         -- Timing Interface (timingClk domain)
          timingClk           => recTimingClk,
          timingRst           => recTimingRst,
          timingBus           => timingBus,
@@ -594,7 +600,7 @@ begin
          rtmHsRxN            => rtmHsRxN,
          rtmHsTxP            => rtmHsTxP,
          rtmHsTxN            => rtmHsTxN,
-         -- RTM's Clock Reference 
+         -- RTM's Clock Reference
          genClkP             => genClkP,
          genClkN             => genClkN);
 

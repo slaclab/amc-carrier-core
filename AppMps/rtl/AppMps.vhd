@@ -1,10 +1,7 @@
 -------------------------------------------------------------------------------
--- File       : AppMps.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-04
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- Note: Do not forget to configure the ATCA crate to drive the clock from the slot#2 MPS link node
 -- For the 7-slot crate:
@@ -13,11 +10,11 @@
 --    $ ipmitool -I lan -H ${SELF_MANAGER} -t 0x84 -b 0 -A NONE raw 0x2e 0x39 0x0a 0x40 0x00 0x00 0x00 0x31 0x01
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -26,14 +23,20 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
-use work.TimingPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
 
 entity AppMps is
    generic (
@@ -55,7 +58,7 @@ entity AppMps is
       -- ethLinkUp       : in  sl;             -- axilClk domain
       -- timingClk       : in  sl;
       -- timingRst       : in  sl;
-      -- timingBus       : in  TimingBusType;  -- timingClk domain  
+      -- timingBus       : in  TimingBusType;  -- timingClk domain
       ----------------------
       -- Top Level Interface
       ----------------------
@@ -123,13 +126,13 @@ begin
    ------------------------------
    -- Backplane Clocks and Resets
    ------------------------------
-   U_Clk : entity work.AppMpsClk
+   U_Clk : entity amc_carrier_core.AppMpsClk
       generic map (
          TPD_G         => TPD_G,
          MPS_SLOT_G    => MPS_SLOT_G,
          SIM_SPEEDUP_G => SIMULATION_G)
       port map (
-         -- Stable Clock and Reset 
+         -- Stable Clock and Reset
          axilClk      => axilClk,
          axilRst      => axilRst,
          -- MPS Clocks and Resets
@@ -145,7 +148,7 @@ begin
          mpsPllRst    => mpsPllRst,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- Backplane MPS Ports
          mpsClkIn     => mpsClkIn,
          mpsClkOut    => mpsClkOut);
@@ -153,7 +156,7 @@ begin
    ---------------------
    -- AXI-Lite: Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -174,7 +177,7 @@ begin
    ----------------------------
    -- Encoder Logic
    ----------------------------
-   U_MpsCoreAsync : entity work.AxiLiteAsync
+   U_MpsCoreAsync : entity surf.AxiLiteAsync
       generic map (
          TPD_G           => TPD_G,
          COMMON_CLK_G    => false,
@@ -193,7 +196,7 @@ begin
          mAxiWriteMaster => encWriteMaster,
          mAxiWriteSlave  => encWriteSlave);
 
-   U_AppMpsEncoder : entity work.AppMpsEncoder
+   U_AppMpsEncoder : entity amc_carrier_core.AppMpsEncoder
       generic map (
          TPD_G           => TPD_G,
          AXI_BASE_ADDR_G => (others => '0'),  -- Only lower 16-bits of address are passed through the AxiLiteAsync
@@ -212,10 +215,10 @@ begin
          mpsCoreReg      => mpsCoreReg,
          diagnosticBus   => diagnosticBus);
 
-   ---------------------------------         
+   ---------------------------------
    -- MPS Backplane SALT Transceiver
-   ---------------------------------         
-   U_Salt : entity work.AppMpsSalt
+   ---------------------------------
+   U_Salt : entity amc_carrier_core.AppMpsSalt
       generic map (
          TPD_G        => TPD_G,
          SIMULATION_G => SIMULATION_G,

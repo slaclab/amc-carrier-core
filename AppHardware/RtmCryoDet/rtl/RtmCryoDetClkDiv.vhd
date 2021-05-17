@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : RtmCryoDetClkDiv.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-11-03
--- Last update: 2017-11-06
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,18 +17,21 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 entity RtmCryoDetClkDiv is
    generic (
       TPD_G       : time     := 1 ns;
       CNT_WIDTH_G : positive := 8);
    port (
-      jesdClk    : in  sl;
-      jesdRst    : in  sl;
-      jesdClkDiv : out sl;
-      lowCycle   : in  slv(CNT_WIDTH_G-1 downto 0);
-      highCycle  : in  slv(CNT_WIDTH_G-1 downto 0));
+      jesdClk       : in  sl;
+      jesdRst       : in  sl;
+      jesdClkDiv    : out sl;
+      rtmClockDelay : in  slv(2 downto 0);
+      lowCycle      : in  slv(CNT_WIDTH_G-1 downto 0);
+      highCycle     : in  slv(CNT_WIDTH_G-1 downto 0));
 end RtmCryoDetClkDiv;
 
 architecture rtl of RtmCryoDetClkDiv is
@@ -48,7 +48,21 @@ architecture rtl of RtmCryoDetClkDiv is
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
+   signal clkDiv : sl;
+
 begin
+
+
+   U_CLOCK_DELAY : entity surf.SlvDelay
+   generic map (
+      TPD_G   => TPD_G,
+      DELAY_G => 8,
+      WIDTH_G => 1)
+   port map (
+      clk     => jesdClk,
+      delay   => rtmClockDelay,
+      din(0)  => clkDiv,
+      dout(0) => jesdClkDiv);
 
    comb : process (highCycle, jesdRst, lowCycle, r) is
       variable v : RegType;
@@ -87,7 +101,7 @@ begin
       rin <= v;
 
       -- Outputs
-      jesdClkDiv <= r.clkDiv;
+      clkDiv <= r.clkDiv;
 
    end process comb;
 

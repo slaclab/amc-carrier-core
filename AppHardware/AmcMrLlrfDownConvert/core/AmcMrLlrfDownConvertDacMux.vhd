@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfDownConvertDacMux.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-27
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,11 +17,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core;
 
 entity AmcMrLlrfDownConvertDacMux is
    generic (
@@ -95,7 +96,7 @@ begin
    dacSclk_o <= dacSclk_i when(enable = '0') else r.sck;
    dacSdi_o  <= dacSdi_i  when(enable = '0') else r.din;
 
-   U_Reg : entity work.AmcMrLlrfDownConvertDacMuxReg
+   U_Reg : entity amc_carrier_core.AmcMrLlrfDownConvertDacMuxReg
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -132,7 +133,7 @@ begin
                   v.csL(r.chIndex) := '0';
 
                   -- Latch the value with respect to channel index
-                  -- Latch the value to be shifter in and the value for 
+                  -- Latch the value to be shifter in and the value for
                   -- comparison
                   v.shift                := dacValues(r.chIndex);
                   v.dacValues(r.chIndex) := dacValues(r.chIndex);
@@ -158,7 +159,7 @@ begin
             end if;
          ----------------------------------------------------------------------
          when SCK_HI_S =>
-            -- Set clock (gated with chip select) 
+            -- Set clock (gated with chip select)
             v.sck := not r.csL(r.chIndex);
             -- Increment the counter
             v.cnt := r.cnt + 1;

@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfUpConvertCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-12-07
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,14 +17,18 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
-use work.I2cPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+use surf.I2cPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core;
 
 entity AmcMrLlrfUpConvertCore is
    generic (
@@ -60,7 +61,7 @@ entity AmcMrLlrfUpConvertCore is
       recRst          : in    sl;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri         : inout slv(4 downto 0);
       jtagSec         : inout slv(4 downto 0);
@@ -87,22 +88,26 @@ architecture mapping of AmcMrLlrfUpConvertCore is
          i2cAddress => "1001000",       -- ADT7420: A1=GND,A0=GND
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'),            -- Big endian
+         endianness => '1',             -- Big endian
+         repeatStart=> '1'),            -- Enable repeated start
       1             => MakeI2cAxiLiteDevType(
          i2cAddress => "1001001",       -- ADT7420: A1=GND,A0=VDD
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'),            -- Big endian
+         endianness => '1',             -- Big endian
+         repeatStart=> '1'),            -- Enable repeated start
       2             => MakeI2cAxiLiteDevType(
          i2cAddress => "1001010",       -- ADT7420: A1=VDD,A0=GND
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'),            -- Big endian
+         endianness => '1',             -- Big endian
+         repeatStart=> '1'),            -- Enable repeated start
       3             => MakeI2cAxiLiteDevType(
          i2cAddress => "1001011",       -- ADT7420: A1=VDD,A0=VDD
          dataSize   => 8,               -- in units of bits
          addrSize   => 8,               -- in units of bits
-         endianness => '1'));           -- Big endian   
+         endianness => '1',             -- Big endian
+         repeatStart=> '1'));           -- Enable repeated start
 
    constant NUM_AXI_MASTERS_C      : natural               := 11;
    constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 5;
@@ -209,7 +214,7 @@ architecture mapping of AmcMrLlrfUpConvertCore is
 
 begin
 
-   U_AmcMapping : entity work.AmcMrLlrfUpConvertMapping
+   U_AmcMapping : entity amc_carrier_core.AmcMrLlrfUpConvertMapping
       generic map (
          TPD_G              => TPD_G,
          TIMING_TRIG_MODE_G => TIMING_TRIG_MODE_G)
@@ -237,7 +242,7 @@ begin
          recRst        => recRst,
          -----------------------
          -- Application Ports --
-         -----------------------      
+         -----------------------
          -- AMC's JTAG Ports
          jtagPri       => jtagPri,
          jtagSec       => jtagSec,
@@ -259,7 +264,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -280,7 +285,7 @@ begin
    --------------------------
    -- I2C Temperature Sensors
    --------------------------
-   U_I2C : entity work.AxiI2cRegMaster
+   U_I2C : entity surf.AxiI2cRegMaster
       generic map (
          TPD_G          => TPD_G,
          I2C_SCL_FREQ_G => 100.0E+3,    -- units of Hz
@@ -303,7 +308,7 @@ begin
    -- SPI interface ADCs and LMK
    ----------------------------------------------------------------
    GEN_SPI_CHIPS : for i in 3 downto 0 generate
-      U_AXI_SPI : entity work.AxiSpiMaster
+      U_AXI_SPI : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -326,7 +331,7 @@ begin
    ----------------------------------------------------------------
    -- SPI interface LVDS DAC
    ----------------------------------------------------------------
-   U_AXI_SPI_DAC : entity work.AxiSpiMaster
+   U_AXI_SPI_DAC : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,
@@ -345,7 +350,7 @@ begin
          coreSDout      => doutVec(4),
          coreCsb        => csbVec(4));
 
-   -- Input mux from "IO" port if LMK and from "I" port for ADCs 
+   -- Input mux from "IO" port if LMK and from "I" port for ADCs
    muxSDin <= lmkSDin when csbVec = "10111" else spiSdo_i;
 
    -- Output mux
@@ -364,7 +369,7 @@ begin
       doutVec(3)             when "10111",
       doutVec(4)             when "01111",
       '0'                    when others;
-   -- Outputs 
+   -- Outputs
    spiSclk_o <= muxSclk;
    spiSdi_o  <= muxSDout;
 
@@ -375,7 +380,7 @@ begin
    -- Serial Attenuator modules
    -----------------------------
    GEN_ATT_CHIPS : for i in NUM_ATTN_CHIPS_C-1 downto 0 generate
-      U_Attn : entity work.AxiSerAttnMaster
+      U_Attn : entity amc_carrier_core.AxiSerAttnMaster
          generic map (
             TPD_G             => TPD_G,
             DATA_SIZE_G       => 6,
@@ -410,7 +415,7 @@ begin
       attDoutVec(3)                when "0111",
       '0'                          when others;
 
-   -- Outputs                   
+   -- Outputs
    attSclk_o    <= attMuxSclk;
    attSdi_o     <= attMuxSDout;
    --attLatchEn_o   <= attCsbVec;
@@ -419,7 +424,7 @@ begin
    ----------------------------
    -- LVDS DAC Signal generator
    ----------------------------
-   U_DAC_SIG_GEN : entity work.LvdsDacSigGen
+   U_DAC_SIG_GEN : entity amc_carrier_core.LvdsDacSigGen
       generic map (
          TPD_G           => TPD_G,
          AXI_BASE_ADDR_G => AXI_CONFIG_C(SIG_GEN_INDEX_C).baseAddr)
@@ -447,7 +452,7 @@ begin
 
    GEN_DLY_OUT :
    for i in 15 downto 0 generate
-      OutputTapDelay_INST : entity work.OutputTapDelay
+      OutputTapDelay_INST : entity amc_carrier_core.OutputTapDelay
          generic map (
             TPD_G              => TPD_G,
             IODELAY_GROUP_G    => IODELAY_GROUP_G,

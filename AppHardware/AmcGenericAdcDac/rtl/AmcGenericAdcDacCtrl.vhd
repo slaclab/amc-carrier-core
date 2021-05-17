@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcGenericAdcDacCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-12-04
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,9 +17,11 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.jesd204bpkg.all;
 
 entity AmcGenericAdcDacCtrl is
    generic (
@@ -54,7 +53,7 @@ entity AmcGenericAdcDacCtrl is
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- LMK Ports
       lmkMuxSel       : out sl;
       lmkClkSel       : out slv(1 downto 0);
@@ -112,7 +111,7 @@ begin
 
    GEN_ADC :
    for i in 3 downto 0 generate
-      Sync_Adc : entity work.SynchronizerFifo
+      Sync_Adc : entity surf.SynchronizerFifo
          generic map (
             TPD_G        => TPD_G,
             DATA_WIDTH_G => 16)
@@ -127,7 +126,7 @@ begin
 
    GEN_DAC :
    for i in 1 downto 0 generate
-      Sync_Dac : entity work.SynchronizerFifo
+      Sync_Dac : entity surf.SynchronizerFifo
          generic map (
             TPD_G        => TPD_G,
             DATA_WIDTH_G => 16)
@@ -140,7 +139,7 @@ begin
             dout   => dacDataSync(i));
    end generate GEN_DAC;
 
-   Sync_DacVco : entity work.SynchronizerFifo
+   Sync_DacVco : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 16)
@@ -152,7 +151,7 @@ begin
          rd_clk => axilClk,
          dout   => dacVcoCtrlSync);
 
-   U_SyncClockFreq : entity work.SyncClockFreq
+   U_SyncClockFreq : entity surf.SyncClockFreq
       generic map (
          TPD_G          => TPD_G,
          REF_CLK_FREQ_G => AXI_CLK_FREQ_G,
@@ -164,7 +163,7 @@ begin
          locClk  => axilClk,
          refClk  => axilClk);
 
-   Sync_Config : entity work.SynchronizerVector
+   Sync_Config : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 1)
@@ -173,7 +172,7 @@ begin
          dataIn(0)  => r.dacVcoEnable,
          dataOut(0) => dacVcoEnable);
 
-   Sync_DacVcoSckConfig : entity work.SynchronizerFifo
+   Sync_DacVcoSckConfig : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 16)
@@ -185,7 +184,7 @@ begin
          rd_clk => clk,
          dout   => dacVcoSckConfig);
 
-   U_SyncStatusVector : entity work.SyncStatusVector
+   U_SyncStatusVector : entity surf.SyncStatusVector
       generic map (
          TPD_G          => TPD_G,
          OUT_POLARITY_G => '1',
@@ -200,9 +199,9 @@ begin
          statusIn(7 downto 6) => lemoDin,
          statusIn(5 downto 4) => lemoDout,
          statusIn(3 downto 0) => adcValids,
-         -- Output Status bit Signals (rdClk domain)  
+         -- Output Status bit Signals (rdClk domain)
          statusOut            => statusOut,
-         -- Status Bit Counters Signals (rdClk domain) 
+         -- Status Bit Counters Signals (rdClk domain)
          cntRstIn             => r.cntRst,
          rollOverEnIn         => r.rollOverEn,
          cntOut               => statusCnt,

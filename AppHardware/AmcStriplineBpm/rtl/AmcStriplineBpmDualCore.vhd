@@ -1,27 +1,28 @@
 -------------------------------------------------------------------------------
--- File       : AmcStriplineBpmDualCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-10-28
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+
+library amc_carrier_core;
 
 entity AmcStriplineBpmDualCore is
    generic (
@@ -29,7 +30,7 @@ entity AmcStriplineBpmDualCore is
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
-      -- Analog Control Ports 
+      -- Analog Control Ports
       attn1A          : in    Slv5Array(1 downto 0);
       attn1B          : in    Slv5Array(1 downto 0);
       attn2A          : in    Slv5Array(1 downto 0);
@@ -98,7 +99,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -120,13 +121,13 @@ begin
    -- AMC Core
    -----------
    GEN_AMC : for i in 1 downto 0 generate
-      U_AMC : entity work.AmcStriplineBpmCore
+      U_AMC : entity amc_carrier_core.AmcStriplineBpmCore
          generic map (
             TPD_G           => TPD_G,
             AXI_CLK_FREQ_G  => AXI_CLK_FREQ_G,
             AXI_BASE_ADDR_G => AXI_CONFIG_C(i).baseAddr)
          port map(
-            -- Analog Control Ports 
+            -- Analog Control Ports
             attn1A          => attn1A(i),
             attn1B          => attn1B(i),
             attn2A          => attn2A(i),

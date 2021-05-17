@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcGenericAdcDacCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-12-04
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,13 +17,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core;
 
 entity AmcGenericAdcDacCore is
    generic (
@@ -43,7 +44,7 @@ entity AmcGenericAdcDacCore is
       jesdRst         : in    sl;
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
-      jesdTxSync      : out   sl;
+      jesdTxSync      : out   slv(9 downto 0);
       -- ADC/DAC Interface
       adcValids       : in    slv(3 downto 0);
       adcValues       : in    sampleDataArray(3 downto 0);
@@ -65,7 +66,7 @@ entity AmcGenericAdcDacCore is
       bcm             : in    sl;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri         : inout slv(4 downto 0);
       jtagSec         : inout slv(4 downto 0);
@@ -165,7 +166,7 @@ architecture mapping of AmcGenericAdcDacCore is
    signal dacVcoSckN  : sl;
    signal dacVcoDinP  : sl;
    signal dacVcoDinN  : sl;
-   -- Pass through Interfaces      
+   -- Pass through Interfaces
    signal fpgaClockP  : sl;
    signal fpgaClockN  : sl;
    signal smaTrigP    : sl;
@@ -178,11 +179,15 @@ architecture mapping of AmcGenericAdcDacCore is
    signal lemoDoutN   : slv(1 downto 0);
    signal lemoDinput  : slv(1 downto 0);
    signal bcmL        : sl;
+   signal smaTrigMon  : sl;
+   signal adcCalMon   : sl;
+
+   signal locJesdTxSync : sl;
 
 begin
 
    -----------------------
-   -- Generalized Mapping 
+   -- Generalized Mapping
    -----------------------
 
    -- JESD Reference Ports
@@ -235,7 +240,7 @@ begin
    spareP(14) <= dacVcoDinP;
    spareN(14) <= dacVcoDinN;
 
-   -- Pass through Interfaces      
+   -- Pass through Interfaces
    fpgaClkP(0) <= fpgaClockP;
    fpgaClkN(0) <= fpgaClockN;
    syncOutP(3) <= smaTrigP;
@@ -255,51 +260,51 @@ begin
    --------------------
    -- Application Ports
    --------------------
-   ClkBuf_0 : entity work.ClkOutBufDiff
+   ClkBuf_0 : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
       port map (
          clkIn   => fpgaClk,
-         clkOutP => fpgaClkP(0),
-         clkOutN => fpgaClkN(0));
+         clkOutP => fpgaClockP,
+         clkOutN => fpgaClockN);
 
    TRIG_SIGNAL : if (TRIG_CLK_G = false) generate
       OBUFDS_1 : OBUFDS
          port map (
             I  => smaTrig,
-            O  => syncOutP(3),
-            OB => syncOutN(3));
+            O  => smaTrigP,
+            OB => smaTrigN);
    end generate;
 
    TRIG_CLK : if (TRIG_CLK_G = true) generate
-      ClkBuf_1 : entity work.ClkOutBufDiff
+      ClkBuf_1 : entity surf.ClkOutBufDiff
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
          port map (
             clkIn   => smaTrig,
-            clkOutP => syncOutP(3),
-            clkOutN => syncOutN(3));
+            clkOutP => smaTrigP,
+            clkOutN => smaTrigN);
    end generate;
 
    CAL_SIGNAL : if (CAL_CLK_G = false) generate
       OBUFDS_2 : OBUFDS
          port map (
             I  => adcCal,
-            O  => syncOutP(4),
-            OB => syncOutN(4));
+            O  => adcCalP,
+            OB => adcCalN);
    end generate;
 
    CAL_CLK : if (CAL_CLK_G = true) generate
-      ClkBuf_2 : entity work.ClkOutBufDiff
+      ClkBuf_2 : entity surf.ClkOutBufDiff
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
          port map (
             clkIn   => adcCal,
-            clkOutP => syncOutP(4),
-            clkOutN => syncOutN(4));
+            clkOutP => adcCalP,
+            clkOutN => adcCalN);
    end generate;
 
    GEN_LEMO :
@@ -308,13 +313,13 @@ begin
       OBUFDS_LemoDout : OBUFDS
          port map (
             I  => lemoDout(i),
-            O  => syncOutP(5+i),
-            OB => syncOutN(5+i));
+            O  => lemoDoutP(i),
+            OB => lemoDoutN(i));
 
       IBUFDS_LemoDin : IBUFDS
          port map (
-            I  => syncInP(i),
-            IB => syncInN(i),
+            I  => lemoDinP(i),
+            IB => lemoDinN(i),
             O  => lemoDinput(i));
 
    end generate GEN_LEMO;
@@ -323,31 +328,55 @@ begin
 
    bcmL <= not(bcm);
 
-   IBUFDS_SysRef : IBUFDS
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
+      generic map (
+         TPD_G       => TPD_G,
+         GEN_ASYNC_G => false, -- Deskewed using LMK to get rid of race condition between jesdSysRefP/N and jesdClk
+         INVERT_G    => false)
       port map (
-         I  => jesdSysRefP,
-         IB => jesdSysRefN,
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdSysRefP,
+         jesdSyncN => jesdSysRefN,
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   IBUFDS_TxSync : IBUFDS
+   U_jesdTxSync : entity amc_carrier_core.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdTxSyncP,
-         IB => jesdTxSyncN,
-         O  => jesdTxSync);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => jesdTxSyncP,
+         jesdSyncN => jesdTxSyncN,
+         -- JESD Low speed Interface
+         jesdSync  => locJesdTxSync);
+
+   jesdTxSync <= (others=>locJesdTxSync);
 
    GEN_RX_SYNC :
    for i in 1 downto 0 generate
-      OBUFDS_RxSync : OBUFDS
+      U_jesdRxSync : entity amc_carrier_core.JesdSyncOut
+         generic map (
+            TPD_G    => TPD_G,
+            INVERT_G => false)
          port map (
-            I  => jesdRxSync,
-            O  => jesdRxSyncP(i),
-            OB => jesdRxSyncN(i));
+            -- Clock
+            jesdClk   => jesdClk,
+            -- JESD Low speed Interface
+            jesdSync  => jesdRxSync,
+            -- JESD Low speed Ports
+            jesdSyncP => jesdRxSyncP(i),
+            jesdSyncN => jesdRxSyncN(i));
    end generate GEN_RX_SYNC;
 
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -367,8 +396,8 @@ begin
 
    -----------------
    -- LMK SPI Module
-   -----------------   
-   SPI_LMK : entity work.AxiSpiMaster
+   -----------------
+   SPI_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 15,
@@ -396,9 +425,9 @@ begin
 
    ----------------------
    -- Fast ADC SPI Module
-   ----------------------   
+   ----------------------
    GEN_ADC_SPI : for i in 1 downto 0 generate
-      FAST_ADC_SPI : entity work.AxiSpiMaster
+      FAST_ADC_SPI : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -420,8 +449,8 @@ begin
 
    ----------------------
    -- Fast DAC SPI Module
-   ----------------------     
-   FAST_SPI_DAC : entity work.AxiSpiMaster
+   ----------------------
+   FAST_SPI_DAC : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,
@@ -440,10 +469,10 @@ begin
          coreSDout      => dacMosi,
          coreCsb        => dacCsL);
 
-   ----------------------   
+   ----------------------
    -- SLOW DAC SPI Module
-   ----------------------   
-   SLOW_SPI_DAC : entity work.AmcGenericAdcDacVcoSpi
+   ----------------------
+   SLOW_SPI_DAC : entity amc_carrier_core.AmcGenericAdcDacVcoSpi
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -460,17 +489,17 @@ begin
          dacVcoDinP      => dacVcoDinP,
          dacVcoDinN      => dacVcoDinN);
 
-   -----------------------   
+   -----------------------
    -- Misc. Control Module
-   ----------------------- 
-   U_Ctrl : entity work.AmcGenericAdcDacCtrl
+   -----------------------
+   U_Ctrl : entity amc_carrier_core.AmcGenericAdcDacCtrl
       generic map (
          TPD_G          => TPD_G,
          AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)
       port map (
          -- Pass through Interfaces
-         smaTrig         => ite(TRIG_CLK_G, '0', smaTrig),
-         adcCal          => ite(CAL_CLK_G, '0', adcCal),
+         smaTrig         => smaTrigMon,
+         adcCal          => adcCalMon,
          lemoDin         => lemoDinput,
          lemoDout        => lemoDout,
          bcm             => bcm,
@@ -492,12 +521,15 @@ begin
          axilWriteSlave  => axilWriteSlaves(CTRL_INDEX_C),
          -----------------------
          -- Application Ports --
-         -----------------------      
+         -----------------------
          -- LMK Ports
          lmkMuxSel       => lmkMuxSel,
          lmkClkSel       => lmkClkSel,
          lmkStatus       => lmkStatus,
          lmkRst          => lmkRst,
          lmkSync         => lmkSync);
+
+   smaTrigMon <= '0' when(TRIG_CLK_G) else smaTrig;
+   adcCalMon  <= '0' when(CAL_CLK_G) else adcCal;
 
 end mapping;

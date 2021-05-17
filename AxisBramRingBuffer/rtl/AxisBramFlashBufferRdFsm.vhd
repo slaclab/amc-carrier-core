@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AxisBramFlashBufferRdFsm.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-04-10
--- Last update: 2018-04-20
 -------------------------------------------------------------------------------
 -- Data Format:
 --    DATA[0].BIT[7:0]    = protocol version (0x0)
@@ -20,11 +17,11 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -33,16 +30,18 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
 
 entity AxisBramFlashBufferRdFsm is
    generic (
       TPD_G              : time     := 1 ns;
       NUM_CH_G           : positive := 1;
-      AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes      
+      AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes
       BUFFER_WIDTH_G     : positive := 8);  -- units of bits
    port (
       -- Write FSM Interface (axisClk domain)
@@ -161,7 +160,7 @@ begin
             if (v.txMaster.tValid = '0') and (v.rdLatecy = 0) then
                -- Increment the counter
                v.rdAddr := r.rdAddr + 1;
-               -- Check the counter               
+               -- Check the counter
                if v.rdAddr(1 downto 0) = "00" then
                   -- Update the data bus
                   v.txMaster.tData(31 downto 0) := rdData(r.idx);
@@ -180,7 +179,7 @@ begin
                   if (v.rdAddr = MAX_CNT_C) then
                      -- Set the EOF bit
                      v.txMaster.tLast := '1';
-                     -- Check for last channel 
+                     -- Check for last channel
                      if (r.idx = (NUM_CH_G-1)) then
                         -- Set the request flag
                         v.ack   := '1';
@@ -225,7 +224,7 @@ begin
    end process seq;
 
    GEN_SYNC : for i in NUM_CH_G-1 downto 0 generate
-      U_SyncTdest : entity work.SynchronizerVector
+      U_SyncTdest : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 8)
@@ -236,7 +235,7 @@ begin
    end generate GEN_SYNC;
 
    GEN_RESIZE : if (AXIS_TDATA_WIDTH_G /= 16) generate
-      U_Resize : entity work.AxiStreamResize
+      U_Resize : entity surf.AxiStreamResize
          generic map (
             TPD_G               => TPD_G,
             READY_EN_G          => true,

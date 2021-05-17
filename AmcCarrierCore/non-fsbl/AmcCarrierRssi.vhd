@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierRssi.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-23
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,13 +17,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.FpgaTypePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.FpgaTypePkg.all;
 
 entity AmcCarrierRssi is
    generic (
@@ -65,13 +66,13 @@ end AmcCarrierRssi;
 
 architecture mapping of AmcCarrierRssi is
 
-   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
+   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
    constant WINDOW_ADDR_SIZE_C : positive := 3;
    constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
    constant MAX_RETRANS_CNT_C  : positive := ite((WINDOW_ADDR_SIZE_C > 1), WINDOW_ADDR_SIZE_C-1, 1);
 
-   constant APP_AXIS_CONFIG_C  : AxiStreamConfigArray(4 downto 0) := (others => ETH_AXIS_CONFIG_C);
-   constant TEMP_AXIS_CONFIG_C : AxiStreamConfigArray(1 downto 0) := (others => ETH_AXIS_CONFIG_C);
+   constant APP_AXIS_CONFIG_C  : AxiStreamConfigArray(4 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
+   constant TEMP_AXIS_CONFIG_C : AxiStreamConfigArray(1 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
 
    signal rssiIbMasters : AxiStreamMasterArray(4 downto 0);
    signal rssiIbSlaves  : AxiStreamSlaveArray(4 downto 0);
@@ -99,12 +100,15 @@ architecture mapping of AmcCarrierRssi is
    signal tempObMasters : AxiStreamMasterArray(1 downto 0);
    signal tempObSlaves  : AxiStreamSlaveArray(1 downto 0);
 
+   signal obRssiTspMasters : AxiStreamMasterArray(1 downto 0);
+   signal obRssiTspSlaves  : AxiStreamSlaveArray(1 downto 0);
+
 begin
 
    --------------------------
    -- AXI-Lite: Crossbar Core
-   --------------------------  
-   U_XBAR : entity work.AxiLiteCrossbar
+   --------------------------
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -125,18 +129,18 @@ begin
    ------------------------------
    -- Software's RSSI Server@8193
    ------------------------------
-   U_RssiServer : entity work.RssiCoreWrapper
+   U_RssiServer : entity surf.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
          SYNTH_MODE_G        => "xpm",
-         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),            
+         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),
          APP_STREAMS_G       => 5,
          APP_STREAM_ROUTES_G => (
             0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
             1                => X"01",  -- TDEST 1 routed to stream 1 (loopback)
             2                => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
             3                => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
-            4                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
+            4                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
          CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G      => TIMEOUT_C,
          SERVER_G            => true,
@@ -159,8 +163,8 @@ begin
          -- Transport Layer Interface
          sTspAxisMaster_i  => obServerMasters(0),
          sTspAxisSlave_o   => obServerSlaves(0),
-         mTspAxisMaster_o  => ibServerMasters(0),
-         mTspAxisSlave_i   => ibServerSlaves(0),
+         mTspAxisMaster_o  => obRssiTspMasters(0),
+         mTspAxisSlave_i   => obRssiTspSlaves(0),
          -- High level  Application side interface
          openRq_i          => '1',  -- Automatically start the connection without debug SRP channel
          closeRq_i         => '0',
@@ -173,23 +177,38 @@ begin
          axilWriteMaster   => axilWriteMasters(0),
          axilWriteSlave    => axilWriteSlaves(0));
 
+   U_RssiTspObFifo_0 : entity amc_carrier_core.AmcCarrierRssiObFifo
+      generic map (
+         TPD_G    => TPD_G,
+         BYPASS_G => true) -- true to reduce logic footprint
+      port map (
+         -- Clock and Reset
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         -- RSSI Interface
+         obRssiTspMaster => obRssiTspMasters(0),
+         obRssiTspSlave  => obRssiTspSlaves(0),
+         -- Interface to UDP Server engine
+         ibServerMaster  => ibServerMasters(0),
+         ibServerSlave   => ibServerSlaves(0));
+
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
    ------------------------------------------------
-   U_SRPv3 : entity work.SrpV3AxiLite
+   U_SRPv3 : entity surf.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
          TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
-         AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
+         AXI_STREAM_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)
          sAxisClk         => axilClk,
          sAxisRst         => axilRst,
          sAxisMaster      => rssiObMasters(0),
          sAxisSlave       => rssiObSlaves(0),
-         -- AXIS Master Interface (mAxisClk domain) 
+         -- AXIS Master Interface (mAxisClk domain)
          mAxisClk         => axilClk,
          mAxisRst         => axilRst,
          mAxisMaster      => rssiIbMasters(0),
@@ -229,18 +248,18 @@ begin
    --------------------------------
    ibAppDebugMaster <= rssiObMasters(4);
    rssiObSlaves(4)  <= ibAppDebugSlave;
-   U_IbLimiter : entity work.SsiFrameLimiter
+   U_IbLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- ETH_AXIS_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of ETH_AXIS_CONFIG_C.TDATA_BYTES_C
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- AXIS_8BYTE_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of AXIS_8BYTE_CONFIG_C.TDATA_BYTES_C
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
+         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,
@@ -256,11 +275,11 @@ begin
    ------------------------------
    -- Software's RSSI Server@8194
    ------------------------------
-   U_Temp : entity work.RssiCoreWrapper
+   U_Temp : entity surf.RssiCoreWrapper
       generic map (
          TPD_G               => TPD_G,
          SYNTH_MODE_G        => "xpm",
-         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),              
+         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),
          APP_STREAMS_G       => 2,
          APP_STREAM_ROUTES_G => (
             0                => X"04",  -- TDEST 4 routed to stream 0 (MEM)
@@ -287,8 +306,8 @@ begin
          -- Transport Layer Interface
          sTspAxisMaster_i  => obServerMasters(1),
          sTspAxisSlave_o   => obServerSlaves(1),
-         mTspAxisMaster_o  => ibServerMasters(1),
-         mTspAxisSlave_i   => ibServerSlaves(1),
+         mTspAxisMaster_o  => obRssiTspMasters(1),
+         mTspAxisSlave_i   => obRssiTspSlaves(1),
          -- High level  Application side interface
          openRq_i          => '1',  -- Automatically start the connection without debug SRP channel
          closeRq_i         => '0',
@@ -300,6 +319,21 @@ begin
          axilReadSlave     => axilReadSlaves(1),
          axilWriteMaster   => axilWriteMasters(1),
          axilWriteSlave    => axilWriteSlaves(1));
+
+   U_RssiTspObFifo_1 : entity amc_carrier_core.AmcCarrierRssiObFifo
+      generic map (
+         TPD_G    => TPD_G,
+         BYPASS_G => true) -- true to reduce logic footprint
+      port map (
+         -- Clock and Reset
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         -- RSSI Interface
+         obRssiTspMaster => obRssiTspMasters(1),
+         obRssiTspSlave  => obRssiTspSlaves(1),
+         -- Interface to UDP Server engine
+         ibServerMaster  => ibServerMasters(1),
+         ibServerSlave   => ibServerSlaves(1));
 
    -----------------------------
    -- Memory Access: TDEST = 0x4

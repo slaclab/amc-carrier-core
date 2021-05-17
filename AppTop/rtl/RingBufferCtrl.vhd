@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : RingBufferCtrl.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-19
--- Last update: 2016-08-19
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,7 +17,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 entity RingBufferCtrl is
    generic (
@@ -40,11 +39,11 @@ end RingBufferCtrl;
 architecture rtl of RingBufferCtrl is
 
    constant TIMEOUT_C : natural := (2**RING_BUFFER_ADDR_WIDTH_G)-1;
-   
+
    type StateType is (
       IDLE_S,
       LOG_S,
-      DONE_S);    
+      DONE_S);
 
    type RegType is record
       cnt        : natural range 0 to TIMEOUT_C;
@@ -62,7 +61,7 @@ architecture rtl of RingBufferCtrl is
 
    -- attribute dont_touch               : string;
    -- attribute dont_touch of r          : signal is "TRUE";
-   
+
 begin
 
    comb : process (debugTrig, r, rst, softClear, softTrig, valid) is
@@ -94,7 +93,7 @@ begin
             end if;
          ----------------------------------------------------------------------
          when DONE_S =>
-            -- Reset the flag 
+            -- Reset the flag
             -- Note: Blocking triggers until the reset or clear
             v.debugLogEn := '0';
       ----------------------------------------------------------------------
@@ -111,7 +110,7 @@ begin
       -- Outputs
       debugLogEn  <= v.debugLogEn;
       debugLogClr <= softClear;
-      
+
    end process comb;
 
    seq : process (clk) is
@@ -120,5 +119,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 end rtl;

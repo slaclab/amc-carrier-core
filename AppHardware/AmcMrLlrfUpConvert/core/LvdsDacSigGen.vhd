@@ -1,22 +1,19 @@
 -------------------------------------------------------------------------------
--- File       : LvdsDacSigGen.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-14
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: Signal generator top module.
 --     Arbitrary signal generator
---     Module has its own AxiLite register interface and access to AXI lite and 
+--     Module has its own AxiLite register interface and access to AXI lite and
 --     AXIlite RAM module for signal definition,
 --     Adjustable period s_periodSize,
---     Polarity can be bitwise reversed s_polarityMask. 
+--     Polarity can be bitwise reversed s_polarityMask.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -24,11 +21,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 entity LvdsDacSigGen is
    generic (
@@ -56,7 +57,7 @@ entity LvdsDacSigGen is
       load_o          : out slv(15 downto 0);
       tapDelaySet_o   : out Slv9Array(15 downto 0);
       tapDelayStat_i  : in  Slv9Array(15 downto 0);
-      -- Sample data output 
+      -- Sample data output
       sampleData_o    : out Slv2Array(15 downto 0));
 end LvdsDacSigGen;
 
@@ -95,7 +96,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -116,7 +117,7 @@ begin
    ---------------------------------
    -- DAQ control register interface
    ---------------------------------
-   U_REG : entity work.LvdsDacRegItf
+   U_REG : entity amc_carrier_core.LvdsDacRegItf
       generic map (
          TPD_G        => TPD_G,
          ADDR_WIDTH_G => ADDR_WIDTH_G)
@@ -132,7 +133,7 @@ begin
          axilReadSlave   => locAxilReadSlaves(DAC_AXIL_INDEX_C),
          axilWriteMaster => locAxilWriteMasters(DAC_AXIL_INDEX_C),
          axilWriteSlave  => locAxilWriteSlaves(DAC_AXIL_INDEX_C),
-         -- Control generation  (devClk_i domain)  
+         -- Control generation  (devClk_i domain)
          devClk_i        => devClk_i,
          devRst_i        => devRst_i,
          enable_o        => s_laneEn,
@@ -145,7 +146,7 @@ begin
    -------------------------
    -- Signal generator lanes
    -------------------------
-   U_LANE : entity work.LvdsDacLane
+   U_LANE : entity amc_carrier_core.LvdsDacLane
       generic map (
          TPD_G        => TPD_G,
          ADDR_WIDTH_G => ADDR_WIDTH_G)
@@ -166,7 +167,7 @@ begin
          devClk_i        => devClk_i,
          devRst_i        => devRst_i,
          extData_i       => extData_i,
-         -- Control generation  (devClk_i domain)      
+         -- Control generation  (devClk_i domain)
          enable_i        => s_laneEn,
          periodSize_i    => s_periodSize,
          -- Parallel data out  (devClk_i domain)

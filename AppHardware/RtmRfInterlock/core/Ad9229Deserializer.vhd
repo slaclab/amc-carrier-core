@@ -1,29 +1,28 @@
 -------------------------------------------------------------------------------
--- File       : Ad9229Deserializer.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-08-09
--- Last update: 2016-08-09
 -------------------------------------------------------------------------------
 -- Description: 12 bit DDR deserializer using Ultrascale IDELAYE3 and ISERDESE3.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 library UNISIM;
 use UNISIM.vcomponents.all;
 
 entity Ad9229Deserializer is
-   
+
    generic (
       TPD_G : time := 1 ns;
       IODELAY_GROUP_G : string:= "DEFAULT_GROUP";
@@ -31,13 +30,13 @@ entity Ad9229Deserializer is
    port (
       clkSer : in sl;
       idelayClk  : in sl;
-      idelayRst  : in sl;      
+      idelayRst  : in sl;
       clkSerDiv2 : in sl;
       rstSerDiv2 : in sl;
 
       clkPar : in sl;
       rstPar : in sl;
-      
+
       slip : in sl;
 
       curDelay : out slv(8 downto 0);
@@ -60,39 +59,39 @@ architecture rtl of Ad9229Deserializer is
       data12bitD1 : slv(11 downto 0);
       weSr : slv(2 downto 0);
 
-      -- Slip     
+      -- Slip
       slipCnt : integer range 0 to 11;
    end record RegType;
 
    constant REG_INIT_C : RegType := (
-      -- Gearbox   
+      -- Gearbox
       par4bitD0 => (others => '0'),
       par4bitD1 => (others => '0'),
       par4bitD2 => (others => '0'),
-      data12bitD0 => (others => '0'), 
+      data12bitD0 => (others => '0'),
       data12bitD1 => (others => '0'),
       weSr  => "001",
-      -- Slip 
+      -- Slip
       slipCnt => 0);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
    signal s_iDataDly    : sl;
    signal s_slipSyncRe  : sl;
-   signal s_serdesData  : slv(7 downto 0);   
+   signal s_serdesData  : slv(7 downto 0);
    signal s_parData     : slv(11 downto 0);
-   
+
    signal clkSerL : sl;
 
    attribute IODELAY_GROUP : string;
    attribute IODELAY_GROUP of U_DELAY : label is IODELAY_GROUP_G;
-   
+
 begin
 
    clkSerL <= not(clkSer);
 
    -- Slip sync and one shot
-   U_SyncOneShot: entity work.SynchronizerOneShot
+   U_SyncOneShot: entity surf.SynchronizerOneShot
    generic map (
       TPD_G           => TPD_G,
       BYPASS_SYNC_G   => false)
@@ -116,7 +115,7 @@ begin
          UPDATE_MODE => "ASYNC" -- Determines when updates to the delay will take effect (ASYNC, MANUAL, SYNC)
       )
       port map (
-      
+
          CASC_OUT => open, -- 1-bit output: Cascade delay output to ODELAY input cascade
          DATAIN => '0', -- 1-bit input: Data input from the logic
          IDATAIN => iData, -- 1-bit input: Data input from the IOBUF
@@ -131,7 +130,7 @@ begin
          EN_VTC => '0', -- 1-bit input: Keep delay constant over VT
          INC => '1', -- 1-bit input: Increment / Decrement tap delay input
          RST => idelayRst); -- 1-bit input: Asynchronous Reset to the DELAY_VALUE
-   
+
    U_ISERDESE3 : ISERDESE3
    generic map (
       DATA_WIDTH => 4, -- Parallel data width (4,8)
@@ -143,7 +142,7 @@ begin
    )
    port map (
       FIFO_EMPTY => open, -- 1-bit output: FIFO empty flag
-      INTERNAL_DIVCLK => open, 
+      INTERNAL_DIVCLK => open,
       CLK    => clkSer, -- 1-bit input: High-speed clock
       CLK_B  => clkSerL, -- 1-bit input: Inversion of High-speed clock CLK
       CLKDIV => clkSerDiv2, -- 1-bit input: Divided Clock
@@ -153,7 +152,7 @@ begin
       FIFO_RD_EN => '0', -- 1-bit input: Enables reading the FIFO when asserted
       RST => rstSerDiv2 -- 1-bit input: Asynchronous Reset
    );
-   
+
    -- Slip shifter
    with r.slipCnt select
    s_parData <= r.data12bitD0                                            when 0,
@@ -169,26 +168,26 @@ begin
                 r.data12bitD1(9  downto 0) & r.data12bitD0(11 downto 10) when 10,
                 r.data12bitD1(10 downto 0) & r.data12bitD0(11)           when 11,
                 r.data12bitD0                                            when others;
-   
+
    comb : process (r, rstSerDiv2, s_serdesData, s_slipSyncRe) is
       variable v : RegType;
    begin
       v := r;
       -------------------
-      
+
       -- GearBox 3x4bit = 12bit parallel word
       v.par4bitD0 := bitReverse(s_serdesData(3 downto 0));
       v.par4bitD1 := r.par4bitD0;
       v.par4bitD2 := r.par4bitD1;
-      
+
       v.data12bitD0 := r.par4bitD2 & r.par4bitD1 & r.par4bitD0;
-      
+
       -- Generate gearbox we
-      -- Shift left to get a /3 we 
+      -- Shift left to get a /3 we
       v.weSr := r.weSr(1 downto 0) & r.weSr(2);
-       
+
       -- Previous data save
-      if (r.weSr(2)='1') then      
+      if (r.weSr(2)='1') then
          v.data12bitD1 := r.data12bitD0;
       end if;
 
@@ -198,13 +197,13 @@ begin
       elsif (s_slipSyncRe = '1') then
          v.slipCnt := r.slipCnt+1;
       end if;
-     
+
       if (rstSerDiv2 = '1') then
          v := REG_INIT_C;
       end if;
 
       rin <= v;
-      
+
    end process comb;
 
    seq : process (clkSerDiv2) is
@@ -213,9 +212,9 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
    -- Output synchronizer
-   U_SyncFifo : entity work.SynchronizerFifo
+   U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => oData'length
@@ -227,6 +226,6 @@ begin
          rd_clk => clkPar,
          dout   => oData
          );
-   
+
 
 end architecture rtl;

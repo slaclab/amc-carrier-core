@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'LCLS2 Common Carrier Core'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'LCLS2 Common Carrier Core', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 # JESD High Speed Ports
@@ -44,7 +44,7 @@ set_property PACKAGE_PIN B2 [get_ports {jesdRxP[1][6]}] ; #P14 PIN50
 set_property PACKAGE_PIN B1 [get_ports {jesdRxN[1][6]}] ; #P14 PIN51
 
 # JESD Reference Ports
-set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {sysRefP[1][2]}] ; #jesdSysRefP 
+set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {sysRefP[1][2]}] ; #jesdSysRefP
 set_property -dict {IOSTANDARD LVDS DIFF_TERM TRUE } [get_ports {sysRefN[1][2]}] ; #jesdSysRefN
 
 # JESD ADC Sync Ports
@@ -57,7 +57,7 @@ set_property -dict {IOSTANDARD LVDS} [get_ports {syncOutN[1][0]}]  ; # jesdRxSyn
 set_property -dict {IOSTANDARD LVDS} [get_ports {syncInP[1][1]}]  ; # jesdRxSyncP(2)
 set_property -dict {IOSTANDARD LVDS} [get_ports {syncInN[1][1]}]  ; # jesdRxSyncN(2)
 
-# AMC's JTAG Ports jtagPri[1][0-4] remapped for SPI 
+# AMC's JTAG Ports jtagPri[1][0-4] remapped for SPI
 set_property -dict {IOSTANDARD LVCMOS25 PULLUP true} [get_ports {jtagPri[1][0]}]   ; #spiSdio_io
 set_property -dict {IOSTANDARD LVCMOS25 PULLUP true} [get_ports {jtagPri[1][1]}]   ; #spiSclk_o
 set_property -dict {IOSTANDARD LVCMOS25 PULLUP true} [get_ports {jtagPri[1][2]}]   ; #spiSdi_o
@@ -68,7 +68,7 @@ set_property -dict {IOSTANDARD LVCMOS25 PULLUP true} [get_ports {jtagPri[1][4]}]
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][3]}]   ; #spiCsL_o
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][3]}]   ; #spiCsL_o
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][2]}]   ; #spiCsL_o
-                                                                           
+
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][0]}]  ; #spiSclkDac_o
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareN[1][0]}]   ; #spiCsLDac_o
 set_property -dict {IOSTANDARD LVCMOS18 PULLUP true} [get_ports {spareP[1][1]}]  ; #spiSdioDac_io

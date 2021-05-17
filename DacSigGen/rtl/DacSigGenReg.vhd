@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AxiLiteGenRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for Signal generator
 --               0x00      (RW)- Enable channels. Example: 0x7F enables all 7 channels (also used to align the lane) (NUM_SIG_GEN_G-1 downto 0)
@@ -12,17 +9,17 @@
 --               0x08      (R) - Running status
 --               0x09      (R) - 16bit to 32bit conversion underflow
 --               0x0A      (R) - 16bit to 32bit conversion overflow
---               0x0B      (R) - Max Waveform size 
+--               0x0B      (R) - Max Waveform size
 --               0x10-0x1x (RW)- WaveformSize: In Periodic mode: Period size (Zero inclusive).
 --                                        In Triggered mode: Waveform size (Zero inclusive).
 --                                        Separate values for separate channels.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -30,10 +27,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.Jesd204bPkg.all;
-use work.AppTopPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.Jesd204bPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
 
 entity DacSigGenReg is
    generic (
@@ -41,7 +42,7 @@ entity DacSigGenReg is
       AXI_ADDR_WIDTH_G : positive                        := 9;
       ADDR_WIDTH_G     : integer range 1 to (2**24)      := 9;
       RAM_CLK_G        : slv(DAC_SIG_WIDTH_C-1 downto 0) := (others => '0');  -- '0': jesdClk2x, '1': jesdClk
-      -- Number of channels 
+      -- Number of channels
       NUM_SIG_GEN_G    : natural range 1 to 10           := 6  -- 0 - Disabled
       );
    port (
@@ -61,7 +62,7 @@ entity DacSigGenReg is
       jesdClk2x : in sl;
       jesdRst2x : in sl;
 
-      -- Registers   
+      -- Registers
       enable_o    : out slv(NUM_SIG_GEN_G-1 downto 0);
       mode_o      : out slv(NUM_SIG_GEN_G-1 downto 0);
       sign_o      : out slv(NUM_SIG_GEN_G-1 downto 0);
@@ -93,8 +94,8 @@ architecture rtl of DacSigGenReg is
    constant REG_INIT_C : RegType := (
       -- enable       => (others=> '0'),
       -- mode         => (others=> '0'),
-      -- sign         => (others=> '0'),      
-      -- trigSw       => (others=> '0'),      
+      -- sign         => (others=> '0'),
+      -- trigSw       => (others=> '0'),
       -- period       => (others => (others=> '0')),
       enable   => (others => '1'),
       mode     => (others => '1'),
@@ -170,7 +171,6 @@ begin
 
       if (axilStatus.readEnable = '1') then
          axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
-         v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0x0)
                v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := r.enable;
@@ -190,7 +190,7 @@ begin
                v.axilReadSlave.rdata(NUM_SIG_GEN_G-1 downto 0) := s_overflowSync;
             when 16#0B# =>              -- ADDR (0x2C)
                v.axilReadSlave.rdata := toSlv(2**ADDR_WIDTH_G, 32);
-            when 16#10# to 16#1F# =>    -- ADDR (0x40-0x7C) 
+            when 16#10# to 16#1F# =>    -- ADDR (0x40-0x7C)
                for i in (NUM_SIG_GEN_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = i) then
                      v.axilReadSlave.rdata := r.period(i);
@@ -224,7 +224,7 @@ begin
    end process seq;
 
    -- Input assignment and synchronization
-   Sync_IN0 : entity work.SynchronizerVector
+   Sync_IN0 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => NUM_SIG_GEN_G)
@@ -233,7 +233,7 @@ begin
          dataIn  => running_i,
          dataOut => s_runningSync);
 
-   Sync_IN1 : entity work.SynchronizerVector
+   Sync_IN1 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => NUM_SIG_GEN_G)
@@ -242,7 +242,7 @@ begin
          dataIn  => underflow_i,
          dataOut => s_underflowSync);
 
-   Sync_IN2 : entity work.SynchronizerVector
+   Sync_IN2 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => NUM_SIG_GEN_G)
@@ -257,7 +257,7 @@ begin
       devClk(i) <= jesdClk2x when(RAM_CLK_G(i) = '0') else jesdClk;
       devRst(i) <= jesdRst2x when(RAM_CLK_G(i) = '0') else jesdRst;
 
-      Sync_OUT1 : entity work.Synchronizer
+      Sync_OUT1 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -265,7 +265,7 @@ begin
             dataIn  => r.enable(i),
             dataOut => enable_o(i));
 
-      Sync_OUT2 : entity work.Synchronizer
+      Sync_OUT2 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -273,7 +273,7 @@ begin
             dataIn  => r.mode(i),
             dataOut => mode_o(i));
 
-      Sync_OUT3 : entity work.Synchronizer
+      Sync_OUT3 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -281,7 +281,7 @@ begin
             dataIn  => r.sign(i),
             dataOut => sign_o(i));
 
-      Sync_OUT4 : entity work.Synchronizer
+      Sync_OUT4 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -289,7 +289,7 @@ begin
             dataIn  => r.trigSw(i),
             dataOut => trigSw_o(i));
 
-      Sync_OUT5 : entity work.SynchronizerVector
+      Sync_OUT5 : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 32)
@@ -298,7 +298,7 @@ begin
             dataIn  => r.period(i),
             dataOut => period_o(i));
 
-      Sync_OUT6 : entity work.Synchronizer
+      Sync_OUT6 : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (

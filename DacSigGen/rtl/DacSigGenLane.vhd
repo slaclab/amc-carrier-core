@@ -1,21 +1,18 @@
 -------------------------------------------------------------------------------
--- File       : DacSigGenLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-11-16
--- Last update: 2018-02-16
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
---               The module contains a AXI-Lite accessible block RAM where the 
+--               The module contains a AXI-Lite accessible block RAM where the
 --               signal is defined.
 --               It has two modes:
 --               Triggered and Periodic:
 --               Triggered:
 --                 When triggered the waveform is output once up to the buffer size
 --                 Rising edge is detected on the trigger
---               Periodic: 
---                 When the module is enabled it periodically reads the block RAM contents 
+--               Periodic:
+--                 When the module is enabled it periodically reads the block RAM contents
 --                 and outputs the contents.
---                 
+--
 --               Signal has to be disabled while the period_i or RAM contents is being changed.
 --               When disabled is outputs signal ZERO data according to sign format (sign_i)
 --                      Sign: '0' - Signed 2's complement, '1' - Offset binary
@@ -25,7 +22,7 @@
 -------------------------------------------------------------------------------
 -- | INTERFACE_G | RAM_CLK_G | BRAM Width (clock) | Output (clock)
 -------------------------------------------------------------------------------
--- |     '0'     |   '0'     | 16-bit (jesdClk2x) | 32-bit (jesdClk) 
+-- |     '0'     |   '0'     | 16-bit (jesdClk2x) | 32-bit (jesdClk)
 -------------------------------------------------------------------------------
 -- |     '1'     |   '0'     | 16-bit (jesdClk2x) | 16-bit (jesdClk2x)
 -------------------------------------------------------------------------------
@@ -34,11 +31,11 @@
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -47,11 +44,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.FpgaTypePkg.all;
 
-use work.Jesd204bPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
+
+use surf.Jesd204bPkg.all;
 
 entity DacSigGenLane is
    generic (
@@ -131,18 +132,18 @@ architecture rtl of DacSigGenLane is
    signal s_ramData  : slv(WIDTH_C-1 downto 0);
    signal s_dacData  : slv(WIDTH_C-1 downto 0);
    signal s_zeroData : slv(WIDTH_C-1 downto 0);
-   
+
    signal readMaster  : AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
    signal readSlave   : AxiLiteReadSlaveType   := AXI_LITE_READ_SLAVE_INIT_C;
    signal writeMaster : AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-   signal writeSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;   
+   signal writeSlave  : AxiLiteWriteSlaveType  := AXI_LITE_WRITE_SLAVE_INIT_C;
 
 begin
 
    devClk <= jesdClk2x when(RAM_CLK_G = '0') else jesdClk;
    devRst <= jesdRst2x when(RAM_CLK_G = '0') else jesdRst;
 
-   U_Sync : entity work.SynchronizerEdge
+   U_Sync : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -150,11 +151,11 @@ begin
          dataIn     => start_i,
          risingEdge => s_startRe);      -- Rising edge
 
-   
-         
+
+
    GEN_BRAM : if (not ULTRASCALE_PLUS_C) generate
-            
-      U_RAM : entity work.AxiDualPortRam
+
+      U_RAM : entity surf.AxiDualPortRam
          generic map (
             TPD_G        => TPD_G,
             ADDR_WIDTH_G => ADDR_WIDTH_G,
@@ -174,11 +175,11 @@ begin
             addr           => r.cnt,
             dout           => s_ramData);
 
-   end generate GEN_BRAM;   
+   end generate GEN_BRAM;
 
    GEN_URAM : if (ULTRASCALE_PLUS_C) generate
-   
-      U_AxiLiteAsync : entity work.AxiLiteAsync
+
+      U_AxiLiteAsync : entity surf.AxiLiteAsync
          generic map (
             TPD_G            => TPD_G,
             NUM_ADDR_BITS_G  => (ADDR_WIDTH_G+2),
@@ -197,9 +198,9 @@ begin
             mAxiReadMaster  => readMaster,
             mAxiReadSlave   => readSlave,
             mAxiWriteMaster => writeMaster,
-            mAxiWriteSlave  => writeSlave);   
-            
-      U_URAM : entity work.AxiDualPortRam
+            mAxiWriteSlave  => writeSlave);
+
+      U_URAM : entity surf.AxiDualPortRam
          generic map (
             TPD_G         => TPD_G,
             SYNTH_MODE_G  => "xpm",
@@ -222,8 +223,8 @@ begin
             addr           => r.cnt,
             dout           => s_ramData);
 
-   end generate GEN_URAM;      
-            
+   end generate GEN_URAM;
+
    comb : process (devRst, enable_i, mode_i, period_i, r, s_startRe) is
       variable v : RegType;
    begin
@@ -312,8 +313,8 @@ begin
       -- jesdClk domain
       GEN_32bit : if (INTERFACE_G = '0') generate
 
-         -- Output sync and assignment      
-         U_Jesd16bTo32b : entity work.Jesd16bTo32b
+         -- Output sync and assignment
+         U_Jesd16bTo32b : entity surf.Jesd16bTo32b
             generic map (
                TPD_G => TPD_G)
             port map (
@@ -328,7 +329,7 @@ begin
                validOut  => valid_o,
                dataOut   => dacSigValues_o);
 
-         U_Sync : entity work.Synchronizer
+         U_Sync : entity surf.Synchronizer
             generic map (
                TPD_G => TPD_G)
             port map (
@@ -337,7 +338,7 @@ begin
                dataIn  => r.runningD1,
                dataOut => running_o);
 
-         U_SyncOneShot : entity work.SynchronizerOneShot
+         U_SyncOneShot : entity surf.SynchronizerOneShot
             generic map (
                TPD_G => TPD_G)
             port map (

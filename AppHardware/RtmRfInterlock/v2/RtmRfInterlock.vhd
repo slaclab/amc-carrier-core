@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : RtmRfInterlock.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-06-17
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C01    
+-- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C01
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,17 +17,26 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
 entity RtmRfInterlock is
    generic (
-      TPD_G            : time             := 1 ns;
-      IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";
-      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
+      TPD_G            : time                := 1 ns;
+      IODELAY_GROUP_G  : string              := "RTM_DELAY_GROUP";
+      AXIL_BASE_ADDR_G : slv(31 downto 0)    := (others => '0');
+      TDEST_G          : slv(7 downto 0)     := x"00";
+      AXIS_CONFIG_G    : AxiStreamConfigType := EMAC_AXIS_CONFIG_C);
    port (
       -- Recovered EVR clock
       recClk          : in    sl;
@@ -39,6 +45,7 @@ entity RtmRfInterlock is
       stndbyTrig      : in    sl;
       accelTrig       : in    sl;
       dataTrig        : in    sl;
+      timestamp       : in    slv(63 downto 0) := (others => '0');
       -- AXI-Lite
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -46,9 +53,14 @@ entity RtmRfInterlock is
       axilReadSlave   : out   AxiLiteReadSlaveType;
       axilWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      -- AXI Stream Interface (axisClk domain)
+      axisClk         : in  sl;
+      axisRst         : in  sl;
+      axisMaster      : out AxiStreamMasterType;
+      axisSlave       : in  AxiStreamSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -139,6 +151,8 @@ begin
    rtmLsN(11) <= cpldCsb;
 
    U_stndbyTrigReg : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => recClk,
          Q  => stndbyTrigReg,
@@ -153,6 +167,8 @@ begin
          OB => rtmLsN(6));
 
    U_accelTrigReg : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => recClk,
          Q  => accelTrigReg,
@@ -169,7 +185,7 @@ begin
    rtmLsP(5) <= detuneSled;
    rtmLsN(5) <= tuneSled;
 
-   -- mode removed in revision C01  
+   -- mode removed in revision C01
 
    rfOff     <= rtmLsP(16);
    fault     <= rtmLsN(16);
@@ -179,17 +195,20 @@ begin
    -------
    -- Core
    -------
-   U_CORE : entity work.RtmRfInterlockCore
+   U_CORE : entity amc_carrier_core.RtmRfInterlockCore
       generic map (
          TPD_G            => TPD_G,
          IODELAY_GROUP_G  => IODELAY_GROUP_G,
-         AXIL_BASE_ADDR_G => AXIL_BASE_ADDR_G)
+         AXIL_BASE_ADDR_G => AXIL_BASE_ADDR_G,
+         TDEST_G          => TDEST_G,
+         AXIS_CONFIG_G    => AXIS_CONFIG_G)
       port map (
          -- Recovered EVR clock
          recClk          => recClk,
          recRst          => recRst,
          -- Timing triggers
          dataTrig        => dataTrig,
+         timestamp       => timestamp,
          -- AXI-Lite
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -197,6 +216,11 @@ begin
          axilReadSlave   => axilReadSlave,
          axilWriteMaster => axilWriteMaster,
          axilWriteSlave  => axilWriteSlave,
+         -- AXI Stream Interface (axisClk domain)
+         axisClk         => axisClk,
+         axisRst         => axisRst,
+         axisMaster      => axisMaster,
+         axisSlave       => axisSlave,
          -- High speed ADC status data (data rate is 6x recClk DDR)
          hsAdcBeamIP     => hsAdcBeamIP,
          hsAdcBeamIN     => hsAdcBeamIN,

@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AppMsgOb.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-03-01
--- Last update: 2018-04-20
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,10 +17,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
 
 entity AppMsgOb is
    generic (
@@ -31,11 +30,11 @@ entity AppMsgOb is
       HDR_SIZE_G         : positive := 1;
       DATA_SIZE_G        : positive := 1;
       EN_CRC_G           : boolean  := true;
-      BRAM_EN_G          : boolean  := true;
+      MEMORY_TYPE_G      : string   := "block";
       AXIS_TDATA_WIDTH_G : positive := 16;  -- units of bytes
       FIFO_ADDR_WIDTH_G  : positive := 9);  -- units of bits
    port (
-      -- Application Messaging Interface (clk domain)      
+      -- Application Messaging Interface (clk domain)
       clk         : in  sl;
       rst         : in  sl;
       strobe      : in  sl;
@@ -88,7 +87,7 @@ architecture rtl of AppMsgOb is
          idx                                 := idx + 1;
       end loop;
 
-      -- Load the tDest 
+      -- Load the tDest
       retVar((idx*32)+7 downto (idx*32)) := tdest;
       idx                                := idx + 1;
 
@@ -131,13 +130,13 @@ architecture rtl of AppMsgOb is
    signal crcResult : slv(31 downto 0) := (others => '0');
 
    -- attribute dont_touch             : string;
-   -- attribute dont_touch of r        : signal is "TRUE";   
+   -- attribute dont_touch of r        : signal is "TRUE";
 
 begin
 
    fifoDin <= toSlv(header, timeStamp, data, tdest);
 
-   RX_FIFO : entity work.SynchronizerFifo
+   RX_FIFO : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => DATA_WIDTH_G)
@@ -245,7 +244,7 @@ begin
       -- Register the variable for next clock cycle
       rin <= v;
 
-      -- Outputs        
+      -- Outputs
       fifoRd   <= v.fifoRd;
       txMaster <= r.txMaster;
 
@@ -259,27 +258,27 @@ begin
    end process seq;
 
    GEN_CRC : if (EN_CRC_G = true) generate
-      U_Crc32 : entity work.Crc32Parallel
+      U_Crc32 : entity surf.Crc32Parallel
          generic map (
             TPD_G        => TPD_G,
             BYTE_WIDTH_G => 4)
          port map (
             crcClk       => axilClk,
             crcReset     => r.crcRst,
-            crcDataWidth => "011",      -- 4 bytes 
+            crcDataWidth => "011",      -- 4 bytes
             crcDataValid => r.crcValid,
             crcIn        => r.crcData,
             crcOut       => crcResult);
    end generate;
 
-   TX_FIFO : entity work.AxiStreamFifoV2
+   TX_FIFO : entity surf.AxiStreamFifoV2
       generic map (
          -- General Configurations
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
          -- FIFO configurations
-         BRAM_EN_G           => BRAM_EN_G,
+         MEMORY_TYPE_G       => MEMORY_TYPE_G,
          GEN_SYNC_FIFO_G     => true,
          FIFO_ADDR_WIDTH_G   => FIFO_ADDR_WIDTH_G,
          -- AXI Stream Port Configurations

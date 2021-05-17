@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierEthFsbl.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-21
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,13 +17,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.AmcCarrierSysRegPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.AmcCarrierSysRegPkg.all;
 
 entity AmcCarrierEthFsbl is
    generic (
@@ -34,7 +35,7 @@ entity AmcCarrierEthFsbl is
    port (
       -- Local Configuration and status
       localMac            : in  slv(47 downto 0);  --  big-Endian configuration
-      localIp             : in  slv(31 downto 0);  --  big-Endian configuration   
+      localIp             : in  slv(31 downto 0);  --  big-Endian configuration
       ethPhyReady         : out sl;
       -- Master AXI-Lite Interface
       mAxilReadMasters    : out AxiLiteReadMasterArray(1 downto 0);
@@ -72,7 +73,7 @@ entity AmcCarrierEthFsbl is
       ibBpMsgServerSlave  : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
-      ----------------   
+      ----------------
       -- ETH Ports
       ethRxP              : in  slv(3 downto 0);
       ethRxN              : in  slv(3 downto 0);
@@ -127,7 +128,7 @@ begin
    -----------------------
    -- Zone2 10 GigE Module
    -----------------------
-   U_Xaui : entity work.XauiGthUltraScaleWrapper
+   U_Xaui : entity surf.XauiGthUltraScaleWrapper
       generic map (
          TPD_G         => TPD_G,
          EN_WDT_G      => true,
@@ -136,7 +137,7 @@ begin
       port map (
          -- Local Configurations
          localMac       => localMac,
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk         => axilClk,
          dmaRst         => axilRst,
          dmaIbMaster    => obMacMasters(0),
@@ -165,7 +166,7 @@ begin
    ----------------------
    -- Zone3 1 GigE Module
    ----------------------
-   U_Rtm : entity work.GigEthGthUltraScaleWrapper
+   U_Rtm : entity surf.GigEthGthUltraScaleWrapper
       generic map (
          TPD_G              => TPD_G,
          -- DMA/MAC Configurations
@@ -175,13 +176,13 @@ begin
          CLKIN_PERIOD_G     => 6.4,     -- 156.25 MHz
          DIVCLK_DIVIDE_G    => 5,       -- 31.25 MHz = (156.25 MHz/5)
          CLKFBOUT_MULT_F_G  => 32.0,    -- 1 GHz = (32 x 31.25 MHz)
-         CLKOUT0_DIVIDE_F_G => 8.0,     -- 125 MHz = (1.0 GHz/8)         
+         CLKOUT0_DIVIDE_F_G => 8.0,     -- 125 MHz = (1.0 GHz/8)
          -- AXI Streaming Configurations
          AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
       port map (
          -- Local Configurations
          localMac(0)     => rtmMac,
-         -- Streaming DMA Interface 
+         -- Streaming DMA Interface
          dmaClk(0)       => axilClk,
          dmaRst(0)       => axilRst,
          dmaIbMasters(0) => obMacMasters(1),
@@ -191,7 +192,7 @@ begin
          -- Misc. Signals
          extRst          => axilRst,
          phyReady(0)     => phyReady(1),
-         -- MGT Clock Port 
+         -- MGT Clock Port
          gtRefClk        => axilClk,
          gtClkP          => '1',
          gtClkN          => '0',
@@ -209,7 +210,7 @@ begin
       ----------------------
       -- IPv4/ARP/UDP Engine
       ----------------------
-      U_UdpEngineWrapper : entity work.UdpEngineWrapper
+      U_UdpEngineWrapper : entity surf.UdpEngineWrapper
          generic map (
             -- Simulation Generics
             TPD_G          => TPD_G,
@@ -221,8 +222,8 @@ begin
             CLIENT_EN_G    => false,
             -- IPv4/ARP Generics
             CLK_FREQ_G     => AXI_CLK_FREQ_C,  -- In units of Hz
-            VLAN_G         => false,           -- no VLAN       
-            DHCP_G         => false)           -- no DHCP       
+            VLAN_G         => false,           -- no VLAN
+            DHCP_G         => false)           -- no DHCP
          port map (
             -- Local Configurations
             localMac           => localMac,
@@ -244,16 +245,16 @@ begin
       --------------------------------------------------
       -- Legacy AXI-Lite Master without RSSI Server@8192
       --------------------------------------------------
-      U_SRPv0 : entity work.SrpV0AxiLite
+      U_SRPv0 : entity surf.SrpV0AxiLite
          generic map (
             TPD_G               => TPD_G,
             SLAVE_READY_EN_G    => true,
             EN_32BIT_ADDR_G     => true,
-            BRAM_EN_G           => true,
+            MEMORY_TYPE_G       => "block",
             GEN_SYNC_FIFO_G     => true,
             AXI_STREAM_CONFIG_G => EMAC_AXIS_CONFIG_C)
          port map (
-            -- Streaming Slave (Rx) Interface (sAxisClk domain) 
+            -- Streaming Slave (Rx) Interface (sAxisClk domain)
             sAxisClk            => axilClk,
             sAxisRst            => axilRst,
             sAxisMaster         => obServerMasters(i),

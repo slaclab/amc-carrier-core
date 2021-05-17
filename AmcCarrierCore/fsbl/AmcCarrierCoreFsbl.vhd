@@ -1,31 +1,34 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierCoreFsbl.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-02-04
--- Last update: 2017-12-13
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.TimingPkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -33,7 +36,7 @@ use unisim.vcomponents.all;
 entity AmcCarrierCoreFsbl is
    generic (
       TPD_G        : time := 1 ns;
-      BUILD_INFO_G : BuildInfoType);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)      
+      BUILD_INFO_G : BuildInfoType);  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
    port (
       -----------------------
       -- Core Ports to AppTop
@@ -46,7 +49,7 @@ entity AmcCarrierCoreFsbl is
       axilReadSlave        : in    AxiLiteReadSlaveType;
       axilWriteMaster      : out   AxiLiteWriteMasterType;
       axilWriteSlave       : in    AxiLiteWriteSlaveType;
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk            : in    sl;
       timingRst            : in    sl;
       timingBus            : out   TimingBusType;
@@ -55,7 +58,7 @@ entity AmcCarrierCoreFsbl is
       timingPhyRst         : out   sl;
       timingRefClk         : out   sl;
       timingRefClkDiv2     : out   sl;
-      timingTrig           : out   TimingTrigType;      
+      timingTrig           : out   TimingTrigType;
       -- Diagnostic Interface (diagnosticClk domain)
       diagnosticClk        : in    sl;
       diagnosticRst        : in    sl;
@@ -222,10 +225,10 @@ begin
    ethPhyReady <= ethLinkUp;
    timingBus   <= timingBusIntf;
 
-   ----------------------------------   
+   ----------------------------------
    -- Register Address Mapping Module
-   ----------------------------------   
-   U_SysReg : entity work.AmcCarrierSysReg
+   ----------------------------------
+   U_SysReg : entity amc_carrier_core.AmcCarrierSysReg
       generic map (
          TPD_G            => TPD_G,
          BUILD_INFO_G     => BUILD_INFO_G,
@@ -273,7 +276,7 @@ begin
          ethLinkUp         => ethLinkUp,
          ----------------------
          -- Top Level Interface
-         ----------------------              
+         ----------------------
          -- Application AXI-Lite Interface
          appReadMaster     => axilReadMaster,
          appReadSlave      => axilReadSlave,
@@ -283,7 +286,7 @@ begin
          bsiBus            => bsiBus,
          ----------------
          -- Core Ports --
-         ----------------   
+         ----------------
          -- Crossbar Ports
          xBarSin           => xBarSin,
          xBarSout          => xBarSout,
@@ -308,7 +311,7 @@ begin
    ------------------
    -- Application MPS
    ------------------
-   U_AppMps : entity work.AppMps
+   U_AppMps : entity amc_carrier_core.AppMps
       generic map (
          TPD_G            => TPD_G,
          APP_TYPE_G       => APP_NULL_TYPE_C,
@@ -352,14 +355,14 @@ begin
    -------------------
    -- AMC Carrier Core
    -------------------
-   U_Core : entity work.AmcCarrierFsbl
+   U_Core : entity amc_carrier_core.AmcCarrierFsbl
       generic map (
          TPD_G => TPD_G)
       port map (
          -----------------------
          -- Core Ports to AppTop
          -----------------------
-         -- Timing Interface (timingClk domain) 
+         -- Timing Interface (timingClk domain)
          timingClk            => timingClk,
          timingRst            => timingRst,
          timingBusIntf        => timingBusIntf,
@@ -400,9 +403,9 @@ begin
          ref156MHzClk         => ref156MHzClk,
          ref156MHzRst         => ref156MHzRst,
          gthFabClk            => gthFabClk,
-         ------------------------         
+         ------------------------
          -- Core Ports to Wrapper
-         ------------------------         
+         ------------------------
          -- AXI-Lite Master bus
          axilReadMasters      => axilReadMasters,
          axilReadSlaves       => axilReadSlaves,

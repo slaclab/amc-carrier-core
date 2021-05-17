@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : Si5317a.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-12-04
--- Last update: 2018-04-24
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_13_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,8 +17,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -138,7 +137,7 @@ begin
    pllLocked <= locked;
    locked    <= not(los) and not(lol);
 
-   U_pllLos : entity work.Debouncer
+   U_pllLos : entity surf.Debouncer
       generic map (
          TPD_G             => TPD_G,
          INPUT_POLARITY_G  => '1',
@@ -148,7 +147,7 @@ begin
          i   => pllLos,
          o   => los);
 
-   U_pllLol : entity work.Debouncer
+   U_pllLol : entity surf.Debouncer
       generic map (
          TPD_G             => TPD_G,
          INPUT_POLARITY_G  => '1',
@@ -260,7 +259,7 @@ begin
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
-      -- Check a local copy 
+      -- Check a local copy
       v.los    := los;
       v.lol    := lol;
       v.locked := locked;
@@ -336,7 +335,7 @@ begin
       end if;
    end process seq;
 
-   U_pllRst : entity work.PwrUpRst
+   U_pllRst : entity surf.PwrUpRst
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '1',         -- active HIGH input

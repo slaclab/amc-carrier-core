@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : AxiSerAttnMaster.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-12
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:   This module handles SPI chips with only one setting (non addressable or readable over SPI)
 --                Write only access to SPI
@@ -12,18 +9,18 @@
 --                to multiple AXI crossbar slaves and use Chip select outputs
 --                (coreCsb) to multiplex select the addressed outputs (coreSDout and
 --                coreSclk).
---                The coreCsb is active low. And active only if the corresponding 
+--                The coreCsb is active low. And active only if the corresponding
 --                Axi Crossbar Slave is addressed.
 --
 --                Outputs a latch enable signal (For Attenuator chips) after the data is written
 --                the latch enable stays high for one SPI_CLK_PERIOD_CYCLES_C.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -34,8 +31,10 @@ use ieee.std_logic_unsigned.all;
 library unisim;
 use unisim.vcomponents.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity AxiSerAttnMaster is
    generic (
@@ -120,7 +119,6 @@ begin
 
             if (axiStatus.readEnable = '1') then
                -- Just return previously written value
-               v.axiReadSlave.rdata                         := (others => '0');
                v.axiReadSlave.rdata(DATA_SIZE_G-1 downto 0) := r.wrData;
                axiSlaveReadResponse(v.axiReadSlave);
 
@@ -129,7 +127,7 @@ begin
             end if;
 
             if (axiStatus.writeEnable = '1') then
-               -- Write data to Attn chip 
+               -- Write data to Attn chip
                v.wrData := axiWriteMaster.wdata(DATA_SIZE_G-1 downto 0);
                v.wrEn   := '1';
                v.state  := WAIT_CYCLE_S;
@@ -182,7 +180,7 @@ begin
       end if;
    end process seq;
 
-   SpiMaster_1 : entity work.SpiMaster
+   SpiMaster_1 : entity surf.SpiMaster
       generic map (
          TPD_G             => TPD_G,
          NUM_CHIPS_G       => 1,

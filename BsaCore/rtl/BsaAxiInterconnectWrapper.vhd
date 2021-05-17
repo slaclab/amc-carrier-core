@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : BsaAxiInterconnectWrapper.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-02-10
--- Last update: 2016-07-13
 -------------------------------------------------------------------------------
 -- Description: Wrapper around AxiInterconnect Xilinx IP Core.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -19,9 +16,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
 
 entity BsaAxiInterconnectWrapper is
    port (
@@ -412,7 +411,7 @@ begin
          S03_AXI_RLAST        => sAxiReadSlaves(3).RLAST,
          S03_AXI_RVALID       => sAxiReadSlaves(3).RVALID,
          S03_AXI_RREADY       => sAxiReadMasters(3).RREADY,
-         
+
          -- MIG DDR Port
          M00_AXI_ARESET_OUT_N => open,
          M00_AXI_ACLK         => axiClk,

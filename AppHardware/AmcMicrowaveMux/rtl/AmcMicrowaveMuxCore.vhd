@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcMicrowaveMuxCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-10-05
--- Last update: 2019-03-26
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_30_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 LLRF Development'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 LLRF Development', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 LLRF Development', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -22,10 +19,14 @@ use ieee.std_logic_arith.all;
 library unisim;
 use unisim.vcomponents.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bPkg.all;
+
+library amc_carrier_core;
 
 entity AmcMicrowaveMuxCore is
    generic (
@@ -33,14 +34,14 @@ entity AmcMicrowaveMuxCore is
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
-      -- Timing Interface (timingClk domain) 
+      -- Timing Interface (timingClk domain)
       timingClk       : in    sl;
       timingRst       : in    sl;
       -- JESD Interface
       jesdClk         : in    sl;
       jesdSysRef      : out   sl;
       jesdRxSync      : in    sl;
-      jesdTxSync      : out   sl;
+      jesdTxSync      : out   slv(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -50,7 +51,7 @@ entity AmcMicrowaveMuxCore is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri         : inout slv(4 downto 0);
       jtagSec         : inout slv(4 downto 0);
@@ -149,9 +150,9 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal jesdTxSyncMask : slv(1 downto 0);
    -------------------------------------------------------------------------------------------------
    -- SPI
-   -------------------------------------------------------------------------------------------------   
+   -------------------------------------------------------------------------------------------------
 
-   -- ADC SPI config interface   
+   -- ADC SPI config interface
    signal adcCoreRst  : slv(1 downto 0) := "00";
    signal adcCoreClk  : slv(1 downto 0);
    signal adcCoreDout : slv(1 downto 0);
@@ -165,7 +166,7 @@ architecture top_level_app of AmcMicrowaveMuxCore is
    signal adcSpiDo  : slv(1 downto 0);
    signal adcSpiCsb : slv(1 downto 0);
 
-   -- DAC SPI config interface 
+   -- DAC SPI config interface
    signal dacCoreClk  : slv(1 downto 0);
    signal dacCoreDout : slv(1 downto 0);
    signal dacCoreCsb  : slv(1 downto 0);
@@ -221,15 +222,15 @@ begin
    axilRstL <= not(axilRst);
 
    -----------------------
-   -- Generalized Mapping 
+   -- Generalized Mapping
    -----------------------
 
    -- JESD Reference Ports
    jesdSysRefP <= sysRefP(0);  -- Polarity swapped on page 2 of schematics
    jesdSysRefN <= sysRefN(0);
 
-   sysRefP(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna) 
-   sysRefN(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna) 
+   sysRefP(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna)
+   sysRefN(2) <= '0';  -- driven the unconnected ext sysref to GND (prevent floating antenna)
 
    -- JESD RX Sync Ports
    syncInP(3) <= jesdRxSyncP(0);
@@ -243,7 +244,7 @@ begin
    jesdTxSyncP(1) <= spareP(8);
    jesdTxSyncN(1) <= spareN(8);
 
-   -- ADC SPI 
+   -- ADC SPI
    adcSpiDo(0) <= spareP(2);
    adcSpiDo(1) <= syncInN(0);
    spareN(1)   <= adcSpiClk;
@@ -282,7 +283,7 @@ begin
    jtagSec(3) <= lmkSync;
 
    -- LMK CLKin0
-   U_LmkClk0 : entity work.ClkOutBufDiff
+   U_LmkClk0 : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          INVERT_G     => true,  -- Fix polarity swap in AMC card hardware
@@ -310,7 +311,7 @@ begin
    syncOutN(1) <= hmc305Sdi;
 
    syncInP(1) <= hmc305Sck;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
-   syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware 
+   syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
 
    syncOutP(2) <= hmc305Addr(1);
    syncOutN(2) <= hmc305Addr(2);
@@ -320,7 +321,7 @@ begin
    syncOutN(1) <= hmc305Sdi;
 
    syncInP(1) <= hmc305Sck;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
-   syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware 
+   syncInN(1) <= hmc305Le;  -- SPI_CLK and SPI_RST (hmc305Le) swapped in hardware
 
    syncOutP(2) <= hmc305Addr(1);
    syncOutN(2) <= hmc305Addr(2);
@@ -328,7 +329,7 @@ begin
    -------------------------------------------------------------------------------------------------
    -- Application Top Axi Crossbar
    -------------------------------------------------------------------------------------------------
-   U_XBAR0 : entity work.AxiLiteCrossbar
+   U_XBAR0 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -347,7 +348,7 @@ begin
          mAxiReadSlaves      => locAxilReadSlaves);
 
 
-   U_XBAR1 : entity work.AxiLiteCrossbar
+   U_XBAR1 : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -367,12 +368,13 @@ begin
 
    ----------------------------------------------------------------
    -- Debug Control Module
-   ----------------------------------------------------------------            
+   ----------------------------------------------------------------
 
-   U_Ctrl : entity work.AmcMicrowaveMuxCoreCtrl
+   U_Ctrl : entity amc_carrier_core.AmcMicrowaveMuxCoreCtrl
       generic map (
          TPD_G => TPD_G)
       port map (
+         jesdClk         => jesdClk,
          -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -392,11 +394,11 @@ begin
 
    ----------------------------------------------------------------
    -- SPI interface PLL (ADF5355)
-   ----------------------------------------------------------------         
+   ----------------------------------------------------------------
 
    GEN_PLL : for i in 3 downto 0 generate
 
-      U_PLL : entity work.adf5355
+      U_PLL : entity amc_carrier_core.adf5355
          generic map (
             TPD_G             => TPD_G,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -445,9 +447,9 @@ begin
 
    ----------------------------------------------------------------
    -- ADI HMC305 Module
-   ----------------------------------------------------------------            
+   ----------------------------------------------------------------
 
-   U_HMC305 : entity work.hmc305
+   U_HMC305 : entity amc_carrier_core.hmc305
       generic map (
          TPD_G             => TPD_G,
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -469,10 +471,11 @@ begin
    ----------------------------------------------------------------
    -- JESD Buffers
    ----------------------------------------------------------------
-   U_jesdSysRef : entity work.JesdSyncIn
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
-         TPD_G    => TPD_G,
-         INVERT_G => true)  -- Note inverted because it is Swapped on the board
+         TPD_G       => TPD_G,
+         GEN_ASYNC_G => false, -- Deskewed using LMK to get rid of race condition between jesdSysRefP/N and jesdClk
+         INVERT_G    => true)  -- Note inverted because it is Swapped on the board
       port map (
          -- Clock
          jesdClk   => jesdClk,
@@ -482,7 +485,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : entity work.JesdSyncOut
+   U_jesdRxSync0 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -495,7 +498,7 @@ begin
          jesdSyncP => jesdRxSyncP(0),
          jesdSyncN => jesdRxSyncN(0));
 
-   U_jesdRxSync1 : entity work.JesdSyncOut
+   U_jesdRxSync1 : entity amc_carrier_core.JesdSyncOut
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => true)  -- Note inverted because it is Swapped on the board
@@ -508,7 +511,7 @@ begin
          jesdSyncP => jesdRxSyncP(1),
          jesdSyncN => jesdRxSyncN(1));
 
-   U_jesdTxSync0 : entity work.JesdSyncIn
+   U_jesdTxSync0 : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -521,7 +524,7 @@ begin
          -- JESD Low speed Interface
          jesdSync  => jesdTxSyncRaw(0));
 
-   U_jesdTxSync1 : entity work.JesdSyncIn
+   U_jesdTxSync1 : entity amc_carrier_core.JesdSyncIn
       generic map (
          TPD_G    => TPD_G,
          INVERT_G => false)
@@ -537,13 +540,14 @@ begin
    jesdTxSyncVec(0) <= jesdTxSyncMask(0) or not(jesdTxSyncRaw(0));
    jesdTxSyncVec(1) <= jesdTxSyncMask(1) or jesdTxSyncRaw(1);
 
-   jesdTxSync <= jesdTxSyncVec(0) and jesdTxSyncVec(1);
+   jesdTxSync(4 downto 0) <= (others=>jesdTxSyncVec(0));
+   jesdTxSync(9 downto 5) <= (others=>jesdTxSyncVec(1));
 
    ----------------------------------------------------------------
    -- SPI interface ADC (ADC32R44)
    ----------------------------------------------------------------
    GEN_ADC : for i in 1 downto 0 generate
-      U_ADC : entity work.adc32rf45
+      U_ADC : entity surf.adc32rf45
          generic map (
             TPD_G             => TPD_G,
             CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
@@ -586,7 +590,7 @@ begin
    -- SPI interface DAC (DAC38J84IAAV)
    ----------------------------------------------------------------
    GEN_DAC : for i in 1 downto 0 generate
-      U_DAC : entity work.AxiSpiMaster
+      U_DAC : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 7,
@@ -629,8 +633,8 @@ begin
          T  => dacTriState);
 
    dacInState  <= dacCoreDout(0) when (dacSpiMode='1') else '0';
-   dacTriState <= '0'            when (dacSpiMode='1') else dacMuxDout;      
-      
+   dacTriState <= '0'            when (dacSpiMode='1') else dacMuxDout;
+
    IOBUF_Dac1 : IOBUF
       port map (
          I  => dacCoreCsb(1),
@@ -654,7 +658,7 @@ begin
    -------------------------------
    -- SPI interface LMK (LMK04828)
    -------------------------------
-   U_LMK : entity work.AxiSpiMaster
+   U_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 15,

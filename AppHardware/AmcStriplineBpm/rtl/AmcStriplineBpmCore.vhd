@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcStriplineBpmCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-10-28
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,13 +17,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core;
 
 entity AmcStriplineBpmCore is
    generic (
@@ -34,7 +35,7 @@ entity AmcStriplineBpmCore is
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
-      -- Analog Control Ports 
+      -- Analog Control Ports
       attn1A          : in    slv(4 downto 0);
       attn1B          : in    slv(4 downto 0);
       attn2A          : in    slv(4 downto 0);
@@ -178,7 +179,7 @@ begin
    spareP(12) <= dacCsL;
    spareN(13) <= dacSck;
    spareN(12) <= dacMosi;
-   -- Analog Control Ports 
+   -- Analog Control Ports
    sysRefN(0) <= attn1A(0);
    sysRefP(0) <= attn1A(1);
    syncInN(0) <= attn1A(2);
@@ -242,23 +243,44 @@ begin
    spareN(9)   <= clClkOe;
    spareP(9)   <= rfAmpOn;
    -- JESD
-   IBUFDS_SysRef : IBUFDS
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => fpgaClkP(0),
-         IB => fpgaClkN(0),
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => fpgaClkP(0),
+         jesdSyncN => fpgaClkN(0),
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   OBUFDS_RxSync0 : OBUFDS
+   U_jesdRxSync0 : entity amc_carrier_core.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => jtagSec(0),
-         OB => jtagSec(1));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => jtagSec(0),
+         jesdSyncN => jtagSec(1));
 
-   OBUFDS_RxSync1 : OBUFDS
+   U_jesdRxSync1 : entity amc_carrier_core.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => jtagSec(2),
-         OB => jtagSec(3));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => jtagSec(2),
+         jesdSyncN => jtagSec(3));
 
    -- Triggers
    IBUFDS_ExtTrig : IBUFDS
@@ -272,7 +294,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -292,8 +314,8 @@ begin
 
    -----------------
    -- LMK SPI Module
-   -----------------   
-   SPI_LMK : entity work.AxiSpiMaster
+   -----------------
+   SPI_LMK : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 15,
@@ -338,9 +360,9 @@ begin
 
    -----------------
    -- ADC SPI Module
-   -----------------   
+   -----------------
    GEN_ADC_SPI : for i in 1 downto 0 generate
-      SPI_DAC : entity work.AxiSpiMaster
+      SPI_DAC : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             ADDRESS_SIZE_G    => 15,
@@ -374,8 +396,8 @@ begin
 
    -----------------
    -- DAC SPI Module
-   -----------------   
-   SPI_DAC_0 : entity work.AxiSpiMaster
+   -----------------
+   SPI_DAC_0 : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          ADDRESS_SIZE_G    => 7,
@@ -394,7 +416,7 @@ begin
          coreSDout      => dacMosiVec(0),
          coreCsb        => dacCsLVec(0));
 
-   SPI_DAC_1 : entity work.AmcBpmDacVcoSpi
+   SPI_DAC_1 : entity amc_carrier_core.AmcBpmDacVcoSpi
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -415,7 +437,7 @@ begin
    ---------------------
    -- BPM Control Module
    ---------------------
-   U_AmcBpmCtrl : entity work.AmcBpmCtrl
+   U_AmcBpmCtrl : entity amc_carrier_core.AmcBpmCtrl
       generic map (
          TPD_G          => TPD_G,
          AXI_CLK_FREQ_G => AXI_CLK_FREQ_G)
@@ -439,7 +461,7 @@ begin
          axilWriteSlave  => axilWriteSlaves(CTRL_INDEX_C),
          -----------------------
          -- Application Ports --
-         -----------------------      
+         -----------------------
          -- LMK Ports
          lmkClkSel       => lmkClkSel,
          lmkRst          => lmkRst,

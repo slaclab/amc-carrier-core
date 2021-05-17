@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : OutputTapDelay.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-03-11
--- Last update: 2016-10-05
 -------------------------------------------------------------------------------
 -- Description: The ODELAYE3 Ultrascale
 --              - Non cascaded
@@ -13,11 +10,11 @@
 --              - refClk input frequency range in MHz (200.0-2400.0)
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -26,7 +23,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -51,9 +53,9 @@ end OutputTapDelay;
 architecture rtl of OutputTapDelay is
 
    signal dataReg : sl;
-   
+
    attribute IODELAY_GROUP : string;
-   attribute IODELAY_GROUP of U_ODELAYE3 : label is IODELAY_GROUP_G;   
+   attribute IODELAY_GROUP of U_ODELAYE3 : label is IODELAY_GROUP_G;
 
 begin
 
@@ -63,7 +65,8 @@ begin
          IS_C_INVERTED  => '0',         -- Optional inversion for C
          IS_D1_INVERTED => '0',         -- Optional inversion for D1
          IS_D2_INVERTED => '0',         -- Optional inversion for D2
-         SRVAL          => '0')  -- Initializes the ODDRE1 Flip-Flops to the specified value ('0', '1')
+         SRVAL          => '0',  -- Initializes the ODDRE1 Flip-Flops to the specified value ('0', '1')
+         SIM_DEVICE     => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          Q  => dataReg,                 -- 1-bit output: Data output to IOB
          C  => clk_i,                   -- 1-bit input: High-speed clock input

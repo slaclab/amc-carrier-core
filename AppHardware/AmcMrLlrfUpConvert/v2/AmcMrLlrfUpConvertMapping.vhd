@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcMrLlrfUpConvertMapping.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-03-30
--- Last update: 2018-02-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,10 +17,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -56,7 +58,7 @@ entity AmcMrLlrfUpConvertMapping is
       recRst        : in    sl;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- AMC's JTAG Ports
       jtagPri       : inout slv(4 downto 0);
       jtagSec       : inout slv(4 downto 0);
@@ -83,33 +85,59 @@ architecture mapping of AmcMrLlrfUpConvertMapping is
 begin
 
    -----------------------
-   -- Generalized Mapping 
+   -- Generalized Mapping
    -----------------------
-   U_jesdSysRef : IBUFDS
+   U_jesdSysRef : entity amc_carrier_core.JesdSyncIn
       generic map (
-         DIFF_TERM => true)
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => syncOutP(7),
-         IB => syncOutN(7),
-         O  => jesdSysRef);
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(7),
+         jesdSyncN => syncOutN(7),
+         -- JESD Low speed Interface
+         jesdSync  => jesdSysRef);
 
-   U_jesdRxSync0 : OBUFDS
+   U_jesdRxSync0 : entity amc_carrier_core.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(4),
-         OB => syncOutN(4));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(4),
+         jesdSyncN => syncOutN(4));
 
-   U_jesdRxSync1 : OBUFDS
+   U_jesdRxSync1 : entity amc_carrier_core.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(2),
-         OB => syncOutN(2));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(2),
+         jesdSyncN => syncOutN(2));
 
-   U_jesdRxSync2 : OBUFDS
+   U_jesdRxSync2 : entity amc_carrier_core.JesdSyncOut
+      generic map (
+         TPD_G    => TPD_G,
+         INVERT_G => false)
       port map (
-         I  => jesdRxSync,
-         O  => syncOutP(1),
-         OB => syncOutN(1));
+         -- Clock
+         jesdClk   => jesdClk,
+         -- JESD Low speed Interface
+         jesdSync  => jesdRxSync,
+         -- JESD Low speed Ports
+         jesdSyncP => syncOutP(1),
+         jesdSyncN => syncOutN(1));
 
    ADC_SDIO_IOBUFT : IOBUF
       port map (
@@ -141,6 +169,8 @@ begin
 
    DATA_OUT : if (TIMING_TRIG_MODE_G = false) generate
       U_ODDR : ODDRE1
+         generic map (
+            SIM_DEVICE => ite(ULTRASCALE_PLUS_C, "ULTRASCALE_PLUS", "ULTRASCALE"))
          port map (
             C  => recClk,
             Q  => timingTrigReg,
@@ -154,7 +184,7 @@ begin
    end generate;
 
    CLK_OUT : if (TIMING_TRIG_MODE_G = true) generate
-      U_CLK : entity work.ClkOutBufSingle
+      U_CLK : entity surf.ClkOutBufSingle
          generic map (
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
@@ -175,8 +205,8 @@ begin
    i2cSda <= spareN(0);
 
    ----------------------------
-   -- Version2 Specific Mapping 
-   ----------------------------    
+   -- Version2 Specific Mapping
+   ----------------------------
 
    U_DOUT7  : OBUFDS port map (I => s_dacDataDly(7), O => sysRefP(0), OB => sysRefN(0));
    U_DOUT8  : OBUFDS port map (I => s_dacDataDly(8), O => sysRefP(1), OB => sysRefN(1));
@@ -188,7 +218,7 @@ begin
    U_DOUT14 : OBUFDS port map (I => s_dacDataDly(14), O => syncOutP(0), OB => syncOutN(0));
    U_DOUT15 : OBUFDS port map (I => s_dacDataDly(15), O => syncOutP(3), OB => syncOutN(3));
 
-   U_CLK_DIFF_BUF : entity work.ClkOutBufDiff
+   U_CLK_DIFF_BUF : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")

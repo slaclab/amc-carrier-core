@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : RtmRfInterlockCore.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-06-17
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_CXX
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,24 +17,35 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.TimingPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+
+library lcls_timing_core;
+use lcls_timing_core.TimingPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
 
+library amc_carrier_core;
+
 entity RtmRfInterlockCore is
    generic (
-      TPD_G            : time             := 1 ns;
-      IODELAY_GROUP_G  : string           := "RTM_DELAY_GROUP";
-      AXIL_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
+      TPD_G              : time                  := 1 ns;
+      IODELAY_GROUP_G    : string                := "RTM_DELAY_GROUP";
+      AXIL_BASE_ADDR_G   : slv(31 downto 0)      := (others => '0');
+      TDEST_G            : slv(7 downto 0)     := x"00";
+      AXIS_CONFIG_G      : AxiStreamConfigType := EMAC_AXIS_CONFIG_C);
    port (
       -- Recovered EVR clock
       recClk          : in  sl;
       recRst          : in  sl;
       -- Timing triggers
       dataTrig        : in  sl;
+      timestamp       : in  slv(63 downto 0) := (others => '0');
       -- AXI-Lite
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -45,6 +53,11 @@ entity RtmRfInterlockCore is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
+      -- AXI Stream Interface (axisClk domain)
+      axisClk         : in  sl;
+      axisRst         : in  sl;
+      axisMaster      : out AxiStreamMasterType;
+      axisSlave       : in  AxiStreamSlaveType;
       -- High speed ADC status data (data rate is 6x recClk DDR)
       hsAdcBeamIP     : in  sl;
       hsAdcBeamIN     : in  sl;
@@ -89,24 +102,28 @@ end RtmRfInterlockCore;
 architecture mapping of RtmRfInterlockCore is
 
    constant BUFFER_WIDTH_C     : natural := 32;
-   constant BUFFER_ADDR_SIZE_C : natural := 9;  -- 512 samples after trigger 
-   constant NUM_AXI_MASTERS_C  : natural := 7;
+   constant BUFFER_ADDR_SIZE_C : natural := 9;  -- 512 samples after trigger
+   constant NUM_AXI_MASTERS_C  : natural := 9;
 
-   constant CPLD_INDEX_C    : natural := 0;
-   constant THR_KLY_INDEX_C : natural := 1;
-   constant THR_MOD_INDEX_C : natural := 2;
-   constant THR_ADC_INDEX_C : natural := 3;
-   constant RTM_REG_INDEX_C : natural := 4;
-   constant BUF0_INDEX_C    : natural := 5;
-   constant BUF1_INDEX_C    : natural := 6;
+   constant CPLD_INDEX_C      : natural := 0;
+   constant THR_KLY_INDEX_C   : natural := 1;
+   constant THR_MOD_INDEX_C   : natural := 2;
+   constant THR_ADC_INDEX_C   : natural := 3;
+   constant RTM_REG_INDEX_C   : natural := 4;
+   constant BUF0_INDEX_C      : natural := 5;
+   constant BUF1_INDEX_C      : natural := 6;
+   constant BUF0_HIST_INDEX_C : natural := 7;
+   constant BUF1_HIST_INDEX_C : natural := 8;
 
-   constant CPLD_ADDRESS_C      : slv(31 downto 0) := x"0000_0000" + AXIL_BASE_ADDR_G;
-   constant THR_KLY_BASE_ADDR_C : slv(31 downto 0) := x"0000_0400" + AXIL_BASE_ADDR_G;
-   constant THR_MOD_BASE_ADDR_C : slv(31 downto 0) := x"0000_0800" + AXIL_BASE_ADDR_G;
-   constant THR_ADC_BASE_ADDR_C : slv(31 downto 0) := x"0000_0C00" + AXIL_BASE_ADDR_G;
-   constant RTM_REG_BASE_ADDR_C : slv(31 downto 0) := x"0000_1000" + AXIL_BASE_ADDR_G;
-   constant BUF0_BASE_ADDR_C    : slv(31 downto 0) := x"0000_2000" + AXIL_BASE_ADDR_G;
-   constant BUF1_BASE_ADDR_C    : slv(31 downto 0) := x"0000_3000" + AXIL_BASE_ADDR_G;
+   constant CPLD_ADDRESS_C           : slv(31 downto 0) := x"0000_0000" + AXIL_BASE_ADDR_G;
+   constant THR_KLY_BASE_ADDR_C      : slv(31 downto 0) := x"0000_0400" + AXIL_BASE_ADDR_G;
+   constant THR_MOD_BASE_ADDR_C      : slv(31 downto 0) := x"0000_0800" + AXIL_BASE_ADDR_G;
+   constant THR_ADC_BASE_ADDR_C      : slv(31 downto 0) := x"0000_0C00" + AXIL_BASE_ADDR_G;
+   constant RTM_REG_BASE_ADDR_C      : slv(31 downto 0) := x"0000_1000" + AXIL_BASE_ADDR_G;
+   constant BUF0_BASE_ADDR_C         : slv(31 downto 0) := x"0000_2000" + AXIL_BASE_ADDR_G;
+   constant BUF1_BASE_ADDR_C         : slv(31 downto 0) := x"0000_3000" + AXIL_BASE_ADDR_G;
+   constant BUF0_HIST_BASE_ADDR_C    : slv(31 downto 0) := x"0000_4000" + AXIL_BASE_ADDR_G;
+   constant BUF1_HIST_BASE_ADDR_C    : slv(31 downto 0) := x"0000_8000" + AXIL_BASE_ADDR_G;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       CPLD_INDEX_C    => (
@@ -136,6 +153,14 @@ architecture mapping of RtmRfInterlockCore is
       BUF1_INDEX_C    => (
          baseAddr     => BUF1_BASE_ADDR_C,
          addrBits     => 12,
+         connectivity => x"FFFF"),
+      BUF0_HIST_INDEX_C    => (
+         baseAddr     => BUF0_HIST_BASE_ADDR_C,
+         addrBits     => 14,
+         connectivity => x"FFFF"),
+      BUF1_HIST_INDEX_C    => (
+         baseAddr     => BUF1_HIST_BASE_ADDR_C,
+         addrBits     => 14,
          connectivity => x"FFFF"));
 
    signal writeMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
@@ -168,6 +193,11 @@ architecture mapping of RtmRfInterlockCore is
    signal s_csbVec  : slv(1 downto 0);
    signal s_muxSClk : sl;
 
+   -- Fault history buffer write pointer
+   signal s_writePointer : slv(BUFFER_ADDR_SIZE_C+2-1 downto 0);
+   signal s_timestamp    : Slv64Array(3 downto 0) := (others => (others => '0'));
+   signal s_streamEn     : sl := '0';
+
 
 begin
 
@@ -176,7 +206,7 @@ begin
    --------------------
    -- AXI-Lite Crossbar
    --------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -198,7 +228,7 @@ begin
    -- Fast ADC
    -----------
    -- Divide the recovered timing clock by 2
-   U_ClockManager : entity work.ClockManagerUltraScale
+   U_ClockManager : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G              => 1 ns,
          TYPE_G             => "MMCM",
@@ -219,7 +249,7 @@ begin
          rstOut(0) => s_recRstDiv2);
 
    -- Get the data from the ADC
-   U_Ad9229Core : entity work.Ad9229Core
+   U_Ad9229Core : entity amc_carrier_core.Ad9229Core
       generic map (
          TPD_G           => TPD_G,
          IODELAY_GROUP_G => IODELAY_GROUP_G,
@@ -250,7 +280,7 @@ begin
          setDelay_i      => s_setDelay,
          setValid_i      => s_setValid);
 
-   U_SyncFifo : entity work.SynchronizerFifo
+   U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => 48)
@@ -264,7 +294,7 @@ begin
    ---------------------
    -- CPLD SPI interface
    ---------------------
-   U_cpldSpi : entity work.AxiSpiMaster
+   U_cpldSpi : entity surf.AxiSpiMaster
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",
@@ -288,9 +318,9 @@ begin
    -- Set Threshold SPI interfaces (TPL0202)
    -- 8 bit Address & 8 bit data
    -- constant PACKET_SIZE_C : positive := ite(MODE_G = "RW", 1, 0) + ADDRESS_SIZE_G + DATA_SIZE_G;
-   ----------------------------------------------------------------         
+   ----------------------------------------------------------------
    GEN_THR_SPI_CHIPS : for i in 1 downto 0 generate
-      U_thrSpi : entity work.AxiSpiMaster
+      U_thrSpi : entity surf.AxiSpiMaster
          generic map (
             TPD_G             => TPD_G,
             MODE_G            => "WO",
@@ -328,14 +358,14 @@ begin
    ---------------------------------------
    -- Get Threshold SPI interface (AD7682)
    ---------------------------------------
-   U_AdcSpi : entity work.AxiSpiAd7682
+   U_AdcSpi : entity amc_carrier_core.AxiSpiAd7682
       generic map (
          TPD_G             => TPD_G,
          DATA_SIZE_G       => 16,
          CLK_PERIOD_G      => 6.4E-9,
          SPI_SCLK_PERIOD_G => 1.0E-6,
          N_INPUTS_G        => 4,        -- 4-AD7682, 8-AD7689
-         N_SPI_CYCLES_G    => 32)  -- Number of SPI clock cycles between two acquisitions      
+         N_SPI_CYCLES_G    => 32)  -- Number of SPI clock cycles between two acquisitions
       port map (
          axiClk         => axilClk,
          axiRst         => axilRst,
@@ -351,7 +381,7 @@ begin
    ----------------
    -- RTM registers
    ----------------
-   U_RtmLlrfMpsReg : entity work.RtmRfInterlockReg
+   U_RtmLlrfMpsReg : entity amc_carrier_core.RtmRfInterlockReg
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -377,17 +407,21 @@ begin
          adcLock_i       => s_hsAdcLocked,
          curDelay_i      => s_curDelay,
          setDelay_o      => s_setDelay,
-         loadDelay_o     => s_setValid);
+         loadDelay_o     => s_setValid,
+         -- Fault history buffer write pointer
+         writePointer_i  => s_writePointer,
+         timestamp_i     => s_timestamp,
+         streamEn_o      => s_streamEn);
 
    ----------------------------------------------------------------
    -- ADC data Ring buffers for:
    -- Save the 128 samples after dataTrig trigger
-   --   - Beam_V_Data   
-   --   - Beam_I_Data   
-   --   - FWD_PWR_Data  
-   --   - REFL_PWR_Data 
-   ----------------------------------------------------------------          
-   U_RingBufferCtrl : entity work.RingBufferCtrl
+   --   - Beam_V_Data
+   --   - Beam_I_Data
+   --   - FWD_PWR_Data
+   --   - REFL_PWR_Data
+   ----------------------------------------------------------------
+   U_RingBufferCtrl : entity amc_carrier_core.RingBufferCtrl
       generic map (
          TPD_G                    => TPD_G,
          RING_BUFFER_ADDR_WIDTH_G => BUFFER_ADDR_SIZE_C)
@@ -401,13 +435,13 @@ begin
          debugLogEn  => s_ringWrEn,
          debugLogClr => s_ringClr);
 
-   -- Beam_I_Data & Beam_V_Data 
+   -- Beam_I_Data & Beam_V_Data
    s_bufferData(0) <= x"0" & s_hsAdcdataSync(23 downto 12) & x"0" & s_hsAdcdataSync(11 downto 0);
    -- FWD_PWR_Data & REFL_PWR_Data
    s_bufferData(1) <= x"0" & s_hsAdcdataSync(47 downto 36) & x"0" & s_hsAdcdataSync(35 downto 24);
 
    GEN_RING_BUF : for i in 1 downto 0 generate
-      U_AxiLiteRingBuffer : entity work.AxiLiteRingBuffer
+      U_AxiLiteRingBuffer : entity surf.AxiLiteRingBuffer
          generic map (
             TPD_G            => TPD_G,
             DATA_WIDTH_G     => BUFFER_WIDTH_C,
@@ -426,5 +460,40 @@ begin
             axilWriteMaster => writeMasters(BUF0_INDEX_C+i),
             axilWriteSlave  => writeSlaves(BUF0_INDEX_C+i));
    end generate GEN_RING_BUF;
+
+   U_HIST_BUF : entity amc_carrier_core.RtmRfInterlockFaultBuffer
+      generic map (
+         TPD_G               => TPD_G,
+         BUFFER_ADDR_SIZE_G  => BUFFER_ADDR_SIZE_C,
+         TDEST_G             => TDEST_G,
+         AXIS_CONFIG_G       => AXIS_CONFIG_G)
+      port map (
+         -- AXI interface
+         axiClk             => axilClk,
+         axiRst             => axilRst,
+         axiReadMasters(0)  => readMasters(BUF0_HIST_INDEX_C),
+         axiReadMasters(1)  => readMasters(BUF1_HIST_INDEX_C),
+         axiReadSlaves(0)   => readSlaves(BUF0_HIST_INDEX_C),
+         axiReadSlaves(1)   => readSlaves(BUF1_HIST_INDEX_C),
+         axiWriteMasters(0) => writeMasters(BUF0_HIST_INDEX_C),
+         axiWriteMasters(1) => writeMasters(BUF1_HIST_INDEX_C),
+         axiWriteSlaves(0)  => writeSlaves(BUF0_HIST_INDEX_C),
+         axiWriteSlaves(1)  => writeSlaves(BUF1_HIST_INDEX_C),
+         -- RTM interface
+         clk                => recClk,
+         rst                => recRst,
+         fault              => fault,
+         trig               => dataTrig,
+         timestamp          => timestamp,
+         bufferValid        => s_hsAdcValid,
+         bufferData         => s_bufferData,
+         writePointer       => s_writePointer,
+         timestampBuffer    => s_timestamp,
+         streamEnable       => s_streamEn,
+         -- AXI Stream Interface (axisClk domain)
+         axisClk            => axisClk,
+         axisRst            => axisRst,
+         axisMaster         => axisMaster,
+         axisSlave          => axisSlave);
 
 end architecture mapping;

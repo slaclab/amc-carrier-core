@@ -1,14 +1,11 @@
 -------------------------------------------------------------------------------
--- File       : LvdsDacRegItf.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:  Register decoding for Signal generator
 --               0x00 (RW)- Control Register
 --                              Bit0: Enable DAC signal generator
 --                              Bit1: Load TAP delays from registers tapDelayIn_o
---               0x01 (RW)- Polarity of the corresponding LVDS output (15 downto 0) 
+--               0x01 (RW)- Polarity of the corresponding LVDS output (15 downto 0)
 --                            - '0' Regular
 --                            - '1' Inverted
 --               0x02 (RW)- Signal period size. In number of Block RAM addresses (two samples per address). Zero inclusive.
@@ -18,11 +15,11 @@
 --
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -30,8 +27,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity LvdsDacRegItf is
    generic (
@@ -50,7 +49,7 @@ entity LvdsDacRegItf is
       axilReadSlave   : out AxiLiteReadSlaveType;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
-      -- Control generation  (devClk_i domain)  
+      -- Control generation  (devClk_i domain)
       devClk_i        : in  sl;
       devRst_i        : in  sl;
       enable_o        : out sl;
@@ -135,7 +134,6 @@ begin
 
       if (axilStatus.readEnable = '1') then
          axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
-         v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0)
                v.axilReadSlave.rdata(0 downto 0) := r.control;
@@ -186,7 +184,7 @@ begin
 
    GEN_0 : for i in 15 downto 0 generate
 
-      Sync_tapDelayStat : entity work.SynchronizerVector
+      Sync_tapDelayStat : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 9)
@@ -197,7 +195,7 @@ begin
 
    end generate GEN_0;
 
-   Sync_enable : entity work.Synchronizer
+   Sync_enable : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -206,7 +204,7 @@ begin
          dataIn  => r.control(0),
          dataOut => enable_o);
 
-   Sync_load : entity work.SynchronizerVector
+   Sync_load : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 16)
@@ -215,7 +213,7 @@ begin
          dataIn  => r.load,
          dataOut => load_o);
 
-   Sync_periodSize : entity work.SynchronizerVector
+   Sync_periodSize : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => ADDR_WIDTH_G)
@@ -224,7 +222,7 @@ begin
          dataIn  => r.periodSize,
          dataOut => periodSize_o);
 
-   Sync_polarityMask : entity work.SynchronizerVector
+   Sync_polarityMask : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 16)
@@ -235,7 +233,7 @@ begin
 
    GEN_1 : for i in 15 downto 0 generate
 
-      Sync_tapDelaySet : entity work.SynchronizerVector
+      Sync_tapDelaySet : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => 9)

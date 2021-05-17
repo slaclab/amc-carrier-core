@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsEncoder.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-04-01
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,11 +17,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -57,7 +58,7 @@ architecture mapping of AppMpsEncoder is
    constant APP_CONFIG_C : MpsAppConfigType := getMpsAppConfig(APP_TYPE_G);
 
    type RegType is record
-      tholdMem   : Slv8VectorArray(MPS_CHAN_COUNT_C-1 downto 0, 7 downto 0);
+      tholdMem   : Slv4VectorArray(MPS_CHAN_COUNT_C-1 downto 0, 7 downto 0);
       mpsMessage : MpsMessageType;
    end record;
 
@@ -73,6 +74,9 @@ architecture mapping of AppMpsEncoder is
    procedure compareTholds (thold       : in    MpsChanTholdType;
                             config      : in    MpsChanConfigType;
                             value       : in    slv;
+                            ignore      : in    sl;
+                            valid       : in    sl;
+                            holdDisable : in    sl;
                             bitPos      : in    integer;
                             tholdMemIn  : in    slv;
                             tholdMemOut : inout slv;
@@ -86,18 +90,44 @@ architecture mapping of AppMpsEncoder is
       signedMin := signed(thold.minThold);
       signedMax := signed(thold.maxThold);
 
-      -- Threshold is exceeded. Set current bit and set 8 bit shift vector
-      if (thold.maxTholdEn = '1' and signedVal > signedMax) or
-         (thold.minTholdEn = '1' and signedVal < signedMin) then
+      -- Threshold is exceeded. Set current bit and set 4 bit counter
+      if ignore = '0' and ((thold.maxTholdEn = '1' and signedVal > signedMax) or
+                           (thold.minTholdEn = '1' and signedVal < signedMin)) then
 
-         tholdMemOut                        := (others => '1');
+         if holdDisable = '1' then
+            tholdMemOut := (others => '0');
+         else
+            tholdMemOut := (others => '1');
+         end if;
+
          message(config.BYTE_MAP_C)(bitPos) := '1';
 
-      -- Threhold was exceeded within the last 8 clocks
+      -- Threshold was exceeded within the last 15 clocks
       elsif tholdMemIn /= 0 then
-         tholdMemOut(7 downto 1)            := tholdMemIn(6 downto 0);
-         tholdMemOut(0)                     := '0';
+         if valid = '1' then
+            tholdMemOut := tholdMemIn - 1;
+         end if;
          message(config.BYTE_MAP_C)(bitPos) := '1';
+      end if;
+   end procedure;
+
+   procedure digitalBit (value       : in    sl;
+                         bitPos      : in    integer;
+                         tholdMemIn  : in    slv;
+                         tholdMemOut : inout slv;
+                         message     : inout Slv8Array) is
+
+   begin
+
+      -- Bit is set
+      if value = '1' then
+         tholdMemOut        := (others => '1');
+         message(0)(bitPos) := '1';
+
+      -- Bit was set within the last 15 clocks
+      elsif tholdMemIn /= 0 then
+         tholdMemOut        := tholdMemIn - 1;
+         message(0)(bitPos) := '1';
       end if;
    end procedure;
 
@@ -114,10 +144,10 @@ begin
    -- Output core reg
    mpsCoreReg <= mpsReg.mpsCore;
 
-   --------------------------------- 
+   ---------------------------------
    -- Registers
-   --------------------------------- 
-   U_AppMpsReg : entity work.AppMpsReg
+   ---------------------------------
+   U_AppMpsReg : entity amc_carrier_core.AppMpsReg
       generic map (
          TPD_G           => TPD_G,
          APP_TYPE_G      => APP_TYPE_G,
@@ -134,10 +164,10 @@ begin
          mpsMsgDrop      => mpsMsgDrop,
          mpsAppRegisters => mpsReg);
 
-   --------------------------------- 
+   ---------------------------------
    -- Pattern decode and threshold select
-   --------------------------------- 
-   U_AppMpsSelect : entity work.AppMpsSelect
+   ---------------------------------
+   U_AppMpsSelect : entity amc_carrier_core.AppMpsSelect
       generic map (
          TPD_G        => TPD_G,
          APP_TYPE_G   => APP_TYPE_G,
@@ -151,9 +181,9 @@ begin
          mpsReg        => mpsReg,
          mpsSelect     => mpsSelect);
 
-   --------------------------------- 
+   ---------------------------------
    -- Thresholds
-   --------------------------------- 
+   ---------------------------------
    comb : process (axilRst, mpsReg, mpsSelect, r) is
       variable v       : RegType;
       variable chan    : integer;
@@ -163,8 +193,13 @@ begin
       -- Latch the current value
       v := r;
 
+      if mpsReg.mpsCore.lcls1Mode = '1' then
+         v.mpsMessage := mpsMessageInit(APP_CONFIG_C.LCLS1_COUNT_C);
+      else
+         v.mpsMessage := mpsMessageInit(APP_CONFIG_C.LCLS2_COUNT_C);
+      end if;
+
       -- Init and setup MPS message
-      v.mpsMessage           := mpsMessageInit(APP_CONFIG_C.BYTE_COUNT_C);
       v.mpsMessage.version   := mpsReg.mpsCore.mpsVersion;
       v.mpsMessage.lcls      := mpsReg.mpsCore.lcls1Mode;
       v.mpsMessage.timeStamp := mpsSelect.timeStamp;
@@ -174,10 +209,15 @@ begin
       -- Init message data
       msgData := (others => (others => '0'));
 
-      -- Digtal Application
+      -- Digital Application
       if APP_CONFIG_C.DIGITAL_EN_C = true then
          v.mpsMessage.inputType := '0';
-         msgData(0)             := mpsSelect.digitalBus;
+
+         for i in 0 to APP_CONFIG_C.BYTE_COUNT_C-1 loop
+            for j in 0 to 7 loop
+               digitalBit (mpsSelect.digitalBus((8*i)+j), j, r.tholdMem(i, j), v.tholdMem(i, j), msgData);
+            end loop;
+         end loop;
 
       -- Analog Process each enabled channel
       else
@@ -186,7 +226,7 @@ begin
          for chan in 0 to (MPS_CHAN_COUNT_C-1) loop
 
             -- Threshold is enabled and mps channel is not ignored
-            if APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C > 0 and mpsSelect.mpsIgnore(chan) = '0' then
+            if APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C > 0 then
 
                -- Channel is marked in error, set all bits
                if mpsSelect.mpsError(chan) = '1' then
@@ -199,13 +239,15 @@ begin
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).LCLS1_EN_C and mpsReg.mpsCore.lcls1Mode = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
-                                 mpsSelect.chanData(chan), 0, r.tholdMem(chan, 0), v.tholdMem(chan, 0), msgData);
+                                 mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '1',
+                                 0, r.tholdMem(chan, 0), v.tholdMem(chan, 0), msgData);
 
                -- LCLS2 idle table
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
-                                 mpsSelect.chanData(chan), 7, r.tholdMem(chan, 7), v.tholdMem(chan, 7), msgData);
+                                 mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
+                                 7, r.tholdMem(chan, 7), v.tholdMem(chan, 7), msgData);
 
                -- Multiple thresholds
                else
@@ -215,13 +257,15 @@ begin
                      if APP_CONFIG_C.CHAN_CONFIG_C(chan).ALT_EN_C and mpsSelect.selectAlt = '1' then
                         compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
-                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
+                                       mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
+                                       thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
 
                      -- Standard table
                      else
                         compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
-                                       mpsSelect.chanData(chan), thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
+                                       mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
+                                       thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
                      end if;
                   end loop;
                end if;
@@ -249,10 +293,10 @@ begin
       end if;
    end process seq;
 
-   --------------------------------- 
+   ---------------------------------
    -- MPS Message Generator
-   --------------------------------- 
-   U_MsgGen : entity work.MpsMsgCore
+   ---------------------------------
+   U_MsgGen : entity amc_carrier_core.MpsMsgCore
       generic map (
          TPD_G            => TPD_G,
          SIM_ERROR_HALT_G => false)

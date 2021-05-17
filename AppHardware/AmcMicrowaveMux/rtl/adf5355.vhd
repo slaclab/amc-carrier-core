@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : adf5355.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-05-26
--- Last update: 2017-10-03
 -------------------------------------------------------------------------------
 -- Description: SPI Master Wrapper for ADI ADF5355 IC
 -------------------------------------------------------------------------------
 -- This file is part of 'SLAC Firmware Standard Library'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'SLAC Firmware Standard Library', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'SLAC Firmware Standard Library', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,14 +17,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity adf5355 is
    generic (
-      TPD_G             : time            := 1 ns;
-      CLK_PERIOD_G      : real            := (1.0/156.25E+6);
-      SPI_SCLK_PERIOD_G : real            := (1.0/10.0E+6));
+      TPD_G             : time := 1 ns;
+      CLK_PERIOD_G      : real := (1.0/156.25E+6);
+      SPI_SCLK_PERIOD_G : real := (1.0/10.0E+6));
    port (
       -- Clock and Reset
       axiClk         : in  sl;
@@ -97,7 +96,7 @@ begin
 
       -- State Machine
       case (r.state) is
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when WAIT_AXI_TXN_S =>
             -- Reset the flag
             v.busyOut := '0';
@@ -120,15 +119,15 @@ begin
                -- Next state
                v.state := RD_RESP_S;
             end if;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when RD_RESP_S =>
             -- Reade the bit
             v.axiReadSlave.rdata := cacheData;
-            -- Send the response 
+            -- Send the response
             axiSlaveReadResponse(v.axiReadSlave);
             -- Next state
             v.state              := WAIT_AXI_TXN_S;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when WAIT_CYCLE_S =>
             -- Wait for rdEn to drop
             if (rdEn = '0') then
@@ -137,25 +136,25 @@ begin
                -- Next state
                v.state := WAIT_SPI_TXN_DONE_S;
             end if;
-         ----------------------------------------------------------------------            
+         ----------------------------------------------------------------------
          when WAIT_SPI_TXN_DONE_S =>
-            -- Check for read completion 
+            -- Check for read completion
             if (rdEn = '1') then
                -- Next state
                v.state := WAIT_AXI_TXN_S;
             end if;
-      ----------------------------------------------------------------------            
+      ----------------------------------------------------------------------
       end case;
 
-      -- Reset      
+      -- Reset
       if (axiRst = '1') then
          v := REG_INIT_C;
       end if;
 
-      -- Register the variable for next clock cycle      
+      -- Register the variable for next clock cycle
       rin <= v;
 
-      -- Outputs            
+      -- Outputs
       axiWriteSlave <= r.axiWriteSlave;
       axiReadSlave  <= r.axiReadSlave;
       busyOut       <= r.busyOut;
@@ -169,7 +168,7 @@ begin
       end if;
    end process seq;
 
-   U_SpiMaster : entity work.SpiMaster
+   U_SpiMaster : entity surf.SpiMaster
       generic map (
          TPD_G             => TPD_G,
          NUM_CHIPS_G       => 1,
@@ -191,13 +190,13 @@ begin
          spiSdi    => coreSDout,
          spiSdo    => '1');
 
-   U_Cache : entity work.SimpleDualPortRam
+   U_Cache : entity surf.SimpleDualPortRam
       generic map(
-         TPD_G        => TPD_G,
-         BRAM_EN_G    => false,
-         DOB_REG_G    => false,
-         DATA_WIDTH_G => 28,
-         ADDR_WIDTH_G => 4)
+         TPD_G         => TPD_G,
+         MEMORY_TYPE_G => "distributed",
+         DOB_REG_G     => false,
+         DATA_WIDTH_G  => 28,
+         ADDR_WIDTH_G  => 4)
       port map (
          -- Port A
          clka  => axiClk,

@@ -1,25 +1,23 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierSysMon.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-07-09
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity AmcCarrierSysMon is
    generic (
@@ -64,6 +62,7 @@ architecture mapping of AmcCarrierSysMon is
          ip2intc_irpt  : out std_logic;
          vp            : in  std_logic;
          vn            : in  std_logic;
+         ot_out        : out std_logic;
          channel_out   : out std_logic_vector(5 downto 0);
          eoc_out       : out std_logic;
          alarm_out     : out std_logic;
@@ -101,6 +100,7 @@ begin
          ip2intc_irpt  => open,
          vp            => vPIn,
          vn            => vNIn,
+         ot_out        => open,
          channel_out   => open,
          eoc_out       => open,
          alarm_out     => open,

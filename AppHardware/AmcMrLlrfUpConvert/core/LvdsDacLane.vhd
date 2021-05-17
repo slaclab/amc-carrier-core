@@ -1,23 +1,20 @@
 -------------------------------------------------------------------------------
--- File       : LvdsDacLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-01-29
--- Last update: 2017-04-19
 -------------------------------------------------------------------------------
 -- Description:  Single lane arbitrary periodic signal generator
---               The module contains a AXI-Lite accessible block RAM where the 
+--               The module contains a AXI-Lite accessible block RAM where the
 --               signal is defined.
---               When the module is enabled it periodically reads the block RAM contents 
+--               When the module is enabled it periodically reads the block RAM contents
 --               and outputs the contents.
 --               The signal period is defined in user register.
 --               Signal has to be disabled while the periodSize_i or RAM contents is being changed.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -25,10 +22,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 entity LvdsDacLane is
    generic (
@@ -80,12 +79,9 @@ architecture rtl of LvdsDacLane is
 
 begin
 
-   U_RAM : entity work.AxiDualPortRam
+   U_RAM : entity surf.AxiDualPortRam
       generic map (
          TPD_G        => TPD_G,
-         BRAM_EN_G    => true,
-         REG_EN_G     => true,
-         MODE_G       => "write-first",
          ADDR_WIDTH_G => ADDR_WIDTH_G,
          DATA_WIDTH_G => 16,
          INIT_G       => "0")
@@ -137,7 +133,7 @@ begin
       end if;
    end process seq;
 
-   U_Jesd16bTo32b : entity work.Jesd16bTo32b
+   U_Jesd16bTo32b : entity surf.Jesd16bTo32b
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -162,7 +158,7 @@ begin
    GEN_VEC :
    for i in 15 downto 0 generate
       sampleData_o(i)(0) <= extData_i(i+0)  when(enable_i = '0') else ramDataReg(i+0);  -- ODDR's D1 port
-      sampleData_o(i)(1) <= extData_i(i+16) when(enable_i = '0') else ramDataReg(i+16);  -- ODDR's D2 port 
+      sampleData_o(i)(1) <= extData_i(i+16) when(enable_i = '0') else ramDataReg(i+16);  -- ODDR's D2 port
    end generate GEN_VEC;
 
 end rtl;

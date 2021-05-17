@@ -1,19 +1,16 @@
 -------------------------------------------------------------------------------
--- File       : DaqTestSig.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2017-07-03
 -------------------------------------------------------------------------------
 -- Description: Reduces the sample rate:
 --                   test_i = '1' : Output counter test data
---                   test_i = '0' : Output sample data           
+--                   test_i = '0' : Output sample data
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -22,8 +19,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.DaqMuxV2Pkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.DaqMuxV2Pkg.all;
 
 entity DaqTestSig is
    generic (
@@ -75,7 +76,7 @@ begin
 
       -- Check for inbound valid
       if (sampleValid_i = '1') then
-      
+
          -- Set the flag
          v.sampleValid := '1';
 

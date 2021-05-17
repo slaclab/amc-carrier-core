@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AppTopJesd.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-11-11
--- Last update: 2018-05-04
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,12 +17,16 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.jesd204bpkg.all;
-use work.AppTopPkg.all;
-use work.AppTopPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.jesd204bpkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppTopPkg.all;
+use amc_carrier_core.AppTopPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -53,7 +54,7 @@ entity AppTopJesd is
       jesdRst2x       : out sl;
       jesdSysRef      : in  sl;
       jesdRxSync      : out sl;
-      jesdTxSync      : in  sl;
+      jesdTxSync      : in  slv(9 downto 0);
       jesdUsrClk      : out sl;
       jesdUsrRst      : out sl;
       -- ADC Interface
@@ -61,6 +62,7 @@ entity AppTopJesd is
       adcValues       : out sampleDataArray(9 downto 0);
       -- DAC interface
       dacValids       : in  slv(9 downto 0);
+      dacReadys       : out slv(9 downto 0);
       dacValues       : in  sampleDataArray(9 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -117,9 +119,9 @@ architecture mapping of AppTopJesd is
    signal jesdRst1x      : sl;
    signal jesdMmcmLocked : sl;
 
-   signal clkOut   : slv(2 downto 0);
-   signal resetOut : slv(2 downto 0);
-   signal rstOut   : slv(2 downto 0);
+   signal clkOut   : slv(1 downto 0);
+   signal resetOut : slv(1 downto 0);
+   signal rstOut   : slv(1 downto 0);
    signal locked   : sl;
 
    signal drpClk  : slv(9 downto 0)       := (others => '0');
@@ -130,25 +132,27 @@ architecture mapping of AppTopJesd is
    signal drpDi   : slv(10*16-1 downto 0) := (others => '0');
    signal drpDo   : slv(10*16-1 downto 0) := (others => '0');
 
-   signal rawAdcValids : slv(9 downto 0)             := (others => '0');
-   signal rawAdcValues : sampleDataArray(9 downto 0) := (others => (others => '0'));
-   signal rawDacValues : sampleDataArray(9 downto 0) := (others => (others => '0'));
+   signal adcEn : slv(9 downto 0)             := (others => '0');
+   signal adc   : sampleDataArray(9 downto 0) := (others => (others => '0'));
+   signal dacEn : slv(9 downto 0)             := (others => '0');
+   signal dac   : sampleDataArray(9 downto 0) := (others => (others => '0'));
 
 begin
 
    GEN_ROUTE : for i in 9 downto 0 generate
 
-      adcValids(i) <= rawAdcValids(JESD_RX_ROUTES_G(i));
-      adcValues(i) <= rawAdcValues(JESD_RX_ROUTES_G(i));
+      adcValids(i) <= adcEn(JESD_RX_ROUTES_G(i));
+      adcValues(i) <= adc(JESD_RX_ROUTES_G(i));
 
-      rawDacValues(JESD_TX_ROUTES_G(i)) <= dacValues(i);
+      dacReadys(i)             <= dacEn(JESD_TX_ROUTES_G(i));
+      dac(JESD_TX_ROUTES_G(i)) <= dacValues(i);
 
    end generate GEN_ROUTE;
 
    ---------------------
    -- AXI-Lite Crossbars
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -171,7 +175,7 @@ begin
    ----------------
 
    -- Left column reference
-   U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
+   U_IBUFDS_GTE3 : entity amc_carrier_core.AmcCarrierIbufGt
       generic map (
          REFCLK_EN_TX_PATH  => '0',
          REFCLK_HROW_CK_SEL => "00",    -- 2'b00: ODIV2 = O
@@ -181,12 +185,12 @@ begin
          IB    => jesdClkN(3),
          CEB   => '0',
          ODIV2 => open,  -- 185 MHz, Frequency the same as jesdRefClk
-         O     => refClkL);             -- 185 MHz    
+         O     => refClkL);             -- 185 MHz
 
    -- Choose Right coulumn reference
    GEN_GTH_R_CLK : for i in 2 downto 0 generate
 
-      U_IBUFDS_GTE3 : entity work.AmcCarrierIbufGt
+      U_IBUFDS_GTE3 : entity amc_carrier_core.AmcCarrierIbufGt
          generic map (
             REFCLK_EN_TX_PATH  => '0',
             REFCLK_HROW_CK_SEL => "00",  -- 2'b00: ODIV2 = O
@@ -196,7 +200,7 @@ begin
             IB    => jesdClkN(i),
             CEB   => '0',
             ODIV2 => refClkDiv2Vec(i),  -- 185 MHz, Frequency the same as jesdRefClk
-            O     => refClkVec(i));     -- 185 MHz     
+            O     => refClkVec(i));     -- 185 MHz
 
       U_BUFG_GT : BUFG_GT
          port map (
@@ -213,7 +217,7 @@ begin
    refClkR <= refClkVec(conv_integer(JESD_REF_SEL_G));
    amcClk  <= amcClkVec(conv_integer(JESD_REF_SEL_G));
 
-   U_PwrUpRst : entity work.PwrUpRst
+   U_PwrUpRst : entity surf.PwrUpRst
       generic map (
          TPD_G          => TPD_G,
          SIM_SPEEDUP_G  => SIMULATION_G,
@@ -223,32 +227,26 @@ begin
          clk    => amcClk,
          rstOut => amcRst);
 
-   U_ClockManager : entity work.ClockManagerUltraScale
+   U_ClockManager : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G              => TPD_G,
-         TYPE_G             => "MMCM",
+         TYPE_G             => "PLL",
          INPUT_BUFG_G       => false,
          FB_BUFG_G          => true,
-         NUM_CLOCKS_G       => 3,
-         BANDWIDTH_G        => "OPTIMIZED",
-         --CLKIN_PERIOD_G     => 3.2,
+         NUM_CLOCKS_G       => 2,
          CLKIN_PERIOD_G     => 3.2,
-         --CLKIN_PERIOD_G     => 6.4,
-         DIVCLK_DIVIDE_G    => 1,
-         CLKFBOUT_MULT_F_G  => 4.000,
-         CLKOUT0_DIVIDE_F_G => 4.000,
+         CLKFBOUT_MULT_G    => 4,
+         CLKOUT0_DIVIDE_G   => 4,
          CLKOUT0_RST_HOLD_G => 16,
          CLKOUT1_DIVIDE_G   => 2,
-         CLKOUT1_RST_HOLD_G => 32,
-         CLKOUT2_DIVIDE_G   => JESD_USR_DIV_G*3,
-         CLKOUT2_RST_HOLD_G => 32)
+         CLKOUT1_RST_HOLD_G => 32)
       port map (
          clkIn           => amcClk,
          rstIn           => amcRst,
          clkOut          => clkOut,
          rstOut          => resetOut,
          locked          => locked,
-         -- AXI-Lite Interface 
+         -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
          axilReadMaster  => axilReadMasters(MMCM_INDEX_C),
@@ -256,8 +254,8 @@ begin
          axilWriteMaster => axilWriteMasters(MMCM_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(MMCM_INDEX_C));
 
-   GEN_RST : for i in 2 downto 0 generate
-      U_RstPipeline : entity work.RstPipeline
+   GEN_RST : for i in 1 downto 0 generate
+      U_RstPipeline : entity surf.RstPipeline
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -268,19 +266,36 @@ begin
 
    jesdClk1x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(0);
    jesdClk2x      <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(1);
-   jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);
+   -- jesdUsrClk     <= axilClk when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else clkOut(2);
    jesdRst1x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(0);
    jesdRst2x      <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(1);
-   jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(2);
+   -- jesdUsrRst     <= axilRst when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else rstOut(2);
    jesdMmcmLocked <= '1'     when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else locked;
 
    jesdClk <= jesdClk1x;
    jesdRst <= jesdRst1x;
 
+   U_jesdUsrClk : entity surf.ClockManagerUltraScale
+      generic map (
+         TPD_G              => TPD_G,
+         TYPE_G             => "PLL",
+         INPUT_BUFG_G       => false,
+         FB_BUFG_G          => true,
+         NUM_CLOCKS_G       => 1,
+         CLKIN_PERIOD_G     => 3.2,
+         CLKFBOUT_MULT_G    => 4,
+         CLKOUT0_DIVIDE_G   => JESD_USR_DIV_G*3,
+         CLKOUT0_RST_HOLD_G => 32)
+      port map (
+         clkIn     => amcClk,
+         rstIn     => amcRst,
+         clkOut(0) => jesdUsrClk,
+         rstOut(0) => jesdUsrRst);
+
    -------------
    -- JESD block
    -------------
-   U_Jesd : entity work.AppTopJesd204b
+   U_Jesd : entity amc_carrier_core.AppTopJesd204b
       generic map (
          TPD_G              => TPD_G,
          JESD_RX_LANE_G     => JESD_RX_LANE_G,
@@ -308,9 +323,10 @@ begin
          txWriteMaster   => axilWriteMasters(JESD_TX_INDEX_C),
          txWriteSlave    => axilWriteSlaves(JESD_TX_INDEX_C),
          -- Sample data output (Use if external data acquisition core is attached)
-         dataValidVec_o  => rawAdcValids,
-         sampleDataArr_o => rawAdcValues,
-         sampleDataArr_i => rawDacValues,
+         dataValidVec_o  => adcEn,
+         sampleDataArr_o => adc,
+         dacReady_o      => dacEn,
+         sampleDataArr_i => dac,
          -------
          -- JESD
          -------
@@ -339,7 +355,7 @@ begin
    drpClk <= (others => axilClk);
    GTH_DRP : if (JESD_DRP_EN_G = true) generate
 
-      U_XBAR : entity work.AxiLiteCrossbar
+      U_XBAR : entity surf.AxiLiteCrossbar
          generic map (
             TPD_G              => TPD_G,
             NUM_SLAVE_SLOTS_G  => 1,
@@ -358,7 +374,7 @@ begin
             mAxiReadSlaves      => gthReadSlaves);
 
       GEN_GTH_DRP : for i in (JESD_LANE_C-1) downto 0 generate
-         U_AxiLiteToDrp : entity work.AxiLiteToDrp
+         U_AxiLiteToDrp : entity surf.AxiLiteToDrp
             generic map (
                TPD_G            => TPD_G,
                COMMON_CLK_G     => true,

@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcBpmDacVcoSpi.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-07-12
--- Last update: 2016-07-12
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_03_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,7 +17,9 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 entity AmcBpmDacVcoSpi is
    generic (
@@ -43,7 +42,7 @@ architecture rtl of AmcBpmDacVcoSpi is
       IDLE_S,
       SCK_LO_S,
       SCK_HI_S,
-      CS_HIGH_S);    
+      CS_HIGH_S);
 
    type RegType is record
       csL        : sl;
@@ -71,9 +70,9 @@ architecture rtl of AmcBpmDacVcoSpi is
 
    -- attribute dont_touch               : string;
    -- attribute dont_touch of r          : signal is "TRUE";
-   
+
 begin
-   
+
    comb : process (dacVcoCtrl, dacVcoEnable, dacVcoSckConfig, r, rst) is
       variable v : regType;
    begin
@@ -168,7 +167,7 @@ begin
       dacCsL  <= r.csL;
       dacSck  <= r.sck;
       dacMosi <= r.din;
-      
+
    end process comb;
 
    seq : process (clk) is
@@ -177,5 +176,5 @@ begin
          r <= rin after TPD_G;
       end if;
    end process seq;
-   
+
 end rtl;

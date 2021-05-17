@@ -1,15 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AmcCarrierRssiInterleave.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -18,13 +17,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.EthMacPkg.all;
-use work.AmcCarrierPkg.all;
-use work.FpgaTypePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+use surf.EthMacPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.FpgaTypePkg.all;
 
 entity AmcCarrierRssiInterleave is
    generic (
@@ -64,11 +67,11 @@ end AmcCarrierRssiInterleave;
 architecture mapping of AmcCarrierRssiInterleave is
 
    constant APP_STREAMS_C      : positive := 6;
-   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds   
+   constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
    constant WINDOW_ADDR_SIZE_C : positive := 4;       -- 16 buffers (2^4)
    constant MAX_SEG_SIZE_C     : positive := 8192;    -- Jumbo frame chucking
 
-   constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_C-1 downto 0) := (others => ETH_AXIS_CONFIG_C);
+   constant APP_AXIS_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_C-1 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
 
    constant SRP_IDX_C        : natural := 0;
    constant BSA_ASYNC_IDX_C  : natural := 1;
@@ -82,19 +85,23 @@ architecture mapping of AmcCarrierRssiInterleave is
    signal rssiObMasters : AxiStreamMasterArray(APP_STREAMS_C-1 downto 0);
    signal rssiObSlaves  : AxiStreamSlaveArray(APP_STREAMS_C-1 downto 0);
 
+   signal obRssiTspMaster : AxiStreamMasterType;
+   signal obRssiTspSlave  : AxiStreamSlaveType;
+
 begin
 
    -------------------------
    -- Software's RSSI Server
    -------------------------
-   U_RssiServer : entity work.RssiCoreWrapper
+   U_RssiServer : entity surf.RssiCoreWrapper
       generic map (
          TPD_G                => TPD_G,
          PIPE_STAGES_G        => 1,
          SYNTH_MODE_G         => "xpm",
-         MEMORY_TYPE_G        => ite(ULTRASCALE_PLUS_C,"ultra","block"),   
+         MEMORY_TYPE_G        => ite(ULTRASCALE_PLUS_C,"ultra","block"),
          APP_ILEAVE_EN_G      => true,  -- true = AxiStreamPacketizer2
-         ILEAVE_ON_NOTVALID_G => true,
+         -- ILEAVE_ON_NOTVALID_G => true,
+         ILEAVE_ON_NOTVALID_G => false, -- Might be a bug in the AxiStreamPacketizer2 when (ILEAVE_ON_NOTVALID_G=true): LLR - 05MAY2019
          MAX_SEG_SIZE_G       => MAX_SEG_SIZE_C,  -- Using Jumbo frames
          SEGMENT_ADDR_SIZE_G  => bitSize(MAX_SEG_SIZE_C/8),
          APP_STREAMS_G        => APP_STREAMS_C,
@@ -103,8 +110,8 @@ begin
             BSA_ASYNC_IDX_C   => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
             DIAG_ASYNC_IDX_C  => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
             MEM_DATA_IDX_C    => X"04",  -- TDEST 4 routed to stream 0 (MEM)
-            RAW_DATA_IDX_C    => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)            
-            APP_ASYNC_IDX_C   => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)   
+            RAW_DATA_IDX_C    => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+            APP_ASYNC_IDX_C   => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
          CLK_FREQUENCY_G      => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G       => TIMEOUT_C,
          SERVER_G             => true,
@@ -125,8 +132,8 @@ begin
          -- Transport Layer Interface
          sTspAxisMaster_i  => obServerMaster,
          sTspAxisSlave_o   => obServerSlave,
-         mTspAxisMaster_o  => ibServerMaster,
-         mTspAxisSlave_i   => ibServerSlave,
+         mTspAxisMaster_o  => obRssiTspMaster,
+         mTspAxisSlave_i   => obRssiTspSlave,
          -- High level  Application side interface
          openRq_i          => '1',  -- Automatically start the connection without debug SRP channel
          closeRq_i         => '0',
@@ -139,23 +146,37 @@ begin
          axilWriteMaster   => axilWriteMaster,
          axilWriteSlave    => axilWriteSlave);
 
+   U_RssiTspObFifo : entity amc_carrier_core.AmcCarrierRssiObFifo
+      generic map (
+         TPD_G    => TPD_G,
+         BYPASS_G => false)
+      port map (
+         -- Clock and Reset
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         -- RSSI Interface
+         obRssiTspMaster => obRssiTspMaster,
+         obRssiTspSlave  => obRssiTspSlave,
+         -- Interface to UDP Server engine
+         ibServerMaster  => ibServerMaster,
+         ibServerSlave   => ibServerSlave);
+
    ------------------------------------------------
    -- AXI-Lite Master with RSSI Server: TDEST = 0x0
    ------------------------------------------------
-   U_SRPv3 : entity work.SrpV3AxiLite
+   U_SRPv3 : entity surf.SrpV3AxiLite
       generic map (
          TPD_G               => TPD_G,
          SLAVE_READY_EN_G    => true,
          GEN_SYNC_FIFO_G     => true,
-         TX_VALID_THOLD_G    => 256,  -- Pre-cache threshold set 256 out of 512 (prevent holding the ETH link during AXI-lite transactions)
-         AXI_STREAM_CONFIG_G => ETH_AXIS_CONFIG_C)
+         AXI_STREAM_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- AXIS Slave Interface (sAxisClk domain)
          sAxisClk         => axilClk,
          sAxisRst         => axilRst,
          sAxisMaster      => rssiObMasters(SRP_IDX_C),
          sAxisSlave       => rssiObSlaves(SRP_IDX_C),
-         -- AXIS Master Interface (mAxisClk domain) 
+         -- AXIS Master Interface (mAxisClk domain)
          mAxisClk         => axilClk,
          mAxisRst         => axilRst,
          mAxisMaster      => rssiIbMasters(SRP_IDX_C),
@@ -205,18 +226,18 @@ begin
    --------------------------------
    ibAppDebugMaster              <= rssiObMasters(APP_ASYNC_IDX_C);
    rssiObSlaves(APP_ASYNC_IDX_C) <= ibAppDebugSlave;
-   U_IbLimiter : entity work.SsiFrameLimiter
+   U_IbLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
          EN_TIMEOUT_G        => true,
          MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
          TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- ETH_AXIS_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of ETH_AXIS_CONFIG_C.TDATA_BYTES_C
+         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- AXIS_8BYTE_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of AXIS_8BYTE_CONFIG_C.TDATA_BYTES_C
          COMMON_CLK_G        => true,
          SLAVE_FIFO_G        => false,
          MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => ETH_AXIS_CONFIG_C,
-         MASTER_AXI_CONFIG_G => ETH_AXIS_CONFIG_C)
+         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
+         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
       port map (
          -- Slave Port
          sAxisClk    => axilClk,

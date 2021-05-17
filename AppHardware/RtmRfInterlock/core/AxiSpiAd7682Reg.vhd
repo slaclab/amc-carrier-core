@@ -1,10 +1,7 @@
 -------------------------------------------------------------------------------
--- File       : AxiSpiAd7682Reg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-15
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
--- Description:  Registers 
+-- Description:  Registers
 --               0x00(RW)- CFG register - Default 0xFFFC(AD7682/AD7689 Data-sheet, Table 11)
 --                   bit15-CFG
 --                   bit14-INCC
@@ -24,14 +21,14 @@
 --                   bit00-XX
 --
 --               0x10-1X(RO)- ADC values (0-3)
---                   
+--
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -39,8 +36,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity AxiSpiAd7682Reg is
    generic (
@@ -70,7 +69,7 @@ end AxiSpiAd7682Reg;
 architecture rtl of AxiSpiAd7682Reg is
 
    type RegType is record
-      -- 
+      --
       cfgReg : slv(cfgReg_o'range);
       we     : sl;
 
@@ -83,7 +82,7 @@ architecture rtl of AxiSpiAd7682Reg is
       --
       cfgReg         => x"FFFC",
       we             => '0',
-      -- AXI lite 
+      -- AXI lite
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -131,7 +130,6 @@ begin
 
       if (axilStatus.readEnable = '1') then
          axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
-         v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0x0)
                v.axilReadSlave.rdata(cfgReg_o'range) := r.cfgReg;

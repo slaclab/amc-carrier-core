@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : DaqLane.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-04-02
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:   This module sends sample data to a single Lane.
 --                In non-continuous mode
@@ -10,12 +7,12 @@
 --                - the module sends data a packet at the time to AXI stream FIFO.
 --                Note: Tx pause must indicate that the AXI stream FIFO can hold the whole data packet.
 --                Note: The data transmission is enabled only if JESD data is valid LinkReady_i='1'.
---                
+--
 --                In continuous mode:
 --                - has to be triggered to start
 --                - continuously sends 4k frames
 --                - the packetSize_i, does not have any function
---                - the freeze_i inserts User bit that freezes the circular buffer 
+--                - the freeze_i inserts User bit that freezes the circular buffer
 --
 --                More info: https://confluence.slac.stanford.edu/display/ppareg/AmcAxisDaqV2+Requirements
 --
@@ -25,11 +22,11 @@
 --                HeaderWord 3: header_i & dec16or32_i & averaging_i & test_i & BAY_INDEX_G & axiNum_i & rateDiv_i
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -37,13 +34,17 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
-use work.DaqMuxV2Pkg.all;
 
-use work.Jesd204bPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.DaqMuxV2Pkg.all;
+
+use surf.Jesd204bPkg.all;
 
 entity DaqLane is
    generic (
@@ -92,7 +93,7 @@ entity DaqLane is
       rxAxisMaster_o : out AxiStreamMasterType;
       error_o        : out sl;          -- Error if tReady drops
       busy_o         : out sl;  -- Busy inhibits trigger in mode_i = '0'
-      pctCnt_o       : out slv(25 downto 0);  -- Number of 4096 byte frames 
+      pctCnt_o       : out slv(25 downto 0);  -- Number of 4096 byte frames
 
       sampleData_i  : in slv((GT_WORD_SIZE_C*8)-1 downto 0);
       sampleValid_i : in sl;
@@ -167,8 +168,8 @@ begin
    -- because it will zero s_rateClk and data will be missed
    s_trigDecimator <= trig_i and not r.busy;
 
-   -- Applies test data if enabled  
-   U_DaqTestSig : entity work.DaqTestSig
+   -- Applies test data if enabled
+   U_DaqTestSig : entity amc_carrier_core.DaqTestSig
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -191,7 +192,7 @@ begin
    -- Decimates data,
    -- Averages decimated data
    GEN_DEC : if (DECIMATOR_EN_G = true) generate
-      Decimator_INST : entity work.DaqDecimator
+      Decimator_INST : entity amc_carrier_core.DaqDecimator
          generic map (
             TPD_G => TPD_G)
          port map (
@@ -213,7 +214,7 @@ begin
       s_rateClk     <= s_sampValidTst;
    end generate GEN_N_DEC;
 
-   U_DspComparator : entity work.DspComparator
+   U_DspComparator : entity surf.DspComparator
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 32)
@@ -221,7 +222,7 @@ begin
          clk  => devClk_i,
          ain  => r.packetSize,
          bin  => toSlv(HEADER_SIZE_C, 32),
-         lsEq => compCheck);  -- less than or equal to (a <= b) --- (r.packetSize <= HEADER_SIZE_C)  
+         lsEq => compCheck);  -- less than or equal to (a <= b) --- (r.packetSize <= HEADER_SIZE_C)
 
    comb : process (LinkReady_i, averaging_i, axiNum_i, bsa_i, compCheck,
                    dec16or32_i, devRst_i, dmod_i, enable_i, freeze_i,
@@ -254,7 +255,7 @@ begin
 
       -- Check if not in the IDLE state
       if (r.state /= IDLE_S) then
-         -- Error if tReady or dataReady drops 
+         -- Error if tReady or dataReady drops
          if (rxAxisSlave_i.tReady = '0') or (LinkReady_i = '0') then
             v.error := '1';
          end if;
@@ -264,7 +265,7 @@ begin
       case (r.state) is
          ----------------------------------------------------------------------
          when IDLE_S =>
-            -- Register values      
+            -- Register values
             v.packetSize         := packetSize_i;
             v.maxSize            := (packetSize_i-1);
             v.rateDiv            := rateDiv_i;
@@ -369,23 +370,23 @@ begin
                   -- Increment the counter
                   v.dataCnt := r.dataCnt + 1;
                end if;
-               -- Send the JESD data 
+               -- Send the JESD data
                v.txAxisMaster.tData((GT_WORD_SIZE_C*8)-1 downto 0) := s_decSampData;
                -- Check for EOF condition
-               if (r.dataCnt = r.maxSize and mode_i = '0')  -- Stop sending data if packet size reached  
+               if (r.dataCnt = r.maxSize and mode_i = '0')  -- Stop sending data if packet size reached
                                           or (v.error = '1')  -- Immediately stop sending data if error occurs
                                           or (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) then  -- end of frame condition
                   -- Set the EOF bit
                   v.txAxisMaster.tLast := '1';
                   -- Set the EOFE bit
                   ssiSetUserEofe(SSI_CONFIG_C, v.txAxisMaster, v.error);
-                  -- Set the freeze buffer tUser bit 
-                  -- if the trigger occurred during the packet the EOF will contain freeze buffer bit 
+                  -- Set the freeze buffer tUser bit
+                  -- if the trigger occurred during the packet the EOF will contain freeze buffer bit
                   axiStreamSetUserBit(SSI_CONFIG_C, v.txAxisMaster, FREZE_BUFFER_TUSER_G, r.freeze);
                end if;
                -- Check if need to stop sending data if in continuous mode or error detected
-               if (r.dataCnt = r.maxSize and mode_i = '0')  -- Stop sending data if packet size reached  
-                              or (v.error = '1') then  -- Immediately stop sending data if error occurs                                      
+               if (r.dataCnt = r.maxSize and mode_i = '0')  -- Stop sending data if packet size reached
+                              or (v.error = '1') then  -- Immediately stop sending data if error occurs
                   -- Clear the flag
                   v.freeze := '0';
                   -- Next state
@@ -394,11 +395,11 @@ begin
                elsif (r.dataCnt(FRAME_BWIDTH_G-1 downto 0) = (2**FRAME_BWIDTH_G-1)) then  -- end of frame condition
                   -- Check if still enabled
                   if (enable_i = '1') then
-                     -- Go to next frame                 
+                     -- Go to next frame
                      v.sof := '1';
                   else
                      -- Next state
-                     v.state := IDLE_S;  -- End packet if disabled                             
+                     v.state := IDLE_S;  -- End packet if disabled
                   end if;
                   -- Clear freeze flag (but apply it if the freeze_i occurs at this very moment)
                   if (freeze_i = '1') then

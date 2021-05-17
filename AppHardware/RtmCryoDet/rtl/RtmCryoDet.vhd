@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : RtmCryoDet.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-11-03
--- Last update: 2019-04-16
 -------------------------------------------------------------------------------
--- Description: https://confluence.slac.stanford.edu/x/5WV4DQ    
+-- Description: https://confluence.slac.stanford.edu/x/5WV4DQ
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,8 +17,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -31,7 +33,8 @@ entity RtmCryoDet is
       TPD_G           : time             := 1 ns;
       SIMULATION_G    : boolean          := false;
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
-      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
+      MMCM_CLK_DIV_G  : boolean          := false);
    port (
       -- JESD Clock Reference
       jesdClk         : in    sl;
@@ -42,6 +45,9 @@ entity RtmCryoDet is
       startRamp       : out   sl;
       selectRamp      : out   sl;
       rampCnt         : out   slv(31 downto 0);
+      -- Copy of RTM DAC Configuration
+      rtmDacAddr      : in    slv(10 downto 0);
+      rtmDacData      : out   slv(19 downto 0);
       -- AXI-Lite
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -51,7 +57,7 @@ entity RtmCryoDet is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -162,6 +168,8 @@ begin
 
    ---------------------------------------------
    U_OREG_startRampPulse0 : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => jesdClk,
          Q  => startRampPulseReg(0),
@@ -180,6 +188,8 @@ begin
 
    ---------------------------------------------
    U_OREG_startRampPulse1 : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => jesdClk,
          Q  => startRampPulseReg(1),
@@ -200,29 +210,43 @@ begin
    maxSdo     <= rtmLsN(15);
    rtmLsN(16) <= not(jesdRst or rtmReset);
 
-
-   U_RTM_CLK : entity work.ClockManagerUltraScale
-      generic map (
-         CLKIN_PERIOD_G     => 3.255,
-         NUM_CLOCKS_G       => 1,
-         DIVCLK_DIVIDE_G    => 6,
-         CLKFBOUT_MULT_F_G  => 23.375,
-         CLKOUT0_DIVIDE_F_G => 23.375)
-      port map (
-         clkIn           => jesdClk,
-         rstIn           => '0',
-         clkOut(0)       => jesdClkDivReg,
-         rstOut(0)       => open,
-         locked          => open);
    ---------------------------------------------
---   U_OREG_jesdClkDiv : ODDRE1
---      port map (
---         C  => jesdClk,
---         Q  => jesdClkDivReg,
---         D1 => jesdClkDiv,
---         D2 => jesdClkDiv,
---         SR => '0');
---
+   U_OREG_jesdClkDiv : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
+      port map (
+         C  => jesdClk,
+         Q  => jesdClkDivReg,
+         D1 => jesdClkDiv,
+         D2 => jesdClkDiv,
+         SR => '0');
+
+   GEN_MMCM_CLK_DIV : if MMCM_CLK_DIV_G generate
+      U_RTM_CLK : entity work.ClockManagerUltraScale
+         generic map (
+            CLKIN_PERIOD_G     => 3.255,
+            NUM_CLOCKS_G       => 1,
+            DIVCLK_DIVIDE_G    => 6,
+            CLKFBOUT_MULT_F_G  => 23.375,
+            CLKOUT0_DIVIDE_F_G => 23.375)
+         port map (
+            clkIn           => jesdClk,
+            rstIn           => '0',
+            clkOut(0)       => jesdClkDivReg,
+            rstOut(0)       => open,
+            locked          => open);
+   end generate GEN_MMCM_CLK_DIV;
+
+   GEN_NO_MMCM_CLK_DIV : if not MMCM_CLK_DIV_G generate
+      U_OREG_jesdClkDiv : ODDRE1
+         port map (
+            C  => jesdClk,
+            Q  => jesdClkDivReg,
+            D1 => jesdClkDiv,
+            D2 => jesdClkDiv,
+            SR => '0');
+   end generate GEN_NO_MMCM_CLK_DIV;
+
    U_OBUFDS_jesdClkDiv : OBUFDS
       port map (
          I  => jesdClkDivReg,
@@ -230,7 +254,7 @@ begin
          OB => rtmLsN(17));
   ---------------------------------------------
 
-   U_extTrig : entity work.Synchronizer
+   U_extTrig : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -238,7 +262,7 @@ begin
          dataIn  => extTrig,
          dataOut => extTrigSync);
 
-   U_TimingTrig : entity work.SynchronizerOneShot
+   U_TimingTrig : entity surf.SynchronizerOneShot
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -287,7 +311,7 @@ begin
 
       ------------------------------------------------------------
       -- Debouncing External Triggering
-      ------------------------------------------------------------ 
+      ------------------------------------------------------------
 
       -- Check if external trigger has changed
       if (extTrigSync /= r.startRampExt) then
@@ -310,7 +334,7 @@ begin
 
       ------------------------------------------------------------
       -- Mux the triggers together
-      ------------------------------------------------------------ 
+      ------------------------------------------------------------
 
       -- Check if enabled
       if (enableRamp = '1') then
@@ -329,9 +353,9 @@ begin
 
       ------------------------------------------------------------
       -- Pulse Stretching
-      ------------------------------------------------------------       
+      ------------------------------------------------------------
 
-      -- Check if pulse stretching 
+      -- Check if pulse stretching
       if (r.startRamp = '1') or (r.pulseCnt /= 0) then
          -- Check the counter
          if (r.pulseCnt = pulseWidth) then
@@ -347,9 +371,9 @@ begin
          end if;
       end if;
 
-      ------------------------------------------------------------       
+      ------------------------------------------------------------
       -- Synchronous Reset
-      ------------------------------------------------------------       
+      ------------------------------------------------------------
       if (jesdRst = '1') then
          v := REG_INIT_C;
       end if;
@@ -373,7 +397,7 @@ begin
    ---------------------
    -- AXI-Lite Crossbar
    ---------------------
-   U_XBAR : entity work.AxiLiteCrossbar
+   U_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -394,7 +418,7 @@ begin
    --------------------------
    -- CRYO DET RTM REG Module
    --------------------------
-   U_Reg : entity work.RtmCryoDetReg
+   U_Reg : entity amc_carrier_core.RtmCryoDetReg
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -420,7 +444,7 @@ begin
    ------------------
    -- PIC SPI Module
    ------------------
-   PIC_SPI : entity work.RtmCryoSpiMaster  -- FPGA=Master and PIC=SLAVE
+   PIC_SPI : entity amc_carrier_core.RtmCryoSpiMaster  -- FPGA=Master and PIC=SLAVE
       generic map (
          TPD_G             => TPD_G,
          CPHA_G            => '0',      -- CPHA = 0
@@ -442,7 +466,7 @@ begin
    ------------------
    -- DAC LUT Module
    ------------------
-   DAC_LUT : entity work.RtmCryoDacLut
+   DAC_LUT : entity amc_carrier_core.RtmCryoDacLut
       generic map (
          TPD_G            => TPD_G,
          AXIL_BASE_ADDR_G => AXI_CONFIG_C(LUT_INDEX_C).baseAddr)
@@ -460,7 +484,7 @@ begin
          mAxilWriteMaster => dacLutWriteMaster,
          mAxilWriteSlave  => dacLutWriteSlave);
 
-   U_DAC_LUT_XBAR : entity work.AxiLiteCrossbar
+   U_DAC_LUT_XBAR : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 2,
@@ -485,7 +509,7 @@ begin
    ------------------
    -- MAX SPI Module
    ------------------
-   MAX_SPI : entity work.AxiSpiMaster   -- FPGA=Master and CPLD=SLAVE
+   MAX_SPI : entity surf.AxiSpiMaster   -- FPGA=Master and CPLD=SLAVE
       generic map (
          TPD_G             => TPD_G,
          MODE_G            => "RW",
@@ -497,15 +521,20 @@ begin
          CLK_PERIOD_G      => (1.0/AXI_CLK_FREQ_G),
          SPI_SCLK_PERIOD_G => ite(SIMULATION_G, (1.0/AXI_CLK_FREQ_G), (1.0/1.0E+6)))  -- SCLK = 1MHz
       port map (
+         -- AXI-Lite Interface
          axiClk         => axilClk,
          axiRst         => axilRst,
          axiReadMaster  => axilReadMasters(MAX_INDEX_C),
          axiReadSlave   => axilReadSlaves(MAX_INDEX_C),
          axiWriteMaster => maxSpiWriteMaster,
          axiWriteSlave  => maxSpiWriteSlave,
+         -- Copy of the shadow memory (SHADOW_EN_G=true)
+         shadowAddr     => rtmDacAddr,
+         shadowData     => rtmDacData,
+         -- SPI Interface
          coreSclk       => maxSck,
          coreSDin       => maxSdo,
          coreSDout      => maxSdi,
          coreCsb        => maxCsL);
 
-end architecture mapping;
+end mapping;

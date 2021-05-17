@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : RtmRfInterlock.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-06-17
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description: https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_19_C00
 ------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,8 +17,13 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.FpgaTypePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -48,7 +50,7 @@ entity RtmRfInterlock is
       axilWriteSlave  : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -208,6 +210,8 @@ begin
          OB => rtmLsN(52));
 
    U_stndbyTrigReg : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => recClk,
          Q  => stndbyTrigLReg,
@@ -222,6 +226,8 @@ begin
          OB => rtmLsN(45));
 
    U_accelTrigReg : ODDRE1
+      generic map (
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
       port map (
          C  => recClk,
          Q  => accelTrigReg,
@@ -282,7 +288,7 @@ begin
          OB => rtmLsN(4));
 
    ----------------------------------
-   -- Note inverted because of HW bug   
+   -- Note inverted because of HW bug
    ----------------------------------
    stndbyTrigL <= not(stndbyTrig);
    tuneSledL   <= not(tuneSled);
@@ -293,7 +299,7 @@ begin
    -------
    -- Core
    -------
-   U_CORE : entity work.RtmRfInterlockCore
+   U_CORE : entity amc_carrier_core.RtmRfInterlockCore
       generic map (
          TPD_G            => TPD_G,
          IODELAY_GROUP_G  => IODELAY_GROUP_G,

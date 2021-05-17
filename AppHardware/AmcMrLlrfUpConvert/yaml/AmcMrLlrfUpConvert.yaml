@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'SLAC Firmware Standard Library'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'SLAC Firmware Standard Library', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'SLAC Firmware Standard Library', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -17,7 +17,7 @@
 #include LvdsSigGen.yaml
 #include LvdsSigGenRam.yaml
 
-AmcMrLlrfUpConvert: &AmcMrLlrfUpConvert 
+AmcMrLlrfUpConvert: &AmcMrLlrfUpConvert
   name: AmcMrLlrfUpConvert
   description: "MR LLRF Upconverter Module (SD-376-396-17)"
   size: 0x01000000
@@ -26,11 +26,11 @@ AmcMrLlrfUpConvert: &AmcMrLlrfUpConvert
   ########
   children:
   ########
-    ##################################################     
+    ##################################################
     AttHMC624:
       <<: *AttHMC624
       at:
-        offset: 0x00000000 
+        offset: 0x00000000
         nelms: 4
         stride: 0x10
     ##################################################
@@ -38,37 +38,37 @@ AmcMrLlrfUpConvert: &AmcMrLlrfUpConvert
       <<: *Adt7420
       name: "Adt7420"
       at:
-        offset: 0x00010000 
+        offset: 0x00010000
         nelms:  4
-        stride: 0x00000400 
-    ##################################################     
+        stride: 0x00000400
+    ##################################################
     Adc16Dx370:
       <<: *Adc16Dx370
       name: "Adc16Dx370"
       at:
-        offset: 0x00020000 
+        offset: 0x00020000
         nelms:  3
-        stride: 0x00020000 
-    ##################################################     
+        stride: 0x00020000
+    ##################################################
     Lmk04828:
       <<: *Lmk04828
       at:
-        offset: 0x00080000     
-    ##################################################     
+        offset: 0x00080000
+    ##################################################
     DacLtc2000:
       <<: *DacLtc2000
       at:
-        offset: 0x000A0000     
+        offset: 0x000A0000
     ##################################################
     LvdsSigGen:
       <<: *LvdsSigGen
       at:
-        offset: 0x000C0000 
+        offset: 0x000C0000
     ##################################################
     LvdsSigGenRam:
       <<: *LvdsSigGenRam
       at:
-        offset: 0x000D0000         
+        offset: 0x000D0000
     ##################################################
     InitAmcCard:
       description: Initialization for AMC card's JESD modules
@@ -76,22 +76,22 @@ AmcMrLlrfUpConvert: &AmcMrLlrfUpConvert
         offset: 0x0
       class: SequenceCommand
       sequence:
-                    
+
         # Calibrate the JESD ADCs
         - entry: Adc16Dx370/CalibrateAdc
-          value: 0x1       
+          value: 0x1
         # 100 ms sleep
         - entry: usleep
-          value: 100000       
+          value: 100000
 
         # Power up the LMK's SYSREF
         - entry: Lmk04828/PwrUpSysRef
-          value: 0x1       
+          value: 0x1
         # 1000 ms sleep
         - entry: usleep
-          value: 1000000          
+          value: 1000000
 
         # Clear the Alarms
-        - entry: Lmk04828/InitLmk          
-          value: 0x1        
+        - entry: Lmk04828/InitLmk
+          value: 0x1
     ##################################################

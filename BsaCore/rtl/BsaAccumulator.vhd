@@ -1,10 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : BsaAccumulator.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-09-29
--- Last update: 2017-09-09
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
 -- Description:
 --   Accumulates BSA data and writes records to RAM.  Each channel has
@@ -27,11 +22,11 @@
 --   are called out explicitly for resource optimization.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -39,10 +34,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.StdRtlPkg.all;
-use work.TextUtilPkg.all;
-use work.AxiStreamPkg.all;
-use work.SsiPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.TextUtilPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.SsiPkg.all;
 
 library UNISIM;
 use UNISIM.vcomponents.all;
@@ -112,7 +109,7 @@ architecture rtl of BsaAccumulator is
      tLast          => '0',
      done           => '0',
      trigger        => '0' );
-     
+
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
@@ -133,7 +130,7 @@ architecture rtl of BsaAccumulator is
    signal srlCE         : sl;
    signal srlIn         : slv(95 downto 0);
    signal srlOut        : slv(95 downto 0);
-   
+
    signal fifoRst       : sl;
    signal fifoFull      : sl;
    signal fifoProgFull  : sl;
@@ -152,7 +149,7 @@ begin
    -- Maybe pass bsaDone on tUser so that we can track when it gets to ram.
 
    fifoRst <= rst or bsaInit or not r.enabled;
-   
+
    FIFO36E2_inst : FIFO36E2
       generic map (
          CASCADE_ORDER           => "NONE",                 -- FIRST, LAST, MIDDLE, NONE, PARALLEL
@@ -230,7 +227,7 @@ begin
          DIN(63 downto 32) => (others=>'0'),                -- 64-bit input: FIFO data input bus
          DIN(31 downto  0) => fifoDin,
          DINP(7 downto  1) => (others=>'0'),                -- 8-bit input: FIFO parity input bus
-         DINP(0)           => rin.fifoDinP(0) 
+         DINP(0)           => rin.fifoDinP(0)
          );
 
    diagSign <= (others=>diagnosticData(31));
@@ -301,7 +298,7 @@ begin
      UNDERFLOW                    => ufSum,
      OVERFLOW                     => ofSum
        );
-     
+
    U_VAR : DSP48E2
      generic map ( ACASCREG   => 0,  -- unused
                    ADREG      => 0,
@@ -362,7 +359,7 @@ begin
      RSTM                         => '0',
      RSTP                         => rst
        );
-     
+
    fifoRdEn <= r.tValid and axisSlave.tReady;
 
    GEN_SRL : for i in 0 to 95 generate
@@ -375,7 +372,7 @@ begin
    end generate GEN_SRL;
    srlCE <= '1' when r.state = SHIFT_REG_S else '0';
    srlIn <= resVar & resSum & resNacc;
-     
+
    assert (r.overflow = '0') report "BsaAccumulator " & str(BSA_NUMBER_G) & " overflowed." severity error;
 
    comb : process (diagnosticSevr, diagnosticFixd, diagnosticExc,
@@ -391,7 +388,7 @@ begin
       if enable = '0' then
         v.enabled := '0';
       end if;
-      
+
       v.fifoWrEn := '0' & r.fifoWrEn(2 downto 1);
       v.fifoDinP(1 downto 0) := r.fifoDinP(2 downto 1);
 
@@ -413,13 +410,13 @@ begin
       else
         notFixd     <= "11";  -- keeping a sum
       end if;
-      
+
       if bsaActive = '1' and diagnosticSevr <= r.sevr then
         incDiag     <= "11";  -- adding the new data
       else
         incDiag     <= "00";  -- not adding the new data
       end if;
-      
+
       case r.state is
         when DATA_S =>
           if accumulateEn = '1' then
@@ -456,7 +453,7 @@ begin
             v.sumExcepts(NUM_ACCUMULATIONS_G-1) := r.sumExcepts(0) or ufSum or ofSum;
             v.varExcepts(NUM_ACCUMULATIONS_G-1) := r.varExcepts(0) or ofVar(3) or diagnosticExc;
           end if;
-          -- Queue readout for bsaDone (unless nothing to read)      
+          -- Queue readout for bsaDone (unless nothing to read)
           if (lastEn = '1' and bsaDone = '1' and fifoEmpty = '0') then
             v.done   := '1';
           end if;
@@ -481,7 +478,7 @@ begin
         v.underflow := '1';
         v.enabled   := '0';
       end if;
-      
+
       if (r.tValid = '0' and fifoProgFull = '1') then
          v.tValid := '1';
       end if;
@@ -501,7 +498,7 @@ begin
         elsif (fifoRdCount(7 downto 0) = toSlv(0,8)) then
           v.tLast := '1';
         end if;
-      
+
         -- Clear valid when tLast has been read
         if r.tLast = '1' then
           v.tValid := r.done;            -- bsaDone readout might have stacked
@@ -537,7 +534,7 @@ begin
          v.tLast     := '0';
          v.done      := '0';
       end if;
-      
+
       rin         <= v;
       bsaOverflow <= r.overflow;
 

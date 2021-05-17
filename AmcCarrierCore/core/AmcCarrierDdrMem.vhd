@@ -1,31 +1,24 @@
 -------------------------------------------------------------------------------
--- Title      : 
--------------------------------------------------------------------------------
--- File       : AmcCarrierDdrMem.vhd
--- Author     : Larry Ruckman  <ruckman@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2015-07-08
--- Last update: 2018-03-14
--- Platform   : 
--- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -54,7 +47,7 @@ entity AmcCarrierDdrMem is
       axiReadSlave    : out   AxiReadSlaveType;
       ----------------
       -- Core Ports --
-      ----------------   
+      ----------------
       -- DDR3L SO-DIMM Ports
       ddrClkP         : in    sl;
       ddrClkN         : in    sl;
@@ -236,7 +229,7 @@ begin
    reset   <= axilRst or r.ddrReset;
    axiRstL <= not(sysRst);
 
-   U_RstSync : entity work.RstSync
+   U_RstSync : entity surf.RstSync
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -317,7 +310,7 @@ begin
 
    FSBL_GEN : if (FSBL_G = true) generate
 
-      U_AxiMemTester : entity work.AxiMemTester
+      U_AxiMemTester : entity surf.AxiMemTester
          generic map (
             TPD_G        => TPD_G,
             START_ADDR_G => START_ADDR_C,
@@ -356,7 +349,7 @@ begin
       ddrReadMaster  <= axiReadMaster;
       axiReadSlave   <= ddrReadSlave;
 
-      U_Sync : entity work.Synchronizer
+      U_Sync : entity surf.Synchronizer
          generic map (
             TPD_G => TPD_G)
          port map (

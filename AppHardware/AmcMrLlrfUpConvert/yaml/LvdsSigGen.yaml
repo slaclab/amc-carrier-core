@@ -1,10 +1,10 @@
 ##############################################################################
 ## This file is part of 'SLAC Firmware Standard Library'.
-## It is subject to the license terms in the LICENSE.txt file found in the 
-## top-level directory of this distribution and at: 
-##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
-## No part of 'SLAC Firmware Standard Library', including this file, 
-## may be copied, modified, propagated, or distributed except according to 
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'SLAC Firmware Standard Library', including this file,
+## may be copied, modified, propagated, or distributed except according to
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
@@ -48,7 +48,7 @@ LvdsSigGen: &LvdsSigGen
       description: 'Size of a generated signal period buffer. In number of RAM addresses
         (Zero inclusive). Example: For the signal period of 16 samples write register
         value ''0xf''. Note: Period changes allowed only when disabled'
-    #########################################################    
+    #########################################################
     LoadTap:
       at:
         offset: 0x00C
@@ -57,7 +57,7 @@ LvdsSigGen: &LvdsSigGen
       sizeBits: 16
       mode: RW
       description: Load TAP delays from registers tapDelayIn_o [15:0]
-    #########################################################    
+    #########################################################
     LvdsTapSet:
       at:
         offset: 0x040
@@ -69,7 +69,7 @@ LvdsSigGen: &LvdsSigGen
       mode: RW
       description: Set 9-bit LVDS tap delay (16x) [0x1f:0x10]
     #########################################################
-    LvdsTapGet:    
+    LvdsTapGet:
       at:
         offset: 0x080
         stride: 4
@@ -79,4 +79,4 @@ LvdsSigGen: &LvdsSigGen
       sizeBits: 9
       mode: RO
       description: Get 9-bit LVDS tap delay (16x) [0x2f:0x20]
-    #########################################################    
+    #########################################################

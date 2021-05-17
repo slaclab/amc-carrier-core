@@ -1,26 +1,29 @@
 -------------------------------------------------------------------------------
--- File       : RtmDigitalDebugV2.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
 -- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
+
+library amc_carrier_core;
 
 entity RtmDigitalDebugV2 is
    generic (
@@ -35,7 +38,7 @@ entity RtmDigitalDebugV2 is
       CLKOUT1_PHASE_G  : real range -360.0 to 360.0 := 0.0);
    port (
       -- Digital I/O Interface
-      din             : out   slv(7 downto 0);  -- digital inputs from the RTM: ASYNC (not registered in FPGA or RTM)  
+      din             : out   slv(7 downto 0);  -- digital inputs from the RTM: ASYNC (not registered in FPGA or RTM)
       dout            : in    slv(7 downto 0);  -- digital outputs to the RTM: If REG_DOUT_MODE_G[x] = '0', then dout[x] SYNC to recClkOut(0) domain else DOUT driven as clock output.
       cout            : in    slv(7 downto 0);  -- clock outputs to the RTM (REG_DOUT_EN_G(x) = '1' and REG_DOUT_MODE_G(x) = '1')
       -- Clock Jitter Cleaner Interface
@@ -59,7 +62,7 @@ entity RtmDigitalDebugV2 is
       pllWriteSlave   : out   AxiLiteWriteSlaveType;
       -----------------------
       -- Application Ports --
-      -----------------------      
+      -----------------------
       -- RTM's Low Speed Ports
       rtmLsP          : inout slv(53 downto 0);
       rtmLsN          : inout slv(53 downto 0);
@@ -76,6 +79,7 @@ architecture mapping of RtmDigitalDebugV2 is
    signal userValueOut : slv(31 downto 0);
    signal doutP        : slv(7 downto 0);
    signal doutN        : slv(7 downto 0);
+   signal doutClk      : sl;
    signal cleanClock   : sl;
 
 
@@ -93,10 +97,10 @@ architecture mapping of RtmDigitalDebugV2 is
 
 begin
 
-   -------------------------        
+   -------------------------
    -- OutBound Clock Mapping
-   -------------------------        
-   U_PLL : entity work.ClockManagerUltraScale
+   -------------------------
+   U_PLL : entity surf.ClockManagerUltraScale
       generic map (
          TPD_G            => TPD_G,
          TYPE_G           => "PLL",
@@ -115,7 +119,7 @@ begin
          clkOut          => clk,
          rstOut          => rst,
          locked          => userValueIn(0),
-         -- AXI-Lite Interface 
+         -- AXI-Lite Interface
          axilClk         => axilClk,
          axilRst         => axilRst,
          axilReadMaster  => pllReadMaster,
@@ -125,7 +129,7 @@ begin
 
    userValueIn(31 downto 1) <= (others => '0');
 
-   U_CLK : entity work.ClkOutBufDiff
+   U_CLK : entity surf.ClkOutBufDiff
       generic map (
          TPD_G        => TPD_G,
          XIL_DEVICE_G => "ULTRASCALE")
@@ -137,9 +141,9 @@ begin
    recClkOut <= clk;
    recRstOut <= rst;
 
-   -------------------------        
+   -------------------------
    -- Inbound Clock Mapping
-   -------------------------               
+   -------------------------
    U_IBUFDS : IBUFDS
       generic map (
          DIFF_TERM => true)
@@ -156,7 +160,7 @@ begin
    ------------------------
    -- Digital Input Mapping
    ------------------------
-   U_DIN : entity work.RtmDigitalDebugDin
+   U_DIN : entity amc_carrier_core.RtmDigitalDebugDin
       generic map (
          TPD_G => TPD_G)
       port map (
@@ -171,16 +175,18 @@ begin
          xDin(7) => rtmLsN(5),
          din     => din);
 
+   doutClk <= not clk(0);
+
    -------------------------
    -- Digital Output Mapping
-   -------------------------         
-   U_DOUT : entity work.RtmDigitalDebugDout
+   -------------------------
+   U_DOUT : entity amc_carrier_core.RtmDigitalDebugDout
       generic map (
          TPD_G           => TPD_G,
          REG_DOUT_EN_G   => REG_DOUT_EN_G,
          REG_DOUT_MODE_G => REG_DOUT_MODE_G)
       port map (
-         clk     => clk(0),             -- Used for REG_DOUT_EN_G(x) = '1')
+         clk     => doutClk,             -- Used for REG_DOUT_EN_G(x) = '1')
          disable => userValueOut(7 downto 0),
          -- Digital Output Interface
          dout    => dout,
@@ -197,7 +203,7 @@ begin
    ---------------------
    -- Register Interface
    ---------------------
-   U_REG : entity work.Si5317a
+   U_REG : entity amc_carrier_core.Si5317a
       generic map (
          TPD_G => TPD_G)
       port map(

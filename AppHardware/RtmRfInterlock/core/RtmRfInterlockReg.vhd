@@ -1,8 +1,5 @@
 -------------------------------------------------------------------------------
--- File       : RtmRfInterlockReg.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2016-06-21
--- Last update: 2018-03-14
 -------------------------------------------------------------------------------
 -- Description:  Register decoding
 --               0x00 (RW)- bit0 = mode
@@ -18,14 +15,14 @@
 --               0x20-0x24
 --                    (RW)- bit0-9 = Set value of the ADC iDelay
 --               0x30-0x34
---                    (R)- bit0-9 = Get value of the ADC iDelay                                       
+--                    (R)- bit0-9 = Get value of the ADC iDelay
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -33,8 +30,10 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
 
 entity RtmRfInterlockReg is
    generic (
@@ -66,11 +65,14 @@ entity RtmRfInterlockReg is
       loadDelay_o  : out sl;
       faultClear_o : out sl;
       bypassMode_o : out sl;
+      streamEn_o   : out sl;
 
       -- Status Register
-      rfOff_i   : in sl;
-      fault_i   : in sl;
-      adcLock_i : in sl;
+      rfOff_i        : in sl;
+      fault_i        : in sl;
+      adcLock_i      : in sl;
+      writePointer_i : slv(10 downto 0);
+      timestamp_i    : Slv64Array(3 downto 0);
 
       -- IDelay control
       curDelay_i : in  Slv9Array(4 downto 0);
@@ -81,12 +83,13 @@ end RtmRfInterlockReg;
 architecture rtl of RtmRfInterlockReg is
 
    type RegType is record
-      -- 
+      --
       tuneSled   : sl;
       detuneSled : sl;
       mode       : sl;
       control    : slv(4 downto 0);
       setDelay   : Slv9Array(4 downto 0);
+      streamEn   : sl;
 
       -- AXI lite
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -99,8 +102,9 @@ architecture rtl of RtmRfInterlockReg is
       mode       => '0',
       control    => (others => '0'),
       setDelay   => (others => (others => '0')),
+      streamEn   => '0',
 
-      -- AXI lite      
+      -- AXI lite
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -111,10 +115,13 @@ architecture rtl of RtmRfInterlockReg is
    signal s_RdAddr : natural := 0;
    signal s_WrAddr : natural := 0;
 
-   -- Read-only synced 
+   -- Read-only synced
    signal s_status   : slv(2 downto 0);
    signal s_curDelay : Slv9Array(4 downto 0);
--- 
+
+   signal s_writePointer : slv(10 downto 0) := (others => '0');
+   signal s_timestamp    : Slv32Array(7 downto 0) := (others => (others => '0'));
+--
 begin
 
    -- Convert address to integer (lower two bits of address are always '0')
@@ -122,7 +129,7 @@ begin
    s_WrAddr <= conv_integer(axilWriteMaster.awaddr(AXIL_ADDR_WIDTH_G-1 downto 2));
 
    comb : process (axiRst_i, axilReadMaster, axilWriteMaster, r, s_RdAddr,
-                   s_WrAddr, s_curDelay, s_status) is
+                   s_WrAddr, s_curDelay, s_status, s_writePointer, s_timestamp) is
       variable v             : RegType;
       variable axilStatus    : AxiLiteStatusType;
       variable axilWriteResp : slv(1 downto 0);
@@ -147,6 +154,8 @@ begin
                v.detuneSled := axilWriteMaster.wdata(0);
             when 16#03# =>              -- ADDR (0xC)
                v.control := axilWriteMaster.wdata(r.control'range);
+            when 16#04# =>              -- ADDR (0x10)
+               v.streamEn := axilWriteMaster.wdata(0);
             when 16#20# to 16#2F# =>
                for i in 4 downto 0 loop
                   if (axilWriteMaster.awaddr(5 downto 2) = i) then
@@ -161,7 +170,6 @@ begin
 
       if (axilStatus.readEnable = '1') then
          axilReadResp          := ite(axilReadMaster.araddr(1 downto 0) = "00", AXI_RESP_OK_C, AXI_RESP_DECERR_C);
-         v.axilReadSlave.rdata := (others => '0');
          case (s_RdAddr) is
             when 16#00# =>              -- ADDR (0x0)
                v.axilReadSlave.rdata(0) := r.mode;
@@ -171,8 +179,12 @@ begin
                v.axilReadSlave.rdata(0) := r.detuneSled;
             when 16#03# =>              -- ADDR (0xc)
                v.axilReadSlave.rdata(r.control'range) := r.control;
+            when 16#04# =>              -- ADDR (0x10)
+               v.axilReadSlave.rdata(0) := r.streamEn;
             when 16#10# =>              -- ADDR (0x40)
                v.axilReadSlave.rdata(s_status'range) := s_status;
+            when 16#11# =>              -- ADDR (0x44)
+               v.axilReadSlave.rdata(s_writePointer'range) := s_writePointer;
             when 16#20# to 16#2F# =>    -- ADDR (0x80)
                for i in 4 downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = i) then
@@ -183,6 +195,12 @@ begin
                for i in 4 downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = i) then
                      v.axilReadSlave.rdata(s_curDelay(i)'range) := s_curDelay(i);
+                  end if;
+               end loop;
+            when 16#40# to 16#4F# =>    -- ADDR (0x100)
+               for i in 7 downto 0 loop
+                  if (axilReadMaster.araddr(5 downto 2) = i) then
+                     v.axilReadSlave.rdata(s_timestamp(i)'range) := s_timestamp(i);
                   end if;
                end loop;
             when others =>
@@ -203,6 +221,8 @@ begin
       axilReadSlave  <= r.axilReadSlave;
       axilWriteSlave <= r.axilWriteSlave;
 
+      streamEn_o     <= r.streamEn;
+
    end process comb;
 
    seq : process (axiClk_i) is
@@ -213,7 +233,26 @@ begin
    end process seq;
 
    -- Input assignment and synchronization
-   Sync_IN0 : entity work.SynchronizerVector
+   Sync_TIMESTAMP : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => 256)
+      port map (
+         dataIn(63 downto 0)     => timestamp_i(0),
+         dataIn(127 downto 64)   => timestamp_i(1),
+         dataIn(191 downto 128)  => timestamp_i(2),
+         dataIn(255 downto 192)  => timestamp_i(3),
+         clk                     => axiClk_i,
+         dataOut(31 downto 0)    => s_timestamp(0),
+         dataOut(63 downto 32)   => s_timestamp(1),
+         dataOut(95 downto 64)   => s_timestamp(2),
+         dataOut(127 downto 96)  => s_timestamp(3),
+         dataOut(159 downto 128) => s_timestamp(4),
+         dataOut(191 downto 160) => s_timestamp(5),
+         dataOut(223 downto 192) => s_timestamp(6),
+         dataOut(255 downto 224) => s_timestamp(7));
+
+   Sync_IN0 : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => s_status'length
@@ -226,8 +265,17 @@ begin
          dataOut   => s_status
          );
 
+   SYNC_IN1 : entity surf.SynchronizerVector
+      generic map (
+         TPD_G   => TPD_G,
+         WIDTH_G => s_writePointer'length)
+      port map (
+         clk     => axiClk_i,
+         dataIn  => writePointer_i,
+         dataOut => s_writePointer);
+
    GEN_IDELAY_IN : for i in 4 downto 0 generate
-      Sync_IN1 : entity work.SynchronizerVector
+      Sync_IN1 : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => curDelay_i(i)'length
@@ -240,7 +288,7 @@ begin
    end generate GEN_IDELAY_IN;
 
    -- Output assignment and synchronization
-   Sync_OUT0 : entity work.Synchronizer
+   Sync_OUT0 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -250,7 +298,7 @@ begin
          dataOut => mode_o
          );
 
-   Sync_OUT1 : entity work.Synchronizer
+   Sync_OUT1 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -260,7 +308,7 @@ begin
          dataOut => detuneSled_o
          );
 
-   Sync_OUT2 : entity work.Synchronizer
+   Sync_OUT2 : entity surf.Synchronizer
       generic map (
          TPD_G => TPD_G
          )
@@ -270,7 +318,7 @@ begin
          dataOut => tuneSled_o
          );
 
-   Sync_OUT3 : entity work.SynchronizerEdge
+   Sync_OUT3 : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G
          )
@@ -280,7 +328,7 @@ begin
          risingEdge => softTrig_o       -- Rising edge
          );
 
-   Sync_OUT4 : entity work.SynchronizerEdge
+   Sync_OUT4 : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G
          )
@@ -290,7 +338,7 @@ begin
          risingEdge => softClear_o      -- Rising edge
          );
 
-   Sync_OUT5 : entity work.SynchronizerEdge
+   Sync_OUT5 : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G
          )
@@ -300,7 +348,7 @@ begin
          dataOut => loadDelay_o
          );
 
-   Sync_OUT6 : entity work.SynchronizerOneShot
+   Sync_OUT6 : entity surf.SynchronizerOneShot
       generic map (
          TPD_G         => TPD_G,
          PULSE_WIDTH_G => 119           -- 1 us
@@ -311,7 +359,7 @@ begin
          dataOut => faultClear_o        -- Rising edge
          );
 
-   Sync_OUT7 : entity work.SynchronizerEdge
+   Sync_OUT7 : entity surf.SynchronizerEdge
       generic map (
          TPD_G => TPD_G
          )
@@ -322,7 +370,7 @@ begin
          );
 
    GEN_IDELAY_OUT : for i in 4 downto 0 generate
-      Sync_OUT4 : entity work.SynchronizerVector
+      Sync_OUT4 : entity surf.SynchronizerVector
          generic map (
             TPD_G   => TPD_G,
             WIDTH_G => r.setDelay(i)'length

@@ -1,17 +1,14 @@
 -------------------------------------------------------------------------------
--- File       : AppMpsSelect.vhd
 -- Company    : SLAC National Accelerator Laboratory
--- Created    : 2017-04-01
--- Last update: 2017-04-13
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Common Carrier Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Common Carrier Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 
@@ -20,10 +17,14 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AppMpsPkg.all;
-use work.AmcCarrierPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+
+library amc_carrier_core;
+use amc_carrier_core.AppMpsPkg.all;
+use amc_carrier_core.AmcCarrierPkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -52,7 +53,7 @@ architecture mapping of AppMpsSelect is
    -- Compute select record size
    -- 16 bits + 8 bits for digital
    -- 16 bits + 34 * byte count for analog
-   constant MPS_SELECT_BITS_C : integer := 18 + ite(APP_CONFIG_G.DIGITAL_EN_C, 8, APP_CONFIG_G.BYTE_COUNT_C*34);
+   constant MPS_SELECT_BITS_C : integer := 18 + ite(APP_CONFIG_G.DIGITAL_EN_C, APP_CONFIG_G.BYTE_COUNT_C*8, APP_CONFIG_G.BYTE_COUNT_C*34);
 
    type RegType is record
       mpsSelect  : MpsSelectType;
@@ -72,10 +73,10 @@ architecture mapping of AppMpsSelect is
 
 begin
 
-   --------------------------------- 
+   ---------------------------------
    -- Config Sync
-   --------------------------------- 
-   U_SyncKickDet : entity work.SynchronizerVector
+   ---------------------------------
+   U_SyncKickDet : entity surf.SynchronizerVector
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 32)
@@ -87,9 +88,9 @@ begin
          dataOut(15 downto 0)  => beamDestInt,
          dataOut(31 downto 16) => altDestInt);
 
-   --------------------------------- 
+   ---------------------------------
    -- Thresholds
-   --------------------------------- 
+   ---------------------------------
    comb : process (altDestInt, beamDestInt, diagnosticBus, diagnosticRst, r) is
       variable v         : RegType;
       variable chan      : integer;
@@ -123,11 +124,9 @@ begin
 
       -- Alt table decode
       v.mpsSelect.selectAlt := ite(((beamDest and altDestInt) /= 0),'1','0');
-      
-      -- Digital APP
-      v.mpsSelect.digitalBus(3 downto 0) := diagnosticBus.data(30)(3 downto 0);
-      v.mpsSelect.digitalBus(7 downto 4) := diagnosticBus.data(31)(3 downto 0);
 
+      -- Digital APP
+      v.mpsSelect.digitalBus(15 downto 0) := diagnosticBus.data(30)(15 downto 0);
       -- Synchronous Reset
       if (diagnosticRst = '1') then
          v := REG_INIT_C;
@@ -145,9 +144,9 @@ begin
       end if;
    end process seq;
 
-   ------------------------------------ 
+   ------------------------------------
    -- Output Synchronization Module
-   ------------------------------------ 
+   ------------------------------------
 
    -- Data Input
    process(r.mpsSelect) is
@@ -163,7 +162,7 @@ begin
       assignSlv(i,vec,r.mpsSelect.selectAlt);
 
       if APP_CONFIG_G.DIGITAL_EN_C then
-         assignSlv(i,vec,r.mpsSelect.digitalBus);
+         assignSlv(i,vec,r.mpsSelect.digitalBus(APP_CONFIG_G.BYTE_COUNT_C*8-1 downto 0));
       else
          for j in 0 to MPS_CHAN_COUNT_C-1 loop
             if APP_CONFIG_G.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
@@ -178,7 +177,7 @@ begin
    end process;
 
    -- FIFO
-   U_SyncFifo : entity work.SynchronizerFifo
+   U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
          TPD_G        => TPD_G,
          DATA_WIDTH_G => MPS_SELECT_BITS_C)
@@ -208,7 +207,7 @@ begin
       assignRecord(i,mpsSelDout,m.selectAlt);
 
       if APP_CONFIG_G.DIGITAL_EN_C then
-         assignRecord(i,mpsSelDout,m.digitalBus);
+         assignRecord(i,mpsSelDout,m.digitalBus(APP_CONFIG_G.BYTE_COUNT_C*8-1 downto 0));
       else
          for j in 0 to MPS_CHAN_COUNT_C-1 loop
             if APP_CONFIG_G.CHAN_CONFIG_C(j).THOLD_COUNT_C > 0 then
