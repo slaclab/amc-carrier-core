@@ -33,7 +33,8 @@ entity RtmCryoDet is
       TPD_G           : time             := 1 ns;
       SIMULATION_G    : boolean          := false;
       AXI_CLK_FREQ_G  : real             := 156.25E+6;
-      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0');
+      MMCM_CLK_DIV_G  : boolean          := false);
    port (
       -- JESD Clock Reference
       jesdClk         : in    sl;
@@ -201,7 +202,6 @@ begin
          I => startRampPulseReg(1),
          O => rtmLsP(12));
    ---------------------------------------------
-
    rtmLsN(12) <= selRamp;
    kRelay(1)  <= rtmLsP(13);
    rtmLsN(13) <= maxCsL;
@@ -210,23 +210,40 @@ begin
    maxSdo     <= rtmLsN(15);
    rtmLsN(16) <= not(jesdRst or rtmReset);
 
-   ---------------------------------------------
-   U_OREG_jesdClkDiv : ODDRE1
-      generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
-      port map (
-         C  => jesdClk,
-         Q  => jesdClkDivReg,
-         D1 => jesdClkDiv,
-         D2 => jesdClkDiv,
-         SR => '0');
+   GEN_MMCM_CLK_DIV : if (MMCM_CLK_DIV_G = true) generate
+      U_RTM_CLK : entity surf.ClockManagerUltraScale
+         generic map (
+            CLKIN_PERIOD_G     => 3.255,
+            NUM_CLOCKS_G       => 1,
+            DIVCLK_DIVIDE_G    => 6,
+            CLKFBOUT_MULT_F_G  => 23.375,
+            CLKOUT0_DIVIDE_F_G => 23.375)
+         port map (
+            clkIn           => jesdClk,
+            rstIn           => '0',
+            clkOut(0)       => jesdClkDivReg,
+            rstOut(0)       => open,
+            locked          => open);
+   end generate GEN_MMCM_CLK_DIV;
+
+   GEN_NO_MMCM_CLK_DIV : if (MMCM_CLK_DIV_G = false) generate
+      U_OREG_jesdClkDiv : ODDRE1
+         generic map (
+            SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
+         port map (
+            C  => jesdClk,
+            Q  => jesdClkDivReg,
+            D1 => jesdClkDiv,
+            D2 => jesdClkDiv,
+            SR => '0');
+   end generate GEN_NO_MMCM_CLK_DIV;
 
    U_OBUFDS_jesdClkDiv : OBUFDS
       port map (
          I  => jesdClkDivReg,
          O  => rtmLsP(17),
          OB => rtmLsN(17));
-   ---------------------------------------------
+  ---------------------------------------------
 
    U_extTrig : entity surf.Synchronizer
       generic map (
