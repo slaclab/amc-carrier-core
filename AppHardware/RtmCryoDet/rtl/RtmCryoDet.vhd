@@ -210,7 +210,7 @@ begin
    maxSdo     <= rtmLsN(15);
    rtmLsN(16) <= not(jesdRst or rtmReset);
 
-   GEN_MMCM_CLK_DIV : if MMCM_CLK_DIV_G generate
+   GEN_MMCM_CLK_DIV : if (MMCM_CLK_DIV_G = true) generate
       U_RTM_CLK : entity surf.ClockManagerUltraScale
          generic map (
             CLKIN_PERIOD_G     => 3.255,
@@ -226,7 +226,7 @@ begin
             locked          => open);
    end generate GEN_MMCM_CLK_DIV;
 
-   GEN_NO_MMCM_CLK_DIV : if not MMCM_CLK_DIV_G generate
+   GEN_NO_MMCM_CLK_DIV : if (MMCM_CLK_DIV_G = false) generate
       U_OREG_jesdClkDiv : ODDRE1
          generic map (
             SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
