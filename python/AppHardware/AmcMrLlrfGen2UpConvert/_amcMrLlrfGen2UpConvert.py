@@ -17,27 +17,27 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
-import time
+# import time
 import pyrogue         as pr
 import surf.devices.ti as ti
 import surf.devices.analog_devices as ad
 
 class AmcMrLlrfGen2UpConvert(pr.Device):
-    def __init__(   self, 
-            name        = "AmcMrLlrfUpConvert", 
-            description = "AmcMrLlrfUpConvert Board", 
+    def __init__(   self,
+            name        = "AmcMrLlrfUpConvert",
+            description = "AmcMrLlrfUpConvert Board",
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
-                
+
         #########
         # Devices
         #########
         for i in range(4):
-           self.add(ad.AttHmc624(         offset=0x00000000+0x10*i,name=f'AttHmc624[{i}]', expand=False))
+            self.add(ad.AttHmc624(         offset=0x00000000+0x10*i,name=f'AttHmc624[{i}]', expand=False))
         for i in range(4):
             self.add(ad.Adt7420(          offset=0x10000 + 0x400*i,name=f'Adt7420[{i}]', expand=False))
         for i in range(3):
-           self.add(ti.Adc16Dx370(     offset=0x00020000 + 0x20000*i,name=f'ADC[{i}]', expand=False))
+            self.add(ti.Adc16Dx370(     offset=0x00020000 + 0x20000*i,name=f'ADC[{i}]', expand=False))
         self.add(ti.Lmk04828(          offset=0x00080000,name='LMK',    expand=False))
         self.add(ti.Dac38J84(          offset=0x000C0000,name='Dac38J84', numTxLanes=4, expand=False))
 
@@ -52,7 +52,7 @@ class AmcMrLlrfGen2UpConvert(pr.Device):
             self.ADC[1].AdcReg_0x0002.set(0x0)
             self.ADC[2].AdcReg_0x0002.set(0x0)
 
-            # Power up continuous SYSREF 
+            # Power up continuous SYSREF
             self.LMK.EnableSysRef.set(0x3)
 
             # Init LMK
