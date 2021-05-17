@@ -222,7 +222,7 @@ begin
          SR => '0');
 
    GEN_MMCM_CLK_DIV : if MMCM_CLK_DIV_G generate
-      U_RTM_CLK : entity work.ClockManagerUltraScale
+      U_RTM_CLK : entity surf.ClockManagerUltraScale
          generic map (
             CLKIN_PERIOD_G     => 3.255,
             NUM_CLOCKS_G       => 1,
