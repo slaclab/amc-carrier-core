@@ -46,6 +46,8 @@ entity RtmRfInterlock is
       accelTrig       : in    sl;
       dataTrig        : in    sl;
       timestamp       : in    slv(63 downto 0) := (others => '0');
+      -- Fault Status
+      faultOut        : out   sl;
       -- AXI-Lite
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -189,6 +191,7 @@ begin
 
    rfOff     <= rtmLsP(16);
    fault     <= rtmLsN(16);
+   faultOut  <= fault;
    rtmLsN(2) <= faultClear;
    rtmLsP(2) <= bypassMode;
 
