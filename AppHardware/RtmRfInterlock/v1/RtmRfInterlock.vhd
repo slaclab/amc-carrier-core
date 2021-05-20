@@ -41,6 +41,8 @@ entity RtmRfInterlock is
       stndbyTrig      : in    sl;
       accelTrig       : in    sl;
       dataTrig        : in    sl;
+      -- Fault Status
+      faultOut        : out   sl;
       -- AXI-Lite
       axilClk         : in    sl;
       axilRst         : in    sl;
@@ -272,6 +274,8 @@ begin
          I  => rtmLsP(48),
          IB => rtmLsN(48),
          O  => fault);
+
+   faultOut <= fault;
 
    U_rfOff : IBUFDS
       generic map (
