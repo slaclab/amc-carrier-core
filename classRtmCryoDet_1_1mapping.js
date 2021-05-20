@@ -56,6 +56,7 @@ var classRtmCryoDet_1_1mapping =
     [ "u_obufds_startramppulse0", "classRtmCryoDet_1_1mapping.html#a3494eb29bd06969aa4fb87d96cbf18e1", null ],
     [ "u_oreg_startramppulse1", "classRtmCryoDet_1_1mapping.html#a788ba16908d374506f15042283dfbf86", null ],
     [ "u_obufds_startramppulse1", "classRtmCryoDet_1_1mapping.html#a90861d30a2e75741af1012ef2fc72474", null ],
+    [ "u_rtm_clk", "classRtmCryoDet_1_1mapping.html#a0603715349f1a53e4868d3aea8cd20c9", null ],
     [ "u_oreg_jesdclkdiv", "classRtmCryoDet_1_1mapping.html#a7446dc206a148055bbe3357413dd7ef5", null ],
     [ "u_obufds_jesdclkdiv", "classRtmCryoDet_1_1mapping.html#a06de4ea8fb20fb6fe3994a47c9b53938", null ],
     [ "u_exttrig", "classRtmCryoDet_1_1mapping.html#ac431205d5135e8b99ac3298304bc769c", null ],

@@ -5,6 +5,7 @@ var classRtmCryoDet =
     [ "SIMULATION_G", "classRtmCryoDet.html#ac6de36aa80aba7f5067e4172962ede27", null ],
     [ "AXI_CLK_FREQ_G", "classRtmCryoDet.html#a9a62acb465b291c47869ac5d04981cbe", null ],
     [ "AXI_BASE_ADDR_G", "classRtmCryoDet.html#acb99ead2657860ed256e1aea12336a4b", null ],
+    [ "MMCM_CLK_DIV_G", "classRtmCryoDet.html#a1e3b35d1893b026cc99f4fd6f2637473", null ],
     [ "jesdClk", "classRtmCryoDet.html#ab94c4142fc301d82f9adf064bf8d4b7d", null ],
     [ "jesdRst", "classRtmCryoDet.html#a95d22647eed04e301616665593a663f8", null ],
     [ "timingTrig", "classRtmCryoDet.html#a21359d84fe611c32caf52f5d92249f31", null ],

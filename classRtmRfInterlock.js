@@ -9,6 +9,7 @@ var classRtmRfInterlock =
     [ "stndbyTrig", "classRtmRfInterlock.html#a66371e8fdedb7a252506da407d97354a", null ],
     [ "accelTrig", "classRtmRfInterlock.html#a09f3684f9200119f29182a689d8fe24a", null ],
     [ "dataTrig", "classRtmRfInterlock.html#ac25fd5820db6350ccf8e2ff4997e2047", null ],
+    [ "faultOut", "classRtmRfInterlock.html#a2f92e8fb0019a353a9d2e9198e4d7d2d", null ],
     [ "axilClk", "classRtmRfInterlock.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
     [ "axilRst", "classRtmRfInterlock.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],
     [ "axilReadMaster", "classRtmRfInterlock.html#acd3440bbc91f595e14ebb565ef1e05c4", null ],
