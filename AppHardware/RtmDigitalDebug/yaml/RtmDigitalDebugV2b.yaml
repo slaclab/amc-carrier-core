@@ -1,0 +1,92 @@
+##############################################################################
+## This file is part of 'LCLS2 Common Carrier Core'.
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once RtmDigitalDebugV2b.yaml
+
+RtmDigitalDebugV2b: &RtmDigitalDebugV2b
+  name: RtmDigitalDebugV2b
+  description: RtmDigitalDebugV2b Module
+  class: MMIODev
+  configPrio: 1
+  size: 0x100
+  children:
+    #########################################################
+    DisableOutput:
+      at:
+        offset: 0x0
+      class: IntField
+      name: DisableOutput
+      mode: RW
+      sizeBits: 8
+      description: 8-bit Output Disable Mask
+    #########################################################
+    DebugOutputMode:
+      at:
+        offset: 0x1
+      class: IntField
+      name: DebugOutputMode
+      mode: RW
+      sizeBits: 8
+      description: 8-bit Output Debug Mode Mask
+    #########################################################
+    DebugOutputValue:
+      at:
+        offset: 0x2
+      class: IntField
+      name: DebugOutputValue
+      mode: RW
+      sizeBits: 8
+      description: 8-bit Output Debug Value Mask (sets output in debug mode)
+    #########################################################
+    DinMonitor:
+      at:
+        offset: 0x4
+      class: IntField
+      name: DinMonitor
+      mode: RO
+      sizeBits: 8
+      description: 8-bit Digital Input Monitor
+    #########################################################
+    DoutMonitor:
+      at:
+        offset: 0x5
+      class: IntField
+      name: DoutMonitor
+      mode: RO
+      sizeBits: 8
+      description: 8-bit Digital Output Monitor
+    #########################################################
+    PllFpgaLocked:
+      at:
+        offset: 0x6
+      class: IntField
+      name: PllFpgaLocked
+      mode: RO
+      sizeBits: 1
+      description: PLL FPGA Lock status
+    #########################################################
+    PllRtmLocked:
+      at:
+        offset: 0x7
+      class: IntField
+      name: PllRtmLocked
+      mode: RO
+      sizeBits: 1
+      description: PLL RTM Lock status
+    #########################################################
+    CleanClkFreq:
+      at:
+        offset: 0x8
+      class: IntField
+      name: CleanClkFreq
+      mode: RO
+      sizeBits: 32
+      description: RTM Clean Clock Frequency (units of Hz)
+    #########################################################
