@@ -38,4 +38,7 @@ set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[14]}] ; # dout[6]
 set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsP[15]}] ; # dout[7]
 set_property -dict { IOSTANDARD LVDS } [get_ports {rtmLsN[15]}] ; # dout[7]
 
-set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks -of_objects [get_pins -hier -filter {NAME =~ */U_RTM/U_PLL/PllGen.U_Pll/CLKOUT1}]]
+create_clock -name cleanRtmClk  -period 5.382 [get_ports {rtmLsP[1]}]
+
+set_clock_groups -asynchronous -group [get_clocks cleanRtmClk] -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_AmcCorePll/PllGen.U_Pll/CLKOUT0]]
+set_clock_groups -asynchronous -group [get_clocks {recTimingClk}] -group [get_clocks -of_objects [get_pins -hier -filter {NAME =~ */U_RTM/U_FPGA_PLL/PllGen.U_Pll/CLKOUT1}]]

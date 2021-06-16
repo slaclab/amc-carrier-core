@@ -284,7 +284,7 @@ begin
    -- Local AXI-Lite Register Space
    --------------------------------
    comb : process (axilReadMaster, axilRst, axilWriteMaster, cleanClkFreq,
-                   pllFpgaLocked, pllRtmLocked, r) is
+                   dinMonSync, doutMonSync, pllFpgaLocked, pllRtmLocked, r) is
       variable v      : RegType;
       variable axilEp : AxiLiteEndpointType;
    begin
