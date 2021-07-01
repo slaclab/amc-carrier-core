@@ -198,6 +198,16 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 32
       description: Counts the diagnostic strobes
     #########################################################
+    MpsChEnable:
+      at:
+        offset: 0xFEC
+      class: IntField
+      name: MpsChEnable
+      mode: RW
+      lsBit: 0
+      sizeBits: 15
+      description: MPS RX SALT Channel enable bitmask
+    #########################################################
     RollOverEn:
       at:
         offset: 0xFF0
