@@ -94,6 +94,7 @@ architecture mapping of AppMpsSalt is
       mpsPllRst      : sl;
       mpsPktCnt      : Slv32Array(14 downto 0);
       mpsErrCnt      : Slv32Array(14 downto 0);
+      mpsChEnable    : slv(14 downto 0);
       srobeCnt       : slv(31 downto 0);
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -106,6 +107,7 @@ architecture mapping of AppMpsSalt is
       rollOverEn     => (others => '0'),
       mpsPktCnt      => (others => (others => '0')),
       mpsErrCnt      => (others => (others => '0')),
+      mpsChEnable    => b"000_0000_0111_1111",  -- Only enable the first lower 7 channels
       srobeCnt       => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
@@ -122,6 +124,9 @@ architecture mapping of AppMpsSalt is
    signal txEofeSent    : sl;
    signal mpsTxEofeSent : sl;
 
+   signal mpsReset    : slv(14 downto 1);
+   signal mpsRst      : slv(14 downto 1);
+   signal mpsChRst    : slv(14 downto 1);
    signal mpsRxLinkUp : slv(14 downto 1);
 
    signal rxPktRcvd    : slv(14 downto 1);
@@ -319,7 +324,7 @@ begin
                rxN           => mpsBusRxN(i),
                -- Reference Signals
                clk125MHz     => mps125MHzClk,
-               rst125MHz     => mps125MHzRst,
+               rst125MHz     => mpsRst(i),
                clk312MHz     => mps312MHzClk,
                clk625MHz     => mps625MHzClk,
                iDelayCtrlRdy => iDelayCtrlRdy,
@@ -335,9 +340,20 @@ begin
                sAxisSlave    => open,
                -- Master Port
                mAxisClk      => axilClk,
-               mAxisRst      => axilRst,
+               mAxisRst      => mpsChRst(i),
                mAxisMaster   => mpsObMasters(i),
                mAxisSlave    => mpsObSlaves(i));
+
+         mpsChRst(i) <= axilRst or not(r.mpsChEnable(i));
+         mpsReset(i) <= mps125MHzRst or not(r.mpsChEnable(i));
+
+         U_mpsRst : entity surf.RstSync
+            generic map (
+               TPD_G => TPD_G)
+            port map (
+               clk      => mps125MHzClk,
+               asyncRst => mpsReset(i),
+               syncRst  => mpsRst(i));
 
          U_mpsRxPktRcvd : entity surf.SynchronizerOneShot
             generic map (
@@ -394,6 +410,7 @@ begin
       axiSlaveRegisterR(regCon, x"718", 0, r.srobeCnt);
 
       -- Map the write registers
+      axiSlaveRegister(regCon, x"FEC", 0, v.mpsChEnable);
       axiSlaveRegister(regCon, x"FF0", 0, v.rollOverEn);
       axiSlaveRegister(regCon, x"FF4", 0, v.cntRst);
       axiSlaveRegister(regCon, x"FF8", 0, v.mpsPllRst);
