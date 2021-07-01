@@ -107,7 +107,7 @@ architecture mapping of AppMpsSalt is
       rollOverEn     => (others => '0'),
       mpsPktCnt      => (others => (others => '0')),
       mpsErrCnt      => (others => (others => '0')),
-      mpsChEnable    => b"000_0000_0111_1111",  -- Only enable the first lower 7 channels
+      mpsChEnable    => (others => '0'),  -- Disable all channels by default
       srobeCnt       => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
