@@ -1,7 +1,11 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_CXX
+-- Board Support: Revision C01 ~ C04
+-- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_C01
+-- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_C02
+-- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_C03
+-- https://confluence.slac.stanford.edu/display/AIRTRACK/PC_379_396_10_C04
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the

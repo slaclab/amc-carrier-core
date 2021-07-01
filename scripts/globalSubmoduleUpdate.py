@@ -59,7 +59,7 @@ repoList  =  [
 ########################################
 
 submoduleConfig  =  [
-    ['amc-carrier-core','v4.2.1'],
+    ['amc-carrier-core','v4.3.0'],
     ['lcls-timing-core','v3.3.0'],
     ['ruckus',          'v3.0.2'],
     ['surf',            'v2.19.0'],
