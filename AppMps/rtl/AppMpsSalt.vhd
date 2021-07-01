@@ -51,7 +51,7 @@ entity AppMpsSalt is
       mps312MHzRst    : in  sl;
       mps625MHzClk    : in  sl;
       mps625MHzRst    : in  sl;
-      mpsPllLocked    : in  sl;
+      mpsPllLocked    : in  sl;  -- mpsPllLocked is on the (axilClk domain) from AppMpsClk.vhd
       mpsPllRst       : out sl;
       -- AXI-Lite Interface
       axilClk         : in  sl;
@@ -91,10 +91,12 @@ architecture mapping of AppMpsSalt is
 
    type RegType is record
       cntRst         : sl;
+      mpsPllLockDly  : sl;
       mpsPllRst      : sl;
       mpsPktCnt      : Slv32Array(14 downto 0);
       mpsErrCnt      : Slv32Array(14 downto 0);
       mpsChEnable    : slv(14 downto 0);
+      mpsPllLockCnt  : slv(31 downto 0);
       srobeCnt       : slv(31 downto 0);
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
@@ -103,11 +105,13 @@ architecture mapping of AppMpsSalt is
 
    constant REG_INIT_C : RegType := (
       cntRst         => '1',
+      mpsPllLockDly  => '1',
       mpsPllRst      => '0',
       rollOverEn     => (others => '0'),
       mpsPktCnt      => (others => (others => '0')),
       mpsErrCnt      => (others => (others => '0')),
       mpsChEnable    => (others => '0'),  -- Disable all channels by default
+      mpsPllLockCnt  => (others => '0'),
       srobeCnt       => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
@@ -408,6 +412,7 @@ begin
       axiSlaveRegisterR(regCon, x"708", 0, APP_TYPE_G);
       axiSlaveRegisterR(regCon, x"714", 0, mpsPllLocked);
       axiSlaveRegisterR(regCon, x"718", 0, r.srobeCnt);
+      axiSlaveRegisterR(regCon, x"71C", 0, r.mpsPllLockCnt);
 
       -- Map the write registers
       axiSlaveRegister(regCon, x"FEC", 0, v.mpsChEnable);
@@ -418,10 +423,14 @@ begin
       -- Closeout the transaction
       axiSlaveDefault(regCon, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
+      -- Keep a delayed copy
+      v.mpsPllLockDly := mpsPllLocked;
+
       if (r.cntRst = '1') then
-         v.mpsPktCnt := (others => (others => '0'));
-         v.mpsErrCnt := (others => (others => '0'));
-         v.srobeCnt  := (others => '0');
+         v.mpsPktCnt     := (others => (others => '0'));
+         v.mpsErrCnt     := (others => (others => '0'));
+         v.mpsPllLockCnt := (others => '0');
+         v.srobeCnt      := (others => '0');
       else
          if (mpsTxPktSent = '1') then
             v.mpsPktCnt(0) := r.mpsPktCnt(0) + 1;
@@ -437,6 +446,9 @@ begin
                v.mpsErrCnt(i) := r.mpsErrCnt(i) + 1;
             end if;
          end loop;
+         if (r.mpsPllLockDly = '0') and (mpsPllLocked = '1') then
+            v.mpsPllLockCnt := r.mpsPllLockCnt + 1;
+         end if;
          if (diagnosticstrobe = '1') then
             v.srobeCnt := r.srobeCnt + 1;
          end if;
