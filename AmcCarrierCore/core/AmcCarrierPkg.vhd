@@ -47,7 +47,8 @@ package AmcCarrierPkg is
 
    constant APP_MPS_AN_TYPE_C : AppType := toSlv(120, AppType'length);
    constant APP_MPS_LN_TYPE_C : AppType := toSlv(121, AppType'length);
-
+   constant APP_MPS_DN_TYPE_C : AppType := toSlv(122, AppType'length);  -- MPS Digital node
+   
    -------------------------------------
    -- Common Platform: General Constants
    -------------------------------------
