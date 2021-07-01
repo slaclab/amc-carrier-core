@@ -116,6 +116,7 @@ var annotated_dup =
     [ "RtmDigitalDebugDout", "classRtmDigitalDebugDout.html", "classRtmDigitalDebugDout" ],
     [ "RtmDigitalDebugV1", "classRtmDigitalDebugV1.html", "classRtmDigitalDebugV1" ],
     [ "RtmDigitalDebugV2", "classRtmDigitalDebugV2.html", "classRtmDigitalDebugV2" ],
+    [ "RtmDigitalDebugV2b", "classRtmDigitalDebugV2b.html", "classRtmDigitalDebugV2b" ],
     [ "RtmEmptyCore", "classRtmEmptyCore.html", "classRtmEmptyCore" ],
     [ "RtmFastWireScanner", "classRtmFastWireScanner.html", "classRtmFastWireScanner" ],
     [ "RtmLoopback", "classRtmLoopback.html", "classRtmLoopback" ],

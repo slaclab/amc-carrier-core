@@ -17,5 +17,7 @@ var classRtmDigitalDebugDout =
     [ "amc_carrier_core", "classRtmDigitalDebugDout.html#a5173e10093c3bf1b5d95f5240e060d43", null ],
     [ "FpgaTypePkg", "classRtmDigitalDebugDout.html#a2d2b0e40d47d57e9474d8be8077ecfa0", null ],
     [ "unisim", "classRtmDigitalDebugDout.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
-    [ "vcomponents", "classRtmDigitalDebugDout.html#aa1cb22e959d47364391e5eb4ef86927c", null ]
+    [ "vcomponents", "classRtmDigitalDebugDout.html#aa1cb22e959d47364391e5eb4ef86927c", null ],
+    [ "debugMode", "classRtmDigitalDebugDout.html#ab255904dfb25c6769896c1311fe2b936", null ],
+    [ "debugValue", "classRtmDigitalDebugDout.html#ae0a0958786f1e36b62922aaebfbfdf3a", null ]
 ];
