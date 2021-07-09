@@ -5,7 +5,7 @@ proc MyVersionCheck { } {
 
    # Get the Vivado version
    set VersionNumber [version -short]
-   set supported "2018.3 2019.1 2019.2 2020.1 2020.2"
+   set supported "2018.3 2019.1 2019.2 2020.1 2020.2 2021.1"
    set retVar -1
 
    # Generate error message
