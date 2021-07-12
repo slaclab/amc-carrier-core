@@ -40,8 +40,8 @@ entity AppMpsClk is
       -- MPS Clocks and Resets
       mps125MHzClk : out sl;
       mps125MHzRst : out sl;
-      mps312MHzClk : out sl;
-      mps312MHzRst : out sl;
+      mps156MHzClk : out sl;
+      mps156MHzRst : out sl;
       mps625MHzClk : out sl;
       mps625MHzRst : out sl;
       mpsTholdClk  : out sl;
@@ -157,19 +157,19 @@ begin
          syncRst  => mpsMmcmRstOut(0));
 
    ------------------------------------------------------------------------------------------------------
-   -- 312.5 MHz is the OSERDESE3's CLKDIV port
+   -- 156.25 MHz is the OSERDESE3's CLKDIV port
    -- Refer to "Figure 3-49: Sub-Optimal to Optimal Clocking Topologies for OSERDESE3" in UG949 (v2018.2)
    ------------------------------------------------------------------------------------------------------
-   U_Bufg312 : BUFGCE_DIV
+   U_Bufg156 : BUFGCE_DIV
       generic map (
-         BUFGCE_DIVIDE => 2)            -- 312.5 MHz = 625 MHz/2
+         BUFGCE_DIVIDE => 4)            -- 156.25 MHz = 625 MHz/2
       port map (
          I   => clkout0,                -- 625 MHz
          CE  => '1',
          CLR => '0',
-         O   => mpsMmcmClkOut(1));      -- 312.5 MHz
+         O   => mpsMmcmClkOut(1));      -- 156.25 MHz
 
-   U_Rst312 : entity surf.RstSync
+   U_Rst156 : entity surf.RstSync
       generic map (
          TPD_G          => TPD_G,
          IN_POLARITY_G  => '0',
@@ -197,8 +197,8 @@ begin
    mps625MHzClk <= mpsMmcmClkOut(0);
    mps625MHzRst <= mpsMmcmRstOut(0);
 
-   mps312MHzClk <= mpsMmcmClkOut(1);
-   mps312MHzRst <= mpsMmcmRstOut(1);
+   mps156MHzClk <= mpsMmcmClkOut(1);
+   mps156MHzRst <= mpsMmcmRstOut(1);
 
    mps125MHzClk <= mpsMmcmClkOut(2);
    mps125MHzRst <= mpsMmcmRstOut(2);
