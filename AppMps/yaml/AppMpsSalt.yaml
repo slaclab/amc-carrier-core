@@ -208,6 +208,36 @@ AppMpsSalt: &AppMpsSalt
       sizeBits: 32
       description: Counts the PLL Lock events
     #########################################################
+#    BypFirstBerDet:
+#      at:
+#        offset: 0xFD0
+#      class: IntField
+#      name: BypFirstBerDet
+#      mode: RW
+#      lsBit: 0
+#      sizeBits: 1
+#      description: BypFirstBerDet
+#    #########################################################
+#    MinEyeWidth:
+#      at:
+#        offset: 0xFD4
+#      class: IntField
+#      name: MinEyeWidth
+#      mode: RW
+#      lsBit: 0
+#      sizeBits: 8
+#      description: MinEyeWidth
+#    #########################################################
+#    LockingCntCfg:
+#      at:
+#        offset: 0xFD8
+#      class: IntField
+#      name: LockingCntCfg
+#      mode: RW
+#      lsBit: 0
+#      sizeBits: 23
+#      description: LockingCntCfg
+    #########################################################
     MpsChEnable:
       at:
         offset: 0xFEC
