@@ -1,5 +1,7 @@
 var NAVTREEINDEX22 =
 {
+"classBsaAccumulator.html#af2fe75efbe0a68c3fb806bb88b1a81ba":[0,0,78,27],
+"classBsaAccumulator.html#af394c587156a2afbc9b0b8dd97fbed17":[0,0,78,13],
 "classBsaAccumulator.html#afd13b50585152f6756d196bf3f1c52ac":[0,0,78,31],
 "classBsaAccumulator_1_1rtl.html":[0,0,78,0],
 "classBsaAccumulator_1_1rtl.html#a0498304adc5e9a77df9df664a54ee3d3":[0,0,78,0,18],
@@ -247,7 +249,5 @@ var NAVTREEINDEX22 =
 "classBsaWaveformEngine_1_1rtl.html#a824f33894deabf407a7621fdff09b518":[0,0,81,0,25],
 "classBsaWaveformEngine_1_1rtl.html#a8c3eba3e79422bf771b95433fbeb41f3":[0,0,81,0,7],
 "classBsaWaveformEngine_1_1rtl.html#aa217df5ed4a2ac60a04707adbc041b25":[0,0,81,0,32],
-"classBsaWaveformEngine_1_1rtl.html#aa39c34e93ac71ecc709ec10c5715b59c":[0,0,81,0,12],
-"classBsaWaveformEngine_1_1rtl.html#aa8851a808af55a36a5678bb316b54da5":[0,0,81,0,16],
-"classBsaWaveformEngine_1_1rtl.html#ab01a88893092d389c9661ec04753afa4":[0,0,81,0,3]
+"classBsaWaveformEngine_1_1rtl.html#aa39c34e93ac71ecc709ec10c5715b59c":[0,0,81,0,12]
 };
