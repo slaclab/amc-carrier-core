@@ -431,6 +431,7 @@ set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U
 
 set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_PLL/PllGen.U_Pll/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_AmcCorePll/PllGen.U_Pll/CLKOUT0]]
 
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_Bufg156/O]] -group [get_clocks -of_objects [get_pins U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_MpsSerdesPll/CLKOUT1]]
 
 ##########################
 ## Misc. Configurations ##
