@@ -47,8 +47,8 @@ entity AppMpsSalt is
       -- SALT Reference clocks
       mps125MHzClk    : in  sl;
       mps125MHzRst    : in  sl;
-      mps312MHzClk    : in  sl;
-      mps312MHzRst    : in  sl;
+      mps156MHzClk    : in  sl;
+      mps156MHzRst    : in  sl;
       mps625MHzClk    : in  sl;
       mps625MHzRst    : in  sl;
       mpsPllLocked    : in  sl;  -- mpsPllLocked is on the (axilClk domain) from AppMpsClk.vhd
@@ -87,6 +87,16 @@ end AppMpsSalt;
 
 architecture mapping of AppMpsSalt is
 
+   ---------------------
+   -- SLOT[3] = index[1]
+   -- SLOT[4] = index[2]
+   -- SLOT[5] = index[3]
+   -- SLOT[6] = index[4]
+   -- SLOT[7] = index[5]
+   ---------------------
+   subtype BACKPLANE_CHANNEL_RANGE_C is natural range 5 downto 1;  -- Only 7-slot crates for now
+   -- subtype BACKPLANE_CHANNEL_RANGE_C is natural range 14 downto 1; -- Up to 16 slot crate
+
    constant STATUS_SIZE_C : natural := 15;
 
    type RegType is record
@@ -99,6 +109,9 @@ architecture mapping of AppMpsSalt is
       mpsPllLockCnt  : slv(31 downto 0);
       srobeCnt       : slv(31 downto 0);
       rollOverEn     : slv(STATUS_SIZE_C-1 downto 0);
+      bypFirstBerDet : sl;
+      minEyeWidth    : slv(7 downto 0);
+      lockingCntCfg  : slv(23 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -113,40 +126,41 @@ architecture mapping of AppMpsSalt is
       mpsChEnable    => (others => '0'),  -- Disable all channels by default
       mpsPllLockCnt  => (others => '0'),
       srobeCnt       => (others => '0'),
+      bypFirstBerDet => '1',  -- Set to '1' if IDELAY full scale range > 2 Unit Intervals (UI) of serial rate (example: IDELAY range 2.5ns  > 1 ns "1Gb/s" )
+      minEyeWidth    => toSlv(80, 8),  -- Sets the minimum eye width required for locking (units of IDELAY step)
+      lockingCntCfg  => ite(SIMULATION_G, x"00_0064", x"00_FFFF"),  -- Number of error-free event before state=LOCKED_S
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
-   signal iDelayCtrlRdy : sl;
+   signal mpsTxLinkUp  : sl := '0';
+   signal txPktSent    : sl := '0';
+   signal mpsTxPktSent : sl := '0';
 
-   signal mpsTxLinkUp  : sl;
-   signal txPktSent    : sl;
-   signal mpsTxPktSent : sl;
+   signal txEofeSent    : sl := '0';
+   signal mpsTxEofeSent : sl := '0';
 
-   signal txEofeSent    : sl;
-   signal mpsTxEofeSent : sl;
+   signal mpsReset    : slv(14 downto 1) := (others => '0');
+   signal mpsRst      : slv(14 downto 1) := (others => '0');
+   signal mpsChRst    : slv(14 downto 1) := (others => '0');
+   signal mpsRxLinkUp : slv(14 downto 1) := (others => '0');
 
-   signal mpsReset    : slv(14 downto 1);
-   signal mpsRst      : slv(14 downto 1);
-   signal mpsChRst    : slv(14 downto 1);
-   signal mpsRxLinkUp : slv(14 downto 1);
+   signal rxPktRcvd    : slv(14 downto 1) := (others => '0');
+   signal mpsRxPktRcvd : slv(14 downto 1) := (others => '0');
 
-   signal rxPktRcvd    : slv(14 downto 1);
-   signal mpsRxPktRcvd : slv(14 downto 1);
+   signal rxErrDet    : slv(14 downto 1) := (others => '0');
+   signal mpsRxErrDet : slv(14 downto 1) := (others => '0');
 
-   signal rxErrDet    : slv(14 downto 1);
-   signal mpsRxErrDet : slv(14 downto 1);
-
-   signal statusOut : slv(STATUS_SIZE_C-1 downto 0);
+   signal statusOut : slv(STATUS_SIZE_C-1 downto 0) := (others => '0');
    signal cntOut    : SlVectorArray(STATUS_SIZE_C-1 downto 0, 31 downto 0);
 
-   signal diagnosticstrobe : sl;
+   signal diagnosticstrobe : sl := '0';
 
-   signal pktPeriod    : Slv32Array(14 downto 0);
-   signal pktPeriodMax : Slv32Array(14 downto 0);
-   signal pktPeriodMin : Slv32Array(14 downto 0);
+   signal pktPeriod    : Slv32Array(14 downto 0) := (others => (others => '0'));
+   signal pktPeriodMax : Slv32Array(14 downto 0) := (others => (others => '0'));
+   signal pktPeriodMin : Slv32Array(14 downto 0) := (others => (others => '0'));
 
 begin
 
@@ -195,7 +209,7 @@ begin
       mpsRxErrDet  <= (others => '0');
       mpsObMasters <= (others => AXI_STREAM_MASTER_INIT_C);
 
-      U_SaltUltraScale : entity surf.SaltUltraScale
+      U_SaltUltraScale : entity surf.SaltCore
          generic map (
             TPD_G               => TPD_G,
             SIMULATION_G        => SIMULATION_G,
@@ -207,32 +221,32 @@ begin
             MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C)
          port map (
             -- TX Serial Stream
-            txP           => mpsTxP,
-            txN           => mpsTxN,
+            txP         => mpsTxP,
+            txN         => mpsTxN,
             -- RX Serial Stream
-            rxP           => '0',          -- Not using RX path
-            rxN           => '1',          -- Not using RX path
+            rxP         => '0',            -- Not using RX path
+            rxN         => '1',            -- Not using RX path
             -- Reference Signals
-            clk125MHz     => mps125MHzClk,
-            rst125MHz     => mps125MHzRst,
-            clk312MHz     => mps312MHzClk,
-            clk625MHz     => mps625MHzClk,
-            iDelayCtrlRdy => '1',          -- Not using RX path
-            linkUp        => mpsTxLinkUp,
-            txPktSent     => txPktSent,
-            txEofeSent    => txEofeSent,
-            rxPktRcvd     => open,
-            rxErrDet      => open,
+            clk125MHz   => mps125MHzClk,
+            rst125MHz   => mps125MHzRst,
+            clk156MHz   => mps156MHzClk,
+            rst156MHz   => mps156MHzRst,
+            clk625MHz   => mps625MHzClk,
+            linkUp      => mpsTxLinkUp,
+            txPktSent   => txPktSent,
+            txEofeSent  => txEofeSent,
+            rxPktRcvd   => open,
+            rxErrDet    => open,
             -- Slave Port
-            sAxisClk      => mpsIbClk,
-            sAxisRst      => mpsIbRst,
-            sAxisMaster   => mpsIbMaster,
-            sAxisSlave    => mpsIbSlave,
+            sAxisClk    => mpsIbClk,
+            sAxisRst    => mpsIbRst,
+            sAxisMaster => mpsIbMaster,
+            sAxisSlave  => mpsIbSlave,
             -- Master Port
-            mAxisClk      => axilClk,
-            mAxisRst      => axilRst,
-            mAxisMaster   => open,
-            mAxisSlave    => AXI_STREAM_SLAVE_FORCE_C);
+            mAxisClk    => axilClk,
+            mAxisRst    => axilRst,
+            mAxisMaster => open,
+            mAxisSlave  => AXI_STREAM_SLAVE_FORCE_C);
 
       U_mpsTxPktSent : entity surf.SynchronizerOneShot
          generic map (
@@ -264,16 +278,6 @@ begin
    end generate;
 
    MPS_SLOT : if (MPS_SLOT_G = true) and (APP_TYPE_G /= APP_NULL_TYPE_C) generate
-
-      U_SaltDelayCtrl : entity surf.SaltDelayCtrl
-         generic map (
-            TPD_G           => TPD_G,
-            SIM_DEVICE_G    => "ULTRASCALE",
-            IODELAY_GROUP_G => "MPS_IODELAY_GRP")
-         port map (
-            iDelayCtrlRdy => iDelayCtrlRdy,
-            refClk        => mps625MHzClk,
-            refRst        => mps625MHzRst);
 
       LN_FIFO : entity surf.AxiStreamFifoV2
          generic map (
@@ -308,8 +312,8 @@ begin
             OB => mpsTxN);
 
       GEN_VEC :
-      for i in 14 downto 1 generate
-         U_SaltUltraScale : entity surf.SaltUltraScale
+      for i in BACKPLANE_CHANNEL_RANGE_C generate
+         U_SaltUltraScale : entity surf.SaltCore
             generic map (
                TPD_G               => TPD_G,
                SIMULATION_G        => SIMULATION_G,
@@ -321,32 +325,36 @@ begin
                MASTER_AXI_CONFIG_G => MPS_AXIS_CONFIG_C)
             port map (
                -- TX Serial Stream
-               txP           => open,
-               txN           => open,
+               txP            => open,
+               txN            => open,
                -- RX Serial Stream
-               rxP           => mpsBusRxP(i),
-               rxN           => mpsBusRxN(i),
+               rxP            => mpsBusRxP(i),
+               rxN            => mpsBusRxN(i),
                -- Reference Signals
-               clk125MHz     => mps125MHzClk,
-               rst125MHz     => mpsRst(i),
-               clk312MHz     => mps312MHzClk,
-               clk625MHz     => mps625MHzClk,
-               iDelayCtrlRdy => iDelayCtrlRdy,
-               linkUp        => mpsRxLinkUp(i),
-               txPktSent     => open,
-               txEofeSent    => open,
-               rxPktRcvd     => rxPktRcvd(i),
-               rxErrDet      => rxErrDet(i),
+               clk125MHz      => mps125MHzClk,
+               rst125MHz      => mpsRst(i),
+               clk156MHz      => mps156MHzClk,
+               rst156MHz      => mps156MHzRst,
+               clk625MHz      => mps625MHzClk,
+               linkUp         => mpsRxLinkUp(i),
+               txPktSent      => open,
+               txEofeSent     => open,
+               rxPktRcvd      => rxPktRcvd(i),
+               rxErrDet       => rxErrDet(i),
+               -- Configuration Interface
+               bypFirstBerDet => r.bypFirstBerDet,
+               minEyeWidth    => r.minEyeWidth,
+               lockingCntCfg  => r.lockingCntCfg,
                -- Slave Port
-               sAxisClk      => axilClk,
-               sAxisRst      => axilRst,
-               sAxisMaster   => AXI_STREAM_MASTER_INIT_C,
-               sAxisSlave    => open,
+               sAxisClk       => axilClk,
+               sAxisRst       => axilRst,
+               sAxisMaster    => AXI_STREAM_MASTER_INIT_C,
+               sAxisSlave     => open,
                -- Master Port
-               mAxisClk      => axilClk,
-               mAxisRst      => mpsChRst(i),
-               mAxisMaster   => mpsObMasters(i),
-               mAxisSlave    => mpsObSlaves(i));
+               mAxisClk       => axilClk,
+               mAxisRst       => mpsChRst(i),
+               mAxisMaster    => mpsObMasters(i),
+               mAxisSlave     => mpsObSlaves(i));
 
          mpsChRst(i) <= axilRst or not(r.mpsChEnable(i));
          mpsReset(i) <= mps125MHzRst or not(r.mpsChEnable(i));
@@ -415,6 +423,9 @@ begin
       axiSlaveRegisterR(regCon, x"71C", 0, r.mpsPllLockCnt);
 
       -- Map the write registers
+      axiSlaveRegister(regCon, x"FD0", 0, v.bypFirstBerDet);
+      axiSlaveRegister(regCon, x"FD4", 0, v.minEyeWidth);
+      axiSlaveRegister(regCon, x"FD8", 0, v.lockingCntCfg);
       axiSlaveRegister(regCon, x"FEC", 0, v.mpsChEnable);
       axiSlaveRegister(regCon, x"FF0", 0, v.rollOverEn);
       axiSlaveRegister(regCon, x"FF4", 0, v.cntRst);
@@ -493,7 +504,7 @@ begin
          periodMin => pktPeriodMin(0));
 
    GEN_STATS :
-   for i in 14 downto 1 generate
+   for i in BACKPLANE_CHANNEL_RANGE_C generate
       U_PktStats : entity surf.SyncTrigPeriod
          generic map (
             TPD_G        => TPD_G,

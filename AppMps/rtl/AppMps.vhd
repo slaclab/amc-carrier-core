@@ -109,8 +109,8 @@ architecture mapping of AppMps is
 
    signal mps125MHzClk : sl;
    signal mps125MHzRst : sl;
-   signal mps312MHzClk : sl;
-   signal mps312MHzRst : sl;
+   signal mps156MHzClk : sl;
+   signal mps156MHzRst : sl;
    signal mps625MHzClk : sl;
    signal mps625MHzRst : sl;
    signal mpsTholdClk  : sl;
@@ -138,8 +138,8 @@ begin
          -- MPS Clocks and Resets
          mps125MHzClk => mps125MHzClk,
          mps125MHzRst => mps125MHzRst,
-         mps312MHzClk => mps312MHzClk,
-         mps312MHzRst => mps312MHzRst,
+         mps156MHzClk => mps156MHzClk,
+         mps156MHzRst => mps156MHzRst,
          mps625MHzClk => mps625MHzClk,
          mps625MHzRst => mps625MHzRst,
          mpsTholdClk  => mpsTholdClk,
@@ -228,8 +228,8 @@ begin
          -- SALT Reference clocks
          mps125MHzClk    => mps125MHzClk,
          mps125MHzRst    => mps125MHzRst,
-         mps312MHzClk    => mps312MHzClk,
-         mps312MHzRst    => mps312MHzRst,
+         mps156MHzClk    => mps156MHzClk,
+         mps156MHzRst    => mps156MHzRst,
          mps625MHzClk    => mps625MHzClk,
          mps625MHzRst    => mps625MHzRst,
          mpsPllLocked    => mpsPllLocked,
