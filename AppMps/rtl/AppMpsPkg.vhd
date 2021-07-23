@@ -444,7 +444,7 @@ package body AppMpsPkg is
             ret.LCLS2_COUNT_C := 12/2;
 
             for i in 0 to 12 - 1 loop
-               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 7;
+               ret.CHAN_CONFIG_C(i).THOLD_COUNT_C := 8;
                ret.CHAN_CONFIG_C(i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(i).BYTE_MAP_C    := i;
                ret.CHAN_CONFIG_C(i).IDLE_EN_C     := true;
