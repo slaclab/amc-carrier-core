@@ -21,6 +21,8 @@ var classAmcMpsSfpMon =
     [ "surf", "classAmcMpsSfpMon.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
     [ "StdRtlPkg", "classAmcMpsSfpMon.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
     [ "AxiLitePkg", "classAmcMpsSfpMon.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
+    [ "I2cPkg", "classAmcMpsSfpMon.html#a3345a70e845069bf678d5aa1733529b6", null ],
+    [ "I2cMuxPkg", "classAmcMpsSfpMon.html#a7d4df32ccb70cf8565f30cab8c55c27e", null ],
     [ "unisim", "classAmcMpsSfpMon.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
     [ "vcomponents", "classAmcMpsSfpMon.html#aa1cb22e959d47364391e5eb4ef86927c", null ]
 ];
