@@ -48,7 +48,7 @@ end AmcMpsSfpMon;
 
 architecture mapping of AmcMpsSfpMon is
 
-   constant AXIL_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(5 downto 0) := genAxiLiteConfig(8, AXI_BASE_ADDR_G, 16, 12);
+   constant AXIL_XBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(7 downto 0) := genAxiLiteConfig(8, AXI_BASE_ADDR_G, 16, 12);
 
    constant SFF8472_I2C_CONFIG_C : I2cAxiLiteDevArray(1 downto 0) := (
       0              => MakeI2cAxiLiteDevType(
