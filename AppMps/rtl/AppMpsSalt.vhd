@@ -23,7 +23,6 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
@@ -32,6 +31,7 @@ use surf.SsiPkg.all;
 
 library amc_carrier_core;
 use amc_carrier_core.AmcCarrierPkg.all;
+use amc_carrier_core.FpgaTypePkg.all;
 use amc_carrier_core.AppMpsPkg.all;
 
 library unisim;
@@ -213,6 +213,7 @@ begin
          generic map (
             TPD_G               => TPD_G,
             SIMULATION_G        => SIMULATION_G,
+            SIM_DEVICE_G        => ite(ULTRASCALE_PLUS_C, "ULTRASCALE_PLUS", "ULTRASCALE"),
             TX_ENABLE_G         => true,   -- TX only
             RX_ENABLE_G         => false,  -- Not using RX path
             COMMON_TX_CLK_G     => false,
@@ -317,6 +318,7 @@ begin
             generic map (
                TPD_G               => TPD_G,
                SIMULATION_G        => SIMULATION_G,
+               SIM_DEVICE_G        => ite(ULTRASCALE_PLUS_C, "ULTRASCALE_PLUS", "ULTRASCALE"),
                TX_ENABLE_G         => false,
                RX_ENABLE_G         => true,
                COMMON_TX_CLK_G     => false,
