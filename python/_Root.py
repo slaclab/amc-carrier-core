@@ -1,3 +1,7 @@
+import pyrogue as pr
+import rogue
+import pyrogue.protocols
+
 class MyRoot(pr.Root):
     def __init__(   self,
             ip           = '10.0.0.101',
@@ -30,15 +34,12 @@ class MyRoot(pr.Root):
 
         elif ( commType=="eth-rssi-interleaved" ):
 
-                # Update the flag
-                rssiInterlaved = True
+            # Create Interleaved RSSI interface
+            self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ip, port=8198, packVer = 2, jumbo = True)
 
-                # Create Interleaved RSSI interface
-                self.rudp = self.stream = pyrogue.protocols.UdpRssiPack( name='rudp', host=ip, port=8198, packVer = 2, jumbo = True)
-
-                # Connect the SRPv3 to tDest = 0x0
-                self.srp = rogue.protocols.srp.SrpV3()
-                self.srp == self.rudp.application(dest=0x0)
+            # Connect the SRPv3 to tDest = 0x0
+            self.srp = rogue.protocols.srp.SrpV3()
+            self.srp == self.rudp.application(dest=0x0)
 
         # Undefined device type
         else:
