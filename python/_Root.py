@@ -2,7 +2,7 @@ import pyrogue as pr
 import rogue
 import pyrogue.protocols
 
-class MyRoot(pr.Root):
+class Root(pr.Root):
     def __init__(   self,
             ip           = '10.0.0.101',
             commType     = 'eth-rssi-non-interleaved',
