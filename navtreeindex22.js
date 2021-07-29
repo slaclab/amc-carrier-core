@@ -1,5 +1,6 @@
 var NAVTREEINDEX22 =
 {
+"classBsaAccumulator.html#a812f1ed789d65d7a4544ed2e41a71b07":[0,0,78,14],
 "classBsaAccumulator.html#a85565e7916a2d50e77d8eb5254a66479":[0,0,78,22],
 "classBsaAccumulator.html#a8562dfa3c7970041e8fb901d9c0e4ecf":[0,0,78,6],
 "classBsaAccumulator.html#a8b54e22b2a07048034b61d5e4ba396e3":[0,0,78,30],
@@ -248,6 +249,5 @@ var NAVTREEINDEX22 =
 "classBsaWaveformEngine_1_1rtl.html#a22193182cf8cb4ded9732abc09dfc36b":[0,0,81,0,30],
 "classBsaWaveformEngine_1_1rtl.html#a2bdd4d836d6a830ceb790daae9b67b0f":[0,0,81,0,15],
 "classBsaWaveformEngine_1_1rtl.html#a2ed4406200670858a331c0f53184a398":[0,0,81,0,20],
-"classBsaWaveformEngine_1_1rtl.html#a3340e0288ecf0b638a1baf971942a61f":[0,0,81,0,5],
-"classBsaWaveformEngine_1_1rtl.html#a3de7d1fdbdb4f0e0d194863598365b46":[0,0,81,0,22]
+"classBsaWaveformEngine_1_1rtl.html#a3340e0288ecf0b638a1baf971942a61f":[0,0,81,0,5]
 };

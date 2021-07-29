@@ -1,5 +1,6 @@
 var NAVTREEINDEX21 =
 {
+"classAxisBramFlashBufferRdFsm.html#a776f7d1c3e4102d6af8db8ec00c215ce":[0,0,71,24],
 "classAxisBramFlashBufferRdFsm.html#a85565e7916a2d50e77d8eb5254a66479":[0,0,71,17],
 "classAxisBramFlashBufferRdFsm.html#a8b54e22b2a07048034b61d5e4ba396e3":[0,0,71,25],
 "classAxisBramFlashBufferRdFsm.html#a8e1fd4ab848b98a0c700b34cf7c90b36":[0,0,71,11],
@@ -248,6 +249,5 @@ var NAVTREEINDEX21 =
 "classBsaAccumulator.html#a67a837684e4f18c2d236ac1d053b419b":[0,0,78,1],
 "classBsaAccumulator.html#a6b0469dc5d13c2b66e61e485e66c312f":[0,0,78,17],
 "classBsaAccumulator.html#a776f7d1c3e4102d6af8db8ec00c215ce":[0,0,78,29],
-"classBsaAccumulator.html#a7b1859d7666393af1f22f84c854ea961":[0,0,78,10],
-"classBsaAccumulator.html#a812f1ed789d65d7a4544ed2e41a71b07":[0,0,78,14]
+"classBsaAccumulator.html#a7b1859d7666393af1f22f84c854ea961":[0,0,78,10]
 };

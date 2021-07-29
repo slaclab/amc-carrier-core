@@ -43,6 +43,7 @@ var classAppMpsSalt =
     [ "SsiPkg", "classAppMpsSalt.html#a8b54e22b2a07048034b61d5e4ba396e3", null ],
     [ "amc_carrier_core", "classAppMpsSalt.html#a5173e10093c3bf1b5d95f5240e060d43", null ],
     [ "AmcCarrierPkg", "classAppMpsSalt.html#a8b57e2e356f8c95c835557378741f538", null ],
+    [ "FpgaTypePkg", "classAppMpsSalt.html#a2d2b0e40d47d57e9474d8be8077ecfa0", null ],
     [ "AppMpsPkg", "classAppMpsSalt.html#a5d081d09b418b5c917a40046767e3adb", null ],
     [ "unisim", "classAppMpsSalt.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
     [ "vcomponents", "classAppMpsSalt.html#aa1cb22e959d47364391e5eb4ef86927c", null ]

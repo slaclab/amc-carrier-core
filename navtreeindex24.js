@@ -1,5 +1,6 @@
 var NAVTREEINDEX24 =
 {
+"classDacSigGen_1_1mapping.html#af76ef3fec09f705d89b902d448e537da":[0,0,82,0,3],
 "classDaqDecimator.html":[0,0,86],
 "classDaqDecimator.html#a05742e4fd38ac63c30ce62b84b5b9595":[0,0,86,5],
 "classDaqDecimator.html#a0a6af6eef40212dbaf130d57ce711256":[0,0,86,13],
@@ -248,6 +249,5 @@ var NAVTREEINDEX24 =
 "classDaqMuxV2_1_1rtl.html#a591352c32e0056927640952675eadcb4":[0,0,89,0,1],
 "classDaqMuxV2_1_1rtl.html#a591e60b7d64525ee57de2043c42ffdf8":[0,0,89,0,18],
 "classDaqMuxV2_1_1rtl.html#a5ea91688892fd12a341b08ba51ed6401":[0,0,89,0,19],
-"classDaqMuxV2_1_1rtl.html#a627e18eabbc8cb6985c022b55fb82ae8":[0,0,89,0,14],
-"classDaqMuxV2_1_1rtl.html#a632818fd77c451d2e58f6cd395c35de1":[0,0,89,0,32]
+"classDaqMuxV2_1_1rtl.html#a627e18eabbc8cb6985c022b55fb82ae8":[0,0,89,0,14]
 };
