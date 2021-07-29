@@ -79,9 +79,30 @@ architecture mapping of AmcMpsSfpMon is
          enable => '0'));
    signal i2co : i2c_out_type;
 
+   signal readSlave  : AxiLiteReadSlaveType;
+   signal writeSlave : AxiLiteWriteSlaveType;
+
 begin
 
    i2cRstL <= not(axilRst);
+
+   RESP_FILTER : process (readSlave, writeSlave) is
+      variable tmpRd : AxiLiteReadSlaveType;
+      variable tmpWr : AxiLiteWriteSlaveType;
+   begin
+      -- Init
+      tmpRd := readSlave;
+      tmpWr := writeSlave;
+
+      -- Force OK bus response (in case unconnected SFP)
+      tmpRd.rresp := AXI_RESP_OK_C;
+      tmpWr.bresp := AXI_RESP_OK_C;
+
+      -- Outputs
+      axilReadSlave  <= tmpRd;
+      axilWriteSlave <= tmpWr;
+   end process;
+
 
    U_XbarI2cMux : entity surf.AxiLiteCrossbarI2cMux
       generic map (
@@ -100,9 +121,9 @@ begin
          axilRst           => axilRst,
          -- Slave AXI-Lite Interface
          sAxilWriteMaster  => axilWriteMaster,
-         sAxilWriteSlave   => axilWriteSlave,
+         sAxilWriteSlave   => writeSlave,
          sAxilReadMaster   => axilReadMaster,
-         sAxilReadSlave    => axilReadSlave,
+         sAxilReadSlave    => readSlave,
          -- Master AXI-Lite Interfaces
          mAxilWriteMasters => axilWriteMasters,
          mAxilWriteSlaves  => axilWriteSlaves,
