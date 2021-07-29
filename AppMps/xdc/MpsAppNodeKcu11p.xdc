@@ -34,3 +34,5 @@ resize_pblock [get_pblocks MPS_RTL_GRP] -add {CLOCKREGION_X2Y6:CLOCKREGION_X2Y6}
 ## Misc. Configurations ##
 ##########################
 
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins {U_Core/U_Core/U_Timing/TimingGthCoreWrapper_1/LOCREF_G.U_TimingGtyCore/inst/gen_gtwizard_gtye4_top.TimingGty_fixedlat_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[3].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[0].GTYE4_CHANNEL_PRIM_INST/TXOUTCLKPCS}]] -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_Timing/TimingGthCoreWrapper_1/LOCREF_G.TIMING_TXCLK_BUFG_GT/O]]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_Core/U_Core/U_Timing/TIMING_REFCLK_IBUFDS_GTE3/U_IBUFDS_GT/ODIV2]] -group [get_clocks -of_objects [get_pins {U_Core/U_Core/U_Timing/TimingGthCoreWrapper_1/LOCREF_G.U_TimingGtyCore/inst/gen_gtwizard_gtye4_top.TimingGty_fixedlat_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_channel_container[3].gen_enabled_channel.gtye4_channel_wrapper_inst/channel_inst/gtye4_channel_gen.gen_gtye4_channel_inst[0].GTYE4_CHANNEL_PRIM_INST/RXOUTCLK}]]
