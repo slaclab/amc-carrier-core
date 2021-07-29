@@ -15,7 +15,7 @@
 # set_property LOC PLL_X0Y10 [get_cells {U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_MpsSerdesPll}]
 
 # set_property LOC BUFGCE_X1Y20 [get_cells {U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_Bufg625}]
-# set_property LOC BUFGCE_X1Y6  [get_cells {U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_Bufg312}]
+# set_property LOC BUFGCE_X1Y6  [get_cells {U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_Bufg156}]
 # set_property LOC BUFGCE_X1Y4  [get_cells {U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_Bufg125}]
 # set_property LOC BUFGCE_X1Y14 [get_cells {U_Core/GEN_EN_MPS.U_AppMps/U_Clk/U_Bufg}]
 
