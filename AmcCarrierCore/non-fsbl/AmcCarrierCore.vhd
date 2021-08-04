@@ -35,6 +35,7 @@ use unisim.vcomponents.all;
 entity AmcCarrierCore is
    generic (
       TPD_G                  : time     := 1 ns;
+      DEBUG_PATH_SELECT_G    : boolean  := false;  -- false = UDP[port=8193], true = UDP[port=8194]
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
       WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
       WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
@@ -307,6 +308,7 @@ begin
          TPD_G                 => TPD_G,
          RSSI_ILEAVE_EN_G      => RSSI_ILEAVE_EN_G,
          RTM_ETH_G             => RTM_ETH_G,
+         DEBUG_PATH_SELECT_G   => DEBUG_PATH_SELECT_G,
          ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G)
       port map (
          -- Local Configuration
