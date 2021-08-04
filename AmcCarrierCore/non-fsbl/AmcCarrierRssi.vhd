@@ -70,6 +70,36 @@ architecture mapping of AmcCarrierRssi is
    constant APP_STREAMS_8193_C : positive := ite(DEBUG_PATH_SELECT_G, 4, 5);
    constant APP_STREAMS_8194_C : positive := ite(DEBUG_PATH_SELECT_G, 3, 2);
 
+   constant APP_STREAM_ROUTES_8193_FALSE_C : Slv8Array := (
+      0 => X"00",                       -- TDEST 0 routed to stream 0 (SRPv3)
+      1 => X"01",  -- TDEST 1 routed to stream 1 (loopback)
+      2 => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
+      3 => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
+      4 => "11------");  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
+
+   constant APP_STREAM_ROUTES_8193_TRUE_C : Slv8Array := (
+      0 => X"00",                       -- TDEST 0 routed to stream 0 (SRPv3)
+      1 => X"01",   -- TDEST 1 routed to stream 1 (loopback)
+      2 => X"02",   -- TDEST 2 routed to stream 2 (BSA async)
+      3 => X"03");  -- TDEST 3 routed to stream 3 (Diag async)
+
+   constant APP_STREAM_ROUTES_8194_FALSE_C : Slv8Array := (
+      0 => X"04",                       -- TDEST 4 routed to stream 0 (MEM)
+      1 => "10------");  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+
+   constant APP_STREAM_ROUTES_8194_TRUE_C : Slv8Array := (
+      0 => X"04",                       -- TDEST 4 routed to stream 0 (MEM)
+      1 => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+      2 => "11------");  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
+
+   function ite (i : boolean; t : Slv8Array; e : Slv8Array) return Slv8Array is
+   begin
+      if (i) then return t; else return e; end if;
+   end function ite;
+
+   constant APP_STREAM_ROUTES_8193_C : Slv8Array := ite(DEBUG_PATH_SELECT_G, APP_STREAM_ROUTES_8193_TRUE_C, APP_STREAM_ROUTES_8193_FALSE_C);
+   constant APP_STREAM_ROUTES_8194_C : Slv8Array := ite(DEBUG_PATH_SELECT_G, APP_STREAM_ROUTES_8194_TRUE_C, APP_STREAM_ROUTES_8194_FALSE_C);
+
    constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
    constant WINDOW_ADDR_SIZE_C : positive := 3;
    constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
@@ -142,12 +172,7 @@ begin
          SYNTH_MODE_G        => "xpm",
          MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C, "ultra", "block"),
          APP_STREAMS_G       => APP_STREAMS_8193_C,
-         APP_STREAM_ROUTES_G => (
-            0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
-            1                => X"01",  -- TDEST 1 routed to stream 1 (loopback)
-            2                => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
-            3                => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
-            4                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
+         APP_STREAM_ROUTES_G => APP_STREAM_ROUTES_8193_C,
          CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G      => TIMEOUT_C,
          SERVER_G            => true,
@@ -300,10 +325,7 @@ begin
          SYNTH_MODE_G        => "xpm",
          MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C, "ultra", "block"),
          APP_STREAMS_G       => APP_STREAMS_8194_C,
-         APP_STREAM_ROUTES_G => (
-            0                => X"04",  -- TDEST 4 routed to stream 0 (MEM)
-            1                => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
-            2                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
+         APP_STREAM_ROUTES_G => APP_STREAM_ROUTES_8194_C,
          CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G      => TIMEOUT_C,
          SERVER_G            => true,
