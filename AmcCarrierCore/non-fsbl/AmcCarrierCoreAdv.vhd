@@ -60,6 +60,7 @@ entity AmcCarrierCoreAdv is
       WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
       MPS_SLOT_G             : boolean  := false; -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
+      DEBUG_PATH_SELECT_G    : boolean  := false;  -- false = UDP[port=8193], true = UDP[port=8194]
       GEN_PWR_I2C_G          : boolean  := true);
    port (
       -----------------------
@@ -405,6 +406,7 @@ begin
    U_Core : entity amc_carrier_core.AmcCarrierCore
       generic map (
          TPD_G                  => TPD_G,
+         DEBUG_PATH_SELECT_G    => DEBUG_PATH_SELECT_G,
          WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
          WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
          ETH_USR_FRAME_LIMIT_G  => ETH_USR_FRAME_LIMIT_G,

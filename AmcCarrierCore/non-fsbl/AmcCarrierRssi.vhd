@@ -32,7 +32,8 @@ use amc_carrier_core.FpgaTypePkg.all;
 entity AmcCarrierRssi is
    generic (
       TPD_G                 : time             := 1 ns;
-      ETH_USR_FRAME_LIMIT_G : positive         := 4096;  -- 4kB
+      ETH_USR_FRAME_LIMIT_G : positive         := 4096;   -- 4kB
+      DEBUG_PATH_SELECT_G   : boolean          := false;  -- false = UDP[port=8193], true = UDP[port=8194]
       AXI_BASE_ADDR_G       : slv(31 downto 0) := (others => '0'));
    port (
       -- Slave AXI-Lite Interface
@@ -66,18 +67,51 @@ end AmcCarrierRssi;
 
 architecture mapping of AmcCarrierRssi is
 
+   constant APP_STREAMS_8193_C : positive := ite(DEBUG_PATH_SELECT_G, 4, 5);
+   constant APP_STREAMS_8194_C : positive := ite(DEBUG_PATH_SELECT_G, 3, 2);
+
+   constant APP_STREAM_ROUTES_8193_FALSE_C : Slv8Array := (
+      0 => X"00",                       -- TDEST 0 routed to stream 0 (SRPv3)
+      1 => X"01",  -- TDEST 1 routed to stream 1 (loopback)
+      2 => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
+      3 => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
+      4 => "11------");  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
+
+   constant APP_STREAM_ROUTES_8193_TRUE_C : Slv8Array := (
+      0 => X"00",                       -- TDEST 0 routed to stream 0 (SRPv3)
+      1 => X"01",   -- TDEST 1 routed to stream 1 (loopback)
+      2 => X"02",   -- TDEST 2 routed to stream 2 (BSA async)
+      3 => X"03");  -- TDEST 3 routed to stream 3 (Diag async)
+
+   constant APP_STREAM_ROUTES_8194_FALSE_C : Slv8Array := (
+      0 => X"04",                       -- TDEST 4 routed to stream 0 (MEM)
+      1 => "10------");  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+
+   constant APP_STREAM_ROUTES_8194_TRUE_C : Slv8Array := (
+      0 => X"04",                       -- TDEST 4 routed to stream 0 (MEM)
+      1 => "10------",  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+      2 => "11------");  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
+
+   function ite (i : boolean; t : Slv8Array; e : Slv8Array) return Slv8Array is
+   begin
+      if (i) then return t; else return e; end if;
+   end function ite;
+
+   constant APP_STREAM_ROUTES_8193_C : Slv8Array := ite(DEBUG_PATH_SELECT_G, APP_STREAM_ROUTES_8193_TRUE_C, APP_STREAM_ROUTES_8193_FALSE_C);
+   constant APP_STREAM_ROUTES_8194_C : Slv8Array := ite(DEBUG_PATH_SELECT_G, APP_STREAM_ROUTES_8194_TRUE_C, APP_STREAM_ROUTES_8194_FALSE_C);
+
    constant TIMEOUT_C          : real     := 1.0E-3;  -- In units of seconds
    constant WINDOW_ADDR_SIZE_C : positive := 3;
    constant MAX_CUM_ACK_CNT_C  : positive := WINDOW_ADDR_SIZE_C;
    constant MAX_RETRANS_CNT_C  : positive := ite((WINDOW_ADDR_SIZE_C > 1), WINDOW_ADDR_SIZE_C-1, 1);
 
-   constant APP_AXIS_CONFIG_C  : AxiStreamConfigArray(4 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
-   constant TEMP_AXIS_CONFIG_C : AxiStreamConfigArray(1 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
+   constant APP_AXIS_CONFIG_C  : AxiStreamConfigArray(APP_STREAMS_8193_C-1 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
+   constant TEMP_AXIS_CONFIG_C : AxiStreamConfigArray(APP_STREAMS_8194_C-1 downto 0) := (others => AXIS_8BYTE_CONFIG_C);
 
-   signal rssiIbMasters : AxiStreamMasterArray(4 downto 0);
-   signal rssiIbSlaves  : AxiStreamSlaveArray(4 downto 0);
-   signal rssiObMasters : AxiStreamMasterArray(4 downto 0);
-   signal rssiObSlaves  : AxiStreamSlaveArray(4 downto 0);
+   signal rssiIbMasters : AxiStreamMasterArray(APP_STREAMS_8193_C-1 downto 0);
+   signal rssiIbSlaves  : AxiStreamSlaveArray(APP_STREAMS_8193_C-1 downto 0);
+   signal rssiObMasters : AxiStreamMasterArray(APP_STREAMS_8193_C-1 downto 0);
+   signal rssiObSlaves  : AxiStreamSlaveArray(APP_STREAMS_8193_C-1 downto 0);
 
    constant NUM_AXI_MASTERS_C : natural := 2;
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
@@ -95,13 +129,16 @@ architecture mapping of AmcCarrierRssi is
    signal axilReadMasters  : AxiLiteReadMasterArray(1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray(1 downto 0);
 
-   signal tempIbMasters : AxiStreamMasterArray(1 downto 0);
-   signal tempIbSlaves  : AxiStreamSlaveArray(1 downto 0);
-   signal tempObMasters : AxiStreamMasterArray(1 downto 0);
-   signal tempObSlaves  : AxiStreamSlaveArray(1 downto 0);
+   signal tempIbMasters : AxiStreamMasterArray(APP_STREAMS_8194_C-1 downto 0);
+   signal tempIbSlaves  : AxiStreamSlaveArray(APP_STREAMS_8194_C-1 downto 0);
+   signal tempObMasters : AxiStreamMasterArray(APP_STREAMS_8194_C-1 downto 0);
+   signal tempObSlaves  : AxiStreamSlaveArray(APP_STREAMS_8194_C-1 downto 0);
 
    signal obRssiTspMasters : AxiStreamMasterArray(1 downto 0);
    signal obRssiTspSlaves  : AxiStreamSlaveArray(1 downto 0);
+
+   signal appDebugMaster : AxiStreamMasterType;
+   signal appDebugSlave  : AxiStreamSlaveType;
 
 begin
 
@@ -133,14 +170,9 @@ begin
       generic map (
          TPD_G               => TPD_G,
          SYNTH_MODE_G        => "xpm",
-         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),
-         APP_STREAMS_G       => 5,
-         APP_STREAM_ROUTES_G => (
-            0                => X"00",  -- TDEST 0 routed to stream 0 (SRPv3)
-            1                => X"01",  -- TDEST 1 routed to stream 1 (loopback)
-            2                => X"02",  -- TDEST 2 routed to stream 2 (BSA async)
-            3                => X"03",  -- TDEST 3 routed to stream 3 (Diag async)
-            4                => "11------"),  -- TDEST 0xC0-0xFF routed to stream 2 (Application)
+         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C, "ultra", "block"),
+         APP_STREAMS_G       => APP_STREAMS_8193_C,
+         APP_STREAM_ROUTES_G => APP_STREAM_ROUTES_8193_C,
          CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G      => TIMEOUT_C,
          SERVER_G            => true,
@@ -180,7 +212,7 @@ begin
    U_RssiTspObFifo_0 : entity amc_carrier_core.AmcCarrierRssiObFifo
       generic map (
          TPD_G    => TPD_G,
-         BYPASS_G => true) -- true to reduce logic footprint
+         BYPASS_G => true)              -- true to reduce logic footprint
       port map (
          -- Clock and Reset
          axilClk         => axilClk,
@@ -246,8 +278,6 @@ begin
    --------------------------------
    -- Debug Path: TDEST = 0xFF:0xC0
    --------------------------------
-   ibAppDebugMaster <= rssiObMasters(4);
-   rssiObSlaves(4)  <= ibAppDebugSlave;
    U_IbLimiter : entity surf.SsiFrameLimiter
       generic map (
          TPD_G               => TPD_G,
@@ -269,8 +299,22 @@ begin
          -- Master Port
          mAxisClk    => axilClk,
          mAxisRst    => axilRst,
-         mAxisMaster => rssiIbMasters(4),
-         mAxisSlave  => rssiIbSlaves(4));
+         mAxisMaster => appDebugMaster,
+         mAxisSlave  => appDebugSlave);
+
+   GEN_DEBUG_8193_PATH : if (not DEBUG_PATH_SELECT_G) generate
+      ibAppDebugMaster <= rssiObMasters(4);
+      rssiObSlaves(4)  <= ibAppDebugSlave;
+      rssiIbMasters(4) <= appDebugMaster;
+      appDebugSlave    <= rssiIbSlaves(4);
+   end generate;
+
+   GEN_DEBUG_8194_PATH : if (DEBUG_PATH_SELECT_G) generate
+      ibAppDebugMaster <= tempObMasters(2);
+      tempObSlaves(2)  <= ibAppDebugSlave;
+      tempIbMasters(2) <= appDebugMaster;
+      appDebugSlave    <= tempIbSlaves(2);
+   end generate;
 
    ------------------------------
    -- Software's RSSI Server@8194
@@ -279,11 +323,9 @@ begin
       generic map (
          TPD_G               => TPD_G,
          SYNTH_MODE_G        => "xpm",
-         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C,"ultra","block"),
-         APP_STREAMS_G       => 2,
-         APP_STREAM_ROUTES_G => (
-            0                => X"04",  -- TDEST 4 routed to stream 0 (MEM)
-            1                => "10------"),  -- TDEST x80-0xBF routed to stream 1 (Raw Data)
+         MEMORY_TYPE_G       => ite(ULTRASCALE_PLUS_C, "ultra", "block"),
+         APP_STREAMS_G       => APP_STREAMS_8194_C,
+         APP_STREAM_ROUTES_G => APP_STREAM_ROUTES_8194_C,
          CLK_FREQUENCY_G     => AXI_CLK_FREQ_C,
          TIMEOUT_UNIT_G      => TIMEOUT_C,
          SERVER_G            => true,
@@ -323,7 +365,7 @@ begin
    U_RssiTspObFifo_1 : entity amc_carrier_core.AmcCarrierRssiObFifo
       generic map (
          TPD_G    => TPD_G,
-         BYPASS_G => true) -- true to reduce logic footprint
+         BYPASS_G => true)              -- true to reduce logic footprint
       port map (
          -- Clock and Reset
          axilClk         => axilClk,

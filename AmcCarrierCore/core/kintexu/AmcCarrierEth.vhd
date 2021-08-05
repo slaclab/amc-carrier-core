@@ -34,6 +34,7 @@ entity AmcCarrierEth is
       TPD_G                 : time     := 1 ns;
       RSSI_ILEAVE_EN_G      : boolean  := false;
       RTM_ETH_G             : boolean  := false;
+      DEBUG_PATH_SELECT_G   : boolean  := false;    -- false = UDP[port=8193], true = UDP[port=8194]
       ETH_USR_FRAME_LIMIT_G : positive := 4096);    -- 4kB
    port (
       -- Local Configuration and status
@@ -383,6 +384,7 @@ begin
          generic map (
             TPD_G                 => TPD_G,
             ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
+            DEBUG_PATH_SELECT_G   => DEBUG_PATH_SELECT_G,
             AXI_BASE_ADDR_G       => AXI_CONFIG_C(AXI_RSSI_NONE_ILEAVE_INDEX_C).baseAddr)
          port map (
             -- Slave AXI-Lite Interface
