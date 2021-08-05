@@ -4,6 +4,7 @@ var classAmcCarrierEth =
     [ "TPD_G", "classAmcCarrierEth.html#a67a837684e4f18c2d236ac1d053b419b", null ],
     [ "RSSI_ILEAVE_EN_G", "classAmcCarrierEth.html#a1326d9dea8f00882d13827fc9691c540", null ],
     [ "RTM_ETH_G", "classAmcCarrierEth.html#a673bb38a015a30373a9ba9054302a256", null ],
+    [ "DEBUG_PATH_SELECT_G", "classAmcCarrierEth.html#a525d512012d4e516c767f9f3f8cc0f98", null ],
     [ "ETH_USR_FRAME_LIMIT_G", "classAmcCarrierEth.html#a670984cb9c63c78429d062853025e550", null ],
     [ "localMac", "classAmcCarrierEth.html#ae02bb35f94a88aa2db811931566e8a02", null ],
     [ "localIp", "classAmcCarrierEth.html#afd3fee997440ec256fc9f5740a0e75ce", null ],

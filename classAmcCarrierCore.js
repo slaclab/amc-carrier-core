@@ -2,6 +2,7 @@ var classAmcCarrierCore =
 [
     [ "mapping", "classAmcCarrierCore_1_1mapping.html", "classAmcCarrierCore_1_1mapping" ],
     [ "TPD_G", "classAmcCarrierCore.html#a67a837684e4f18c2d236ac1d053b419b", null ],
+    [ "DEBUG_PATH_SELECT_G", "classAmcCarrierCore.html#a525d512012d4e516c767f9f3f8cc0f98", null ],
     [ "ETH_USR_FRAME_LIMIT_G", "classAmcCarrierCore.html#a670984cb9c63c78429d062853025e550", null ],
     [ "WAVEFORM_NUM_LANES_G", "classAmcCarrierCore.html#a2cfec1295116fb7ee26aafcae39002be", null ],
     [ "WAVEFORM_TDATA_BYTES_G", "classAmcCarrierCore.html#afcd1380bd60c6b2b65e97c4e075440f2", null ],

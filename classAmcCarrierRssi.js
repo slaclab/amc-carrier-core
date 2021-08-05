@@ -3,6 +3,7 @@ var classAmcCarrierRssi =
     [ "mapping", "classAmcCarrierRssi_1_1mapping.html", "classAmcCarrierRssi_1_1mapping" ],
     [ "TPD_G", "classAmcCarrierRssi.html#a67a837684e4f18c2d236ac1d053b419b", null ],
     [ "ETH_USR_FRAME_LIMIT_G", "classAmcCarrierRssi.html#a670984cb9c63c78429d062853025e550", null ],
+    [ "DEBUG_PATH_SELECT_G", "classAmcCarrierRssi.html#a525d512012d4e516c767f9f3f8cc0f98", null ],
     [ "AXI_BASE_ADDR_G", "classAmcCarrierRssi.html#acb99ead2657860ed256e1aea12336a4b", null ],
     [ "axilClk", "classAmcCarrierRssi.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
     [ "axilRst", "classAmcCarrierRssi.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],
