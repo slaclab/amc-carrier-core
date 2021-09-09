@@ -55,7 +55,7 @@ package AppMpsPkg is
       timeStamp => (others => '0'),
       class     => (others => (others => '0')));
 
-   function toSlv (m : MpsMitigationMsgType) return slv;
+   function toSlv (m                : MpsMitigationMsgType) return slv;
    function toMpsMitigationMsg (vec : slv) return MpsMitigationMsgType;
 
    ---------------------------------------------------
@@ -65,7 +65,7 @@ package AppMpsPkg is
 
    type MpsMessageType is record
       valid     : sl;
-      version   : slv(4 downto 0);      -- Message version (wrong version is detected by MpsAppTimeout)
+      version   : slv(4 downto 0);  -- Message version (wrong version is detected by MpsAppTimeout)
       lcls      : sl;                   -- '0' LCLS-II, '1' LCLS-I
       inputType : sl;                   -- '0' Digital, '1' Analog
       timeStamp : slv(15 downto 0);
@@ -86,10 +86,10 @@ package AppMpsPkg is
       message   => (others => (others => '0')),
       msgSize   => (others => '0'));
 
-   function toSlv (m : MpsMessageType) return slv;
+   function toSlv (m          : MpsMessageType) return slv;
    function toMpsMessage (vec : slv) return MpsMessageType;
 
-   function mpsMessageInit ( msgSize : integer ) return MpsMessageType;
+   function mpsMessageInit (msgSize : integer) return MpsMessageType;
 
    ---------------------------------------------------
    -- MPS Channel Configuration Constants
@@ -173,21 +173,21 @@ package AppMpsPkg is
    constant MPS_CORE_REG_BITS_C : integer := 17;
 
    type MpsCoreRegType is record
-      mpsEnable    : sl;
-      mpsAppId     : slv(9 downto 0);
-      mpsVersion   : slv(4 downto 0);
-      lcls1Mode    : sl;
+      mpsEnable  : sl;
+      mpsAppId   : slv(9 downto 0);
+      mpsVersion : slv(4 downto 0);
+      lcls1Mode  : sl;
    end record;
 
    type MpsCoreRegArray is array (natural range <>) of MpsCoreRegType;
 
    constant MPS_CORE_REG_INIT_C : MpsCoreRegType := (
-      mpsEnable    => '0',
-      mpsAppId     => (others => '0'),
-      mpsVersion   => (others => '0'),
-      lcls1Mode    => '0');
+      mpsEnable  => '0',
+      mpsAppId   => (others => '0'),
+      mpsVersion => (others => '0'),
+      lcls1Mode  => '0');
 
-   function toSlv (m : MpsCoreRegType) return slv;
+   function toSlv (m          : MpsCoreRegType) return slv;
    function toMpsCoreReg (vec : slv) return MpsCoreRegType;
 
    ---------------------------------------------------
@@ -317,11 +317,11 @@ package body AppMpsPkg is
       return m;
    end function;
 
-   function mpsMessageInit ( msgSize : integer ) return MpsMessageType is
+   function mpsMessageInit (msgSize : integer) return MpsMessageType is
       variable ret : MpsMessageType;
    begin
-      ret := MPS_MESSAGE_INIT_C;
-      ret.msgSize := toSlv(msgSize,8);
+      ret         := MPS_MESSAGE_INIT_C;
+      ret.msgSize := toSlv(msgSize, 8);
 
       return ret;
    end function;
@@ -378,21 +378,21 @@ package body AppMpsPkg is
                ret.CHAN_CONFIG_C(14+i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(14+i).IDLE_EN_C     := true;
                ret.CHAN_CONFIG_C(14+i).ALT_EN_C      := true;
-               ret.CHAN_CONFIG_C(14+i).BYTE_MAP_C    := i; -- amc0 = 0 & amc1 = 1
+               ret.CHAN_CONFIG_C(14+i).BYTE_MAP_C    := i;  -- amc0 = 0 & amc1 = 1
 
                -- Inputs 4 & 5 X
                ret.CHAN_CONFIG_C(4+i).THOLD_COUNT_C := 2;
                ret.CHAN_CONFIG_C(4+i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(4+i).IDLE_EN_C     := true;
                ret.CHAN_CONFIG_C(4+i).ALT_EN_C      := true;
-               ret.CHAN_CONFIG_C(4+i).BYTE_MAP_C    := i+2; -- amc0 = 2 & amc1 = 3
+               ret.CHAN_CONFIG_C(4+i).BYTE_MAP_C    := i+2;  -- amc0 = 2 & amc1 = 3
 
                -- Inputs 6 & 7 Y
                ret.CHAN_CONFIG_C(6+i).THOLD_COUNT_C := 2;
                ret.CHAN_CONFIG_C(6+i).LCLS1_EN_C    := true;
                ret.CHAN_CONFIG_C(6+i).IDLE_EN_C     := true;
                ret.CHAN_CONFIG_C(6+i).ALT_EN_C      := true;
-               ret.CHAN_CONFIG_C(6+i).BYTE_MAP_C    := i+4; -- amc0 = 4 & amc1 = 5
+               ret.CHAN_CONFIG_C(6+i).BYTE_MAP_C    := i+4;  -- amc0 = 4 & amc1 = 5
 
             end loop;
 
@@ -435,9 +435,9 @@ package body AppMpsPkg is
             ret.CHAN_CONFIG_C(21).BYTE_MAP_C    := 3;
 
          when APP_LLRF_TYPE_C =>
-            ret.DIGITAL_EN_C := true;
-            ret.BYTE_COUNT_C := 2;
-	    ret.LCLS2_COUNT_C := 2; -- same as BYTE_COUNT_C
+            ret.DIGITAL_EN_C  := true;
+            ret.BYTE_COUNT_C  := 2;
+            ret.LCLS2_COUNT_C := 2;     -- same as BYTE_COUNT_C
 
          when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
             ret.BYTE_COUNT_C  := 12;
@@ -452,12 +452,12 @@ package body AppMpsPkg is
             end loop;
 
          when APP_FWS_TYPE_C =>
-            ret.DIGITAL_EN_C := true;
-            ret.BYTE_COUNT_C := 1;
-	    ret.LCLS2_COUNT_C := 1; -- same as BYTE_COUNT_C
+            ret.DIGITAL_EN_C  := true;
+            ret.BYTE_COUNT_C  := 1;
+            ret.LCLS2_COUNT_C := 1;     -- same as BYTE_COUNT_C
 
-        when others =>
-            NULL;
+         when others =>
+            null;
 
       end case;
 
