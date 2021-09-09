@@ -437,6 +437,7 @@ package body AppMpsPkg is
          when APP_LLRF_TYPE_C =>
             ret.DIGITAL_EN_C := true;
             ret.BYTE_COUNT_C := 2;
+	    ret.LCLS2_COUNT_C := 2; -- same as BYTE_COUNT_C
 
          when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
             ret.BYTE_COUNT_C  := 12;
@@ -453,6 +454,7 @@ package body AppMpsPkg is
          when APP_FWS_TYPE_C =>
             ret.DIGITAL_EN_C := true;
             ret.BYTE_COUNT_C := 1;
+	    ret.LCLS2_COUNT_C := 1; -- same as BYTE_COUNT_C
 
         when others =>
             NULL;
