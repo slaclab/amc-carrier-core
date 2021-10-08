@@ -216,7 +216,7 @@ package AppMpsPkg is
       timeStamp  : slv(15 downto 0);
       selectIdle : sl;
       selectAlt  : sl;
-      digitalBus : slv(15 downto 0);
+      digitalBus : slv(63 downto 0);
       mpsError   : slv(MPS_CHAN_COUNT_C-1 downto 0);
       mpsIgnore  : slv(MPS_CHAN_COUNT_C-1 downto 0);
       chanData   : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
