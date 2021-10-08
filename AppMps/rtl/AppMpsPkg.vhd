@@ -415,6 +415,26 @@ package body AppMpsPkg is
             ret.CHAN_CONFIG_C(16).IDLE_EN_C     := true;
             ret.CHAN_CONFIG_C(16).BYTE_MAP_C    := 1;
 
+            -- Input 5
+            ret.CHAN_CONFIG_C(5).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(5).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(5).BYTE_MAP_C    := 2;
+
+            -- Input 21
+            ret.CHAN_CONFIG_C(21).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(21).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(21).BYTE_MAP_C    := 3;
+
+            -- Input 1
+            ret.CHAN_CONFIG_C(1).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(1).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(1).BYTE_MAP_C    := 4;
+
+            -- Input 17
+            ret.CHAN_CONFIG_C(17).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(17).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(17).BYTE_MAP_C    := 5;
+
          when APP_BCM_TYPE_C =>
             -- ret.BYTE_COUNT_C  := 4;
             -- ret.LCLS2_COUNT_C := 4;
@@ -443,6 +463,16 @@ package body AppMpsPkg is
             ret.CHAN_CONFIG_C(21).THOLD_COUNT_C := 8;
             ret.CHAN_CONFIG_C(21).IDLE_EN_C     := true;
             ret.CHAN_CONFIG_C(21).BYTE_MAP_C    := 3;
+
+            -- Input 1
+            ret.CHAN_CONFIG_C(1).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(1).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(1).BYTE_MAP_C    := 4;
+
+            -- Input 17
+            ret.CHAN_CONFIG_C(17).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(17).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(17).BYTE_MAP_C    := 5;
 
          when APP_LLRF_TYPE_C =>
             ret.DIGITAL_EN_C  := true;
