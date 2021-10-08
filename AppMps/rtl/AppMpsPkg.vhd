@@ -216,7 +216,7 @@ package AppMpsPkg is
       timeStamp  : slv(15 downto 0);
       selectIdle : sl;
       selectAlt  : sl;
-      digitalBus : slv(15 downto 0);
+      digitalBus : slv(63 downto 0);
       mpsError   : slv(MPS_CHAN_COUNT_C-1 downto 0);
       mpsIgnore  : slv(MPS_CHAN_COUNT_C-1 downto 0);
       chanData   : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
@@ -397,22 +397,14 @@ package body AppMpsPkg is
             end loop;
 
          when APP_BLEN_TYPE_C =>
-            ret.BYTE_COUNT_C  := 2;
-            ret.LCLS2_COUNT_C := 2;
-
-            -- Input 0
-            ret.CHAN_CONFIG_C(0).THOLD_COUNT_C := 8;
-            ret.CHAN_CONFIG_C(0).IDLE_EN_C     := true;
-            ret.CHAN_CONFIG_C(0).BYTE_MAP_C    := 0;
-
-            -- Input 16
-            ret.CHAN_CONFIG_C(16).THOLD_COUNT_C := 8;
-            ret.CHAN_CONFIG_C(16).IDLE_EN_C     := true;
-            ret.CHAN_CONFIG_C(16).BYTE_MAP_C    := 1;
-
-         when APP_BCM_TYPE_C =>
-            ret.BYTE_COUNT_C  := 4;
-            ret.LCLS2_COUNT_C := 4;
+            -- ret.BYTE_COUNT_C  := 2;
+            -- ret.LCLS2_COUNT_C := 2;
+            -------------------------------------------------------
+            -- https://jira.slac.stanford.edu/browse/ESLMPS-144
+            -- Setting to 6byte for mps network latency work around
+            -------------------------------------------------------
+            ret.BYTE_COUNT_C  := 6;
+            ret.LCLS2_COUNT_C := 6;
 
             -- Input 0
             ret.CHAN_CONFIG_C(0).THOLD_COUNT_C := 8;
@@ -434,10 +426,66 @@ package body AppMpsPkg is
             ret.CHAN_CONFIG_C(21).IDLE_EN_C     := true;
             ret.CHAN_CONFIG_C(21).BYTE_MAP_C    := 3;
 
+            -- Input 1
+            ret.CHAN_CONFIG_C(1).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(1).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(1).BYTE_MAP_C    := 4;
+
+            -- Input 17
+            ret.CHAN_CONFIG_C(17).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(17).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(17).BYTE_MAP_C    := 5;
+
+         when APP_BCM_TYPE_C =>
+            -- ret.BYTE_COUNT_C  := 4;
+            -- ret.LCLS2_COUNT_C := 4;
+            -------------------------------------------------------
+            -- https://jira.slac.stanford.edu/browse/ESLMPS-144
+            -- Setting to 6byte for mps network latency work around
+            -------------------------------------------------------
+            ret.BYTE_COUNT_C  := 6;
+            ret.LCLS2_COUNT_C := 6;
+
+            -- Input 0
+            ret.CHAN_CONFIG_C(0).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(0).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(0).BYTE_MAP_C    := 0;
+
+            -- Input 16
+            ret.CHAN_CONFIG_C(16).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(16).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(16).BYTE_MAP_C    := 1;
+
+            -- Input 5
+            ret.CHAN_CONFIG_C(5).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(5).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(5).BYTE_MAP_C    := 2;
+
+            -- Input 21
+            ret.CHAN_CONFIG_C(21).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(21).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(21).BYTE_MAP_C    := 3;
+
+            -- Input 1
+            ret.CHAN_CONFIG_C(1).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(1).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(1).BYTE_MAP_C    := 4;
+
+            -- Input 17
+            ret.CHAN_CONFIG_C(17).THOLD_COUNT_C := 8;
+            ret.CHAN_CONFIG_C(17).IDLE_EN_C     := true;
+            ret.CHAN_CONFIG_C(17).BYTE_MAP_C    := 5;
+
          when APP_LLRF_TYPE_C =>
             ret.DIGITAL_EN_C  := true;
-            ret.BYTE_COUNT_C  := 2;
-            ret.LCLS2_COUNT_C := 2;     -- same as BYTE_COUNT_C
+            -- ret.BYTE_COUNT_C  := 2;
+            -- ret.LCLS2_COUNT_C := 2;     -- same as BYTE_COUNT_C
+            -------------------------------------------------------
+            -- https://jira.slac.stanford.edu/browse/ESLMPS-144
+            -- Setting to 6byte for mps network latency work around
+            -------------------------------------------------------
+            ret.BYTE_COUNT_C  := 6;
+            ret.LCLS2_COUNT_C := 6;     -- same as BYTE_COUNT_C
 
          when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
             ret.BYTE_COUNT_C  := 12;
@@ -453,8 +501,14 @@ package body AppMpsPkg is
 
          when APP_FWS_TYPE_C =>
             ret.DIGITAL_EN_C  := true;
-            ret.BYTE_COUNT_C  := 1;
-            ret.LCLS2_COUNT_C := 1;     -- same as BYTE_COUNT_C
+            -- ret.BYTE_COUNT_C  := 1;
+            -- ret.LCLS2_COUNT_C := 1;     -- same as BYTE_COUNT_C
+            -------------------------------------------------------
+            -- https://jira.slac.stanford.edu/browse/ESLMPS-144
+            -- Setting to 6byte for mps network latency work around
+            -------------------------------------------------------
+            ret.BYTE_COUNT_C  := 6;
+            ret.LCLS2_COUNT_C := 6;     -- same as BYTE_COUNT_C
 
          when others =>
             null;
