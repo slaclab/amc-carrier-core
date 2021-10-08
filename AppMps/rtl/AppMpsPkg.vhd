@@ -400,6 +400,7 @@ package body AppMpsPkg is
             -- ret.BYTE_COUNT_C  := 2;
             -- ret.LCLS2_COUNT_C := 2;
             -------------------------------------------------------
+            -- https://jira.slac.stanford.edu/browse/ESLMPS-144
             -- Setting to 6byte for mps network latency work around
             -------------------------------------------------------
             ret.BYTE_COUNT_C  := 6;
@@ -439,6 +440,7 @@ package body AppMpsPkg is
             -- ret.BYTE_COUNT_C  := 4;
             -- ret.LCLS2_COUNT_C := 4;
             -------------------------------------------------------
+            -- https://jira.slac.stanford.edu/browse/ESLMPS-144
             -- Setting to 6byte for mps network latency work around
             -------------------------------------------------------
             ret.BYTE_COUNT_C  := 6;
@@ -479,6 +481,7 @@ package body AppMpsPkg is
             -- ret.BYTE_COUNT_C  := 2;
             -- ret.LCLS2_COUNT_C := 2;     -- same as BYTE_COUNT_C
             -------------------------------------------------------
+            -- https://jira.slac.stanford.edu/browse/ESLMPS-144
             -- Setting to 6byte for mps network latency work around
             -------------------------------------------------------
             ret.BYTE_COUNT_C  := 6;
@@ -501,6 +504,7 @@ package body AppMpsPkg is
             -- ret.BYTE_COUNT_C  := 1;
             -- ret.LCLS2_COUNT_C := 1;     -- same as BYTE_COUNT_C
             -------------------------------------------------------
+            -- https://jira.slac.stanford.edu/browse/ESLMPS-144
             -- Setting to 6byte for mps network latency work around
             -------------------------------------------------------
             ret.BYTE_COUNT_C  := 6;
