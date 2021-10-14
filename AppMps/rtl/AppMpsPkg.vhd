@@ -478,8 +478,8 @@ package body AppMpsPkg is
 
          when APP_LLRF_TYPE_C =>
             ret.DIGITAL_EN_C  := true;
-            -- ret.BYTE_COUNT_C  := 2;
-            -- ret.LCLS2_COUNT_C := 2;     -- same as BYTE_COUNT_C
+            -- ret.BYTE_COUNT_C  := 4;
+            -- ret.LCLS2_COUNT_C := 4;     -- same as BYTE_COUNT_C
             -------------------------------------------------------
             -- https://jira.slac.stanford.edu/browse/ESLMPS-144
             -- Setting to 6byte for mps network latency work around
