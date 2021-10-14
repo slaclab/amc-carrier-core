@@ -126,7 +126,9 @@ begin
       v.mpsSelect.selectAlt := ite(((beamDest and altDestInt) /= 0),'1','0');
 
       -- Digital APP
-      v.mpsSelect.digitalBus(15 downto 0) := diagnosticBus.data(30)(15 downto 0);
+      v.mpsSelect.digitalBus(31 downto 0)  := diagnosticBus.data(30);
+      v.mpsSelect.digitalBus(63 downto 32) := diagnosticBus.data(31);
+
       -- Synchronous Reset
       if (diagnosticRst = '1') then
          v := REG_INIT_C;
