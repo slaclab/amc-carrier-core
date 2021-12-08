@@ -1,0 +1,331 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the 
+## top-level directory of this distribution and at: 
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
+## No part of 'SLAC Firmware Standard Library', including this file, 
+## may be copied, modified, propagated, or distributed except according to 
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once BldAxiStream.yaml
+
+BldAxiStream: &BldAxiStream 
+  name: BldAxiStream
+  description: Beam line data service
+  size: 0x8000
+  class: MMIODev
+  configPrio: 1
+  metadata:
+    numEdefs: &numEdefs 16
+  ########
+  children:
+  ########
+    #########################################################
+    packetSize:
+      class: IntField
+      at:
+        offset: 0x0
+      sizeBits: 12
+      mode: RW
+      description: "Maximum size of packets in 32b words"
+    #########################################################
+    enable:
+      class: IntField
+      at:
+        offset: 0x3
+      sizeBits: 1
+      lsBit: 7
+      mode: RW
+      description: "Enable packets"
+    #########################################################
+    channelMask:
+      class: IntField
+      at:
+        offset: 0x4
+      sizeBits: 31
+      mode: RW
+      description: "Mask of enabled channels"
+    #########################################################
+    channelSevr:
+      class: IntField
+      at:
+        offset: 0x8
+      sizeBits: 62
+      mode: RW
+      description: "Maximum channel severity"
+    #########################################################
+    currPacketSize:
+      class: IntField
+      at:
+        offset: 0x10
+      sizeBits: 12
+      mode: RO
+      description: "Current size of packet in 32b words"
+    #########################################################
+    currPacketState:
+      class: IntField
+      at:
+        offset: 0x12
+      sizeBits: 4
+      mode: RO
+      enums:
+        - name: Idle
+          class: Enum
+          value: 0
+        - name: TSL
+          class: Enum
+          value: 1
+        - name: TSU
+          class: Enum
+          value: 2
+        - name: PIDL
+          class: Enum
+          value: 3
+        - name: PIDU
+          class: Enum
+          value: 4
+        - name: CHM
+          class: Enum
+          value: 5
+        - name: DELT
+          class: Enum
+          value: 6
+        - name: SVC
+          class: Enum
+          value: 7
+        - name: CHD
+          class: Enum
+          value: 8
+        - name: END
+          class: Enum
+          value: 9
+        - name: INVALID_10
+          class: Enum
+          value: 10
+        - name: INVALID_11
+          class: Enum
+          value: 11
+        - name: INVALID_12
+          class: Enum
+          value: 12
+        - name: INVALID_13
+          class: Enum
+          value: 13
+        - name: INVALID_14
+          class: Enum
+          value: 14
+        - name: INVALID_15
+          class: Enum
+          value: 15
+      description: "Current packet fill state"
+    #########################################################
+    currPulseIdL:
+      class: IntField
+      at:
+        offset: 0x14
+      sizeBits: 32
+      mode: RO
+      description: "Current packet pulseID lower word"
+    #########################################################
+    currTimeStampL:
+      class: IntField
+      at:
+        offset: 0x18
+      sizeBits: 32
+      mode: RO
+      description: "Current packet timestamp lower word"
+    #########################################################
+    currDelta:
+      class: IntField
+      at:
+        offset: 0x1C
+      sizeBits: 32
+      mode: RO
+      description: "Current compressed timestamp/pulseID"
+    #########################################################
+    packetCount:
+      class: IntField
+      at:
+        offset: 0x20
+      sizeBits: 20
+      mode: RO
+      description: "Packet count"
+    #########################################################
+    paused:
+      class: IntField
+      at:
+        offset: 0x23
+      sizeBits: 1
+      lsBit: 7
+      mode: RO
+      description: "Stream paused"
+    #########################################################
+    diagnClockRate:
+      class: IntField
+      at:
+        offset: 0x28
+      sizeBits: 32
+      mode: RO
+      description: "Diagn clock rate"
+    #########################################################
+    diagnStrobeRate:
+      class: IntField
+      at:
+        offset: 0x2c
+      sizeBits: 32
+      mode: RO
+      description: "Diagn strobe rate"
+    #########################################################
+    eventSel0Rate:
+      class: IntField
+      at:
+        offset: 0x30
+      sizeBits: 32
+      mode: RO
+      description: "Event select0 rate"
+    #########################################################
+    EdefEnable:
+      at:
+        offset: 0x47
+        nelms: *numEdefs
+        stride: 8
+      class: IntField
+      name: Enable
+      sizeBits: 1
+      lsBit: 7
+      mode: RW
+      description: Enable EDEF
+    #########################################################  
+    EdefRateLimit:
+      at:
+        offset: 0x44
+        nelms: *numEdefs
+        stride: 8
+      class: IntField
+      name: RateLimit
+      sizeBits: 5
+      lsBit: 0
+      mode: RW
+      enums:
+        - name: INVALID_0
+          class: Enum
+          value: 0
+        - name: INVALID_1
+          class: Enum
+          value: 1
+        - name: INVALID_2
+          class: Enum
+          value: 2
+        - name: INVALID_3
+          class: Enum
+          value: 3
+        - name: INVALID_4
+          class: Enum
+          value: 4
+        - name: INVALID_5
+          class: Enum
+          value: 5
+        - name: INVALID_6
+          class: Enum
+          value: 6
+        - name: INVALID_7
+          class: Enum
+          value: 7
+        - name: INVALID_8
+          class: Enum
+          value: 8
+        - name: INVALID_9
+          class: Enum
+          value: 9
+        - name: INVALID_10
+          class: Enum
+          value: 10
+        - name: INVALID_11
+          class: Enum
+          value: 11
+        - name: INVALID_12
+          class: Enum
+          value: 12
+        - name: INVALID_13
+          class: Enum
+          value: 13
+        - name: INVALID_14
+          class: Enum
+          value: 14
+        - name: INVALID_15
+          class: Enum
+          value: 15
+        - name: INVALID_16
+          class: Enum
+          value: 16
+        - name: INVALID_17
+          class: Enum
+          value: 17
+        - name: INVALID_18
+          class: Enum
+          value: 18
+        - name: Limit_1p9_kHz
+          class: Enum
+          value: 19
+        - name: Limit_950_Hz
+          class: Enum
+          value: 20
+        - name: Limit_476_Hz
+          class: Enum
+          value: 21
+        - name: Limit_238_Hz
+          class: Enum
+          value: 22
+        - name: Limit_119_Hz
+          class: Enum
+          value: 23
+        - name: Limit_59_Hz
+          class: Enum
+          value: 24
+        - name: Limit_29_Hz
+          class: Enum
+          value: 25
+        - name: Limit_14_Hz
+          class: Enum
+          value: 26
+        - name: Limit_7_Hz
+          class: Enum
+          value: 27
+        - name: Limit_3p7_Hz
+          class: Enum
+          value: 28
+        - name: Limit_1p8_Hz
+          class: Enum
+          value: 29
+        - name: Limit_0p9_Hz
+          class: Enum
+          value: 30
+        - name: Limit_0p5_Hz
+          class: Enum
+          value: 31
+      description: Rate Limit
+    #########################################################  
+    EdefRateSel:
+      at:
+        offset: 0x40
+        nelms: *numEdefs
+        stride: 8
+      class: IntField
+      name: RateSelect
+      sizeBits: 13
+      lsBit: 0
+      mode: RW
+      description: Rate select
+    #########################################################  
+    EdefDestSel:
+      at:
+        offset: 0x41
+        nelms: *numEdefs
+        stride: 8
+      class: IntField
+      name: DestSelect
+      sizeBits: 19
+      lsBit: 5
+      mode: RW
+      description: Destination select

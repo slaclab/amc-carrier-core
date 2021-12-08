@@ -31,7 +31,13 @@ AmcCarrierBsa: &AmcCarrierBsa
         offset: 0x00010000
         nelms: 2
         stride: 0x00010000
-    BldAxiStream:
+    Bsss:
       <<: *BldAxiStream
       at:
         offset: 0x00030000
+	numEdefs: 9
+    Bld:
+      <<: *BldAxiStream
+      at:
+        offset: 0x00040000
+	numEdefs: 4

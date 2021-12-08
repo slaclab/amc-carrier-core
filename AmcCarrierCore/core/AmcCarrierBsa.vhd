@@ -100,12 +100,14 @@ architecture mapping of AmcCarrierBsa is
    -------------------------------------------------------------------------------------------------
    -- AXI Lite
    -------------------------------------------------------------------------------------------------
-   constant AXIL_MASTERS_C : integer := ite(DISABLE_BLD_G, 3, 4);
+   constant AXIL_MASTERS_C : integer := ite((DISABLE_BLD_G and DISABLE_BSA_G), 3,
+                                            ite((DISABLE_BLD_G or DISABLE_BSA_G), 4, 5));
 
    constant BSA_BUFFER_AXIL_C : integer := 0;
    constant WAVEFORM_0_AXIL_C : integer := 1;
    constant WAVEFORM_1_AXIL_C : integer := 2;
-   constant BLD_AXIL_C        : integer := 3;
+   constant BSSS_AXIL_C       : integer := 3;
+   constant BLD_AXIL_C        : integer := 4;
 
    constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
       genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, 20, 16);
@@ -345,6 +347,23 @@ begin
                axiRst           => axiRst,
                axiWriteMaster   => bsaAxiWriteMaster,
                axiWriteSlave    => bsaAxiWriteSlave);
+         BsssWrapper : entity amc_carrier_core.BsssWrapper
+            generic map (
+               NUM_EDEFS_G => 9)
+            port map (
+               diagnosticClk   => diagnosticClk,
+               diagnosticRst   => diagnosticRst,
+               diagnosticBus   => diagnosticBus,
+               axilClk         => axilClk,
+               axilRst         => axilRst,
+               axilReadMaster  => locAxilReadMasters (BSSS_AXIL_C),
+               axilReadSlave   => locAxilReadSlaves  (BSSS_AXIL_C),
+               axilWriteMaster => locAxilWriteMasters(BSSS_AXIL_C),
+               axilWriteSlave  => locAxilWriteSlaves (BSSS_AXIL_C),
+               ibEthMsgMaster  => ibEthMsgMaster,
+               ibEthMsgSlave   => ibEthMsgSlave,
+               obEthMsgMaster  => intEthMsgMaster,
+               obEthMsgSlave   => intEthMsgSlave );
       end generate BSA_EN_GEN;
 
       BSA_DISABLE_GEN : if (DISABLE_BSA_G) generate
@@ -352,6 +371,8 @@ begin
          locAxilWriteSlaves(BSA_BUFFER_AXIL_C)     <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
          bsaAxiWriteMaster                         <= AXI_WRITE_MASTER_INIT_C;
          obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
+         intEthMsgMaster                           <= ibEthMsgMaster;
+         ibEthMsgSlave                             <= intEthMsgSlave;
       end generate BSA_DISABLE_GEN;
 
 --      -----------------------------------------------------------------------------------------------
@@ -435,31 +456,28 @@ begin
    end generate BSA_GEN;
 
    BLD_ENABLE_GEN : if not DISABLE_BLD_G generate
-      U_BLD : entity amc_carrier_core.BldAxiStream
+      U_BLD : entity amc_carrier_core.BldWrapper
          generic map (
-            TPD_G => TPD_G)
+            NUM_EDEFS_G => 4)
          port map (
-            -- Diagnostic data interface
             diagnosticClk   => diagnosticClk,
             diagnosticRst   => diagnosticRst,
             diagnosticBus   => diagnosticBus,
-            -- AXI Lite interface
             axilClk         => axilClk,
             axilRst         => axilRst,
             axilReadMaster  => locAxilReadMasters (BLD_AXIL_C),
-            axilReadSlave   => locAxilReadSlaves (BLD_AXIL_C),
+            axilReadSlave   => locAxilReadSlaves  (BLD_AXIL_C),
             axilWriteMaster => locAxilWriteMasters(BLD_AXIL_C),
             axilWriteSlave  => locAxilWriteSlaves (BLD_AXIL_C),
-            -- Timing ETH MSG Interface (axilClk domain)
-            ibEthMsgMaster  => ibEthMsgMaster,
-            ibEthMsgSlave   => ibEthMsgSlave,
+            ibEthMsgMaster  => intEthMsgMaster,
+            ibEthMsgSlave   => intEthMsgSlave,
             obEthMsgMaster  => obEthMsgMaster,
-            obEthMsgSlave   => obEthMsgSlave);
+            obEthMsgSlave   => obEthMsgSlave );
    end generate;
 
    BLD_DISABLE_GEN : if DISABLE_BLD_G generate
-      obEthMsgMaster <= ibEthMsgMaster;
-      ibEthMsgSlave  <= obEthMsgSlave;
+      obEthMsgMaster <= intEthMsgMaster;
+      intEthMsgSlave <= obEthMsgSlave;
    end generate;
 
 end mapping;
