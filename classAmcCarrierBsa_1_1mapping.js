@@ -2,11 +2,12 @@ var classAmcCarrierBsa_1_1mapping =
 [
     [ "ROUTE0_C", "classAmcCarrierBsa_1_1mapping.html#a45fb693698ef6a9cd01106d6f0090f71", null ],
     [ "ROUTE1_C", "classAmcCarrierBsa_1_1mapping.html#adb935a1018230f2bcb7c730af0f4d13e", null ],
-    [ "AXIL_MASTERS_C", "classAmcCarrierBsa_1_1mapping.html#a9bb8cb1e2f0b1d300b4542192e8bd8ab", null ],
+    [ "AXIL_MASTERS_C", "classAmcCarrierBsa_1_1mapping.html#a70f0b4561a87e4bb693e17aeb2b04fba", null ],
     [ "BSA_BUFFER_AXIL_C", "classAmcCarrierBsa_1_1mapping.html#ae7c11439830031cf7af979d631cf2e0b", null ],
     [ "WAVEFORM_0_AXIL_C", "classAmcCarrierBsa_1_1mapping.html#a31cf930e85db8d9e91885b88d9cae9db", null ],
     [ "WAVEFORM_1_AXIL_C", "classAmcCarrierBsa_1_1mapping.html#abdec785a911ed613f9e89257a7dd2c8c", null ],
-    [ "BLD_AXIL_C", "classAmcCarrierBsa_1_1mapping.html#ab8e5969562c3caf17842039b2691d808", null ],
+    [ "BSSS_AXIL_C", "classAmcCarrierBsa_1_1mapping.html#a021404a00acdb452c4e0c7ea596e5aa0", null ],
+    [ "BLD_AXIL_C", "classAmcCarrierBsa_1_1mapping.html#aa261e6703ab92f39c2adf33677e190d7", null ],
     [ "AXIL_CROSSBAR_CONFIG_C", "classAmcCarrierBsa_1_1mapping.html#aa88b943a44b19df7821a37ed1c412492", null ],
     [ "locAxilWriteMasters", "classAmcCarrierBsa_1_1mapping.html#ab1f8aa2c4651a5fc56178692abfedd89", null ],
     [ "locAxilWriteSlaves", "classAmcCarrierBsa_1_1mapping.html#aa90488831bb257d70f1a4903a188f418", null ],
@@ -42,6 +43,7 @@ var classAmcCarrierBsa_1_1mapping =
     [ "u_axistreammux_waveformstatus", "classAmcCarrierBsa_1_1mapping.html#a9c4cd8a4454204296062423137caafcc", null ],
     [ "u_axistreammux_waveformdata", "classAmcCarrierBsa_1_1mapping.html#a7cb752673c18283a36c80757cb59d803", null ],
     [ "bsabuffercontrol_1", "classAmcCarrierBsa_1_1mapping.html#ac026df5d8ea7f50aee2262dcd790d41f", null ],
+    [ "bssswrapper", "classAmcCarrierBsa_1_1mapping.html#acf9cecac312677f967820fec81e84014", null ],
     [ "u_srpv3axi_1", "classAmcCarrierBsa_1_1mapping.html#a437c251d0305b8a9a833869301f7c9d1", null ],
     [ "u_bsaaxiinterconnectwrapper_1", "classAmcCarrierBsa_1_1mapping.html#af282a5aaa302a40f7bc6236d83691ee2", null ],
     [ "u_bld", "classAmcCarrierBsa_1_1mapping.html#a3da06afdce96bee12c88dd397fe7fc15", null ]

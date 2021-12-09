@@ -1,8 +1,12 @@
 <map id="AmcCarrierBsa" name="AmcCarrierBsa">
-<area shape="rect" id="node1" title=" " alt="" coords="307,155,425,181"/>
-<area shape="rect" id="node2" href="$classBsaWaveformEngine.html" title=" " alt="" coords="5,80,180,107"/>
-<area shape="rect" id="node3" href="$classBsaBufferControl.html" title=" " alt="" coords="204,80,336,107"/>
-<area shape="rect" id="node4" href="$classBsaAccumulator.html" title=" " alt="" coords="206,5,334,32"/>
-<area shape="rect" id="node5" href="$classBsaAxiInterconnectWrapper.html" title=" " alt="" coords="361,80,563,107"/>
-<area shape="rect" id="node6" href="$classBldAxiStream.html" title=" " alt="" coords="588,80,699,107"/>
+<area shape="rect" id="node1" title=" " alt="" coords="759,107,877,133"/>
+<area shape="rect" id="node2" href="$classBsaWaveformEngine.html" title=" " alt="" coords="522,5,697,32"/>
+<area shape="rect" id="node3" href="$classBsaBufferControl.html" title=" " alt="" coords="543,56,675,83"/>
+<area shape="rect" id="node4" href="$classBsaAccumulator.html" title=" " alt="" coords="332,56,460,83"/>
+<area shape="rect" id="node5" href="$classBsssWrapper.html" title=" " alt="" coords="556,107,663,133"/>
+<area shape="rect" id="node6" href="$classBldAxiStream.html" title=" " alt="" coords="341,132,451,159"/>
+<area shape="rect" id="node10" href="$classBldWrapper.html" title=" " alt="" coords="560,157,659,184"/>
+<area shape="rect" id="node7" href="$classBldEventSelect.html" title=" " alt="" coords="164,132,284,159"/>
+<area shape="rect" id="node8" href="$classBldEventRAM.html" title=" " alt="" coords="5,132,116,159"/>
+<area shape="rect" id="node9" href="$classBsaAxiInterconnectWrapper.html" title=" " alt="" coords="508,208,711,235"/>
 </map>

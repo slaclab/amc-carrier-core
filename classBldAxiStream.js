@@ -2,7 +2,9 @@ var classBldAxiStream =
 [
     [ "rtl", "classBldAxiStream_1_1rtl.html", "classBldAxiStream_1_1rtl" ],
     [ "TPD_G", "classBldAxiStream.html#a67a837684e4f18c2d236ac1d053b419b", null ],
-    [ "AXIL_ERROR_RESP_G", "classBldAxiStream.html#a183b9cc61a615f1f660c134b30caf3e4", null ],
+    [ "SVC_START_G", "classBldAxiStream.html#aae44d09aa2f96d3ad550d24c49395116", null ],
+    [ "NUM_EDEFS_G", "classBldAxiStream.html#a0e16f9d67022c2fbfa091b1a5f60a5f8", null ],
+    [ "BATCH_G", "classBldAxiStream.html#a41fba7c3fda5d653948e3eefc7ca810e", null ],
     [ "diagnosticClk", "classBldAxiStream.html#a73de3f9427dc2279ddf694c28d504b24", null ],
     [ "diagnosticRst", "classBldAxiStream.html#a6820800a3526eae92a27c2dd3acf399a", null ],
     [ "diagnosticBus", "classBldAxiStream.html#aea9d7cb7026696a5cd4279abe344f6fc", null ],
@@ -29,5 +31,6 @@ var classBldAxiStream =
     [ "lcls_timing_core", "classBldAxiStream.html#a013c20dbecc6073fc352d07e596c4bea", null ],
     [ "TimingPkg", "classBldAxiStream.html#aa5fefbb58d6204d5242dd2f4be3352e0", null ],
     [ "amc_carrier_core", "classBldAxiStream.html#a5173e10093c3bf1b5d95f5240e060d43", null ],
-    [ "AmcCarrierPkg", "classBldAxiStream.html#a8b57e2e356f8c95c835557378741f538", null ]
+    [ "AmcCarrierPkg", "classBldAxiStream.html#a8b57e2e356f8c95c835557378741f538", null ],
+    [ "BldPkg", "classBldAxiStream.html#a0d96bb7bf588c76ce0afb1fce0c2cea5", null ]
 ];
