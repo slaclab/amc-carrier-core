@@ -1,22 +1,22 @@
 -----------------------------------------------------------------------------
--- Title      : 
+-- Title      :
 -------------------------------------------------------------------------------
 -- File       : BldEventRAM.vhd
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2021-11-24
 -- Last update: 2021-11-24
--- Platform   : 
+-- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
--- Description: 
+-- Description:
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Timing Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Timing Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Timing Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 library ieee;
@@ -45,7 +45,7 @@ end entity BldEventRAM;
 architecture rtl of BldEventRAM is
 
   function INIT_VAL(iline : integer) return slv is
-    variable k : integer; 
+    variable k : integer;
     variable v : slv(255 downto 0) := (others=>'0');
   begin
     for i in 0 to 3 loop
@@ -58,7 +58,7 @@ architecture rtl of BldEventRAM is
   end function;
 
   signal doutb : slv(63 downto 0);
-  
+
 begin
 
   U_RAM : RAMB36E2
@@ -186,5 +186,5 @@ begin
       DOUTPBDOUTP               => open );
 
   dout <= doutb(47 downto 0);
-  
+
 end rtl;
