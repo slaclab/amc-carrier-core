@@ -100,8 +100,6 @@ architecture mapping of AmcCarrierBsa is
    -------------------------------------------------------------------------------------------------
    -- AXI Lite
    -------------------------------------------------------------------------------------------------
-   constant AXIL_MASTERS_C : integer := ite((DISABLE_BLD_G and DISABLE_BSA_G), 3,
-                                            ite((DISABLE_BLD_G or DISABLE_BSA_G), 4, 5));
 
    constant BSA_BUFFER_AXIL_C : integer := 0;
    constant WAVEFORM_0_AXIL_C : integer := 1;
@@ -109,13 +107,15 @@ architecture mapping of AmcCarrierBsa is
    constant BSSS_AXIL_C       : integer := 3;
    constant BLD_AXIL_C        : integer := 4;
 
+   constant AXIL_MASTERS_C : integer := 5;
+
    constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
       genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, 20, 16);
 
-   signal locAxilWriteMasters : AxiLiteWriteMasterArray(AXIL_MASTERS_C-1 downto 0);
-   signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(AXIL_MASTERS_C-1 downto 0);
-   signal locAxilReadMasters  : AxiLiteReadMasterArray(AXIL_MASTERS_C-1 downto 0);
-   signal locAxilReadSlaves   : AxiLiteReadSlaveArray(AXIL_MASTERS_C-1 downto 0);
+   signal locAxilWriteMasters : AxiLiteWriteMasterArray(AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_MASTER_INIT_C);
+   signal locAxilWriteSlaves  : AxiLiteWriteSlaveArray(AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_WRITE_SLAVE_EMPTY_OK_C);
+   signal locAxilReadMasters  : AxiLiteReadMasterArray(AXIL_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_MASTER_INIT_C);
+   signal locAxilReadSlaves   : AxiLiteReadSlaveArray(AXIL_MASTERS_C-1 downto 0)   := (others => AXI_LITE_READ_SLAVE_EMPTY_OK_C);
 
 
    -------------------------------------------------------------------------------------------------

@@ -77,7 +77,7 @@ architecture rtl of BldAxiStream is
       edefConfig  => (others=>EDEF_CONFIG_INIT_C) );
 
    constant BLD_CONFIG_BITS_C : integer := BSA_DIAGNOSTIC_OUTPUTS_C + 77 + NUM_EDEFS_G*EDEF_CONFIG_BITS_C;
-   
+
    function toSlv(r : BldConfigType) return slv is
       variable v : slv(BLD_CONFIG_BITS_C-1 downto 0) := (others=>'0');
       variable i,j : integer := 0;
@@ -169,7 +169,7 @@ architecture rtl of BldAxiStream is
       assignSlv(i, v, r.depth);
       return v;
    end function;
-   
+
    function toBldStatus(v : slv) return BldStatusType is
       variable c : BldStatusType;
       variable i : integer := 0;
@@ -184,7 +184,7 @@ architecture rtl of BldAxiStream is
       assignRecord(i, v, c.depth);
       return c;
    end function;
-   
+
    type AxilRegType is record
       config      : BldConfigType;
       axilWriteS  : AxiLiteWriteSlaveType;
@@ -195,7 +195,7 @@ architecture rtl of BldAxiStream is
       config      => BLD_CONFIG_INIT_C,
       axilWriteS  => AXI_LITE_WRITE_SLAVE_INIT_C,
       axilReadS   => AXI_LITE_READ_SLAVE_INIT_C );
-    
+
    signal c     : AxilRegType := AXIL_REG_INIT_C;
    signal cin   : AxilRegType;
 
@@ -243,7 +243,7 @@ architecture rtl of BldAxiStream is
       TID_BITS_C    => 0,
       TKEEP_MODE_C  => TKEEP_COMP_C,
       TUSER_BITS_C  => 4,
-      TUSER_MODE_C  => TUSER_FIRST_LAST_C);   
+      TUSER_MODE_C  => TUSER_FIRST_LAST_C);
 
    signal sAxisMasters : AxiStreamMasterArray(1 downto 0);
    signal sAxisSlaves  : AxiStreamSlaveArray(1 downto 0);
@@ -251,11 +251,11 @@ architecture rtl of BldAxiStream is
    signal eventStrobe  : sl;
    signal eventSel     : slv(NUM_EDEFS_G-1 downto 0);
    signal eventSel0Q   : sl;
-   
+
    signal diagnClkFreq    : slv(31 downto 0);
    signal diagnStrobeRate : slv(31 downto 0);
    signal eventSel0Rate   : slv(31 downto 0);
-  
+
 begin
 
    U_DIAGNCLKFREQ : entity surf.SyncClockFreq
@@ -266,7 +266,7 @@ begin
                 clkIn      => diagnosticClk,
                 locClk     => axilClk,
                 refClk     => axilClk );
-                   
+
    U_DIAGNSTRRATE : entity surf.SyncTrigRate
      generic map ( COMMON_CLK_G      => false,
                    REF_CLK_FREQ_G    => 156.25E+6 )
@@ -283,7 +283,7 @@ begin
                 trigRateOut=> eventSel0Rate,
                 locClk     => diagnosticClk,
                 refClk     => axilClk );
-                   
+
    axilReadSlave  <= cin.axilReadS;
    axilWriteSlave <= cin.axilWriteS;
 
@@ -305,14 +305,14 @@ begin
                 mAxisRst     => axilRst,
                 mAxisMaster  => sAxisMasters(1),
                 mAxisSlave   => sAxisSlaves (1) );
-   
+
    reg_comb: process(c, axilRst, ssync, axilReadMaster, axilWriteMaster,
                      diagnClkFreq, diagnStrobeRate, eventSel0Rate ) is
      variable v   : AxilRegType;
      variable ep  : AxiLiteEndPointType;
    begin
      v := c;
-     
+
      -----------------------------
      -- Register access
      -----------------------------
@@ -342,7 +342,7 @@ begin
        axiSlaveRegister (ep, toSlv(68+i*8, 12),  0, v.config.edefConfig(i).tsUpdate);
        axiSlaveRegister (ep, toSlv(68+i*8, 12), 31, v.config.edefConfig(i).enable);
      end loop;
-       
+
      axiSlaveDefault (ep, v.axilWriteS, v.axilReadS);
 
      if axilRst = '1' then
@@ -361,16 +361,16 @@ begin
 
    cv    <= toSlv      (c.config);
    csync <= toBldConfig(csyncv);
-   
+
    U_CSYNC : entity surf.SynchronizerVector
      generic map ( WIDTH_G => BLD_CONFIG_BITS_C )
      port map ( clk     => diagnosticClk,
                 dataIn  => cv,
                 dataOut => csyncv );
-   
+
    sv    <= toSlv      (r.status);
    ssync <= toBldStatus(ssyncv);
-   
+
    U_SSYNC : entity surf.SynchronizerVector
      generic map ( WIDTH_G => BLD_STATUS_BITS_C )
      port map ( clk     => axilClk,
@@ -386,7 +386,7 @@ begin
                 dataIn    => r.timingMessage,
                 strobeOut => eventStrobe,
                 selectOut => eventSel );
-   
+
    comb: process(r, csync,
                  diagnosticRst, diagnosticBus, eventSel, eventStrobe,
                  intSlave, intAxisCtrl ) is
@@ -407,13 +407,13 @@ begin
      if intAxisCtrl.pause = '1' then
        eventSelQ := (others=>'0');
      end if;
-     
+
      v := r;
 
      if diagnosticBus.strobe = '1' then
        v.timingMessage := diagnosticBus.timingMessage;
      end if;
-     
+
      v.strobe := r.strobe(r.strobe'left-1 downto 0) & diagnosticBus.strobe;
 
      --  Reset svcReady when appropriate ts bits change
@@ -425,7 +425,7 @@ begin
          end if;
        end loop;
      end if;
-     
+
      for i in 0 to BSA_DIAGNOSTIC_OUTPUTS_C-1 loop
        sevr(i) := csync.channelSevr(2*i+1 downto 2*i);
      end loop;
@@ -437,7 +437,7 @@ begin
      if v.master.tValid = '0' then
        ssiSetUserSof ( axiStreamConfig, v.master, '0' );
        ssiSetUserEofe( axiStreamConfig, v.master, '0' );
-     
+
        v.master.tValid := '1';
        v.master.tLast  := '0';
 
@@ -552,7 +552,7 @@ begin
        if ( csync.enable = '0' and v.status.state /= IDLE_S ) then
          v.status.state := INVALID_S;
        end if;
-       
+
 
      --  Output FIFO refused to acknowledge data
      elsif (v.status.state /= IDLE_S) then
@@ -581,5 +581,5 @@ begin
                 sAxisSlaves  => sAxisSlaves,
                 mAxisMaster  => obEthMsgMaster,
                 mAxisSlave   => obEthMsgSlave );
-   
+
 end rtl;

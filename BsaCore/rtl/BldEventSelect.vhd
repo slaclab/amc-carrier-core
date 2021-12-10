@@ -10,11 +10,11 @@
 -- Translation of BSA DEF to control bits in timing pattern
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Timing Core'.
--- It is subject to the license terms in the LICENSE.txt file found in the 
--- top-level directory of this distribution and at: 
---    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html. 
--- No part of 'LCLS2 Timing Core', including this file, 
--- may be copied, modified, propagated, or distributed except according to 
+-- It is subject to the license terms in the LICENSE.txt file found in the
+-- top-level directory of this distribution and at:
+--    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+-- No part of 'LCLS2 Timing Core', including this file,
+-- may be copied, modified, propagated, or distributed except according to
 -- the terms contained in the LICENSE.txt file.
 -------------------------------------------------------------------------------
 -- Modification history:
@@ -75,13 +75,13 @@ architecture BldEventSelect of BldEventSelect is
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
-   
+
 begin
 
   GEN_CONTROL : for i in 0 to 16 generate
     controlWord(16*i+15 downto 16*i) <= dataIn.control(i);
   end generate;
-  
+
   GEN_BLOCK : for i in 0 to 5 generate
     --
     --  Setup double wide single port ram to provide (1<<i) for i in 0 to 271,
@@ -157,7 +157,7 @@ begin
         RSTP                         => rst
         );
   end generate;
-    
+
   comb : process ( r, rst, strobeIn, dataIn, noMatch, config ) is
     variable       v : RegType;
     variable rateType : slv(1 downto 0);
@@ -173,13 +173,13 @@ begin
       end if;
     elsif r.idef = NUM_EDEFS_G-1 then
       v.idef := 0;
-    else  
+    else
       v.idef := r.idef + 1;
     end if;
 
     v.bdef := r.idef;
     v.cdef := r.bdef;
-    
+
     v.addr := config(r.idef).rateSel(8 downto 0);
     c      := config(r.cdef);
 
@@ -202,19 +202,19 @@ begin
       when "10" => destSel := '1';
       when "01" => if not (dataIn.beamRequest(0)='1' and c.destSel(conv_integer(dataIn.beamRequest(7 downto 4)))='1') then
                      destSel := '1';
-                   end if;    
+                   end if;
       when "00" => if (dataIn.beamRequest(0)='1' and c.destSel(conv_integer(dataIn.beamRequest(7 downto 4)))='1') then
                      destSel := '1';
-                   end if;    
+                   end if;
       when others => null;
     end case;
-               
+
     v.strobe := r.strobe(r.strobe'left-1 downto 0) & strobeIn;
 
     if r.strobe(r.strobe'left-1 downto 1) /= 0 then
       v.selectOut := (c.enable and rateSel and destSel) & r.selectOut(r.selectOut'left downto 1);
-    end if;  
-    
+    end if;
+
     if rst = '1' then
       v := REG_INIT_C;
     end if;
