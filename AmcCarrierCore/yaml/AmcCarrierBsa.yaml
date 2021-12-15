@@ -35,9 +35,9 @@ AmcCarrierBsa: &AmcCarrierBsa
       <<: *BldAxiStream
       at:
         offset: 0x00030000
-	numEdefs: 9
+        numEdefs: 9
     Bld:
       <<: *BldAxiStream
       at:
         offset: 0x00040000
-	numEdefs: 4
+        numEdefs: 4
