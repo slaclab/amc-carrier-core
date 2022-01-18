@@ -480,7 +480,7 @@ begin
                             v.master.tValid := '1';
                             v.master.tData(31 downto 0)  := diagnosticBus.data(r.channelId);
                             v.status.count               := r.status.count-1;
-                            if diagnosticBus.sevr(r.channelId) < sevr(r.channelId) then
+                            if diagnosticBus.sevr(r.channelId) <= sevr(r.channelId) then
                               v.channelValid  := '1' & r.channelValid(r.channelValid'left downto 1);
                             end if;
                           end if;
