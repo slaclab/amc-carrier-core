@@ -208,7 +208,7 @@ architecture rtl of BldAxiStream is
    type RegType is record
       -- data
      strobe        : slv       ( 1 downto 0);
-     timingMessage : TimingMessageType;
+     dbus          : DiagnosticBusType;
      svcMask       : slv       (31 downto 0);
      svcTs         : Slv2Array (NUM_EDEFS_G-1 downto 0);
      svcReady      : slv       (NUM_EDEFS_G-1 downto 0);   -- updated for r.strobe(1)
@@ -220,7 +220,7 @@ architecture rtl of BldAxiStream is
    end record;
    constant REG_INIT_C : RegType := (
       strobe        => (others=>'0'),
-      timingMessage => TIMING_MESSAGE_INIT_C,
+      dbus          => DIAGNOSTIC_BUS_INIT_C,
       svcMask       => (others=>'0'),
       svcTs         => (others=>"00"),
       svcReady      => (others=>'1'),
@@ -383,7 +383,7 @@ begin
                 rst       => diagnosticRst,
                 config    => csync.edefConfig,
                 strobeIn  => r.strobe(0),
-                dataIn    => r.timingMessage,
+                dataIn    => r.dbus.timingMessage,
                 strobeOut => eventStrobe,
                 selectOut => eventSel );
 
@@ -411,7 +411,7 @@ begin
      v := r;
 
      if diagnosticBus.strobe = '1' then
-       v.timingMessage := diagnosticBus.timingMessage;
+       v.dbus := diagnosticBus;
      end if;
 
      v.strobe := r.strobe(r.strobe'left-1 downto 0) & diagnosticBus.strobe;
@@ -420,7 +420,7 @@ begin
      if r.strobe(0) = '1' then
        for i in 0 to NUM_EDEFS_G-1 loop
          j := conv_integer(csync.edefConfig(i).tsUpdate);
-         if r.svcTs(i) /= r.timingMessage.timeStamp(j+1 downto j) then
+         if r.svcTs(i) /= r.dbus.timingMessage.timeStamp(j+1 downto j) then
            v.svcReady(i) := '1';
          end if;
        end loop;
@@ -444,18 +444,18 @@ begin
        case r.status.state is
          -- Full event header
          when TSL_S  => v.status.count              := csync.packetSize;
-                        v.master.tData(31 downto 0) := r.timingMessage.timeStamp(31 downto 0);
-                        v.status.timeStampL         := r.timingMessage.timeStamp(31 downto 0);
+                        v.master.tData(31 downto 0) := r.dbus.timingMessage.timeStamp(31 downto 0);
+                        v.status.timeStampL         := r.dbus.timingMessage.timeStamp(31 downto 0);
                         v.status.state              := TSU_S;
                         ssiSetUserSof( axiStreamConfig, v.master, '1' );
-         when TSU_S  => v.master.tData(31 downto 0) := r.timingMessage.timeStamp(63 downto 32);
+         when TSU_S  => v.master.tData(31 downto 0) := r.dbus.timingMessage.timeStamp(63 downto 32);
                         v.status.count              := r.status.count-1;
                         v.status.state              := PIDL_S;
-         when PIDL_S => v.master.tData(31 downto 0) := r.timingMessage.pulseId  (31 downto 0);
+         when PIDL_S => v.master.tData(31 downto 0) := r.dbus.timingMessage.pulseId  (31 downto 0);
                         v.status.count              := r.status.count-1;
-                        v.status.pulseIdL           := r.timingMessage.pulseId  (19 downto 0);
+                        v.status.pulseIdL           := r.dbus.timingMessage.pulseId  (19 downto 0);
                         v.status.state              := PIDU_S;
-         when PIDU_S => v.master.tData(31 downto 0) := r.timingMessage.pulseId   (63 downto 32);
+         when PIDU_S => v.master.tData(31 downto 0) := r.dbus.timingMessage.pulseId   (63 downto 32);
                         v.status.count              := r.status.count-1;
                         v.status.state              := CHM_S;
          when CHM_S  => v.master.tData(31 downto 0) := resize(r.channelMaskL,32);
@@ -478,9 +478,9 @@ begin
                           v.channelValid  := '0' & r.channelValid(r.channelValid'left downto 1);
                           if r.channelMaskL(r.channelId) = '1' then
                             v.master.tValid := '1';
-                            v.master.tData(31 downto 0)  := diagnosticBus.data(r.channelId);
+                            v.master.tData(31 downto 0)  := r.dbus.data(r.channelId);
                             v.status.count               := r.status.count-1;
-                            if diagnosticBus.sevr(r.channelId) <= sevr(r.channelId) then
+                            if r.dbus.sevr(r.channelId) <= sevr(r.channelId) then
                               v.channelValid  := '1' & r.channelValid(r.channelValid'left downto 1);
                             end if;
                           end if;
@@ -500,8 +500,8 @@ begin
                           -- Check the duration and size of this frame
                           --
                           v.status.count  := r.status.count-1;
-                          deltaPID := r.timingMessage.pulseId  (19 downto 0) - r.status.pulseIdL;
-                          deltaTS  := r.timingMessage.timeStamp(31 downto 0) - r.status.timeStampL;
+                          deltaPID := r.dbus.timingMessage.pulseId  (19 downto 0) - r.status.pulseIdL;
+                          deltaTS  := r.dbus.timingMessage.timeStamp(31 downto 0) - r.status.timeStampL;
                           if (deltaTS (31 downto 20)/=0 or
                               r.status.count(r.status.count'left)='1') then
                             --  Close the packet and start a new one
@@ -538,7 +538,7 @@ begin
                             for i in 0 to NUM_EDEFS_G-1 loop
                               if eventSelQ(i)='1' then
                                 j := conv_integer(csync.edefConfig(i).tsUpdate);
-                                v.svcTs(i) := diagnosticBus.timingMessage.timeStamp(j+1 downto j);
+                                v.svcTs(i) := r.dbus.timingMessage.timeStamp(j+1 downto j);
                               end if;
                             end loop;
                           end if;
