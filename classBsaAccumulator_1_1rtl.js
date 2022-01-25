@@ -44,6 +44,8 @@ var classBsaAccumulator_1_1rtl =
     [ "fifoEmpty", "classBsaAccumulator_1_1rtl.html#a5fbbb7d567943eac69933660f8cb4d2f", null ],
     [ "fifoProgEmpty", "classBsaAccumulator_1_1rtl.html#ae5e9df9970eb416b8f34dd1628a5c74e", null ],
     [ "fifoRdCount", "classBsaAccumulator_1_1rtl.html#a33d5b7c116e07404c0e75a0a37b1e0d0", null ],
+    [ "keep_hierarchy", "classBsaAccumulator_1_1rtl.html#ae6117ca4ff29000912fbd3c9586ac49d", null ],
+    [ "keep_hierarchy", "classBsaAccumulator_1_1rtl.html#a7c388df67d1f0c21565331c1d1cf885b", null ],
     [ "fifo36e2_inst", "classBsaAccumulator_1_1rtl.html#a5ebd74631f54340e6e955641c1246dc1", null ],
     [ "u_sum", "classBsaAccumulator_1_1rtl.html#a477a1d74d79f498f1711f61f62010c22", null ],
     [ "u_var", "classBsaAccumulator_1_1rtl.html#ab2804adb04ea41606340872cd54a096e", null ],
