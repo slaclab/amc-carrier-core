@@ -146,7 +146,7 @@ architecture rtl of BsaAccumulator is
    --  Vivado "optimizes" the DSP48E2 and breaks the rules (REQP-1667)
    attribute keep_hierarchy : string;
    attribute keep_hierarchy of U_SUM : label is "yes";
-   
+
 begin
 
    -- Maybe pass bsaDone on tUser so that we can track when it gets to ram.
