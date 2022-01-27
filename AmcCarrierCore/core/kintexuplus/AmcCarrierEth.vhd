@@ -17,7 +17,6 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
 
-
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
@@ -34,62 +33,62 @@ entity AmcCarrierEth is
       TPD_G                 : time     := 1 ns;
       RSSI_ILEAVE_EN_G      : boolean  := false;
       RTM_ETH_G             : boolean  := false;
-      DEBUG_PATH_SELECT_G   : boolean  := false;    -- false = UDP[port=8193], true = UDP[port=8194]
-      ETH_USR_FRAME_LIMIT_G : positive := 4096);    -- 4kB
+      DEBUG_PATH_SELECT_G   : boolean  := false;  -- false = UDP[port=8193], true = UDP[port=8194]
+      ETH_USR_FRAME_LIMIT_G : positive := 4096);  -- 4kB
    port (
       -- Local Configuration and status
-      localMac             : in  slv(47 downto 0);  --  big-Endian configuration
-      localIp              : in  slv(31 downto 0);  --  big-Endian configuration
-      ethPhyReady          : out sl;
+      localMac              : in  slv(47 downto 0);  --  big-Endian configuration
+      localIp               : in  slv(31 downto 0);  --  big-Endian configuration
+      ethPhyReady           : out sl;
       -- Master AXI-Lite Interface
-      mAxilReadMasters     : out AxiLiteReadMasterArray(1 downto 0);
-      mAxilReadSlaves      : in  AxiLiteReadSlaveArray(1 downto 0);
-      mAxilWriteMasters    : out AxiLiteWriteMasterArray(1 downto 0);
-      mAxilWriteSlaves     : in  AxiLiteWriteSlaveArray(1 downto 0);
+      mAxilReadMasters      : out AxiLiteReadMasterArray(1 downto 0);
+      mAxilReadSlaves       : in  AxiLiteReadSlaveArray(1 downto 0);
+      mAxilWriteMasters     : out AxiLiteWriteMasterArray(1 downto 0);
+      mAxilWriteSlaves      : in  AxiLiteWriteSlaveArray(1 downto 0);
       -- AXI-Lite Interface
-      axilClk              : in  sl;
-      axilRst              : in  sl;
-      axilReadMaster       : in  AxiLiteReadMasterType;
-      axilReadSlave        : out AxiLiteReadSlaveType;
-      axilWriteMaster      : in  AxiLiteWriteMasterType;
-      axilWriteSlave       : out AxiLiteWriteSlaveType;
+      axilClk               : in  sl;
+      axilRst               : in  sl;
+      axilReadMaster        : in  AxiLiteReadMasterType;
+      axilReadSlave         : out AxiLiteReadSlaveType;
+      axilWriteMaster       : in  AxiLiteWriteMasterType;
+      axilWriteSlave        : out AxiLiteWriteSlaveType;
       -- BSA Ethernet Interface
-      obBsaMasters         : in  AxiStreamMasterArray(3 downto 0);
-      obBsaSlaves          : out AxiStreamSlaveArray(3 downto 0);
-      ibBsaMasters         : out AxiStreamMasterArray(3 downto 0);
-      ibBsaSlaves          : in  AxiStreamSlaveArray(3 downto 0);
+      obBsaMasters          : in  AxiStreamMasterArray(3 downto 0);
+      obBsaSlaves           : out AxiStreamSlaveArray(3 downto 0);
+      ibBsaMasters          : out AxiStreamMasterArray(3 downto 0);
+      ibBsaSlaves           : in  AxiStreamSlaveArray(3 downto 0);
       -- Timing ETH MSG Interface
-      obTimingEthMsgMaster : in  AxiStreamMasterType;
-      obTimingEthMsgSlave  : out AxiStreamSlaveType;
-      ibTimingEthMsgMaster : out AxiStreamMasterType;
-      ibTimingEthMsgSlave  : in  AxiStreamSlaveType;
+      obTimingEthMsgMasters : in  AxiStreamMasterArray(1 downto 0);
+      obTimingEthMsgSlaves  : out AxiStreamSlaveArray(1 downto 0);
+      ibTimingEthMsgMasters : out AxiStreamMasterArray(1 downto 0);
+      ibTimingEthMsgSlaves  : in  AxiStreamSlaveArray(1 downto 0);
       ----------------------
       -- Top Level Interface
       ----------------------
       -- Application Debug Interface
-      obAppDebugMaster     : in  AxiStreamMasterType;
-      obAppDebugSlave      : out AxiStreamSlaveType;
-      ibAppDebugMaster     : out AxiStreamMasterType;
-      ibAppDebugSlave      : in  AxiStreamSlaveType;
+      obAppDebugMaster      : in  AxiStreamMasterType;
+      obAppDebugSlave       : out AxiStreamSlaveType;
+      ibAppDebugMaster      : out AxiStreamMasterType;
+      ibAppDebugSlave       : in  AxiStreamSlaveType;
       -- Backplane Messaging Interface
-      obBpMsgClientMaster  : in  AxiStreamMasterType;
-      obBpMsgClientSlave   : out AxiStreamSlaveType;
-      ibBpMsgClientMaster  : out AxiStreamMasterType;
-      ibBpMsgClientSlave   : in  AxiStreamSlaveType;
-      obBpMsgServerMaster  : in  AxiStreamMasterType;
-      obBpMsgServerSlave   : out AxiStreamSlaveType;
-      ibBpMsgServerMaster  : out AxiStreamMasterType;
-      ibBpMsgServerSlave   : in  AxiStreamSlaveType;
+      obBpMsgClientMaster   : in  AxiStreamMasterType;
+      obBpMsgClientSlave    : out AxiStreamSlaveType;
+      ibBpMsgClientMaster   : out AxiStreamMasterType;
+      ibBpMsgClientSlave    : in  AxiStreamSlaveType;
+      obBpMsgServerMaster   : in  AxiStreamMasterType;
+      obBpMsgServerSlave    : out AxiStreamSlaveType;
+      ibBpMsgServerMaster   : out AxiStreamMasterType;
+      ibBpMsgServerSlave    : in  AxiStreamSlaveType;
       ----------------
       -- Core Ports --
       ----------------
       -- ETH Ports
-      ethRxP               : in  slv(3 downto 0);
-      ethRxN               : in  slv(3 downto 0);
-      ethTxP               : out slv(3 downto 0);
-      ethTxN               : out slv(3 downto 0);
-      ethClkP              : in  sl;
-      ethClkN              : in  sl);
+      ethRxP                : in  slv(3 downto 0);
+      ethRxN                : in  slv(3 downto 0);
+      ethTxP                : out slv(3 downto 0);
+      ethTxN                : out slv(3 downto 0);
+      ethClkP               : in  sl;
+      ethClkN               : in  sl);
 end AmcCarrierEth;
 
 architecture mapping of AmcCarrierEth is
@@ -127,7 +126,7 @@ architecture mapping of AmcCarrierEth is
       UDP_SRV_RSSI1_IDX_C       => 8194,  -- Legacy Non-interleaved RSSI for bulk data transfer
       UDP_SRV_BP_MGS_IDX_C      => 8195,  -- Backplane Messaging
       UDP_SRV_TIMING_IDX_C      => 8197,  -- Timing ASYNC Messaging
-      UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- Interleaved RSSI
+      UDP_SRV_RSSI_ILEAVE_IDX_C => 8198);  -- ite(RSSI_ILEAVE_EN_G, Interleaved RSSI, BLD/BSSS)
 
    ------------------------------------------
    --     UDP Client Configurations        --
@@ -422,8 +421,13 @@ begin
       axilReadSlaves(AXI_RSSI_ILEAVE_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
       axilWriteSlaves(AXI_RSSI_ILEAVE_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
 
-      obServerSlaves(UDP_SRV_RSSI_ILEAVE_IDX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
-      ibServerMasters(UDP_SRV_RSSI_ILEAVE_IDX_C) <= AXI_STREAM_MASTER_INIT_C;
+      ----------------------
+      -- BLD/BSSS MSG Server
+      ----------------------
+      ibServerMasters(UDP_SRV_RSSI_ILEAVE_IDX_C) <= obTimingEthMsgMasters(1);
+      obTimingEthMsgSlaves(1)                    <= ibServerSlaves(UDP_SRV_RSSI_ILEAVE_IDX_C);
+      ibTimingEthMsgMasters(1)                   <= obServerMasters(UDP_SRV_RSSI_ILEAVE_IDX_C);
+      obServerSlaves(UDP_SRV_RSSI_ILEAVE_IDX_C)  <= ibTimingEthMsgSlaves(1);
 
    end generate;
 
@@ -471,6 +475,9 @@ begin
 
       obServerSlaves(UDP_SRV_RSSI1_IDX_C)  <= AXI_STREAM_SLAVE_FORCE_C;
       ibServerMasters(UDP_SRV_RSSI1_IDX_C) <= AXI_STREAM_MASTER_INIT_C;
+
+      obTimingEthMsgSlaves(1)  <= AXI_STREAM_SLAVE_FORCE_C;
+      ibTimingEthMsgMasters(1) <= AXI_STREAM_MASTER_INIT_C;
 
    end generate;
 
@@ -523,10 +530,10 @@ begin
    --------------------
    -- Timing MSG Server
    --------------------
-   ibServerMasters(UDP_SRV_TIMING_IDX_C) <= obTimingEthMsgMaster;
-   obTimingEthMsgSlave                   <= ibServerSlaves(UDP_SRV_TIMING_IDX_C);
-   ibTimingEthMsgMaster                  <= obServerMasters(UDP_SRV_TIMING_IDX_C);
-   obServerSlaves(UDP_SRV_TIMING_IDX_C)  <= ibTimingEthMsgSlave;
+   ibServerMasters(UDP_SRV_TIMING_IDX_C) <= obTimingEthMsgMasters(0);
+   obTimingEthMsgSlaves(0)               <= ibServerSlaves(UDP_SRV_TIMING_IDX_C);
+   ibTimingEthMsgMasters(0)              <= obServerMasters(UDP_SRV_TIMING_IDX_C);
+   obServerSlaves(UDP_SRV_TIMING_IDX_C)  <= ibTimingEthMsgSlaves(0);
 
    ----------------------
    -- BP Messenger Client
