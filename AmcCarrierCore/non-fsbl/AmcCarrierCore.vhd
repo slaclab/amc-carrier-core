@@ -192,15 +192,15 @@ architecture mapping of AmcCarrierCore is
    signal axiReadMaster  : AxiReadMasterType;
    signal axiReadSlave   : AxiReadSlaveType;
 
-   signal obBsaMasters : AxiStreamMasterArray(3 downto 0);
-   signal obBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
-   signal ibBsaMasters : AxiStreamMasterArray(3 downto 0);
-   signal ibBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
+   signal obBsaMasters : AxiStreamMasterArray(3 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal obBsaSlaves  : AxiStreamSlaveArray(3 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal ibBsaMasters : AxiStreamMasterArray(3 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal ibBsaSlaves  : AxiStreamSlaveArray(3 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
-   signal obTimingEthMsgMasters : AxiStreamMasterArray(1 downto 0);
-   signal obTimingEthMsgSlaves  : AxiStreamSlaveArray(1 downto 0);
-   signal ibTimingEthMsgMasters : AxiStreamMasterArray(1 downto 0);
-   signal ibTimingEthMsgSlaves  : AxiStreamSlaveArray(1 downto 0);
+   signal obTimingEthMsgMasters : AxiStreamMasterArray(1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal obTimingEthMsgSlaves  : AxiStreamSlaveArray(1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
+   signal ibTimingEthMsgMasters : AxiStreamMasterArray(1 downto 0) := (others => AXI_STREAM_MASTER_INIT_C);
+   signal ibTimingEthMsgSlaves  : AxiStreamSlaveArray(1 downto 0)  := (others => AXI_STREAM_SLAVE_FORCE_C);
 
    signal gtClk   : sl;
    signal fabClk  : sl;
@@ -472,8 +472,10 @@ begin
          -- Timing ETH MSG Interface (axilClk domain)
          obEthMsgMaster       => obTimingEthMsgMasters(1),
          obEthMsgSlave        => obTimingEthMsgSlaves(1),
-         ibEthMsgMaster       => ibTimingEthMsgMasters(1),
-         ibEthMsgSlave        => ibTimingEthMsgSlaves(1));
+--       ibEthMsgMaster       => ibTimingEthMsgMasters(1),
+--       ibEthMsgSlave        => ibTimingEthMsgSlaves(1));
+         ibEthMsgMaster       => AXI_STREAM_MASTER_INIT_C,
+         ibEthMsgSlave        => open);
 
    ------------------
    -- DDR Memory Core
