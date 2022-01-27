@@ -1,7 +1,5 @@
 var NAVTREEINDEX28 =
 {
-"classRingBufferCtrl.html":[0,0,109],
-"classRingBufferCtrl.html#a0a6af6eef40212dbaf130d57ce711256":[0,0,109,11],
 "classRingBufferCtrl.html#a0f5ecc6613f63d07f7963a97b1b26095":[0,0,109,14],
 "classRingBufferCtrl.html#a27cb135d43c8df63490a192b7328d788":[0,0,109,8],
 "classRingBufferCtrl.html#a2d11f89123e5d2dc4d7607fdc1b66a7d":[0,0,109,10],
@@ -249,5 +247,7 @@ var NAVTREEINDEX28 =
 "classRtmCryoDet_1_1mapping.html#a3494eb29bd06969aa4fb87d96cbf18e1":[0,0,112,0,53],
 "classRtmCryoDet_1_1mapping.html#a357d1c1ab610cebc52459088ef7dd1f8":[0,0,112,0,31],
 "classRtmCryoDet_1_1mapping.html#a35f0a6888bd1c2e56754f97c77a534b9":[0,0,112,0,17],
-"classRtmCryoDet_1_1mapping.html#a36b5afdb3bdfbf2ec29857afd6f6f34e":[0,0,112,0,23]
+"classRtmCryoDet_1_1mapping.html#a36b5afdb3bdfbf2ec29857afd6f6f34e":[0,0,112,0,23],
+"classRtmCryoDet_1_1mapping.html#a3cb1fca8da950d48126041dfa2e7b944":[0,0,112,0,26],
+"classRtmCryoDet_1_1mapping.html#a433c4cf785635b92c11336a4f2e7f17a":[0,0,112,0,46]
 };

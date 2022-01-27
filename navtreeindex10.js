@@ -1,7 +1,5 @@
 var NAVTREEINDEX10 =
 {
-"classAmcGenericAdcDacCtrl.html#ace4c6e685a39a4850aa4ff10e8c85cfe":[0,0,31,35],
-"classAmcGenericAdcDacCtrl.html#ad5d8c3361421d6aa07a9e449e3604275":[0,0,31,6],
 "classAmcGenericAdcDacCtrl.html#ad66d29655a225854c0e47c17938308b4":[0,0,31,5],
 "classAmcGenericAdcDacCtrl.html#aea100bb202c4ba82833b4485fbef2ebb":[0,0,31,4],
 "classAmcGenericAdcDacCtrl.html#aecb4d517e10422525b3156a238f1408b":[0,0,31,11],
@@ -249,5 +247,7 @@ var NAVTREEINDEX10 =
 "classAmcMicrowaveMuxCoreCtrl.html#a01c9c97f02ab1d27acd97d975677c5c4":[0,0,37,12],
 "classAmcMicrowaveMuxCoreCtrl.html#a0a6af6eef40212dbaf130d57ce711256":[0,0,37,17],
 "classAmcMicrowaveMuxCoreCtrl.html#a0db206ebb3e246e377fe6b7c501ac8e9":[0,0,37,15],
-"classAmcMicrowaveMuxCoreCtrl.html#a0f5ecc6613f63d07f7963a97b1b26095":[0,0,37,20]
+"classAmcMicrowaveMuxCoreCtrl.html#a0f5ecc6613f63d07f7963a97b1b26095":[0,0,37,20],
+"classAmcMicrowaveMuxCoreCtrl.html#a22f8db74a5a4c77e7e2767279ca36e7f":[0,0,37,6],
+"classAmcMicrowaveMuxCoreCtrl.html#a36cdf604eb18ec12fb7ccdb006e36974":[0,0,37,9]
 };
