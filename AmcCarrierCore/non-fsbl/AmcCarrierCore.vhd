@@ -15,7 +15,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-
 library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiStreamPkg.all;
@@ -198,12 +197,10 @@ architecture mapping of AmcCarrierCore is
    signal ibBsaMasters : AxiStreamMasterArray(3 downto 0);
    signal ibBsaSlaves  : AxiStreamSlaveArray(3 downto 0);
 
-   signal obTimingEthMsgMaster  : AxiStreamMasterType;
-   signal obTimingEthMsgSlave   : AxiStreamSlaveType;
-   signal ibTimingEthMsgMaster  : AxiStreamMasterType;
-   signal ibTimingEthMsgSlave   : AxiStreamSlaveType;
-   signal intTimingEthMsgMaster : AxiStreamMasterType;
-   signal intTimingEthMsgSlave  : AxiStreamSlaveType;
+   signal obTimingEthMsgMasters : AxiStreamMasterArray(1 downto 0);
+   signal obTimingEthMsgSlaves  : AxiStreamSlaveArray(1 downto 0);
+   signal ibTimingEthMsgMasters : AxiStreamMasterArray(1 downto 0);
+   signal ibTimingEthMsgSlaves  : AxiStreamSlaveArray(1 downto 0);
 
    signal gtClk   : sl;
    signal fabClk  : sl;
@@ -216,6 +213,9 @@ architecture mapping of AmcCarrierCore is
    signal auxPwrL : sl;
 
 begin
+
+   assert (RSSI_ILEAVE_EN_G = false) or (RSSI_ILEAVE_EN_G and (DISABLE_BSA_G = false) and (DISABLE_BLD_G = false))
+      report "RSSI Interleave + BSA or BLD is NOT supported" severity failure;
 
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
    -- Note: Install R1063 if you want the FPGA to control AUX power
@@ -312,58 +312,58 @@ begin
          ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G)
       port map (
          -- Local Configuration
-         localMac             => localMac,
-         localIp              => localIp,
-         ethPhyReady          => ethLinkUp,
+         localMac              => localMac,
+         localIp               => localIp,
+         ethPhyReady           => ethLinkUp,
          -- Master AXI-Lite Interface
-         mAxilReadMasters     => axilReadMasters,
-         mAxilReadSlaves      => axilReadSlaves,
-         mAxilWriteMasters    => axilWriteMasters,
-         mAxilWriteSlaves     => axilWriteSlaves,
+         mAxilReadMasters      => axilReadMasters,
+         mAxilReadSlaves       => axilReadSlaves,
+         mAxilWriteMasters     => axilWriteMasters,
+         mAxilWriteSlaves      => axilWriteSlaves,
          -- AXI-Lite Interface
-         axilClk              => axilClk,
-         axilRst              => axilRst,
-         axilReadMaster       => ethReadMaster,
-         axilReadSlave        => ethReadSlave,
-         axilWriteMaster      => ethWriteMaster,
-         axilWriteSlave       => ethWriteSlave,
+         axilClk               => axilClk,
+         axilRst               => axilRst,
+         axilReadMaster        => ethReadMaster,
+         axilReadSlave         => ethReadSlave,
+         axilWriteMaster       => ethWriteMaster,
+         axilWriteSlave        => ethWriteSlave,
          -- BSA Ethernet Interface
-         obBsaMasters         => obBsaMasters,
-         obBsaSlaves          => obBsaSlaves,
-         ibBsaMasters         => ibBsaMasters,
-         ibBsaSlaves          => ibBsaSlaves,
+         obBsaMasters          => obBsaMasters,
+         obBsaSlaves           => obBsaSlaves,
+         ibBsaMasters          => ibBsaMasters,
+         ibBsaSlaves           => ibBsaSlaves,
          -- Timing ETH MSG Interface
-         obTimingEthMsgMaster => obTimingEthMsgMaster,
-         obTimingEthMsgSlave  => obTimingEthMsgSlave,
-         ibTimingEthMsgMaster => ibTimingEthMsgMaster,
-         ibTimingEthMsgSlave  => ibTimingEthMsgSlave,
+         obTimingEthMsgMasters => obTimingEthMsgMasters,
+         obTimingEthMsgSlaves  => obTimingEthMsgSlaves,
+         ibTimingEthMsgMasters => ibTimingEthMsgMasters,
+         ibTimingEthMsgSlaves  => ibTimingEthMsgSlaves,
          ----------------------
          -- Top Level Interface
          ----------------------
          -- Application Debug Interface
-         obAppDebugMaster     => obAppDebugMaster,
-         obAppDebugSlave      => obAppDebugSlave,
-         ibAppDebugMaster     => ibAppDebugMaster,
-         ibAppDebugSlave      => ibAppDebugSlave,
+         obAppDebugMaster      => obAppDebugMaster,
+         obAppDebugSlave       => obAppDebugSlave,
+         ibAppDebugMaster      => ibAppDebugMaster,
+         ibAppDebugSlave       => ibAppDebugSlave,
          -- Backplane Messaging Interface
-         obBpMsgClientMaster  => obBpMsgClientMaster,
-         obBpMsgClientSlave   => obBpMsgClientSlave,
-         ibBpMsgClientMaster  => ibBpMsgClientMaster,
-         ibBpMsgClientSlave   => ibBpMsgClientSlave,
-         obBpMsgServerMaster  => obBpMsgServerMaster,
-         obBpMsgServerSlave   => obBpMsgServerSlave,
-         ibBpMsgServerMaster  => ibBpMsgServerMaster,
-         ibBpMsgServerSlave   => ibBpMsgServerSlave,
+         obBpMsgClientMaster   => obBpMsgClientMaster,
+         obBpMsgClientSlave    => obBpMsgClientSlave,
+         ibBpMsgClientMaster   => ibBpMsgClientMaster,
+         ibBpMsgClientSlave    => ibBpMsgClientSlave,
+         obBpMsgServerMaster   => obBpMsgServerMaster,
+         obBpMsgServerSlave    => obBpMsgServerSlave,
+         ibBpMsgServerMaster   => ibBpMsgServerMaster,
+         ibBpMsgServerSlave    => ibBpMsgServerSlave,
          ----------------
          -- Core Ports --
          ----------------
          -- ETH Ports
-         ethRxP               => ethRxP,
-         ethRxN               => ethRxN,
-         ethTxP               => ethTxP,
-         ethTxN               => ethTxN,
-         ethClkP              => ethClkP,
-         ethClkN              => ethClkN);
+         ethRxP                => ethRxP,
+         ethRxN                => ethRxN,
+         ethTxP                => ethTxP,
+         ethTxN                => ethTxN,
+         ethClkP               => ethClkP,
+         ethClkN               => ethClkN);
 
    --------------
    -- Timing Core
@@ -392,10 +392,10 @@ begin
          axilWriteMaster      => timingWriteMaster,
          axilWriteSlave       => timingWriteSlave,
          -- Timing ETH MSG Interface (axilClk domain)
-         obTimingEthMsgMaster => intTimingEthMsgMaster,
-         obTimingEthMsgSlave  => intTimingEthMsgSlave,
-         ibTimingEthMsgMaster => ibTimingEthMsgMaster,
-         ibTimingEthMsgSlave  => ibTimingEthMsgSlave,
+         obTimingEthMsgMaster => obTimingEthMsgMasters(0),
+         obTimingEthMsgSlave  => obTimingEthMsgSlaves(0),
+         ibTimingEthMsgMaster => ibTimingEthMsgMasters(0),
+         ibTimingEthMsgSlave  => ibTimingEthMsgSlaves(0),
          ----------------------
          -- Top Level Interface
          ----------------------
@@ -470,10 +470,10 @@ begin
          obAppWaveformMasters => obAppWaveformMasters,
          obAppWaveformSlaves  => obAppWaveformSlaves,
          -- Timing ETH MSG Interface (axilClk domain)
-         ibEthMsgMaster       => intTimingEthMsgMaster,
-         ibEthMsgSlave        => intTimingEthMsgSlave,
-         obEthMsgMaster       => obTimingEthMsgMaster,
-         obEthMsgSlave        => obTimingEthMsgSlave);
+         ibEthMsgMaster       => obTimingEthMsgMasters(1),
+         ibEthMsgSlave        => obTimingEthMsgSlaves(1),
+         obEthMsgMaster       => ibTimingEthMsgMasters(1),
+         obEthMsgSlave        => ibTimingEthMsgSlaves(1));
 
    ------------------
    -- DDR Memory Core
