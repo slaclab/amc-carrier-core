@@ -470,10 +470,10 @@ begin
          obAppWaveformMasters => obAppWaveformMasters,
          obAppWaveformSlaves  => obAppWaveformSlaves,
          -- Timing ETH MSG Interface (axilClk domain)
-         ibEthMsgMaster       => obTimingEthMsgMasters(1),
-         ibEthMsgSlave        => obTimingEthMsgSlaves(1),
-         obEthMsgMaster       => ibTimingEthMsgMasters(1),
-         obEthMsgSlave        => ibTimingEthMsgSlaves(1));
+         obEthMsgMaster       => obTimingEthMsgMasters(1),
+         obEthMsgSlave        => obTimingEthMsgSlaves(1),
+         ibEthMsgMaster       => ibTimingEthMsgMasters(1),
+         ibEthMsgSlave        => ibTimingEthMsgSlaves(1));
 
    ------------------
    -- DDR Memory Core
