@@ -224,7 +224,7 @@ begin
        port map (
          clk            => diagnosticClk,
          rst            => diagnosticRst,
-         accumulateEn   => r.accumulateEn,
+         valid          => r.accumulateEn,
          acquire        => r.acquire,
          sample         => r.sample,
          flush          => r.flush,

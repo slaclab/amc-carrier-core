@@ -366,6 +366,8 @@ begin
                obEthMsgMaster  => intEthMsgMaster(0),
                obEthMsgSlave   => intEthMsgSlave (0));
          BsasWrapper : entity amc_carrier_core.BsasWrapper
+            generic map  (
+               BASE_ADDR_G => AXIL_CROSSBAR_CONFIG_C(BSAS_AXIL_C).baseAddr)
             port map (
                diagnosticClk   => diagnosticClk,
                diagnosticRst   => diagnosticRst,

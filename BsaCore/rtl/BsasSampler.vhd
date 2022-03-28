@@ -102,7 +102,6 @@ begin
                    acquire, flush, sample, valid) is
      variable v : RegType;
      variable uval : slv(31 downto 0);
-     variable sdat : slv(31 downto 0);
    begin
       v := r;
 
@@ -122,12 +121,7 @@ begin
           end if;
         when DATA_S =>
           if acquire = '1' and sample = '1' and diagnosticSevr = '0' then
-            if diagnosticFixd = '1' then
-              v.data   (0) := diagnosticData;
-            else
-              v.data   (0) := resize(diagnosticData(16 downto 0),32,
-                                     diagnosticData(16));
-            end if;
+            v.data   (0) := diagnosticData;
             v.nacc   (0) := '1';
 
             -- signed or unsigned?
