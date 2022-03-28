@@ -486,7 +486,7 @@ begin
        v.diagnosticFixd(NCHAN_C-1 downto 0) := diagnosticBus.fixed(NCHAN_C-1 downto 0);
 
        for i in 0 to NCHAN_C-1 loop
-         if diagnosticBus.sevr(i) <= config.channelSevr(i*2+1 downto i*2) then
+         if diagnosticBus.sevr(i) <= csync.channelSevr(i*2+1 downto i*2) then
            v.diagnosticSevr(i) := '0';
          else
            v.diagnosticSevr(i) := '1';
