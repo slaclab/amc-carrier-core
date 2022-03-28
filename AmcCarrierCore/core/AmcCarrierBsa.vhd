@@ -106,8 +106,9 @@ architecture mapping of AmcCarrierBsa is
    constant WAVEFORM_1_AXIL_C : integer := 2;
    constant BSSS_AXIL_C       : integer := 3;
    constant BLD_AXIL_C        : integer := 4;
+   constant BSAS_AXIL_C       : integer := 5;
 
-   constant AXIL_MASTERS_C : integer := 5;
+   constant AXIL_MASTERS_C : integer := 6;
 
    constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
       genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, 20, 16);
