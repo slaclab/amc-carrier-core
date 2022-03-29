@@ -46,9 +46,9 @@ use UNISIM.vcomponents.all;
 entity BsasSampler is
 
    generic (
-      TPD_G               : time                      := 1 ns;
-      NUM_ACCUMULATIONS_G : integer range 1 to 32     := 32;
-      AXIS_CONFIG_G       : AxiStreamConfigType       := ssiAxiStreamConfig(4));
+      TPD_G          : time                      := 1 ns;
+      NUM_CHANNELS_G : integer range 1 to 32     := 31;
+      AXIS_CONFIG_G  : AxiStreamConfigType       := ssiAxiStreamConfig(4));
 
    port (
       clk            : in  sl;
@@ -74,10 +74,10 @@ architecture rtl of BsasSampler is
 
    type RegType is record
       state         : StateType;
-      nacc          : slv       (NUM_ACCUMULATIONS_G-1 downto 0);
-      data          : Slv32Array(NUM_ACCUMULATIONS_G-1 downto 0);
-      min           : Slv32Array(NUM_ACCUMULATIONS_G-1 downto 0);
-      max           : Slv32Array(NUM_ACCUMULATIONS_G-1 downto 0);
+      nacc          : slv       (NUM_CHANNELS_G-1 downto 0);
+      data          : Slv32Array(NUM_CHANNELS_G-1 downto 0);
+      min           : Slv32Array(NUM_CHANNELS_G-1 downto 0);
+      max           : Slv32Array(NUM_CHANNELS_G-1 downto 0);
       axisMaster    : AxiStreamMasterType;
       ready         : sl;
    end record RegType;

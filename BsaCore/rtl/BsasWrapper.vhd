@@ -35,7 +35,8 @@ entity BsasWrapper is
    generic (
       TPD_G       : time    := 1 ns;
       SVC_G       : integer := 31;   -- Index of EDEF
-      BASE_ADDR_G : slv(31 downto 0) := x"00000000" );
+      BASE_ADDR_G : slv(31 downto 0) := x"00000000";
+      GEN_ACC_G   : boolean := false );
    port (
       -- Diagnostic data interface
       diagnosticClk   : in  sl;
@@ -58,7 +59,7 @@ end entity BsasWrapper;
 
 architecture rtl of BsasWrapper is
 
-   constant GEN_ACC_C : boolean := false;
+   constant GEN_ACC_C : boolean := GEN_ACC_G;
   
    constant INT_STREAM_CONFIG_C : AxiStreamConfigType := (
      TSTRB_EN_C    => false,
@@ -74,7 +75,6 @@ architecture rtl of BsasWrapper is
    signal cv, csyncv : slv(BSAS_CONFIG_BITS_C-1 downto 0);
 
    constant NCHAN_C : integer := BSA_DIAGNOSTIC_OUTPUTS_C;
---   constant NCHAN_C : integer := 5;
 
    type StateType is (IDLE_S, HEADER_S, DATA_S, FORWARD_S, SINK_S);
    
@@ -183,7 +183,7 @@ begin
        writeRegister  => axilWriteRegs);
 
    config.enable      <= axilWriteRegs(0)(0);
-   config.channelMask <= resize(axilWriteRegs(1),31);
+   config.channelMask <= resize(axilWriteRegs(1),NCHAN_C);
    config.channelSevr <= axilWriteRegs(3) & axilWriteRegs(2);
    
    U_Axil_Evr : entity lcls_timing_core.EvrV2ChannelReg
@@ -218,9 +218,9 @@ begin
    GEN_ACC : if GEN_ACC_C generate
      U_Stats : entity amc_carrier_core.BsasAccumulator
        generic map (
-         TPD_G               => TPD_G,
-         NUM_ACCUMULATIONS_G => NCHAN_C,
-         AXIS_CONFIG_G       => INT_STREAM_CONFIG_C )
+         TPD_G          => TPD_G,
+         NUM_CHANNELS_G => NCHAN_C,
+         AXIS_CONFIG_G  => INT_STREAM_CONFIG_C )
        port map (
          clk            => diagnosticClk,
          rst            => diagnosticRst,
@@ -233,6 +233,7 @@ begin
          diagnosticFixd => r.diagnosticFixd(NCHAN_C-1),          -- [in]
          diagnosticSevr => r.diagnosticSevr(NCHAN_C-1),          -- [in]
          diagnosticExc  => r.excSquare,                                    -- [in]
+         ready          => ready,
          axisMaster     => accAxisMaster,
          axisSlave      => accAxisSlave );
    end generate;
@@ -240,9 +241,9 @@ begin
    NO_GEN_ACC : if not GEN_ACC_C generate
      U_Stats : entity amc_carrier_core.BsasSampler
        generic map (
-         TPD_G               => TPD_G,
-         NUM_ACCUMULATIONS_G => NCHAN_C,
-         AXIS_CONFIG_G       => INT_STREAM_CONFIG_C )
+         TPD_G          => TPD_G,
+         NUM_CHANNELS_G => NCHAN_C,
+         AXIS_CONFIG_G  => INT_STREAM_CONFIG_C )
        port map (
          clk            => diagnosticClk,
          rst            => diagnosticRst,
