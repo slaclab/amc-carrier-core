@@ -82,6 +82,8 @@ architecture rtl of BsasAccumulator is
       trigger       : sl;
       axisMaster    : AxiStreamMasterType;
       ready         : sl;
+      incDiag       : slv       (1 downto 0);  -- add current value to sums
+      notFixd       : slv       (1 downto 0);  -- discard sums (only current)
    end record RegType;
 
    constant REG_INIT_C : RegType := (
@@ -95,7 +97,9 @@ architecture rtl of BsasAccumulator is
      flush          => '0',
      trigger        => '0',
      axisMaster     => axiStreamMasterInit(AXIS_CONFIG_G),
-     ready          => '0' );
+     ready          => '0',
+     incDiag        => "00",
+     notFixd        => "00" );
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -103,8 +107,6 @@ architecture rtl of BsasAccumulator is
    --
    --  DSP control: allows summing, latching, and reset for all bits
    --
-   signal incDiag       : slv( 1 downto 0);  -- add current value to sums
-   signal notFixd       : slv( 1 downto 0);  -- discard sums (only current)
 
    signal diagSign      : slv( 2 downto 0);
    signal sumsSign      : slv( 2 downto 0);
@@ -321,8 +323,8 @@ begin
      INMODE                       => "00000",
      MULTSIGNIN                   => '0',
      OPMODE      (8 downto 4)     => "00000",
-     OPMODE      (3 downto 2)     => notFixd,  -- include C
-     OPMODE      (1 downto 0)     => incDiag,  -- include A|B
+     OPMODE      (3 downto 2)     => rin.notFixd,  -- include C
+     OPMODE      (1 downto 0)     => rin.incDiag,  -- include A|B
      PCIN                         => (others=>'0'),  -- unused
      RSTA                         => '0',
      RSTALLCARRYIN                => '0',
@@ -388,8 +390,8 @@ begin
      INMODE                       => "00000",
      MULTSIGNIN                   => '0',
      OPMODE      (8 downto 4)     => "00000",
-     OPMODE      (3 downto 2)     => notFixd,  -- include C
-     OPMODE      (1 downto 0)     => incDiag,  -- include A|B
+     OPMODE      (3 downto 2)     => rin.notFixd,  -- include C
+     OPMODE      (1 downto 0)     => rin.incDiag,  -- include A|B
      PCIN                         => (others=>'0'),  -- unused
      RSTA                         => '0',
      RSTALLCARRYIN                => '0',
@@ -426,8 +428,8 @@ begin
    resSmp        <= srlOut(191 downto 160);
      
    comb : process (diagnosticSevr, diagnosticFixd, diagnosticExc,
-                   resNacc, resSum, resSmp, resVar, ufSum, ofSum, ofVar, incDiag,
-                   acquire, flush, valid,
+                   resNacc, resSum, resSmp, resVar, ufSum, ofSum, ofVar,
+                   acquire, flush, valid, sample, srlOut,
                    r, rst) is
       variable v : RegType;
    begin
@@ -455,7 +457,7 @@ begin
                                                 srlOut(191 downto 160) &
                                                 diagnosticFixd &
                                                 (r.varExcepts(0) or ofVar(3) or
-                                                 (diagnosticExc and incDiag(0)) or uOr(resNacc(15 downto 13))) &
+                                                 (diagnosticExc and r.incDiag(0)) or uOr(resNacc(15 downto 13))) &
                                                 (r.sumExcepts(0) or ufSum or ofSum or uOr(resNacc(15 downto 13))) &
                                                 srlOut(12 downto 0);
           v.axisMaster.tLast  := '1';
@@ -465,15 +467,15 @@ begin
 
         when DATA_S =>
           if diagnosticFixd = '1' or sample = '1' then
-            notFixd     <= "00";  -- not keeping a sum (replacing)
+            v.notFixd   := "00";  -- not keeping a sum (replacing)
           else
-            notFixd     <= "11";  -- keeping a sum
+            v.notFixd   := "11";  -- keeping a sum
           end if;
 
           if acquire = '1' and diagnosticSevr = '0' then
-            incDiag     <= "11";  -- adding the new data
+            v.incDiag   := "11";  -- adding the new data
           else
-            incDiag     <= "00";  -- not adding the new data
+            v.incDiag   := "00";  -- not adding the new data
           end if;
           v.state     := SHIFT_REG_S;
 
