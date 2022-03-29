@@ -34,7 +34,7 @@ entity BsasWrapper is
 
    generic (
       TPD_G       : time    := 1 ns;
-      SVC_G       : integer := 31;   -- Index of EDEF
+      SVC_G       : integer := 0;   -- Index of EDEF
       BASE_ADDR_G : slv(31 downto 0) := x"00000000";
       GEN_ACC_G   : boolean := false );
    port (
@@ -81,7 +81,8 @@ architecture rtl of BsasWrapper is
    type RegType is record
       state          : StateType;
       init           : sl;
-      row            : slv (19 downto 0);
+      count          : slv ( 3 downto 0);
+      row            : slv (15 downto 0);
       rowStarted     : sl;
       rowTimestamp   : slv (63 downto 0);
       rowPulseId     : slv (63 downto 0);
@@ -104,6 +105,7 @@ architecture rtl of BsasWrapper is
    constant REG_INIT_C : RegType := (
       state          => IDLE_S,
       init           => '0',
+      count          => (others => '0'),
       row            => (others => '1'),
       rowStarted     => '0',
       rowTimestamp   => (others=>'0'),
@@ -375,7 +377,9 @@ begin
              end if; -- rowReset
            else -- r.init
              if (rowReset = '1' or rowAdvance = '1') and r.rowStarted = '1' then
-               v.header(2) := '1' & resize(r.row,31) & resize(csync.channelMask,32);
+               -- (1<<31) | 11 rsvd | 4b table id | 16b row number
+               v.header(2) := '1' & toSlv(0,7) & toSlv(SVC_G,4) & r.count &
+                              r.row & resize(csync.channelMask,32);
                v.header(1) := r.rowPulseId;
                v.header(0) := r.rowTimestamp;
                v.row     := r.row + 1;
@@ -390,6 +394,7 @@ begin
              end if;
            end if; -- r.init
            if rowReset = '1' then
+             v.count := r.count+1;
              v.row   := (others=>'0');
            end if;
          end if; -- r.strobe

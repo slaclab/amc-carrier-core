@@ -15,10 +15,9 @@
 --        [127:80]  sum of squared-samples
 --        [159:128] minimum of samples
 --        [191:160] maximum of samples
---   Five clock cycles are guaranteed between accumulateEn and another
---   accumulateEn; 1 cycle for math; 3 cycles for pushing to fifo; 1
---   cycle for shift register input (possible zeroing). DSP48E and SRL32CE
---   are called out explicitly for resource optimization.
+--   The valid signal qualifies acquire, sample, and flush.  It is acknowledged
+--   by the ready signal.
+--   DSP48E and SRL32CE are called out explicitly for resource optimization.
 -------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
@@ -73,6 +72,7 @@ architecture rtl of BsasAccumulator is
 
    type RegType is record
       state         : StateType;
+      clear         : sl;
       nacc          : slv       (NUM_CHANNELS_G-1 downto 0);
       sumExcepts    : slv       (NUM_CHANNELS_G-1 downto 0);
       varExcepts    : slv       (NUM_CHANNELS_G-1 downto 0);
@@ -86,6 +86,7 @@ architecture rtl of BsasAccumulator is
 
    constant REG_INIT_C : RegType := (
      state          => DATA_S,
+     clear          => '1',
      nacc           => (others=>'0'),
      sumExcepts     => (others=>'0'),
      varExcepts     => (others=>'0'),
@@ -410,12 +411,15 @@ begin
                   CLK => clk,
                   D   => srlIn(i) );
    end generate GEN_SRL;
+
+   --  Results are shifted in on SHIFT_REG_S state
    srlCE <= '1' when r.state = SHIFT_REG_S else '0';
    srlIn( 95 downto   0) <= resVar & resSum(31 downto 0) & resNacc;
-   srlIn(127 downto  96) <= diagnosticMin(31 downto 0) when (resMin(32)='0') else diagnosticData;
-   srlIn(159 downto 128) <= diagnosticMax(31 downto 0) when (resMax(32)='1') else diagnosticData;
+   srlIn(127 downto  96) <= diagnosticMin(31 downto 0) when (resMin(32)='0' and r.clear='0') else diagnosticData;
+   srlIn(159 downto 128) <= diagnosticMax(31 downto 0) when (resMax(32)='1' and r.clear='0') else diagnosticData;
    srlIn(191 downto 160) <= resSmp when sample='0' else diagnosticData;
 
+   --  sign extend the data for 48-bit computations
    diagnosticExt <= resize(diagnosticData,48,diagnosticData(31));
    diagnosticMin <= resize(srlOut(127 downto  96),48,srlOut(127));
    diagnosticMax <= resize(srlOut(159 downto 128),48,srlOut(159));
@@ -433,18 +437,6 @@ begin
       v.axisMaster.tLast  := '0';
       v.ready             := '0';
       
-      if diagnosticFixd = '1' then
-        notFixd     <= "00";  -- not keeping a sum (replacing)
-      else
-        notFixd     <= "11";  -- keeping a sum
-      end if;
-
-      if acquire = '1' and diagnosticSevr ='0' then
-        incDiag     <= "11";  -- adding the new data
-      else
-        incDiag     <= "00";  -- not adding the new data
-      end if;
-
       case r.state is
         when IDLE_S =>
           if valid = '1' then
@@ -457,25 +449,22 @@ begin
 
         when SHIFT_FIFO_S =>
           v.axisMaster.tValid := '1';
-          v.axisMaster.tData(191 downto 128) := diagnosticMax(31 downto 0) &
-                                                diagnosticMin(31 downto 0);
-          v.axisMaster.tData(127 downto  64) := resVar & resSum(31 downto 16);
-          v.axisMaster.tData( 63 downto   0) := resSum(15 downto 0) &
-                                                resSmp &
+          v.axisMaster.tData(191 downto 128) := srlOut(159 downto 96);
+          v.axisMaster.tData(127 downto  64) := srlOut( 95 downto 32);
+          v.axisMaster.tData( 63 downto   0) := srlOut( 31 downto 16) &
+                                                srlOut(191 downto 160) &
                                                 diagnosticFixd &
                                                 (r.varExcepts(0) or ofVar(3) or
                                                  (diagnosticExc and incDiag(0)) or uOr(resNacc(15 downto 13))) &
                                                 (r.sumExcepts(0) or ufSum or ofSum or uOr(resNacc(15 downto 13))) &
-                                                resize(resNacc,13);
+                                                srlOut(12 downto 0);
           v.axisMaster.tLast  := '1';
           
-          --  Clear shift register
-          incDiag     <= "00";  -- not adding the new data
-          notFixd     <= "00";  -- not keeping a sum
+          v.clear     := '1';
           v.state     := DATA_S;
 
         when DATA_S =>
-          if diagnosticFixd = '1' then
+          if diagnosticFixd = '1' or sample = '1' then
             notFixd     <= "00";  -- not keeping a sum (replacing)
           else
             notFixd     <= "11";  -- keeping a sum
@@ -504,6 +493,7 @@ begin
             v.sumExcepts(NUM_CHANNELS_G-1) := r.sumExcepts(0) or ufSum or ofSum;
             v.varExcepts(NUM_CHANNELS_G-1) := r.varExcepts(0) or ofVar(3) or diagnosticExc;
           end if;
+          v.clear     := '0';
           v.ready     := '1';
           v.state     := IDLE_S;
         when others => NULL;
