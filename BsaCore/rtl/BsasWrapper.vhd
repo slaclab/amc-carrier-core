@@ -71,9 +71,6 @@ architecture rtl of BsasWrapper is
 
 begin
 
-   sAxisMasters(0) <= ibEthMsgMaster;
-   ibEthMsgSlave   <= sAxisSlaves(0);
-
    U_AxiLiteXbar : entity surf.AxiLiteCrossbar
      generic map (
        NUM_SLAVE_SLOTS_G  => 1,
