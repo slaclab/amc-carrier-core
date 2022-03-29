@@ -105,13 +105,13 @@ begin
          -- AXI Lite interface
          axilClk         => axilClk,
          axilRst         => axilRst,
-         axilReadMaster  => axilReadMaster,
-         axilReadSlave   => axilReadSlave,
-         axilWriteMaster => axilWriteMaster,
-         axilWriteSlave  => axilWriteSlave,
+         axilReadMaster  => axilReadMasters (i),
+         axilReadSlave   => axilReadSlaves  (i),
+         axilWriteMaster => axilWriteMasters(i),
+         axilWriteSlave  => axilWriteSlaves (i),
          -- Timing ETH MSG Interface (axilClk domain)
          obEthMsgMaster  => sAxisMasters(i),
-         obEthMsgSlave   => sAxisSlaves(i) );
+         obEthMsgSlave   => sAxisSlaves (i) );
    end generate;
 
    sAxisMasters(NUM_EDEFS_G) <= ibEthMsgMaster;
