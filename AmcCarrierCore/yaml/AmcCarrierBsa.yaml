@@ -12,7 +12,7 @@
 #include BsaBufferControl.yaml
 #include BsaWaveformEngine.yaml
 #include BldAxiStream.yaml
-#include BsasAxiStream.yaml
+#include BsasWrapper.yaml
 
 AmcCarrierBsa: &AmcCarrierBsa
   name: AmcCarrierBsa
@@ -43,6 +43,7 @@ AmcCarrierBsa: &AmcCarrierBsa
         offset: 0x00040000
         numEdefs: 4
     Bsas:
-      <<: *BsasAxiStream
+      <<: *BsasWrapper
       at:
         offset: 0x00050000
+	numEdefs: 4

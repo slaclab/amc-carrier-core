@@ -12,28 +12,20 @@
 #include BsasStream.yaml
 #include EvrV2ChannelReg.yaml
 
-BsasAxiStream: &BsasAxiStream
-  name: BsasAxiStream
+BsasWrapper: &BsasWrapper
+  name: BsasWrapper
   description: Beam line modeling data service
   size: 0x10000
   class: MMIODev
   configPrio: 1
+  metadata:
+    numEdefs: &numEdefs 4
   ########
   children:
   ########
-    BsasStream:
-      <<: *BsasStream
+    BsasModule:
+      <<: *BsasModule
       at:
-        offset: 0x00000100
-    Acquire:
-      <<: *EvrV2ChannelReg
-      at:
-        offset: 0x00000400
-    RowAdvance:
-      <<: *EvrV2ChannelReg
-      at:
-        offset: 0x00000500
-    TableReset:
-      <<: *EvrV2ChannelReg
-      at:
-        offset: 0x00000600
+        offset: 0x00000000
+	nelms: *numEdefs
+	stride: 0x00800

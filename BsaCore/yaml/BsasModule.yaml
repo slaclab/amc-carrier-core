@@ -1,0 +1,39 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'SLAC Firmware Standard Library', including this file,
+## may be copied, modified, propagated, or distributed except according to
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once BsasModule.yaml
+#include BsasStream.yaml
+#include EvrV2ChannelReg.yaml
+
+BsasModule: &BsasModule
+  name: BsasModule
+  description: Beam line modeling data service
+  size: 0x00800
+  class: MMIODev
+  configPrio: 1
+  ########
+  children:
+  ########
+    BsasStream:
+      <<: *BsasStream
+      at:
+        offset: 0x00000100
+    Acquire:
+      <<: *EvrV2ChannelReg
+      at:
+        offset: 0x00000400
+    RowAdvance:
+      <<: *EvrV2ChannelReg
+      at:
+        offset: 0x00000500
+    TableReset:
+      <<: *EvrV2ChannelReg
+      at:
+        offset: 0x00000600
