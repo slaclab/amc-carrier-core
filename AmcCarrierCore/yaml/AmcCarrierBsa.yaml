@@ -46,4 +46,4 @@ AmcCarrierBsa: &AmcCarrierBsa
       <<: *BsasWrapper
       at:
         offset: 0x00050000
-	numEdefs: 4
+        numEdefs: 4

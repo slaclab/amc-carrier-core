@@ -13,7 +13,7 @@
 BsasStream: &BsasStream
   name: BsasStream
   description: Beam synchronous modeling data service
-  size: 0x8000
+  size: 0x200
   class: MMIODev
   configPrio: 1
   ########
