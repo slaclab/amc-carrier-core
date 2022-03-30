@@ -8,8 +8,8 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once BsasAxiStream.yaml
-#include BsasStream.yaml
+#once BsasWrapper.yaml
+#include BsasModule.yaml
 #include EvrV2ChannelReg.yaml
 
 BsasWrapper: &BsasWrapper
