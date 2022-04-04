@@ -152,8 +152,9 @@ architecture rtl of BldAxiStream is
         when DELT_S    => s := x"6";
         when SVC_S     => s := x"7";
         when CHD_S     => s := x"8";
-        when END_S     => s := x"9";
-        when INVALID_S => s := x"A";
+        when SEV_S     => s := x"9";
+        when END_S     => s := x"A";
+        when INVALID_S => s := x"B";
       end case;
       assignSlv(i, v, s);
       assignSlv(i, v, r.pulseIdL);
