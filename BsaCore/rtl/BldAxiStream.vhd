@@ -319,8 +319,6 @@ begin
      axiSlaveRegister(ep, x"000", 0, v.config.packetSize);
      axiSlaveRegister(ep, x"000",31, v.config.enable);
      axiSlaveRegister(ep, x"004", 0, v.config.channelMask);
-     axiSlaveRegister(ep, x"008", 0, v.config.channelSevr(31 downto 0));
-     axiSlaveRegister(ep, x"00C", 0, v.config.channelSevr(63 downto 32));
      axiSlaveRegisterR(ep, x"010", 0, ssync.count);
      axiSlaveRegisterR(ep, x"010",16, ssync.vstate);
      axiSlaveRegisterR(ep, x"014", 0, ssync.pulseIdL);
@@ -387,7 +385,6 @@ begin
                  diagnosticRst, diagnosticBus, eventSel, eventStrobe,
                  intSlave, intAxisCtrl ) is
      variable v         : RegType;
-     variable sevr      : Slv2Array(BSA_DIAGNOSTIC_OUTPUTS_C-1 downto 0);
      variable deltaPID  : slv(19 downto 0);
      variable deltaTS   : slv(31 downto 0);
      variable eventSelQ : slv(eventSel'range);
@@ -421,10 +418,6 @@ begin
          end if;
        end loop;
      end if;
-
-     for i in 0 to BSA_DIAGNOSTIC_OUTPUTS_C-1 loop
-       sevr(i) := csync.channelSevr(2*i+1 downto 2*i);
-     end loop;
 
      if intSlave.tReady = '1' then
        v.master.tValid := '0';
@@ -471,13 +464,13 @@ begin
                           --  Only include channels in header's mask
                           v.master.tValid := '0';
                           v.channelId     := r.channelId + 1;
-                          v.channelValid  := '0' & r.channelValid(r.channelValid'left downto 1);
+                          v.channelSevr   := r.dbus.sevr(r.channelId)(1) &
+                                             r.dbus.sevr(r.channelId)(0) &
+                                             r.channelSevr(r.channelSevr'left downto 2);
                           if r.channelMaskL(r.channelId) = '1' then
                             v.master.tValid := '1';
                             v.master.tData(31 downto 0)  := r.dbus.data(r.channelId);
                             v.status.count               := r.status.count-1;
-                            v.channelSevr                := r.dbus.sevr(r.channelId)(1) & r.dbus.sevr(r.channelId)(0) &
-                                                            r.channelSevr(r.channelSevr'left downto 2);
                           end if;
                         else
                           v.master.tValid := '0';
@@ -485,7 +478,7 @@ begin
                         end if;
          when SEV_S  => v.master.tData(31 downto 0) := resize(r.channelSevr,32);
                         v.status.count              := r.status.count-1;
-                        v.state                     := END_S;
+                        v.status.state              := END_S;
          -- Event trailer: hold until next strobe; decide to append or open a new packet
          when END_S  => if not BATCH_G then
                           v.master.tData(31 downto 0) := resize(r.channelSevr(r.channelSevr'left downto 32),32);
