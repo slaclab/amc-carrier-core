@@ -213,7 +213,7 @@ begin
          mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
 
    -- Store timestamps during accumulate phase since we are already iterating over
-   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.timestampAddr));
+   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaDone(conv_integer(r.timestampAddr));
    U_AxiDualPortRam_TimeStamps : entity surf.AxiDualPortRam
       generic map (
          TPD_G          => TPD_G,
