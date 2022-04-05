@@ -228,8 +228,8 @@ begin
             -- Threshold is enabled and mps channel is not ignored
             if APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C > 0 then
 
-               -- Channel is marked in error, set all bits
-               if mpsSelect.mpsError(chan) = '1' then
+               -- Channel is marked as error and not ignored
+               if (mpsSelect.mpsError(chan) = '1') and (mpsSelect.mpsIgnore(chan) = '0') then
                   for i in 0 to 7 loop
                      msgData(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C)(i) := '1';
                      v.tholdMem(chan, 0)                                     := (others => '1');
