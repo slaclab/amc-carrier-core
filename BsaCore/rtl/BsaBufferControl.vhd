@@ -236,7 +236,7 @@ begin
          rst            => axiRst,
          addr           => r.timestampAddr,
          we             => bufferClearEn,
-         din(0)         => '1');
+         din            => toSlv(1,32));
 
    -- Store timestamps during accumulate phase since we are already iterating over
    timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaDone(conv_integer(r.timestampAddr));
