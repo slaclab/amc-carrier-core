@@ -185,7 +185,6 @@ architecture rtl of BsaBufferControl is
    signal diagnosticBusSyncSlv   : slv(DIAGNOSTIC_BUS_BITS_C-1 downto 0);
 
    signal timeStampRamWe : sl;
-   signal bufferClearEn  : sl;
 
    -- axilClk signals
    signal bufferClearEn : sl;
