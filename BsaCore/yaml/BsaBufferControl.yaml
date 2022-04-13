@@ -114,3 +114,18 @@ BsaBufferControl: &BsaBufferControl
           class: IntField
           at:
             nelms: *BsaBufferControlNelms
+    BufferInit:
+      at:
+        offset: 0x00002000
+      size: 256 # 64 32-bit values
+      class: MMIODev
+      configPrio: 1
+      children:
+        MemoryArray:
+          <<: *MemoryArray
+          at:
+            offset: 0x0
+            stride: 4
+            nelms: 64
+          sizeBits: *BsaBufferControlNelms
+          mode: RO
