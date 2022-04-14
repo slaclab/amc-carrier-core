@@ -16,7 +16,7 @@ BsaBufferControl: &BsaBufferControl
   description: Configuration and status of the BSA dignosic buffers
   class: MMIODev
   configPrio: 1
-  size: 0x2000 # Double check this
+  size: 0x3000 # Double check this
   #########
   children:
     Timestamps:
@@ -126,6 +126,6 @@ BsaBufferControl: &BsaBufferControl
           at:
             offset: 0x0
             stride: 4
-            nelms: 64
-          sizeBits: *BsaBufferControlNelms
-          mode: RO
+            nelms: *BsaBufferControlNelms
+          sizeBits: 32
+          mode: RW
