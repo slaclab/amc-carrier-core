@@ -475,7 +475,7 @@ begin
                           end if;
                         else
                           v.master.tValid := '0';
-                          v.status.state  := END_S;
+                          v.status.state  := SEV_S;
                         end if;
          when SEV_S  => v.master.tData(31 downto 0) := resize(r.channelSevr,32);
                         v.status.count              := r.status.count-1;
