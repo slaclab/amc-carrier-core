@@ -24,7 +24,7 @@ BsasModule: &BsasModule
     BsasStream:
       <<: *BsasStream
       at:
-        offset: 0x00000100
+        offset: 0x00000000
     Acquire:
       <<: *EvrV2ChannelReg
       at:
