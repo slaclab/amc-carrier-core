@@ -59,11 +59,11 @@ architecture rtl of BsasModule is
    constant INT_STREAM_CONFIG_C : AxiStreamConfigType := (
      TSTRB_EN_C    => false,
      TDATA_BYTES_C => 24,
-     TDEST_BITS_C  => 0,
-     TID_BITS_C    => 0,
-     TKEEP_MODE_C  => TKEEP_COMP_C,
-     TUSER_BITS_C  => 0,
-     TUSER_MODE_C  => TUSER_NONE_C );
+     TDEST_BITS_C  => EMAC_AXIS_CONFIG_C.TDEST_BITS_C,
+     TID_BITS_C    => EMAC_AXIS_CONFIG_C.TID_BITS_C,
+     TKEEP_MODE_C  => EMAC_AXIS_CONFIG_C.TKEEP_MODE_C,
+     TUSER_BITS_C  => EMAC_AXIS_CONFIG_C.TUSER_BITS_C,
+     TUSER_MODE_C  => EMAC_AXIS_CONFIG_C.TUSER_MODE_C );
    
    signal config : BsasConfigType;
    signal csync  : BsasConfigType;
@@ -299,8 +299,13 @@ begin
      ichan := conv_integer(r.channel);
      
      v.strobe        := diagnosticBus.strobe;
+
+     --  Not the usual axi-stream master/slave handshake
+     --  We're on a fixed schedule, so can't handle backpressure
      v.master.tValid := '0';
      v.master.tLast  := '0';
+     ssiSetUserSof ( INT_STREAM_CONFIG_C, v.master, '0' );
+     ssiSetUserEofe( INT_STREAM_CONFIG_C, v.master, '0' );
 
      if ready = '1' then
        v.accumulateEn := '0';
@@ -363,6 +368,7 @@ begin
            end if;
          end if; -- r.strobe
        when HEADER_S => -- Shift header into FIFO
+         ssiSetUserSof ( INT_STREAM_CONFIG_C, v.master, '1' );
          v.master.tValid              := r.rowStarted;
          v.master.tData(191 downto 0) := r.header(2) & r.header(1) & r.header(0);
          start                        := '1';
