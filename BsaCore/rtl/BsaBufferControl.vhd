@@ -73,10 +73,11 @@ end entity BsaBufferControl;
 
 architecture rtl of BsaBufferControl is
 
-   constant AXIL_MASTERS_C : integer := 2;
+   constant AXIL_MASTERS_C : integer := 3;
 
-   constant TIMESTAMP_AXIL_C : integer := 0;
-   constant DMA_RING_AXIL_C  : integer := 1;
+   constant TIMESTAMP_AXIL_C   : integer := 0;
+   constant DMA_RING_AXIL_C    : integer := 1;
+   constant BUFFER_INIT_AXIL_C : integer := 2;
 
    constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
       genAxiLiteConfig(AXIL_MASTERS_C, AXIL_BASE_ADDR_G, 16, 12);
@@ -212,8 +213,33 @@ begin
          mAxiReadMasters     => locAxilReadMasters,   -- [out]
          mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
 
+   bufferClearEn  <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.timestampAddr));
+   U_AxiDualPortRam_Buffer_Init : entity surf.AxiDualPortRam
+      generic map (
+         TPD_G        => TPD_G,
+         SYNTH_MODE_G => "inferred",
+         MEMORY_TYPE_G=> "distributed",
+         READ_LATENCY_G => 0,
+         AXI_WR_EN_G  => true,
+         SYS_WR_EN_G  => true,
+         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
+         DATA_WIDTH_G => 32,
+         INIT_G       => toSlv(1,32) )
+      port map (
+         axiClk         => axilClk,
+         axiRst         => axilRst,
+         axiReadMaster  => locAxilReadMasters(BUFFER_INIT_AXIL_C),
+         axiReadSlave   => locAxilReadSlaves(BUFFER_INIT_AXIL_C),
+         axiWriteMaster => locAxilWriteMasters(BUFFER_INIT_AXIL_C),
+         axiWriteSlave  => locAxilWriteSlaves(BUFFER_INIT_AXIL_C),
+         clk            => axiClk,
+         rst            => axiRst,
+         addr           => r.timestampAddr,
+         we             => bufferClearEn,
+         din            => toSlv(1,32));
+
    -- Store timestamps during accumulate phase since we are already iterating over
-   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.timestampAddr));
+   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaDone(conv_integer(r.timestampAddr));
    U_AxiDualPortRam_TimeStamps : entity surf.AxiDualPortRam
       generic map (
          TPD_G          => TPD_G,
@@ -415,7 +441,7 @@ begin
          axisStatusSlave  => AXI_STREAM_SLAVE_FORCE_C,              -- [in]
          axiClk           => axiClk,                                -- [in]
          axiRst           => axiRst,                                -- [in]
-         bufferClearEn    => timeStampRamWe,                        -- [in]
+         bufferClearEn    => bufferClearEn,                         -- [in]
          bufferClear      => r.timestampAddr,                       -- [in]
          bufferEnabled    => bufferEnabled,                         -- [out]
          axisDataMaster   => lastFifoAxisMaster,                    -- [in]
