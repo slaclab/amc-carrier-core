@@ -64,7 +64,6 @@ architecture rtl of BldAxiStream is
    type BldConfigType is record
       enable      : sl;
       channelMask : slv (BSA_DIAGNOSTIC_OUTPUTS_C-1 downto 0);
-      channelSevr : slv (63 downto 0);
       packetSize  : slv (11 downto 0);
       edefConfig  : EdefConfigArray(NUM_EDEFS_G-1 downto 0);
    end record;
@@ -72,11 +71,10 @@ architecture rtl of BldAxiStream is
    constant BLD_CONFIG_INIT_C : BldConfigType := (
       enable      => '0',
       channelMask => (others => '0'),
-      channelSevr => (others => '0'),
       packetSize  => START_COUNT,
       edefConfig  => (others=>EDEF_CONFIG_INIT_C) );
 
-   constant BLD_CONFIG_BITS_C : integer := BSA_DIAGNOSTIC_OUTPUTS_C + 77 + NUM_EDEFS_G*EDEF_CONFIG_BITS_C;
+   constant BLD_CONFIG_BITS_C : integer := BSA_DIAGNOSTIC_OUTPUTS_C + 13 + NUM_EDEFS_G*EDEF_CONFIG_BITS_C;
 
    function toSlv(r : BldConfigType) return slv is
       variable v : slv(BLD_CONFIG_BITS_C-1 downto 0) := (others=>'0');
@@ -84,7 +82,6 @@ architecture rtl of BldAxiStream is
    begin
       assignSlv(i, v, r.enable);
       assignSlv(i, v, r.channelMask);
-      assignSlv(i, v, r.channelSevr);
       assignSlv(i, v, r.packetSize);
       for j in 0 to NUM_EDEFS_G-1 loop
          assignSlv(i, v, toSlv(r.edefConfig(j)) );
@@ -99,7 +96,6 @@ architecture rtl of BldAxiStream is
    begin
       assignRecord(i, v, c.enable);
       assignRecord(i, v, c.channelMask);
-      assignRecord(i, v, c.channelSevr);
       assignRecord(i, v, c.packetSize);
       for j in 0 to NUM_EDEFS_G-1 loop
          w := v(i+EDEF_CONFIG_BITS_C-1 downto i);
@@ -114,7 +110,7 @@ architecture rtl of BldAxiStream is
                       PIDL_S, PIDU_S,
                       CHM_S , DELT_S,
                       SVC_S , CHD_S,
-                      END_S , INVALID_S);
+                      SEV_S , END_S , INVALID_S);
 
    type BldStatusType is record
       state      : StateType;
@@ -156,8 +152,9 @@ architecture rtl of BldAxiStream is
         when DELT_S    => s := x"6";
         when SVC_S     => s := x"7";
         when CHD_S     => s := x"8";
-        when END_S     => s := x"9";
-        when INVALID_S => s := x"A";
+        when SEV_S     => s := x"9";
+        when END_S     => s := x"A";
+        when INVALID_S => s := x"B";
       end case;
       assignSlv(i, v, s);
       assignSlv(i, v, r.pulseIdL);
@@ -214,7 +211,7 @@ architecture rtl of BldAxiStream is
      svcReady      : slv       (NUM_EDEFS_G-1 downto 0);   -- updated for r.strobe(1)
      channelId     : integer range 0 to BSA_DIAGNOSTIC_OUTPUTS_C;
      channelMaskL  : slv       (BSA_DIAGNOSTIC_OUTPUTS_C-1 downto 0);
-     channelValid  : slv       (BSA_DIAGNOSTIC_OUTPUTS_C-1 downto 0);
+     channelSevr   : slv       (2*BSA_DIAGNOSTIC_OUTPUTS_C-1 downto 0);
      status        : BldStatusType;
      master        : AxiStreamMasterType;
    end record;
@@ -226,7 +223,7 @@ architecture rtl of BldAxiStream is
       svcReady      => (others=>'1'),
       channelId     => 0,
       channelMaskL  => (others=>'0'),
-      channelValid  => (others=>'0'),
+      channelSevr   => (others=>'1'),
       status        => BLD_STATUS_INIT_C,
       master        => AXI_STREAM_MASTER_INIT_C );
 
@@ -323,8 +320,6 @@ begin
      axiSlaveRegister(ep, x"000", 0, v.config.packetSize);
      axiSlaveRegister(ep, x"000",31, v.config.enable);
      axiSlaveRegister(ep, x"004", 0, v.config.channelMask);
-     axiSlaveRegister(ep, x"008", 0, v.config.channelSevr(31 downto 0));
-     axiSlaveRegister(ep, x"00C", 0, v.config.channelSevr(63 downto 32));
      axiSlaveRegisterR(ep, x"010", 0, ssync.count);
      axiSlaveRegisterR(ep, x"010",16, ssync.vstate);
      axiSlaveRegisterR(ep, x"014", 0, ssync.pulseIdL);
@@ -391,7 +386,6 @@ begin
                  diagnosticRst, diagnosticBus, eventSel, eventStrobe,
                  intSlave, intAxisCtrl ) is
      variable v         : RegType;
-     variable sevr      : Slv2Array(BSA_DIAGNOSTIC_OUTPUTS_C-1 downto 0);
      variable deltaPID  : slv(19 downto 0);
      variable deltaTS   : slv(31 downto 0);
      variable eventSelQ : slv(eventSel'range);
@@ -425,10 +419,6 @@ begin
          end if;
        end loop;
      end if;
-
-     for i in 0 to BSA_DIAGNOSTIC_OUTPUTS_C-1 loop
-       sevr(i) := csync.channelSevr(2*i+1 downto 2*i);
-     end loop;
 
      if intSlave.tReady = '1' then
        v.master.tValid := '0';
@@ -468,34 +458,36 @@ begin
          when SVC_S  => v.master.tData(31 downto 0) := r.svcMask;
                         v.status.count              := r.status.count-1;
                         v.channelId                 := 0;
-                        v.channelValid              := (others=>'0');
+                        v.channelSevr               := (others=>'1');
                         v.status.state              := CHD_S;
          -- Channel data
          when CHD_S  => if r.channelId < BSA_DIAGNOSTIC_OUTPUTS_C then
                           --  Only include channels in header's mask
                           v.master.tValid := '0';
                           v.channelId     := r.channelId + 1;
-                          v.channelValid  := '0' & r.channelValid(r.channelValid'left downto 1);
+                          v.channelSevr   := r.dbus.sevr(r.channelId)(1) &
+                                             r.dbus.sevr(r.channelId)(0) &
+                                             r.channelSevr(r.channelSevr'left downto 2);
                           if r.channelMaskL(r.channelId) = '1' then
                             v.master.tValid := '1';
                             v.master.tData(31 downto 0)  := r.dbus.data(r.channelId);
                             v.status.count               := r.status.count-1;
-                            if r.dbus.sevr(r.channelId) <= sevr(r.channelId) then
-                              v.channelValid  := '1' & r.channelValid(r.channelValid'left downto 1);
-                            end if;
                           end if;
                         else
                           v.master.tValid := '0';
-                          v.status.state  := END_S;
+                          v.status.state  := SEV_S;
                         end if;
+         when SEV_S  => v.master.tData(31 downto 0) := resize(r.channelSevr,32);
+                        v.status.count              := r.status.count-1;
+                        v.status.state              := END_S;
          -- Event trailer: hold until next strobe; decide to append or open a new packet
          when END_S  => if not BATCH_G then
-                          v.master.tData(31 downto 0) := resize(r.channelValid,32);
+                          v.master.tData(31 downto 0) := resize(r.channelSevr(r.channelSevr'left downto 32),32);
                           v.master.tLast              := '1';
                           v.status.packets            := r.status.packets + 1;
                           v.status.state              := IDLE_S;
                         elsif eventStrobe = '1' then
-                          v.master.tData(31 downto 0) := resize(r.channelValid,32);
+                          v.master.tData(31 downto 0) := resize(r.channelSevr(r.channelSevr'left downto 32),32);
                           --
                           -- Check the duration and size of this frame
                           --

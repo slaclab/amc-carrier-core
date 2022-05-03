@@ -47,14 +47,6 @@ BldAxiStream: &BldAxiStream
       mode: RW
       description: "Mask of enabled channels"
     #########################################################
-    channelSevr:
-      class: IntField
-      at:
-        offset: 0x8
-      sizeBits: 62
-      mode: RW
-      description: "Maximum channel severity"
-    #########################################################
     currPacketSize:
       class: IntField
       at:
