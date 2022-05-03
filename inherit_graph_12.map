@@ -1,3 +1,8 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classRtmDigitalDebugV1.html" title=" " alt="" coords="5,5,156,32"/>
+<area shape="rect" id="node1" href="$classRtmCryoDacLut.html" title=" " alt="" coords="209,5,333,32"/>
+<area shape="rect" id="node2" href="$classRtmCryoDet.html" title=" " alt="" coords="391,56,493,83"/>
+<area shape="rect" id="node3" href="$classRtmCryoDacLutTb.html" title=" " alt="" coords="541,56,681,83"/>
+<area shape="rect" id="node4" href="$classRtmCryoDetClkDiv.html" title=" " alt="" coords="5,56,151,83"/>
+<area shape="rect" id="node5" href="$classRtmCryoDetReg.html" title=" " alt="" coords="207,56,334,83"/>
+<area shape="rect" id="node6" href="$classRtmCryoSpiMaster.html" title=" " alt="" coords="199,107,343,133"/>
 </map>

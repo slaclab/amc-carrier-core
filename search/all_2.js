@@ -1,14 +1,19 @@
 var searchData=
 [
-  ['bhv_86',['Bhv',['../classDacSigGenTb_1_1Bhv.html',1,'DacSigGenTb']]],
-  ['bldaxistream_87',['BldAxiStream',['../classBldAxiStream.html',1,'']]],
-  ['bldeventram_88',['BldEventRAM',['../classBldEventRAM.html',1,'']]],
-  ['bldeventselect_89',['BldEventSelect',['../classBldEventSelect.html',1,'BldEventSelect'],['../classBldEventSelect_1_1BldEventSelect.html',1,'BldEventSelect']]],
-  ['bldpkg_90',['BldPkg',['../classBldPkg.html',1,'']]],
-  ['bldwrapper_91',['BldWrapper',['../classBldWrapper.html',1,'']]],
-  ['bsaaccumulator_92',['BsaAccumulator',['../classBsaAccumulator.html',1,'']]],
-  ['bsaaxiinterconnectwrapper_93',['BsaAxiInterconnectWrapper',['../classBsaAxiInterconnectWrapper.html',1,'']]],
-  ['bsabuffercontrol_94',['BsaBufferControl',['../classBsaBufferControl.html',1,'']]],
-  ['bsawaveformengine_95',['BsaWaveformEngine',['../classBsaWaveformEngine.html',1,'']]],
-  ['bssswrapper_96',['BsssWrapper',['../classBsssWrapper.html',1,'']]]
+  ['bhv_87',['Bhv',['../classDacSigGenTb_1_1Bhv.html',1,'DacSigGenTb']]],
+  ['bldaxistream_88',['BldAxiStream',['../classBldAxiStream.html',1,'']]],
+  ['bldeventram_89',['BldEventRAM',['../classBldEventRAM.html',1,'']]],
+  ['bldeventselect_90',['BldEventSelect',['../classBldEventSelect.html',1,'BldEventSelect'],['../classBldEventSelect_1_1BldEventSelect.html',1,'BldEventSelect']]],
+  ['bldpkg_91',['BldPkg',['../classBldPkg.html',1,'']]],
+  ['bldwrapper_92',['BldWrapper',['../classBldWrapper.html',1,'']]],
+  ['bsaaccumulator_93',['BsaAccumulator',['../classBsaAccumulator.html',1,'']]],
+  ['bsaaxiinterconnectwrapper_94',['BsaAxiInterconnectWrapper',['../classBsaAxiInterconnectWrapper.html',1,'']]],
+  ['bsabuffercontrol_95',['BsaBufferControl',['../classBsaBufferControl.html',1,'']]],
+  ['bsasaccumulator_96',['BsasAccumulator',['../classBsasAccumulator.html',1,'']]],
+  ['bsasmodule_97',['BsasModule',['../classBsasModule.html',1,'']]],
+  ['bsaspkg_98',['BsasPkg',['../classBsasPkg.html',1,'']]],
+  ['bsassampler_99',['BsasSampler',['../classBsasSampler.html',1,'']]],
+  ['bsaswrapper_100',['BsasWrapper',['../classBsasWrapper.html',1,'']]],
+  ['bsawaveformengine_101',['BsaWaveformEngine',['../classBsaWaveformEngine.html',1,'']]],
+  ['bssswrapper_102',['BsssWrapper',['../classBsssWrapper.html',1,'']]]
 ];
