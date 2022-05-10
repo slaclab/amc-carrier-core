@@ -81,7 +81,7 @@ architecture rtl of BsasWrapper is
    signal r_in : RegType;
 
    signal dbus : DiagnosticBusType;
-   
+
 begin
 
    U_AxiLiteXbar : entity surf.AxiLiteCrossbar
@@ -166,5 +166,5 @@ begin
        r <= r_in;
      end if;
    end process seq;
-   
+
 end rtl;
