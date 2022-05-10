@@ -43,7 +43,7 @@ package BsasPkg is
 end BsasPkg;
 
 package body BsasPkg is
-  
+
    function toSlv(r : BsasConfigType) return slv is
       variable v : slv(BSAS_CONFIG_BITS_C-1 downto 0) := (others=>'0');
       variable i : integer := 0;
@@ -74,4 +74,4 @@ package body BsasPkg is
 
 end package body;
 
-  
+
