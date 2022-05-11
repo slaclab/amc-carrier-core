@@ -35,7 +35,6 @@ entity BsasWrapper is
    generic (
       TPD_G       : time    := 1 ns;
       NUM_EDEFS_G : integer := 1;   -- Index of EDEF
-      DBUS_REG_G  : boolean := true;
       BASE_ADDR_G : slv(31 downto 0) := x"00000000" );
    port (
       -- Diagnostic data interface
@@ -70,18 +69,6 @@ architecture rtl of BsasWrapper is
    signal axilReadMasters  : AxiLiteReadMasterArray (NUM_EDEFS_G-1 downto 0);
    signal axilReadSlaves   : AxiLiteReadSlaveArray  (NUM_EDEFS_G-1 downto 0);
 
-   type RegType is record
-     dbus : DiagnosticBusArray(1 downto 0);
-   end record;
-
-   constant REG_INIT_C : RegType := (
-     dbus => (others=>DIAGNOSTIC_BUS_INIT_C) );
-
-   signal r    : RegType := REG_INIT_C;
-   signal r_in : RegType;
-
-   signal dbus : DiagnosticBusType;
-
 begin
 
    U_AxiLiteXbar : entity surf.AxiLiteCrossbar
@@ -111,7 +98,7 @@ begin
          -- Diagnostic data interface
          diagnosticClk   => diagnosticClk,
          diagnosticRst   => diagnosticRst,
-         diagnosticBus   => dbus,
+         diagnosticBus   => diagnosticBus,
          -- AXI Lite interface
          axilClk         => axilClk,
          axilRst         => axilRst,
@@ -126,45 +113,14 @@ begin
 
    sAxisMasters(NUM_EDEFS_G) <= ibEthMsgMaster;
    ibEthMsgSlave             <= sAxisSlaves(NUM_EDEFS_G);
-
+   
    U_Mux : entity surf.AxiStreamMux
-      generic map (
-         TPD_G         => TPD_G,
-         NUM_SLAVES_G  => NUM_EDEFS_G+1,
-         PIPE_STAGES_G => 1) -- Help with making timing
-      port map (
-         axisClk      => axilClk,
-         axisRst      => axilRst,
-         sAxisMasters => sAxisMasters,
-         sAxisSlaves  => sAxisSlaves,
-         mAxisMaster  => obEthMsgMaster,
-         mAxisSlave   => obEthMsgSlave);
-
-   comb : process ( diagnosticRst, r, diagnosticBus ) is
-     variable v : RegType;
-   begin
-     v := r;
-
-     v.dbus := r.dbus(0) & diagnosticBus;
-
-     if diagnosticRst = '1' then
-       v := REG_INIT_C;
-     end if;
-
-     r_in <= v;
-
-     if DBUS_REG_G then
-       dbus <= r.dbus(1);
-     else
-       dbus <= diagnosticBus;
-     end if;
-   end process comb;
-
-   seq : process ( diagnosticClk ) is
-   begin
-     if rising_edge(diagnosticClk) then
-       r <= r_in;
-     end if;
-   end process seq;
+     generic map ( NUM_SLAVES_G => NUM_EDEFS_G+1 )
+     port map ( axisClk      => axilClk,
+                axisRst      => axilRst,
+                sAxisMasters => sAxisMasters,
+                sAxisSlaves  => sAxisSlaves,
+                mAxisMaster  => obEthMsgMaster,
+                mAxisSlave   => obEthMsgSlave );
 
 end rtl;
