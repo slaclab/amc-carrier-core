@@ -86,6 +86,7 @@ var classAppTopJesd_1_1mapping =
     [ "u_bufg_gt", "classAppTopJesd_1_1mapping.html#a9c15501f1571fea5d4ee1328c11d74d1", null ],
     [ "u_pwruprst", "classAppTopJesd_1_1mapping.html#afcee726b120d2b0b3e5d15f3f91020eb", null ],
     [ "u_clockmanager", "classAppTopJesd_1_1mapping.html#a3753ac6c58617c8518efe5c1c8bd24e0", null ],
+    [ "u_jesdrst", "classAppTopJesd_1_1mapping.html#a56bbd7a1a96696a45a77c7c88fc9742e", null ],
     [ "u_jesdusrclk", "classAppTopJesd_1_1mapping.html#a1a6a34612e61662d0fd09ef0e653eafe", null ],
     [ "u_jesd", "classAppTopJesd_1_1mapping.html#a8c49f1c4412dc3a09712c27870b63026", null ],
     [ "u_xbar", "classAppTopJesd_1_1mapping.html#a5df5f0eba02f3e58776cb180da69bf4a", null ],

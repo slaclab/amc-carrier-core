@@ -37,7 +37,7 @@ var classAmcCarrierBsa_1_1mapping =
     [ "waveform1AxiReadMaster", "classAmcCarrierBsa_1_1mapping.html#a46225190e460f0c18f6250802f3c4401", null ],
     [ "waveform1AxiReadSlave", "classAmcCarrierBsa_1_1mapping.html#af2becc3a2a91bfaf782f3c5eb198145e", null ],
     [ "intEthMsgMaster", "classAmcCarrierBsa_1_1mapping.html#a500eabf98ddc5b92e45de66cdbda8453", null ],
-    [ "intEthMsgSlave", "classAmcCarrierBsa_1_1mapping.html#a11a24c956554db0f9e32596e8bb157b1", null ],
+    [ "intEthMsgSlave", "classAmcCarrierBsa_1_1mapping.html#a512027b803f486142aae4ab6c3687549", null ],
     [ "u_axilitecrossbar_1", "classAmcCarrierBsa_1_1mapping.html#a0a0d682a18a0b797da3f3b0148633d44", null ],
     [ "bsawaveformengine_0", "classAmcCarrierBsa_1_1mapping.html#ac65695a4ccf42a0fb00c1dc9957d5364", null ],
     [ "bsawaveformengine_1", "classAmcCarrierBsa_1_1mapping.html#a12e5b3723d01de6f5b20e9f2d29d6bce", null ],

@@ -1,5 +1,8 @@
 var NAVTREEINDEX21 =
 {
+"classAxisBramFlashBuffer.html#a8e1fd4ab848b98a0c700b34cf7c90b36":[0,0,70,17],
+"classAxisBramFlashBuffer.html#a9a2a5aa394c36011bd8e0e8ed50e335f":[0,0,70,9],
+"classAxisBramFlashBuffer.html#aa55c8169747ac7a3047a832a016fca50":[0,0,70,12],
 "classAxisBramFlashBuffer.html#aada3e73ee8db4190524295bfa4dff085":[0,0,70,19],
 "classAxisBramFlashBuffer.html#abfe4f66f4d7d8953313b8f8fa6c0a393":[0,0,70,4],
 "classAxisBramFlashBuffer.html#ac220cc2710ba738744915c3b2a0f43bc":[0,0,70,13],
@@ -246,8 +249,5 @@ var NAVTREEINDEX21 =
 "classBldAxiStream_1_1rtl.html#a8d77c5c5fc882b74d48cbe981c60fe2a":[0,0,77,0,29],
 "classBldAxiStream_1_1rtl.html#a8daecb30bf34bcc7664d776d043f4b46":[0,0,77,0,5],
 "classBldAxiStream_1_1rtl.html#a9106e849883a35ea7fe1934231307f94":[0,0,77,0,14],
-"classBldAxiStream_1_1rtl.html#a93725171ae8bd31642823e1a6724880a":[0,0,77,0,19],
-"classBldAxiStream_1_1rtl.html#a9916c8a33c70f79dcc78eb4c2317c7d0":[0,0,77,0,2],
-"classBldAxiStream_1_1rtl.html#a9916c8a33c70f79dcc78eb4c2317c7d0":[0,0,77,0,0],
-"classBldAxiStream_1_1rtl.html#a9af6d1eaec7e192ea3908e41819c903d":[0,0,77,0,9]
+"classBldAxiStream_1_1rtl.html#a93725171ae8bd31642823e1a6724880a":[0,0,77,0,19]
 };

@@ -1,5 +1,6 @@
 var classAmcCarrierCore_1_1mapping =
 [
+    [ "PROCESS_5", "classAmcCarrierCore_1_1mapping.html#a04013da05b2b3e3816e59344cbf74522", null ],
     [ "AXI_ERROR_RESP_C", "classAmcCarrierCore_1_1mapping.html#aa6e149f34a2435059455ed12efc56812", null ],
     [ "axiWriteMaster", "classAmcCarrierCore_1_1mapping.html#a754179b1c1adea68160555c78c94edc0", null ],
     [ "axiWriteSlave", "classAmcCarrierCore_1_1mapping.html#acbe82b269fa3e2163ccb5ee96a400b57", null ],
@@ -22,6 +23,7 @@ var classAmcCarrierCore_1_1mapping =
     [ "axilClk", "classAmcCarrierCore_1_1mapping.html#acd97a1862aa67d995d692dca4d8f0290", null ],
     [ "axilRst", "classAmcCarrierCore_1_1mapping.html#aa4d077ec6cba61d781f77394732964ca", null ],
     [ "auxPwrL", "classAmcCarrierCore_1_1mapping.html#a2a2f84c3b725cc7911c0120624889e12", null ],
+    [ "diagnosticBusReg", "classAmcCarrierCore_1_1mapping.html#a5a6b849a7aa99fcecdbf75a6d3c40c97", null ],
     [ "u_enauxpwrl", "classAmcCarrierCore_1_1mapping.html#a55eb32635c2f4fad8ba64ee35dabd48e", null ],
     [ "u_ibufds", "classAmcCarrierCore_1_1mapping.html#a7cb7cf7ae0c473f4f53e67e72a419300", null ],
     [ "u_bufg_gt", "classAmcCarrierCore_1_1mapping.html#a9c15501f1571fea5d4ee1328c11d74d1", null ],

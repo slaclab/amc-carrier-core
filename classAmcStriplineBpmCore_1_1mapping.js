@@ -1,6 +1,6 @@
 var classAmcStriplineBpmCore_1_1mapping =
 [
-    [ "PROCESS_11", "classAmcStriplineBpmCore_1_1mapping.html#aafae9eb6ded3ba764e420358aaeedec0", null ],
+    [ "PROCESS_12", "classAmcStriplineBpmCore_1_1mapping.html#a35bfab6c39e3d8eccdd9c0afa9f89e2f", null ],
     [ "NUM_AXI_MASTERS_C", "classAmcStriplineBpmCore_1_1mapping.html#a3e6abf9da8e21c0d920fbad651bd1f5d", null ],
     [ "CTRL_INDEX_C", "classAmcStriplineBpmCore_1_1mapping.html#aac05f0453486bc21c6b8b4e8f3053bdc", null ],
     [ "DAC_INDEX_C", "classAmcStriplineBpmCore_1_1mapping.html#adb44f74d71b5a68bc53d80cc50c7eb47", null ],
