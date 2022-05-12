@@ -113,14 +113,18 @@ begin
 
    sAxisMasters(NUM_EDEFS_G) <= ibEthMsgMaster;
    ibEthMsgSlave             <= sAxisSlaves(NUM_EDEFS_G);
-   
+
    U_Mux : entity surf.AxiStreamMux
-     generic map ( NUM_SLAVES_G => NUM_EDEFS_G+1 )
-     port map ( axisClk      => axilClk,
-                axisRst      => axilRst,
-                sAxisMasters => sAxisMasters,
-                sAxisSlaves  => sAxisSlaves,
-                mAxisMaster  => obEthMsgMaster,
-                mAxisSlave   => obEthMsgSlave );
+      generic map (
+         TPD_G         => TPD_G,
+         NUM_SLAVES_G  => NUM_EDEFS_G+1,
+         PIPE_STAGES_G => 1) -- Help with making timing
+      port map (
+         axisClk      => axilClk,
+         axisRst      => axilRst,
+         sAxisMasters => sAxisMasters,
+         sAxisSlaves  => sAxisSlaves,
+         mAxisMaster  => obEthMsgMaster,
+         mAxisSlave   => obEthMsgSlave);
 
 end rtl;

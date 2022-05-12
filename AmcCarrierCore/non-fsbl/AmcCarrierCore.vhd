@@ -212,6 +212,8 @@ architecture mapping of AmcCarrierCore is
    signal axilRst : sl;
    signal auxPwrL : sl;
 
+   signal diagnosticBusReg : DiagnosticBusType := DIAGNOSTIC_BUS_INIT_C;
+
 begin
 
    assert (RSSI_ILEAVE_EN_G = false) or (RSSI_ILEAVE_EN_G and (DISABLE_BSA_G = false) and (DISABLE_BLD_G = false))
@@ -234,6 +236,14 @@ begin
 
    stableClk <= fabClk;
    stableRst <= fabRst;
+
+   -- Register to help with making timing
+   process(diagnosticClk)
+   begin
+      if rising_edge(diagnosticClk) then
+         diagnosticBusReg <= diagnosticBus after TPD_G;
+      end if;
+   end process;
 
    --------------------------------
    -- Common Clock and Reset Module
@@ -463,7 +473,7 @@ begin
          -- Diagnostic Interface
          diagnosticClk        => diagnosticClk,
          diagnosticRst        => diagnosticRst,
-         diagnosticBus        => diagnosticBus,
+         diagnosticBus        => diagnosticBusReg,
          -- Waveform interface (axiClk domain)
          waveformClk          => axiClk,
          waveformRst          => axiRst,

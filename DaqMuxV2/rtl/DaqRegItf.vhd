@@ -123,6 +123,9 @@ architecture rtl of DaqRegItf is
    signal s_sampleValid : slv(N_DATA_IN_G-1 downto 0) := (others => '0');
    signal s_linkReady   : slv(N_DATA_IN_G-1 downto 0) := (others => '0');
 
+   signal syncFifoIn  : slv(32*N_DATA_OUT_G-1 downto 0);
+   signal syncFifoOut : slv(32*N_DATA_OUT_G-1 downto 0);
+
 begin
 
    U_SyncSampleValid : entity surf.SynchronizerVector
@@ -293,46 +296,38 @@ begin
 
    -- Input assignment and synchronization
    GEN_IN_0 : for I in N_DATA_OUT_G-1 downto 0 generate
-      SyncFifo_IN : entity surf.SynchronizerFifo
-         generic map (
-            TPD_G        => TPD_G,
-            DATA_WIDTH_G => 32)
-         port map (
-            wr_clk => devClk_i,
-            din    => daqStatus_i(I),
-            rd_clk => axiClk_i,
-            dout   => s_daqStatus(I));
+
+      syncFifoIn(32*I+31 downto 32*I) <= daqStatus_i(I);
+
+      s_daqStatus(I) <= syncFifoOut(32*I+31 downto 32*I);
+
    end generate GEN_IN_0;
 
    SyncFifo_IN0 : entity surf.SynchronizerFifo
       generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => 6)
+         TPD_G         => TPD_G,
+         MEMORY_TYPE_G => "block",
+         DATA_WIDTH_G  => 32*N_DATA_OUT_G)
       port map (
          wr_clk => devClk_i,
-         din    => trigStatus_i,
+         din    => syncFifoIn,
          rd_clk => axiClk_i,
-         dout   => s_trigStatus);
+         dout   => syncFifoOut);
 
    SyncFifo_IN1 : entity surf.SynchronizerFifo
       generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => 64)
+         TPD_G         => TPD_G,
+         MEMORY_TYPE_G => "block",
+         DATA_WIDTH_G  => 128+64+6)
       port map (
-         wr_clk => devClk_i,
-         din    => timeStamp_i,
-         rd_clk => axiClk_i,
-         dout   => s_timeStamp);
-
-   SyncFifo_IN2 : entity surf.SynchronizerFifo
-      generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => 128)
-      port map (
-         wr_clk => devClk_i,
-         din    => bsa_i,
-         rd_clk => axiClk_i,
-         dout   => s_bsa);
+         wr_clk               => devClk_i,
+         din(127 downto 0)    => bsa_i,
+         din(191 downto 128)  => timeStamp_i,
+         din(197 downto 192)  => trigStatus_i,
+         rd_clk               => axiClk_i,
+         dout(127 downto 0)   => s_bsa,
+         dout(191 downto 128) => s_timeStamp,
+         dout(197 downto 192) => s_trigStatus);
 
    ------------------------------------------------
    -- Output assignment and synchronization
@@ -419,53 +414,45 @@ begin
          dataIn  => r.control(8),
          dataOut => freezeHwMask_o);
 
-   SyncFifo_OUT0 : entity surf.SynchronizerFifo
+   U_dataSize : entity surf.SynchronizerVector
       generic map (
-         TPD_G         => TPD_G,
-         PIPE_STAGES_G => 1,
-         DATA_WIDTH_G  => dataSize_o'length)
+         TPD_G   => TPD_G,
+         WIDTH_G => dataSize_o'length)
       port map (
-         wr_clk => axiClk_i,
-         din    => r.dataSize,
-         rd_clk => devClk_i,
-         dout   => dataSize_o);
+         clk     => devClk_i,
+         dataIn  => r.dataSize,
+         dataOut => dataSize_o);
 
-   SyncFifo_OUT1 : entity surf.SynchronizerFifo
+   U_rateDiv : entity surf.SynchronizerVector
       generic map (
-         TPD_G         => TPD_G,
-         PIPE_STAGES_G => 1,
-         DATA_WIDTH_G  => 16)
+         TPD_G   => TPD_G,
+         WIDTH_G => 16)
       port map (
-         wr_clk => axiClk_i,
-         din    => r.rateDiv,
-         rd_clk => devClk_i,
-         dout   => rateDiv_o);
+         clk     => devClk_i,
+         dataIn  => r.rateDiv,
+         dataOut => rateDiv_o);
 
    GEN_OUT_0 : for I in N_DATA_OUT_G-1 downto 0 generate
-      SyncFifo_OUT : entity surf.SynchronizerFifo
+      U_muxSel : entity surf.SynchronizerVector
          generic map (
-            TPD_G         => TPD_G,
-            PIPE_STAGES_G => 1,
-            DATA_WIDTH_G  => 5)
+            TPD_G   => TPD_G,
+            WIDTH_G => 5)
          port map (
-            wr_clk => axiClk_i,
-            din    => r.muxSel(I),
-            rd_clk => devClk_i,
-            dout   => muxSel_o(I));
+            clk     => devClk_i,
+            dataIn  => r.muxSel(I),
+            dataOut => muxSel_o(I));
    end generate GEN_OUT_0;
 
 
    GEN_OUT_1 : for I in N_DATA_OUT_G-1 downto 0 generate
-      SyncFifo_OUT : entity surf.SynchronizerFifo
+      U_signWidth : entity surf.SynchronizerVector
          generic map (
-            TPD_G         => TPD_G,
-            PIPE_STAGES_G => 1,
-            DATA_WIDTH_G  => 5)
+            TPD_G   => TPD_G,
+            WIDTH_G => 5)
          port map (
-            wr_clk => axiClk_i,
-            din    => r.dataFormat(I)(4 downto 0),
-            rd_clk => devClk_i,
-            dout   => signWidth_o(I));
+            clk     => devClk_i,
+            dataIn  => r.dataFormat(I)(4 downto 0),
+            dataOut => signWidth_o(I));
 
       Sync_OUT0 : entity surf.Synchronizer
          generic map (

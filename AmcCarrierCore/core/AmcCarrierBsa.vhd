@@ -169,7 +169,7 @@ architecture mapping of AmcCarrierBsa is
    signal waveform1AxiReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
 
    signal intEthMsgMaster : AxiStreamMasterArray(1 downto 0) := (others=>AXI_STREAM_MASTER_INIT_C);
-   signal intEthMsgSlave  : AxiStreamSlaveArray (1 downto 0) := (others=>AXI_STREAM_SLAVE_INIT_C);
+   signal intEthMsgSlave  : AxiStreamSlaveArray (1 downto 0) := (others=>AXI_STREAM_SLAVE_FORCE_C);
 
 begin
 
@@ -180,7 +180,7 @@ begin
       axiWriteMaster      <= AXI_WRITE_MASTER_INIT_C;
       axiReadMaster       <= AXI_READ_MASTER_INIT_C;
       obBsaMasters        <= (others => AXI_STREAM_MASTER_INIT_C);
-      ibBsaSlaves         <= (others => AXI_STREAM_SLAVE_INIT_C);
+      ibBsaSlaves         <= (others => AXI_STREAM_SLAVE_FORCE_C);
       obAppWaveformSlaves <= WAVEFORM_SLAVE_ARRAY_INIT_C;
    end generate FSBL_GEN;
 
@@ -383,7 +383,7 @@ begin
                ibEthMsgSlave   => intEthMsgSlave (0),
                obEthMsgMaster  => intEthMsgMaster(1),
                obEthMsgSlave   => intEthMsgSlave (1));
-           
+
       end generate BSA_EN_GEN;
 
       BSA_DISABLE_GEN : if (DISABLE_BSA_G) generate
