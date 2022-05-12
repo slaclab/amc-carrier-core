@@ -64,7 +64,7 @@ architecture rtl of BsasModule is
      TKEEP_MODE_C  => EMAC_AXIS_CONFIG_C.TKEEP_MODE_C,
      TUSER_BITS_C  => EMAC_AXIS_CONFIG_C.TUSER_BITS_C,
      TUSER_MODE_C  => EMAC_AXIS_CONFIG_C.TUSER_MODE_C );
-   
+
    signal config : BsasConfigType;
    signal csync  : BsasConfigType;
    signal cv, csyncv : slv(BSAS_CONFIG_BITS_C-1 downto 0);
@@ -72,7 +72,7 @@ architecture rtl of BsasModule is
    constant NCHAN_C : integer := BSA_DIAGNOSTIC_OUTPUTS_C;
 
    type StateType is (IDLE_S, HEADER_S, DATA_S, FORWARD_S, SINK_S);
-   
+
    type RegType is record
       state          : StateType;
       init           : sl;
@@ -141,7 +141,7 @@ architecture rtl of BsasModule is
    signal trigRatesVec   : Slv32Array(2 downto 0);
 
    signal ready : sl;
-   
+
 begin
 
    U_AxiLiteXbar : entity surf.AxiLiteCrossbar
@@ -176,7 +176,7 @@ begin
    config.enable      <= axilWriteRegs(0)(0);
    config.channelMask <= resize(axilWriteRegs(1),NCHAN_C);
    config.channelSevr <= axilWriteRegs(3) & axilWriteRegs(2);
-   
+
    U_Axil_Evr : entity lcls_timing_core.EvrV2ChannelReg
      generic map (
        NCHANNELS_G => 3 )
@@ -189,7 +189,7 @@ begin
        axilReadSlave   => axilReadSlaves  (1),
        channelConfig   => config.channels,
        eventCount      => trigRatesVec );
-       
+
    U_FIFO : entity surf.AxiStreamFifoV2
      generic map ( FIFO_ADDR_WIDTH_G   => 11,
                    FIFO_PAUSE_THRESH_G => 1024,
@@ -237,7 +237,7 @@ begin
 
    cv    <= toSlv(config);
    csync <= toBsasConfigType(csyncv);
-       
+
    -- Signal to latch data for this pulse
    U_Acquire : entity lcls_timing_core.EvrV2EventSelect
      port map (
@@ -285,7 +285,7 @@ begin
    trigRatesVec(0) <= muxSlVectorArray(trigRatesArray,0);
    trigRatesVec(1) <= muxSlVectorArray(trigRatesArray,1);
    trigRatesVec(2) <= muxSlVectorArray(trigRatesArray,2);
-       
+
    comb: process(r, diagnosticRst, diagnosticBus, acquire, rowAdvance, rowReset, csync,
                  accAxisMaster, ready) is
      variable v       : RegType;
@@ -297,7 +297,7 @@ begin
      v := r;
 
      ichan := conv_integer(r.channel);
-     
+
      v.strobe        := diagnosticBus.strobe;
 
      --  Not the usual axi-stream master/slave handshake
@@ -310,11 +310,11 @@ begin
      if ready = '1' then
        v.accumulateEn := '0';
      end if;
-     
+
      start   := '0';
      advance := '0';
      sample  := '0';
-     
+
      --
      --  States:
      --    HEADER_S : write row header before sending old data and
@@ -418,7 +418,7 @@ begin
        v.rowTimestamp := diagnosticBus.timingMessage.timeStamp;
        v.rowPulseId   := diagnosticBus.timingMessage.pulseId;
      end if;
-     
+
      ----------------------------------------------------------------------------------------------
      -- Accumulation stage - shift new diagnostic data through the accumulators
      ----------------------------------------------------------------------------------------------
@@ -468,10 +468,10 @@ begin
            v.diagnosticSevr(i) := '1';
          end if;
        end loop;
-       
+
        v.channel    := (others => '0');
      end if;
-     
+
      if diagnosticRst = '1' then
        v := REG_INIT_C;
      end if;

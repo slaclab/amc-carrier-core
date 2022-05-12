@@ -181,8 +181,9 @@ begin
    -- FIFO
    U_SyncFifo : entity surf.SynchronizerFifo
       generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => MPS_SELECT_BITS_C)
+         TPD_G         => TPD_G,
+         MEMORY_TYPE_G => "block",
+         DATA_WIDTH_G  => MPS_SELECT_BITS_C)
       port map (
          -- Asynchronous Reset
          rst    => diagnosticRst,

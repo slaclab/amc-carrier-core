@@ -245,7 +245,13 @@ begin
    jesdMmcmLocked <= '1'     when((JESD_RX_LANE_G = 0) and (JESD_TX_LANE_G = 0)) else locked;
 
    jesdClk <= jesdClk185;
-   jesdRst <= jesdRst185;
+   U_jesdRst : entity surf.RstPipeline
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk    => jesdClk185,
+         rstIn  => jesdRst185,
+         rstOut => jesdRst);
 
    U_jesdUsrClk : entity surf.ClockManagerUltraScale
       generic map (

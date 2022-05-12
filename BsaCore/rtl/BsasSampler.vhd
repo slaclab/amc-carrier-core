@@ -169,7 +169,7 @@ begin
    end process comb;
 
    ready       <= rin.ready;
-   
+
    seq : process (clk) is
    begin
       if (rising_edge(clk)) then

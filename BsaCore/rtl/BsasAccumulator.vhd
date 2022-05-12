@@ -190,7 +190,7 @@ begin
        MULTSIGNIN                   => '0',
        OPMODE      (8 downto 7)     => "00",
        OPMODE      (6 downto 4)     => "011",  -- Z = C
-       OPMODE      (3 downto 2)     => "00", 
+       OPMODE      (3 downto 2)     => "00",
        OPMODE      (1 downto 0)     => "11",   -- X = A|B
        PCIN                         => (others=>'0'),  -- unused
        RSTA                         => '0',
@@ -253,7 +253,7 @@ begin
        MULTSIGNIN                   => '0',
        OPMODE      (8 downto 7)     => "00",
        OPMODE      (6 downto 4)     => "011",  -- Z = C
-       OPMODE      (3 downto 2)     => "00", 
+       OPMODE      (3 downto 2)     => "00",
        OPMODE      (1 downto 0)     => "11",   -- X = A|B
        PCIN                         => (others=>'0'),  -- unused
        RSTA                         => '0',
@@ -426,7 +426,7 @@ begin
    diagnosticMin <= resize(srlOut(127 downto  96),48,srlOut(127));
    diagnosticMax <= resize(srlOut(159 downto 128),48,srlOut(159));
    resSmp        <= srlOut(191 downto 160);
-     
+
    comb : process (diagnosticSevr, diagnosticFixd, diagnosticExc,
                    resNacc, resSum, resSmp, resVar, ufSum, ofSum, ofVar,
                    acquire, flush, valid, sample, srlOut,
@@ -438,7 +438,7 @@ begin
       v.axisMaster.tValid := '0';
       v.axisMaster.tLast  := '0';
       v.ready             := '0';
-      
+
       case r.state is
         when IDLE_S =>
           if valid = '1' then
@@ -461,7 +461,7 @@ begin
                                                 (r.sumExcepts(0) or ufSum or ofSum or uOr(resNacc(15 downto 13))) &
                                                 srlOut(12 downto 0);
           v.axisMaster.tLast  := '1';
-          
+
           v.clear     := '1';
           v.state     := DATA_S;
 
@@ -510,7 +510,7 @@ begin
    end process comb;
 
    ready  <= rin.ready;
-   
+
    seq : process (clk) is
    begin
       if (rising_edge(clk)) then
