@@ -417,8 +417,8 @@ begin
    --  Results are shifted in on SHIFT_REG_S state
    srlCE <= '1' when r.state = SHIFT_REG_S else '0';
    srlIn( 95 downto   0) <= resVar & resSum(31 downto 0) & resNacc;
-   srlIn(127 downto  96) <= diagnosticMin(31 downto 0) when (resMin(32)='0' and r.clear='0') else diagnosticData;
-   srlIn(159 downto 128) <= diagnosticMax(31 downto 0) when (resMax(32)='1' and r.clear='0') else diagnosticData;
+   srlIn(127 downto  96) <= diagnosticMin(31 downto 0) when (acquire='0' or (resMin(32)='0' and r.clear='0')) else diagnosticData;
+   srlIn(159 downto 128) <= diagnosticMax(31 downto 0) when (acquire='0' or (resMax(32)='1' and r.clear='0')) else diagnosticData;
    srlIn(191 downto 160) <= resSmp when sample='0' else diagnosticData;
 
    --  sign extend the data for 48-bit computations
