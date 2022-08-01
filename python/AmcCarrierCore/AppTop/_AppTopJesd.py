@@ -55,7 +55,7 @@ class AppTopJesd(pr.Device):
             maxlanes = numTxLanes
 
         # Check if DRP enabled and non-zero lane count
-        if((maxlanes > 0) and enJesdDrp):
+        if ((maxlanes > 0) and enJesdDrp):
             for i in range(maxlanes):
                 self.add(xil.Gthe3Channel(
                     name   = f'Gthe3Channel[{i}]',

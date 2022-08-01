@@ -96,16 +96,16 @@ class SpiCryo(pr.Device):
 
 
     def cmd_read(self, data):  # checks for a read bit set in data
-        return( (data & 0x80000000) != 0)
+        return ( (data & 0x80000000) != 0)
 
     def cmd_address(self, data): # returns address data
-        return((data & 0x7FFF0000) >> 20)
+        return ((data & 0x7FFF0000) >> 20)
 
     def cmd_data(self, data):  # returns data
-        return(data & 0xFFFFF)
+        return (data & 0xFFFFF)
 
     def cmd_make(self, read, address, data):
-        return((read << 31) | ((address << 20) & 0x7FFF00000) | (data & 0xFFFFF))
+        return ((read << 31) | ((address << 20) & 0x7FFF00000) | (data & 0xFFFFF))
 
     def do_read(self, address):
         #need double write to make sure buffer is updated
@@ -115,8 +115,8 @@ class SpiCryo(pr.Device):
             data = self._rawRead(self.read_address)
             addrrb = self.cmd_address(data)
             if (addrrb == address):
-                return(data)
-        return(0)
+                return (data)
+        return (0)
 
     @staticmethod
     def read_temperature(dev, var, read):
@@ -135,9 +135,9 @@ class SpiCryo(pr.Device):
         for dev.busy_retry in range(0, dev.max_retries):
             data = dev.do_read(dev.relay_address)
             if ~(data & 0x80000):  # check that not moving
-                return(data & 0x7FFFF)
+                return (data & 0x7FFFF)
                 time.sleep(0.1) # wait for relays to move
-        return(80000) # busy flag still set
+        return (80000) # busy flag still set
 
     @staticmethod
     def read_hemt_bias(dev, var, read):
