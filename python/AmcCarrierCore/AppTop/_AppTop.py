@@ -188,7 +188,7 @@ class AppTop(pr.Device):
                     else:
                         print(f'AppTop.Init().{tx.path}: Warning: SysRefPeriodmin = {tx.SysRefPeriodmin.value()}, SysRefPeriodmax = {tx.SysRefPeriodmax.value()}')
                 ######################################################################
-                if( tx.DataValid.get() != tx.Enable.get() ):
+                if ( tx.DataValid.get() != tx.Enable.get() ):
                     print(f'AppTop.Init(): Link Not Locked: {tx.path}.DataValid = {tx.DataValid.value()} ')
                     linkLock = False
                 ######################################################################
@@ -212,7 +212,7 @@ class AppTop(pr.Device):
                     else:
                         print(f'AppTop.Init().{rx.path}: Warning: SysRefPeriodmin = {rx.SysRefPeriodmin.value()}, SysRefPeriodmax = {rx.SysRefPeriodmax.value()}')
                 ######################################################################
-                if( rx.DataValid.get() != rx.Enable.get() ):
+                if ( rx.DataValid.get() != rx.Enable.get() ):
                     print(f'AppTop.Init(): Link Not Locked: {rx.path}.DataValid = {rx.DataValid.value()} ')
                     linkLock = False
                 ######################################################################
@@ -253,7 +253,7 @@ class AppTop(pr.Device):
 
             retryCnt = 0
             retryCntMax = 8
-            while( retryCnt < retryCntMax ):
+            while ( retryCnt < retryCntMax ):
 
                 for rx in jesdRxDevices:
                     rx.Enable.set(0)
@@ -299,7 +299,7 @@ class AppTop(pr.Device):
 
                 time.sleep(2.000)
 
-                if( self.JesdHealth() ):
+                if ( self.JesdHealth() ):
                     self._init = False
                     break
                 else:
