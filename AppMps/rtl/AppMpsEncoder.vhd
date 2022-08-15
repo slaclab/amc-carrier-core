@@ -78,7 +78,6 @@ architecture mapping of AppMpsEncoder is
                             valid       : in    sl;
                             holdDisable : in    sl;
                             bitPos      : in    integer;
-                            tholdMemIn  : in    slv;
                             tholdMemOut : inout slv;
                             message     : inout Slv8Array) is
 
@@ -102,12 +101,6 @@ architecture mapping of AppMpsEncoder is
 
          message(config.BYTE_MAP_C)(bitPos) := '1';
 
-      -- Threshold was exceeded within the last 15 clocks
-      elsif tholdMemIn /= 0 then
-         if valid = '1' then
-            tholdMemOut := tholdMemIn - 1;
-         end if;
-         message(config.BYTE_MAP_C)(bitPos) := '1';
       end if;
    end procedure;
 
@@ -228,6 +221,18 @@ begin
             -- Threshold is enabled and mps channel is not ignored
             if APP_CONFIG_C.CHAN_CONFIG_C(chan).THOLD_COUNT_C > 0 then
 
+               -- Process threshold memory to ensure messages are held for at least 15 clocks after a threshold error
+               -- and that the threshold memory is still drained after switching tables
+               -- Do this first each clock to ensure r.tholdMem is still valid
+               for thold in 0 to 7 loop
+                  if r.tholdMem(chan, thold) /= 0 then
+                     if mpsSelect.valid = '1' then
+                        v.tholdMem(chan, thold) := r.tholdMem(chan, thold) - 1;
+                     end if;
+                     msgData(APP_CONFIG_C.CHAN_CONFIG_C(chan).BYTE_MAP_C)(thold) := '1';
+                  end if;
+               end loop;
+
                -- Channel is marked as error and not ignored
                if (mpsSelect.mpsError(chan) = '1') and (mpsSelect.mpsIgnore(chan) = '0') then
                   for i in 0 to 7 loop
@@ -240,14 +245,14 @@ begin
                   compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                  mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '1',
-                                 0, r.tholdMem(chan, 0), v.tholdMem(chan, 0), msgData);
+                                 0, v.tholdMem(chan, 0), msgData);
 
                -- LCLS2 idle table
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                  mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                 7, r.tholdMem(chan, 7), v.tholdMem(chan, 7), msgData);
+                                 7, v.tholdMem(chan, 7), msgData);
 
                -- Multiple thresholds
                else
@@ -258,14 +263,14 @@ begin
                         compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                        mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                       thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
+                                       thold, v.tholdMem(chan, thold), msgData);
 
                      -- Standard table
                      else
                         compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                        mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                       thold, r.tholdMem(chan, thold), v.tholdMem(chan, thold), msgData);
+                                       thold, v.tholdMem(chan, thold), msgData);
                      end if;
                   end loop;
                end if;
