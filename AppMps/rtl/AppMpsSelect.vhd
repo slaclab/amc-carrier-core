@@ -120,7 +120,7 @@ begin
       beamDest(conv_integer(diagnosticBus.timingMessage.beamRequest(7 downto 4))) := '1';
 
       -- Beam enable decode
-      v.mpsSelect.selectIdle := ite((((beamDest and beamDestInt) /= 0) or ((beamDest and altDestInt) /= 0)),'0', '1');
+      v.mpsSelect.selectIdle := ite(((beamDest and beamDestInt) /= 0),'0', '1');
 
       -- Alt table decode
       v.mpsSelect.selectAlt := ite(((beamDest and altDestInt) /= 0),'1','0');
