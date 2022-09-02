@@ -176,8 +176,8 @@ begin
       end generate GEN_CHS;
 
       -- Assign out
-      dacSigStatus.running <= s_running;
-      dacSigStatus.sow     <= s_sow;
+      dacSigStatus.running(SIG_GEN_SIZE_G-1 downto 0) <= s_running(SIG_GEN_SIZE_G-1 downto 0);
+      dacSigStatus.sow(SIG_GEN_SIZE_G-1 downto 0)     <= s_sow(SIG_GEN_SIZE_G-1 downto 0);
    ------
    end generate GEN_SIGGEN;
 -----------------------------------
