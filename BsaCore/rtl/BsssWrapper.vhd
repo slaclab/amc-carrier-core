@@ -30,6 +30,8 @@ library surf;
 use surf.StdRtlPkg.all;
 use surf.AxiLitePkg.all;
 use surf.AxiStreamPkg.all;
+use surf.EthMacPkg.all;
+use surf.SsiPkg.all;
 
 library amc_carrier_core;
 use amc_carrier_core.AmcCarrierPkg.all;
@@ -398,7 +400,7 @@ begin
      --  Reset svcReady when appropriate ts bits change
      if r.strobe(0) = '1' then
        for i in 0 to NUM_EDEFS_G-1 loop
-         j := conv_integer(csync.tsUpdate);
+         j := conv_integer(tsUpdate);
          if r.svcTs(i) /= r.dbus.timingMessage.timeStamp(j+1 downto j) then
            v.svcReady(i) := '1';
          end if;
@@ -517,7 +519,7 @@ begin
                             v.svcReady     := r.svcReady and not eventSelQ;
                             for i in 0 to NUM_EDEFS_G-1 loop
                               if eventSelQ(i)='1' then
-                                j := conv_integer(csync.tsUpdate);
+                                j := conv_integer(tsUpdate);
                                 v.svcTs(i) := r.dbus.timingMessage.timeStamp(j+1 downto j);
                               end if;
                             end loop;
