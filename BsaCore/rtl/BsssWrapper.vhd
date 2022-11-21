@@ -242,7 +242,7 @@ architecture rtl of BsssWrapper is
    signal sAxisSlaves  : AxiStreamSlaveArray(1 downto 0);
 
    signal eventStrobe  : sl;
-   signal eventSel     : slv(NUM_EDEFS_G-1 downto 0);
+   signal eventSel     : slv(63 downto 0);
    signal eventSel0Q   : sl;
 
    signal diagnClkFreq    : slv(31 downto 0);
@@ -364,9 +364,9 @@ begin
                 dataIn  => sv,
                 dataOut => ssyncv );
 
-   eventSel    <= (r.dbus.timingMessage.bsaActive and
-                   r.dbus.timingMessage.bsaAvgDone and not
-                   r.dbus.timingMessage.bsaInit)(eventSel'range);
+   eventSel    <= r.dbus.timingMessage.bsaActive and
+                  r.dbus.timingMessage.bsaAvgDone and not
+                  r.dbus.timingMessage.bsaInit;
    eventStrobe <= r.strobe(0);
 
    comb: process(r, csync,
@@ -375,13 +375,13 @@ begin
      variable v         : RegType;
      variable deltaPID  : slv(19 downto 0);
      variable deltaTS   : slv(31 downto 0);
-     variable eventSelQ : slv(eventSel'range);
+     variable eventSelQ : slv(NUM_EDEFS_G-1 downto 0);
      variable j         : integer;
    begin
      if BATCH_G then
-       eventSelQ := eventSel;
+       eventSelQ := eventSel(eventSelQ'range);
      else
-       eventSelQ := eventSel and r.svcReady;
+       eventSelQ := eventSel(eventSelQ'range) and r.svcReady;
      end if;
 
      -- Dont start a new frame if not enough space in the fifo
