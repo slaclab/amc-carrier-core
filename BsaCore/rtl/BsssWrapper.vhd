@@ -59,11 +59,9 @@ end entity BsssWrapper;
 
 architecture rtl of BsssWrapper is
 
-  constant SVC_START_G : integer := 0;
-  constant BATCH_G     : boolean := false;
+   constant SVC_START_G : integer := 0;
+   constant BATCH_G     : boolean := false;
   
-begin
-
    constant START_COUNT : slv(11 downto 0) := toSlv(960, 12);  -- MTU
 
    type BldConfigType is record
