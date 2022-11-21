@@ -350,7 +350,7 @@ begin
                axiWriteSlave    => bsaAxiWriteSlave);
          BsssWrapper : entity amc_carrier_core.BsssWrapper
             generic map (
-               NUM_EDEFS_G => 9)
+               NUM_EDEFS_G => BSA_BUFFERS_C-4)
             port map (
                diagnosticClk   => diagnosticClk,
                diagnosticRst   => diagnosticRst,

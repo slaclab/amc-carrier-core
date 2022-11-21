@@ -109,7 +109,8 @@ architecture rtl of BldAxiStream is
                       TSL_S , TSU_S,
                       PIDL_S, PIDU_S,
                       CHM_S , DELT_S,
-                      SVC_S , CHD_S,
+                      SVC_S , SVC2_S,
+                      CHD_S,
                       SEV_S , END_S , INVALID_S);
 
    type BldStatusType is record
@@ -151,10 +152,11 @@ architecture rtl of BldAxiStream is
         when CHM_S     => s := x"5";
         when DELT_S    => s := x"6";
         when SVC_S     => s := x"7";
-        when CHD_S     => s := x"8";
-        when SEV_S     => s := x"9";
-        when END_S     => s := x"A";
-        when INVALID_S => s := x"B";
+        when SVC2_S    => s := x"8";
+        when CHD_S     => s := x"9";
+        when SEV_S     => s := x"A";
+        when END_S     => s := x"B";
+        when INVALID_S => s := x"F";
       end case;
       assignSlv(i, v, s);
       assignSlv(i, v, r.pulseIdL);
@@ -206,7 +208,7 @@ architecture rtl of BldAxiStream is
       -- data
      strobe        : slv       ( 1 downto 0);
      dbus          : DiagnosticBusType;
-     svcMask       : slv       (31 downto 0);
+     svcMask       : slv       (63 downto 0);
      svcTs         : Slv2Array (NUM_EDEFS_G-1 downto 0);
      svcReady      : slv       (NUM_EDEFS_G-1 downto 0);   -- updated for r.strobe(1)
      channelId     : integer range 0 to BSA_DIAGNOSTIC_OUTPUTS_C;
@@ -455,7 +457,10 @@ begin
          when DELT_S => v.master.tData(31 downto 0) := r.status.delta;
                         v.status.count              := r.status.count-1;
                         v.status.state              := SVC_S;
-         when SVC_S  => v.master.tData(31 downto 0) := r.svcMask;
+         when SVC_S  => v.master.tData(31 downto 0) := r.svcMask(31 downto 0);
+                        v.status.count              := r.status.count-1;
+                        v.status.state              := SVC2_S;
+         when SVC2_S => v.master.tData(31 downto 0) := r.svcMask(63 downto 32);
                         v.status.count              := r.status.count-1;
                         v.channelId                 := 0;
                         v.channelSevr               := (others=>'1');

@@ -75,7 +75,7 @@ package AmcCarrierPkg is
    -------------------------------------------------------------------------------------------------
    -- BSA configuration
    -------------------------------------------------------------------------------------------------
-   constant BSA_BUFFERS_C            : integer := 64;
+   constant BSA_BUFFERS_C            : integer := 48;
    constant BSA_DIAGNOSTIC_OUTPUTS_C : integer := 31;
    constant BSA_STREAM_BYTE_WIDTH_C  : integer := 8;
    constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data
