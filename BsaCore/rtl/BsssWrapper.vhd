@@ -242,7 +242,7 @@ architecture rtl of BsssWrapper is
    signal sAxisSlaves  : AxiStreamSlaveArray(1 downto 0);
 
    signal eventStrobe  : sl;
-   signal eventSel     : slv(63 downto 0);
+   signal eventSel     : slv(NUM_EDEFS_G-1 downto 0);
    signal eventSel0Q   : sl;
 
    signal diagnClkFreq    : slv(31 downto 0);
@@ -364,9 +364,9 @@ begin
                 dataIn  => sv,
                 dataOut => ssyncv );
 
-   eventSel    <= r.dbus.timingMessage.bsaActive and
-                  r.dbus.timingMessage.bsaAvgDone and not
-                  r.dbus.timingMessage.bsaInit;
+   eventSel    <= (r.dbus.timingMessage.bsaActive and
+                   r.dbus.timingMessage.bsaAvgDone and not
+                   r.dbus.timingMessage.bsaInit)(eventSel'range);
    eventStrobe <= r.strobe(0);
 
    comb: process(r, csync,
