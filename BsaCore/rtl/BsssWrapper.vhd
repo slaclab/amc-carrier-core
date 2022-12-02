@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2021-11-24
--- Last update: 2022-11-20
+-- Last update: 2022-12-02
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -38,7 +38,9 @@ use amc_carrier_core.AmcCarrierPkg.all;
 
 entity BsssWrapper is
 
-   generic ( NUM_EDEFS_G : integer := 1 ); -- Num of EDEFs in stream
+   generic ( NUM_EDEFS_G : integer := 1; -- Num of EDEFs in stream
+             SVC_START_G : integer := 0; -- First EDEF
+             SVC_TYPE_G  : integer := 0 ); -- BSSS=0 or 1
    port (
       -- Diagnostic data interface
       diagnosticClk   : in  sl;
@@ -61,7 +63,7 @@ end entity BsssWrapper;
 
 architecture rtl of BsssWrapper is
 
-   constant SVC_START_G : integer := 0;
+   constant SVC_TYPE_C  : integer := 0;
    constant BATCH_G     : boolean := false;
   
    constant START_COUNT : slv(11 downto 0) := toSlv(960, 12);  -- MTU
@@ -103,8 +105,7 @@ architecture rtl of BsssWrapper is
                       TSL_S , TSU_S,
                       PIDL_S, PIDU_S,
                       CHM_S , DELT_S,
-                      SVC_S , SVC2_S,
-                      CHD_S,
+                      SVC_S , CHD_S,
                       SEV_S , END_S , INVALID_S);
 
    type BldStatusType is record
@@ -116,7 +117,7 @@ architecture rtl of BsssWrapper is
       count      : slv (11 downto 0);
       pause      : sl;
       packets    : slv (19 downto 0);
-     depth       : slv       ( 3 downto 0);
+      depth       : slv       ( 3 downto 0);
    end record;
 
    constant BLD_STATUS_INIT_C : BldStatusType := (
@@ -146,10 +147,9 @@ architecture rtl of BsssWrapper is
         when CHM_S     => s := x"5";
         when DELT_S    => s := x"6";
         when SVC_S     => s := x"7";
-        when SVC2_S    => s := x"8";
-        when CHD_S     => s := x"9";
-        when SEV_S     => s := x"A";
-        when END_S     => s := x"B";
+        when CHD_S     => s := x"8";
+        when SEV_S     => s := x"9";
+        when END_S     => s := x"A";
         when INVALID_S => s := x"F";
       end case;
       assignSlv(i, v, s);
@@ -202,7 +202,7 @@ architecture rtl of BsssWrapper is
       -- data
      strobe        : slv       ( 1 downto 0);
      dbus          : DiagnosticBusType;
-     svcMask       : slv       (63 downto 0);
+     svcMask       : slv       (27 downto 0);
      svcTs         : Slv2Array (NUM_EDEFS_G-1 downto 0);
      svcReady      : slv       (NUM_EDEFS_G-1 downto 0);   -- updated for r.strobe(1)
      channelId     : integer range 0 to BSA_DIAGNOSTIC_OUTPUTS_C;
@@ -379,9 +379,9 @@ begin
      variable j         : integer;
    begin
      if BATCH_G then
-       eventSelQ := eventSel(eventSelQ'range);
+       eventSelQ := eventSel(SVC_START_G+NUM_EDEFS_G-1 downto SVC_START_G);
      else
-       eventSelQ := eventSel(eventSelQ'range) and r.svcReady;
+       eventSelQ := eventSel(SVC_START_G+NUM_EDEFS_G-1 downto SVC_START_G) and r.svcReady;
      end if;
 
      -- Dont start a new frame if not enough space in the fifo
@@ -442,10 +442,8 @@ begin
          when DELT_S => v.master.tData(31 downto 0) := r.status.delta;
                         v.status.count              := r.status.count-1;
                         v.status.state              := SVC_S;
-         when SVC_S  => v.master.tData(31 downto 0) := r.svcMask(31 downto 0);
-                        v.status.count              := r.status.count-1;
-                        v.status.state              := SVC2_S;
-         when SVC2_S => v.master.tData(31 downto 0) := r.svcMask(63 downto 32);
+         when SVC_S  => v.master.tData(31 downto 0) := toSlv(SVC_START_C,4) &
+                                                       r.svcMask(27 downto 0);
                         v.status.count              := r.status.count-1;
                         v.channelId                 := 0;
                         v.channelSevr               := (others=>'1');
@@ -496,7 +494,7 @@ begin
                             end if;
                           elsif eventSelQ /= 0 then
                             --  Append to the current packet
-                            v.svcMask(eventSelQ'left+SVC_START_G downto SVC_START_G) := eventSelQ;
+                            v.svcMask      := resize(eventSelQ,r.svcMask'length);
                             v.status.delta := resize(deltaPID,12) & resize(deltaTS,20);
                             v.status.state := DELT_S;
                           else
@@ -524,7 +522,7 @@ begin
                               end if;
                             end loop;
                           end if;
-                          v.svcMask(eventSelQ'left+SVC_START_G downto SVC_START_G) := eventSelQ;
+                          v.svcMask        := resize(eventSelQ,r.svcMask'length);
                           v.channelMaskL   := csync.channelMask;
                           v.status.state   := TSL_S;
                         end if;

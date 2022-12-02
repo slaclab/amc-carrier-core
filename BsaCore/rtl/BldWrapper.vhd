@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2015-09-25
--- Last update: 2022-11-14
+-- Last update: 2022-12-02
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -60,7 +60,8 @@ architecture rtl of BldWrapper is
 begin
 
   U_Bsss : entity amc_carrier_core.BldAxiStream
-    generic map ( SVC_START_G  => 48,
+    generic map ( SVC_START_G  => 0,
+                  SVC_TYPE_G   => 2,
                   NUM_EDEFS_G  => NUM_EDEFS_G,
                   BATCH_G      => true )
     port map (
