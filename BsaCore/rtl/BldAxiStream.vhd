@@ -34,7 +34,7 @@ entity BldAxiStream is
 
    generic (
       TPD_G       : time    := 1 ns;
-      SVC_START_G : integer := 0;      -- Index of first EDEF
+      SVC_TYPE_G  : integer := 0;      -- Service Type (0=BSSS,1=BSAS,2=BLD)
       NUM_EDEFS_G : integer := 1;      -- Num of EDEFs in stream
       BATCH_G     : boolean := true ); -- Batch events into fewer
    port (
@@ -154,7 +154,7 @@ architecture rtl of BldAxiStream is
         when CHD_S     => s := x"8";
         when SEV_S     => s := x"9";
         when END_S     => s := x"A";
-        when INVALID_S => s := x"B";
+        when INVALID_S => s := x"F";
       end case;
       assignSlv(i, v, s);
       assignSlv(i, v, r.pulseIdL);
@@ -206,7 +206,7 @@ architecture rtl of BldAxiStream is
       -- data
      strobe        : slv       ( 1 downto 0);
      dbus          : DiagnosticBusType;
-     svcMask       : slv       (31 downto 0);
+     svcMask       : slv       (59 downto 0);
      svcTs         : Slv2Array (NUM_EDEFS_G-1 downto 0);
      svcReady      : slv       (NUM_EDEFS_G-1 downto 0);   -- updated for r.strobe(1)
      channelId     : integer range 0 to BSA_DIAGNOSTIC_OUTPUTS_C;
@@ -255,6 +255,8 @@ architecture rtl of BldAxiStream is
 
 begin
 
+   assert (SVC_TYPE_G < 16) report "SVC_TYPE_G must be less than 16" severity failure;
+  
    U_DIAGNCLKFREQ : entity surf.SyncClockFreq
      generic map ( REF_CLK_FREQ_G    => 156.25E+6,
                    CLK_LOWER_LIMIT_G => 180.0E+6,
@@ -455,7 +457,8 @@ begin
          when DELT_S => v.master.tData(31 downto 0) := r.status.delta;
                         v.status.count              := r.status.count-1;
                         v.status.state              := SVC_S;
-         when SVC_S  => v.master.tData(31 downto 0) := r.svcMask;
+         when SVC_S  => v.master.tData(31 downto 0) := toSlv(SVC_TYPE_G,4) &
+                                                       r.svcMask(27 downto 0);
                         v.status.count              := r.status.count-1;
                         v.channelId                 := 0;
                         v.channelSevr               := (others=>'1');
@@ -506,7 +509,7 @@ begin
                             end if;
                           elsif eventSelQ /= 0 then
                             --  Append to the current packet
-                            v.svcMask(eventSelQ'left+SVC_START_G downto SVC_START_G) := eventSelQ;
+                            v.svcMask(eventSelQ'left downto 0) := eventSelQ;
                             v.status.delta := resize(deltaPID,12) & resize(deltaTS,20);
                             v.status.state := DELT_S;
                           else
@@ -534,7 +537,7 @@ begin
                               end if;
                             end loop;
                           end if;
-                          v.svcMask(eventSelQ'left+SVC_START_G downto SVC_START_G) := eventSelQ;
+                          v.svcMask(eventSelQ'left downto 0) := eventSelQ;
                           v.channelMaskL   := csync.channelMask;
                           v.status.state   := TSL_S;
                         end if;
