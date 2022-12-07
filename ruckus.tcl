@@ -8,9 +8,9 @@ if { [VersionCheck 2018.3 ] < 0 } {
 
 # Check for submodule tagging
 if { [info exists ::env(OVERRIDE_SUBMODULE_LOCKS)] != 1 || $::env(OVERRIDE_SUBMODULE_LOCKS) == 0 } {
-   if { [SubmoduleCheck {lcls-timing-core} {3.6.5}  "mustBeExact" ] < 0 } {exit -1}
-   if { [SubmoduleCheck {ruckus}           {4.3.1}  "mustBeExact" ] < 0 } {exit -1}
-   if { [SubmoduleCheck {surf}             {2.30.1} "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {lcls-timing-core} {3.7.0}  "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {ruckus}           {4.4.0}  "mustBeExact" ] < 0 } {exit -1}
+   if { [SubmoduleCheck {surf}             {2.36.0} "mustBeExact" ] < 0 } {exit -1}
 } else {
    puts "\n\n*********************************************************"
    puts "OVERRIDE_SUBMODULE_LOCKS != 0"
