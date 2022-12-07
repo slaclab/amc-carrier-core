@@ -72,12 +72,14 @@ architecture rtl of BsssWrapper is
       enable      : sl;
       channelMask : slv (BSA_DIAGNOSTIC_OUTPUTS_C-1 downto 0);
       packetSize  : slv (11 downto 0);
+      svcTsBit    : slv ( 3 downto 0);
    end record;
 
    constant BLD_CONFIG_INIT_C : BldConfigType := (
       enable      => '0',
       channelMask => (others => '0'),
-      packetSize  => START_COUNT );
+      packetSize  => START_COUNT,
+      svcTsBit    => toSlv(11,4) );
 
    constant BLD_CONFIG_BITS_C : integer := BSA_DIAGNOSTIC_OUTPUTS_C + 13;
 
@@ -249,8 +251,6 @@ architecture rtl of BsssWrapper is
    signal diagnStrobeRate : slv(31 downto 0);
    signal eventSel0Rate   : slv(31 downto 0);
 
-   constant tsUpdate : slv(4 downto 0) := toSlv(27,5);
-   
 begin
 
    U_DIAGNCLKFREQ : entity surf.SyncClockFreq
@@ -318,6 +318,7 @@ begin
      axiSlaveRegister(ep, x"000", 0, v.config.packetSize);
      axiSlaveRegister(ep, x"000",31, v.config.enable);
      axiSlaveRegister(ep, x"004", 0, v.config.channelMask);
+     axiSlaveRegister(ep, x"008", 0, v.config.svcTsBit);
      axiSlaveRegisterR(ep, x"010", 0, ssync.count);
      axiSlaveRegisterR(ep, x"010",16, ssync.vstate);
      axiSlaveRegisterR(ep, x"014", 0, ssync.pulseIdL);
@@ -400,7 +401,7 @@ begin
      --  Reset svcReady when appropriate ts bits change
      if r.strobe(0) = '1' then
        for i in 0 to NUM_EDEFS_G-1 loop
-         j := conv_integer(tsUpdate);
+         j := conv_integer(csync.svcTsBit)+16;
          if r.svcTs(i) /= r.dbus.timingMessage.timeStamp(j+1 downto j) then
            v.svcReady(i) := '1';
          end if;
@@ -442,7 +443,7 @@ begin
          when DELT_S => v.master.tData(31 downto 0) := r.status.delta;
                         v.status.count              := r.status.count-1;
                         v.status.state              := SVC_S;
-         when SVC_S  => v.master.tData(31 downto 0) := toSlv(SVC_START_C,4) &
+         when SVC_S  => v.master.tData(31 downto 0) := toSlv(SVC_TYPE_G,4) &
                                                        r.svcMask(27 downto 0);
                         v.status.count              := r.status.count-1;
                         v.channelId                 := 0;
@@ -517,7 +518,7 @@ begin
                             v.svcReady     := r.svcReady and not eventSelQ;
                             for i in 0 to NUM_EDEFS_G-1 loop
                               if eventSelQ(i)='1' then
-                                j := conv_integer(tsUpdate);
+                                j := conv_integer(csync.svcTsBit)+16;
                                 v.svcTs(i) := r.dbus.timingMessage.timeStamp(j+1 downto j);
                               end if;
                             end loop;

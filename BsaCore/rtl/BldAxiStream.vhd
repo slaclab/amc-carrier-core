@@ -509,7 +509,7 @@ begin
                             end if;
                           elsif eventSelQ /= 0 then
                             --  Append to the current packet
-                            v.svcMask(eventSelQ'left+SVC_START_G downto SVC_START_G) := eventSelQ;
+                            v.svcMask(eventSelQ'left downto 0) := eventSelQ;
                             v.status.delta := resize(deltaPID,12) & resize(deltaTS,20);
                             v.status.state := DELT_S;
                           else
@@ -537,7 +537,7 @@ begin
                               end if;
                             end loop;
                           end if;
-                          v.svcMask(eventSelQ'left+SVC_START_G downto SVC_START_G) := eventSelQ;
+                          v.svcMask(eventSelQ'left downto 0) := eventSelQ;
                           v.channelMaskL   := csync.channelMask;
                           v.status.state   := TSL_S;
                         end if;

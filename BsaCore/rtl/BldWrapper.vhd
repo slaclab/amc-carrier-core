@@ -60,8 +60,7 @@ architecture rtl of BldWrapper is
 begin
 
   U_Bsss : entity amc_carrier_core.BldAxiStream
-    generic map ( SVC_START_G  => 0,
-                  SVC_TYPE_G   => 2,
+    generic map ( SVC_TYPE_G   => 2,
                   NUM_EDEFS_G  => NUM_EDEFS_G,
                   BATCH_G      => true )
     port map (
