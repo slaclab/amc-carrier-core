@@ -45,7 +45,7 @@ var classBldAxiStream_1_1rtl =
     [ "RegType", "classBldAxiStream_1_1rtl.html#a35f0a6888bd1c2e56754f97c77a534b9", null ],
     [ "strobe", "classBldAxiStream_1_1rtl.html#a18d3e9a036c91db1ae0c8a7d0ba23270", null ],
     [ "dbus", "classBldAxiStream_1_1rtl.html#abce705e0a5eb5dca6517d6d25ce5c6f9", null ],
-    [ "svcMask", "classBldAxiStream_1_1rtl.html#a18b0c651daee57ee4a6cd0168ed2fa53", null ],
+    [ "svcMask", "classBldAxiStream_1_1rtl.html#a8ad476b95768662c11996569a7dbd7e1", null ],
     [ "svcTs", "classBldAxiStream_1_1rtl.html#ae6435916960c1e764465c13227112d54", null ],
     [ "svcReady", "classBldAxiStream_1_1rtl.html#a0919bbf756ce1530ada0fe3a7c6a6537", null ],
     [ "channelId", "classBldAxiStream_1_1rtl.html#a3904e8ae241386fd06b9b23db73c2cec", null ],

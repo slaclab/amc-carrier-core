@@ -24,14 +24,14 @@
 <area shape="rect" id="node23" href="$classBsaWaveformEngine.html" title=" " alt="" coords="593,411,768,437"/>
 <area shape="rect" id="node24" href="$classBsaBufferControl.html" title=" " alt="" coords="615,461,747,488"/>
 <area shape="rect" id="node25" href="$classBsaAccumulator.html" title=" " alt="" coords="374,461,502,488"/>
-<area shape="rect" id="node26" href="$classBsssWrapper.html" title=" " alt="" coords="627,512,734,539"/>
-<area shape="rect" id="node27" href="$classBldAxiStream.html" title=" " alt="" coords="383,537,493,564"/>
-<area shape="rect" id="node34" href="$classBldWrapper.html" title=" " alt="" coords="631,563,730,589"/>
-<area shape="rect" id="node28" href="$classBldEventSelect.html" title=" " alt="" coords="171,537,291,564"/>
-<area shape="rect" id="node29" href="$classBldEventRAM.html" title=" " alt="" coords="5,537,116,564"/>
-<area shape="rect" id="node30" href="$classBsasWrapper.html" title=" " alt="" coords="627,613,735,640"/>
-<area shape="rect" id="node31" href="$classBsasModule.html" title=" " alt="" coords="387,613,489,640"/>
-<area shape="rect" id="node32" href="$classBsasAccumulator.html" title=" " alt="" coords="164,613,299,640"/>
-<area shape="rect" id="node33" href="$classBsaAxiInterconnectWrapper.html" title=" " alt="" coords="579,664,782,691"/>
+<area shape="rect" id="node26" href="$classBsssWrapper.html" title=" " alt="" coords="618,512,743,539"/>
+<area shape="rect" id="node27" href="$classBsasWrapper.html" title=" " alt="" coords="627,563,735,589"/>
+<area shape="rect" id="node28" href="$classBsasModule.html" title=" " alt="" coords="387,563,489,589"/>
+<area shape="rect" id="node29" href="$classBsasAccumulator.html" title=" " alt="" coords="164,563,299,589"/>
+<area shape="rect" id="node30" href="$classBsaAxiInterconnectWrapper.html" title=" " alt="" coords="579,613,782,640"/>
+<area shape="rect" id="node31" href="$classBldWrapper.html" title=" " alt="" coords="631,664,730,691"/>
+<area shape="rect" id="node32" href="$classBldAxiStream.html" title=" " alt="" coords="383,664,493,691"/>
+<area shape="rect" id="node33" href="$classBldEventSelect.html" title=" " alt="" coords="171,664,291,691"/>
+<area shape="rect" id="node34" href="$classBldEventRAM.html" title=" " alt="" coords="5,664,116,691"/>
 <area shape="rect" id="node35" href="$classAmcCarrierDdrMem.html" title=" " alt="" coords="832,537,983,564"/>
 </map>

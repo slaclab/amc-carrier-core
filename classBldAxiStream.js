@@ -2,7 +2,7 @@ var classBldAxiStream =
 [
     [ "rtl", "classBldAxiStream_1_1rtl.html", "classBldAxiStream_1_1rtl" ],
     [ "TPD_G", "classBldAxiStream.html#a67a837684e4f18c2d236ac1d053b419b", null ],
-    [ "SVC_START_G", "classBldAxiStream.html#aae44d09aa2f96d3ad550d24c49395116", null ],
+    [ "SVC_TYPE_G", "classBldAxiStream.html#a8196151a18e710b2598e18906036332a", null ],
     [ "NUM_EDEFS_G", "classBldAxiStream.html#a0e16f9d67022c2fbfa091b1a5f60a5f8", null ],
     [ "BATCH_G", "classBldAxiStream.html#a41fba7c3fda5d653948e3eefc7ca810e", null ],
     [ "diagnosticClk", "classBldAxiStream.html#a73de3f9427dc2279ddf694c28d504b24", null ],
