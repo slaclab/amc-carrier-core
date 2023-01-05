@@ -106,6 +106,7 @@ architecture rtl of AmcCarrierBsi is
       crateId        : slv(15 downto 0);
       macAddress     : Slv48Array(BSI_MAC_SIZE_C-1 downto 0);
       localIp        : slv(31 downto 0);
+      rst            : slv(2 downto 0);
       axilReadSlave  : AxiLiteReadSlaveType;
       axilWriteSlave : AxiLiteWriteSlaveType;
    end record;
@@ -123,6 +124,7 @@ architecture rtl of AmcCarrierBsi is
       crateId        => x"0000",
       macAddress     => (others => (others => '0')),
       localIp        => x"0000000A",
+      rst            => (others='0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
@@ -184,7 +186,7 @@ begin
          ENDIANNESS_G         => 1)     -- 0=LE, 1=BE
       port map (
          clk    => axilClk,
-         sRst   => axilRst,
+         sRst   => r.rst(0),
          aRst   => '0',
          addr   => i2cBramAddr(0),
          wrEn   => i2cBramWr(0),
@@ -209,7 +211,7 @@ begin
          ENDIANNESS_G         => 1)     -- 0=LE, 1=BE
       port map (
          clk    => axilClk,
-         sRst   => axilRst,
+         sRst   => r.rst(0),
          aRst   => '0',
          addr   => i2cBramAddr(1),
          wrEn   => i2cBramWr(1),
@@ -451,6 +453,8 @@ begin
       if (axilRst = '1') then
          v := REG_INIT_C;
       end if;
+
+      v.rst := axilRst & r.rst(r.rst'left downto 1);
 
       -- Register the variable for next clock cycle
       rin <= v;
