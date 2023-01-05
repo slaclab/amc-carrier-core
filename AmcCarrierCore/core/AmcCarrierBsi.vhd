@@ -124,7 +124,7 @@ architecture rtl of AmcCarrierBsi is
       crateId        => x"0000",
       macAddress     => (others => (others => '0')),
       localIp        => x"0000000A",
-      rst            => (others='0'),
+      rst            => (others=>'0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
