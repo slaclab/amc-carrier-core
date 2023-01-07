@@ -1,5 +1,6 @@
 var NAVTREEINDEX11 =
 {
+"classAmcMicrowaveMuxCoreCtrl.html":[0,0,37],
 "classAmcMicrowaveMuxCoreCtrl.html#a01c9c97f02ab1d27acd97d975677c5c4":[0,0,37,12],
 "classAmcMicrowaveMuxCoreCtrl.html#a0a6af6eef40212dbaf130d57ce711256":[0,0,37,17],
 "classAmcMicrowaveMuxCoreCtrl.html#a0db206ebb3e246e377fe6b7c501ac8e9":[0,0,37,15],
@@ -248,6 +249,5 @@ var NAVTREEINDEX11 =
 "classAmcMpsDigitalInputDualCore.html#ae704ed611babe78b8f3c0c38f0fd79b5":[0,0,40,22],
 "classAmcMpsDigitalInputDualCore.html#af2fe75efbe0a68c3fb806bb88b1a81ba":[0,0,40,26],
 "classAmcMpsDigitalInputDualCore.html#af72b9959fef6bc554f4f09d790eb7838":[0,0,40,12],
-"classAmcMpsDigitalInputDualCore.html#af98a1f0df20cf0e5f0fdb9f5999ad782":[0,0,40,27],
-"classAmcMpsDigitalInputDualCore_1_1mapping.html":[0,0,40,0]
+"classAmcMpsDigitalInputDualCore.html#af98a1f0df20cf0e5f0fdb9f5999ad782":[0,0,40,27]
 };

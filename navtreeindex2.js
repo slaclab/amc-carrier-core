@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"classAmcCarrierCore.html#ac35da15ad2a0672df251117b1bd11dc7":[0,0,8,104],
 "classAmcCarrierCore.html#ac9456deb6cfeff91a56e632e4b22ce89":[0,0,8,111],
 "classAmcCarrierCore.html#acabf3ea45bb9ea54f778c194fc238b6d":[0,0,8,125],
 "classAmcCarrierCore.html#acd03516902501cd1c7296a98e22c6fcb":[0,0,8,124],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "classAmcCarrierCoreBase.html#a2aad9d2ca724150874d304c7792b5062":[0,0,10,110],
 "classAmcCarrierCoreBase.html#a2cfec1295116fb7ee26aafcae39002be":[0,0,10,22],
 "classAmcCarrierCoreBase.html#a2dcf48abdd0587c9fd1c2edc41875f0e":[0,0,10,88],
-"classAmcCarrierCoreBase.html#a2dfe52a26c7507505c60c45b07ed6972":[0,0,10,11],
-"classAmcCarrierCoreBase.html#a32b00ffdea0b847a9834fa573bc3fbb7":[0,0,10,115]
+"classAmcCarrierCoreBase.html#a2dfe52a26c7507505c60c45b07ed6972":[0,0,10,11]
 };

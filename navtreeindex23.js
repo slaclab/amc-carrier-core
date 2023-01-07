@@ -1,5 +1,6 @@
 var NAVTREEINDEX23 =
 {
+"classBsaBufferControl.html#aada3e73ee8db4190524295bfa4dff085":[0,0,83,10],
 "classBsaBufferControl.html#ac4846a113db5091362e41049a6e0a221":[0,0,83,7],
 "classBsaBufferControl.html#acabf3ea45bb9ea54f778c194fc238b6d":[0,0,83,29],
 "classBsaBufferControl.html#acd03516902501cd1c7296a98e22c6fcb":[0,0,83,26],
@@ -248,6 +249,5 @@ var NAVTREEINDEX23 =
 "classBsasModule.html#a73de3f9427dc2279ddf694c28d504b24":[0,0,85,4],
 "classBsasModule.html#a776f7d1c3e4102d6af8db8ec00c215ce":[0,0,85,22],
 "classBsasModule.html#a79b73f4b465a5026255800d78dde7552":[0,0,85,2],
-"classBsasModule.html#a8063c3e896b8f609f53c6d4aa4aec694":[0,0,85,3],
-"classBsasModule.html#a80e5574c28ce6fd06510648d63787843":[0,0,85,12]
+"classBsasModule.html#a8063c3e896b8f609f53c6d4aa4aec694":[0,0,85,3]
 };

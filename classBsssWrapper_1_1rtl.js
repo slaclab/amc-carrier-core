@@ -17,7 +17,7 @@ var classBsssWrapper_1_1rtl =
     [ "packetSize", "classBsssWrapper_1_1rtl.html#a052bcf7eb45fae1c9a3be85def32ac7d", null ],
     [ "svcTsBit", "classBsssWrapper_1_1rtl.html#ab5dc6432967aa91e893f792b0fd23bfb", null ],
     [ "BLD_CONFIG_INIT_C", "classBsssWrapper_1_1rtl.html#afaedf367469ce52f29e406332e15c2dc", null ],
-    [ "BLD_CONFIG_BITS_C", "classBsssWrapper_1_1rtl.html#a78c9e506b205dc647552b951c926eded", null ],
+    [ "BLD_CONFIG_BITS_C", "classBsssWrapper_1_1rtl.html#a0e561489ff3bf224ccc3b84773718a81", null ],
     [ "StateType", "classBsssWrapper_1_1rtl.html#ac463f6941d76a2644da017482256121a", null ],
     [ "BldStatusType", "classBsssWrapper_1_1rtl.html#a6c083757ffc77a9974facd5d179dd612", null ],
     [ "state", "classBsssWrapper_1_1rtl.html#a4d1aa26dcfa648e02cbb0964cddbdbfe", null ],
