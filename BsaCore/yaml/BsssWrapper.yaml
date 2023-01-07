@@ -8,10 +8,10 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once BsssAxiStream.yaml
+#once BsssWrapper.yaml
 
-BsssAxiStream: &BsssAxiStream
-  name: BsssAxiStream
+BsssWrapper: &BsssWrapper
+  name: BsssWrapper
   description: Beam line data service
   size: 0x8000
   class: MMIODev
@@ -56,12 +56,13 @@ BsssAxiStream: &BsssAxiStream
       lsBit: 0
       mode: RW
       enums:
-          class: Enum
-          value: 0
         - name: INVALID_0
           class: Enum
-          value: 1
+          value: 0
         - name: INVALID_1
+          class: Enum
+          value: 1
+        - name: INVALID_2
           class: Enum
           value: 2
         - name: Limit_1p9_kHz

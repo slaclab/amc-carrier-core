@@ -5,7 +5,7 @@
 -- Author     : Matt Weaver <weaver@slac.stanford.edu>
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2021-11-24
--- Last update: 2022-12-02
+-- Last update: 2022-12-15
 -- Platform   :
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ architecture rtl of BsssWrapper is
       packetSize  => START_COUNT,
       svcTsBit    => toSlv(11,4) );
 
-   constant BLD_CONFIG_BITS_C : integer := BSA_DIAGNOSTIC_OUTPUTS_C + 13;
+   constant BLD_CONFIG_BITS_C : integer := BSA_DIAGNOSTIC_OUTPUTS_C + 17;
 
    function toSlv(r : BldConfigType) return slv is
       variable v : slv(BLD_CONFIG_BITS_C-1 downto 0) := (others=>'0');
@@ -90,16 +90,18 @@ architecture rtl of BsssWrapper is
       assignSlv(i, v, r.enable);
       assignSlv(i, v, r.channelMask);
       assignSlv(i, v, r.packetSize);
+      assignSlv(i, v, r.svcTsBit);
       return v;
    end function;
 
    function toBldConfig(v : slv) return BldConfigType is
-      variable c : BldConfigType;
+      variable c : BldConfigType := BLD_CONFIG_INIT_C;
       variable i,j : integer := 0;
    begin
       assignRecord(i, v, c.enable);
       assignRecord(i, v, c.channelMask);
       assignRecord(i, v, c.packetSize);
+      assignRecord(i, v, c.svcTsBit);
       return c;
    end function;
 

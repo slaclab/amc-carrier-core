@@ -394,6 +394,9 @@ begin
            intEthMsgSlave (0) <= intEthMsgSlave (1);
          end generate NOGEN_BSSS1;
          BsasWrapper : entity amc_carrier_core.BsasWrapper
+            generic map (
+               NUM_EDEFS_G => 4,
+               BASE_ADDR_G => AXIL_CROSSBAR_CONFIG_C(BSAS_AXIL_C).baseAddr )
             port map (
                diagnosticClk   => diagnosticClk,
                diagnosticRst   => diagnosticRst,

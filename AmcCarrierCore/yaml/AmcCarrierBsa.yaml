@@ -13,6 +13,7 @@
 #include BsaWaveformEngine.yaml
 #include BldAxiStream.yaml
 #include BsasWrapper.yaml
+#include BsssWrapper.yaml
 
 AmcCarrierBsa: &AmcCarrierBsa
   name: AmcCarrierBsa
