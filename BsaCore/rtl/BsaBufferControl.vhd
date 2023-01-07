@@ -427,6 +427,7 @@ begin
          BUFFERS_G            => BSA_BUFFERS_G,
          BURST_SIZE_BYTES_G   => BSA_BURST_BYTES_G,
          ENABLE_UNALIGN_G     => true,
+         FORCE_WRAP_ALIGN_G   => true,
          TRIGGER_USER_BIT_G   => 1,                                 -- EOFE is bit 0
          AXIL_BASE_ADDR_G     => DMA_RING_BASE_ADDR_C,
          DATA_AXIS_CONFIG_G   => LAST_STREAM_CONFIG_C,
