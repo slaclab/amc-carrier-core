@@ -22,7 +22,7 @@ BsaBufferControl: &BsaBufferControl
     Timestamps:
       at:
         offset: 0x00000000
-      size: 512 # 64 64-bit values
+      size: 512 # 48 64-bit values
       class: MMIODev
       configPrio: 1
       children:
@@ -31,7 +31,7 @@ BsaBufferControl: &BsaBufferControl
           at:
             offset: 0x0
             stride: 8
-            nelms: 64
+            nelms: 48
           sizeBits: 64
           mode: RO
     BsaBuffers:
@@ -39,7 +39,7 @@ BsaBufferControl: &BsaBufferControl
         offset: 0x00001000
       <<: *AxiStreamDmaRingWrite
       metadata:
-        numBuffers: &BsaBufferControlNelms 64
+        numBuffers: &BsaBufferControlNelms 48
         destEnums: &BsaBufferControlEnums
           - name: Software
             value: 0
@@ -117,7 +117,7 @@ BsaBufferControl: &BsaBufferControl
     BufferInit:
       at:
         offset: 0x00002000
-      size: 256 # 64 32-bit values
+      size: 192 # 48 32-bit values
       class: MMIODev
       configPrio: 1
       children:
