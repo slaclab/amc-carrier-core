@@ -474,7 +474,7 @@ begin
 
    U_AmcClkFreqReg : entity amc_carrier_core.AmcClkFreqReg
       generic map (
-         TPD_G           => TPD_G)
+         TPD_G => TPD_G)
       port map (
          amcClk          => jesdClk,
          -- AXI-Lite Interface
@@ -483,6 +483,6 @@ begin
          axilReadMaster  => axilReadMasters(CLK_FREQ_INDEX_C),
          axilReadSlave   => axilReadSlaves(CLK_FREQ_INDEX_C),
          axilWriteMaster => axilWriteMasters(CLK_FREQ_INDEX_C),
-         axilWriteSlave  => axilWriteSlaves(CLK_FREQ_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(CLK_FREQ_INDEX_C));
 
 end mapping;
