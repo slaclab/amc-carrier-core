@@ -32,6 +32,14 @@ AmcMrLlrfGen2UpConvert: &AmcMrLlrfGen2UpConvert
         nelms: 4
         stride: 0x10
     ##################################################
+    AmcClkFreq:
+      at:
+        offset: 0x000000A0
+      class: IntField
+      name: AmcClkFreq
+      mode: RO
+      description: AMC Clock frequency (in units of Hz)
+    ##################################################
     Adt7420:
       <<: *Adt7420
       name: "Adt7420"
