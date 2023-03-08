@@ -45,6 +45,14 @@ AmcMrLlrfDownConvert: &AmcMrLlrfDownConvert
       at:
         offset: 0x00000090
     ##################################################
+    AmcClkFreq:
+      at:
+        offset: 0x000000A0
+      class: IntField
+      name: AmcClkFreq
+      mode: RO
+      description: AMC Clock frequency (in units of Hz)
+    ##################################################
     Adt7420:
       <<: *Adt7420
       name: "Adt7420"

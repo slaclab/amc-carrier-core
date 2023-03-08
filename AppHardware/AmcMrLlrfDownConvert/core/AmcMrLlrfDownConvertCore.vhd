@@ -105,7 +105,7 @@ architecture mapping of AmcMrLlrfDownConvertCore is
          endianness  => '1',            -- Big endian
          repeatStart => '1'));          -- Enable repeated start
 
-   constant NUM_AXI_MASTERS_C      : natural  := 15;
+   constant NUM_AXI_MASTERS_C      : natural  := 16;
    constant NUM_COMMON_SPI_CHIPS_C : positive := 4;
    constant NUM_DAC_CHIPS_C        : positive := 3;
    constant NUM_ATTN_CHIPS_C       : positive := 6;
@@ -120,11 +120,12 @@ architecture mapping of AmcMrLlrfDownConvertCore is
    constant DAC_1_INDEX_C    : natural := 7;
    constant DAC_2_INDEX_C    : natural := 8;
    constant DAC_MUX_INDEX_C  : natural := 9;
-   constant TEMP_I2C_INDEX_C : natural := 10;
-   constant ADC_0_INDEX_C    : natural := 11;
-   constant ADC_1_INDEX_C    : natural := 12;
-   constant ADC_2_INDEX_C    : natural := 13;
-   constant LMK_INDEX_C      : natural := 14;
+   constant CLK_FREQ_INDEX_C : natural := 10;
+   constant TEMP_I2C_INDEX_C : natural := 11;
+   constant ADC_0_INDEX_C    : natural := 12;
+   constant ADC_1_INDEX_C    : natural := 13;
+   constant ADC_2_INDEX_C    : natural := 14;
+   constant LMK_INDEX_C      : natural := 15;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       ATT_0_INDEX_C    => (
@@ -165,6 +166,10 @@ architecture mapping of AmcMrLlrfDownConvertCore is
          connectivity  => X"FFFF"),
       DAC_MUX_INDEX_C  => (
          baseAddr      => (AXI_BASE_ADDR_G + x"0000_0090"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      CLK_FREQ_INDEX_C  => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_00A0"),
          addrBits      => 4,
          connectivity  => X"FFFF"),
       TEMP_I2C_INDEX_C => (
@@ -557,5 +562,18 @@ begin
          dacSclk_o       => dacSclk_o,
          dacSdi_o        => dacSdi_o,
          dacCsL_o        => dacCsL_o);
+
+   U_AmcClkFreqReg : entity amc_carrier_core.AmcClkFreqReg
+      generic map (
+         TPD_G           => TPD_G)
+      port map (
+         amcClk          => jesdClk,
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(CLK_FREQ_INDEX_C),
+         axilReadSlave   => axilReadSlaves(CLK_FREQ_INDEX_C),
+         axilWriteMaster => axilWriteMasters(CLK_FREQ_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(CLK_FREQ_INDEX_C),
 
 end mapping;
