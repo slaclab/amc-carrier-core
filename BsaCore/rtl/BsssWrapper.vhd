@@ -65,7 +65,7 @@ architecture rtl of BsssWrapper is
 
    constant SVC_TYPE_C  : integer := 0;
    constant BATCH_G     : boolean := false;
-  
+
    constant START_COUNT : slv(11 downto 0) := toSlv(960, 12);  -- MTU
 
    type BldConfigType is record

@@ -208,7 +208,7 @@ begin
          axiClk              => axilClk,              -- [in]
          axiClkRst           => axilRst,              -- [in]
          sAxiWriteMasters(0) => axilWriteMaster,      -- [in]
-         sAxiWriteSlaves(0)  => axilWriteSlave,       -- [out] 
+         sAxiWriteSlaves(0)  => axilWriteSlave,       -- [out]
          sAxiReadMasters(0)  => axilReadMaster,       -- [in]
          sAxiReadSlaves(0)   => axilReadSlave,        -- [out]
          mAxiWriteMasters    => locAxilWriteMasters,  -- [out]
