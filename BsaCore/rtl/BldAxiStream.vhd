@@ -256,7 +256,7 @@ architecture rtl of BldAxiStream is
 begin
 
    assert (SVC_TYPE_G < 16) report "SVC_TYPE_G must be less than 16" severity failure;
-  
+
    U_DIAGNCLKFREQ : entity surf.SyncClockFreq
      generic map ( REF_CLK_FREQ_G    => 156.25E+6,
                    CLK_LOWER_LIMIT_G => 180.0E+6,
