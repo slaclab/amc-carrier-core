@@ -1,11 +1,12 @@
 <map id="AmcMrLlrfUpConvertCore" name="AmcMrLlrfUpConvertCore">
-<area shape="rect" id="node1" title=" " alt="" coords="295,155,483,181"/>
-<area shape="rect" id="node2" href="$classAmcMrLlrfUpConvertMapping.html" title=" " alt="" coords="5,80,220,107"/>
-<area shape="rect" id="node3" href="$classJesdSyncIn.html" title=" " alt="" coords="25,5,136,32"/>
-<area shape="rect" id="node4" href="$classJesdSyncOut.html" title=" " alt="" coords="160,5,281,32"/>
-<area shape="rect" id="node5" href="$classAxiSerAttnMaster.html" title=" " alt="" coords="245,80,381,107"/>
-<area shape="rect" id="node6" href="$classLvdsDacSigGen.html" title=" " alt="" coords="405,80,527,107"/>
-<area shape="rect" id="node7" href="$classLvdsDacRegItf.html" title=" " alt="" coords="356,5,472,32"/>
-<area shape="rect" id="node8" href="$classLvdsDacLane.html" title=" " alt="" coords="496,5,604,32"/>
-<area shape="rect" id="node9" href="$classOutputTapDelay.html" title=" " alt="" coords="552,80,679,107"/>
+<area shape="rect" id="node1" title=" " alt="" coords="437,144,625,171"/>
+<area shape="rect" id="node2" href="$classAmcMrLlrfUpConvertMapping.html" title=" " alt="" coords="175,43,389,69"/>
+<area shape="rect" id="node3" href="$classJesdSyncIn.html" title=" " alt="" coords="11,5,121,32"/>
+<area shape="rect" id="node4" href="$classJesdSyncOut.html" title=" " alt="" coords="5,56,127,83"/>
+<area shape="rect" id="node5" href="$classAxiSerAttnMaster.html" title=" " alt="" coords="214,93,350,120"/>
+<area shape="rect" id="node6" href="$classLvdsDacSigGen.html" title=" " alt="" coords="221,144,343,171"/>
+<area shape="rect" id="node7" href="$classLvdsDacRegItf.html" title=" " alt="" coords="8,119,124,145"/>
+<area shape="rect" id="node8" href="$classLvdsDacLane.html" title=" " alt="" coords="12,169,120,196"/>
+<area shape="rect" id="node9" href="$classOutputTapDelay.html" title=" " alt="" coords="219,195,345,221"/>
+<area shape="rect" id="node10" href="$classAmcClkFreqReg.html" title=" " alt="" coords="219,245,345,272"/>
 </map>

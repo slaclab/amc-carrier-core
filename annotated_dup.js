@@ -23,6 +23,7 @@ var annotated_dup =
     [ "AmcCarrierSysMon", "classAmcCarrierSysMon.html", "classAmcCarrierSysMon" ],
     [ "AmcCarrierSysReg", "classAmcCarrierSysReg.html", "classAmcCarrierSysReg" ],
     [ "AmcCarrierTiming", "classAmcCarrierTiming.html", "classAmcCarrierTiming" ],
+    [ "AmcClkFreqReg", "classAmcClkFreqReg.html", "classAmcClkFreqReg" ],
     [ "AmcCryoCore", "classAmcCryoCore.html", "classAmcCryoCore" ],
     [ "AmcCryoCoreCtrl", "classAmcCryoCoreCtrl.html", "classAmcCryoCoreCtrl" ],
     [ "AmcCryoDemoCore", "classAmcCryoDemoCore.html", "classAmcCryoDemoCore" ],

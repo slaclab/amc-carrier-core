@@ -1,7 +1,7 @@
 var classAmcMrLlrfDownConvertCore_1_1mapping =
 [
     [ "I2C_DEVICE_MAP_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#aa2c1c4b499cbc2b9295decffbe46d0f6", null ],
-    [ "NUM_AXI_MASTERS_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#aee3c833aaf32b32232d09dd7def53235", null ],
+    [ "NUM_AXI_MASTERS_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#af239ff68eb56c4aa26d6d8dcac57c76b", null ],
     [ "NUM_COMMON_SPI_CHIPS_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a3e93560f06b437481a6bfb58dfac5b8c", null ],
     [ "NUM_DAC_CHIPS_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#ad3b84c542c75fc07ab2390d8b2ed95b2", null ],
     [ "NUM_ATTN_CHIPS_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#ac3c8cc3619aa9acecb53a84e176b6a1b", null ],
@@ -15,12 +15,13 @@ var classAmcMrLlrfDownConvertCore_1_1mapping =
     [ "DAC_1_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a1086dd792548299b70ab33abbb22481e", null ],
     [ "DAC_2_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a3072abc6f18fe9519bfbc8588218a2a2", null ],
     [ "DAC_MUX_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a63a5381aa4d0fa80c816b13a9861704f", null ],
-    [ "TEMP_I2C_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#ad9a28b315cbd57036353027009d986b0", null ],
-    [ "ADC_0_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#aa0706d7e4abbd299ff34e0072d78a969", null ],
-    [ "ADC_1_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#ad2ce2527d49c2367a0ff352e00f676a1", null ],
-    [ "ADC_2_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a9b0e062198b545a7c12d82873a575317", null ],
-    [ "LMK_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a1609b5fed7c75557bc3fbbe6c4609e23", null ],
-    [ "AXI_CONFIG_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a9755e1d026e4b0df36980b188751807d", null ],
+    [ "CLK_FREQ_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#abf518bbaa1c4c40e91a1e67da07d24c9", null ],
+    [ "TEMP_I2C_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a2afcc00821f09d5c439b509c88807b66", null ],
+    [ "ADC_0_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a528de804bf090856ef63d6de8fa820f7", null ],
+    [ "ADC_1_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#ae9a44261d4e54e4388de48663ecac9ba", null ],
+    [ "ADC_2_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a4aff86ddb36468f7f588db090aa81eb9", null ],
+    [ "LMK_INDEX_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#aa00c0495979b112b29bb816d69ce5f24", null ],
+    [ "AXI_CONFIG_C", "classAmcMrLlrfDownConvertCore_1_1mapping.html#aa96a964ce8bed0bd5afeb2d6e640dd80", null ],
     [ "axilWriteMasters", "classAmcMrLlrfDownConvertCore_1_1mapping.html#ac5e5be4b521e70ed3130b773e1686568", null ],
     [ "axilWriteSlaves", "classAmcMrLlrfDownConvertCore_1_1mapping.html#af76ef3fec09f705d89b902d448e537da", null ],
     [ "axilReadMasters", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a1536e0f948b8e3a7c1f0370d158b537e", null ],
@@ -70,5 +71,6 @@ var classAmcMrLlrfDownConvertCore_1_1mapping =
     [ "axispimaster_inst", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a5d42cf36efbe137e3e868bfbcb4bb42f", null ],
     [ "u_attn", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a138843e4b581f1999460d9d430c9f208", null ],
     [ "axiserattnmaster_inst", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a036e165acbb76960971a3dda34fb690c", null ],
-    [ "u_dac", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a782a161e592d11591316677c2db9a7af", null ]
+    [ "u_dac", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a782a161e592d11591316677c2db9a7af", null ],
+    [ "u_amcclkfreqreg", "classAmcMrLlrfDownConvertCore_1_1mapping.html#a5b3c270be14046256992a164326bd60b", null ]
 ];
