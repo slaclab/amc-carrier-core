@@ -36,33 +36,36 @@ entity RtmCryoDet is
       AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- JESD Clock Reference
-      jesdClk         : in    sl;
-      jesdRst         : in    sl;
+      jesdClk         : in  sl;
+      jesdRst         : in  sl;
       -- Timing trigger
-      timingTrig      : in    sl;
+      timingTrig      : in  sl;
       -- Digital I/O Interface
-      startRamp       : out   sl;
-      selectRamp      : out   sl;
-      rampCnt         : out   slv(31 downto 0);
+      startRamp       : out sl;
+      selectRamp      : out sl;
+      rampCnt         : out slv(31 downto 0);
       -- Copy of RTM DAC Configuration
-      rtmDacAddr      : in    slv(10 downto 0);
-      rtmDacData      : out   slv(19 downto 0);
+      rtmDacAddr      : in  slv(10 downto 0);
+      rtmDacData      : out slv(19 downto 0);
+      -- 1PPS Interface
+      lemoInRaw       : out sl;
       -- AXI-Lite
-      axilClk         : in    sl;
-      axilRst         : in    sl;
-      axilReadMaster  : in    AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
-      axilReadSlave   : out   AxiLiteReadSlaveType;
-      axilWriteMaster : in    AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
-      axilWriteSlave  : out   AxiLiteWriteSlaveType;
+      axilClk         : in  sl;
+      axilRst         : in  sl;
+      axilReadMaster  : in  AxiLiteReadMasterType  := AXI_LITE_READ_MASTER_INIT_C;
+      axilReadSlave   : out AxiLiteReadSlaveType;
+      axilWriteMaster : in  AxiLiteWriteMasterType := AXI_LITE_WRITE_MASTER_INIT_C;
+      axilWriteSlave  : out AxiLiteWriteSlaveType;
+
       -----------------------
       -- Application Ports --
       -----------------------
       -- RTM's Low Speed Ports
-      rtmLsP          : inout slv(53 downto 0);
-      rtmLsN          : inout slv(53 downto 0);
+      rtmLsP  : inout slv(53 downto 0);
+      rtmLsN  : inout slv(53 downto 0);
       --  RTM's Clock Reference
-      genClkP         : in    sl;
-      genClkN         : in    sl);
+      genClkP : in    sl;
+      genClkN : in    sl);
 end RtmCryoDet;
 
 architecture mapping of RtmCryoDet is
@@ -163,12 +166,13 @@ begin
    rtmLsP(3) <= picSck;
    rtmLsN(3) <= picSdi;
 
-   extTrig <= rtmLsP(7);                -- LEMO1
+   extTrig   <= rtmLsP(7);              -- LEMO1
+   lemoInRaw <= rtmLsP(7);
 
    ---------------------------------------------
    U_OREG_startRampPulse0 : ODDRE1
       generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C, "ULTRASCALE_PLUS", "ULTRASCALE"))
       port map (
          C  => jesdClk,
          Q  => startRampPulseReg(0),
@@ -188,7 +192,7 @@ begin
    ---------------------------------------------
    U_OREG_startRampPulse1 : ODDRE1
       generic map (
-         SIM_DEVICE => ite(ULTRASCALE_PLUS_C,"ULTRASCALE_PLUS","ULTRASCALE"))
+         SIM_DEVICE => ite(ULTRASCALE_PLUS_C, "ULTRASCALE_PLUS", "ULTRASCALE"))
       port map (
          C  => jesdClk,
          Q  => startRampPulseReg(1),
@@ -445,7 +449,7 @@ begin
          TPD_G            => TPD_G,
          AXIL_BASE_ADDR_G => AXI_CONFIG_C(LUT_INDEX_C).baseAddr)
       port map (
-         hwTrig           => '0',  -- Mitch: Please connect this to the correct port.
+         hwTrig           => '0',       -- Mitch: Please connect this to the correct port.
          -- Clock and Reset
          axilClk          => axilClk,
          axilRst          => axilRst,
