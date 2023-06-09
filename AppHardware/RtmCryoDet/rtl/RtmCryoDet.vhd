@@ -62,8 +62,8 @@ entity RtmCryoDet is
       -- Application Ports --
       -----------------------
       -- RTM's Low Speed Ports
-      rtmLsP  : inout slv(53 downto 0);
-      rtmLsN  : inout slv(53 downto 0);
+      rtmLsP  : inout slv(53 downto 0) := (others => 'Z');
+      rtmLsN  : inout slv(53 downto 0) := (others => 'Z');
       --  RTM's Clock Reference
       genClkP : in    sl;
       genClkN : in    sl);
