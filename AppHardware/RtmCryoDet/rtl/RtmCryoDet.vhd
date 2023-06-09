@@ -226,7 +226,7 @@ begin
             clkIn           => jesdClk,
             rstIn           => '0',
             clkOut(0)       => jesdClkDivReg,
-            rstOut(0)       => open,
+            rstOut          => open,
             locked          => open);
    end generate GEN_MMCM_CLK_DIV;
 
