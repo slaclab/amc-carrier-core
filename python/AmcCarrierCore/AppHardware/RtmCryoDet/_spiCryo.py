@@ -17,7 +17,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-import time
+#import time
 
 class SpiCryo(pr.Device):
     def __init__(   self,
