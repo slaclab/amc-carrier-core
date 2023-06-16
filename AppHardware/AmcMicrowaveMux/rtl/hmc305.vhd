@@ -205,16 +205,16 @@ begin
          CLK_PERIOD_G      => CLK_PERIOD_G,
          SPI_SCLK_PERIOD_G => SPI_SCLK_PERIOD_G)
       port map (
-         clk       => axiClk,
-         sRst      => axiRst,
-         chipSel   => "0",
-         wrEn      => r.wrEn,
-         wrData    => r.wrData,
-         rdEn      => rdEn,
-         rdData    => open,
-         spiCsL(0) => open,
-         spiSclk   => spiSck,
-         spiSdi    => spiSdi,
-         spiSdo    => '1');
+         clk     => axiClk,
+         sRst    => axiRst,
+         chipSel => "0",
+         wrEn    => r.wrEn,
+         wrData  => r.wrData,
+         rdEn    => rdEn,
+         rdData  => open,
+         spiCsL  => open,
+         spiSclk => spiSck,
+         spiSdi  => spiSdi,
+         spiSdo  => '1');
 
 end architecture rtl;
