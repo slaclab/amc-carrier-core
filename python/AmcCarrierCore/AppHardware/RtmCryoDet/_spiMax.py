@@ -65,6 +65,7 @@ class SpiMax(pr.Device):
                 offset       =  0x00 + (i+8),
                 bitSize      =  20,
                 bitOffset    =  0x00,
+                value        =  0x2,
                 base         = pr.UInt,
                 mode         = "RW",
             ))

@@ -216,7 +216,7 @@ architecture mapping of AmcCarrierCore is
 
 begin
 
-   assert (RSSI_ILEAVE_EN_G = false) or (RSSI_ILEAVE_EN_G and (DISABLE_BSA_G = false) and (DISABLE_BLD_G = false))
+   assert (RSSI_ILEAVE_EN_G = false) or (RSSI_ILEAVE_EN_G and DISABLE_BSA_G and DISABLE_BLD_G)
       report "RSSI Interleave + BSA or BLD is NOT supported" severity failure;
 
    -- Secondary AMC's Auxiliary Power (Default to allows active for the time being)
