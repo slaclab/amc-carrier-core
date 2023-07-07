@@ -134,15 +134,20 @@ class DacSigGen(pr.Device):
         )
 
         for i in range(self._numOfChs):
-            pr.MemoryDevice(
-                name        = ('Waveform[%d]' % i),
-                description = "Waveform data 16-bit samples.",
-                offset      = 0x01000000 + (i * 0x01000000),
-                size        = (2*self._buffSize),
-                wordBitSize = (16 if (fillMode) else 32),
-                stride      = (2  if (fillMode) else 4),
-                base        = pr.Int,
-            )
+            self.add(pr.RemoteVariable(
+                name         = ('Waveform[%d]' % i),
+                description  = "Waveform data 16-bit samples.",
+                offset       = 0x01000000 + (i * 0x01000000),
+                updateNotify = False,
+                bulkOpEn     = False,
+                hidden       = True,
+                numValues    = self._buffSize,
+                valueBits    = 16 if fillMode else 32,
+                valueStride  = 16 if fillMode else 32,
+                bitSize      = (16*self._buffSize) if fillMOde else (32*self._buffSize),
+                bitOffset    = 0,
+                base         = pr.Int,
+            ))
 
         self.add(pr.LocalVariable(
             name         = "CsvFilePath",
