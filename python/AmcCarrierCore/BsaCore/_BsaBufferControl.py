@@ -30,16 +30,17 @@ class BsaBufferControl(pr.Device):
         # Variables
         ##############################
 
-        pr.MemoryDevice(
+        self.add(pr.RemoveVariable(
             name        = 'Timestamps',
             description = '',
             offset      = 0x00,
-            size        = (8*64), # Units of bytes
-            wordBitSize = 64,
-            stride      = 8,
+            bitSize     = 8*8*64, # Units of bits
+            numValues   = 64,
+            valueBits   = 64,
+            valueStride = 64,
             verify      = False,
-            # mode        = "RO",
-        )
+            mode        = "RO",
+        ))
 
         self.add(axi.AxiStreamDmaRingWrite(
             offset     =  0x00001000,
