@@ -144,7 +144,7 @@ class DacSigGen(pr.Device):
                 numValues    = self._buffSize,
                 valueBits    = 16 if fillMode else 32,
                 valueStride  = 16 if fillMode else 32,
-                bitSize      = (16*self._buffSize) if fillMOde else (32*self._buffSize),
+                bitSize      = (16*self._buffSize) if fillMode else (32*self._buffSize),
                 bitOffset    = 0,
                 base         = pr.Int,
             ))
