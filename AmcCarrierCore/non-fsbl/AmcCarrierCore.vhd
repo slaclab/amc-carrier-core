@@ -36,7 +36,7 @@ entity AmcCarrierCore is
       TPD_G                  : time     := 1 ns;
       DEBUG_PATH_SELECT_G    : boolean  := false;  -- false = UDP[port=8193], true = UDP[port=8194]
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
-      WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
+      WAVEFORM_NUM_LANES_G   : natural  := 4;  -- Number of Waveform lanes per DaqMuxV2
       WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
       RSSI_ILEAVE_EN_G       : boolean  := false;
       SIM_SPEEDUP_G          : boolean  := false;  -- false = Normal Operation, true = simulation
