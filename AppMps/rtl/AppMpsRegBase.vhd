@@ -40,6 +40,7 @@ entity AppMpsRegBase is
       -- MPS message monitoring
       mpsMessage      : in  MpsMessageType;
       mpsMsgDrop      : in  sl;
+      rstTripValue    : out sl;
       -- MPS Configuration Registers
       mpsCore         : out MpsCoreRegType;
       beamDestMask    : out slv(15 downto 0);
@@ -57,6 +58,7 @@ end AppMpsRegBase;
 architecture mapping of AppMpsRegBase is
 
    type RegType is record
+      rstTripValue   : sl;
       mpsCore        : MpsCoreRegType;
       beamDestMask   : slv(15 downto 0);
       altDestMask    : slv(15 downto 0);
@@ -68,6 +70,7 @@ architecture mapping of AppMpsRegBase is
    end record;
 
    constant REG_INIT_C : RegType := (
+      rstTripValue   => '0',
       mpsCore        => MPS_CORE_REG_INIT_C,
       beamDestMask   => (others => '0'),
       altDestMask    => (others => '0'),
@@ -133,6 +136,8 @@ begin
       axiSlaveRegisterR(regEp, x"1C", 0, r.mpsMessage.message(4));
       axiSlaveRegisterR(regEp, x"1C", 8, r.mpsMessage.message(5));
 
+      axiSlaveRegister(regEp, x"20", 0, v.rstTripValue);
+
       -- Closeout the transaction
       axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
 
@@ -150,6 +155,7 @@ begin
       mpsCore        <= r.mpsCore;
       beamDestMask   <= r.beamDestMask;
       altDestMask    <= r.altDestMask;
+      rstTripValue   <= r.rstTripValue;
 
    end process comb;
 
