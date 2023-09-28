@@ -58,13 +58,15 @@ architecture mapping of AppMpsEncoder is
    constant APP_CONFIG_C : MpsAppConfigType := getMpsAppConfig(APP_TYPE_G);
 
    type RegType is record
-      tholdMem   : Slv4VectorArray(MPS_CHAN_COUNT_C-1 downto 0, 7 downto 0);
-      mpsMessage : MpsMessageType;
+      mpsTripValue : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
+      tholdMem     : Slv4VectorArray(MPS_CHAN_COUNT_C-1 downto 0, 7 downto 0);
+      mpsMessage   : MpsMessageType;
    end record;
 
    constant REG_INIT_C : RegType := (
-      tholdMem   => (others => (others => (others => '0'))),
-      mpsMessage => mpsMessageInit(APP_CONFIG_C.BYTE_COUNT_C));
+      mpsTripValue => (others => (others => '0')),
+      tholdMem     => (others => (others => (others => '0'))),
+      mpsMessage   => mpsMessageInit(APP_CONFIG_C.BYTE_COUNT_C));
 
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
@@ -78,6 +80,7 @@ architecture mapping of AppMpsEncoder is
                             valid       : in    sl;
                             holdDisable : in    sl;
                             bitPos      : in    integer;
+                            tripValue   : inout slv;
                             tholdMemOut : inout slv;
                             message     : inout Slv8Array) is
 
@@ -100,6 +103,8 @@ architecture mapping of AppMpsEncoder is
          end if;
 
          message(config.BYTE_MAP_C)(bitPos) := '1';
+
+         tripValue := value;
 
       end if;
    end procedure;
@@ -124,8 +129,9 @@ architecture mapping of AppMpsEncoder is
       end if;
    end procedure;
 
-   signal mpsReg     : MpsAppRegType;
-   signal mpsMsgDrop : sl;
+   signal mpsReg       : MpsAppRegType;
+   signal mpsMsgDrop   : sl;
+   signal rstTripValue : sl;
 
 --   attribute MARK_DEBUG : string;
 --   attribute MARK_DEBUG of r         : signal is "TRUE";
@@ -155,6 +161,8 @@ begin
          axilWriteSlave  => axilWriteSlave,
          mpsMessage      => r.mpsMessage,
          mpsMsgDrop      => mpsMsgDrop,
+         mpsTripValue    => r.mpsTripValue,
+         rstTripValue    => rstTripValue,
          mpsAppRegisters => mpsReg);
 
    ---------------------------------
@@ -177,7 +185,7 @@ begin
    ---------------------------------
    -- Thresholds
    ---------------------------------
-   comb : process (axilRst, mpsReg, mpsSelect, r) is
+   comb : process (axilRst, mpsReg, mpsSelect, r, rstTripValue) is
       variable v       : RegType;
       variable chan    : integer;
       variable thold   : integer;
@@ -245,14 +253,14 @@ begin
                   compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                  mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '1',
-                                 0, v.tholdMem(chan, 0), msgData);
+                                 0, v.mpsTripValue(chan), v.tholdMem(chan, 0), msgData);
 
                -- LCLS2 idle table
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                  mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                 7, v.tholdMem(chan, 7), msgData);
+                                 7, v.mpsTripValue(chan), v.tholdMem(chan, 7), msgData);
 
                -- Multiple thresholds
                else
@@ -263,14 +271,14 @@ begin
                         compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                        mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                       thold, v.tholdMem(chan, thold), msgData);
+                                       thold, v.mpsTripValue(chan), v.tholdMem(chan, thold), msgData);
 
                      -- Standard table
                      else
                         compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                        mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                       thold, v.tholdMem(chan, thold), msgData);
+                                       thold, v.mpsTripValue(chan), v.tholdMem(chan, thold), msgData);
                      end if;
                   end loop;
                end if;
@@ -280,6 +288,11 @@ begin
 
       -- Update message data
       v.mpsMessage.message(APP_CONFIG_C.BYTE_COUNT_C-1 downto 0) := msgData;
+
+      -- Check for trip value reset
+      if (rstTripValue = '1') then
+         v.mpsTripValue := (others => (others => '0'));
+      end if;
 
       -- Synchronous Reset
       if (axilRst = '1') then
