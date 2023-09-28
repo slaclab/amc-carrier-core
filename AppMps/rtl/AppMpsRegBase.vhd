@@ -105,33 +105,33 @@ begin
       axiSlaveWaitTxn(regEp, axilWriteMaster, axilReadMaster, v.axilWriteSlave, v.axilReadSlave);
 
       -- Top level registers
-      axiSlaveRegister(regEp, x"0000", 0, v.mpsCore.mpsAppId);
-      axiSlaveRegister(regEp, x"0000", 16, v.mpsCore.mpsEnable);
-      axiSlaveRegister(regEp, x"0000", 17, v.mpsCore.lcls1Mode);
-      axiSlaveRegister(regEp, x"0000", 24, v.mpsCore.mpsVersion);
+      axiSlaveRegister(regEp, x"00", 0, v.mpsCore.mpsAppId);
+      axiSlaveRegister(regEp, x"00", 16, v.mpsCore.mpsEnable);
+      axiSlaveRegister(regEp, x"00", 17, v.mpsCore.lcls1Mode);
+      axiSlaveRegister(regEp, x"00", 24, v.mpsCore.mpsVersion);
 
-      axiSlaveRegisterR(regEp, x"0004", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C, 8));
-      axiSlaveRegisterR(regEp, x"0004", 8, ite(APP_CONFIG_G.DIGITAL_EN_C, '1', '0'));
-      axiSlaveRegisterR(regEp, x"0004", 16, toSlv(APP_CONFIG_G.LCLS2_COUNT_C, 8));
-      axiSlaveRegisterR(regEp, x"0004", 24, toSlv(APP_CONFIG_G.LCLS1_COUNT_C, 8));
+      axiSlaveRegisterR(regEp, x"04", 0, toSlv(APP_CONFIG_G.BYTE_COUNT_C, 8));
+      axiSlaveRegisterR(regEp, x"04", 8, ite(APP_CONFIG_G.DIGITAL_EN_C, '1', '0'));
+      axiSlaveRegisterR(regEp, x"04", 16, toSlv(APP_CONFIG_G.LCLS2_COUNT_C, 8));
+      axiSlaveRegisterR(regEp, x"04", 24, toSlv(APP_CONFIG_G.LCLS1_COUNT_C, 8));
 
-      axiSlaveRegister(regEp, x"0008", 0, v.beamDestMask);
-      axiSlaveRegister(regEp, x"0008", 16, v.altDestMask);
+      axiSlaveRegister(regEp, x"08", 0, v.beamDestMask);
+      axiSlaveRegister(regEp, x"08", 16, v.altDestMask);
 
-      axiSlaveRegisterR(regEp, x"000C", 0, r.mpsMsgDropCnt);
-      axiSlaveRegisterR(regEp, x"0010", 0, r.mpsCount);
+      axiSlaveRegisterR(regEp, x"0C", 0, r.mpsMsgDropCnt);
+      axiSlaveRegisterR(regEp, x"10", 0, r.mpsCount);
 
-      axiSlaveRegisterR(regEp, x"0014", 0, r.mpsMessage.appId(9 downto 0));
-      axiSlaveRegisterR(regEp, x"0014", 10, r.mpsMessage.lcls);
-      axiSlaveRegisterR(regEp, x"0014", 16, r.mpsMessage.timeStamp);
+      axiSlaveRegisterR(regEp, x"14", 0, r.mpsMessage.appId(9 downto 0));
+      axiSlaveRegisterR(regEp, x"14", 10, r.mpsMessage.lcls);
+      axiSlaveRegisterR(regEp, x"14", 16, r.mpsMessage.timeStamp);
 
-      axiSlaveRegisterR(regEp, x"0018", 0, r.mpsMessage.message(0));
-      axiSlaveRegisterR(regEp, x"0018", 8, r.mpsMessage.message(1));
-      axiSlaveRegisterR(regEp, x"0018", 16, r.mpsMessage.message(2));
-      axiSlaveRegisterR(regEp, x"0018", 24, r.mpsMessage.message(3));
+      axiSlaveRegisterR(regEp, x"18", 0, r.mpsMessage.message(0));
+      axiSlaveRegisterR(regEp, x"18", 8, r.mpsMessage.message(1));
+      axiSlaveRegisterR(regEp, x"18", 16, r.mpsMessage.message(2));
+      axiSlaveRegisterR(regEp, x"18", 24, r.mpsMessage.message(3));
 
-      axiSlaveRegisterR(regEp, x"001C", 0, r.mpsMessage.message(4));
-      axiSlaveRegisterR(regEp, x"001C", 8, r.mpsMessage.message(5));
+      axiSlaveRegisterR(regEp, x"1C", 0, r.mpsMessage.message(4));
+      axiSlaveRegisterR(regEp, x"1C", 8, r.mpsMessage.message(5));
 
       -- Closeout the transaction
       axiSlaveDefault(regEp, v.axilWriteSlave, v.axilReadSlave, AXI_RESP_DECERR_C);
