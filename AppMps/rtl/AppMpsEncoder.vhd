@@ -59,12 +59,14 @@ architecture mapping of AppMpsEncoder is
 
    type RegType is record
       mpsTripValue : Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
+      tripPulseId  : Slv64Array(MPS_CHAN_COUNT_C-1 downto 0);
       tholdMem     : Slv4VectorArray(MPS_CHAN_COUNT_C-1 downto 0, 7 downto 0);
       mpsMessage   : MpsMessageType;
    end record;
 
    constant REG_INIT_C : RegType := (
       mpsTripValue => (others => (others => '0')),
+      tripPulseId   => (others => (others => '0')),
       tholdMem     => (others => (others => (others => '0'))),
       mpsMessage   => mpsMessageInit(APP_CONFIG_C.BYTE_COUNT_C));
 
@@ -80,6 +82,8 @@ architecture mapping of AppMpsEncoder is
                             valid       : in    sl;
                             holdDisable : in    sl;
                             bitPos      : in    integer;
+                            pulseIdIn   : in    slv;
+                            tripPulseId : inout slv;
                             tripValue   : inout slv;
                             tholdMemOut : inout slv;
                             message     : inout Slv8Array) is
@@ -162,6 +166,7 @@ begin
          mpsMessage      => r.mpsMessage,
          mpsMsgDrop      => mpsMsgDrop,
          mpsTripValue    => r.mpsTripValue,
+         tripPulseId     => r.tripPulseId,
          rstTripValue    => rstTripValue,
          mpsAppRegisters => mpsReg);
 
@@ -253,14 +258,14 @@ begin
                   compareTholds (mpsReg.mpsChanReg(chan).lcls1Thold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                  mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '1',
-                                 0, v.mpsTripValue(chan), v.tholdMem(chan, 0), msgData);
+                                 0, diagnosticBus.timingMessage.pulseId, v.tripPulseId(chan), v.mpsTripValue(chan), v.tholdMem(chan, 0), msgData);
 
                -- LCLS2 idle table
                elsif APP_CONFIG_C.CHAN_CONFIG_C(chan).IDLE_EN_C and mpsReg.mpsChanReg(chan).idleEn = '1' and mpsSelect.selectIdle = '1' then
                   compareTholds (mpsReg.mpsChanReg(chan).idleThold,
                                  APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                  mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                 7, v.mpsTripValue(chan), v.tholdMem(chan, 7), msgData);
+                                 7, diagnosticBus.timingMessage.pulseId, v.tripPulseId(chan), v.mpsTripValue(chan), v.tholdMem(chan, 7), msgData);
 
                -- Multiple thresholds
                else
@@ -271,14 +276,14 @@ begin
                         compareTholds (mpsReg.mpsChanReg(chan).altTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                        mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                       thold, v.mpsTripValue(chan), v.tholdMem(chan, thold), msgData);
+                                       thold, diagnosticBus.timingMessage.pulseId, v.tripPulseId(chan), v.mpsTripValue(chan), v.tholdMem(chan, thold), msgData);
 
                      -- Standard table
                      else
                         compareTholds (mpsReg.mpsChanReg(chan).stdTholds(thold),
                                        APP_CONFIG_C.CHAN_CONFIG_C(chan),
                                        mpsSelect.chanData(chan), mpsSelect.mpsIgnore(chan), mpsSelect.valid, '0',
-                                       thold, v.mpsTripValue(chan), v.tholdMem(chan, thold), msgData);
+                                       thold, diagnosticBus.timingMessage.pulseId, v.tripPulseId(chan), v.mpsTripValue(chan), v.tholdMem(chan, thold), msgData);
                      end if;
                   end loop;
                end if;
@@ -292,6 +297,7 @@ begin
       -- Check for trip value reset
       if (rstTripValue = '1') then
          v.mpsTripValue := (others => (others => '0'));
+         v.tripPulseId  := (others => (others => '0'));
       end if;
 
       -- Synchronous Reset

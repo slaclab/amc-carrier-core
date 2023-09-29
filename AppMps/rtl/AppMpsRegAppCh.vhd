@@ -39,6 +39,7 @@ entity AppMpsRegAppCh is
       -- MPS Configuration Registers
       mpsChanReg      : out MpsChanRegType;
       mpsTripValue    : in  slv(31 downto 0);
+      tripPulseId     : in  slv(63 downto 0);
       -- AXI-Lite Interface
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -66,7 +67,7 @@ architecture mapping of AppMpsRegAppCh is
 
 begin
 
-   comb : process (axilReadMaster, axilRst, axilWriteMaster, mpsTripValue, r) is
+   comb : process (axilReadMaster, axilRst, axilWriteMaster, mpsTripValue, r, tripPulseId) is
       variable v     : RegType;
       variable regEp : AxiLiteEndPointType;
       variable thold : natural;
@@ -94,6 +95,9 @@ begin
 
          -- Offset 0x4
          axiSlaveRegisterR(regEp, toSlv(4, 9), 0, mpsTripValue);
+
+         -- Offset 0x8, 0xC
+         axiSlaveRegisterR(regEp, toSlv(8, 9), 0, tripPulseId);
 
          -- Offset 0x10, 0x14, 0x18
          if CHAN_CONFIG_G.LCLS1_EN_C then

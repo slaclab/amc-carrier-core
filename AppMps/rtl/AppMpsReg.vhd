@@ -46,6 +46,7 @@ entity AppMpsReg is
       mpsMessage      : in  MpsMessageType;
       mpsMsgDrop      : in  sl;
       mpsTripValue    : in  Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
+      tripPulseId     : in  Slv64Array(MPS_CHAN_COUNT_C-1 downto 0);
       rstTripValue    : out sl;
       -- MPS Configuration Registers
       mpsAppRegisters : out MpsAppRegType);
@@ -147,6 +148,7 @@ begin
             -- MPS Configuration Registers
             mpsChanReg      => mpsAppRegisters.mpsChanReg(i),
             mpsTripValue    => mpsTripValue(i),
+            tripPulseId     => tripPulseId(i),
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
