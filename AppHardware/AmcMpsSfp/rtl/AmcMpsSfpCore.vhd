@@ -88,14 +88,17 @@ architecture mapping of AmcMpsSfpCore is
          connectivity     => X"0001"));
 
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXI_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
    signal axilReadMasters  : AxiLiteReadMasterArray(NUM_AXI_MASTERS_C-1 downto 0);
-   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0);
+   signal axilReadSlaves   : AxiLiteReadSlaveArray(NUM_AXI_MASTERS_C-1 downto 0)  := (others => AXI_LITE_READ_SLAVE_EMPTY_DECERR_C);
 
-   signal los : sl;
-   signal lol : sl;
+   signal los : sl := '0';
+   signal lol : sl := '0';
 
 begin
+
+   pllLol <= lol;
+   pllLos <= los;
 
    --------------------
    -- Application Ports
@@ -130,23 +133,10 @@ begin
          mAxiReadMasters     => axilReadMasters,
          mAxiReadSlaves      => axilReadSlaves);
 
-   BYP_PLL : if (EN_PLL_G = false) generate
-
-      pllLos <= '0';
-      pllLol <= '0';
-
-      axilReadSlaves(PLL_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
-      axilWriteSlaves(PLL_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
-
-   end generate;
-
    GEN_PLL : if (EN_PLL_G = true) generate
 
       lol <= syncInP(0);
       los <= syncInP(1);
-
-      pllLol <= lol;
-      pllLos <= los;
 
       U_PLL : entity amc_carrier_core.Si5317a
          generic map (
@@ -182,17 +172,7 @@ begin
 
    end generate;
 
-   BYP_HSR : if (EN_HS_REPEATER_G = false) generate
-
-      axilReadSlaves(HS_REPEATER_INDEX_C)  <= AXI_LITE_READ_SLAVE_EMPTY_DECERR_C;
-      axilWriteSlaves(HS_REPEATER_INDEX_C) <= AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C;
-
-   end generate;
-
    GEN_HSR : if (EN_HS_REPEATER_G = true) generate
-
-      pllLos <= syncInP(0);
-      pllLol <= syncInP(1);
 
       U_HSR : entity amc_carrier_core.AmcMpsSfpHsRepeater
          generic map (
