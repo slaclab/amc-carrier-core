@@ -73,10 +73,11 @@ end entity BsaBufferControl;
 
 architecture rtl of BsaBufferControl is
 
-   constant AXIL_MASTERS_C : integer := 2;
+   constant AXIL_MASTERS_C : integer := 3;
 
-   constant TIMESTAMP_AXIL_C : integer := 0;
-   constant DMA_RING_AXIL_C  : integer := 1;
+   constant TIMESTAMP_AXIL_C   : integer := 0;
+   constant DMA_RING_AXIL_C    : integer := 1;
+   constant BUFFER_INIT_AXIL_C : integer := 2;
 
    constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
       genAxiLiteConfig(AXIL_MASTERS_C, AXIL_BASE_ADDR_G, 16, 12);
@@ -123,8 +124,10 @@ architecture rtl of BsaBufferControl is
 --       ID_BITS_C    => 1,
 --       LEN_BITS_C   => 8);
 
-   constant INT_AXIS_COUNT_C : integer                                := 8;  --integer(ceil(real(BSA_BUFFERS_G)/8.0));
-   constant TDEST_ROUTES_C   : Slv8Array(INT_AXIS_COUNT_C-1 downto 0) := (others => "--------");
+   constant INT_AXIS_COUNT_C     : integer := 6;  --integer(ceil(real(BSA_BUFFERS_G)/8.0));
+   constant INT_BAXIS_COUNT_C    : integer := 8;
+   constant TDEST_ROUTES_BAXIS_C : Slv8Array(7 downto 0) := (others => "--------");
+   constant TDEST_ROUTES_AXIS_C  : Slv8Array(5 downto 0) := (others => "--------");
 
    signal bsaAxisMasters     : AxiStreamMasterArray(BSA_BUFFERS_G-1 downto 0);
    signal bsaAxisSlaves      : AxiStreamSlaveArray(BSA_BUFFERS_G-1 downto 0);
@@ -142,6 +145,7 @@ architecture rtl of BsaBufferControl is
    -- Each accumulator maintains 128b header word + diagnostic output accumulations
 --   constant NUM_ACCUMULATIONS_C      : integer := DIAGNOSTIC_OUTPUTS_G;
    constant NUM_ACCUMULATIONS_C : integer := 31;
+   signal timestampAddrSlv : slv(BSA_ADDR_BITS_C-1 downto 0);
 
    type RegType is record
       diagnosticData : Slv32Array(NUM_ACCUMULATIONS_C downto 0);
@@ -151,7 +155,7 @@ architecture rtl of BsaBufferControl is
       excSquare      : sl;
       syncRdEn       : sl;
       timestampEn    : sl;
-      timestampAddr  : slv(BSA_ADDR_BITS_C-1 downto 0);
+      timestampAddr  : integer range 0 to BSA_BUFFERS_G-1;
       headerEn       : sl;
       accumulateEn   : sl;
       lastEn         : sl;
@@ -168,7 +172,7 @@ architecture rtl of BsaBufferControl is
       excSquare      => '0',
       syncRdEn       => '0',
       timestampEn    => '0',
-      timestampAddr  => (others => '0'),
+      timestampAddr  => 0,
       headerEn       => '0',
       accumulateEn   => '0',
       lastEn         => '0',
@@ -212,8 +216,34 @@ begin
          mAxiReadMasters     => locAxilReadMasters,   -- [out]
          mAxiReadSlaves      => locAxilReadSlaves);   -- [in]
 
+   timestampAddrSlv <= toSlv(r.timeStampAddr,BSA_ADDR_BITS_C);
+   bufferClearEn    <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(r.timestampAddr);
+   U_AxiDualPortRam_Buffer_Init : entity surf.AxiDualPortRam
+      generic map (
+         TPD_G        => TPD_G,
+         SYNTH_MODE_G => "inferred",
+         MEMORY_TYPE_G=> "distributed",
+         READ_LATENCY_G => 0,
+         AXI_WR_EN_G  => true,
+         SYS_WR_EN_G  => true,
+         ADDR_WIDTH_G => BSA_ADDR_BITS_C,
+         DATA_WIDTH_G => 32,
+         INIT_G       => toSlv(1,32) )
+      port map (
+         axiClk         => axilClk,
+         axiRst         => axilRst,
+         axiReadMaster  => locAxilReadMasters(BUFFER_INIT_AXIL_C),
+         axiReadSlave   => locAxilReadSlaves(BUFFER_INIT_AXIL_C),
+         axiWriteMaster => locAxilWriteMasters(BUFFER_INIT_AXIL_C),
+         axiWriteSlave  => locAxilWriteSlaves(BUFFER_INIT_AXIL_C),
+         clk            => axiClk,
+         rst            => axiRst,
+         addr           => timestampAddrSlv,
+         we             => bufferClearEn,
+         din            => toSlv(1,32));
+
    -- Store timestamps during accumulate phase since we are already iterating over
-   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaInit(conv_integer(r.timestampAddr));
+   timestampRamWe <= r.timestampEn and diagnosticBusSync.timingMessage.bsaDone(r.timestampAddr);
    U_AxiDualPortRam_TimeStamps : entity surf.AxiDualPortRam
       generic map (
          TPD_G          => TPD_G,
@@ -234,7 +264,7 @@ begin
          clk            => axiClk,
          rst            => axiRst,
          we             => timeStampRamWe,
-         addr           => r.timestampAddr,
+         addr           => timestampAddrSlv,
          din            => diagnosticBusSync.timingMessage.timeStamp,
          dout           => open);
 
@@ -295,22 +325,22 @@ begin
    AxiStreamMux_INT : for i in INT_AXIS_COUNT_C-1 downto 0 generate
       signal intMuxAxisMasters : AxiStreamMasterArray(INT_AXIS_COUNT_C-1 downto 0);
       signal intMuxAxisSlaves  : AxiStreamSlaveArray(INT_AXIS_COUNT_C-1 downto 0);
-      signal intBsaAxisMasters : AxiStreamMasterArray(7 downto 0);
-      signal intBsaAxisSlaves  : AxiStreamSlaveArray(7 downto 0);
+      signal intBsaAxisMasters : AxiStreamMasterArray(INT_BAXIS_COUNT_C-1 downto 0);
+      signal intBsaAxisSlaves  : AxiStreamSlaveArray (INT_BAXIS_COUNT_C-1 downto 0);
    begin
 
-      mapping : for j in 7 downto 0 generate
-         intBsaAxisMasters(j) <= bsaAxisMasters(j*8+i);
-         bsaAxisSlaves(j*8+i) <= intBsaAxisSlaves(j);
+      mapping : for j in intBsaAxisMasters'range generate
+         intBsaAxisMasters(j) <= bsaAxisMasters(j*INT_AXIS_COUNT_C+i);
+         bsaAxisSlaves(j*INT_AXIS_COUNT_C+i) <= intBsaAxisSlaves(j);
       end generate mapping;
 
       U_AxiStreamMux_INT : entity surf.AxiStreamMux
          generic map (
             TPD_G          => TPD_G,
-            NUM_SLAVES_G   => 8,
+            NUM_SLAVES_G   => intBsaAxisMasters'length,
             PIPE_STAGES_G  => 1,
             TDEST_LOW_G    => 0,
-            TDEST_ROUTES_G => TDEST_ROUTES_C,
+            TDEST_ROUTES_G => TDEST_ROUTES_BAXIS_C,
             MODE_G         => "ROUTED")
          port map (
             sAxisMasters => intBsaAxisMasters,     -- [in]
@@ -350,10 +380,10 @@ begin
    U_AxiStreamMux_LAST : entity surf.AxiStreamMux
       generic map (
          TPD_G          => TPD_G,
-         NUM_SLAVES_G   => INT_AXIS_COUNT_C,
+         NUM_SLAVES_G   => intAxisMasters'length,
          PIPE_STAGES_G  => 1,
          TDEST_LOW_G    => 0,
-         TDEST_ROUTES_G => TDEST_ROUTES_C,
+         TDEST_ROUTES_G => TDEST_ROUTES_AXIS_C,
          MODE_G         => "ROUTED")
       port map (
          sAxisMasters => intAxisMasters,     -- [in]
@@ -397,6 +427,7 @@ begin
          BUFFERS_G            => BSA_BUFFERS_G,
          BURST_SIZE_BYTES_G   => BSA_BURST_BYTES_G,
          ENABLE_UNALIGN_G     => true,
+         FORCE_WRAP_ALIGN_G   => true,
          TRIGGER_USER_BIT_G   => 1,                                 -- EOFE is bit 0
          AXIL_BASE_ADDR_G     => DMA_RING_BASE_ADDR_C,
          DATA_AXIS_CONFIG_G   => LAST_STREAM_CONFIG_C,
@@ -415,8 +446,8 @@ begin
          axisStatusSlave  => AXI_STREAM_SLAVE_FORCE_C,              -- [in]
          axiClk           => axiClk,                                -- [in]
          axiRst           => axiRst,                                -- [in]
-         bufferClearEn    => timeStampRamWe,                        -- [in]
-         bufferClear      => r.timestampAddr,                       -- [in]
+         bufferClearEn    => bufferClearEn,                         -- [in]
+         bufferClear      => timestampAddrSlv,                      -- [in]
          bufferEnabled    => bufferEnabled,                         -- [out]
          axisDataMaster   => lastFifoAxisMaster,                    -- [in]
          axisDataSlave    => lastFifoAxisSlave,                     -- [out]
@@ -509,7 +540,7 @@ begin
          v.excSquare     := '0';
          v.accumulateEn  := '1';
          v.timestampEn   := '1';
-         v.timestampAddr := (others => '0');
+         v.timestampAddr := 0;
          v.adderEn       := '1';
          v.adderCount    := (others => '0');
          v.adderPhase    := (others => '0');

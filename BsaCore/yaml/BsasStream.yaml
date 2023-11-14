@@ -1,0 +1,46 @@
+##############################################################################
+## This file is part of 'SLAC Firmware Standard Library'.
+## It is subject to the license terms in the LICENSE.txt file found in the
+## toplevel directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'SLAC Firmware Standard Library', including this file,
+## may be copied, modified, propagated, or distributed except according to
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once BsasStream.yaml
+
+BsasStream: &BsasStream
+  name: BsasStream
+  description: Beam synchronous modeling data service
+  size: 0x200
+  class: MMIODev
+  configPrio: 1
+  ########
+  children:
+  ########
+    #########################################################
+    enable:
+      class: IntField
+      at:
+        offset: 0x100
+      sizeBits: 1
+      mode: RW
+      description: "Enable packets"
+    #########################################################
+    channelMask:
+      class: IntField
+      at:
+        offset: 0x104
+      sizeBits: 31
+      mode: RW
+      description: "Mask of enabled channels"
+    #########################################################
+    channelSevr:
+      class: IntField
+      at:
+        offset: 0x108
+      sizeBits: 62
+      mode: RW
+      description: "Maximum channel severity"
+    #########################################################

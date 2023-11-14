@@ -104,10 +104,12 @@ architecture mapping of AmcCarrierBsa is
    constant BSA_BUFFER_AXIL_C : integer := 0;
    constant WAVEFORM_0_AXIL_C : integer := 1;
    constant WAVEFORM_1_AXIL_C : integer := 2;
-   constant BSSS_AXIL_C       : integer := 3;
-   constant BLD_AXIL_C        : integer := 4;
+   constant BSSS0_AXIL_C      : integer := 3;
+   constant BSSS1_AXIL_C      : integer := 4;
+   constant BLD_AXIL_C        : integer := 5;
+   constant BSAS_AXIL_C       : integer := 6;
 
-   constant AXIL_MASTERS_C : integer := 5;
+   constant AXIL_MASTERS_C    : integer := 7;
 
    constant AXIL_CROSSBAR_CONFIG_C : AxiLiteCrossbarMasterConfigArray(AXIL_MASTERS_C-1 downto 0) :=
       genAxiLiteConfig(AXIL_MASTERS_C, BSA_ADDR_C, 20, 16);
@@ -167,8 +169,8 @@ architecture mapping of AmcCarrierBsa is
    signal waveform1AxiReadMaster  : AxiReadMasterType  := AXI_READ_MASTER_INIT_C;
    signal waveform1AxiReadSlave   : AxiReadSlaveType   := AXI_READ_SLAVE_INIT_C;
 
-   signal intEthMsgMaster : AxiStreamMasterType;
-   signal intEthMsgSlave  : AxiStreamSlaveType;
+   signal intEthMsgMaster : AxiStreamMasterArray(2 downto 0) := (others=>AXI_STREAM_MASTER_INIT_C);
+   signal intEthMsgSlave  : AxiStreamSlaveArray (2 downto 0) := (others=>AXI_STREAM_SLAVE_FORCE_C);
 
 begin
 
@@ -179,7 +181,7 @@ begin
       axiWriteMaster      <= AXI_WRITE_MASTER_INIT_C;
       axiReadMaster       <= AXI_READ_MASTER_INIT_C;
       obBsaMasters        <= (others => AXI_STREAM_MASTER_INIT_C);
-      ibBsaSlaves         <= (others => AXI_STREAM_SLAVE_INIT_C);
+      ibBsaSlaves         <= (others => AXI_STREAM_SLAVE_FORCE_C);
       obAppWaveformSlaves <= WAVEFORM_SLAVE_ARRAY_INIT_C;
    end generate FSBL_GEN;
 
@@ -349,30 +351,74 @@ begin
                axiWriteSlave    => bsaAxiWriteSlave);
          BsssWrapper : entity amc_carrier_core.BsssWrapper
             generic map (
-               NUM_EDEFS_G => 9)
+               NUM_EDEFS_G => ite(BSA_BUFFERS_C>32,28,BSA_BUFFERS_C-4),
+               SVC_START_G => 0,
+               SVC_TYPE_G  => 0 )
             port map (
                diagnosticClk   => diagnosticClk,
                diagnosticRst   => diagnosticRst,
                diagnosticBus   => diagnosticBus,
                axilClk         => axilClk,
                axilRst         => axilRst,
-               axilReadMaster  => locAxilReadMasters (BSSS_AXIL_C),
-               axilReadSlave   => locAxilReadSlaves  (BSSS_AXIL_C),
-               axilWriteMaster => locAxilWriteMasters(BSSS_AXIL_C),
-               axilWriteSlave  => locAxilWriteSlaves (BSSS_AXIL_C),
+               axilReadMaster  => locAxilReadMasters (BSSS0_AXIL_C),
+               axilReadSlave   => locAxilReadSlaves  (BSSS0_AXIL_C),
+               axilWriteMaster => locAxilWriteMasters(BSSS0_AXIL_C),
+               axilWriteSlave  => locAxilWriteSlaves (BSSS0_AXIL_C),
                ibEthMsgMaster  => ibEthMsgMaster,
                ibEthMsgSlave   => ibEthMsgSlave,
-               obEthMsgMaster  => intEthMsgMaster,
-               obEthMsgSlave   => intEthMsgSlave );
+               obEthMsgMaster  => intEthMsgMaster(0),
+               obEthMsgSlave   => intEthMsgSlave (0));
+         GEN_BSSS1 : if BSA_BUFFERS_C > 32 generate
+           BsssWrapper1 : entity amc_carrier_core.BsssWrapper
+             generic map (
+               NUM_EDEFS_G => BSA_BUFFERS_C-32,
+               SVC_START_G => 28,
+               SVC_TYPE_G  => 1 )
+             port map (
+               diagnosticClk   => diagnosticClk,
+               diagnosticRst   => diagnosticRst,
+               diagnosticBus   => diagnosticBus,
+               axilClk         => axilClk,
+               axilRst         => axilRst,
+               axilReadMaster  => locAxilReadMasters (BSSS1_AXIL_C),
+               axilReadSlave   => locAxilReadSlaves  (BSSS1_AXIL_C),
+               axilWriteMaster => locAxilWriteMasters(BSSS1_AXIL_C),
+               axilWriteSlave  => locAxilWriteSlaves (BSSS1_AXIL_C),
+               ibEthMsgMaster  => intEthMsgMaster(0),
+               ibEthMsgSlave   => intEthMsgSlave (0),
+               obEthMsgMaster  => intEthMsgMaster(1),
+               obEthMsgSlave   => intEthMsgSlave (1));
+         end generate GEN_BSSS1;
+         NOGEN_BSSS1 : if BSA_BUFFERS_C < 33 generate
+           intEthMsgMaster(1) <= intEthMsgMaster(0);
+           intEthMsgSlave (0) <= intEthMsgSlave (1);
+         end generate NOGEN_BSSS1;
+         BsasWrapper : entity amc_carrier_core.BsasWrapper
+            generic map (
+               NUM_EDEFS_G => 4,
+               BASE_ADDR_G => AXIL_CROSSBAR_CONFIG_C(BSAS_AXIL_C).baseAddr )
+            port map (
+               diagnosticClk   => diagnosticClk,
+               diagnosticRst   => diagnosticRst,
+               diagnosticBus   => diagnosticBus,
+               axilClk         => axilClk,
+               axilRst         => axilRst,
+               axilReadMaster  => locAxilReadMasters (BSAS_AXIL_C),
+               axilReadSlave   => locAxilReadSlaves  (BSAS_AXIL_C),
+               axilWriteMaster => locAxilWriteMasters(BSAS_AXIL_C),
+               axilWriteSlave  => locAxilWriteSlaves (BSAS_AXIL_C),
+               ibEthMsgMaster  => intEthMsgMaster(1),
+               ibEthMsgSlave   => intEthMsgSlave (1),
+               obEthMsgMaster  => intEthMsgMaster(2),
+               obEthMsgSlave   => intEthMsgSlave (2));
+
       end generate BSA_EN_GEN;
 
       BSA_DISABLE_GEN : if (DISABLE_BSA_G) generate
-         locAxilReadSlaves(BSA_BUFFER_AXIL_C)      <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
-         locAxilWriteSlaves(BSA_BUFFER_AXIL_C)     <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;
          bsaAxiWriteMaster                         <= AXI_WRITE_MASTER_INIT_C;
          obBsaMasters(BSA_BSA_STATUS_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
-         intEthMsgMaster                           <= ibEthMsgMaster;
-         ibEthMsgSlave                             <= intEthMsgSlave;
+         intEthMsgMaster(2)                        <= ibEthMsgMaster;
+         ibEthMsgSlave                             <= intEthMsgSlave(2);
       end generate BSA_DISABLE_GEN;
 
 --      -----------------------------------------------------------------------------------------------
@@ -469,15 +515,15 @@ begin
             axilReadSlave   => locAxilReadSlaves  (BLD_AXIL_C),
             axilWriteMaster => locAxilWriteMasters(BLD_AXIL_C),
             axilWriteSlave  => locAxilWriteSlaves (BLD_AXIL_C),
-            ibEthMsgMaster  => intEthMsgMaster,
-            ibEthMsgSlave   => intEthMsgSlave,
+            ibEthMsgMaster  => intEthMsgMaster(2),
+            ibEthMsgSlave   => intEthMsgSlave (2),
             obEthMsgMaster  => obEthMsgMaster,
             obEthMsgSlave   => obEthMsgSlave );
    end generate;
 
    BLD_DISABLE_GEN : if DISABLE_BLD_G generate
-      obEthMsgMaster <= intEthMsgMaster;
-      intEthMsgSlave <= obEthMsgSlave;
+      obEthMsgMaster    <= intEthMsgMaster(2);
+      intEthMsgSlave(2) <= obEthMsgSlave;
    end generate;
 
 end mapping;

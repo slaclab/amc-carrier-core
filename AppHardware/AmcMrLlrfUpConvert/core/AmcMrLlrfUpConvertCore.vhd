@@ -109,7 +109,7 @@ architecture mapping of AmcMrLlrfUpConvertCore is
          endianness => '1',             -- Big endian
          repeatStart=> '1'));           -- Enable repeated start
 
-   constant NUM_AXI_MASTERS_C      : natural               := 11;
+   constant NUM_AXI_MASTERS_C      : natural               := 12;
    constant NUM_COMMON_SPI_CHIPS_C : positive range 1 to 8 := 5;
    constant NUM_ATTN_CHIPS_C       : positive range 1 to 8 := 4;
 
@@ -117,13 +117,14 @@ architecture mapping of AmcMrLlrfUpConvertCore is
    constant ATT_1_INDEX_C    : natural := 1;
    constant ATT_2_INDEX_C    : natural := 2;
    constant ATT_3_INDEX_C    : natural := 3;
-   constant TEMP_I2C_INDEX_C : natural := 4;
-   constant ADC_0_INDEX_C    : natural := 5;
-   constant ADC_1_INDEX_C    : natural := 6;
-   constant ADC_2_INDEX_C    : natural := 7;
-   constant LMK_INDEX_C      : natural := 8;
-   constant DAC_INDEX_C      : natural := 9;
-   constant SIG_GEN_INDEX_C  : natural := 10;
+   constant CLK_FREQ_INDEX_C : natural := 4;
+   constant TEMP_I2C_INDEX_C : natural := 5;
+   constant ADC_0_INDEX_C    : natural := 6;
+   constant ADC_1_INDEX_C    : natural := 7;
+   constant ADC_2_INDEX_C    : natural := 8;
+   constant LMK_INDEX_C      : natural := 9;
+   constant DAC_INDEX_C      : natural := 10;
+   constant SIG_GEN_INDEX_C  : natural := 11;
 
    constant AXI_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXI_MASTERS_C-1 downto 0) := (
       ATT_0_INDEX_C    => (
@@ -140,6 +141,10 @@ architecture mapping of AmcMrLlrfUpConvertCore is
          connectivity  => X"FFFF"),
       ATT_3_INDEX_C    => (
          baseAddr      => (AXI_BASE_ADDR_G + x"0000_0030"),
+         addrBits      => 4,
+         connectivity  => X"FFFF"),
+      CLK_FREQ_INDEX_C  => (
+         baseAddr      => (AXI_BASE_ADDR_G + x"0000_00A0"),
          addrBits      => 4,
          connectivity  => X"FFFF"),
       TEMP_I2C_INDEX_C => (
@@ -466,5 +471,18 @@ begin
             data_i   => s_dacData(i),
             data_o   => s_dacDataDly(i));
    end generate GEN_DLY_OUT;
+
+   U_AmcClkFreqReg : entity amc_carrier_core.AmcClkFreqReg
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         amcClk          => jesdClk,
+         -- AXI-Lite Interface
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(CLK_FREQ_INDEX_C),
+         axilReadSlave   => axilReadSlaves(CLK_FREQ_INDEX_C),
+         axilWriteMaster => axilWriteMasters(CLK_FREQ_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(CLK_FREQ_INDEX_C));
 
 end mapping;

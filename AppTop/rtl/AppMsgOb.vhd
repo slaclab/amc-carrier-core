@@ -138,8 +138,9 @@ begin
 
    RX_FIFO : entity surf.SynchronizerFifo
       generic map (
-         TPD_G        => TPD_G,
-         DATA_WIDTH_G => DATA_WIDTH_G)
+         TPD_G         => TPD_G,
+         MEMORY_TYPE_G => "block",
+         DATA_WIDTH_G  => DATA_WIDTH_G)
       port map (
          rst    => rst,
          -- Write Ports

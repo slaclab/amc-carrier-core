@@ -25,8 +25,8 @@ use lcls_timing_core.TimingPkg.all;
 
 package AmcCarrierPkg is
 
-   -- https://github.com/slaclab/amc-carrier-core/releases/tag/v4.7.1
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"04_07_01_00";
+   -- https://github.com/slaclab/amc-carrier-core/releases/tag/v4.10.1
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"04_10_01_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types
@@ -75,7 +75,7 @@ package AmcCarrierPkg is
    -------------------------------------------------------------------------------------------------
    -- BSA configuration
    -------------------------------------------------------------------------------------------------
-   constant BSA_BUFFERS_C            : integer := 64;
+   constant BSA_BUFFERS_C            : integer := 48;
    constant BSA_DIAGNOSTIC_OUTPUTS_C : integer := 31;
    constant BSA_STREAM_BYTE_WIDTH_C  : integer := 8;
    constant BSA_BURST_BYTES_C        : integer := 2048;  -- Bytes in each burst of BSA data

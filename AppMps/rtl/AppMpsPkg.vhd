@@ -373,24 +373,24 @@ package body AppMpsPkg is
 
             for i in 0 to 1 loop
 
-               -- Inputs 14 & 15 TMIT DIFFERENCE INSTEAD OF TMIT
-               ret.CHAN_CONFIG_C(14+i).THOLD_COUNT_C := 8;
-               ret.CHAN_CONFIG_C(14+i).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(14+i).IDLE_EN_C     := true;
-               ret.CHAN_CONFIG_C(14+i).ALT_EN_C      := true;
-               ret.CHAN_CONFIG_C(14+i).BYTE_MAP_C    := i;  -- amc0 = 0 & amc1 = 1
+               -- Inputs 2 & 3 TMIT
+               ret.CHAN_CONFIG_C(2+i).THOLD_COUNT_C := 8;
+               ret.CHAN_CONFIG_C(2+i).LCLS1_EN_C    := true;
+               ret.CHAN_CONFIG_C(2+i).IDLE_EN_C     := true;
+               ret.CHAN_CONFIG_C(2+i).ALT_EN_C      := false;
+               ret.CHAN_CONFIG_C(2+i).BYTE_MAP_C    := i;  -- amc0 = 0 & amc1 = 1
 
                -- Inputs 4 & 5 X
                ret.CHAN_CONFIG_C(4+i).THOLD_COUNT_C := 2;
                ret.CHAN_CONFIG_C(4+i).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(4+i).IDLE_EN_C     := true;
+               ret.CHAN_CONFIG_C(4+i).IDLE_EN_C     := false;
                ret.CHAN_CONFIG_C(4+i).ALT_EN_C      := true;
                ret.CHAN_CONFIG_C(4+i).BYTE_MAP_C    := i+2;  -- amc0 = 2 & amc1 = 3
 
                -- Inputs 6 & 7 Y
                ret.CHAN_CONFIG_C(6+i).THOLD_COUNT_C := 2;
                ret.CHAN_CONFIG_C(6+i).LCLS1_EN_C    := true;
-               ret.CHAN_CONFIG_C(6+i).IDLE_EN_C     := true;
+               ret.CHAN_CONFIG_C(6+i).IDLE_EN_C     := false;
                ret.CHAN_CONFIG_C(6+i).ALT_EN_C      := true;
                ret.CHAN_CONFIG_C(6+i).BYTE_MAP_C    := i+4;  -- amc0 = 4 & amc1 = 5
 
@@ -487,7 +487,7 @@ package body AppMpsPkg is
             ret.BYTE_COUNT_C  := 6;
             ret.LCLS2_COUNT_C := 6;     -- same as BYTE_COUNT_C
 
-         when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C =>
+         when APP_MPS_AN_TYPE_C | APP_MPS_LN_TYPE_C | APP_MPS_DN_TYPE_C =>
             ret.BYTE_COUNT_C  := 12;
             ret.LCLS1_COUNT_C := 12;
             ret.LCLS2_COUNT_C := 12/2;

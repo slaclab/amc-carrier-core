@@ -8,10 +8,10 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 #schemaversion 3.0.0
-#once BldAxiStream.yaml
+#once BsssWrapper.yaml
 
-BldAxiStream: &BldAxiStream
-  name: BldAxiStream
+BsssWrapper: &BsssWrapper
+  name: BsssWrapper
   description: Beam line data service
   size: 0x8000
   class: MMIODev
@@ -46,6 +46,65 @@ BldAxiStream: &BldAxiStream
       sizeBits: 31
       mode: RW
       description: "Mask of enabled channels"
+    #########################################################
+    EdefRateLimit:
+      at:
+        offset: 0x8
+      class: IntField
+      name: RateLimit
+      sizeBits: 4
+      lsBit: 0
+      mode: RW
+      enums:
+        - name: INVALID_0
+          class: Enum
+          value: 0
+        - name: INVALID_1
+          class: Enum
+          value: 1
+        - name: INVALID_2
+          class: Enum
+          value: 2
+        - name: Limit_1p9_kHz
+          class: Enum
+          value: 3
+        - name: Limit_950_Hz
+          class: Enum
+          value: 4
+        - name: Limit_476_Hz
+          class: Enum
+          value: 5
+        - name: Limit_238_Hz
+          class: Enum
+          value: 6
+        - name: Limit_119_Hz
+          class: Enum
+          value: 7
+        - name: Limit_59_Hz
+          class: Enum
+          value: 8
+        - name: Limit_29_Hz
+          class: Enum
+          value: 9
+        - name: Limit_14_Hz
+          class: Enum
+          value: 10
+        - name: Limit_7_Hz
+          class: Enum
+          value: 11
+        - name: Limit_3p7_Hz
+          class: Enum
+          value: 12
+        - name: Limit_1p8_Hz
+          class: Enum
+          value: 13
+        - name: Limit_0p9_Hz
+          class: Enum
+          value: 14
+        - name: Limit_0p5_Hz
+          class: Enum
+          value: 15
+      description: Rate Limit
     #########################################################
     currPacketSize:
       class: IntField
@@ -176,148 +235,3 @@ BldAxiStream: &BldAxiStream
       sizeBits: 32
       mode: RO
       description: "Event select0 rate"
-    #########################################################
-    EdefEnable:
-      at:
-        offset: 0x47
-        nelms: *numEdefs
-        stride: 8
-      class: IntField
-      name: Enable
-      sizeBits: 1
-      lsBit: 7
-      mode: RW
-      description: Enable EDEF
-    #########################################################
-    EdefRateLimit:
-      at:
-        offset: 0x44
-        nelms: *numEdefs
-        stride: 8
-      class: IntField
-      name: RateLimit
-      sizeBits: 5
-      lsBit: 0
-      mode: RW
-      enums:
-        - name: INVALID_0
-          class: Enum
-          value: 0
-        - name: INVALID_1
-          class: Enum
-          value: 1
-        - name: INVALID_2
-          class: Enum
-          value: 2
-        - name: INVALID_3
-          class: Enum
-          value: 3
-        - name: INVALID_4
-          class: Enum
-          value: 4
-        - name: INVALID_5
-          class: Enum
-          value: 5
-        - name: INVALID_6
-          class: Enum
-          value: 6
-        - name: INVALID_7
-          class: Enum
-          value: 7
-        - name: INVALID_8
-          class: Enum
-          value: 8
-        - name: INVALID_9
-          class: Enum
-          value: 9
-        - name: INVALID_10
-          class: Enum
-          value: 10
-        - name: INVALID_11
-          class: Enum
-          value: 11
-        - name: INVALID_12
-          class: Enum
-          value: 12
-        - name: INVALID_13
-          class: Enum
-          value: 13
-        - name: INVALID_14
-          class: Enum
-          value: 14
-        - name: INVALID_15
-          class: Enum
-          value: 15
-        - name: INVALID_16
-          class: Enum
-          value: 16
-        - name: INVALID_17
-          class: Enum
-          value: 17
-        - name: INVALID_18
-          class: Enum
-          value: 18
-        - name: Limit_1p9_kHz
-          class: Enum
-          value: 19
-        - name: Limit_950_Hz
-          class: Enum
-          value: 20
-        - name: Limit_476_Hz
-          class: Enum
-          value: 21
-        - name: Limit_238_Hz
-          class: Enum
-          value: 22
-        - name: Limit_119_Hz
-          class: Enum
-          value: 23
-        - name: Limit_59_Hz
-          class: Enum
-          value: 24
-        - name: Limit_29_Hz
-          class: Enum
-          value: 25
-        - name: Limit_14_Hz
-          class: Enum
-          value: 26
-        - name: Limit_7_Hz
-          class: Enum
-          value: 27
-        - name: Limit_3p7_Hz
-          class: Enum
-          value: 28
-        - name: Limit_1p8_Hz
-          class: Enum
-          value: 29
-        - name: Limit_0p9_Hz
-          class: Enum
-          value: 30
-        - name: Limit_0p5_Hz
-          class: Enum
-          value: 31
-      description: Rate Limit
-    #########################################################
-    EdefRateSel:
-      at:
-        offset: 0x40
-        nelms: *numEdefs
-        stride: 8
-      class: IntField
-      name: RateSelect
-      sizeBits: 13
-      lsBit: 0
-      mode: RW
-      description: Rate select
-    #########################################################
-    EdefDestSel:
-      at:
-        offset: 0x41
-        nelms: *numEdefs
-        stride: 8
-      class: IntField
-      name: DestSelect
-      sizeBits: 19
-      lsBit: 5
-      mode: RW
-      description: Destination select
