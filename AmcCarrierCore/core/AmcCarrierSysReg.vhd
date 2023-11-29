@@ -79,6 +79,7 @@ entity AmcCarrierSysReg is
       localMac          : out   slv(47 downto 0);
       localIp           : out   slv(31 downto 0);
       ethLinkUp         : in    sl := '0';
+      userReset         : out   sl;
       ----------------------
       -- Top Level Interface
       ----------------------
@@ -287,6 +288,7 @@ begin
          upTimeCnt      => upTimeCnt,
          userValues     => userValues,
          fpgaReload     => bootCmd,
+         userReset      => userReset,
          axiReadMaster  => mAxilReadMasters(VERSION_INDEX_C),
          axiReadSlave   => mAxilReadSlaves(VERSION_INDEX_C),
          axiWriteMaster => mAxilWriteMasters(VERSION_INDEX_C),
