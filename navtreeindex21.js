@@ -1,5 +1,16 @@
 var NAVTREEINDEX21 =
 {
+"classAxiSpiAd7682Reg_1_1rtl.html#a35f0a6888bd1c2e56754f97c77a534b9":[0,0,77,0,2],
+"classAxiSpiAd7682Reg_1_1rtl.html#a38f870940b73180b604d9425911c9c87":[0,0,77,0,1],
+"classAxiSpiAd7682Reg_1_1rtl.html#a43322cd4282bd0eb0bd2552c8ba96733":[0,0,77,0,7],
+"classAxiSpiAd7682Reg_1_1rtl.html#a5daf374ea804f394dee40a30d3e2e12f":[0,0,77,0,5],
+"classAxiSpiAd7682Reg_1_1rtl.html#a8c45deddb73e42384a9742641721678b":[0,0,77,0,4],
+"classAxiSpiAd7682Reg_1_1rtl.html#ab91c63e1fa0b3f9a1591146a33b17211":[0,0,77,0,0],
+"classAxiSpiAd7682Reg_1_1rtl.html#ade4de2a008a5f96235206eb18081481c":[0,0,77,0,9],
+"classAxiSpiAd7682_1_1rtl.html":[0,0,76,0],
+"classAxiSpiAd7682_1_1rtl.html#a0498304adc5e9a77df9df664a54ee3d3":[0,0,76,0,14],
+"classAxiSpiAd7682_1_1rtl.html#a1029f80e85fdc2f8a7b41a7097579f61":[0,0,76,0,21],
+"classAxiSpiAd7682_1_1rtl.html#a180139e92c0f2fe05f3096ffeb084bbc":[0,0,76,0,17],
 "classAxiSpiAd7682_1_1rtl.html#a2981438045a5020ed2efed4438cb8b4e":[0,0,76,0,10],
 "classAxiSpiAd7682_1_1rtl.html#a35a0b6576128345c92297db84c13078f":[0,0,76,0,9],
 "classAxiSpiAd7682_1_1rtl.html#a35f0a6888bd1c2e56754f97c77a534b9":[0,0,76,0,4],
@@ -238,16 +249,5 @@ var NAVTREEINDEX21 =
 "classBldAxiStream.html#aea9d7cb7026696a5cd4279abe344f6fc":[0,0,78,7],
 "classBldAxiStream.html#af2fe75efbe0a68c3fb806bb88b1a81ba":[0,0,78,23],
 "classBldAxiStream.html#af642c1a0ef40dfacd32e7b2474c1266e":[0,0,78,17],
-"classBldAxiStream.html#af98a1f0df20cf0e5f0fdb9f5999ad782":[0,0,78,24],
-"classBldAxiStream_1_1rtl.html":[0,0,78,0],
-"classBldAxiStream_1_1rtl.html#a0104c794afed275944c8341fe24fd6e3":[0,0,78,0,25],
-"classBldAxiStream_1_1rtl.html#a0264b30b16e4fea2f3829b44a9aedfa7":[0,0,78,0,20],
-"classBldAxiStream_1_1rtl.html#a0498304adc5e9a77df9df664a54ee3d3":[0,0,78,0,54],
-"classBldAxiStream_1_1rtl.html#a052bcf7eb45fae1c9a3be85def32ac7d":[0,0,78,0,12],
-"classBldAxiStream_1_1rtl.html#a07675b2efd6102226590e327182a853c":[0,0,78,0,65],
-"classBldAxiStream_1_1rtl.html#a08548b47c90213aa171a01623cc3e160":[0,0,78,0,60],
-"classBldAxiStream_1_1rtl.html#a08e7bde4ab4a7abbabb6a3639b24985c":[0,0,78,0,32],
-"classBldAxiStream_1_1rtl.html#a0919bbf756ce1530ada0fe3a7c6a6537":[0,0,78,0,47],
-"classBldAxiStream_1_1rtl.html#a0f7ebc6509b2cad8829273f7d94269af":[0,0,78,0,22],
-"classBldAxiStream_1_1rtl.html#a150ba9cfdbbf507247855460a47eafdf":[0,0,78,0,6]
+"classBldAxiStream.html#af98a1f0df20cf0e5f0fdb9f5999ad782":[0,0,78,24]
 };

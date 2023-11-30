@@ -74,6 +74,7 @@ var classAmcCarrierCoreBase =
     [ "stableRst", "classAmcCarrierCoreBase.html#a558a4f6a6aa937c2b3e2d3d9fb76593b", null ],
     [ "ipmiBsi", "classAmcCarrierCoreBase.html#acd37066ee8aeb9c2847b1225d9686fcc", null ],
     [ "ethPhyReady", "classAmcCarrierCoreBase.html#a7df1404689ce5327080b2e4cc78ffb5d", null ],
+    [ "userReset", "classAmcCarrierCoreBase.html#afa0d97a4d1ca8632eaf526411df3bf6d", null ],
     [ "fabClkP", "classAmcCarrierCoreBase.html#a586a7944f72b6aa9186950bb578a6af9", null ],
     [ "fabClkN", "classAmcCarrierCoreBase.html#a6b575dde973e6f1f0e343c7cc4830f96", null ],
     [ "ethRxP", "classAmcCarrierCoreBase.html#a756ea3d1b593f9264776d4b2a656b638", null ],

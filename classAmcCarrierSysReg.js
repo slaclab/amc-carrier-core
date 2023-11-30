@@ -38,6 +38,7 @@ var classAmcCarrierSysReg =
     [ "localMac", "classAmcCarrierSysReg.html#a273c3ce1740767852f0b107b499ea24e", null ],
     [ "localIp", "classAmcCarrierSysReg.html#ac0f6bc5bf6d2cbf0b01604233911223b", null ],
     [ "ethLinkUp", "classAmcCarrierSysReg.html#af0aa1983b40740772a1a117c5efd8de6", null ],
+    [ "userReset", "classAmcCarrierSysReg.html#afa0d97a4d1ca8632eaf526411df3bf6d", null ],
     [ "appReadMaster", "classAmcCarrierSysReg.html#a8670bf5a467a3fc55dd3ee15267779f2", null ],
     [ "appReadSlave", "classAmcCarrierSysReg.html#ad8b8caaf45b3fc14b0c0bf74a48c4b10", null ],
     [ "appWriteMaster", "classAmcCarrierSysReg.html#aa52e6ab0cc5421113d036df2663f7bd7", null ],
