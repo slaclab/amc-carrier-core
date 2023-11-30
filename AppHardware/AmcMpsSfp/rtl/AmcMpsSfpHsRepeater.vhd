@@ -1,8 +1,6 @@
 -------------------------------------------------------------------------------
 -- Company    : SLAC National Accelerator Laboratory
 -------------------------------------------------------------------------------
--- Description:
--------------------------------------------------------------------------------
 -- This file is part of 'LCLS2 Common Carrier Core'.
 -- It is subject to the license terms in the LICENSE.txt file found in the
 -- top-level directory of this distribution and at:
@@ -16,7 +14,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_arith.all;
-
 
 library surf;
 use surf.StdRtlPkg.all;

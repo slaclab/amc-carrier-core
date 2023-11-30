@@ -140,7 +140,8 @@ begin
 
       U_PLL : entity amc_carrier_core.Si5317a
          generic map (
-            TPD_G => TPD_G)
+            TPD_G         => TPD_G,
+            TIMING_MODE_G => true)  -- true = 185 MHz clock, false = 119 MHz clock
          port map(
             -- PLL Parallel Interface
             pllLos          => los,
