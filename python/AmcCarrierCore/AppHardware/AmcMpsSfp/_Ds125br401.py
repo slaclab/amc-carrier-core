@@ -135,9 +135,9 @@ class Ds125br401(pr.Device):
             'ChannelB[0]', 'ChannelB[1]', 'ChannelB[2]', 'ChannelB[3]', 'ChannelA[0]', 'ChannelA[1]', 'ChannelA[2]', 'ChannelA[3]'
         ]
            
-        for channel in range(6, len(channels)):
+        for channel in range(len(channels)):
             self.add(pr.RemoteVariable(
-                name         = "PWDN_ch{}".format(channel),
+                name         = "PWDN_ch[{}]".format(channel),
                 description  = "Power down - override pwdn pin. (1: enabled, 0: disabled)",
                 offset       =  (0x01*4),
                 bitSize      =  1,
@@ -148,7 +148,7 @@ class Ds125br401(pr.Device):
             ))  
             
             self.add(pr.RemoteVariable(
-                name         = "ShortCircuitProt_ch{}".format(channel),
+                name         = "ShortCircuitProt_ch[{}]".format(channel),
                 description  = "Short circuit protection (1: enable, 0: disable)",
                 offset       =  ((0x10+0x07*channel)*4),
                 bitSize      =  1,
@@ -159,7 +159,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "ModeSelect_ch{}".format(channel),
+                name         = "ModeSelect_ch[{}]".format(channel),
                 description  = "Mode selection (1: PCIe Gen-1 or PCIe Gen-2, 0: PCIe Gen 3)",
                 offset       =  ((0x10+0x07*channel)*4),
                 bitSize      =  1,
@@ -170,7 +170,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "SigDet_ch{}".format(channel),
+                name         = "SigDet_ch[{}]".format(channel),
                 description  = "Signal detect at input (1: not detected, 0: detected)",
                 offset       =  (0x0a*4),
                 bitSize      =  1,
@@ -181,7 +181,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "SigDetRst_ch{}".format(channel),
+                name         = "SigDetRst_ch[{}]".format(channel),
                 description  = "Signal detect reset (1: force to OFF)",
                 offset       =  ((0x0d+0x07*channel)*4),
                 bitSize      =  1,
@@ -192,7 +192,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "SigDetPreset_ch{}".format(channel),
+                name         = "SigDetPreset_ch[{}]".format(channel),
                 description  = "Signal detect presset (1: force to ON)",
                 offset       =  ((0x0d+0x07*channel)*4),
                 bitSize      =  1,
@@ -203,7 +203,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "IdleSelect_ch{}".format(channel),
+                name         = "IdleSelect_ch[{}]".format(channel),
                 description  = "Enable automatic idle detection (0: auto, 1: manual)",
                 offset       =  ((0x0e+0x07*channel)*4),
                 bitSize      =  1,
@@ -214,7 +214,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "Idle_ch{}".format(channel),
+                name         = "Idle_ch[{}]".format(channel),
                 description  = "Set idle manually (0: output ON, 1: mute output)",
                 offset       =  ((0x0e+0x07*channel)*4),
                 bitSize      =  1,
@@ -225,7 +225,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "RxDetConf_ch{}".format(channel),
+                name         = "RxDetConf_ch[{}]".format(channel),
                 description  = "Loopback selection",
                 offset       =  ((0x0e+0x07*channel)*4),
                 bitSize      =  2,
@@ -242,7 +242,7 @@ class Ds125br401(pr.Device):
             ))  
             
             self.add(pr.RemoteVariable(
-                name         = "EQ_ch{}".format(channel),
+                name         = "EQ_ch[{}]".format(channel),
                 description  = "Set equalizer",
                 offset       =  ((0x0f+0x07*channel)*4),
                 bitSize      =  8,
@@ -253,7 +253,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "VOD_ch{}".format(channel),
+                name         = "VOD_ch[{}]".format(channel),
                 description  = "Set VOD",
                 offset       =  ((0x10+0x07*channel)*4),
                 bitSize      =  3,
@@ -274,7 +274,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "Rxdet_ch{}".format(channel),
+                name         = "Rxdet_ch[{}]".format(channel),
                 description  = "Rx detected (1: detected)",
                 offset       =  ((0x11+0x07*channel)*4),
                 bitSize      =  1,
@@ -285,7 +285,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "Mode_ch{}".format(channel),
+                name         = "Mode_ch[{}]".format(channel),
                 description  = "Mode",
                 offset       =  ((0x11+0x07*channel)*4),
                 bitSize      =  2,
@@ -302,7 +302,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "DEM_ch{}".format(channel),
+                name         = "DEM_ch[{}]".format(channel),
                 description  = "DEM Control",
                 offset       =  ((0x11+0x07*channel)*4),
                 bitSize      =  3,
@@ -323,7 +323,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "IdleAssertThreshold_ch{}".format(channel),
+                name         = "IdleAssertThreshold_ch[{}]".format(channel),
                 description  = "Idle assert threshold",
                 offset       =  ((0x12+0x07*channel)*4),
                 bitSize      =  2,
@@ -340,7 +340,7 @@ class Ds125br401(pr.Device):
             ))
             
             self.add(pr.RemoteVariable(
-                name         = "IdleDeassertThreshold_ch{}".format(channel),
+                name         = "IdleDeassertThreshold_ch[{}]".format(channel),
                 description  = "Idle deassert threshold",
                 offset       =  ((0x12+0x07*channel)*4),
                 bitSize      =  2,
