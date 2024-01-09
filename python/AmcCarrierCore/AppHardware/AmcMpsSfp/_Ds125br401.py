@@ -15,7 +15,7 @@ class Ds125br401Channel(pr.Device):
         super().__init__(**kwargs)
         '''
         '''
-        
+
 
 class Ds125br401(pr.Device):
     def __init__(self,**kwargs):
@@ -23,7 +23,7 @@ class Ds125br401(pr.Device):
 
         ##########################
         # Device generic registers
-        
+
         self.add(pr.RemoteVariable(
             name         = "RstSMBus",
             description  = "Reset SMBUS",
@@ -33,7 +33,7 @@ class Ds125br401(pr.Device):
             base         =  pr.Bool,
             mode         =  "RW",
         ))
-        
+
         self.add(pr.RemoteVariable(
             name         = "RstRegisters",
             description  = "Reset internal registers",
@@ -43,7 +43,7 @@ class Ds125br401(pr.Device):
             base         =  pr.Bool,
             mode         =  "RW",
         ))
-        
+
         self.add(pr.RemoteVariable(
             name         = "CtrlEn",
             description  = "Enable SMBus control (1: enable setting VOD, DEM and EQ)",
@@ -53,7 +53,7 @@ class Ds125br401(pr.Device):
             base         =  pr.Bool,
             mode         =  "RW",
         ))
-        
+
         self.add(pr.RemoteVariable(
             name         = "Loopback",
             description  = "Loopback selection",
@@ -63,8 +63,8 @@ class Ds125br401(pr.Device):
             base         =  pr.UInt,
             mode         =  "RW",
             enum         = {0: "Use LPBK pin control", 1: "INA_n to OUTB_n loopback", 2: "INB_n to OUTA_n loopback", 3: "Disable loopback and ignore LPBK pin"}
-        ))  
-        
+        ))
+
         self.add(pr.RemoteVariable(
             name         = "PWDNOverride",
             description  = "Allows overriding PWDN pin (0: prevent, 1: allow)",
@@ -74,7 +74,7 @@ class Ds125br401(pr.Device):
             base         =  pr.Bool,
             mode         =  "RW",
         ))
-        
+
         self.add(pr.RemoteVariable(
             name         = "SD_THOverride",
             description  = "Allows overriding Signal detect (0: prevent, 1: allow)",
@@ -84,7 +84,7 @@ class Ds125br401(pr.Device):
             base         =  pr.Bool,
             mode         =  "RW",
         ))
-        
+
         self.add(pr.RemoteVariable(
             name         = "IDLEOverride",
             description  = "Allows overriding IDLE (0: prevent, 1: allow)",
@@ -94,7 +94,7 @@ class Ds125br401(pr.Device):
             base         =  pr.Bool,
             mode         =  "RW",
         ))
-        
+
         self.add(pr.RemoteVariable(
             name         = "RXDETOverride",
             description  = "Allows overriding RXDET (0: prevent, 1: allow)",
@@ -104,7 +104,7 @@ class Ds125br401(pr.Device):
             base         =  pr.Bool,
             mode         =  "RW",
         ))
-        
+
         self.add(pr.RemoteVariable(
             name         = "MODEOverride",
             description  = "Allows overriding MODE (0: prevent, 1: allow)",
@@ -114,7 +114,7 @@ class Ds125br401(pr.Device):
             base         =  pr.Bool,
             mode         =  "RW",
         ))
-        
+
         #JM: Loopback (reg: 0x02)
 
         ########################
@@ -127,14 +127,14 @@ class Ds125br401(pr.Device):
         #    CH5 : Channel A (1)
         #    CH6 : Channel A (2)
         #    CH7 : Channel A (3)
-        
+
         #########################
         # Channels
-        
+
         channels = [
             'ChannelB[0]', 'ChannelB[1]', 'ChannelB[2]', 'ChannelB[3]', 'ChannelA[0]', 'ChannelA[1]', 'ChannelA[2]', 'ChannelA[3]'
         ]
-           
+
         for channel in range(len(channels)):
             self.add(pr.RemoteVariable(
                 name         = "PWDN_ch[{}]".format(channel),
@@ -145,8 +145,8 @@ class Ds125br401(pr.Device):
                 base         =  pr.Bool,
                 mode         =  "RW",
                 guiGroup     = '{}'.format(channels[channel])
-            ))  
-            
+            ))
+
             self.add(pr.RemoteVariable(
                 name         = "ShortCircuitProt_ch[{}]".format(channel),
                 description  = "Short circuit protection (1: enable, 0: disable)",
@@ -157,7 +157,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RW",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "ModeSelect_ch[{}]".format(channel),
                 description  = "Mode selection (1: PCIe Gen-1 or PCIe Gen-2, 0: PCIe Gen 3)",
@@ -168,7 +168,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RW",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "SigDet_ch[{}]".format(channel),
                 description  = "Signal detect at input (1: not detected, 0: detected)",
@@ -179,7 +179,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RO",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "SigDetRst_ch[{}]".format(channel),
                 description  = "Signal detect reset (1: force to OFF)",
@@ -190,7 +190,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RW",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "SigDetPreset_ch[{}]".format(channel),
                 description  = "Signal detect presset (1: force to ON)",
@@ -201,7 +201,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RW",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "IdleSelect_ch[{}]".format(channel),
                 description  = "Enable automatic idle detection (0: auto, 1: manual)",
@@ -212,7 +212,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RW",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "Idle_ch[{}]".format(channel),
                 description  = "Set idle manually (0: output ON, 1: mute output)",
@@ -223,7 +223,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RW",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "RxDetConf_ch[{}]".format(channel),
                 description  = "Loopback selection",
@@ -233,14 +233,14 @@ class Ds125br401(pr.Device):
                 base         =  pr.UInt,
                 mode         =  "RW",
                 enum         = {
-                        0: "Input is hi-z impedance", 
-                        1: "Auto RX-Detect for 600ms", 
-                        2: "Auto RX-Detect until detected", 
+                        0: "Input is hi-z impedance",
+                        1: "Auto RX-Detect for 600ms",
+                        2: "Auto RX-Detect until detected",
                         3: "Input is 50 Ω"
                     },
                 guiGroup    = '{}'.format(channels[channel])
-            ))  
-            
+            ))
+
             self.add(pr.RemoteVariable(
                 name         = "EQ_ch[{}]".format(channel),
                 description  = "Set equalizer",
@@ -251,7 +251,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RW",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "VOD_ch[{}]".format(channel),
                 description  = "Set VOD",
@@ -272,7 +272,7 @@ class Ds125br401(pr.Device):
                     },
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "Rxdet_ch[{}]".format(channel),
                 description  = "Rx detected (1: detected)",
@@ -283,7 +283,7 @@ class Ds125br401(pr.Device):
                 mode         =  "RO",
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "Mode_ch[{}]".format(channel),
                 description  = "Mode",
@@ -300,7 +300,7 @@ class Ds125br401(pr.Device):
                     },
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "DEM_ch[{}]".format(channel),
                 description  = "DEM Control",
@@ -321,7 +321,7 @@ class Ds125br401(pr.Device):
                     },
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "IdleAssertThreshold_ch[{}]".format(channel),
                 description  = "Idle assert threshold",
@@ -338,7 +338,7 @@ class Ds125br401(pr.Device):
                     },
                 guiGroup    = '{}'.format(channels[channel])
             ))
-            
+
             self.add(pr.RemoteVariable(
                 name         = "IdleDeassertThreshold_ch[{}]".format(channel),
                 description  = "Idle deassert threshold",
