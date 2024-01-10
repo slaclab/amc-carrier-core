@@ -8,7 +8,7 @@ var classRtmDigitalDebugV2b_1_1mapping =
     [ "debugValue", "classRtmDigitalDebugV2b_1_1mapping.html#ae9b6c8fc158c088d775a05a9b1c8a4c1", null ],
     [ "axilReadSlave", "classRtmDigitalDebugV2b_1_1mapping.html#a5daf374ea804f394dee40a30d3e2e12f", null ],
     [ "axilWriteSlave", "classRtmDigitalDebugV2b_1_1mapping.html#a1b43705cc2da350eb0df1e71fb23ab88", null ],
-    [ "REG_INIT_C", "classRtmDigitalDebugV2b_1_1mapping.html#aef7e8693f804aef5a5e277aa2cd99000", null ],
+    [ "REG_INIT_C", "classRtmDigitalDebugV2b_1_1mapping.html#a55dd6fde0325f1995285500170675050", null ],
     [ "r", "classRtmDigitalDebugV2b_1_1mapping.html#a0498304adc5e9a77df9df664a54ee3d3", null ],
     [ "rin", "classRtmDigitalDebugV2b_1_1mapping.html#ade4de2a008a5f96235206eb18081481c", null ],
     [ "clk", "classRtmDigitalDebugV2b_1_1mapping.html#a0491e0d47530277e16a615459010fd03", null ],
