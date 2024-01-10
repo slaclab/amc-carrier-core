@@ -26,7 +26,7 @@ Ds125br401: &Ds125br401
       description: Reset SMBus
       sizeBits: 1
       lsBit: 5
-      
+
     RstRegisters:
       at:
         offset: 0x1c
@@ -36,7 +36,7 @@ Ds125br401: &Ds125br401
       description: Reset internal registers
       sizeBits: 1
       lsBit: 6
-      
+
     CtrlEn:
       at:
         offset: 0x18
@@ -46,7 +46,7 @@ Ds125br401: &Ds125br401
       description: Enable SMBus control - set 1 to enable setting VOD, DEM and EQ
       sizeBits: 1
       lsBit: 3
-      
+
     Loopback:
       at:
         offset: 0x08
@@ -56,7 +56,7 @@ Ds125br401: &Ds125br401
       description: 0 to use loopback pin, 1 for INA_n to OUTB_n, 2 for INB_n to OUTA_n, 3 to disable loopback and ignore pin
       sizeBits: 2
       lsBit: 4
-      
+
     PwdnOverride:
       at:
         offset: 0x08
@@ -66,7 +66,7 @@ Ds125br401: &Ds125br401
       description: 1 to allow overriding the pin
       sizeBits: 1
       lsBit: 0
-      
+
     SDThOverride:
       at:
         offset: 0x20
@@ -76,7 +76,7 @@ Ds125br401: &Ds125br401
       description: 1 to allow overriding the signal detect threshold
       sizeBits: 1
       lsBit: 6
-      
+
     IdleOverride:
       at:
         offset: 0x20
@@ -86,7 +86,7 @@ Ds125br401: &Ds125br401
       description: 1 to allow overriding IDLE
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetOverride:
       at:
         offset: 0x20
@@ -96,7 +96,7 @@ Ds125br401: &Ds125br401
       description: 1 to allow overriding Rx detect
       sizeBits: 1
       lsBit: 3
-      
+
     ModeOverride:
       at:
         offset: 0x20
@@ -106,7 +106,7 @@ Ds125br401: &Ds125br401
       description: 1 to allow overriding mode
       sizeBits: 1
       lsBit: 2
-      
+
     ###########################################
     # Channel B[0]
     ###########################################
@@ -119,7 +119,7 @@ Ds125br401: &Ds125br401
       description: 1 to power down the channel
       sizeBits: 1
       lsBit: 0
-      
+
     ShortCircProt:
       at:
         offset: 0x40
@@ -129,7 +129,7 @@ Ds125br401: &Ds125br401
       description: 1 to enable short circuit protection
       sizeBits: 1
       lsBit: 7
-      
+
     ModeSelectChB0:
       at:
         offset: 0x40
@@ -139,7 +139,7 @@ Ds125br401: &Ds125br401
       description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetChB0:
       at:
         offset: 0x28
@@ -149,7 +149,7 @@ Ds125br401: &Ds125br401
       description: 0 when signal is detected
       sizeBits: 1
       lsBit: 0
-      
+
     SigDetRstChB0:
       at:
         offset: 0x34
@@ -159,7 +159,7 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to off
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetPresetChB0:
       at:
         offset: 0x34
@@ -169,27 +169,27 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to on
       sizeBits: 1
       lsBit: 1
-      
+
     IdleSelectChB0:
       at:
         offset: 0x38
       class: IntField
       name: IdleSelectChB0
       mode: RW
-      description: 1 to set idle detection to manual 
+      description: 1 to set idle detection to manual
       sizeBits: 1
       lsBit: 5
-      
+
     IdleChB0:
       at:
         offset: 0x38
       class: IntField
       name: IdleChB0
       mode: RW
-      description: 1 to mute output 
+      description: 1 to mute output
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetConfChB0:
       at:
         offset: 0x38
@@ -199,7 +199,7 @@ Ds125br401: &Ds125br401
       description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
       sizeBits: 2
       lsBit: 2
-      
+
     EqChB0:
       at:
         offset: 0x3c
@@ -209,7 +209,7 @@ Ds125br401: &Ds125br401
       description: Equalizer value according to datasheet
       sizeBits: 8
       lsBit: 0
-      
+
     VodChB0:
       at:
         offset: 0x40
@@ -219,7 +219,7 @@ Ds125br401: &Ds125br401
       description: VOD value according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     RxDetChB0:
       at:
         offset: 0x44
@@ -229,7 +229,7 @@ Ds125br401: &Ds125br401
       description: 1 for rx detected
       sizeBits: 1
       lsBit: 7
-      
+
     ModeChB0:
       at:
         offset: 0x44
@@ -239,7 +239,7 @@ Ds125br401: &Ds125br401
       description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
       sizeBits: 2
       lsBit: 5
-      
+
     DemChB0:
       at:
         offset: 0x44
@@ -249,7 +249,7 @@ Ds125br401: &Ds125br401
       description: DEM control according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     IdleAssertThChB0:
       at:
         offset: 0x48
@@ -259,7 +259,7 @@ Ds125br401: &Ds125br401
       description: Idle assert threshold according to datasheet
       sizeBits: 2
       lsBit: 2
-      
+
     IdleDeAssertThChB0:
       at:
         offset: 0x48
@@ -269,7 +269,7 @@ Ds125br401: &Ds125br401
       description: Idle de-assert threshold according to datasheet
       sizeBits: 2
       lsBit: 0
-      
+
     ###########################################
     # Channel B[1]
     ###########################################
@@ -282,7 +282,7 @@ Ds125br401: &Ds125br401
       description: 1 to power down the channel
       sizeBits: 1
       lsBit: 1
-      
+
     ShortCircProtChB1:
       at:
         offset: 0x5c
@@ -292,7 +292,7 @@ Ds125br401: &Ds125br401
       description: 1 to enable short circuit protection
       sizeBits: 1
       lsBit: 7
-      
+
     ModeSelectChB1:
       at:
         offset: 0x5c
@@ -302,7 +302,7 @@ Ds125br401: &Ds125br401
       description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetChB1:
       at:
         offset: 0x28
@@ -312,7 +312,7 @@ Ds125br401: &Ds125br401
       description: 0 when signal is detected
       sizeBits: 1
       lsBit: 1
-      
+
     SigDetRstChB1:
       at:
         offset: 0x50
@@ -322,7 +322,7 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to off
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetPresetChB1:
       at:
         offset: 0x50
@@ -332,27 +332,27 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to on
       sizeBits: 1
       lsBit: 1
-      
+
     IdleSelectChB1:
       at:
         offset: 0x54
       class: IntField
       name: IdleSelectChB1
       mode: RW
-      description: 1 to set idle detection to manual 
+      description: 1 to set idle detection to manual
       sizeBits: 1
       lsBit: 5
-      
+
     IdleChB1:
       at:
         offset: 0x54
       class: IntField
       name: IdleChB1
       mode: RW
-      description: 1 to mute output 
+      description: 1 to mute output
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetConfChB1:
       at:
         offset: 0x54
@@ -362,7 +362,7 @@ Ds125br401: &Ds125br401
       description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
       sizeBits: 2
       lsBit: 2
-      
+
     EqChB1:
       at:
         offset: 0x58
@@ -372,7 +372,7 @@ Ds125br401: &Ds125br401
       description: Equalizer value according to datasheet
       sizeBits: 8
       lsBit: 0
-      
+
     VodChB1:
       at:
         offset: 0x5c
@@ -382,7 +382,7 @@ Ds125br401: &Ds125br401
       description: VOD value according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     RxDetChB1:
       at:
         offset: 0x60
@@ -392,7 +392,7 @@ Ds125br401: &Ds125br401
       description: 1 for rx detected
       sizeBits: 1
       lsBit: 7
-      
+
     ModeChB1:
       at:
         offset: 0x60
@@ -402,7 +402,7 @@ Ds125br401: &Ds125br401
       description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
       sizeBits: 2
       lsBit: 5
-      
+
     DemChB1:
       at:
         offset: 0x60
@@ -412,7 +412,7 @@ Ds125br401: &Ds125br401
       description: DEM control according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     IdleAssertThChB1:
       at:
         offset: 0x64
@@ -422,7 +422,7 @@ Ds125br401: &Ds125br401
       description: Idle assert threshold according to datasheet
       sizeBits: 2
       lsBit: 2
-      
+
     IdleDeAssertThChB1:
       at:
         offset: 0x64
@@ -432,7 +432,7 @@ Ds125br401: &Ds125br401
       description: Idle de-assert threshold according to datasheet
       sizeBits: 2
       lsBit: 0
-    
+
     ###########################################
     # Channel B[2]
     ###########################################
@@ -445,7 +445,7 @@ Ds125br401: &Ds125br401
       description: 1 to power down the channel
       sizeBits: 1
       lsBit: 2
-      
+
     ShortCircProtChB2:
       at:
         offset: 0x78
@@ -455,7 +455,7 @@ Ds125br401: &Ds125br401
       description: 1 to enable short circuit protection
       sizeBits: 1
       lsBit: 7
-      
+
     ModeSelectChB2:
       at:
         offset: 0x78
@@ -465,7 +465,7 @@ Ds125br401: &Ds125br401
       description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetChB2:
       at:
         offset: 0x28
@@ -475,7 +475,7 @@ Ds125br401: &Ds125br401
       description: 0 when signal is detected
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetRstChB2:
       at:
         offset: 0x6c
@@ -485,7 +485,7 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to off
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetPresetChB2:
       at:
         offset: 0x6c
@@ -495,27 +495,27 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to on
       sizeBits: 1
       lsBit: 1
-      
+
     IdleSelectChB2:
       at:
         offset: 0x70
       class: IntField
       name: IdleSelectChB2
       mode: RW
-      description: 1 to set idle detection to manual 
+      description: 1 to set idle detection to manual
       sizeBits: 1
       lsBit: 5
-      
+
     IdleChB2:
       at:
         offset: 0x70
       class: IntField
       name: IdleChB2
       mode: RW
-      description: 1 to mute output 
+      description: 1 to mute output
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetConfChB2:
       at:
         offset: 0x70
@@ -525,7 +525,7 @@ Ds125br401: &Ds125br401
       description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
       sizeBits: 2
       lsBit: 2
-      
+
     EqChB2:
       at:
         offset: 0x74
@@ -535,7 +535,7 @@ Ds125br401: &Ds125br401
       description: Equalizer value according to datasheet
       sizeBits: 8
       lsBit: 0
-      
+
     VodChB2:
       at:
         offset: 0x78
@@ -545,7 +545,7 @@ Ds125br401: &Ds125br401
       description: VOD value according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     RxDetChB2:
       at:
         offset: 0x7c
@@ -555,7 +555,7 @@ Ds125br401: &Ds125br401
       description: 1 for rx detected
       sizeBits: 1
       lsBit: 7
-      
+
     ModeChB2:
       at:
         offset: 0x7c
@@ -565,7 +565,7 @@ Ds125br401: &Ds125br401
       description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
       sizeBits: 2
       lsBit: 5
-      
+
     DemChB2:
       at:
         offset: 0x7c
@@ -575,7 +575,7 @@ Ds125br401: &Ds125br401
       description: DEM control according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     IdleAssertThChB2:
       at:
         offset: 0x80
@@ -585,7 +585,7 @@ Ds125br401: &Ds125br401
       description: Idle assert threshold according to datasheet
       sizeBits: 2
       lsBit: 2
-      
+
     IdleDeAssertThChB2:
       at:
         offset: 0x80
@@ -608,7 +608,7 @@ Ds125br401: &Ds125br401
       description: 1 to power down the channel
       sizeBits: 1
       lsBit: 3
-      
+
     ShortCircProtChB3:
       at:
         offset: 0x94
@@ -618,7 +618,7 @@ Ds125br401: &Ds125br401
       description: 1 to enable short circuit protection
       sizeBits: 1
       lsBit: 7
-      
+
     ModeSelectChB3:
       at:
         offset: 0x94
@@ -628,7 +628,7 @@ Ds125br401: &Ds125br401
       description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetChB3:
       at:
         offset: 0x28
@@ -638,7 +638,7 @@ Ds125br401: &Ds125br401
       description: 0 when signal is detected
       sizeBits: 1
       lsBit: 3
-      
+
     SigDetRstChB3:
       at:
         offset: 0x88
@@ -648,7 +648,7 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to off
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetPresetChB3:
       at:
         offset: 0x88
@@ -658,27 +658,27 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to on
       sizeBits: 1
       lsBit: 1
-      
+
     IdleSelectChB3:
       at:
         offset: 0x8c
       class: IntField
       name: IdleSelectChB3
       mode: RW
-      description: 1 to set idle detection to manual 
+      description: 1 to set idle detection to manual
       sizeBits: 1
       lsBit: 5
-      
+
     IdleChB3:
       at:
         offset: 0x8c
       class: IntField
       name: IdleChB3
       mode: RW
-      description: 1 to mute output 
+      description: 1 to mute output
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetConfChB3:
       at:
         offset: 0x8c
@@ -688,7 +688,7 @@ Ds125br401: &Ds125br401
       description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
       sizeBits: 2
       lsBit: 2
-      
+
     EqChB3:
       at:
         offset: 0x90
@@ -698,7 +698,7 @@ Ds125br401: &Ds125br401
       description: Equalizer value according to datasheet
       sizeBits: 8
       lsBit: 0
-      
+
     VodChB3:
       at:
         offset: 0x94
@@ -708,7 +708,7 @@ Ds125br401: &Ds125br401
       description: VOD value according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     RxDetChB3:
       at:
         offset: 0x98
@@ -718,7 +718,7 @@ Ds125br401: &Ds125br401
       description: 1 for rx detected
       sizeBits: 1
       lsBit: 7
-      
+
     ModeChB3:
       at:
         offset: 0x98
@@ -728,7 +728,7 @@ Ds125br401: &Ds125br401
       description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
       sizeBits: 2
       lsBit: 5
-      
+
     DemChB3:
       at:
         offset: 0x98
@@ -738,7 +738,7 @@ Ds125br401: &Ds125br401
       description: DEM control according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     IdleAssertThChB3:
       at:
         offset: 0x9c
@@ -748,7 +748,7 @@ Ds125br401: &Ds125br401
       description: Idle assert threshold according to datasheet
       sizeBits: 2
       lsBit: 2
-      
+
     IdleDeAssertThChB3:
       at:
         offset: 0x9c
@@ -758,7 +758,7 @@ Ds125br401: &Ds125br401
       description: Idle de-assert threshold according to datasheet
       sizeBits: 2
       lsBit: 0
-      
+
     ###########################################
     # Channel A[0]
     ###########################################
@@ -771,7 +771,7 @@ Ds125br401: &Ds125br401
       description: 1 to power down the channel
       sizeBits: 1
       lsBit: 4
-      
+
     ShortCircProtChA0:
       at:
         offset: 0xb0
@@ -781,7 +781,7 @@ Ds125br401: &Ds125br401
       description: 1 to enable short circuit protection
       sizeBits: 1
       lsBit: 7
-      
+
     ModeSelectChA0:
       at:
         offset: 0xb0
@@ -791,7 +791,7 @@ Ds125br401: &Ds125br401
       description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetChA0:
       at:
         offset: 0x28
@@ -801,7 +801,7 @@ Ds125br401: &Ds125br401
       description: 0 when signal is detected
       sizeBits: 1
       lsBit: 4
-      
+
     SigDetRstChA0:
       at:
         offset: 0xa4
@@ -811,7 +811,7 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to off
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetPresetChA0:
       at:
         offset: 0xa4
@@ -821,27 +821,27 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to on
       sizeBits: 1
       lsBit: 1
-      
+
     IdleSelectChA0:
       at:
         offset: 0xa8
       class: IntField
       name: IdleSelectChA0
       mode: RW
-      description: 1 to set idle detection to manual 
+      description: 1 to set idle detection to manual
       sizeBits: 1
       lsBit: 5
-      
+
     IdleChA0:
       at:
         offset: 0xa8
       class: IntField
       name: IdleChA0
       mode: RW
-      description: 1 to mute output 
+      description: 1 to mute output
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetConfChA0:
       at:
         offset: 0xa8
@@ -851,7 +851,7 @@ Ds125br401: &Ds125br401
       description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
       sizeBits: 2
       lsBit: 2
-      
+
     EqChA0:
       at:
         offset: 0xac
@@ -861,7 +861,7 @@ Ds125br401: &Ds125br401
       description: Equalizer value according to datasheet
       sizeBits: 8
       lsBit: 0
-      
+
     VodChA0:
       at:
         offset: 0xb0
@@ -871,7 +871,7 @@ Ds125br401: &Ds125br401
       description: VOD value according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     RxDetChA0:
       at:
         offset: 0xb4
@@ -881,7 +881,7 @@ Ds125br401: &Ds125br401
       description: 1 for rx detected
       sizeBits: 1
       lsBit: 7
-      
+
     ModeChA0:
       at:
         offset: 0xb4
@@ -891,7 +891,7 @@ Ds125br401: &Ds125br401
       description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
       sizeBits: 2
       lsBit: 5
-      
+
     DemChA0:
       at:
         offset: 0xb4
@@ -901,7 +901,7 @@ Ds125br401: &Ds125br401
       description: DEM control according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     IdleAssertThChA0:
       at:
         offset: 0xb8
@@ -911,7 +911,7 @@ Ds125br401: &Ds125br401
       description: Idle assert threshold according to datasheet
       sizeBits: 2
       lsBit: 2
-      
+
     IdleDeAssertThChA0:
       at:
         offset: 0xb8
@@ -921,7 +921,7 @@ Ds125br401: &Ds125br401
       description: Idle de-assert threshold according to datasheet
       sizeBits: 2
       lsBit: 0
-      
+
     ###########################################
     # Channel A[1]
     ###########################################
@@ -934,7 +934,7 @@ Ds125br401: &Ds125br401
       description: 1 to power down the channel
       sizeBits: 1
       lsBit: 5
-      
+
     ShortCircProtChA1:
       at:
         offset: 0xcc
@@ -944,7 +944,7 @@ Ds125br401: &Ds125br401
       description: 1 to enable short circuit protection
       sizeBits: 1
       lsBit: 7
-      
+
     ModeSelectChA1:
       at:
         offset: 0xcc
@@ -954,7 +954,7 @@ Ds125br401: &Ds125br401
       description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetChA1:
       at:
         offset: 0x28
@@ -964,7 +964,7 @@ Ds125br401: &Ds125br401
       description: 0 when signal is detected
       sizeBits: 1
       lsBit: 5
-      
+
     SigDetRstChA1:
       at:
         offset: 0xc0
@@ -974,7 +974,7 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to off
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetPresetChA1:
       at:
         offset: 0xc0
@@ -984,27 +984,27 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to on
       sizeBits: 1
       lsBit: 1
-      
+
     IdleSelectChA1:
       at:
         offset: 0xc4
       class: IntField
       name: IdleSelectChA1
       mode: RW
-      description: 1 to set idle detection to manual 
+      description: 1 to set idle detection to manual
       sizeBits: 1
       lsBit: 5
-      
+
     IdleChA1:
       at:
         offset: 0xc4
       class: IntField
       name: IdleChA1
       mode: RW
-      description: 1 to mute output 
+      description: 1 to mute output
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetConfChA1:
       at:
         offset: 0xc4
@@ -1014,7 +1014,7 @@ Ds125br401: &Ds125br401
       description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
       sizeBits: 2
       lsBit: 2
-      
+
     EqChA1:
       at:
         offset: 0xc8
@@ -1024,7 +1024,7 @@ Ds125br401: &Ds125br401
       description: Equalizer value according to datasheet
       sizeBits: 8
       lsBit: 0
-      
+
     VodChA1:
       at:
         offset: 0xcc
@@ -1034,7 +1034,7 @@ Ds125br401: &Ds125br401
       description: VOD value according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     RxDetChA1:
       at:
         offset: 0xd0
@@ -1044,7 +1044,7 @@ Ds125br401: &Ds125br401
       description: 1 for rx detected
       sizeBits: 1
       lsBit: 7
-      
+
     ModeChA1:
       at:
         offset: 0xd0
@@ -1054,7 +1054,7 @@ Ds125br401: &Ds125br401
       description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
       sizeBits: 2
       lsBit: 5
-      
+
     DemChA1:
       at:
         offset: 0xd0
@@ -1064,7 +1064,7 @@ Ds125br401: &Ds125br401
       description: DEM control according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     IdleAssertThChA1:
       at:
         offset: 0xd4
@@ -1074,7 +1074,7 @@ Ds125br401: &Ds125br401
       description: Idle assert threshold according to datasheet
       sizeBits: 2
       lsBit: 2
-      
+
     IdleDeAssertThChA1:
       at:
         offset: 0xd4
@@ -1097,7 +1097,7 @@ Ds125br401: &Ds125br401
       description: 1 to power down the channel
       sizeBits: 1
       lsBit: 6
-      
+
     ShortCircProtChA2:
       at:
         offset: 0xe8
@@ -1107,7 +1107,7 @@ Ds125br401: &Ds125br401
       description: 1 to enable short circuit protection
       sizeBits: 1
       lsBit: 7
-      
+
     ModeSelectChA2:
       at:
         offset: 0xe8
@@ -1117,7 +1117,7 @@ Ds125br401: &Ds125br401
       description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetChA2:
       at:
         offset: 0x28
@@ -1127,7 +1127,7 @@ Ds125br401: &Ds125br401
       description: 0 when signal is detected
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetRstChA2:
       at:
         offset: 0xdc
@@ -1137,7 +1137,7 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to off
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetPresetChA2:
       at:
         offset: 0xdc
@@ -1147,27 +1147,27 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to on
       sizeBits: 1
       lsBit: 1
-      
+
     IdleSelectChA2:
       at:
         offset: 0xe0
       class: IntField
       name: IdleSelectChA2
       mode: RW
-      description: 1 to set idle detection to manual 
+      description: 1 to set idle detection to manual
       sizeBits: 1
       lsBit: 5
-      
+
     IdleChA2:
       at:
         offset: 0xe0
       class: IntField
       name: IdleChA2
       mode: RW
-      description: 1 to mute output 
+      description: 1 to mute output
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetConfChA2:
       at:
         offset: 0xe0
@@ -1177,7 +1177,7 @@ Ds125br401: &Ds125br401
       description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
       sizeBits: 2
       lsBit: 2
-      
+
     EqChA2:
       at:
         offset: 0xe4
@@ -1187,7 +1187,7 @@ Ds125br401: &Ds125br401
       description: Equalizer value according to datasheet
       sizeBits: 8
       lsBit: 0
-      
+
     VodChA2:
       at:
         offset: 0xe8
@@ -1197,7 +1197,7 @@ Ds125br401: &Ds125br401
       description: VOD value according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     RxDetChA2:
       at:
         offset: 0xec
@@ -1207,7 +1207,7 @@ Ds125br401: &Ds125br401
       description: 1 for rx detected
       sizeBits: 1
       lsBit: 7
-      
+
     ModeChA2:
       at:
         offset: 0xec
@@ -1217,7 +1217,7 @@ Ds125br401: &Ds125br401
       description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
       sizeBits: 2
       lsBit: 5
-      
+
     DemChA2:
       at:
         offset: 0xec
@@ -1227,7 +1227,7 @@ Ds125br401: &Ds125br401
       description: DEM control according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     IdleAssertThChA2:
       at:
         offset: 0xf0
@@ -1237,7 +1237,7 @@ Ds125br401: &Ds125br401
       description: Idle assert threshold according to datasheet
       sizeBits: 2
       lsBit: 2
-      
+
     IdleDeAssertThChA2:
       at:
         offset: 0xf0
@@ -1247,7 +1247,7 @@ Ds125br401: &Ds125br401
       description: Idle de-assert threshold according to datasheet
       sizeBits: 2
       lsBit: 0
-      
+
     ###########################################
     # Channel A[3]
     ###########################################
@@ -1260,7 +1260,7 @@ Ds125br401: &Ds125br401
       description: 1 to power down the channel
       sizeBits: 1
       lsBit: 7
-      
+
     ShortCircProtChA3:
       at:
         offset: 0x104
@@ -1270,7 +1270,7 @@ Ds125br401: &Ds125br401
       description: 1 to enable short circuit protection
       sizeBits: 1
       lsBit: 7
-      
+
     ModeSelectChA3:
       at:
         offset: 0x104
@@ -1280,7 +1280,7 @@ Ds125br401: &Ds125br401
       description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
       sizeBits: 1
       lsBit: 6
-      
+
     SigDetChA3:
       at:
         offset: 0x28
@@ -1290,7 +1290,7 @@ Ds125br401: &Ds125br401
       description: 0 when signal is detected
       sizeBits: 1
       lsBit: 7
-      
+
     SigDetRstChA3:
       at:
         offset: 0xf8
@@ -1300,7 +1300,7 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to off
       sizeBits: 1
       lsBit: 2
-      
+
     SigDetPresetChA3:
       at:
         offset: 0xf8
@@ -1310,27 +1310,27 @@ Ds125br401: &Ds125br401
       description: 1 to force signal detect to on
       sizeBits: 1
       lsBit: 1
-      
+
     IdleSelectChA3:
       at:
         offset: 0xfc
       class: IntField
       name: IdleSelectChA3
       mode: RW
-      description: 1 to set idle detection to manual 
+      description: 1 to set idle detection to manual
       sizeBits: 1
       lsBit: 5
-      
+
     IdleChA3:
       at:
         offset: 0xfc
       class: IntField
       name: IdleChA3
       mode: RW
-      description: 1 to mute output 
+      description: 1 to mute output
       sizeBits: 1
       lsBit: 4
-      
+
     RxDetConfChA3:
       at:
         offset: 0xfc
@@ -1340,7 +1340,7 @@ Ds125br401: &Ds125br401
       description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
       sizeBits: 2
       lsBit: 2
-      
+
     EqChA3:
       at:
         offset: 0x100
@@ -1350,7 +1350,7 @@ Ds125br401: &Ds125br401
       description: Equalizer value according to datasheet
       sizeBits: 8
       lsBit: 0
-      
+
     VodChA3:
       at:
         offset: 0x104
@@ -1360,7 +1360,7 @@ Ds125br401: &Ds125br401
       description: VOD value according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     RxDetChA3:
       at:
         offset: 0x108
@@ -1370,7 +1370,7 @@ Ds125br401: &Ds125br401
       description: 1 for rx detected
       sizeBits: 1
       lsBit: 7
-      
+
     ModeChA3:
       at:
         offset: 0x108
@@ -1380,7 +1380,7 @@ Ds125br401: &Ds125br401
       description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
       sizeBits: 2
       lsBit: 5
-      
+
     DemChA3:
       at:
         offset: 0x108
@@ -1390,7 +1390,7 @@ Ds125br401: &Ds125br401
       description: DEM control according to datasheet
       sizeBits: 3
       lsBit: 0
-      
+
     IdleAssertThChA3:
       at:
         offset: 0x10c
@@ -1400,7 +1400,7 @@ Ds125br401: &Ds125br401
       description: Idle assert threshold according to datasheet
       sizeBits: 2
       lsBit: 2
-      
+
     IdleDeAssertThChA3:
       at:
         offset: 0x10c
