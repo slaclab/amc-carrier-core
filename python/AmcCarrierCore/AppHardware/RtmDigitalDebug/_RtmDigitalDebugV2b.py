@@ -51,7 +51,7 @@ class RtmDigitalDebugV2b(pr.Device):
             bitSize      =  8,
             bitOffset    =  0,
             mode         = "RO",
-            # pollInterval = 1
+            pollInterval = 1
         ))
 
         self.add(pr.RemoteVariable(
@@ -61,7 +61,7 @@ class RtmDigitalDebugV2b(pr.Device):
             bitSize      =  8,
             bitOffset    =  8,
             mode         = "RO",
-            # pollInterval = 1
+            pollInterval = 1
         ))
 
         self.add(pr.RemoteVariable(
@@ -71,7 +71,7 @@ class RtmDigitalDebugV2b(pr.Device):
             bitSize      =  1,
             bitOffset    =  16,
             mode         = "RO",
-            # pollInterval = 1
+            pollInterval = 1
         ))
 
         self.add(pr.RemoteVariable(
@@ -81,7 +81,7 @@ class RtmDigitalDebugV2b(pr.Device):
             bitSize      =  1,
             bitOffset    =  24,
             mode         = "RO",
-            # pollInterval = 1
+            pollInterval = 1
         ))
 
         self.add(pr.RemoteVariable(
@@ -93,5 +93,5 @@ class RtmDigitalDebugV2b(pr.Device):
             mode         = "RO",
             disp         = '{:d}',
             units        = 'Hz',
-            # pollInterval = 1
+            pollInterval = 1
         ))
