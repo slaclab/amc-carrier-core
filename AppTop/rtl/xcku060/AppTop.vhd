@@ -270,8 +270,8 @@ begin
          ------------------------------
          when others =>
             -- (TIMING_BUS_DOMAIN_G = "AXI-LITE")
-            timingClk <= axilClk;
-            timingRst <= axilRst;
+            timingClkb <= axilClk;
+            timingRstb <= axilRst;
       ------------------------------
       end case;
    end process;
