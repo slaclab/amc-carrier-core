@@ -355,25 +355,26 @@ begin
             sampleDataArr_i(4)  => adcValues(i, 4),
             sampleDataArr_i(5)  => adcValues(i, 5),
             sampleDataArr_i(6)  => adcValues(i, 6),
-            sampleDataArr_i(7)  => adcValues(i, 7),
-            sampleDataArr_i(8)  => adcValues(i, 8),
-            sampleDataArr_i(9)  => adcValues(i, 9),
             -- DAC Input
-            sampleDataArr_i(10) => dacValues(i, 0),
-            sampleDataArr_i(11) => dacValues(i, 1),
-            sampleDataArr_i(12) => dacValues(i, 2),
-            sampleDataArr_i(13) => dacValues(i, 3),
-            sampleDataArr_i(14) => dacValues(i, 4),
-            sampleDataArr_i(15) => dacValues(i, 5),
-            sampleDataArr_i(16) => dacValues(i, 6),
-            sampleDataArr_i(17) => dacValues(i, 7),
-            sampleDataArr_i(18) => dacValues(i, 8),
-            sampleDataArr_i(19) => dacValues(i, 9),
+            sampleDataArr_i(7)  => dacValues(i, 0),
+            sampleDataArr_i(8)  => dacValues(i, 1),
+            sampleDataArr_i(9)  => dacValues(i, 2),
+            sampleDataArr_i(10) => dacValues(i, 3),
+            sampleDataArr_i(11) => dacValues(i, 4),
+            sampleDataArr_i(12) => dacValues(i, 5),
+            sampleDataArr_i(13) => dacValues(i, 6),
             -- DBG Input
-            sampleDataArr_i(20) => debugValues(i, 0),
-            sampleDataArr_i(21) => debugValues(i, 1),
-            sampleDataArr_i(22) => debugValues(i, 2),
-            sampleDataArr_i(23) => debugValues(i, 3),
+            sampleDataArr_i(14) => debugValues(i, 0),
+            sampleDataArr_i(15) => debugValues(i, 1),
+            sampleDataArr_i(16) => debugValues(i, 2),
+            sampleDataArr_i(17) => debugValues(i, 3),
+            -- Extra Inputs
+            sampleDataArr_i(18) => adcValues(i, 7),
+            sampleDataArr_i(19) => adcValues(i, 8),
+            sampleDataArr_i(20) => adcValues(i, 9),
+            sampleDataArr_i(21) => dacValues(i, 7),
+            sampleDataArr_i(22) => dacValues(i, 8),
+            sampleDataArr_i(23) => dacValues(i, 9),
             -- MISC Interfaces
             sampleValidVec_i    => dataValids(i),
             linkReadyVec_i      => linkReady(i),
@@ -390,7 +391,9 @@ begin
             rxAxisCtrlArr_i(2)  => obAppWaveformSlaves(i)(2).ctrl,
             rxAxisCtrlArr_i(3)  => obAppWaveformSlaves(i)(3).ctrl);
 
-      dataValids(i) <= debugValids(i) & dacValids(i) & adcValids(i);
+      dataValids(i) <= daqValids(i)(9 downto 7) & adcValids(9 downto 7) &
+                       debugValids(i) &
+                       dacValids(i)(6 downto 0) & adcValids(i)(6 downto 0);
       linkReady(i)  <= x"F" & dacValids(i) & adcValids(i);
 
       ------------
