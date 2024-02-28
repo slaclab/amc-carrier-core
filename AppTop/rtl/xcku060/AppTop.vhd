@@ -391,7 +391,7 @@ begin
             rxAxisCtrlArr_i(2)  => obAppWaveformSlaves(i)(2).ctrl,
             rxAxisCtrlArr_i(3)  => obAppWaveformSlaves(i)(3).ctrl);
 
-      dataValids(i) <= dacValids(i)(9 downto 7) & adcValids(9 downto 7) &
+      dataValids(i) <= dacValids(i)(9 downto 7) & adcValids(i)(9 downto 7) &
                        debugValids(i) &
                        dacValids(i)(6 downto 0) & adcValids(i)(6 downto 0);
       linkReady(i)  <= x"F" & dacValids(i) & adcValids(i);
