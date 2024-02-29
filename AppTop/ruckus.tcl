@@ -7,7 +7,7 @@ loadSource -lib amc_carrier_core -sim_only -dir  "$::DIR_PATH/tb/"
 
 # Check for valid FPGA
 if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" ||
-     $::env(USE_APPTOP_040_INTF == 1 } {
+     $::env(USE_APPTOP_040_INTF) == 1 } {
    loadConstraints -path "$::DIR_PATH/xdc/AppTop_gen1.xdc"
 
    if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
