@@ -5,8 +5,16 @@ source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
 loadSource -lib amc_carrier_core           -dir  "$::DIR_PATH/rtl"
 loadSource -lib amc_carrier_core -sim_only -dir  "$::DIR_PATH/tb/"
 
+# Checking for new amc-carrier-core@v5.0.0 that may not exist in older projects
+if { [info exists ::env(USE_APPTOP_040_INTF)] != 1 || $::env(USE_APPTOP_040_INTF) == 0 } {
+   set USE_APPTOP_040_INTF 0
+} else {
+   set USE_APPTOP_040_INTF 1
+}
+
 # Check for valid FPGA
-if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" } {
+if { $::env(PRJ_PART) == "XCKU040-FFVA1156-2-E" ||
+     ${USE_APPTOP_040_INTF} == 1 } {
    loadConstraints -path "$::DIR_PATH/xdc/AppTop_gen1.xdc"
 
    if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
