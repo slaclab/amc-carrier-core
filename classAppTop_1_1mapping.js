@@ -1,8 +1,8 @@
 var classAppTop_1_1mapping =
 [
-    [ "PROCESS_16", "classAppTop_1_1mapping.html#a5fb9bd0b09fc22388a3787b730f2de45", null ],
+    [ "PROCESS_16", "classAppTop_1_1mapping.html#a344caf66ba6d2d3a30a4751575d51e2f", null ],
     [ "PROCESS_21", "classAppTop_1_1mapping.html#ab25c9367f5e439036947c61fa255efe0", null ],
-    [ "PROCESS_26", "classAppTop_1_1mapping.html#a2ebd27ffbd1536a28d071a979084b9ac", null ],
+    [ "PROCESS_26", "classAppTop_1_1mapping.html#a2051d4402850559ef6852e0158250ebe", null ],
     [ "PROCESS_31", "classAppTop_1_1mapping.html#a113dcf4c5b9f379928c0ce18e9b400ce", null ],
     [ "NUM_AXI_MASTERS_C", "classAppTop_1_1mapping.html#aec30bb31539dba011a9debdfde2706fa", null ],
     [ "CORE_INDEX_C", "classAppTop_1_1mapping.html#a4d7760d4d667007e5b5d55dc20ceb5b5", null ],
@@ -31,6 +31,10 @@ var classAppTop_1_1mapping =
     [ "jesdSysRef", "classAppTop_1_1mapping.html#a2e7185badafb48779fea6dc2ddcda06f", null ],
     [ "jesdRxSync", "classAppTop_1_1mapping.html#a25d0bb97779935d2572cafa3ef3f14bd", null ],
     [ "jesdTxSync", "classAppTop_1_1mapping.html#ac9c31aa775455a05c0b9019bc7ffc05e", null ],
+    [ "appTimingClk", "classAppTop_1_1mapping.html#aa12042f255bac535d88359f5f59a64a1", null ],
+    [ "appTimingRst", "classAppTop_1_1mapping.html#a497a77ef279d6b2d3cf5d2461d723bf1", null ],
+    [ "timingClkb", "classAppTop_1_1mapping.html#af71b1a52d897d192ba317d79db9ae0ae", null ],
+    [ "timingRstb", "classAppTop_1_1mapping.html#a724865696ff3ce28e14212ef2bd5880e", null ],
     [ "adcValids", "classAppTop_1_1mapping.html#a2bf626289dd6aa24a8e86be5a5b813be", null ],
     [ "adcValues", "classAppTop_1_1mapping.html#a8ab0adbfaaa09565885237397c2ffb1d", null ],
     [ "dacValids", "classAppTop_1_1mapping.html#a28820e4db0f30e3ef7e69dd99abf44f7", null ],
