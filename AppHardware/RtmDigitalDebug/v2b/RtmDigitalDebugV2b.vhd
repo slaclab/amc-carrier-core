@@ -89,7 +89,7 @@ architecture mapping of RtmDigitalDebugV2b is
 
    constant REG_INIT_C : RegType := (
       disable        => (others => '0'),
-      debugMode      => (others => '0'),
+      debugMode      => (others => '1'),
       debugValue     => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);

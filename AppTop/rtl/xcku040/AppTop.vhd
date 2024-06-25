@@ -188,6 +188,12 @@ architecture mapping of AppTop is
    signal jesdRxSync : slv(1 downto 0);
    signal jesdTxSync : Slv7Array(1 downto 0);
 
+   signal appTimingClk : sl;
+   signal appTimingRst : sl;
+
+   signal timingClkb : sl;
+   signal timingRstb : sl;
+
    signal adcValids : Slv7Array(1 downto 0);
    signal adcValues : sampleDataVectorArray(1 downto 0, 6 downto 0);
 
@@ -215,49 +221,57 @@ begin
            (TIMING_BUS_DOMAIN_G = "JESD_2xCLK1") or
            (TIMING_BUS_DOMAIN_G = "JESD_UsrCLK0") or
            (TIMING_BUS_DOMAIN_G = "JESD_UsrCLK1") or
-           (TIMING_BUS_DOMAIN_G = "AXI_LITE"))
-      report "TIMING_BUS_DOMAIN_G be either [REC_CLK,AXI_LITE,JESD_CLK0,JESD_CLK1,JESD_2xCLK0,JESD_2xCLK1,JESD_UsrCLK0,JESD_UsrCLK1]" severity error;
+           (TIMING_BUS_DOMAIN_G = "AXI_LITE") or
+           (TIMING_BUS_DOMAIN_G = "APP_CLK"))
+      report "TIMING_BUS_DOMAIN_G be either [REC_CLK,AXI_LITE,APP_CLK,JESD_CLK0,JESD_CLK1,JESD_2xCLK0,JESD_2xCLK1,JESD_UsrCLK0,JESD_UsrCLK1]" severity error;
 
+   timingClk <= timingClkb;
+   timingRst <= timingRstb;
+   
    --------------------------
    -- Clock and reset mapping
    --------------------------
    process(axilClk, axilRst, jesdClk, jesdClk2x, jesdRst, jesdRst2x,
-           jesdUsrClk, jesdUsrRst, recTimingClk, recTimingRst)
+           jesdUsrClk, jesdUsrRst, recTimingClk, recTimingRst, appTimingClk, appTimingRst)
    begin
       case TIMING_BUS_DOMAIN_G is
          ------------------------------
          when "REC_CLK" =>
-            timingClk <= recTimingClk;
-            timingRst <= recTimingRst;
+            timingClkb <= recTimingClk;
+            timingRstb <= recTimingRst;
+         ------------------------------
+         when "APP_CLK" =>
+            timingClkb <= appTimingClk;
+            timingRstb <= appTimingRst;
          ------------------------------
          when "JESD_CLK0" =>
-            timingClk <= jesdClk(0);
-            timingRst <= jesdRst(0);
+            timingClkb <= jesdClk(0);
+            timingRstb <= jesdRst(0);
          ------------------------------
          when "JESD_CLK1" =>
-            timingClk <= jesdClk(1);
-            timingRst <= jesdRst(1);
+            timingClkb <= jesdClk(1);
+            timingRstb <= jesdRst(1);
          ------------------------------
          when "JESD_2xCLK0" =>
-            timingClk <= jesdClk2x(0);
-            timingRst <= jesdRst2x(0);
+            timingClkb <= jesdClk2x(0);
+            timingRstb <= jesdRst2x(0);
          ------------------------------
          when "JESD_2xCLK1" =>
-            timingClk <= jesdClk2x(1);
-            timingRst <= jesdRst2x(1);
+            timingClkb <= jesdClk2x(1);
+            timingRstb <= jesdRst2x(1);
          ------------------------------
          when "JESD_UsrCLK0" =>
-            timingClk <= jesdUsrClk(0);
-            timingRst <= jesdUsrRst(0);
+            timingClkb <= jesdUsrClk(0);
+            timingRstb <= jesdUsrRst(0);
          ------------------------------
          when "JESD_UsrCLK1" =>
-            timingClk <= jesdUsrClk(1);
-            timingRst <= jesdUsrRst(1);
+            timingClkb <= jesdUsrClk(1);
+            timingRstb <= jesdUsrRst(1);
          ------------------------------
          when others =>
             -- (TIMING_BUS_DOMAIN_G = "AXI-LITE")
-            timingClk <= axilClk;
-            timingRst <= axilRst;
+            timingClkb <= axilClk;
+            timingRstb <= axilRst;
       ------------------------------
       end case;
    end process;
@@ -488,6 +502,8 @@ begin
          jesdRst2x           => jesdRst2x,
          jesdUsrClk          => jesdUsrClk,
          jesdUsrRst          => jesdUsrRst,
+         appTimingClk        => appTimingClk,
+         appTimingRst        => appTimingRst,
          -- DaqMux/Trig Interface (timingClk domain)
          freezeHw            => freezeHw,
          timingTrig          => timingTrig,
@@ -523,8 +539,10 @@ begin
          -- Top Level Interface
          ----------------------
          -- Timing Interface (timingClk domain)
-         timingClk           => recTimingClk,
-         timingRst           => recTimingRst,
+         recTimingClk        => recTimingClk,
+         recTimingRst        => recTimingRst,
+         timingClk           => timingClkb,
+         timingRst           => timingRstb,
          timingBus           => timingBus,
          timingPhy           => timingPhy,
          timingPhyClk        => timingPhyClk,

@@ -122,6 +122,7 @@ entity AmcCarrierCoreAdv is
       -- Misc. Interface (axilClk domain)
       ipmiBsi              : out   BsiBusType;
       ethPhyReady          : out   sl;
+      userReset            : out   sl;
       ----------------
       --  Top Level Interface to IO
       ----------------
@@ -307,6 +308,7 @@ begin
          localMac          => localMac,
          localIp           => localIp,
          ethLinkUp         => ethLinkUp,
+         userReset         => userReset,
          ----------------------
          -- Top Level Interface
          ----------------------

@@ -1,0 +1,1412 @@
+##############################################################################
+## This file is part of 'LCLS2 Common Carrier Core'.
+## It is subject to the license terms in the LICENSE.txt file found in the
+## top-level directory of this distribution and at:
+##    https://confluence.slac.stanford.edu/display/ppareg/LICENSE.html.
+## No part of 'LCLS2 Common Carrier Core', including this file,
+## may be copied, modified, propagated, or distributed except according to
+## the terms contained in the LICENSE.txt file.
+##############################################################################
+#schemaversion 3.0.0
+#once Ds125br401.yaml
+
+Ds125br401: &Ds125br401
+  name: Ds125br401
+  description: AMC MPS Repeater Ds125br401
+  class: MMIODev
+  size: 0x200
+  children:
+    #########################################################
+    RstSMBus:
+      at:
+        offset: 0x1c
+      class: IntField
+      name: RstSMBus
+      mode: RW
+      description: Reset SMBus
+      sizeBits: 1
+      lsBit: 5
+
+    RstRegisters:
+      at:
+        offset: 0x1c
+      class: IntField
+      name: RstRegisters
+      mode: RW
+      description: Reset internal registers
+      sizeBits: 1
+      lsBit: 6
+
+    CtrlEn:
+      at:
+        offset: 0x18
+      class: IntField
+      name: CtrlEn
+      mode: RW
+      description: Enable SMBus control - set 1 to enable setting VOD, DEM and EQ
+      sizeBits: 1
+      lsBit: 3
+
+    Loopback:
+      at:
+        offset: 0x08
+      class: IntField
+      name: Loopback
+      mode: RW
+      description: 0 to use loopback pin, 1 for INA_n to OUTB_n, 2 for INB_n to OUTA_n, 3 to disable loopback and ignore pin
+      sizeBits: 2
+      lsBit: 4
+
+    PwdnOverride:
+      at:
+        offset: 0x08
+      class: IntField
+      name: PwdnOverride
+      mode: RW
+      description: 1 to allow overriding the pin
+      sizeBits: 1
+      lsBit: 0
+
+    SDThOverride:
+      at:
+        offset: 0x20
+      class: IntField
+      name: SDThOverride
+      mode: RW
+      description: 1 to allow overriding the signal detect threshold
+      sizeBits: 1
+      lsBit: 6
+
+    IdleOverride:
+      at:
+        offset: 0x20
+      class: IntField
+      name: IdleOverride
+      mode: RW
+      description: 1 to allow overriding IDLE
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetOverride:
+      at:
+        offset: 0x20
+      class: IntField
+      name: RxDetOverride
+      mode: RW
+      description: 1 to allow overriding Rx detect
+      sizeBits: 1
+      lsBit: 3
+
+    ModeOverride:
+      at:
+        offset: 0x20
+      class: IntField
+      name: ModeOverride
+      mode: RW
+      description: 1 to allow overriding mode
+      sizeBits: 1
+      lsBit: 2
+
+    ###########################################
+    # Channel B[0]
+    ###########################################
+    PwdnChB0:
+      at:
+        offset: 0x04
+      class: IntField
+      name: PwdnChB0
+      mode: RW
+      description: 1 to power down the channel
+      sizeBits: 1
+      lsBit: 0
+
+    ShortCircProt:
+      at:
+        offset: 0x40
+      class: IntField
+      name: ShortCircProt
+      mode: RW
+      description: 1 to enable short circuit protection
+      sizeBits: 1
+      lsBit: 7
+
+    ModeSelectChB0:
+      at:
+        offset: 0x40
+      class: IntField
+      name: ModeSelectChB0
+      mode: RW
+      description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetChB0:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SigDetChB0
+      mode: RW
+      description: 0 when signal is detected
+      sizeBits: 1
+      lsBit: 0
+
+    SigDetRstChB0:
+      at:
+        offset: 0x34
+      class: IntField
+      name: SigDetRstChB0
+      mode: RW
+      description: 1 to force signal detect to off
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetPresetChB0:
+      at:
+        offset: 0x34
+      class: IntField
+      name: SigDetPresetChB0
+      mode: RW
+      description: 1 to force signal detect to on
+      sizeBits: 1
+      lsBit: 1
+
+    IdleSelectChB0:
+      at:
+        offset: 0x38
+      class: IntField
+      name: IdleSelectChB0
+      mode: RW
+      description: 1 to set idle detection to manual
+      sizeBits: 1
+      lsBit: 5
+
+    IdleChB0:
+      at:
+        offset: 0x38
+      class: IntField
+      name: IdleChB0
+      mode: RW
+      description: 1 to mute output
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetConfChB0:
+      at:
+        offset: 0x38
+      class: IntField
+      name: RxDetConfChB0
+      mode: RW
+      description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
+      sizeBits: 2
+      lsBit: 2
+
+    EqChB0:
+      at:
+        offset: 0x3c
+      class: IntField
+      name: EqChB0
+      mode: RW
+      description: Equalizer value according to datasheet
+      sizeBits: 8
+      lsBit: 0
+
+    VodChB0:
+      at:
+        offset: 0x40
+      class: IntField
+      name: VodChB0
+      mode: RW
+      description: VOD value according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    RxDetChB0:
+      at:
+        offset: 0x44
+      class: IntField
+      name: RxDetChB0
+      mode: RW
+      description: 1 for rx detected
+      sizeBits: 1
+      lsBit: 7
+
+    ModeChB0:
+      at:
+        offset: 0x44
+      class: IntField
+      name: ModeChB0
+      mode: RW
+      description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
+      sizeBits: 2
+      lsBit: 5
+
+    DemChB0:
+      at:
+        offset: 0x44
+      class: IntField
+      name: DemChB0
+      mode: RW
+      description: DEM control according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    IdleAssertThChB0:
+      at:
+        offset: 0x48
+      class: IntField
+      name: IdleAssertThChB0
+      mode: RW
+      description: Idle assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 2
+
+    IdleDeAssertThChB0:
+      at:
+        offset: 0x48
+      class: IntField
+      name: IdleDeAssertThChB0
+      mode: RW
+      description: Idle de-assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 0
+
+    ###########################################
+    # Channel B[1]
+    ###########################################
+    PwdnChB1:
+      at:
+        offset: 0x04
+      class: IntField
+      name: PwdnChB1
+      mode: RW
+      description: 1 to power down the channel
+      sizeBits: 1
+      lsBit: 1
+
+    ShortCircProtChB1:
+      at:
+        offset: 0x5c
+      class: IntField
+      name: ShortCircProtChB1
+      mode: RW
+      description: 1 to enable short circuit protection
+      sizeBits: 1
+      lsBit: 7
+
+    ModeSelectChB1:
+      at:
+        offset: 0x5c
+      class: IntField
+      name: ModeSelectChB1
+      mode: RW
+      description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetChB1:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SigDetChB1
+      mode: RW
+      description: 0 when signal is detected
+      sizeBits: 1
+      lsBit: 1
+
+    SigDetRstChB1:
+      at:
+        offset: 0x50
+      class: IntField
+      name: SigDetRstChB1
+      mode: RW
+      description: 1 to force signal detect to off
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetPresetChB1:
+      at:
+        offset: 0x50
+      class: IntField
+      name: SigDetPresetChB1
+      mode: RW
+      description: 1 to force signal detect to on
+      sizeBits: 1
+      lsBit: 1
+
+    IdleSelectChB1:
+      at:
+        offset: 0x54
+      class: IntField
+      name: IdleSelectChB1
+      mode: RW
+      description: 1 to set idle detection to manual
+      sizeBits: 1
+      lsBit: 5
+
+    IdleChB1:
+      at:
+        offset: 0x54
+      class: IntField
+      name: IdleChB1
+      mode: RW
+      description: 1 to mute output
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetConfChB1:
+      at:
+        offset: 0x54
+      class: IntField
+      name: RxDetConfChB1
+      mode: RW
+      description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
+      sizeBits: 2
+      lsBit: 2
+
+    EqChB1:
+      at:
+        offset: 0x58
+      class: IntField
+      name: EqChB1
+      mode: RW
+      description: Equalizer value according to datasheet
+      sizeBits: 8
+      lsBit: 0
+
+    VodChB1:
+      at:
+        offset: 0x5c
+      class: IntField
+      name: VodChB1
+      mode: RW
+      description: VOD value according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    RxDetChB1:
+      at:
+        offset: 0x60
+      class: IntField
+      name: RxDetChB1
+      mode: RW
+      description: 1 for rx detected
+      sizeBits: 1
+      lsBit: 7
+
+    ModeChB1:
+      at:
+        offset: 0x60
+      class: IntField
+      name: ModeChB1
+      mode: RW
+      description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
+      sizeBits: 2
+      lsBit: 5
+
+    DemChB1:
+      at:
+        offset: 0x60
+      class: IntField
+      name: DemChB1
+      mode: RW
+      description: DEM control according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    IdleAssertThChB1:
+      at:
+        offset: 0x64
+      class: IntField
+      name: IdleAssertThChB1
+      mode: RW
+      description: Idle assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 2
+
+    IdleDeAssertThChB1:
+      at:
+        offset: 0x64
+      class: IntField
+      name: IdleDeAssertThChB1
+      mode: RW
+      description: Idle de-assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 0
+
+    ###########################################
+    # Channel B[2]
+    ###########################################
+    PwdnChB2:
+      at:
+        offset: 0x04
+      class: IntField
+      name: PwdnChB2
+      mode: RW
+      description: 1 to power down the channel
+      sizeBits: 1
+      lsBit: 2
+
+    ShortCircProtChB2:
+      at:
+        offset: 0x78
+      class: IntField
+      name: ShortCircProtChB2
+      mode: RW
+      description: 1 to enable short circuit protection
+      sizeBits: 1
+      lsBit: 7
+
+    ModeSelectChB2:
+      at:
+        offset: 0x78
+      class: IntField
+      name: ModeSelectChB2
+      mode: RW
+      description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetChB2:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SigDetChB2
+      mode: RW
+      description: 0 when signal is detected
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetRstChB2:
+      at:
+        offset: 0x6c
+      class: IntField
+      name: SigDetRstChB2
+      mode: RW
+      description: 1 to force signal detect to off
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetPresetChB2:
+      at:
+        offset: 0x6c
+      class: IntField
+      name: SigDetPresetChB2
+      mode: RW
+      description: 1 to force signal detect to on
+      sizeBits: 1
+      lsBit: 1
+
+    IdleSelectChB2:
+      at:
+        offset: 0x70
+      class: IntField
+      name: IdleSelectChB2
+      mode: RW
+      description: 1 to set idle detection to manual
+      sizeBits: 1
+      lsBit: 5
+
+    IdleChB2:
+      at:
+        offset: 0x70
+      class: IntField
+      name: IdleChB2
+      mode: RW
+      description: 1 to mute output
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetConfChB2:
+      at:
+        offset: 0x70
+      class: IntField
+      name: RxDetConfChB2
+      mode: RW
+      description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
+      sizeBits: 2
+      lsBit: 2
+
+    EqChB2:
+      at:
+        offset: 0x74
+      class: IntField
+      name: EqChB2
+      mode: RW
+      description: Equalizer value according to datasheet
+      sizeBits: 8
+      lsBit: 0
+
+    VodChB2:
+      at:
+        offset: 0x78
+      class: IntField
+      name: VodChB2
+      mode: RW
+      description: VOD value according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    RxDetChB2:
+      at:
+        offset: 0x7c
+      class: IntField
+      name: RxDetChB2
+      mode: RW
+      description: 1 for rx detected
+      sizeBits: 1
+      lsBit: 7
+
+    ModeChB2:
+      at:
+        offset: 0x7c
+      class: IntField
+      name: ModeChB2
+      mode: RW
+      description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
+      sizeBits: 2
+      lsBit: 5
+
+    DemChB2:
+      at:
+        offset: 0x7c
+      class: IntField
+      name: DemChB2
+      mode: RW
+      description: DEM control according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    IdleAssertThChB2:
+      at:
+        offset: 0x80
+      class: IntField
+      name: IdleAssertThChB2
+      mode: RW
+      description: Idle assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 2
+
+    IdleDeAssertThChB2:
+      at:
+        offset: 0x80
+      class: IntField
+      name: IdleDeAssertThChB2
+      mode: RW
+      description: Idle de-assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 0
+
+    ###########################################
+    # Channel B[3]
+    ###########################################
+    PwdnChB3:
+      at:
+        offset: 0x04
+      class: IntField
+      name: PwdnChB3
+      mode: RW
+      description: 1 to power down the channel
+      sizeBits: 1
+      lsBit: 3
+
+    ShortCircProtChB3:
+      at:
+        offset: 0x94
+      class: IntField
+      name: ShortCircProtChB3
+      mode: RW
+      description: 1 to enable short circuit protection
+      sizeBits: 1
+      lsBit: 7
+
+    ModeSelectChB3:
+      at:
+        offset: 0x94
+      class: IntField
+      name: ModeSelectChB3
+      mode: RW
+      description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetChB3:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SigDetChB3
+      mode: RW
+      description: 0 when signal is detected
+      sizeBits: 1
+      lsBit: 3
+
+    SigDetRstChB3:
+      at:
+        offset: 0x88
+      class: IntField
+      name: SigDetRstChB3
+      mode: RW
+      description: 1 to force signal detect to off
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetPresetChB3:
+      at:
+        offset: 0x88
+      class: IntField
+      name: SigDetPresetChB3
+      mode: RW
+      description: 1 to force signal detect to on
+      sizeBits: 1
+      lsBit: 1
+
+    IdleSelectChB3:
+      at:
+        offset: 0x8c
+      class: IntField
+      name: IdleSelectChB3
+      mode: RW
+      description: 1 to set idle detection to manual
+      sizeBits: 1
+      lsBit: 5
+
+    IdleChB3:
+      at:
+        offset: 0x8c
+      class: IntField
+      name: IdleChB3
+      mode: RW
+      description: 1 to mute output
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetConfChB3:
+      at:
+        offset: 0x8c
+      class: IntField
+      name: RxDetConfChB3
+      mode: RW
+      description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
+      sizeBits: 2
+      lsBit: 2
+
+    EqChB3:
+      at:
+        offset: 0x90
+      class: IntField
+      name: EqChB3
+      mode: RW
+      description: Equalizer value according to datasheet
+      sizeBits: 8
+      lsBit: 0
+
+    VodChB3:
+      at:
+        offset: 0x94
+      class: IntField
+      name: VodChB3
+      mode: RW
+      description: VOD value according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    RxDetChB3:
+      at:
+        offset: 0x98
+      class: IntField
+      name: RxDetChB3
+      mode: RW
+      description: 1 for rx detected
+      sizeBits: 1
+      lsBit: 7
+
+    ModeChB3:
+      at:
+        offset: 0x98
+      class: IntField
+      name: ModeChB3
+      mode: RW
+      description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
+      sizeBits: 2
+      lsBit: 5
+
+    DemChB3:
+      at:
+        offset: 0x98
+      class: IntField
+      name: DemChB3
+      mode: RW
+      description: DEM control according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    IdleAssertThChB3:
+      at:
+        offset: 0x9c
+      class: IntField
+      name: IdleAssertThChB3
+      mode: RW
+      description: Idle assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 2
+
+    IdleDeAssertThChB3:
+      at:
+        offset: 0x9c
+      class: IntField
+      name: IdleDeAssertThChB3
+      mode: RW
+      description: Idle de-assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 0
+
+    ###########################################
+    # Channel A[0]
+    ###########################################
+    PwdnChA0:
+      at:
+        offset: 0x04
+      class: IntField
+      name: PwdnChA0
+      mode: RW
+      description: 1 to power down the channel
+      sizeBits: 1
+      lsBit: 4
+
+    ShortCircProtChA0:
+      at:
+        offset: 0xb0
+      class: IntField
+      name: ShortCircProtChA0
+      mode: RW
+      description: 1 to enable short circuit protection
+      sizeBits: 1
+      lsBit: 7
+
+    ModeSelectChA0:
+      at:
+        offset: 0xb0
+      class: IntField
+      name: ModeSelectChA0
+      mode: RW
+      description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetChA0:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SigDetChA0
+      mode: RW
+      description: 0 when signal is detected
+      sizeBits: 1
+      lsBit: 4
+
+    SigDetRstChA0:
+      at:
+        offset: 0xa4
+      class: IntField
+      name: SigDetRstChA0
+      mode: RW
+      description: 1 to force signal detect to off
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetPresetChA0:
+      at:
+        offset: 0xa4
+      class: IntField
+      name: SigDetPresetChA0
+      mode: RW
+      description: 1 to force signal detect to on
+      sizeBits: 1
+      lsBit: 1
+
+    IdleSelectChA0:
+      at:
+        offset: 0xa8
+      class: IntField
+      name: IdleSelectChA0
+      mode: RW
+      description: 1 to set idle detection to manual
+      sizeBits: 1
+      lsBit: 5
+
+    IdleChA0:
+      at:
+        offset: 0xa8
+      class: IntField
+      name: IdleChA0
+      mode: RW
+      description: 1 to mute output
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetConfChA0:
+      at:
+        offset: 0xa8
+      class: IntField
+      name: RxDetConfChA0
+      mode: RW
+      description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
+      sizeBits: 2
+      lsBit: 2
+
+    EqChA0:
+      at:
+        offset: 0xac
+      class: IntField
+      name: EqChA0
+      mode: RW
+      description: Equalizer value according to datasheet
+      sizeBits: 8
+      lsBit: 0
+
+    VodChA0:
+      at:
+        offset: 0xb0
+      class: IntField
+      name: VodChA0
+      mode: RW
+      description: VOD value according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    RxDetChA0:
+      at:
+        offset: 0xb4
+      class: IntField
+      name: RxDetChA0
+      mode: RW
+      description: 1 for rx detected
+      sizeBits: 1
+      lsBit: 7
+
+    ModeChA0:
+      at:
+        offset: 0xb4
+      class: IntField
+      name: ModeChA0
+      mode: RW
+      description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
+      sizeBits: 2
+      lsBit: 5
+
+    DemChA0:
+      at:
+        offset: 0xb4
+      class: IntField
+      name: DemChA0
+      mode: RW
+      description: DEM control according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    IdleAssertThChA0:
+      at:
+        offset: 0xb8
+      class: IntField
+      name: IdleAssertThChA0
+      mode: RW
+      description: Idle assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 2
+
+    IdleDeAssertThChA0:
+      at:
+        offset: 0xb8
+      class: IntField
+      name: IdleDeAssertThChA0
+      mode: RW
+      description: Idle de-assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 0
+
+    ###########################################
+    # Channel A[1]
+    ###########################################
+    PwdnChA1:
+      at:
+        offset: 0x04
+      class: IntField
+      name: PwdnChA1
+      mode: RW
+      description: 1 to power down the channel
+      sizeBits: 1
+      lsBit: 5
+
+    ShortCircProtChA1:
+      at:
+        offset: 0xcc
+      class: IntField
+      name: ShortCircProtChA1
+      mode: RW
+      description: 1 to enable short circuit protection
+      sizeBits: 1
+      lsBit: 7
+
+    ModeSelectChA1:
+      at:
+        offset: 0xcc
+      class: IntField
+      name: ModeSelectChA1
+      mode: RW
+      description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetChA1:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SigDetChA1
+      mode: RW
+      description: 0 when signal is detected
+      sizeBits: 1
+      lsBit: 5
+
+    SigDetRstChA1:
+      at:
+        offset: 0xc0
+      class: IntField
+      name: SigDetRstChA1
+      mode: RW
+      description: 1 to force signal detect to off
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetPresetChA1:
+      at:
+        offset: 0xc0
+      class: IntField
+      name: SigDetPresetChA1
+      mode: RW
+      description: 1 to force signal detect to on
+      sizeBits: 1
+      lsBit: 1
+
+    IdleSelectChA1:
+      at:
+        offset: 0xc4
+      class: IntField
+      name: IdleSelectChA1
+      mode: RW
+      description: 1 to set idle detection to manual
+      sizeBits: 1
+      lsBit: 5
+
+    IdleChA1:
+      at:
+        offset: 0xc4
+      class: IntField
+      name: IdleChA1
+      mode: RW
+      description: 1 to mute output
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetConfChA1:
+      at:
+        offset: 0xc4
+      class: IntField
+      name: RxDetConfChA1
+      mode: RW
+      description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
+      sizeBits: 2
+      lsBit: 2
+
+    EqChA1:
+      at:
+        offset: 0xc8
+      class: IntField
+      name: EqChA1
+      mode: RW
+      description: Equalizer value according to datasheet
+      sizeBits: 8
+      lsBit: 0
+
+    VodChA1:
+      at:
+        offset: 0xcc
+      class: IntField
+      name: VodChA1
+      mode: RW
+      description: VOD value according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    RxDetChA1:
+      at:
+        offset: 0xd0
+      class: IntField
+      name: RxDetChA1
+      mode: RW
+      description: 1 for rx detected
+      sizeBits: 1
+      lsBit: 7
+
+    ModeChA1:
+      at:
+        offset: 0xd0
+      class: IntField
+      name: ModeChA1
+      mode: RW
+      description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
+      sizeBits: 2
+      lsBit: 5
+
+    DemChA1:
+      at:
+        offset: 0xd0
+      class: IntField
+      name: DemChA1
+      mode: RW
+      description: DEM control according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    IdleAssertThChA1:
+      at:
+        offset: 0xd4
+      class: IntField
+      name: IdleAssertThChA1
+      mode: RW
+      description: Idle assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 2
+
+    IdleDeAssertThChA1:
+      at:
+        offset: 0xd4
+      class: IntField
+      name: IdleDeAssertThChA1
+      mode: RW
+      description: Idle de-assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 0
+
+    ###########################################
+    # Channel A[2]
+    ###########################################
+    PwdnChA2:
+      at:
+        offset: 0x04
+      class: IntField
+      name: PwdnChA2
+      mode: RW
+      description: 1 to power down the channel
+      sizeBits: 1
+      lsBit: 6
+
+    ShortCircProtChA2:
+      at:
+        offset: 0xe8
+      class: IntField
+      name: ShortCircProtChA2
+      mode: RW
+      description: 1 to enable short circuit protection
+      sizeBits: 1
+      lsBit: 7
+
+    ModeSelectChA2:
+      at:
+        offset: 0xe8
+      class: IntField
+      name: ModeSelectChA2
+      mode: RW
+      description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetChA2:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SigDetChA2
+      mode: RW
+      description: 0 when signal is detected
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetRstChA2:
+      at:
+        offset: 0xdc
+      class: IntField
+      name: SigDetRstChA2
+      mode: RW
+      description: 1 to force signal detect to off
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetPresetChA2:
+      at:
+        offset: 0xdc
+      class: IntField
+      name: SigDetPresetChA2
+      mode: RW
+      description: 1 to force signal detect to on
+      sizeBits: 1
+      lsBit: 1
+
+    IdleSelectChA2:
+      at:
+        offset: 0xe0
+      class: IntField
+      name: IdleSelectChA2
+      mode: RW
+      description: 1 to set idle detection to manual
+      sizeBits: 1
+      lsBit: 5
+
+    IdleChA2:
+      at:
+        offset: 0xe0
+      class: IntField
+      name: IdleChA2
+      mode: RW
+      description: 1 to mute output
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetConfChA2:
+      at:
+        offset: 0xe0
+      class: IntField
+      name: RxDetConfChA2
+      mode: RW
+      description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
+      sizeBits: 2
+      lsBit: 2
+
+    EqChA2:
+      at:
+        offset: 0xe4
+      class: IntField
+      name: EqChA2
+      mode: RW
+      description: Equalizer value according to datasheet
+      sizeBits: 8
+      lsBit: 0
+
+    VodChA2:
+      at:
+        offset: 0xe8
+      class: IntField
+      name: VodChA2
+      mode: RW
+      description: VOD value according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    RxDetChA2:
+      at:
+        offset: 0xec
+      class: IntField
+      name: RxDetChA2
+      mode: RW
+      description: 1 for rx detected
+      sizeBits: 1
+      lsBit: 7
+
+    ModeChA2:
+      at:
+        offset: 0xec
+      class: IntField
+      name: ModeChA2
+      mode: RW
+      description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
+      sizeBits: 2
+      lsBit: 5
+
+    DemChA2:
+      at:
+        offset: 0xec
+      class: IntField
+      name: DemChA2
+      mode: RW
+      description: DEM control according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    IdleAssertThChA2:
+      at:
+        offset: 0xf0
+      class: IntField
+      name: IdleAssertThChA2
+      mode: RW
+      description: Idle assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 2
+
+    IdleDeAssertThChA2:
+      at:
+        offset: 0xf0
+      class: IntField
+      name: IdleDeAssertThChA2
+      mode: RW
+      description: Idle de-assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 0
+
+    ###########################################
+    # Channel A[3]
+    ###########################################
+    PwdnChA3:
+      at:
+        offset: 0x04
+      class: IntField
+      name: PwdnChA3
+      mode: RW
+      description: 1 to power down the channel
+      sizeBits: 1
+      lsBit: 7
+
+    ShortCircProtChA3:
+      at:
+        offset: 0x104
+      class: IntField
+      name: ShortCircProtChA3
+      mode: RW
+      description: 1 to enable short circuit protection
+      sizeBits: 1
+      lsBit: 7
+
+    ModeSelectChA3:
+      at:
+        offset: 0x104
+      class: IntField
+      name: ModeSelectChA3
+      mode: RW
+      description: 1 for PCIe Gen-1/2, 0 for PCIe Gen-3
+      sizeBits: 1
+      lsBit: 6
+
+    SigDetChA3:
+      at:
+        offset: 0x28
+      class: IntField
+      name: SigDetChA3
+      mode: RW
+      description: 0 when signal is detected
+      sizeBits: 1
+      lsBit: 7
+
+    SigDetRstChA3:
+      at:
+        offset: 0xf8
+      class: IntField
+      name: SigDetRstChA3
+      mode: RW
+      description: 1 to force signal detect to off
+      sizeBits: 1
+      lsBit: 2
+
+    SigDetPresetChA3:
+      at:
+        offset: 0xf8
+      class: IntField
+      name: SigDetPresetChA3
+      mode: RW
+      description: 1 to force signal detect to on
+      sizeBits: 1
+      lsBit: 1
+
+    IdleSelectChA3:
+      at:
+        offset: 0xfc
+      class: IntField
+      name: IdleSelectChA3
+      mode: RW
+      description: 1 to set idle detection to manual
+      sizeBits: 1
+      lsBit: 5
+
+    IdleChA3:
+      at:
+        offset: 0xfc
+      class: IntField
+      name: IdleChA3
+      mode: RW
+      description: 1 to mute output
+      sizeBits: 1
+      lsBit: 4
+
+    RxDetConfChA3:
+      at:
+        offset: 0xfc
+      class: IntField
+      name: RxDetConfChA3
+      mode: RW
+      description: 0 for hi-z impedance, 1 for auto Rx detect during 600ms, 2 for auto rx detect and 3 for 50Ohm input
+      sizeBits: 2
+      lsBit: 2
+
+    EqChA3:
+      at:
+        offset: 0x100
+      class: IntField
+      name: EqChA3
+      mode: RW
+      description: Equalizer value according to datasheet
+      sizeBits: 8
+      lsBit: 0
+
+    VodChA3:
+      at:
+        offset: 0x104
+      class: IntField
+      name: VodChA3
+      mode: RW
+      description: VOD value according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    RxDetChA3:
+      at:
+        offset: 0x108
+      class: IntField
+      name: RxDetChA3
+      mode: RW
+      description: 1 for rx detected
+      sizeBits: 1
+      lsBit: 7
+
+    ModeChA3:
+      at:
+        offset: 0x108
+      class: IntField
+      name: ModeChA3
+      mode: RW
+      description: 0 for PCIe gem-1 (2.5Gbps), 1 for PCIe Gen-2 (5Gps), 3 for PCIe Gen-3 (8Gps+)
+      sizeBits: 2
+      lsBit: 5
+
+    DemChA3:
+      at:
+        offset: 0x108
+      class: IntField
+      name: DemChA3
+      mode: RW
+      description: DEM control according to datasheet
+      sizeBits: 3
+      lsBit: 0
+
+    IdleAssertThChA3:
+      at:
+        offset: 0x10c
+      class: IntField
+      name: IdleAssertThChA3
+      mode: RW
+      description: Idle assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 2
+
+    IdleDeAssertThChA3:
+      at:
+        offset: 0x10c
+      class: IntField
+      name: IdleDeAssertThChA3
+      mode: RW
+      description: Idle de-assert threshold according to datasheet
+      sizeBits: 2
+      lsBit: 0
