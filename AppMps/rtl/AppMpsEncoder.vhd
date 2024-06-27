@@ -108,7 +108,8 @@ architecture mapping of AppMpsEncoder is
 
          message(config.BYTE_MAP_C)(bitPos) := '1';
 
-         tripValue := value;
+         tripValue   := value;
+         tripPulseId := pulseIdIn;
 
       end if;
    end procedure;
