@@ -145,3 +145,11 @@ AppMpsRegBase: &AppMpsRegBase
       sizeBits:     8
       mode:         RO
       description:  Bytes from the last message
+    rstTripValue:
+      at:
+        offset:     0x20
+      class:        IntField
+      sizeBits:     1
+      lsBit:        0
+      mode:         RW
+      description:  Resets the analog trip values

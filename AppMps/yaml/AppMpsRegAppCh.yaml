@@ -96,6 +96,22 @@ channel: &channel
       lsBit:        0
       mode:         RO
       description:  Idle threshold table enable
+    mpsTripValue:
+      at:
+        offset:     4
+      class:        IntField
+      sizeBits:     32
+      lsBit:        0
+      mode:         RO
+      description:  analog trip value
+    mpsTripPulseId:
+      at:
+        offset:     8
+      class:        IntField
+      sizeBits:     64
+      lsBit:        0
+      mode:         RO
+      description:  Pulse ID of the analog trip value
     lcls1Thr:
       <<: *threshold
       at:
