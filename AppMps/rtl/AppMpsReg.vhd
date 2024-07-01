@@ -45,6 +45,9 @@ entity AppMpsReg is
       -- MPS message monitoring
       mpsMessage      : in  MpsMessageType;
       mpsMsgDrop      : in  sl;
+      mpsTripValue    : in  Slv32Array(MPS_CHAN_COUNT_C-1 downto 0);
+      tripPulseId     : in  Slv64Array(MPS_CHAN_COUNT_C-1 downto 0);
+      rstTripValue    : out sl;
       -- MPS Configuration Registers
       mpsAppRegisters : out MpsAppRegType);
 end AppMpsReg;
@@ -103,6 +106,7 @@ begin
          -- MPS message monitoring
          mpsMessage      => mpsMessage,
          mpsMsgDrop      => mpsMsgDrop,
+         rstTripValue    => rstTripValue,
          -- MPS Configuration Registers
          mpsCore         => mpsAppRegisters.mpsCore,
          beamDestMask    => mpsAppRegisters.beamDestMask,
@@ -143,6 +147,8 @@ begin
          port map (
             -- MPS Configuration Registers
             mpsChanReg      => mpsAppRegisters.mpsChanReg(i),
+            mpsTripValue    => mpsTripValue(i),
+            tripPulseId     => tripPulseId(i),
             -- AXI-Lite Interface
             axilClk         => axilClk,
             axilRst         => axilRst,
