@@ -4,6 +4,8 @@ var classAppMpsRegAppCh =
     [ "TPD_G", "classAppMpsRegAppCh.html#a67a837684e4f18c2d236ac1d053b419b", null ],
     [ "CHAN_CONFIG_G", "classAppMpsRegAppCh.html#ae4160162a271b8618d9cbd914ae4927e", null ],
     [ "mpsChanReg", "classAppMpsRegAppCh.html#a80485b8e3b4bfd70011dcb409fa014be", null ],
+    [ "mpsTripValue", "classAppMpsRegAppCh.html#a4142f24bbb92579a332bcc5c7446013c", null ],
+    [ "tripPulseId", "classAppMpsRegAppCh.html#a900cee9403d8d6cc8df87c232c0f0c7c", null ],
     [ "axilClk", "classAppMpsRegAppCh.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
     [ "axilRst", "classAppMpsRegAppCh.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],
     [ "axilReadMaster", "classAppMpsRegAppCh.html#aada3e73ee8db4190524295bfa4dff085", null ],

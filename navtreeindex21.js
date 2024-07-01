@@ -1,5 +1,15 @@
 var NAVTREEINDEX21 =
 {
+"classAxiSpiAd7682Reg.html#ab2996eb4a1b39a49844c9b119b5d8d3a":[0,0,77,12],
+"classAxiSpiAd7682Reg.html#acabf3ea45bb9ea54f778c194fc238b6d":[0,0,77,17],
+"classAxiSpiAd7682Reg.html#acd03516902501cd1c7296a98e22c6fcb":[0,0,77,14],
+"classAxiSpiAd7682Reg.html#acd3440bbc91f595e14ebb565ef1e05c4":[0,0,77,6],
+"classAxiSpiAd7682Reg.html#aeeb7b7136ac51b9ed4df37449accd11e":[0,0,77,3],
+"classAxiSpiAd7682Reg.html#af2fe75efbe0a68c3fb806bb88b1a81ba":[0,0,77,18],
+"classAxiSpiAd7682Reg.html#af93425697b87ec78fb59dd1ff56a0cc9":[0,0,77,10],
+"classAxiSpiAd7682Reg.html#af98a1f0df20cf0e5f0fdb9f5999ad782":[0,0,77,19],
+"classAxiSpiAd7682Reg_1_1rtl.html":[0,0,77,0],
+"classAxiSpiAd7682Reg_1_1rtl.html#a0498304adc5e9a77df9df664a54ee3d3":[0,0,77,0,8],
 "classAxiSpiAd7682Reg_1_1rtl.html#a0dc67794417dda643d22cdd585153552":[0,0,77,0,3],
 "classAxiSpiAd7682Reg_1_1rtl.html#a1b43705cc2da350eb0df1e71fb23ab88":[0,0,77,0,6],
 "classAxiSpiAd7682Reg_1_1rtl.html#a1fd4b641bf56da278a055adc0e98bb20":[0,0,77,0,11],
@@ -239,15 +249,5 @@ var NAVTREEINDEX21 =
 "classBldAxiStream.html#a776f7d1c3e4102d6af8db8ec00c215ce":[0,0,78,25],
 "classBldAxiStream.html#a7caa11b9e95cbdb9630d19e5c521d2a0":[0,0,78,14],
 "classBldAxiStream.html#a80e5574c28ce6fd06510648d63787843":[0,0,78,13],
-"classBldAxiStream.html#a8196151a18e710b2598e18906036332a":[0,0,78,2],
-"classBldAxiStream.html#a8b54e22b2a07048034b61d5e4ba396e3":[0,0,78,27],
-"classBldAxiStream.html#a8b57e2e356f8c95c835557378741f538":[0,0,78,31],
-"classBldAxiStream.html#a8cc88283087926e934bb67651263b053":[0,0,78,12],
-"classBldAxiStream.html#a8e1fd4ab848b98a0c700b34cf7c90b36":[0,0,78,8],
-"classBldAxiStream.html#aa5fefbb58d6204d5242dd2f4be3352e0":[0,0,78,29],
-"classBldAxiStream.html#aada3e73ee8db4190524295bfa4dff085":[0,0,78,10],
-"classBldAxiStream.html#ac1625414338993fe184c68bfdbb48894":[0,0,78,26],
-"classBldAxiStream.html#acabf3ea45bb9ea54f778c194fc238b6d":[0,0,78,22],
-"classBldAxiStream.html#acd03516902501cd1c7296a98e22c6fcb":[0,0,78,19],
-"classBldAxiStream.html#ae15512b1bc74c4a4784990bd43318b2d":[0,0,78,15]
+"classBldAxiStream.html#a8196151a18e710b2598e18906036332a":[0,0,78,2]
 };

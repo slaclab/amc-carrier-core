@@ -6,6 +6,7 @@ var classAppMpsRegBase =
     [ "APP_CONFIG_G", "classAppMpsRegBase.html#a3f1847622ba43e5b2317805e1384b449", null ],
     [ "mpsMessage", "classAppMpsRegBase.html#a5494f4c263c34aefbbeaf8bee349c8cb", null ],
     [ "mpsMsgDrop", "classAppMpsRegBase.html#aaaefc574cbb1c0750ec8440a5439f502", null ],
+    [ "rstTripValue", "classAppMpsRegBase.html#a2b118850df908aa2490eafcb599bf1f4", null ],
     [ "mpsCore", "classAppMpsRegBase.html#a39bb02613afb694d640cbcc9f037f51c", null ],
     [ "beamDestMask", "classAppMpsRegBase.html#ab6917ca3ecdad97b982de099be3a603b", null ],
     [ "altDestMask", "classAppMpsRegBase.html#a25e664d356a91f3f4de5c87efe4c8202", null ],
