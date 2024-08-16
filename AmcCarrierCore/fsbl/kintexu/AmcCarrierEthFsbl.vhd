@@ -222,7 +222,6 @@ begin
             CLIENT_EN_G    => false,
             -- IPv4/ARP Generics
             CLK_FREQ_G     => AXI_CLK_FREQ_C,  -- In units of Hz
-            VLAN_G         => false,           -- no VLAN
             DHCP_G         => false)           -- no DHCP
          port map (
             -- Local Configurations
