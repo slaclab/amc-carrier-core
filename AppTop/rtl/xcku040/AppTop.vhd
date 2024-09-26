@@ -227,7 +227,7 @@ begin
 
    timingClk <= timingClkb;
    timingRst <= timingRstb;
-   
+
    --------------------------
    -- Clock and reset mapping
    --------------------------

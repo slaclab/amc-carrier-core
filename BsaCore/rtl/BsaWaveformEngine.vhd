@@ -30,7 +30,7 @@ entity BsaWaveformEngine is
 
    generic (
       TPD_G                  : time                   := 1 ns;
-      WAVEFORM_NUM_LANES_G   : positive range 1 to 4  := 4;
+      WAVEFORM_NUM_LANES_G   : natural range 1 to 4   := 4;
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4;
       AXIL_BASE_ADDR_G       : slv(31 downto 0)       := (others => '0');
       AXI_CONFIG_G           : AxiConfigType          := axiConfig(33, 16, 1, 8));
@@ -75,7 +75,7 @@ architecture rtl of BsaWaveformEngine is
       ssiAxiStreamConfig(WAVEFORM_TDATA_BYTES_G, TKEEP_FIXED_C, TUSER_FIRST_LAST_C, 0, 3);  -- No tdest bits, 3 tUser bits
 
    -- constant STREAMS_C : positive := WaveformMasterType'length;
-   constant STREAMS_C : positive := WAVEFORM_NUM_LANES_G;
+   constant STREAMS_C : natural := WAVEFORM_NUM_LANES_G;
 
    constant TDEST_ROUTES_C : Slv8Array(STREAMS_C-1 downto 0) := (others => "--------");
 
@@ -162,7 +162,7 @@ begin
             CASCADE_SIZE_G      => 1,
             FIFO_ADDR_WIDTH_G   => 9,
             FIFO_FIXED_THRESH_G => true,
-            FIFO_PAUSE_THRESH_G => 1,                    --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
+            FIFO_PAUSE_THRESH_G => 1,   --2**(AXIS_FIFO_ADDR_WIDTH_G-1),
             SLAVE_AXI_CONFIG_G  => WAVEFORM_AXIS_CONFIG_C,
             MASTER_AXI_CONFIG_G => WRITE_AXIS_CONFIG_C)  -- 128-bit
          port map (

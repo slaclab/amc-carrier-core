@@ -298,7 +298,6 @@ begin
          -- IPv4/ARP Generics
          CLK_FREQ_G     => AXI_CLK_FREQ_C,  -- In units of Hz
          COMM_TIMEOUT_G => 30,  -- In units of seconds, Client's Communication timeout before re-ARPing
-         VLAN_G         => false,       -- no VLAN
          DHCP_G         => false)       -- no DHCP
       port map (
          -- Local Configurations

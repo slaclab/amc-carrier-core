@@ -56,7 +56,7 @@ entity AmcCarrierCoreBase is
       ASYNC_G                : boolean  := true;
       FSBL_G                 : boolean  := false;  -- false = Normal Operation, true = First Stage Boot loader
       APP_TYPE_G             : AppType;
-      WAVEFORM_NUM_LANES_G   : positive := 4;  -- Number of Waveform lanes per DaqMuxV2
+      WAVEFORM_NUM_LANES_G   : natural  := 4;  -- Number of Waveform lanes per DaqMuxV2
       WAVEFORM_TDATA_BYTES_G : positive := 4;  -- Waveform stream's tData width (in units of bytes)
       ETH_USR_FRAME_LIMIT_G  : positive := 4096;   -- 4kB
       MPS_SLOT_G             : boolean  := false;  -- false = Normal Operation, true = MPS message concentrator (Slot#2 only)
