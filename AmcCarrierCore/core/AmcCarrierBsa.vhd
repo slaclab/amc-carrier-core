@@ -33,7 +33,7 @@ entity AmcCarrierBsa is
       DISABLE_BSA_G          : boolean                := false;
       DISABLE_BLD_G          : boolean                := false;
       DISABLE_DDR_SRP_G      : boolean                := false;
-      WAVEFORM_NUM_LANES_G   : positive range 1 to 4  := 4;  -- Number of Waveform lanes per DaqMuxV2
+      WAVEFORM_NUM_LANES_G   : natural  range 0 to 4  := 4;  -- Number of Waveform lanes per DaqMuxV2
       WAVEFORM_TDATA_BYTES_G : positive range 4 to 16 := 4);  -- Waveform stream's tData width (in units of bytes)
    port (
       -- AXI-Lite Interface (axilClk domain)
@@ -215,14 +215,15 @@ begin
       ------------------------------------------------------------------------------------------------
       ibBsaSlaves(BSA_WAVEFORM_STATUS_AXIS_INDEX_C) <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only.
       ibBsaSlaves(BSA_WAVEFORM_DATA_AXIS_INDEX_C)   <= AXI_STREAM_SLAVE_FORCE_C;  -- Upstream only
-      BsaWaveformEngine_0 : entity amc_carrier_core.BsaWaveformEngine
-         generic map (
+      GEN_WF : if WAVEFORM_NUM_LANES_G > 0 generate
+        BsaWaveformEngine_0 : entity amc_carrier_core.BsaWaveformEngine
+          generic map (
             TPD_G                  => TPD_G,
             WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
             AXIL_BASE_ADDR_G       => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_0_AXIL_C).baseAddr,
             AXI_CONFIG_G           => WAVEFORM_AXI_CONFIG_C)
-         port map (
+          port map (
             waveformClk       => waveformClk,
             waveformRst       => waveformRst,
             ibWaveformMasters => obAppWaveformMasters(0),   -- [in]
@@ -248,14 +249,14 @@ begin
             axiReadMaster     => waveform0AxiReadMaster,    -- [out]
             axiReadSlave      => waveform0AxiReadSlave);    -- [in]
 
-      BsaWaveformEngine_1 : entity amc_carrier_core.BsaWaveformEngine
-         generic map (
+        BsaWaveformEngine_1 : entity amc_carrier_core.BsaWaveformEngine
+          generic map (
             TPD_G                  => TPD_G,
             WAVEFORM_NUM_LANES_G   => WAVEFORM_NUM_LANES_G,
             WAVEFORM_TDATA_BYTES_G => WAVEFORM_TDATA_BYTES_G,
             AXIL_BASE_ADDR_G       => AXIL_CROSSBAR_CONFIG_C(WAVEFORM_1_AXIL_C).baseAddr,
             AXI_CONFIG_G           => WAVEFORM_AXI_CONFIG_C)
-         port map (
+          port map (
             waveformClk       => waveformClk,
             waveformRst       => waveformRst,
             ibWaveformMasters => obAppWaveformMasters(1),   -- [in]
@@ -281,17 +282,17 @@ begin
             axiReadMaster     => waveform1AxiReadMaster,    -- [out]
             axiReadSlave      => waveform1AxiReadSlave);    -- [in]
 
-      U_AxiStreamMux_WaveformStatus : entity surf.AxiStreamMux
-         generic map (
+        U_AxiStreamMux_WaveformStatus : entity surf.AxiStreamMux
+          generic map (
             TPD_G          => TPD_G,
             NUM_SLAVES_G   => 2,
             MODE_G         => "ROUTED",
             TDEST_ROUTES_G => (
-               0           => ROUTE0_C,
-               1           => ROUTE1_C),
+              0           => ROUTE0_C,
+              1           => ROUTE1_C),
             PIPE_STAGES_G  => 1,
             TDEST_LOW_G    => 0)
-         port map (
+          port map (
             sAxisMasters => waveformStatusMasters,  -- [in]
             sAxisSlaves  => waveformStatusSlaves,   -- [out]
             mAxisMaster  => obBsaMasters(BSA_WAVEFORM_STATUS_AXIS_INDEX_C),  -- [out]
@@ -299,24 +300,29 @@ begin
             axisClk      => axilClk,    -- [in]
             axisRst      => axilRst);   -- [in]
 
-      U_AxiStreamMux_WaveformData : entity surf.AxiStreamMux
-         generic map (
+        U_AxiStreamMux_WaveformData : entity surf.AxiStreamMux
+          generic map (
             TPD_G          => TPD_G,
             NUM_SLAVES_G   => 2,
             MODE_G         => "ROUTED",
             TDEST_ROUTES_G => (
-               0           => ROUTE0_C,
-               1           => ROUTE1_C),
+              0           => ROUTE0_C,
+              1           => ROUTE1_C),
             PIPE_STAGES_G  => 1,
             TDEST_LOW_G    => 0)
-         port map (
+          port map (
             sAxisMasters => waveformDataMasters,  -- [in]
             sAxisSlaves  => waveformDataSlaves,   -- [out]
             mAxisMaster  => obBsaMasters(BSA_WAVEFORM_DATA_AXIS_INDEX_C),  -- [out]
             mAxisSlave   => obBsaSlaves(BSA_WAVEFORM_DATA_AXIS_INDEX_C),  -- [in]
             axisClk      => axilClk,    -- [in]
             axisRst      => axilRst);   -- [in]
-
+      end generate GEN_WF;
+      GEN_NO_WF : if WAVEFORM_NUM_LANES_G = 0 generate
+        obAppWaveformSlaves                          <= WAVEFORM_SLAVE_ARRAY_INIT_C;
+        obBsaMasters(BSA_WAVEFORM_DATA_AXIS_INDEX_C) <= AXI_STREAM_MASTER_INIT_C;
+      end generate GEN_NO_WF;
+      
       -------------------------------------------------------------------------------------------------
       -- BSA buffers
       -------------------------------------------------------------------------------------------------
