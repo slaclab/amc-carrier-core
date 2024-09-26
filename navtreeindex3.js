@@ -1,6 +1,5 @@
 var NAVTREEINDEX3 =
 {
-"classAmcCarrierCoreBase.html#a2dfe52a26c7507505c60c45b07ed6972":[0,0,10,11],
 "classAmcCarrierCoreBase.html#a32b00ffdea0b847a9834fa573bc3fbb7":[0,0,10,116],
 "classAmcCarrierCoreBase.html#a32feb2a8cf9af8e5ed26b6f24852e351":[0,0,10,38],
 "classAmcCarrierCoreBase.html#a3d8d1e6a97b640054999e6b94659dea8":[0,0,10,129],
@@ -50,6 +49,7 @@ var NAVTREEINDEX3 =
 "classAmcCarrierCoreBase.html#a7df6ce1b01b36951d9a67873eb325309":[0,0,10,87],
 "classAmcCarrierCoreBase.html#a7ea76b1ecd35558b532981120988a2b9":[0,0,10,117],
 "classAmcCarrierCoreBase.html#a803d63dcbca1e51650a0585b2a5b4763":[0,0,10,65],
+"classAmcCarrierCoreBase.html#a84f9216fc50509ddf78b6c9b52d7034f":[0,0,10,22],
 "classAmcCarrierCoreBase.html#a8502a18f3a69f6e9d4e5d8ad149ee693":[0,0,10,94],
 "classAmcCarrierCoreBase.html#a85df55cbde3bf3e590c47ab431a30413":[0,0,10,40],
 "classAmcCarrierCoreBase.html#a8b2386340b5fb993545f13b8fe3831d1":[0,0,10,28],

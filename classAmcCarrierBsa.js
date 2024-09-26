@@ -6,7 +6,7 @@ var classAmcCarrierBsa =
     [ "DISABLE_BSA_G", "classAmcCarrierBsa.html#a923a8635f376b87dc71330cd5695fe7f", null ],
     [ "DISABLE_BLD_G", "classAmcCarrierBsa.html#aa4557b195182a823da19d46764695132", null ],
     [ "DISABLE_DDR_SRP_G", "classAmcCarrierBsa.html#a8e1fa23a755ba8cc1d319b541ff3d16d", null ],
-    [ "WAVEFORM_NUM_LANES_G", "classAmcCarrierBsa.html#a0411f57a5c430b8ceb33fee7b9fe5cb0", null ],
+    [ "WAVEFORM_NUM_LANES_G", "classAmcCarrierBsa.html#adf4bdd0903d41098ff7246fa39ffedc0", null ],
     [ "WAVEFORM_TDATA_BYTES_G", "classAmcCarrierBsa.html#a77c7fff9c34dffee2788341aa8f49019", null ],
     [ "axilClk", "classAmcCarrierBsa.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
     [ "axilRst", "classAmcCarrierBsa.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],

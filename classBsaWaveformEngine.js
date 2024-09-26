@@ -2,7 +2,7 @@ var classBsaWaveformEngine =
 [
     [ "rtl", "classBsaWaveformEngine_1_1rtl.html", "classBsaWaveformEngine_1_1rtl" ],
     [ "TPD_G", "classBsaWaveformEngine.html#a67a837684e4f18c2d236ac1d053b419b", null ],
-    [ "WAVEFORM_NUM_LANES_G", "classBsaWaveformEngine.html#a0411f57a5c430b8ceb33fee7b9fe5cb0", null ],
+    [ "WAVEFORM_NUM_LANES_G", "classBsaWaveformEngine.html#ad5fcb0954ade8233114f6fc093e4f2b6", null ],
     [ "WAVEFORM_TDATA_BYTES_G", "classBsaWaveformEngine.html#a77c7fff9c34dffee2788341aa8f49019", null ],
     [ "AXIL_BASE_ADDR_G", "classBsaWaveformEngine.html#ae1903f9ae02f4ffed7c029858fbcae3b", null ],
     [ "AXI_CONFIG_G", "classBsaWaveformEngine.html#af1ecb2796f08eb3957037ad53e39b9bc", null ],

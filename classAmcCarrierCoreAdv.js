@@ -22,7 +22,7 @@ var classAmcCarrierCoreAdv =
     [ "ASYNC_G", "classAmcCarrierCoreAdv.html#a6f107f5ea0dbc76c5f8f08381e3b3589", null ],
     [ "FSBL_G", "classAmcCarrierCoreAdv.html#af04728c810b62b0c0807031e438c5163", null ],
     [ "APP_TYPE_G", "classAmcCarrierCoreAdv.html#adb10d6d1d8e6c459a177ec44efeb06d8", null ],
-    [ "WAVEFORM_NUM_LANES_G", "classAmcCarrierCoreAdv.html#a2cfec1295116fb7ee26aafcae39002be", null ],
+    [ "WAVEFORM_NUM_LANES_G", "classAmcCarrierCoreAdv.html#a84f9216fc50509ddf78b6c9b52d7034f", null ],
     [ "WAVEFORM_TDATA_BYTES_G", "classAmcCarrierCoreAdv.html#afcd1380bd60c6b2b65e97c4e075440f2", null ],
     [ "ETH_USR_FRAME_LIMIT_G", "classAmcCarrierCoreAdv.html#a670984cb9c63c78429d062853025e550", null ],
     [ "MPS_SLOT_G", "classAmcCarrierCoreAdv.html#ad00e9b1bfd0f20f4f3ba02c9906537fa", null ],
