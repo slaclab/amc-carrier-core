@@ -591,7 +591,7 @@ class Adf5356(pr.Device):
             bitOffset    =  0,
             base         = pr.UInt,
             mode         = "RW",
-            number       =  13,
+            number       =  14,
             stride       =  4,
         )
 
