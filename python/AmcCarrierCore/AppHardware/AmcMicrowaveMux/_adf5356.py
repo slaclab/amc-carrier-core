@@ -608,7 +608,7 @@ class Adf5356(pr.Device):
 
             # Frequency Update Sequence
             self.REG[13].set(self.REG[13].get() & 0xFFFC000F)
-            self.REG[6].set(self.REG[10].get())
+            self.REG[6].set(self.REG[6].get())
             # self.REG[4].set(self.REG[4].get() | 0x00000010)
             self.REG[2].set(self.REG[2].get())
             self.REG[1].set(self.REG[1].get())
