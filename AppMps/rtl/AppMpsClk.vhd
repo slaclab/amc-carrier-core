@@ -162,7 +162,7 @@ begin
    ------------------------------------------------------------------------------------------------------
    U_Bufg156 : BUFGCE_DIV
       generic map (
-         BUFGCE_DIVIDE => 4)            -- 156.25 MHz = 625 MHz/2
+         BUFGCE_DIVIDE => 4)            -- 156.25 MHz = 625 MHz/4
       port map (
          I   => clkout0,                -- 625 MHz
          CE  => '1',
