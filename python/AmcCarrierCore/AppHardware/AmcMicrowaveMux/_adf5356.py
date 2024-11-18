@@ -604,11 +604,12 @@ class Adf5356(pr.Device):
             for i in range( 12, 0, -1 ):
                 self.REG[i].set(self.REG[i].get())
             time.sleep(0.001)
-            self.REG[0].set(self.REG[0].get() & 0xFFDFFFFF)
+            self.REG[0].set(self.REG[0].get() & 0xFFDFFFFF) #autocal disabled
 
             # Frequency Update Sequence
             self.REG[13].set(self.REG[13].get() & 0xFFFC000F)
-            self.REG[6].set(self.REG[6].get())
+            self.REG[10].set(self.REG[10].get())
+            #self.REG[6].set(self.REG[6].get())
             # self.REG[4].set(self.REG[4].get() | 0x00000010)
             self.REG[2].set(self.REG[2].get())
             self.REG[1].set(self.REG[1].get())
