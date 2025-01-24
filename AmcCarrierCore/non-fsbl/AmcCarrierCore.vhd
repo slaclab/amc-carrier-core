@@ -99,6 +99,8 @@ entity AmcCarrierCore is
       recTimingRst         : out   sl;
       ref156MHzClk         : out   sl;
       ref156MHzRst         : out   sl;
+      ref125MHzClk         : out   sl;
+      ref125MHzRst         : out   sl;
       stableClk            : out   sl;
       stableRst            : out   sl;
       gthFabClk            : out   sl;
@@ -285,21 +287,24 @@ begin
          INPUT_BUFG_G      => true,
          FB_BUFG_G         => true,
          RST_IN_POLARITY_G => '1',
-         NUM_CLOCKS_G      => 1,
+         NUM_CLOCKS_G      => 2,
          -- MMCM attributes
          BANDWIDTH_G       => "OPTIMIZED",
          CLKIN_PERIOD_G    => 12.8,     -- 78.125MHz
          DIVCLK_DIVIDE_G   => 1,        -- 78.125MHz = 78.125MHz/1
          CLKFBOUT_MULT_G   => 16,       -- 1.25GHz=78.125MHz*16
-         CLKOUT0_DIVIDE_G  => 8)        -- 156.25MHz=1.25GHz/8
+         CLKOUT0_DIVIDE_G  => 8,        -- 156.25MHz=1.25GHz/8
+         CLKOUT1_DIVIDE_G  => 10)       -- 125MHz=1.25GHz/10
       port map(
          -- Clock Input
          clkIn     => fabClk,
          rstIn     => fabRst,
          -- Clock Outputs
          clkOut(0) => axilClk,
+         clkOut(1) => ref125MHzClk,
          -- Reset Outputs
-         rstOut(0) => reset);
+         rstOut(0) => reset,
+         rstOut(1) => ref125MHzRst);
 
    -- Help with meeting timing on the reset path
    U_Rst : entity surf.RstPipeline

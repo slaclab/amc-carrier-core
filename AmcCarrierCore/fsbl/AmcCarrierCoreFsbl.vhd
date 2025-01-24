@@ -214,6 +214,10 @@ architecture mapping of AmcCarrierCoreFsbl is
 
    signal ref156MHzClk  : sl;
    signal ref156MHzRst  : sl;
+
+   signal ref125MHzClk  : sl;
+   signal ref125MHzRst  : sl;
+
    signal bsiBus        : BsiBusType;
    signal timingBusIntf : TimingBusType;
 
@@ -345,6 +349,8 @@ begin
          -- Core Ports --
          ----------------
          -- Backplane MPS Ports
+         ref125MHzClk    => ref125MHzClk,
+         ref125MHzRst    => ref125MHzRst,
          mpsClkIn        => mpsClkIn,
          mpsClkOut       => mpsClkOut,
          mpsBusRxP       => mpsBusRxP,
@@ -402,6 +408,8 @@ begin
          recTimingRst         => recTimingRst,
          ref156MHzClk         => ref156MHzClk,
          ref156MHzRst         => ref156MHzRst,
+         ref125MHzClk         => ref125MHzClk,
+         ref125MHzRst         => ref125MHzRst,
          gthFabClk            => gthFabClk,
          ------------------------
          -- Core Ports to Wrapper

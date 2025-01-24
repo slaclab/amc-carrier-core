@@ -52,6 +52,8 @@ entity AppMpsClk is
       -- Core Ports --
       ----------------
       -- Backplane MPS Ports
+      ref125MHzClk : in  sl;
+      ref125MHzRst : in  sl;
       mpsClkIn     : in  sl;
       mpsClkOut    : out sl);
 end AppMpsClk;
@@ -60,8 +62,7 @@ architecture mapping of AppMpsClk is
 
    signal mpsRefClk     : sl;
    signal mpsClk        : sl;
-   signal mpsRst        : sl;
-   signal mpsReset      : sl;
+
    signal mpsMmcmClkOut : slv(2 downto 0);
    signal mpsMmcmRstOut : slv(2 downto 0);
    signal locked        : sl;
@@ -78,40 +79,35 @@ begin
          I => mpsClkIn,
          O => mpsRefClk);
 
-   GEN_MPS_SLOT : if (MPS_SLOT_G = true) generate
+   U_mpsClk : BUFG
+      port map (
+         I => mpsRefClk,
+         O => mpsClk);
 
-      mpsClk <= axilClk;
-      mpsRst <= axilRst;
+   GEN_MPS_SLOT : if (MPS_SLOT_G = true) generate
 
       U_ClkOutBufSingle : entity surf.ClkOutBufSingle
          generic map(
             TPD_G        => TPD_G,
             XIL_DEVICE_G => "ULTRASCALE")
          port map (
-            clkIn  => mpsMmcmClkOut(2),
+            clkIn  => ref125MHzClk,
             clkOut => mpsClkOut);
 
    end generate;
 
    GEN_APP_SLOT : if (MPS_SLOT_G = false) generate
 
-      U_Bufg : BUFG
-         port map (
-            I => mpsRefClk,
-            O => mpsClk);
-      mpsRst    <= '0';
       mpsClkOut <= '0';
 
    end generate;
 
-   mpsReset <= mpsRst or mpsPllRst;
-
    U_MpsSerdesPll : PLLE3_ADV
       generic map (
          STARTUP_WAIT       => "FALSE",
-         CLKIN_PERIOD       => ite(MPS_SLOT_G, 6.4, 8.0),
+         CLKIN_PERIOD       => 8.0,
          DIVCLK_DIVIDE      => 1,
-         CLKFBOUT_MULT      => ite(MPS_SLOT_G, 8, 10),  -- 1.25 GHz
+         CLKFBOUT_MULT      => 10,      -- 1.25 GHz
          CLKOUT0_DIVIDE     => 2,       -- 625 MHz = 1.25 GHz/2
          CLKOUT1_DIVIDE     => 10,      -- 125 MHz = 1.25 GHz/10
          CLKOUT0_PHASE      => 0.0,
@@ -127,7 +123,7 @@ begin
          DI          => (others => '0'),
          DO          => open,
          PWRDWN      => '0',
-         RST         => mpsReset,
+         RST         => mpsPllRst,
          CLKIN       => mpsClk,
          CLKOUTPHYEN => '0',
          CLKFBOUT    => clkFbOut,

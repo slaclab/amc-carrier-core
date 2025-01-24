@@ -79,6 +79,8 @@ entity AmcCarrierFsbl is
       recTimingRst         : out   sl;
       ref156MHzClk         : out   sl;
       ref156MHzRst         : out   sl;
+      ref125MHzClk         : out   sl;
+      ref125MHzRst         : out   sl;
       gthFabClk            : out   sl;
       ------------------------
       -- Core Ports to Wrapper
@@ -253,21 +255,24 @@ begin
          INPUT_BUFG_G      => true,
          FB_BUFG_G         => true,
          RST_IN_POLARITY_G => '1',
-         NUM_CLOCKS_G      => 1,
+         NUM_CLOCKS_G      => 2,
          -- MMCM attributes
          BANDWIDTH_G       => "OPTIMIZED",
          CLKIN_PERIOD_G    => 6.4,
          DIVCLK_DIVIDE_G   => 1,
          CLKFBOUT_MULT_G   => 8,
-         CLKOUT0_DIVIDE_G  => 8)
+         CLKOUT0_DIVIDE_G  => 8,
+         CLKOUT1_DIVIDE_G  => 10)
       port map(
          -- Clock Input
          clkIn     => fabClk,
          rstIn     => fabRst,
          -- Clock Outputs
          clkOut(0) => axilClk,
+         clkOut(1) => ref125MHzClk,
          -- Reset Outputs
-         rstOut(0) => reset);
+         rstOut(0) => reset,
+         rstOut(1) => ref125MHzRst);
 
    -- Forcing BUFG for reset that's used everywhere
    U_BUFG : BUFG
