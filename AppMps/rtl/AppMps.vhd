@@ -73,6 +73,8 @@ entity AppMps is
       -- Core Ports --
       ----------------
       -- Backplane MPS Ports
+      ref125MHzClk    : in  sl;
+      ref125MHzRst    : in  sl;
       mpsClkIn        : in  sl;
       mpsClkOut       : out sl;
       mpsBusRxP       : in  slv(14 downto 1);
@@ -150,6 +152,8 @@ begin
          -- Core Ports --
          ----------------
          -- Backplane MPS Ports
+         ref125MHzClk => ref125MHzClk,
+         ref125MHzRst => ref125MHzRst,
          mpsClkIn     => mpsClkIn,
          mpsClkOut    => mpsClkOut);
 
