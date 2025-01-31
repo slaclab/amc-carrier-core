@@ -36,6 +36,8 @@ entity AmcCarrierEth is
       DEBUG_PATH_SELECT_G   : boolean  := false;  -- false = UDP[port=8193], true = UDP[port=8194]
       ETH_USR_FRAME_LIMIT_G : positive := 4096);  -- 4kB
    port (
+      gtRefClk              : out sl;
+      gtRefClkBufg          : out sl;
       -- Local Configuration and status
       localMac              : in  slv(47 downto 0);  --  big-Endian configuration
       localIp               : in  slv(31 downto 0);  --  big-Endian configuration
@@ -200,6 +202,8 @@ begin
             -- AXI Streaming Configurations
             AXIS_CONFIG_G => EMAC_AXIS_CONFIG_C)
          port map (
+            gtClkOut       => gtRefClk,
+            phyClk         => gtRefClkBufg,
             -- Local Configurations
             localMac       => localMac,
             -- Streaming DMA Interface
@@ -247,6 +251,8 @@ begin
             -- AXI Streaming Configurations
             AXIS_CONFIG_G      => (others => EMAC_AXIS_CONFIG_C))
          port map (
+            gtClkOut        => gtRefClk,
+            refClkOut       => gtRefClkBufg,
             -- Local Configurations
             localMac(0)     => localMac,
             -- Streaming DMA Interface
