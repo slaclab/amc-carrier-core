@@ -1,28 +1,4 @@
 var classAxiSerAttnMaster =
 [
-    [ "rtl", "classAxiSerAttnMaster_1_1rtl.html", "classAxiSerAttnMaster_1_1rtl" ],
-    [ "TPD_G", "classAxiSerAttnMaster.html#a67a837684e4f18c2d236ac1d053b419b", null ],
-    [ "DATA_SIZE_G", "classAxiSerAttnMaster.html#aa8a4c35d783a4aa5fddb83c0db4f2657", null ],
-    [ "CLK_PERIOD_G", "classAxiSerAttnMaster.html#a592f4e41d0ed03785633299361665749", null ],
-    [ "SPI_SCLK_PERIOD_G", "classAxiSerAttnMaster.html#a694a3179e8ee20ca5c12f0da5599e0cd", null ],
-    [ "axiClk", "classAxiSerAttnMaster.html#a7d8781c632c75ab0fdde6e592fd13d60", null ],
-    [ "axiRst", "classAxiSerAttnMaster.html#a399a775bae9ae4819d5af6838a95e28e", null ],
-    [ "axiReadMaster", "classAxiSerAttnMaster.html#ac847742920ba32301ddc91cf13d6f5fe", null ],
-    [ "axiReadSlave", "classAxiSerAttnMaster.html#af5301f308dc850ff6d3b80315d2e644c", null ],
-    [ "axiWriteMaster", "classAxiSerAttnMaster.html#abf08eac4311749af56c8ec14b1903091", null ],
-    [ "axiWriteSlave", "classAxiSerAttnMaster.html#a0eb32e5fab67488b94fb47c9fe42e97f", null ],
-    [ "coreSclk", "classAxiSerAttnMaster.html#a656e835a0890a162151082bef7ac3400", null ],
-    [ "coreSDin", "classAxiSerAttnMaster.html#a235365c8c85be8348cd9dcfd86cf53d8", null ],
-    [ "coreSDout", "classAxiSerAttnMaster.html#ab494f9de512f117c98fe32f8f93e22e7", null ],
-    [ "coreCsb", "classAxiSerAttnMaster.html#aaabc1205d85a1e0dfbb414fa8b00ab04", null ],
-    [ "coreLEn", "classAxiSerAttnMaster.html#a859c4383e795f107dbb87e72f92acfc3", null ],
-    [ "ieee", "classAxiSerAttnMaster.html#a0a6af6eef40212dbaf130d57ce711256", null ],
-    [ "std_logic_1164", "classAxiSerAttnMaster.html#acd03516902501cd1c7296a98e22c6fcb", null ],
-    [ "std_logic_arith", "classAxiSerAttnMaster.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
-    [ "std_logic_unsigned", "classAxiSerAttnMaster.html#a598da929e807d58939b47499e8bc9fa8", null ],
-    [ "unisim", "classAxiSerAttnMaster.html#a962f1c6a2adaac3e10a6f7fa3d111e01", null ],
-    [ "vcomponents", "classAxiSerAttnMaster.html#aa1cb22e959d47364391e5eb4ef86927c", null ],
-    [ "surf", "classAxiSerAttnMaster.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
-    [ "StdRtlPkg", "classAxiSerAttnMaster.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
-    [ "AxiLitePkg", "classAxiSerAttnMaster.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ]
+    [ "AxiSerAttnMaster.rtl", "classAxiSerAttnMaster_1_1rtl.html", null ]
 ];

@@ -1,5 +1,7 @@
 <map id="LvdsDacRegItf" name="LvdsDacRegItf">
-<area shape="rect" id="node1" title=" " alt="" coords="41,5,157,32"/>
-<area shape="rect" id="node2" href="$classLvdsDacSigGen.html" title=" " alt="" coords="38,80,161,107"/>
-<area shape="rect" id="node3" href="$classAmcMrLlrfUpConvertCore.html" title=" " alt="" coords="5,155,193,181"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="41,5,157,31"/>
+<area shape="rect" id="Node000002" href="$classLvdsDacSigGen.html" title=" " alt="" coords="38,79,161,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,44,102,79,97,79,97,44"/>
+<area shape="rect" id="Node000003" href="$classAmcMrLlrfUpConvertCore.html" title=" " alt="" coords="5,152,193,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,118,102,152,97,152,97,118"/>
 </map>

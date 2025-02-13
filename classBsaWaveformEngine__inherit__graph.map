@@ -1,9 +1,15 @@
 <map id="BsaWaveformEngine" name="BsaWaveformEngine">
-<area shape="rect" id="node1" title=" " alt="" coords="254,5,411,32"/>
-<area shape="rect" id="node2" href="$classAmcCarrierBsa.html" title=" " alt="" coords="273,80,392,107"/>
-<area shape="rect" id="node3" href="$classAmcCarrierCore.html" title=" " alt="" coords="197,155,322,181"/>
-<area shape="rect" id="node6" href="$classAmcCarrierFsbl.html" title=" " alt="" coords="361,155,483,181"/>
-<area shape="rect" id="node4" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="5,229,156,256"/>
-<area shape="rect" id="node5" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="181,229,338,256"/>
-<area shape="rect" id="node7" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="362,229,514,256"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="91,5,248,31"/>
+<area shape="rect" id="Node000002" href="$classAmcCarrierBsa.html" title=" " alt="" coords="110,79,229,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,44,172,79,167,79,167,44"/>
+<area shape="rect" id="Node000003" href="$classAmcCarrierFsbl.html" title=" " alt="" coords="35,152,157,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="149,116,110,154,106,150,146,112"/>
+<area shape="rect" id="Node000005" href="$classAmcCarrierCore.html" title=" " alt="" coords="195,152,320,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="196,110,245,150,241,154,192,115"/>
+<area shape="rect" id="Node000004" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="5,225,157,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="93,191,86,226,81,225,88,190"/>
+<area shape="rect" id="Node000006" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="182,225,333,251"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="260,191,260,225,255,225,255,191"/>
+<area shape="rect" id="Node000007" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="357,225,515,251"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="299,180,408,223,406,228,298,185"/>
 </map>

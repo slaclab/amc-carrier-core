@@ -1,30 +1,4 @@
 var classDaqTrigger =
 [
-    [ "rtl", "classDaqTrigger_1_1rtl.html", "classDaqTrigger_1_1rtl" ],
-    [ "TPD_G", "classDaqTrigger.html#a67a837684e4f18c2d236ac1d053b419b", null ],
-    [ "clk", "classDaqTrigger.html#a8562dfa3c7970041e8fb901d9c0e4ecf", null ],
-    [ "rst", "classDaqTrigger.html#a5e055e2244f51a31f609da3af2c8a8c7", null ],
-    [ "trigSw_i", "classDaqTrigger.html#af97a2ce6bca6ebc4878b9e33c55346d1", null ],
-    [ "trigHw_i", "classDaqTrigger.html#a1fc184990ff8a9b9037847fdd41da3d2", null ],
-    [ "trigCasc_i", "classDaqTrigger.html#a283269f0fd320af5648b8d2b30327f49", null ],
-    [ "armCasc_i", "classDaqTrigger.html#a22986ff0197595da4d84ae6cc70133c1", null ],
-    [ "freezeSw_i", "classDaqTrigger.html#ad4e9988ce45791168133aad30da52b1e", null ],
-    [ "freezeHw_i", "classDaqTrigger.html#ad9e922f6b8477316de37d3b9bfaa9aa6", null ],
-    [ "trigCascMask_i", "classDaqTrigger.html#abbbab75b221b3cd1fc3840495db93189", null ],
-    [ "trigHwAutoRearm_i", "classDaqTrigger.html#a13ffd630e58761fe1507dc54c581296f", null ],
-    [ "trigHwArm_i", "classDaqTrigger.html#a23c4ea2f16a7ec28c07a83b32bfd63fe", null ],
-    [ "clearTrigStatus_i", "classDaqTrigger.html#a1dc85e295c8edb6e6d49747657649675", null ],
-    [ "trigMode_i", "classDaqTrigger.html#ac77604dcb6b5f41cf7c118f747722747", null ],
-    [ "freezeHwMask_i", "classDaqTrigger.html#a2b268bc752d1cb377e875546414f783d", null ],
-    [ "daqBusy_i", "classDaqTrigger.html#af2c7ac14970a9bdbb57e825384be2f0a", null ],
-    [ "trigStatus_o", "classDaqTrigger.html#ae248e2a23d3c93bab9b6b1fac6b657c9", null ],
-    [ "trigHeader_o", "classDaqTrigger.html#a874f2c828dbff1004afff88c6cca1630", null ],
-    [ "trig_o", "classDaqTrigger.html#af83a939d51fcd34771e8b26661fab83a", null ],
-    [ "freeze_o", "classDaqTrigger.html#a76e2ec6632ddc6c76b2675b5dac1a542", null ],
-    [ "ieee", "classDaqTrigger.html#a0a6af6eef40212dbaf130d57ce711256", null ],
-    [ "std_logic_1164", "classDaqTrigger.html#acd03516902501cd1c7296a98e22c6fcb", null ],
-    [ "std_logic_unsigned", "classDaqTrigger.html#a598da929e807d58939b47499e8bc9fa8", null ],
-    [ "std_logic_arith", "classDaqTrigger.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
-    [ "surf", "classDaqTrigger.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
-    [ "StdRtlPkg", "classDaqTrigger.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ]
+    [ "DaqTrigger.rtl", "classDaqTrigger_1_1rtl.html", null ]
 ];

@@ -1,11 +1,19 @@
 <map id="BsasAccumulator" name="BsasAccumulator">
-<area shape="rect" id="node1" title=" " alt="" coords="265,5,400,32"/>
-<area shape="rect" id="node2" href="$classBsasModule.html" title=" " alt="" coords="282,80,383,107"/>
-<area shape="rect" id="node3" href="$classBsasWrapper.html" title=" " alt="" coords="279,155,387,181"/>
-<area shape="rect" id="node4" href="$classAmcCarrierBsa.html" title=" " alt="" coords="273,229,392,256"/>
-<area shape="rect" id="node5" href="$classAmcCarrierCore.html" title=" " alt="" coords="197,304,322,331"/>
-<area shape="rect" id="node8" href="$classAmcCarrierFsbl.html" title=" " alt="" coords="361,304,483,331"/>
-<area shape="rect" id="node6" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="5,379,156,405"/>
-<area shape="rect" id="node7" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="181,379,338,405"/>
-<area shape="rect" id="node9" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="362,379,514,405"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="102,5,237,31"/>
+<area shape="rect" id="Node000002" href="$classBsasModule.html" title=" " alt="" coords="119,79,220,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,44,172,79,167,79,167,44"/>
+<area shape="rect" id="Node000003" href="$classBsasWrapper.html" title=" " alt="" coords="115,152,223,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="172,118,172,152,167,152,167,118"/>
+<area shape="rect" id="Node000004" href="$classAmcCarrierBsa.html" title=" " alt="" coords="110,225,229,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="172,191,172,225,167,225,167,191"/>
+<area shape="rect" id="Node000005" href="$classAmcCarrierFsbl.html" title=" " alt="" coords="35,299,157,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="149,262,110,300,106,297,146,258"/>
+<area shape="rect" id="Node000007" href="$classAmcCarrierCore.html" title=" " alt="" coords="195,299,320,324"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="196,257,245,296,241,301,192,261"/>
+<area shape="rect" id="Node000006" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="5,372,157,397"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="93,338,86,372,81,371,88,337"/>
+<area shape="rect" id="Node000008" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="182,372,333,397"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="260,338,260,372,255,372,255,338"/>
+<area shape="rect" id="Node000009" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="357,372,515,397"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="299,326,408,369,406,374,298,331"/>
 </map>

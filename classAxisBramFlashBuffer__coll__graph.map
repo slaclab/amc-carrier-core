@@ -1,5 +1,7 @@
 <map id="AxisBramFlashBuffer" name="AxisBramFlashBuffer">
-<area shape="rect" id="node1" title=" " alt="" coords="143,80,302,107"/>
-<area shape="rect" id="node2" href="$classAxisBramFlashBufferWrFsm.html" title=" " alt="" coords="5,5,211,32"/>
-<area shape="rect" id="node3" href="$classAxisBramFlashBufferRdFsm.html" title=" " alt="" coords="235,5,439,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="143,79,302,104"/>
+<area shape="rect" id="Node000002" href="$classAxisBramFlashBufferWrFsm.html" title=" " alt="" coords="5,5,211,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,35,205,76,203,81,136,40"/>
+<area shape="rect" id="Node000003" href="$classAxisBramFlashBufferRdFsm.html" title=" " alt="" coords="235,5,439,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="309,40,243,81,240,76,306,35"/>
 </map>

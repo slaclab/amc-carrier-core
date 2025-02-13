@@ -1,12 +1,21 @@
 <map id="AmcMrLlrfUpConvertCore" name="AmcMrLlrfUpConvertCore">
-<area shape="rect" id="node1" title=" " alt="" coords="437,144,625,171"/>
-<area shape="rect" id="node2" href="$classAmcMrLlrfUpConvertMapping.html" title=" " alt="" coords="175,43,389,69"/>
-<area shape="rect" id="node3" href="$classJesdSyncIn.html" title=" " alt="" coords="11,5,121,32"/>
-<area shape="rect" id="node4" href="$classJesdSyncOut.html" title=" " alt="" coords="5,56,127,83"/>
-<area shape="rect" id="node5" href="$classAxiSerAttnMaster.html" title=" " alt="" coords="214,93,350,120"/>
-<area shape="rect" id="node6" href="$classLvdsDacSigGen.html" title=" " alt="" coords="221,144,343,171"/>
-<area shape="rect" id="node7" href="$classLvdsDacRegItf.html" title=" " alt="" coords="8,119,124,145"/>
-<area shape="rect" id="node8" href="$classLvdsDacLane.html" title=" " alt="" coords="12,169,120,196"/>
-<area shape="rect" id="node9" href="$classOutputTapDelay.html" title=" " alt="" coords="219,195,345,221"/>
-<area shape="rect" id="node10" href="$classAmcClkFreqReg.html" title=" " alt="" coords="219,245,345,272"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="432,140,620,165"/>
+<area shape="rect" id="Node000002" href="$classAmcMrLlrfUpConvertMapping.html" title=" " alt="" coords="169,41,384,67"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="361,68,385,76,452,107,506,137,503,142,450,111,383,80,359,73"/>
+<area shape="rect" id="Node000003" href="$classJesdSyncIn.html" title=" " alt="" coords="17,5,109,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,25,201,39,200,44,122,31"/>
+<area shape="rect" id="Node000004" href="$classJesdSyncOut.html" title=" " alt="" coords="12,55,115,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="128,61,169,58,169,63,129,66"/>
+<area shape="rect" id="Node000005" href="$classAxiSerAttnMaster.html" title=" " alt="" coords="209,91,345,116"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="355,116,461,137,460,143,354,121"/>
+<area shape="rect" id="Node000006" href="$classLvdsDacSigGen.html" title=" " alt="" coords="215,140,338,165"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="352,150,432,150,432,155,352,155"/>
+<area shape="rect" id="Node000007" href="$classLvdsDacRegItf.html" title=" " alt="" coords="5,116,121,141"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="135,134,216,143,215,148,135,139"/>
+<area shape="rect" id="Node000008" href="$classLvdsDacLane.html" title=" " alt="" coords="9,165,117,191"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="131,167,215,157,215,163,131,173"/>
+<area shape="rect" id="Node000009" href="$classOutputTapDelay.html" title=" " alt="" coords="213,189,340,215"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="353,184,461,163,462,168,354,189"/>
+<area shape="rect" id="Node000010" href="$classAmcClkFreqReg.html" title=" " alt="" coords="214,239,339,264"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="352,235,383,225,450,194,503,163,506,168,452,199,385,230,353,240"/>
 </map>

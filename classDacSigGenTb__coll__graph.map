@@ -1,6 +1,9 @@
 <map id="DacSigGenTb" name="DacSigGenTb">
-<area shape="rect" id="node1" title=" " alt="" coords="82,155,191,181"/>
-<area shape="rect" id="node2" href="$classDacSigGen.html" title=" " alt="" coords="90,80,183,107"/>
-<area shape="rect" id="node3" href="$classDacSigGenReg.html" title=" " alt="" coords="5,5,124,32"/>
-<area shape="rect" id="node4" href="$classDacSigGenLane.html" title=" " alt="" coords="148,5,272,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="82,152,191,177"/>
+<area shape="rect" id="Node000002" href="$classDacSigGen.html" title=" " alt="" coords="90,79,183,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,118,139,152,134,152,134,118"/>
+<area shape="rect" id="Node000003" href="$classDacSigGenReg.html" title=" " alt="" coords="5,5,124,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="88,39,127,77,123,80,85,43"/>
+<area shape="rect" id="Node000004" href="$classDacSigGenLane.html" title=" " alt="" coords="148,5,272,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="190,42,150,80,147,77,186,38"/>
 </map>

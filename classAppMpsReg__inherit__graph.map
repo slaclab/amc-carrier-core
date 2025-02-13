@@ -1,10 +1,17 @@
 <map id="AppMpsReg" name="AppMpsReg">
-<area shape="rect" id="node1" title=" " alt="" coords="210,80,309,107"/>
-<area shape="rect" id="node4" href="$classAppMpsEncoder.html" title=" " alt="" coords="196,155,323,181"/>
-<area shape="rect" id="node2" href="$classAppMpsRegBase.html" title=" " alt="" coords="114,5,245,32"/>
-<area shape="rect" id="node3" href="$classAppMpsRegAppCh.html" title=" " alt="" coords="269,5,410,32"/>
-<area shape="rect" id="node5" href="$classAppMps.html" title=" " alt="" coords="222,229,297,256"/>
-<area shape="rect" id="node6" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="5,304,156,331"/>
-<area shape="rect" id="node7" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="181,304,338,331"/>
-<area shape="rect" id="node8" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="362,304,514,331"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="208,79,307,104"/>
+<area shape="rect" id="Node000004" href="$classAppMpsEncoder.html" title=" " alt="" coords="194,152,321,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="260,118,260,152,255,152,255,118"/>
+<area shape="rect" id="Node000002" href="$classAppMpsRegBase.html" title=" " alt="" coords="112,5,243,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,38,246,76,242,80,198,42"/>
+<area shape="rect" id="Node000003" href="$classAppMpsRegAppCh.html" title=" " alt="" coords="267,5,408,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="316,42,272,80,269,76,313,38"/>
+<area shape="rect" id="Node000005" href="$classAppMps.html" title=" " alt="" coords="220,225,295,251"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="260,191,260,225,255,225,255,191"/>
+<area shape="rect" id="Node000006" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="5,299,157,324"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="217,258,111,301,109,296,215,253"/>
+<area shape="rect" id="Node000007" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="182,299,333,324"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="260,264,260,299,255,299,255,264"/>
+<area shape="rect" id="Node000008" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="357,299,515,324"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="299,253,408,296,406,301,298,258"/>
 </map>

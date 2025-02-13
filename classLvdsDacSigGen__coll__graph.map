@@ -1,5 +1,7 @@
 <map id="LvdsDacSigGen" name="LvdsDacSigGen">
-<area shape="rect" id="node1" title=" " alt="" coords="70,80,193,107"/>
-<area shape="rect" id="node2" href="$classLvdsDacRegItf.html" title=" " alt="" coords="5,5,121,32"/>
-<area shape="rect" id="node3" href="$classLvdsDacLane.html" title=" " alt="" coords="145,5,253,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="70,79,193,104"/>
+<area shape="rect" id="Node000002" href="$classLvdsDacRegItf.html" title=" " alt="" coords="5,5,121,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,39,122,77,118,80,82,42"/>
+<area shape="rect" id="Node000003" href="$classLvdsDacLane.html" title=" " alt="" coords="145,5,253,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="181,42,144,80,140,77,177,39"/>
 </map>

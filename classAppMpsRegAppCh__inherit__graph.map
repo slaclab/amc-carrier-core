@@ -1,9 +1,15 @@
 <map id="AppMpsRegAppCh" name="AppMpsRegAppCh">
-<area shape="rect" id="node1" title=" " alt="" coords="189,5,330,32"/>
-<area shape="rect" id="node2" href="$classAppMpsReg.html" title=" " alt="" coords="210,80,309,107"/>
-<area shape="rect" id="node3" href="$classAppMpsEncoder.html" title=" " alt="" coords="196,155,323,181"/>
-<area shape="rect" id="node4" href="$classAppMps.html" title=" " alt="" coords="222,229,297,256"/>
-<area shape="rect" id="node5" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="5,304,156,331"/>
-<area shape="rect" id="node6" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="181,304,338,331"/>
-<area shape="rect" id="node7" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="362,304,514,331"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="187,5,328,31"/>
+<area shape="rect" id="Node000002" href="$classAppMpsReg.html" title=" " alt="" coords="208,79,307,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="260,44,260,79,255,79,255,44"/>
+<area shape="rect" id="Node000003" href="$classAppMpsEncoder.html" title=" " alt="" coords="194,152,321,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="260,118,260,152,255,152,255,118"/>
+<area shape="rect" id="Node000004" href="$classAppMps.html" title=" " alt="" coords="220,225,295,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="260,191,260,225,255,225,255,191"/>
+<area shape="rect" id="Node000005" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="5,299,157,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="217,258,111,301,109,296,215,253"/>
+<area shape="rect" id="Node000006" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="182,299,333,324"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="260,264,260,299,255,299,255,264"/>
+<area shape="rect" id="Node000007" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="357,299,515,324"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="299,253,408,296,406,301,298,258"/>
 </map>

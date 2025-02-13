@@ -1,8 +1,13 @@
 <map id="AmcCarrierRssi" name="AmcCarrierRssi">
-<area shape="rect" id="node1" title=" " alt="" coords="109,80,231,107"/>
-<area shape="rect" id="node3" href="$classAmcCarrierEth.html" title=" " alt="" coords="112,155,228,181"/>
-<area shape="rect" id="node2" href="$classAmcCarrierRssiObFifo.html" title=" " alt="" coords="79,5,261,32"/>
-<area shape="rect" id="node4" href="$classAmcCarrierCore.html" title=" " alt="" coords="107,229,233,256"/>
-<area shape="rect" id="node5" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="5,304,156,331"/>
-<area shape="rect" id="node6" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="181,304,338,331"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="109,79,231,104"/>
+<area shape="rect" id="Node000003" href="$classAmcCarrierEth.html" title=" " alt="" coords="112,152,228,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,118,173,152,167,152,167,118"/>
+<area shape="rect" id="Node000002" href="$classAmcCarrierRssiObFifo.html" title=" " alt="" coords="88,5,252,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,44,173,79,167,79,167,44"/>
+<area shape="rect" id="Node000004" href="$classAmcCarrierCore.html" title=" " alt="" coords="107,225,233,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="173,191,173,225,167,225,167,191"/>
+<area shape="rect" id="Node000005" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="5,299,156,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="147,261,97,301,94,296,143,257"/>
+<area shape="rect" id="Node000006" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="181,299,338,324"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="197,257,246,296,243,301,193,261"/>
 </map>

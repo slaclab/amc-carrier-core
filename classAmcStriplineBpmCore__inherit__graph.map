@@ -1,8 +1,13 @@
 <map id="AmcStriplineBpmCore" name="AmcStriplineBpmCore">
-<area shape="rect" id="node1" title=" " alt="" coords="179,80,345,107"/>
-<area shape="rect" id="node6" href="$classAmcStriplineBpmDualCore.html" title=" " alt="" coords="165,155,359,181"/>
-<area shape="rect" id="node2" href="$classJesdSyncIn.html" title=" " alt="" coords="5,5,97,32"/>
-<area shape="rect" id="node3" href="$classJesdSyncOut.html" title=" " alt="" coords="121,5,243,32"/>
-<area shape="rect" id="node4" href="$classAmcBpmDacVcoSpi.html" title=" " alt="" coords="267,5,417,32"/>
-<area shape="rect" id="node5" href="$classAmcBpmCtrl.html" title=" " alt="" coords="442,5,546,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="165,79,330,104"/>
+<area shape="rect" id="Node000006" href="$classAmcStriplineBpmDualCore.html" title=" " alt="" coords="150,152,345,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="250,118,250,152,245,152,245,118"/>
+<area shape="rect" id="Node000002" href="$classJesdSyncIn.html" title=" " alt="" coords="5,5,97,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,33,216,76,214,81,95,38"/>
+<area shape="rect" id="Node000003" href="$classJesdSyncOut.html" title=" " alt="" coords="121,5,224,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,38,237,77,233,80,193,42"/>
+<area shape="rect" id="Node000004" href="$classAmcBpmDacVcoSpi.html" title=" " alt="" coords="248,5,399,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="303,42,262,80,258,76,299,38"/>
+<area shape="rect" id="Node000005" href="$classAmcBpmCtrl.html" title=" " alt="" coords="423,5,527,31"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="426,37,285,81,283,76,425,32"/>
 </map>

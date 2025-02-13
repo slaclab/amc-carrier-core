@@ -1,6 +1,9 @@
 <map id="AmcMpsSfpCore" name="AmcMpsSfpCore">
-<area shape="rect" id="node1" title=" " alt="" coords="127,80,257,107"/>
-<area shape="rect" id="node2" href="$classSi5317a.html" title=" " alt="" coords="5,5,80,32"/>
-<area shape="rect" id="node3" href="$classAmcMpsSfpHsRepeater.html" title=" " alt="" coords="105,5,279,32"/>
-<area shape="rect" id="node4" href="$classAmcMpsSfpMon.html" title=" " alt="" coords="303,5,430,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="127,79,257,104"/>
+<area shape="rect" id="Node000002" href="$classSi5317a.html" title=" " alt="" coords="5,5,80,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,34,169,76,166,81,78,39"/>
+<area shape="rect" id="Node000003" href="$classAmcMpsSfpHsRepeater.html" title=" " alt="" coords="105,5,279,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,44,195,79,189,79,189,44"/>
+<area shape="rect" id="Node000004" href="$classAmcMpsSfpMon.html" title=" " alt="" coords="303,5,430,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="327,38,222,81,220,76,325,33"/>
 </map>

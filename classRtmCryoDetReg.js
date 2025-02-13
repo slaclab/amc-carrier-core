@@ -1,31 +1,4 @@
 var classRtmCryoDetReg =
 [
-    [ "RtmCryoDetReg.rtl", "classRtmCryoDetReg_1_1rtl.html", "classRtmCryoDetReg_1_1rtl" ],
-    [ "TPD_G", "classRtmCryoDetReg.html#a67a837684e4f18c2d236ac1d053b419b", null ],
-    [ "CNT_WIDTH_G", "classRtmCryoDetReg.html#adfe38238e311007ad230f05acbed83da", null ],
-    [ "jesdClk", "classRtmCryoDetReg.html#ab94c4142fc301d82f9adf064bf8d4b7d", null ],
-    [ "jesdRst", "classRtmCryoDetReg.html#a95d22647eed04e301616665593a663f8", null ],
-    [ "jesdClkDiv", "classRtmCryoDetReg.html#a9613c8834e7ea1889ca81743d46eae43", null ],
-    [ "kRelay", "classRtmCryoDetReg.html#a4727f5f1364da52ed949d20650684e01", null ],
-    [ "rampMaxCnt", "classRtmCryoDetReg.html#a86836511c1c1dcb66e70bddae9597a1e", null ],
-    [ "enableRamp", "classRtmCryoDetReg.html#abb3f91125e6ce2dce4ab5719872be659", null ],
-    [ "rampStartMode", "classRtmCryoDetReg.html#ae44a15607cd02cbd1d344a91aba43aa5", null ],
-    [ "selRamp", "classRtmCryoDetReg.html#a318959aecddced4abc73d8ac28332e9b", null ],
-    [ "pulseWidth", "classRtmCryoDetReg.html#a84e6c2d937e28248b89d9af651470e98", null ],
-    [ "debounceWidth", "classRtmCryoDetReg.html#aaeb6ca707b2fbd557ac82c7a98e30f04", null ],
-    [ "rtmReset", "classRtmCryoDetReg.html#a9ab9906aa780edce51814cd047bf8255", null ],
-    [ "axilClk", "classRtmCryoDetReg.html#a8e1fd4ab848b98a0c700b34cf7c90b36", null ],
-    [ "axilRst", "classRtmCryoDetReg.html#a4b36ee28c73fadc67fe1a670f1ba11ff", null ],
-    [ "axilReadMaster", "classRtmCryoDetReg.html#aada3e73ee8db4190524295bfa4dff085", null ],
-    [ "axilReadSlave", "classRtmCryoDetReg.html#a22f8db74a5a4c77e7e2767279ca36e7f", null ],
-    [ "axilWriteMaster", "classRtmCryoDetReg.html#a8cc88283087926e934bb67651263b053", null ],
-    [ "axilWriteSlave", "classRtmCryoDetReg.html#a80e5574c28ce6fd06510648d63787843", null ],
-    [ "ieee", "classRtmCryoDetReg.html#a0a6af6eef40212dbaf130d57ce711256", null ],
-    [ "std_logic_1164", "classRtmCryoDetReg.html#acd03516902501cd1c7296a98e22c6fcb", null ],
-    [ "std_logic_unsigned", "classRtmCryoDetReg.html#a598da929e807d58939b47499e8bc9fa8", null ],
-    [ "std_logic_arith", "classRtmCryoDetReg.html#a0f5ecc6613f63d07f7963a97b1b26095", null ],
-    [ "surf", "classRtmCryoDetReg.html#acabf3ea45bb9ea54f778c194fc238b6d", null ],
-    [ "StdRtlPkg", "classRtmCryoDetReg.html#af2fe75efbe0a68c3fb806bb88b1a81ba", null ],
-    [ "AxiLitePkg", "classRtmCryoDetReg.html#af98a1f0df20cf0e5f0fdb9f5999ad782", null ],
-    [ "amc_carrier_core", "classRtmCryoDetReg.html#a5173e10093c3bf1b5d95f5240e060d43", null ]
+    [ "RtmCryoDetReg.rtl", "classRtmCryoDetReg_1_1rtl.html", null ]
 ];

@@ -1,5 +1,7 @@
 <map id="RtmDigitalDebugV2b" name="RtmDigitalDebugV2b">
-<area shape="rect" id="node1" title=" " alt="" coords="96,80,255,107"/>
-<area shape="rect" id="node2" href="$classRtmDigitalDebugDin.html" title=" " alt="" coords="5,5,161,32"/>
-<area shape="rect" id="node3" href="$classRtmDigitalDebugDout.html" title=" " alt="" coords="186,5,351,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="96,79,255,104"/>
+<area shape="rect" id="Node000002" href="$classRtmDigitalDebugDin.html" title=" " alt="" coords="5,5,161,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,37,162,76,159,81,107,41"/>
+<area shape="rect" id="Node000003" href="$classRtmDigitalDebugDout.html" title=" " alt="" coords="186,5,351,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="245,41,192,81,189,76,241,37"/>
 </map>

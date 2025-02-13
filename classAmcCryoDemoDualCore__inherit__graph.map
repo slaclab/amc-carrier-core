@@ -1,6 +1,9 @@
 <map id="AmcCryoDemoDualCore" name="AmcCryoDemoDualCore">
-<area shape="rect" id="node1" title=" " alt="" coords="36,155,216,181"/>
-<area shape="rect" id="node2" href="$classAmcCryoDemoCore.html" title=" " alt="" coords="51,80,201,107"/>
-<area shape="rect" id="node3" href="$classJesdSyncIn.html" title=" " alt="" coords="5,5,116,32"/>
-<area shape="rect" id="node4" href="$classJesdSyncOut.html" title=" " alt="" coords="140,5,243,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="21,152,201,177"/>
+<area shape="rect" id="Node000002" href="$classAmcCryoDemoCore.html" title=" " alt="" coords="36,79,187,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,118,114,152,109,152,109,118"/>
+<area shape="rect" id="Node000003" href="$classJesdSyncIn.html" title=" " alt="" coords="5,5,97,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="72,40,104,77,100,80,68,43"/>
+<area shape="rect" id="Node000004" href="$classJesdSyncOut.html" title=" " alt="" coords="121,5,224,31"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="156,43,123,80,119,77,152,40"/>
 </map>

@@ -1,9 +1,15 @@
 <map id="DaqMuxV2Tb" name="DaqMuxV2Tb">
-<area shape="rect" id="node1" title=" " alt="" coords="107,229,217,256"/>
-<area shape="rect" id="node2" href="$classDaqMuxV2.html" title=" " alt="" coords="115,155,209,181"/>
-<area shape="rect" id="node3" href="$classDaqRegItf.html" title=" " alt="" coords="5,80,92,107"/>
-<area shape="rect" id="node4" href="$classDaqTrigger.html" title=" " alt="" coords="116,80,208,107"/>
-<area shape="rect" id="node5" href="$classDaqLane.html" title=" " alt="" coords="232,80,311,107"/>
-<area shape="rect" id="node6" href="$classDaqTestSig.html" title=" " alt="" coords="159,5,253,32"/>
-<area shape="rect" id="node7" href="$classDaqDecimator.html" title=" " alt="" coords="277,5,393,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="107,225,217,251"/>
+<area shape="rect" id="Node000002" href="$classDaqMuxV2.html" title=" " alt="" coords="115,152,209,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,191,165,225,159,225,159,191"/>
+<area shape="rect" id="Node000003" href="$classDaqRegItf.html" title=" " alt="" coords="5,79,92,104"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="80,109,145,150,142,154,77,114"/>
+<area shape="rect" id="Node000004" href="$classDaqTrigger.html" title=" " alt="" coords="116,79,208,104"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="165,118,165,152,159,152,159,118"/>
+<area shape="rect" id="Node000005" href="$classDaqLane.html" title=" " alt="" coords="232,79,311,104"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="244,114,181,154,178,150,241,109"/>
+<area shape="rect" id="Node000006" href="$classDaqTestSig.html" title=" " alt="" coords="159,5,253,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="228,39,263,77,259,80,224,43"/>
+<area shape="rect" id="Node000007" href="$classDaqDecimator.html" title=" " alt="" coords="277,5,393,31"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="318,43,284,80,280,77,314,39"/>
 </map>

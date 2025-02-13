@@ -1,8 +1,13 @@
 <map id="AmcGenericAdcDacCore" name="AmcGenericAdcDacCore">
-<area shape="rect" id="node1" title=" " alt="" coords="188,80,368,107"/>
-<area shape="rect" id="node6" href="$classAmcGenericAdcDacDualCore.html" title=" " alt="" coords="173,155,383,181"/>
-<area shape="rect" id="node2" href="$classJesdSyncIn.html" title=" " alt="" coords="5,5,116,32"/>
-<area shape="rect" id="node3" href="$classJesdSyncOut.html" title=" " alt="" coords="140,5,243,32"/>
-<area shape="rect" id="node4" href="$classAmcGenericAdcDacVcoSpi.html" title=" " alt="" coords="267,5,462,32"/>
-<area shape="rect" id="node5" href="$classAmcGenericAdcDacCtrl.html" title=" " alt="" coords="486,5,659,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="169,79,349,104"/>
+<area shape="rect" id="Node000006" href="$classAmcGenericAdcDacDualCore.html" title=" " alt="" coords="154,152,365,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="262,118,262,152,257,152,257,118"/>
+<area shape="rect" id="Node000002" href="$classJesdSyncIn.html" title=" " alt="" coords="5,5,97,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,33,227,76,225,81,97,38"/>
+<area shape="rect" id="Node000003" href="$classJesdSyncOut.html" title=" " alt="" coords="121,5,224,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,37,247,76,243,81,195,41"/>
+<area shape="rect" id="Node000004" href="$classAmcGenericAdcDacVcoSpi.html" title=" " alt="" coords="249,5,443,31"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="323,41,275,81,272,76,320,37"/>
+<area shape="rect" id="Node000005" href="$classAmcGenericAdcDacCtrl.html" title=" " alt="" coords="467,5,641,31"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="494,36,308,81,306,76,493,31"/>
 </map>

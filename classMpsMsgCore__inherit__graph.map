@@ -1,8 +1,13 @@
 <map id="MpsMsgCore" name="MpsMsgCore">
-<area shape="rect" id="node1" title=" " alt="" coords="206,5,313,32"/>
-<area shape="rect" id="node2" href="$classAppMpsEncoder.html" title=" " alt="" coords="196,80,323,107"/>
-<area shape="rect" id="node3" href="$classAppMps.html" title=" " alt="" coords="222,155,297,181"/>
-<area shape="rect" id="node4" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="5,229,156,256"/>
-<area shape="rect" id="node5" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="181,229,338,256"/>
-<area shape="rect" id="node6" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="362,229,514,256"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="204,5,311,31"/>
+<area shape="rect" id="Node000002" href="$classAppMpsEncoder.html" title=" " alt="" coords="194,79,321,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="260,44,260,79,255,79,255,44"/>
+<area shape="rect" id="Node000003" href="$classAppMps.html" title=" " alt="" coords="220,152,295,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="260,118,260,152,255,152,255,118"/>
+<area shape="rect" id="Node000004" href="$classAmcCarrierCoreFsbl.html" title=" " alt="" coords="5,225,157,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="217,185,111,228,109,223,215,180"/>
+<area shape="rect" id="Node000005" href="$classAmcCarrierCoreAdv.html" title=" " alt="" coords="182,225,333,251"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="260,191,260,225,255,225,255,191"/>
+<area shape="rect" id="Node000006" href="$classAmcCarrierCoreBase.html" title=" " alt="" coords="357,225,515,251"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="299,180,408,223,406,228,298,185"/>
 </map>

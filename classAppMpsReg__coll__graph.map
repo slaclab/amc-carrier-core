@@ -1,5 +1,7 @@
 <map id="AppMpsReg" name="AppMpsReg">
-<area shape="rect" id="node1" title=" " alt="" coords="101,80,200,107"/>
-<area shape="rect" id="node2" href="$classAppMpsRegBase.html" title=" " alt="" coords="5,5,136,32"/>
-<area shape="rect" id="node3" href="$classAppMpsRegAppCh.html" title=" " alt="" coords="160,5,301,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="101,79,200,104"/>
+<area shape="rect" id="Node000002" href="$classAppMpsRegBase.html" title=" " alt="" coords="5,5,136,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,38,139,76,136,80,92,42"/>
+<area shape="rect" id="Node000003" href="$classAppMpsRegAppCh.html" title=" " alt="" coords="160,5,301,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="210,42,166,80,162,76,206,38"/>
 </map>
