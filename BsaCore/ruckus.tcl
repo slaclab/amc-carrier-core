@@ -8,11 +8,10 @@ loadSource -lib amc_carrier_core -dir  "$::DIR_PATH/rtl/"
 # Get the family type
 set family [getFpgaFamily]
 
-if { ${family} == "kintexuplus" } {
-   loadSource -path "$::DIR_PATH/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp"
-}
 
-if { ${family} == "kintexu" } {
+if { ${family} eq {kintexu} ||
+     ${family} eq {kintexuplus} ||
+     ${family} eq {zynquplusRFSOC} } {
    loadSource -path "$::DIR_PATH/cores/BsaAxiInterconnect/xilinxUltraScale/BsaAxiInterconnect.dcp"
 }
 
