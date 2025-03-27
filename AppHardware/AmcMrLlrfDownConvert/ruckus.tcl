@@ -1,5 +1,5 @@
 # Load RUCKUS environment and library
-source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
+source $::env(RUCKUS_PROC_TCL)
 
 # Load local Source Code and constraints
 loadSource -lib amc_carrier_core -dir "$::DIR_PATH/core/"

@@ -1,5 +1,5 @@
 # Load RUCKUS environment and library
-source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
+source $::env(RUCKUS_PROC_TCL)
 
 # Check if AMC BAY[0] configuration
 set rootName [file rootname [file tail $::DIR_PATH]]
