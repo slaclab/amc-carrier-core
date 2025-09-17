@@ -25,8 +25,8 @@ use lcls_timing_core.TimingPkg.all;
 
 package AmcCarrierPkg is
 
-   -- https://github.com/slaclab/amc-carrier-core/releases/tag/v5.3.0
-   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"05_03_00_00";
+   -- https://github.com/slaclab/amc-carrier-core/releases/tag/v5.3.1
+   constant AMC_CARRIER_CORE_VERSION_C : slv(31 downto 0) := x"05_03_01_00";
 
    -----------------------------------------------------------
    -- Application: Configurations, Constants and Records Types

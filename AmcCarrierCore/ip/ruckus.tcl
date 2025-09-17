@@ -1,5 +1,5 @@
 # Load RUCKUS environment and library
-source -quiet $::env(RUCKUS_DIR)/vivado_proc.tcl
+source $::env(RUCKUS_PROC_TCL)
 
 loadSource -path "$::DIR_PATH/SysMonCore/SysMonCore.dcp"
 # loadIpCore -path "$::DIR_PATH/SysMonCore/SysMonCore.xci"
