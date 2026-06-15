@@ -28,42 +28,19 @@ class LutMem(pr.Device):
 
         super().__init__(name=name,description=description,**kwargs)
 
-        self.addRemoteVariables(
-            name        = 'MEM',
-            offset      = 0x0,
-            number      =  2**ADDR_WIDTH_G,
-            bitSize     =  20,
-            bitOffset   =  0,
-            stride      =  4,
-            mode        = "RW",
-            base         = pr.Int,
-            hidden      = True,
-        )
-
-        self.add(pr.LinkVariable(
+        self.add(pr.RemoteVariable(
             name         = 'MemArray',
             hidden       = True,
             description  = "LUT mem array",
-            dependencies = [self.node(f'MEM[{i}]') for i in range(2**ADDR_WIDTH_G)],
-            linkedGet    = lambda dev, var, read: dev.getArray(dev, var, read),
-            linkedSet    = lambda dev, var, value: dev.setArray(dev, var, value),
-            typeStr      = "List[Int20]",
+            offset       = 0x0,
+            numValues    = 2**ADDR_WIDTH_G,
+            valueBits    = 20,
+            valueStride  = 32,
+            bitOffset    = 0,
+            base         = pr.Int,
+            mode         = "RW",
+            verify       = False,
         ))
-
-    @staticmethod
-    def setArray(dev, var, value):
-        for variable, setpoint in zip(var.dependencies, value):
-            variable.set(setpoint, write=False)
-        dev.writeBlocks()
-        dev.verifyBlocks()
-        dev.checkBlocks()
-
-    @staticmethod
-    def getArray(dev, var, read):
-        if read:
-            dev.readBlocks(variable=var.dependencies)
-            dev.checkBlocks(variable=var.dependencies)
-        return [variable.value() for variable in var.dependencies]
 
 
 class LutCtrl(pr.Device):
