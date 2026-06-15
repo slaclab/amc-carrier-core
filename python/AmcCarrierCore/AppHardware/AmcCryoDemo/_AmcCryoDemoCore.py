@@ -34,19 +34,19 @@ class AmcCryoDemoCore(pr.Device):
 
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            self.checkBlocks(recurse=True)
+            self.waitBlocks(recurse=True)
             self.ADC[0].CalibrateAdc()
             self.ADC[1].CalibrateAdc()
             self.ADC[2].CalibrateAdc()
             self.LMK.Init()
             self.DAC.Init()
-            self.checkBlocks(recurse=True)
+            self.waitBlocks(recurse=True)
 
     def writeBlocks(self, **kwargs):
         super().writeBlocks(**kwargs)
 
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(recurse=True)
+        self._root.waitBlocks(recurse=True)
 
         self.enable.set(True)
         self.ADC[0].enable.set(True)
@@ -63,4 +63,4 @@ class AmcCryoDemoCore(pr.Device):
         self.ADC[1].enable.set(False)
         self.ADC[2].enable.set(False)
         self.DAC.enable.set(False)
-        self.checkBlocks(recurse=True)
+        self.waitBlocks(recurse=True)

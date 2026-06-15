@@ -161,7 +161,7 @@ class RtmCryoDet(pr.Device):
             self.CpldReset.set(0x0)
             # Reset all registers
             self.writeBlocks(force=True, recurse=True)
-            self.checkBlocks(recurse=True)
+            self.waitBlocks(recurse=True)
 
         @self.command(description="Reset RTM CPLD and initialize DACs to 0")
         def InitRtm():
