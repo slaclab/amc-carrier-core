@@ -25,12 +25,16 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
+import rogue
 import pyrogue as pr
 # import pyrogue.interfaces.simulation
 # import pyrogue.protocols
 # import pyrogue.utilities.fileio
 import AmcCarrierCore as amccCore
 from AmcCarrierCore.AppTop._AppTop import AppTop
+
+# changes to Block access methods starting at this release
+rogue.Version.minVersion('6.14.0')
 
 class TopLevel(pr.Device):
     def __init__(   self,
@@ -89,7 +93,7 @@ class TopLevel(pr.Device):
         super().writeBlocks(**kwargs)
 
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(recurse=True)
+        self._root.waitBlocks(recurse=True)
 
         # Calculate the BsaWaveformEngine buffer sizes
         size    = [[0]*self._numWaveformBuffers,[0]*self._numWaveformBuffers]
@@ -116,4 +120,4 @@ class TopLevel(pr.Device):
                 # Set the DAQ MUX buffer sizes
                 self.AppTop.DaqMuxV2[i].DataBufferSize.set(minSize[i])
 
-        self.checkBlocks(recurse=True)
+        self.waitBlocks(recurse=True)

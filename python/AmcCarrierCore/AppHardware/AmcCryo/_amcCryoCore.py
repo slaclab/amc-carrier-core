@@ -43,13 +43,13 @@ class AmcCryoCore(pr.Device):
         ##########
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
-            self.checkBlocks(recurse=True)
+            self.waitBlocks(recurse=True)
             self.LMK.Init()
             self.DAC[0].Init()
             self.DAC[1].Init()
             self.ADC[0].Init()
             self.ADC[1].Init()
-            self.checkBlocks(recurse=True)
+            self.waitBlocks(recurse=True)
 
         @self.command(description="Enable Front Panel LMK reference",)
         def CmdEnLmkRef():
@@ -59,7 +59,7 @@ class AmcCryoCore(pr.Device):
         def CmdDisLmkRef():
             self.LMK.LmkReg_0x011F.set(0x0)
 
-    def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
+    def writeBlocks(self, *, force=False, recurse=True, variable=None, waitEach=False, **kwargs):
         """
         Write all of the blocks held by this Device to memory
         """
@@ -68,15 +68,15 @@ class AmcCryoCore(pr.Device):
 
         # Process local blocks.
         if variable is not None:
-            variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
+            pr.startTransaction(variable._block, type=rogue.interfaces.memory.Write, wait=False)
         else:
             for block in self._blocks:
                 if force or block.stale:
-                    if block.bulkEn:
-                        block.backgroundTransaction(rogue.interfaces.memory.Write)
+                    if block.bulkOpEn:
+                        pr.startTransaction(block, type=rogue.interfaces.memory.Write, wait=False)
 
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(recurse=True)
+        self._root.waitBlocks(recurse=True)
 
         # Note: Requires that AmcCryoCore: enable: 'True' in defaults.yml file
         self.enable.set(True)
@@ -97,7 +97,7 @@ class AmcCryoCore(pr.Device):
         self.ADC[0].writeBlocks(force=force, recurse=recurse, variable=variable)
         self.ADC[1].writeBlocks(force=force, recurse=recurse, variable=variable)
 
-        self._root.checkBlocks(recurse=True)
+        self._root.waitBlocks(recurse=True)
         self.ADC[0].DigRst()
         self.ADC[1].DigRst()
 
@@ -108,4 +108,4 @@ class AmcCryoCore(pr.Device):
         self.ADC[1].enable.set(False)
 
         self.readBlocks(recurse=True)
-        self.checkBlocks(recurse=True)
+        self.waitBlocks(recurse=True)
