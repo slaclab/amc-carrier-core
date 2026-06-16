@@ -330,9 +330,9 @@ class AppTop(pr.Device):
         super().writeBlocks(**kwargs)
 
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(recurse=True)
+        self._root.waitBlocks(recurse=True)
 
         # Perform the device init
         self.Init()
 
-        self.checkBlocks(recurse=True)
+        self.waitBlocks(recurse=True)

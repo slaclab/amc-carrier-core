@@ -75,7 +75,7 @@ class AmcMicrowaveMuxCore(pr.Device):
         def CmdDisLmkRef():
             self.LMK.LmkReg_0x011F.set(0x0)
 
-    def writeBlocks(self, force=False, recurse=True, variable=None, checkEach=False):
+    def writeBlocks(self, *, force=False, recurse=True, variable=None, waitEach=False, **kwargs):
         print(f'{self.path}.writeBlocks()')
         """
         Write all of the blocks held by this Device to memory
@@ -85,15 +85,15 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         # Process local blocks.
         if variable is not None:
-            variable._block.backgroundTransaction(rogue.interfaces.memory.Write)
+            pr.startTransaction(variable._block, type=rogue.interfaces.memory.Write, wait=False)
         else:
             for block in self._blocks:
                 if force or block.stale:
-                    if block.bulkEn:
-                        block.backgroundTransaction(rogue.interfaces.memory.Write)
+                    if block.bulkOpEn:
+                        pr.startTransaction(block, type=rogue.interfaces.memory.Write, wait=False)
 
         # Retire any in-flight transactions before starting
-        self._root.checkBlocks(recurse=True)
+        self._root.waitBlocks(recurse=True)
 
         # Enables
         self.DBG.enable.set(True)
@@ -107,7 +107,7 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self.ATT.writeBlocks(force=force, recurse=recurse, variable=variable)
-        self._root.checkBlocks(recurse=True)
+        self._root.waitBlocks(recurse=True)
 
         for i in range(2):
             self.ADC[i].HW_RST.set(0x1)
@@ -118,7 +118,7 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         for x in range(2):
             self.LMK.writeBlocks(force=force, recurse=recurse, variable=variable)
-            self._root.checkBlocks(recurse=True)
+            self._root.waitBlocks(recurse=True)
 
         time.sleep(5.000)
         self.LMK.Init()
@@ -131,18 +131,18 @@ class AmcMicrowaveMuxCore(pr.Device):
 
         for i in range(4):
             self.PLL[i].writeBlocks(force=force, recurse=recurse, variable=variable)
-            self._root.checkBlocks(recurse=True)
+            self._root.waitBlocks(recurse=True)
             self.PLL[i].RegInitSeq()
 
         for i in range(2):
             for x in range(2):
                 self.DAC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
-                self._root.checkBlocks(recurse=True)
+                self._root.waitBlocks(recurse=True)
 
         for i in range(2):
             self.ADC[i].Powerup_AnalogConfig()
             self.ADC[i].writeBlocks(force=force, recurse=recurse, variable=variable)
-            self._root.checkBlocks(recurse=True)
+            self._root.waitBlocks(recurse=True)
 
         self.DBG.enable.set(False)
         # self.ATT.enable.set(False)
@@ -156,4 +156,4 @@ class AmcMicrowaveMuxCore(pr.Device):
         self.InitAmcCard()
 
         self.readBlocks(recurse=True)
-        self.checkBlocks(recurse=True)
+        self.waitBlocks(recurse=True)
