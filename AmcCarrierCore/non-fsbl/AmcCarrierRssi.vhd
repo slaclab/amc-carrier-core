@@ -31,10 +31,9 @@ use amc_carrier_core.FpgaTypePkg.all;
 
 entity AmcCarrierRssi is
    generic (
-      TPD_G                 : time             := 1 ns;
-      ETH_USR_FRAME_LIMIT_G : positive         := 4096;   -- 4kB
-      DEBUG_PATH_SELECT_G   : boolean          := false;  -- false = UDP[port=8193], true = UDP[port=8194]
-      AXI_BASE_ADDR_G       : slv(31 downto 0) := (others => '0'));
+      TPD_G               : time             := 1 ns;
+      DEBUG_PATH_SELECT_G : boolean          := false;  -- false = UDP[port=8193], true = UDP[port=8194]
+      AXI_BASE_ADDR_G     : slv(31 downto 0) := (others => '0'));
    port (
       -- Slave AXI-Lite Interface
       axilClk          : in  sl;
@@ -136,9 +135,6 @@ architecture mapping of AmcCarrierRssi is
 
    signal obRssiTspMasters : AxiStreamMasterArray(1 downto 0);
    signal obRssiTspSlaves  : AxiStreamSlaveArray(1 downto 0);
-
-   signal appDebugMaster : AxiStreamMasterType;
-   signal appDebugSlave  : AxiStreamSlaveType;
 
 begin
 
@@ -278,42 +274,18 @@ begin
    --------------------------------
    -- Debug Path: TDEST = 0xFF:0xC0
    --------------------------------
-   U_IbLimiter : entity surf.SsiFrameLimiter
-      generic map (
-         TPD_G               => TPD_G,
-         EN_TIMEOUT_G        => true,
-         MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
-         TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- AXIS_8BYTE_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of AXIS_8BYTE_CONFIG_C.TDATA_BYTES_C
-         COMMON_CLK_G        => true,
-         SLAVE_FIFO_G        => false,
-         MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
-         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
-      port map (
-         -- Slave Port
-         sAxisClk    => axilClk,
-         sAxisRst    => axilRst,
-         sAxisMaster => obAppDebugMaster,
-         sAxisSlave  => obAppDebugSlave,
-         -- Master Port
-         mAxisClk    => axilClk,
-         mAxisRst    => axilRst,
-         mAxisMaster => appDebugMaster,
-         mAxisSlave  => appDebugSlave);
-
    GEN_DEBUG_8193_PATH : if (not DEBUG_PATH_SELECT_G) generate
       ibAppDebugMaster <= rssiObMasters(4);
       rssiObSlaves(4)  <= ibAppDebugSlave;
-      rssiIbMasters(4) <= appDebugMaster;
-      appDebugSlave    <= rssiIbSlaves(4);
+      rssiIbMasters(4) <= obAppDebugMaster;
+      obAppDebugSlave  <= rssiIbSlaves(4);
    end generate;
 
    GEN_DEBUG_8194_PATH : if (DEBUG_PATH_SELECT_G) generate
       ibAppDebugMaster <= tempObMasters(2);
       tempObSlaves(2)  <= ibAppDebugSlave;
-      tempIbMasters(2) <= appDebugMaster;
-      appDebugSlave    <= tempIbSlaves(2);
+      tempIbMasters(2) <= obAppDebugMaster;
+      obAppDebugSlave  <= tempIbSlaves(2);
    end generate;
 
    ------------------------------

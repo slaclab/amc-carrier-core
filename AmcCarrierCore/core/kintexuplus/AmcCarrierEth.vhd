@@ -386,10 +386,9 @@ begin
 
       U_RssiServer : entity amc_carrier_core.AmcCarrierRssi
          generic map (
-            TPD_G                 => TPD_G,
-            ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-            DEBUG_PATH_SELECT_G   => DEBUG_PATH_SELECT_G,
-            AXI_BASE_ADDR_G       => AXI_CONFIG_C(AXI_RSSI_NONE_ILEAVE_INDEX_C).baseAddr)
+            TPD_G               => TPD_G,
+            DEBUG_PATH_SELECT_G => DEBUG_PATH_SELECT_G,
+            AXI_BASE_ADDR_G     => AXI_CONFIG_C(AXI_RSSI_NONE_ILEAVE_INDEX_C).baseAddr)
          port map (
             -- Slave AXI-Lite Interface
             axilClk            => axilClk,
@@ -440,9 +439,8 @@ begin
 
       U_RssiServer : entity amc_carrier_core.AmcCarrierRssiInterleave
          generic map (
-            TPD_G                 => TPD_G,
-            ETH_USR_FRAME_LIMIT_G => ETH_USR_FRAME_LIMIT_G,
-            AXI_BASE_ADDR_G       => AXI_CONFIG_C(AXI_RSSI_ILEAVE_INDEX_C).baseAddr)
+            TPD_G           => TPD_G,
+            AXI_BASE_ADDR_G => AXI_CONFIG_C(AXI_RSSI_ILEAVE_INDEX_C).baseAddr)
          port map (
             -- Slave AXI-Lite Interface
             axilClk          => axilClk,

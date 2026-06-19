@@ -31,9 +31,8 @@ use amc_carrier_core.FpgaTypePkg.all;
 
 entity AmcCarrierRssiInterleave is
    generic (
-      TPD_G                 : time             := 1 ns;
-      ETH_USR_FRAME_LIMIT_G : positive         := 4096;  -- 4kB
-      AXI_BASE_ADDR_G       : slv(31 downto 0) := (others => '0'));
+      TPD_G           : time             := 1 ns;
+      AXI_BASE_ADDR_G : slv(31 downto 0) := (others => '0'));
    port (
       -- Slave AXI-Lite Interface
       axilClk          : in  sl;
@@ -224,30 +223,9 @@ begin
    --------------------------------
    -- Debug Path: TDEST = 0xFF:0xC0
    --------------------------------
-   ibAppDebugMaster              <= rssiObMasters(APP_ASYNC_IDX_C);
-   rssiObSlaves(APP_ASYNC_IDX_C) <= ibAppDebugSlave;
-   U_IbLimiter : entity surf.SsiFrameLimiter
-      generic map (
-         TPD_G               => TPD_G,
-         EN_TIMEOUT_G        => true,
-         MAXIS_CLK_FREQ_G    => AXI_CLK_FREQ_C,
-         TIMEOUT_G           => TIMEOUT_C,
-         FRAME_LIMIT_G       => (ETH_USR_FRAME_LIMIT_G/8),  -- AXIS_8BYTE_CONFIG_C is 64-bit, FRAME_LIMIT_G is in units of AXIS_8BYTE_CONFIG_C.TDATA_BYTES_C
-         COMMON_CLK_G        => true,
-         SLAVE_FIFO_G        => false,
-         MASTER_FIFO_G       => false,
-         SLAVE_AXI_CONFIG_G  => AXIS_8BYTE_CONFIG_C,
-         MASTER_AXI_CONFIG_G => AXIS_8BYTE_CONFIG_C)
-      port map (
-         -- Slave Port
-         sAxisClk    => axilClk,
-         sAxisRst    => axilRst,
-         sAxisMaster => obAppDebugMaster,
-         sAxisSlave  => obAppDebugSlave,
-         -- Master Port
-         mAxisClk    => axilClk,
-         mAxisRst    => axilRst,
-         mAxisMaster => rssiIbMasters(APP_ASYNC_IDX_C),
-         mAxisSlave  => rssiIbSlaves(APP_ASYNC_IDX_C));
+   ibAppDebugMaster               <= rssiObMasters(APP_ASYNC_IDX_C);
+   rssiObSlaves(APP_ASYNC_IDX_C)  <= ibAppDebugSlave;
+   rssiIbMasters(APP_ASYNC_IDX_C) <= obAppDebugMaster;
+   obAppDebugSlave                <= rssiIbSlaves(APP_ASYNC_IDX_C);
 
 end mapping;
