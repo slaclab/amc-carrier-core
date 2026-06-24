@@ -31,7 +31,11 @@ import pyrogue as pr
 # import pyrogue.protocols
 # import pyrogue.utilities.fileio
 import AmcCarrierCore as amccCore
-from AmcCarrierCore.AppTop._AppTop import AppTop
+import AmcCarrierCore.AppTop._AppTop as AppTop
+
+# Restrict 'from ... import *' to the class, so the AppTop module alias above
+# does not leak into and clobber the AmcCarrierCore.AppTop package namespace
+__all__ = ['TopLevel']
 
 # changes to Block access methods starting at this release
 rogue.Version.minVersion('6.14.0')
@@ -71,7 +75,7 @@ class TopLevel(pr.Device):
             numWaveformBuffers= numWaveformBuffers,
             enableTpgMini     = enableTpgMini,
         ))
-        self.add(AppTop(
+        self.add(AppTop.AppTop(
             offset       = 0x80000000,
             numRxLanes   = numRxLanes,
             numTxLanes   = numTxLanes,

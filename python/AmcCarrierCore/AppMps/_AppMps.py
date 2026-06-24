@@ -17,8 +17,8 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue as pr
-from AmcCarrierCore.AppMps._AppMpsSalt import AppMpsSalt
-from AmcCarrierCore.AppMps._AppMpsThr  import AppMpsThr
+import AmcCarrierCore.AppMps._AppMpsSalt as AppMpsSalt
+import AmcCarrierCore.AppMps._AppMpsThr  as AppMpsThr
 
 class AppMps(pr.Device):
     def __init__(   self,
@@ -31,10 +31,10 @@ class AppMps(pr.Device):
         # Variables
         ##############################
 
-        self.add(AppMpsSalt(
+        self.add(AppMpsSalt.AppMpsSalt(
             offset       =  0x00000000,
         ))
 
-        self.add(AppMpsThr(
+        self.add(AppMpsThr.AppMpsThr(
             offset       =  0x00010000,
         ))

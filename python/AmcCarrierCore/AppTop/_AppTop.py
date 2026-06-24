@@ -15,8 +15,8 @@
 
 import time
 import pyrogue   as pr
-from AmcCarrierCore.AppTop._AppCore    import AppCore
-from AmcCarrierCore.AppTop._AppTopJesd import AppTopJesd
+import AmcCarrierCore.AppTop._AppCore    as AppCore
+import AmcCarrierCore.AppTop._AppTopJesd as AppTopJesd
 import AmcCarrierCore.DacSigGen as dacSigGen
 import AmcCarrierCore.DaqMuxV2  as daqMuxV2
 
@@ -76,7 +76,7 @@ class AppTop(pr.Device):
 
         for i in range(2):
             if ( (numRxLanes[i] > 0) or (numTxLanes[i] > 0) ):
-                self.add(AppTopJesd(
+                self.add(AppTopJesd.AppTopJesd(
                     name         = f'AppTopJesd[{i}]',
                     offset       =  0x40000000 + (i * 0x10000000),
                     numRxLanes   =  numRxLanes[i],
@@ -245,7 +245,7 @@ class AppTop(pr.Device):
             jesdTxDevices = self.find(typ=jesd.JesdTx)
             dacDevices    = self.find(typ=ti.Dac38J84)
             sigGenDevices = self.find(typ=dacSigGen.DacSigGen)
-            appCore       = self.find(typ=AppCore)
+            appCore       = self.find(typ=AppCore.AppCore)
 
             rxEnables  = [rx.Enable.get()  for rx  in jesdRxDevices]
             txEnables  = [tx.Enable.get()  for tx  in jesdTxDevices]
