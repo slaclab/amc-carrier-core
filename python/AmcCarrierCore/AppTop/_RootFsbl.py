@@ -20,11 +20,7 @@ import pyrogue
 import rogue.protocols.udp
 import rogue.protocols.srp
 
-import AmcCarrierCore.AppTop._TopLevel as FpgaTopLevel
-
-# Restrict 'from ... import *' to the class, so the FpgaTopLevel module alias above
-# does not leak into and clobber the AmcCarrierCore.AppTop package namespace
-__all__ = ['RootFsbl']
+import AmcCarrierCore.AppTop as appTop
 
 class RootFsbl(pyrogue.Root):
     def __init__(self, *, ipAddr='10.0.0.1', name='base', description = '', **kwargs):
@@ -45,4 +41,4 @@ class RootFsbl(pyrogue.Root):
         # Top level module should be added here.
         # Top level is a sub-class of AmcCarrierCore.AppTop.TopLevel
         # SRP interface should be passed as an arg
-        self.add(FpgaTopLevel.TopLevel(memBase=self.srp))
+        self.add(appTop.TopLevel(memBase=self.srp))
