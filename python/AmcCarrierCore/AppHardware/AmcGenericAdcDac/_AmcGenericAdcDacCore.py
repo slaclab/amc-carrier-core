@@ -40,6 +40,16 @@ class AmcGenericAdcDacCore(pr.Device):
 
         @self.command(description="Initialization for AMC card's JESD modules",)
         def InitAmcCard():
+            # Note: LMK.Init() is a SYNC, not a re-initialisation. It toggles
+            # register 0x143 and nothing else, so AppTop.Init()'s retry loop
+            # cannot recover an LMK whose clock has actually dropped out.
+            #
+            # Adding a hardware reset and register reload here was tried and
+            # is a regression: bring-up went from 8/9 to 0/8, failing in under
+            # 4 s with an SPI verify error inside LMK.Init(), with or without a
+            # longer settle after the reset. The reset in writeBlocks() runs
+            # once before the retry loop and is safe; doing it per retry is
+            # not. Do not re-add it without measuring.
             self.LMK.Init()
             time.sleep(1.000)
             for i in range(2):
