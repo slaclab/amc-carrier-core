@@ -191,7 +191,7 @@ begin
    ---------------------------------
    -- Thresholds
    ---------------------------------
-   comb : process (axilRst, mpsReg, mpsSelect, r, rstTripValue) is
+   comb : process (axilRst, diagnosticBus, mpsReg, mpsSelect, r, rstTripValue) is
       variable v       : RegType;
       variable chan    : integer;
       variable thold   : integer;
