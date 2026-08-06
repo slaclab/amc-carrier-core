@@ -69,6 +69,24 @@ class AmcGenericAdcDacCore(pr.Device):
         self.DBG.writeBlocks(force=force, recurse=recurse, variable=variable)
         self._root.waitBlocks(recurse=True)
 
+        # Pulse the LMK's physical RESET pin before the SPI soft reset.
+        #
+        # LMK.RESET is register 0x000 bit 7, which is write-only, so the
+        # read-modify-write cannot preserve the other bits of that register
+        # (notably 3WIREDIS at bit 4).  It also does not reliably recover a
+        # part that has ended up in a bad state: an LMK whose PLL2 has lost
+        # lock can survive any number of soft resets and register reloads,
+        # which then presents downstream as a non-constant SysRef period and
+        # an AppTop.Init() that exhausts all of its JESD retries.
+        #
+        # The hardware pin returns the part to power-on defaults for real, so
+        # the register load below always starts from a known state.
+        self.DBG.LmkRst.set(0x1)
+        self._root.waitBlocks(recurse=True)
+        self.DBG.LmkRst.set(0x0)
+        self._root.waitBlocks(recurse=True)
+        time.sleep(0.100)
+
         self.LMK.RESET.set(0x1)
         self.LMK.RESET.set(0x0)
 
