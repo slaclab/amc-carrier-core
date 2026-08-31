@@ -30,7 +30,8 @@ use unisim.vcomponents.all;
 
 entity AmcCarrierBsi is
    generic (
-      TPD_G        : time := 1 ns;
+      TPD_G        : time    := 1 ns;
+      IPMC_INIT_G  : boolean := false;
       BUILD_INFO_G : BuildInfoType);
    port (
       -- DDR Memory Status
@@ -120,11 +121,15 @@ architecture rtl of AmcCarrierBsi is
       ramData        => x"00",
       bootReq        => '0',
       bootAddr       => x"04000000",    -- Default to 2nd stage boot
-      slotNumber     => x"00",
-      crateId        => x"0000",
-      macAddress     => (others => (others => '0')),
+      slotNumber     => ite(IPMC_INIT_G, x"03", x"00"),
+      crateId        => ite(IPMC_INIT_G, x"0001", x"0000"),
+      macAddress     => (
+         0           => ite(IPMC_INIT_G, x"08_00_56_00_00_00", x"00_00_00_00_00_00"),
+         1           => ite(IPMC_INIT_G, x"08_00_56_00_00_01", x"00_00_00_00_00_00"),
+         2           => ite(IPMC_INIT_G, x"08_00_56_00_00_02", x"00_00_00_00_00_00"),
+         3           => ite(IPMC_INIT_G, x"08_00_56_00_00_03", x"00_00_00_00_00_00")),
       localIp        => x"0000000A",
-      rst            => (others=>'0'),
+      rst            => (others => '0'),
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
