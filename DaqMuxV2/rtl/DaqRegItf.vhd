@@ -122,6 +122,7 @@ architecture rtl of DaqRegItf is
    signal s_bsa         : slv(127 downto 0);
    signal s_sampleValid : slv(N_DATA_IN_G-1 downto 0) := (others => '0');
    signal s_linkReady   : slv(N_DATA_IN_G-1 downto 0) := (others => '0');
+   signal s_devRst      : sl                          := '1';
 
    signal syncFifoIn  : slv(32*N_DATA_OUT_G-1 downto 0);
    signal syncFifoOut : slv(32*N_DATA_OUT_G-1 downto 0);
@@ -145,6 +146,16 @@ begin
          clk     => axiClk_i,
          dataIn  => linkReady_i,
          dataOut => s_linkReady);
+
+   -- Sampled in the AXI-Lite domain so that it remains readable while devClk_i
+   -- is stopped (e.g. before the external clock chips have been programmed)
+   U_SyncDevRst : entity surf.Synchronizer
+      generic map (
+         TPD_G   => TPD_G)
+      port map (
+         clk     => axiClk_i,
+         dataIn  => devRst_i,
+         dataOut => s_devRst);
 
    -- Counts the number of trigger pulses
    U_SyncStatusVector : entity surf.SyncStatusVector
@@ -249,6 +260,8 @@ begin
                v.axilReadSlave.rdata(15 downto 8)  := toSlv(N_DATA_IN_G,8);
                v.axilReadSlave.rdata(23 downto 16) := toSlv(N_DATA_OUT_G,8);
                v.axilReadSlave.rdata(31 downto 24) := x"00";
+            when 16#0e# =>              -- ADDR (0x38)
+               v.axilReadSlave.rdata(0) := s_devRst;
             when 16#10# to 16#1F# =>    -- ADDR (0x40)
                for I in (N_DATA_OUT_G-1) downto 0 loop
                   if (axilReadMaster.araddr(5 downto 2) = I) then

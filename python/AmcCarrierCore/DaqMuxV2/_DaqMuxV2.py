@@ -16,6 +16,8 @@
 # contained in the LICENSE.txt file.
 #-----------------------------------------------------------------------------
 
+import time
+
 import pyrogue as pr
 
 class DaqMuxV2(pr.Device):
@@ -287,6 +289,17 @@ class DaqMuxV2(pr.Device):
             mode         = 'RO',
         ))
 
+        self.add(pr.RemoteVariable(
+            name         = "DevReset",
+            description  = "Device Clock (devClk_i) Reset Status",
+            offset       =  0x38,
+            bitSize      =  1,
+            bitOffset    =  0,
+            mode         = 'RO',
+            base         = pr.Bool,
+            pollInterval =  1,
+        ))
+
         self.addRemoteVariables(
             name         = "InputMuxSel",
             description  = "Input Mux select. Maximum number of channels is 29.",
@@ -494,3 +507,28 @@ class DaqMuxV2(pr.Device):
         def ClearTrigStatus():
             self.TriggerClearStatus.set(1)
             self.TriggerClearStatus.set(0)
+
+    def DspRstWait(self, timeout=0):
+        # Initialize watchdog counter
+        watchdog_counter = 0
+        watchdog_limit = 10  # 10 iterations of 0.1s = 1 second
+
+        # Convert timeout from seconds to iterations of 0.1s
+        timeout_iterations = int(timeout / 0.1) if timeout > 0 else float('inf')
+        timeout_counter = 0
+
+        # Wait for the device clock to come out of reset
+        while watchdog_counter < watchdog_limit:
+            if not self.DevReset.get():
+                watchdog_counter += 1
+            else:
+                watchdog_counter = 0  # Reset watchdog if condition is broken
+
+            # Handle timeout condition
+            if timeout_counter >= timeout_iterations:
+                return True  # Timed out
+
+            timeout_counter += 1
+            time.sleep(0.1)
+
+        return False  # Watchdog condition met
