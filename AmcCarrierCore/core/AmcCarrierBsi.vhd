@@ -133,6 +133,48 @@ architecture rtl of AmcCarrierBsi is
       axilReadSlave  => AXI_LITE_READ_SLAVE_INIT_C,
       axilWriteSlave => AXI_LITE_WRITE_SLAVE_INIT_C);
 
+   -- The state machine unconditionally latches slotNumber, crateId, bootAddr and
+   -- macAddress out of the dual port RAM on every scan pass.  An all zero RAM at
+   -- power up therefore overwrites REG_INIT_C before the IPMC has a chance to
+   -- write anything, which zeros out the defaults on boards without an IPMC.
+   -- Seed those RAM locations with the REG_INIT_C values instead.
+   constant RAM_INIT_LEN_C : positive := 3*256 - 1;  -- "XX," per byte, no trailing comma
+
+   function makeRamInitParam return string is
+      constant HEX_C : string(1 to 16) := "0123456789ABCDEF";
+      variable mem   : RomType         := (others => (others => '0'));
+      variable ret   : string(1 to RAM_INIT_LEN_C);
+      variable byte  : slv(7 downto 0);
+   begin
+      -- Only the locations that the IPMC drives need seeding.  Everything else is
+      -- either sourced by this module or unused, so it stays zero.
+      for i in 0 to BSI_MAC_SIZE_C-1 loop
+         for j in 0 to 5 loop
+            mem(16*i+j) := REG_INIT_C.macAddress(i)(8*j+7 downto 8*j);
+         end loop;
+      end loop;
+      mem(16#F6#) := REG_INIT_C.bootAddr(7 downto 0);
+      mem(16#F7#) := REG_INIT_C.bootAddr(15 downto 8);
+      mem(16#F8#) := REG_INIT_C.bootAddr(23 downto 16);
+      mem(16#F9#) := REG_INIT_C.bootAddr(31 downto 24);
+      mem(16#FD#) := REG_INIT_C.crateId(7 downto 0);
+      mem(16#FE#) := REG_INIT_C.crateId(15 downto 8);
+      mem(16#FF#) := REG_INIT_C.slotNumber;
+
+      -- XPM's MEMORY_INIT_PARAM is a comma separated hex list, address 0 first
+      for i in 0 to 255 loop
+         byte       := mem(i);
+         ret(3*i+1) := HEX_C(conv_integer(byte(7 downto 4))+1);
+         ret(3*i+2) := HEX_C(conv_integer(byte(3 downto 0))+1);
+         if (i /= 255) then
+            ret(3*i+3) := ',';
+         end if;
+      end loop;
+      return ret;
+   end function makeRamInitParam;
+
+   constant RAM_INIT_PARAM_C : string(1 to RAM_INIT_LEN_C) := makeRamInitParam;
+
    signal r   : RegType := REG_INIT_C;
    signal rin : RegType;
 
@@ -231,10 +273,16 @@ begin
    ----------------
    U_RAM : entity surf.TrueDualPortRam
       generic map (
-         TPD_G        => TPD_G,
-         MODE_G       => "read-first",
-         DATA_WIDTH_G => 8,
-         ADDR_WIDTH_G => 8)
+         TPD_G               => TPD_G,
+         MODE_G              => "read-first",
+         -- XPM backend required: the inferred backend's INIT_G applies one value
+         -- to every address, so it cannot express a per address init map
+         SYNTH_MODE_G        => "xpm",
+         MEMORY_TYPE_G       => "block",
+         MEMORY_INIT_PARAM_G => RAM_INIT_PARAM_C,
+         COMMON_CLK_G        => true,
+         DATA_WIDTH_G        => 8,
+         ADDR_WIDTH_G        => 8)
       port map (
          -- Port A
          clka  => axilClk,
