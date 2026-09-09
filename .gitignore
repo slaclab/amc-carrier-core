@@ -46,3 +46,12 @@ ghdl/
 *.bit
 *.mcs
 *.vho
+
+# AI Agents
+.vscode/
+.cursor/
+.claude/
+.gsd/
+.planning/
+planning/
+CLAUDE.md
