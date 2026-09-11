@@ -1,8 +1,26 @@
 # Load RUCKUS library
 source $::env(RUCKUS_PROC_TCL)
 
-# Get the family type
-set family [getFpgaFamily]
+# Get the FPGA architecture and map it onto the directory name that actually
+# exists under rtl/ and coregen/. The FAMILY property is not usable here: on
+# this part FAMILY and ARCHITECTURE both return the same string, but on other
+# parts FAMILY collapses distinct architectures that need different sources.
+set arch [getFpgaArch]
+if { ${arch} eq {kintexu} ||
+     ${arch} eq {virtexu} } {
+   set family "kintexu"
+} elseif { ${arch} eq {kintexuplus}     ||
+           ${arch} eq {virtexuplus}     ||
+           ${arch} eq {virtexuplusHBM}  ||
+           ${arch} eq {zynquplus}       ||
+           ${arch} eq {zynquplusRFSOC} } {
+   set family "kintexuplus"
+} else {
+   # loadSource -dir on a directory that doesn't exist is a silent no-op in
+   # ruckus, so falling through here would load zero AppMps RTL files and
+   # still report success. Fail loudly instead.
+   error "AppMps/ruckus.tcl: unsupported FPGA architecture '${arch}'; no AppMps rtl/coregen directory serves it"
+}
 
 # Load Source Code
 loadSource -lib amc_carrier_core -dir "$::DIR_PATH/rtl"
@@ -35,10 +53,28 @@ if { [info exists ::env(APP_MPS_LNODE)] != 1 || $::env(APP_MPS_LNODE) == 0 } {
    } elseif {  $::env(PRJ_PART) eq {XCKU060-FFVA1156-2-E} ||
                $::env(PRJ_PART) eq {XCKU095-FFVA1156-2-E} } {
       loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu060.xdc"
+   } elseif { $::env(PRJ_PART) eq {XCZU48DR-FFVG1517-2-E} } {
+      # No AppMps/xdc file is loaded for this part. Everything in
+      # MpsAppNodeKcu11p.xdc except the pblock is already present, with
+      # correct hierarchy paths, in rfmc-carrier-core's own timing
+      # constraints, and the pblock itself resizes to CLOCKREGION_X2Y6, a
+      # clock region coordinate that does not exist on this die.
+      puts "AppMps/ruckus.tcl: app-node placement constraints for this part are supplied by the carrier core, not AppMps/xdc"
    } else {
       loadConstraints -path "$::DIR_PATH/xdc/MpsAppNodeKcu11p.xdc"
    }
 
 } else {
-   loadConstraints -path "$::DIR_PATH/xdc/MpsLinkNodeSaltSerdes.xdc"
+
+   if { $::env(PRJ_PART) eq {XCZU48DR-FFVG1517-2-E} } {
+      # No AppMps/xdc file is loaded for this part. This board's
+      # mpsBusRxP/N and mpsTxP/N are already pinned in the carrier-core
+      # constraints independent of slot type, and the four scalar rtmHs
+      # pin assignments in MpsLinkNodeSaltSerdes.xdc name ports that
+      # AppMps does not have.
+      puts "AppMps/ruckus.tcl: link-node placement constraints for this part are supplied by the carrier core, not AppMps/xdc"
+   } else {
+      loadConstraints -path "$::DIR_PATH/xdc/MpsLinkNodeSaltSerdes.xdc"
+   }
+
 }
