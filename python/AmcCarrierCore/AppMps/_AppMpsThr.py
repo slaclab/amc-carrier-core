@@ -110,3 +110,14 @@ class AppMpsThr(pr.Device):
             base         = pr.UInt,
             mode         = "RW",
         ))
+
+        self.add(pr.RemoteVariable(
+            name         = "MpsCount",
+            description  = "Count of encoded machine protection messages",
+            offset       =  0x10,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
