@@ -122,7 +122,7 @@ architecture rtl of AmcCarrierBsi is
       bootReq        => '0',
       bootAddr       => x"04000000",    -- Default to 2nd stage boot
       slotNumber     => ite(IPMC_INIT_G, x"03", x"00"),
-      crateId        => ite(IPMC_INIT_G, x"0001", x"0000"),
+      crateId        => ite(IPMC_INIT_G, x"0000", x"0000"),
       macAddress     => (
          0           => ite(IPMC_INIT_G, x"08_00_56_00_00_00", x"00_00_00_00_00_00"),
          1           => ite(IPMC_INIT_G, x"08_00_56_00_00_01", x"00_00_00_00_00_00"),
