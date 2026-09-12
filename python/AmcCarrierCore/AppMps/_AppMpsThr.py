@@ -92,6 +92,28 @@ class AppMpsThr(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(
+            name         = "Lcls2Count",
+            description  = "Compiled LCLS-II message size readback in bytes, not an event counter",
+            offset       =  0x04,
+            bitSize      =  8,
+            bitOffset    =  16,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "Lcls1Count",
+            description  = "Compiled LCLS-I message size readback in bytes, not an event counter",
+            offset       =  0x04,
+            bitSize      =  8,
+            bitOffset    =  24,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "BeamDestMask",
             description  = "One bit per destination for BPM or kicker not idle for idelEn=true",
             offset       =  0x08,
@@ -112,11 +134,121 @@ class AppMpsThr(pr.Device):
         ))
 
         self.add(pr.RemoteVariable(
+            name         = "MpsMsgDropCnt",
+            description  = "Count of encoder output overflow, a different failure than a transmit error",
+            offset       =  0x0C,
+            bitSize      =  32,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
             name         = "MpsCount",
             description  = "Count of encoded machine protection messages",
             offset       =  0x10,
             bitSize      =  32,
             bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgAppId",
+            description  = "Application ID field of the last encoded message",
+            offset       =  0x14,
+            bitSize      =  10,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgLcls",
+            description  = "LCLS mode field of the last encoded message: 0 = LCLS-II, 1 = LCLS-I",
+            offset       =  0x14,
+            bitSize      =  1,
+            bitOffset    =  10,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgTimeStamp",
+            description  = "Time stamp field of the last encoded message",
+            offset       =  0x14,
+            bitSize      =  16,
+            bitOffset    =  16,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgByte0",
+            description  = "Byte 0 (ascending order) of the last encoded message",
+            offset       =  0x18,
+            bitSize      =  8,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgByte1",
+            description  = "Byte 1 (ascending order) of the last encoded message",
+            offset       =  0x18,
+            bitSize      =  8,
+            bitOffset    =  8,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgByte2",
+            description  = "Byte 2 (ascending order) of the last encoded message",
+            offset       =  0x18,
+            bitSize      =  8,
+            bitOffset    =  16,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgByte3",
+            description  = "Byte 3 (ascending order) of the last encoded message",
+            offset       =  0x18,
+            bitSize      =  8,
+            bitOffset    =  24,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgByte4",
+            description  = "Byte 4 (ascending order) of the last encoded message",
+            offset       =  0x1C,
+            bitSize      =  8,
+            bitOffset    =  0,
+            base         = pr.UInt,
+            mode         = "RO",
+            pollInterval = 1,
+        ))
+
+        self.add(pr.RemoteVariable(
+            name         = "LastMsgByte5",
+            description  = "Byte 5 (ascending order) of the last encoded message",
+            offset       =  0x1C,
+            bitSize      =  8,
+            bitOffset    =  8,
             base         = pr.UInt,
             mode         = "RO",
             pollInterval = 1,
