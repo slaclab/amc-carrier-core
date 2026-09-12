@@ -17,6 +17,7 @@
 #-----------------------------------------------------------------------------
 
 import pyrogue        as pr
+import surf.xilinx    as xil
 import LclsTimingCore as timingCore
 
 class AmcCarrierTiming(pr.Device):
@@ -46,6 +47,6 @@ class AmcCarrierTiming(pr.Device):
             numTrig = numCoreTrigs,
         ))
 
-        self.add(timingCore.GthRxAlignCheck(
+        self.add(xil.GtRxAlignCheck(
             offset = 0x00800000,
         ))
