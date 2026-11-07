@@ -55,6 +55,7 @@ class TopLevel(pr.Device):
             numWaveformBuffers  = 4,
             expand          = True,
             enableTpgMini   = True,
+            jesdGtClass     = None,     # GT DRP register map: None = Gthe3Channel (KU040), xil.Gthe4Channel on KU15P
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)
 
@@ -76,6 +77,7 @@ class TopLevel(pr.Device):
             numRxLanes   = numRxLanes,
             numTxLanes   = numTxLanes,
             enJesdDrp    = enJesdDrp,
+            jesdGtClass  = jesdGtClass,
             numSigGen    = numSigGen,
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,

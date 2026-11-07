@@ -33,6 +33,7 @@ class AppTop(pr.Device):
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
             numWaveformBuffers  = 4,
+            jesdGtClass    = None,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
@@ -81,6 +82,7 @@ class AppTop(pr.Device):
                     numRxLanes   =  numRxLanes[i],
                     numTxLanes   =  numTxLanes[i],
                     enJesdDrp    =  enJesdDrp,
+                    gtClass      =  jesdGtClass,
                     expand       =  True,
                 ))
 
