@@ -219,6 +219,15 @@ def runJesdRxEyeScan(args, jesdPlan, root, appTop, *, version=None, measureLineR
             time.sleep(args.settle)
             return checkLink()
 
+    def tryBringUp():
+        # A bring-up that raises (AppTop.Init() gives up with pr.DeviceError after
+        # its retries, for instance on a bay without an AMC card) is a failed
+        # bring-up, not a crash of the scan
+        try:
+            return bringUpLink()
+        except Exception as e:  # noqa: BLE001
+            return False, [f'bring-up raised {type(e).__name__}: {e}']
+
     code = 0
     scanned = False          # a scan pulsed the shared GT reset, so the TX side needs its bring-up
     try:
@@ -235,7 +244,7 @@ def runJesdRxEyeScan(args, jesdPlan, root, appTop, *, version=None, measureLineR
                 print('JESD link is not healthy, running the bring-up first:')
                 for reason in reasons:
                     print(f'  {reason}')
-                ok, reasons = bringUpLink()
+                ok, reasons = tryBringUp()
             if not ok:
                 if dumpLink is not None:
                     dumpLink()
@@ -271,6 +280,9 @@ def runJesdRxEyeScan(args, jesdPlan, root, appTop, *, version=None, measureLineR
             enable = int(jesdTop.JesdRx.Enable.get())
             enables[bay] = f'0x{enable:X}'
             byLane = {target.lane: target for target in jesdTop.eyeScanLanes()}
+            if not byLane:
+                print(f'Bay {bay}: no GT DRP devices in the tree (root built with enJesdDrp False)')
+                return 2
             for laneId, (b, lane) in laneIds.items():
                 if b != bay:
                     continue
@@ -309,7 +321,7 @@ def runJesdRxEyeScan(args, jesdPlan, root, appTop, *, version=None, measureLineR
         # The shared GT reset dropped the TX/DAC link: bring the JESD link back
         if args.bringUp and scanned:
             print('Restoring the JESD link after the scan')
-            ok, reasons = bringUpLink()
+            ok, reasons = tryBringUp()
             if ok:
                 print('JESD link is healthy')
             else:

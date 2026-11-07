@@ -29,8 +29,8 @@ class AppTopJesd(pr.Device):
             numRxLanes  = 6,
             numTxLanes  = 2,
             enJesdDrp   = False,
-            gtClass     = None,
             expand      = False,
+            gtClass     = None,
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)
 
@@ -39,7 +39,6 @@ class AppTopJesd(pr.Device):
         # Both carry the eye scan child. The devices are named after the class.
         if gtClass is None:
             gtClass = xil.Gthe3Channel
-        self._gtClass    = gtClass
         self._gtName     = gtClass.__name__
         self._numRxLanes = numRxLanes
 
@@ -85,8 +84,15 @@ class AppTopJesd(pr.Device):
                 jesd.JesdRxEyeScanLink.connectRxReset(self.gtChannel(i), self.JesdRx, i)
 
     def gtChannel(self, lane):
-        """Return the GT channel DRP device of a lane (Gthe3Channel[lane] or Gthe4Channel[lane])."""
-        return self.node(f'{self._gtName}[{lane}]')
+        """Return the GT channel DRP device of a lane (Gthe3Channel[lane] or Gthe4Channel[lane]).
+
+        Raises ValueError when the device is not in the tree (enJesdDrp False
+        or no such lane).
+        """
+        node = self.node(f'{self._gtName}[{lane}]')
+        if node is None:
+            raise ValueError(f'{self.path} has no {self._gtName}[{lane}] (enJesdDrp False or no such lane)')
+        return node
 
     def eyeScanLanes(self):
         """Return the EyeScanLane list of the RX lanes for surf.xilinx.eyescan.runEyeScan.

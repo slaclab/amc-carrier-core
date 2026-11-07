@@ -29,11 +29,11 @@ class AppTop(pr.Device):
             numRxLanes     = [0,0],
             numTxLanes     = [0,0],
             enJesdDrp      = False,
-            jesdGtClass    = None,
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
             numWaveformBuffers  = 4,
+            jesdGtClass    = None,
             **kwargs):
         super().__init__(name=name, description=description, **kwargs)
 
