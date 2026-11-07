@@ -29,10 +29,18 @@ class AppTopJesd(pr.Device):
             numRxLanes  = 6,
             numTxLanes  = 2,
             enJesdDrp   = False,
+            gtClass     = None,
             expand      = False,
             **kwargs):
         super().__init__(name=name, description=description, expand=expand, **kwargs)
 
+        # GT channel register map of the DRP devices: Gthe3Channel on the
+        # UltraScale carriers (KU040), Gthe4Channel on UltraScale+ (KU15P).
+        # Both carry the eye scan child. The devices are named after the class.
+        if gtClass is None:
+            gtClass = xil.Gthe3Channel
+        self._gtClass    = gtClass
+        self._gtName     = gtClass.__name__
         self._numRxLanes = numRxLanes
 
         ##############################
@@ -59,11 +67,9 @@ class AppTopJesd(pr.Device):
 
         # Check if DRP enabled and non-zero lane count
         if ((maxlanes > 0) and enJesdDrp):
-            # GTHE3 register map (KU040 carriers). UltraScale+ carriers (KU15P)
-            # need xil.Gthe4Channel here; the eye scan child exists on both.
             for i in range(maxlanes):
-                self.add(xil.Gthe3Channel(
-                    name   = f'Gthe3Channel[{i}]',
+                self.add(gtClass(
+                    name   = f'{self._gtName}[{i}]',
                     offset =  0x03000000 + (i * 0x100000),
                     expand =  False,
                 ))
@@ -76,7 +82,11 @@ class AppTopJesd(pr.Device):
             # (--parallel false) and re-run the JESD bring-up afterwards.
             # Registration only stores the hook; it never touches the hardware.
             for i in range(numRxLanes):
-                jesd.JesdRxEyeScanLink.connectRxReset(self.Gthe3Channel[i], self.JesdRx, i)
+                jesd.JesdRxEyeScanLink.connectRxReset(self.gtChannel(i), self.JesdRx, i)
+
+    def gtChannel(self, lane):
+        """Return the GT channel DRP device of a lane (Gthe3Channel[lane] or Gthe4Channel[lane])."""
+        return self.node(f'{self._gtName}[{lane}]')
 
     def eyeScanLanes(self):
         """Return the EyeScanLane list of the RX lanes for surf.xilinx.eyescan.runEyeScan.
@@ -86,8 +96,8 @@ class AppTopJesd(pr.Device):
         return [
             es.EyeScanLane(
                 lane = i,
-                gt   = self.Gthe3Channel[i],
+                gt   = self.gtChannel(i),
                 link = jesd.JesdRxEyeScanLink(self.JesdRx, i),
             )
-            for i in range(self._numRxLanes) if f'Gthe3Channel[{i}]' in self.nodes
+            for i in range(self._numRxLanes) if f'{self._gtName}[{i}]' in self.nodes
         ]

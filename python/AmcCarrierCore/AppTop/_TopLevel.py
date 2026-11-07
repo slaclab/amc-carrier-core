@@ -44,6 +44,7 @@ class TopLevel(pr.Device):
             numRxLanes      = [0,0],
             numTxLanes      = [0,0],
             enJesdDrp       = False,
+            jesdGtClass     = None,     # GT DRP register map: None = Gthe3Channel (KU040), xil.Gthe4Channel on KU15P
             # Signal Generator Parameters
             numSigGen       = [0,0],
             sizeSigGen      = [0,0],
@@ -76,6 +77,7 @@ class TopLevel(pr.Device):
             numRxLanes   = numRxLanes,
             numTxLanes   = numTxLanes,
             enJesdDrp    = enJesdDrp,
+            jesdGtClass  = jesdGtClass,
             numSigGen    = numSigGen,
             sizeSigGen   = sizeSigGen,
             modeSigGen   = modeSigGen,

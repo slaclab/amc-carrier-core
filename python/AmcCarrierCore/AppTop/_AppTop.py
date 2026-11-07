@@ -29,6 +29,7 @@ class AppTop(pr.Device):
             numRxLanes     = [0,0],
             numTxLanes     = [0,0],
             enJesdDrp      = False,
+            jesdGtClass    = None,
             numSigGen      = [0,0],
             sizeSigGen     = [0,0],
             modeSigGen     = [False,False],
@@ -81,6 +82,7 @@ class AppTop(pr.Device):
                     numRxLanes   =  numRxLanes[i],
                     numTxLanes   =  numTxLanes[i],
                     enJesdDrp    =  enJesdDrp,
+                    gtClass      =  jesdGtClass,
                     expand       =  True,
                 ))
 
