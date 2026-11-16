@@ -1,6 +1,7 @@
 
 from AmcCarrierCore.AppTop._AppTop import *
 from AmcCarrierCore.AppTop._AppTopJesd import *
+from AmcCarrierCore.AppTop._JesdRxEyeScan import *
 from AmcCarrierCore.AppTop._TopLevel import *
 from AmcCarrierCore.AppTop._AppCore  import *
 
