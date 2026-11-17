@@ -12,8 +12,10 @@
 #
 # The only RX reset of a bay is JesdRx.ResetGTs, which AppTopJesd204b feeds to
 # gtwiz_reset_all: every GT of the bay, RX and TX. The lanes therefore scan one
-# at a time (--parallel false is enforced) and the JESD bring-up runs again
-# after the scan so the TX (DAC) link comes back.
+# at a time (--parallel false is enforced) and, when the scan may have pulsed
+# that reset, the JESD bring-up runs again after it so the TX (DAC) link comes
+# back. With --resetPolicy Never and no --softCold the scan never resets a GT,
+# so it never brings the link up either: it is a passive measurement.
 #-----------------------------------------------------------------------------
 # This file is part of the rogue software platform. It is subject to
 # the license terms in the LICENSE.txt file found in the top-level directory
@@ -65,7 +67,9 @@ def addJesdRxEyeScanArguments(parser):
                         help="Skip the JESD link check before the scan and the bring-up after it. "
                              "By default the link is checked (and brought up if needed) first, and brought "
                              "up again afterwards because the shared GT reset drops the TX/DAC link too. "
-                             "With this flag the link is left as the scan left it.")
+                             "With --resetPolicy Never (and no --softCold) the scan resets nothing, so the "
+                             "link is checked but never brought up. With this flag the link is left as the "
+                             "scan left it.")
     parser.add_argument("--force", action='store_true',
                         help="Scan anyway when the measured line rate disagrees with --lineRate or the "
                              "JESD link cannot be brought up")
@@ -202,7 +206,9 @@ def runJesdRxEyeScan(args, jesdPlan, root, appTop, *, version=None, measureLineR
     bringUpLink : callable, optional
         ``bringUpLink() -> (ok, [reasons])``; default ``appTop.Init()`` then
         ``checkLink()``. Runs before the scan when the check fails and after
-        every scan, because the shared GT reset drops the TX link.
+        every scan, because the shared GT reset drops the TX link. Never runs
+        when the scan cannot reset a GT (``--resetPolicy Never`` without
+        ``--softCold``): the bring-up is itself a reset of the bay.
     dumpLink : callable, optional
         Diagnostic printed when the bring-up fails.
     extraMeta : dict, optional
@@ -228,6 +234,10 @@ def runJesdRxEyeScan(args, jesdPlan, root, appTop, *, version=None, measureLineR
         except Exception as e:  # noqa: BLE001
             return False, [f'bring-up raised {type(e).__name__}: {e}']
 
+    # With --resetPolicy Never and no --softCold the runner only sets the enables
+    # and never calls the RX reset hook, so the link is never dropped and must
+    # not be brought up (AppTop.Init() pulses the same shared reset)
+    resets = args.resetPolicy != 'Never' or args.softCold
     code = 0
     scanned = False          # a scan pulsed the shared GT reset, so the TX side needs its bring-up
     try:
@@ -241,10 +251,14 @@ def runJesdRxEyeScan(args, jesdPlan, root, appTop, *, version=None, measureLineR
         if args.bringUp and args.mode != 'Status':
             ok, reasons = checkLink()
             if not ok:
-                print('JESD link is not healthy, running the bring-up first:')
+                if resets:
+                    print('JESD link is not healthy, running the bring-up first:')
+                else:
+                    print('JESD link is not healthy (--resetPolicy Never: no bring-up, nothing is reset):')
                 for reason in reasons:
                     print(f'  {reason}')
-                ok, reasons = tryBringUp()
+                if resets:
+                    ok, reasons = tryBringUp()
             if not ok:
                 if dumpLink is not None:
                     dumpLink()
@@ -301,16 +315,17 @@ def runJesdRxEyeScan(args, jesdPlan, root, appTop, *, version=None, measureLineR
         meta = {
             'laneStride' : stride,
             'bays'       : {str(bay): dict(rates.get(bay, {}), jesdRxEnable=enables[bay]) for bay in bays},
-            'resetScope' : 'JesdRx.ResetGTs resets every GT of the bay (RX and TX)',
+            'resetScope' : ('JesdRx.ResetGTs resets every GT of the bay (RX and TX)' if resets
+                            else 'none: --resetPolicy Never, JesdRx.ResetGTs never pulsed'),
         }
         if extraMeta:
             meta.update(extraMeta)
         try:
             code = es.runEyeScan(args, runPlan, targets, version=version, extraMeta=meta)
-            scanned = args.mode != 'Status'
+            scanned = resets and args.mode != 'Status'
         except KeyboardInterrupt:
             print('Interrupted')
-            scanned = args.mode != 'Status'
+            scanned = resets and args.mode != 'Status'
             code = 2
         except ValueError as e:
             # The runner refused a lane before any write (and removed the empty run folder)
